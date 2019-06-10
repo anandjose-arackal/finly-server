@@ -22,7 +22,7 @@ class AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter < Account
     return true
   end
 
-  def balance
+  def balance(options = {})
     handle = self.object_id
     IciciBankBalanceProvider.perform_async(handle, self.company.id)
     timeout = 30

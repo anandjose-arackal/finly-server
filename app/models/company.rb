@@ -48,6 +48,7 @@ class Company < ApplicationRecord
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one :icici_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -454,6 +455,7 @@ class Company < ApplicationRecord
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save

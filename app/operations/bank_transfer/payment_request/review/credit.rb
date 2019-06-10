@@ -155,7 +155,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       end
     end
 
-
     add_message :success, "Payment Order credit initiated!"
   end
 
@@ -164,7 +163,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   def retrieve_initiating_account
     case params[:initiating_account_type]
       when 1, '1'
-        return user.company.yes_bank_company_account
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return user.company.yes_bank_company_account
+          when "ICICI"
+            return user.company.icici_bank_company_account
+          else
+            return user.company.yes_bank_company_account
+        end
       when 2, '2'
         return user.bank_wallet
       else
@@ -175,7 +181,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
       when 1, '1'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+          when "ICICI"
+            return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          else
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else

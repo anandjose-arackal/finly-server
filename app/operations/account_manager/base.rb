@@ -16,6 +16,8 @@ class AccountManager::Base < BackgroundOperation
         return AccountManager::Wallet::WalletAdapter.new(account, payment)
       when 'YesBankCompanyAccount'
         return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account, payment)
+      when 'IciciBankCompanyAccount'
+        return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(account, payment)
       when 'CashOnHand'
         return AccountManager::CashOnHand::CashOnHandAdapter.new(account, payment)
       when 'ItzCashCompanyAccount'
