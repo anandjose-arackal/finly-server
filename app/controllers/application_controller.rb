@@ -256,6 +256,7 @@ class ApplicationController < ActionController::Base
           format.json {render 'layouts/application'}
           format.html {}
           format.xls {}
+          format.csv {}
         end
       end
     else

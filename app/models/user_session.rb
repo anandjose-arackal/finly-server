@@ -88,9 +88,9 @@ class UserSession < ApplicationRecord
     # Todo temporary workaround as user device, ip, client verification is only implemented for the web
     return true unless web?
 
-    return false unless user_device&.status_id == UserDeviceStatus.id_for(:verified)
-    return false unless user_ip&.status_id == UserIpStatus.id_for(:verified)
-    return false unless user_agent_client&.status_id == UserAgentClientStatus.id_for(:verified)
+    return false if user.security_policy.browser_client.otp_verify? and not user_device&.status_id == UserDeviceStatus.id_for(:verified)
+    return false if user.security_policy.browser_ip.otp_verify? and not user_ip&.status_id == UserIpStatus.id_for(:verified)
+    return false if user.security_policy.browser_user_agent.otp_verify? and not user_agent_client&.status_id == UserAgentClientStatus.id_for(:verified)
 
     true
   end

@@ -97,6 +97,7 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
       return
     end
 
+    self.bank_payment_request.update(rejection_note: "")
     self.workflow_output = op.workflow_output
 
     # todo create bank_payment_request_trail
