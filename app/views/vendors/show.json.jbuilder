@@ -42,7 +42,7 @@ json.bank_accounts do
     json.id bank_account.id
     json.card_id bank_account.id
     json.name bank_account.name
-    json.default bank_account.default_account
+    json.default_account bank_account.default_account
   end
 end
 
