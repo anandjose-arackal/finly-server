@@ -182,14 +182,14 @@ class Budget < ApplicationRecord
     where.not(id: id)
   }
 
-  scope :filter_criteria, -> (criteria) {
-    case criteria
-    when 'budget', :budget, '1'
+  # scope :filter_criteria, -> (criteria) {
+  #   case criteria
+  #   when 'budget', :budget, '1'
 
-    when 'timeline', :timeline, '2'
+  #   when 'timeline', :timeline, '2'
 
-    end
-  }
+  #   end
+  # }
 
   scope :include_details, -> {
     includes([

@@ -41,7 +41,6 @@ class Budgets::SubBudgets < Budgets::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_search
-    has_scope :filter_criteria
 
     def init
       self.budget = params[:budget]
