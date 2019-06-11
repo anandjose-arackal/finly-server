@@ -262,7 +262,7 @@ class Budget < ApplicationRecord
     }
   end
 
-  def timeline_criteria_json(options={})
+  def timeline_criteria_as_json(options={})
     {
       id: id,
       name: name,
