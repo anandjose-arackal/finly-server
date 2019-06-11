@@ -242,6 +242,8 @@ class Budget < ApplicationRecord
   end
 
   def budget_criteria_as_json(options={})
+    level = (options[:level] + 1) rescue 1
+    return if level > 4
     {
       id: id,
       name: name,
@@ -257,12 +259,15 @@ class Budget < ApplicationRecord
         email: user.email
 
       },
-      sub_budgets: budget_children&.as_json,
+      # sub_budgets: budget_children.map(&:budget_criteria_as_json),
+      sub_budgets: self.budget_criteria_as_json({level:level}),
       sub_budgets_count: budget_children.size
     }
   end
 
   def timeline_criteria_as_json(options={})
+    level = (options[:level] + 1) rescue 1
+    return if level > 4
     {
       id: id,
       name: name,
@@ -270,7 +275,8 @@ class Budget < ApplicationRecord
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       spent_amount: processor_instance.spent_amount,
-      sub_budgets: budget_children&.as_json,
+      # sub_budgets: budget_children.map(&:timeline_criteria_as_json),
+      sub_budgets: self.timeline_criteria_as_json({level:level}),
       sub_budgets_count: budget_children.size
     }
   end
