@@ -145,7 +145,7 @@ class PurchaseRequest < ApplicationRecord
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
-      total_cost: calculate_total_amount,
+      total_cost: self&.total_amount&.value,
       controlling_user: self.get_reviewers&.first&.name
     }
   end
