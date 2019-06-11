@@ -852,9 +852,9 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if self.balance_amount.present?
-      self.balance_amount.value = total_amount
+      self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
