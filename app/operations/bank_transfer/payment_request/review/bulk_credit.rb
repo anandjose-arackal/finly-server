@@ -63,6 +63,18 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       # todo = should trigger a mailer or notification preferably
       return
     end
+
+    #checking if the OTP for all the payment tickets are the same as the one passed in the request
+    otp = self.payment_requests.pluck(:otp).uniq
+    unless otp.size == 1
+      add_message :error, "Invalid OTP, try again"
+      return
+    end
+
+    unless otp.first == self.otp
+      add_message :error, "Wrong OTP entered. Please enter the riht OTP and try again"
+      return
+    end
   end
 
   def pre_process

@@ -1,7 +1,7 @@
 # A non persistent model that holds information about a particular bank transfer
 # contains shit like account number, ifsc, beneficiary name etc.
 
-class TransferRequest < NonPersistentModel
+class YesBankTransferRequest < NonPersistentModel
 
   attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
                 :transfer_currency_code, :transfer_amount, :unique_reference_number,
@@ -39,7 +39,7 @@ class TransferRequest < NonPersistentModel
     ref = nil
     loop do
       ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      if BankTransaction.find_by(unique_request_number: ref).blank?
+      if YesBankTransaction.find_by(unique_request_number: ref).blank?
         self.unique_reference_number = ref
         break
       end

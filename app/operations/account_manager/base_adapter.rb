@@ -1,7 +1,7 @@
 class AccountManager::BaseAdapter
   attr_accessor :errors, :account
 
-  def initialize(account=nil)
+  def initialize(account=nil, payment = nil)
     # source is the source from where the credit / debit is supposed to happen
     # params is general, can be anything
     self.errors = []

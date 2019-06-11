@@ -5,7 +5,7 @@
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
   attr_accessor :initiating_account, :initiating_account_adapter, :view_role,
-                :crediting_payments, :bank_transfer_type
+                :crediting_payments, :bank_transfer_type, :otp
 
   def personalizer
     {
@@ -38,11 +38,20 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     end
     self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
+
   end
 
   def validate
     if self.bank_payment_request.blank?
       add_message :error, "Payment order not found"
+      return
+    end
+
+    # checking for the right OTP for this particular bank payment request
+    #todo - have to move this to the Payment Processor Rules branch
+    self.otp = params[:otp]
+    unless self.otp == self.bank_payment_request.otp
+      add_message :error, "Invalid OTP. Please enter the right OTP and try again"
       return
     end
 
@@ -146,7 +155,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       end
     end
 
-
     add_message :success, "Payment Order credit initiated!"
   end
 
@@ -155,7 +163,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   def retrieve_initiating_account
     case params[:initiating_account_type]
       when 1, '1'
-        return user.company.yes_bank_company_account
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return user.company.yes_bank_company_account
+          when "ICICI"
+            return user.company.icici_bank_company_account
+          else
+            return user.company.yes_bank_company_account
+        end
       when 2, '2'
         return user.bank_wallet
       else
@@ -166,7 +181,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
       when 1, '1'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+          when "ICICI"
+            return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          else
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else

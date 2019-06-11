@@ -223,11 +223,15 @@ group :development, :test do
   # gem 'binding_of_caller'
 
   gem 'rspec-rails', '~> 3.8'
+  gem 'spring-commands-rspec', '~> 1.0.4'
   gem 'capybara'
-  gem 'factory_bot_rails'
+
+end
+
+group :test do
+  gem 'factory_bot_rails', require: false
   gem 'factory_bot'
   gem 'database_cleaner'
-
 end
 
 group :development do

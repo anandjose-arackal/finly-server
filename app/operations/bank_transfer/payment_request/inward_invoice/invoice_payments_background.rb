@@ -40,6 +40,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     self.payments_attributes.each do |payment|
+      initiating_account = retrieve_initiating_account
       bank_account = retrieve_bank_account(payment)
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
@@ -125,6 +126,18 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+      when "YES"
+        initiating_account = user.company.yes_bank_company_account
+      when "ICICI"
+        initiating_account = user.company.icici_bank_company_account
+      else
+        initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
   end
 
   def retrieve_bank_account(order_details)
