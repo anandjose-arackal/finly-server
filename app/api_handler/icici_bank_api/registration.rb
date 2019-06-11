@@ -45,9 +45,9 @@ class IciciBankApi::Registration < IciciBankApi::Base
   def post_process
     case self.response.status
       when 404
-
+        self.parsed_response = {}
       when 500
-
+        self.parsed_response = {}
       when 200
         self.parsed_response = JSON.parse(self.decrypted_response)
     end
@@ -60,6 +60,11 @@ class IciciBankApi::Registration < IciciBankApi::Base
   def failure?
     if self.parsed_response["Response"]&.upcase == "FAILURE"
       add_message :error, "Registration was not successful"
+      return true
+    end
+    if self.parsed_response.blank?
+      add_message :error, "Registration was not successful"
+      return true
     end
   end
 
