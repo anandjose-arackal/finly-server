@@ -151,8 +151,6 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def calculate_total_amount
-    # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
-    # Amount.where(id: amount_ids)&.pluck(:value).sum
     self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
@@ -300,7 +298,7 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def update_total_amount
-    updated_amount = self.purchase_request_items.joins(:estimated_amount).pluck('amounts.value').compact.sum rescue nil
+    updated_amount = calculate_total_amount
     if updated_amount.present?
       if self.total_amount.present?
         self.total_amount.update_attributes(value: updated_amount)
