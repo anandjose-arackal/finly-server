@@ -119,7 +119,9 @@ class PurchaseRequestItem < ApplicationRecord
     if quantity.present? && per_unit_price.present?
       amount = Amount.create(currency_id: 1, value: quantity*per_unit_price)
       self.estimated_amount_id = amount.id
-      self.save
+      if self.save
+        self.purchase_request.update_total_amount
+      end
     end
   end
 
@@ -138,5 +140,7 @@ class PurchaseRequestItem < ApplicationRecord
       end
     end
   end
+
+
 
 end
