@@ -16,6 +16,8 @@ class AccountManager::Base < BackgroundOperation
         return AccountManager::Wallet::WalletAdapter.new(account)
       when 'YesBankCompanyAccount'
         return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
+      when 'KotakBankCompanyAccount'
+        return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(account)
       when 'CashOnHand'
         return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
       when 'ItzCashCompanyAccount'
