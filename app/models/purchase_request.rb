@@ -37,7 +37,7 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
   belongs_to :cost_center, optional: true
-
+  belongs_to :total_amount, optional: true, class_name: "Amount", dependent: :destroy
   has_many :attachments, as: :resource, dependent: :destroy
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
@@ -297,6 +297,19 @@ class PurchaseRequest < ApplicationRecord
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
+  end
+
+  def update_total_amount
+    updated_amount = self.purchase_request_items.joins(:estimated_amount).pluck('amounts.value').compact.sum rescue nil
+    if updated_amount.present?
+      if self.total_amount.present?
+        self.total_amount.update_attributes(value: updated_amount)
+      else
+        if self.create_total_amount(currency_id: 1, value: updated_amount)
+          self.save
+        end
+      end
+    end
   end
 
   private
