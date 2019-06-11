@@ -1,7 +1,7 @@
 class Budgets::SubBudgets < Budgets::Base
 
   def pre_validate
-    if params[:id].blank? || params[:budget_id].blank?
+    if params[:id].blank?
       add_message :error, "Budget details not sent."
       return
     end
