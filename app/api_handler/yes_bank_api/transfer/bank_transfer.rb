@@ -83,7 +83,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
           # potential failure cases
           when "ns:E504", "ns:502", "ns:E500"
             self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
-            Event::EAlert::Create.(nil, title: 'E:504 - Timeout error',description: "Errors: Timout error - check sideki logs. <br><br> #{payment.as_json}", subject: 'Finly Vendor Payments - E:504')
+            Event::EAlert::Create.(nil, title: 'E:504 - Timeout error', description: "Errors: Timout error - check sidekiq logs. <br><br> #{payment.as_json}", subject: 'Finly Vendor Payments - E:504')
           # definite failure case
           when "ns:E406", "ns:E6001", "ns:E6002", "ns:E6003", "ns:E8000", "ns:E1001", "ns:E1002", "ns:E1003", "ns:E1004", "ns:E1028", "flex:E18", "flex:E307",
             "flex:E404", "flex:E449", "flex:E8036", "flex:E8087", "flex:E9072", "npci:E08", "npci:EM1", "npci:EM2", "npci:EM3", "npci:EM4", "npci:EM5", "npci:E307",
@@ -94,6 +94,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
             self.transfer_status_id = BankTransferStatus.id_for(:failed)
           else
             self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        end
+        # in this case it is a legitimate internal server error at their end, so parse that message into bank_error_message
+        if self.error_code.blank?
+          self.transfer_request.bank_error_message = "#{parsed_response&.dig("errorResponse")&.dig("errorResponse")} + #{parsed_response&.dig("errorResponse")&.dig("moreInformation")}"
         end
       when 200
         self.parsed_response = Hash.from_xml(response.body)

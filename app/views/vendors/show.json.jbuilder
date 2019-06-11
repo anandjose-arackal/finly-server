@@ -42,13 +42,14 @@ json.bank_accounts do
     json.id bank_account.id
     json.card_id bank_account.id
     json.name bank_account.name
-    json.default bank_account.default_account
+    json.default_account bank_account.default_account
   end
 end
 
 json.gstin_locations do 
   json.array!(@result.vendor.gstin_locations) do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
+    json.card_id gstin_location.id
     if gstin_location.gstin_master.present?
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
