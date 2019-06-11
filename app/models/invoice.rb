@@ -178,7 +178,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :proforma_advance
 
   delegate :tax_amount_value, to: :tax_amount
-  delegate :tds_amount_value, to: :tax_amount
+  delegate :tds_amount_value, to: :tds_amount
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
