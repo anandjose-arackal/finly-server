@@ -646,7 +646,7 @@ class PurchaseOrder < ApplicationRecord
     {
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
-        advance_amount: precision_value(self.advance_amount&.value),
+        # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: precision_value(self.advance_amount&.value),
         balance_due: precision_value(self.balance_amount&.value),
         procurement_id: self.procurement_id,
@@ -660,7 +660,7 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: false
+        editable: true
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -859,8 +859,6 @@ class PurchaseOrder < ApplicationRecord
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
-
-      # if self.advance_tds_slab.present?
 
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
       unless skip_adv_calculation
