@@ -2,6 +2,7 @@ class ExportManager::Master::BaseSubscriber
   include EventBus::Subscriber
   include Supporters::ErrorTracker
   include DynamicProperty
+  include MathUtil
 
   attr_accessor :user, :params, :input, :messages
 
