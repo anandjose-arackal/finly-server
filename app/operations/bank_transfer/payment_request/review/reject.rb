@@ -58,7 +58,7 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
       add_message :error, op.messages[:error]
       return
     end
-
+    self.bank_payment_request.update(rejection_note: self.rejection_note)
     self.workflow_output = op.workflow_output
   end
 

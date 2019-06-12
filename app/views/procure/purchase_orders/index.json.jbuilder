@@ -1,8 +1,9 @@
 json.results do
   json.array! @result.paginated_purchase_orders do |po|
-    json.extract! po, :id, :po_number, :department_id, :sub_department_id, :cost_center_id, :procurement_id
+    json.extract! po, :id, :po_number, :department_id, :sub_department_id, :cost_center_id, :procurement_id, :rejection_note
     json.procurement_name po.procurement&.name
 
+    json.controlling_level_name po.controlling_level&.name
     # Vendor
     json.vendor_name po.vendor&.business_name
     json.vendor_id po.vendor&.id
