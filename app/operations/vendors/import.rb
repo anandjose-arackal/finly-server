@@ -100,6 +100,10 @@ class Vendors::Import < Vendors::Base
      gstin_state_id = GstStateCode.where(state_code: gstin[0..1])&.first&.id
     end
 
+    if gstin_state_id.nil?
+     gstin_state_id = GstStateCode.where('name LIKE ?', "%#{location}%")&.first&.id
+    end
+
     gst_registered = (gstin.present? ? true : false)
 
     params =  {"vendor"=>{"name"=> row[import_fields[:name]].to_s,
