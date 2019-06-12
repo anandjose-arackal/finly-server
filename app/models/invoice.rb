@@ -284,10 +284,8 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse('01-01-1990') if from.blank?
-    to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
   }
 
@@ -299,8 +297,8 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
