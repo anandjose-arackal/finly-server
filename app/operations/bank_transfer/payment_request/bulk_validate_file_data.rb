@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item, :ghost_invoice
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -37,6 +37,15 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
+    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    self.payment_order_custom_fields.each do |custom_field_config|
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+          self.headers << "#{custom_field_config.field_name} ID"
+        else
+          self.headers << "#{custom_field_config.field_name}"
+      end
+    end
 
     self.issues = []
 
@@ -353,6 +362,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   def retrieve_header_names
     [
         "Name",
+        "Business Name",
         "Account Number",
         "IFSC",
         "Sub Total",
