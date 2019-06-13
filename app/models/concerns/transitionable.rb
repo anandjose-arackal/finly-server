@@ -500,7 +500,7 @@ module Transitionable
       end
 
       forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
-      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
+      forwarded_document_ids_from_dlrms = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:document_reviewer_mappable_id)
 
       if self.column_names.include? 'company_id'
         document_ids = self.where(id: document_ids_from_dlrms, company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
