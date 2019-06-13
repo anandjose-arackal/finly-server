@@ -46,6 +46,7 @@ class ImportUtil
           val = row[j]
         end
         val = cleanup_email(val)
+        val = cleanup_account_number(key, val)
         map[key] = val
       end
       add_line = false
@@ -91,6 +92,14 @@ class ImportUtil
       clean_text = clean_text.sub(character, '')
     end
     return clean_text
+  end
+
+  def self.cleanup_account_number(key, raw_value)
+    unless key.to_s.include?("account_number")
+      return raw_value
+    end
+    raw_value = raw_value.to_i.to_s
+    return raw_value
   end
 
 end

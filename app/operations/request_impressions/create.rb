@@ -49,7 +49,7 @@ class RequestImpressions::Create < BaseOperation
   protected
 
   def enrich_username(args)
-    args[:username] = (params[:username] || params[:email_mobile] || params[:email])&.to_s&.force_encoding(Encoding::UTF_8)
+    args[:username] = (params[:username] || params[:email_mobile] || params[:email])&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
   end
 
   def enrich_request(args)
