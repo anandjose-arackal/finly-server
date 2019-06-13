@@ -536,6 +536,7 @@ module Transitionable
         # Find all taken control documents from DLRM with controlling level ids
         ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
             with_taken_control.
+            where(viewable: true).
             with_taken_control_by_id(user.id).
             with_document_type(self.name).
             where(action_taken_by_id: nil).
@@ -545,6 +546,7 @@ module Transitionable
       ids += DocumentLevelReviewerMapping.with_level_id(forwarded_controlling_level_ids).
             with_forwarded.
             with_forwarded_to_id(user.id).
+            where(viewable: true).
             with_document_type(self.name).
             where(action_taken_by_id: nil).
             with_document_id(forwarded_document_ids).pluck(:document_reviewer_mappable_id)
@@ -553,6 +555,7 @@ module Transitionable
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
           with_reviewer_id(user.id).
           where(forwarded: false).
+          where(viewable: true).
           where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
