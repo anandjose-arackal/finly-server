@@ -58,7 +58,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       return false
     end
 
-    op = YesBankApi::Transfer::BankTransfer.({
+    op = KotakBankApi::Transfer.({
         transfer_request: transfer_request,
         payment: payment
     })
