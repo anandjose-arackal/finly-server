@@ -6,6 +6,7 @@ json.vendor do
     json.payment_term @result.vendor.payment_term
     json.currency @result.vendor.currency
     json.business_name @result.vendor.business_name
+    json.trade_name @result.vendor.trade_name
     json.address @result.vendor.address
     json.authorized @result.vendor.authorized
     json.description @result.vendor.description
