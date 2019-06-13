@@ -24,12 +24,12 @@ class StringUtils
 
   def self.generic_business_keywords
     [
-        /\bpvt\b/, /\bprivate\b/, /\blimited\b/, /\bltd\b/, /\bmrs\b/, /\bms\b/, /\bmiss\b/,
-        /\bmr\b/,
-        /\btech\b/, /\btechnology\b/, /\bindia\b/, /\bsolution\b/, /\bsolutions\b/,
-        /\bservice\b/, /\bservices\b/, /\bco\b/, /\bconsultant\b/, /\bconsultants\b/,
-        /\benterprises\b/, /\bnetworks\b/, /\bnetwork\b/, /\bbusiness\b/,
-        /\bconsultancy\b/, /\bcorporate\b/, /\bsystems\b/, /\bllp\b/,
+        # /\bpvt\b/, /\bprivate\b/, /\blimited\b/, /\bltd\b/, /\bmrs\b/, /\bms\b/, /\bmiss\b/,
+        # /\bmr\b/,
+        # /\btech\b/, /\btechnology\b/, /\bindia\b/, /\bsolution\b/, /\bsolutions\b/,
+        # /\bservice\b/, /\bservices\b/, /\bco\b/, /\bconsultant\b/, /\bconsultants\b/,
+        # /\benterprises\b/, /\bnetworks\b/, /\bnetwork\b/, /\bbusiness\b/,
+        # /\bconsultancy\b/, /\bcorporate\b/, /\bsystems\b/, /\bllp\b/,
         '.', '\\', '(', ')', '/', '-'
     ]
   end
