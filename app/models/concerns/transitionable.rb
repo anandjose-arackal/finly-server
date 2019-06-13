@@ -492,6 +492,8 @@ module Transitionable
       # Find all level ids where user is a reviewer & is NOT forwarded
       all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)
 
+      document_ids_from_dlrm = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:document_reviewer_mappable_id)
+
       if admin
         taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
       end
@@ -499,7 +501,7 @@ module Transitionable
       forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
 
       if self.column_names.include? 'company_id'
-        document_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
+        document_ids = self.where(id: document_ids_from_dlrm, company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
@@ -512,7 +514,7 @@ module Transitionable
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
+        document_ids = self.where(id: document_ids_from_dlrm).where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
