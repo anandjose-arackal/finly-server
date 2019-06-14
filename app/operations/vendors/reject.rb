@@ -1,5 +1,6 @@
 class Vendors::Reject < Vendors::Base
 
+
   def process
     params[:document] = self.vendor
     params[:aasm_event] = 'reject'
@@ -9,6 +10,8 @@ class Vendors::Reject < Vendors::Base
       add_message :error, op.messages[:error]
       return
     end
+
+    self.vendor.update(reject_note: params[:reject_note])
 
     self.workflow_output = op.workflow_output
   end

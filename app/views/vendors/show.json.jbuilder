@@ -6,6 +6,7 @@ json.vendor do
     json.payment_term @result.vendor.payment_term
     json.currency @result.vendor.currency
     json.business_name @result.vendor.business_name
+    json.trade_name @result.vendor.trade_name
     json.address @result.vendor.address
     json.authorized @result.vendor.authorized
     json.description @result.vendor.description
@@ -17,6 +18,7 @@ json.vendor do
     json.state_code_name @result.vendor.state_code&.full_name
     json.created_by @result.vendor.created_by&.name
     json.vendor_id @result.vendor.vendor_id
+    json.rejection_note @result.vendor&.reject_note
     json.tds_rates do
       json.array! @result.vendor.vendor_tds_rates do |vtr|
         json.id vtr.id

@@ -24,12 +24,12 @@ class Vendors::Base < BaseOperation
 
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
-                                   :business_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
+                                   :business_name, :trade_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
                                    bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :_destroy],
                                    gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :address, :_destroy]
-    ) 
+    )
   end
 
   def validate_custom_fields(reset_fields = false)
@@ -83,7 +83,7 @@ class Vendors::Base < BaseOperation
       gstin = gstin_location[:gstin]
 
       unless gstin.present?
-        add_message :error, "Please Provide GSTIN for Location #{index+1}"
+        add_message :error, "Please Provide GSTIN for Location #{index + 1}"
         next
       end
 
@@ -94,17 +94,17 @@ class Vendors::Base < BaseOperation
         if gstin_master.status == "Active"
 
           unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]
-            add_message :error, "PAN doesn't match with GSTIN for Location #{index+1}"
+            add_message :error, "PAN doesn't match with GSTIN for Location #{index + 1}"
           end
 
-          match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
-          trade_name_match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.trade_name)
+          match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(business_name), StringUtils.clear_generic_keywords(gstin_master.legal_name_of_business))
+          trade_name_match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(business_name), StringUtils.clear_generic_keywords(gstin_master.trade_name))
 
           if match_percentile < 90 && trade_name_match_percentile < 90
-            add_message :error, "Business Name or Trade Name Match Percentile is below 90% for Location #{index+1}"
+            add_message :error, "Business Name or Trade Name Match Percentile is below 90% for Location #{index + 1}"
           end
         else
-          add_message :error, "GSTIN Status is not Active for Location #{index+1}"
+          add_message :error, "GSTIN Status is not Active for Location #{index + 1}"
         end
       end
     end
@@ -118,9 +118,9 @@ class Vendors::Base < BaseOperation
     if vendor_params.present? && vendor_params[:vendor_attachments_attributes].present?
       unless (self.vendor.present? && self.vendor.vendor_attachments.with_type(type).present?) || find_attachment(vendor_params[:vendor_attachments_attributes], type)
         # do nothing
-      # elsif 
-      #   add_message :error, "Please upload #{types[type]}"
-      # else
+        # elsif
+        #   add_message :error, "Please upload #{types[type]}"
+        # else
         add_message :error, "Please upload #{types[type]}"
       end
     elsif self.vendor.present? && self.vendor.vendor_attachments.with_type(type).present?
