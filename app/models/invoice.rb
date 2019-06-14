@@ -661,7 +661,7 @@ class Invoice < ApplicationRecord
   # For user role as invoice reviewer
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self) || user.vendor_payment_admin?
   end
 
   def is_crediting_user?(user = nil)
