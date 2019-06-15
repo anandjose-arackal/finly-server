@@ -29,7 +29,7 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
         type: 'personal_expense',
         data: [
           {
-            title: "Unreported Expenses",
+            title: "Unreported",
             count: apply_scopes(self.expenses, {filter_status: 2})&.count,
             total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
             filters: []
