@@ -36,7 +36,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
           },
 
           {
-            title: "Processing Travel Requests",
+            title: "Processing",
             count: self.trips.filter_status('processing')&.count,
             total_amount: self.trips.filter_status('processing').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
             filters: []
@@ -50,7 +50,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
           },
 
           {
-            title: "Rejected Travel Requests",
+            title: "Rejected",
             count: self.trips.filter_status('rejected')&.count,
             total_amount: self.trips.filter_status('rejected').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
             filters: []

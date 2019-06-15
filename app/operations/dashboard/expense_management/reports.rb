@@ -31,28 +31,28 @@ class Dashboard::ExpenseManagement::Reports < Dashboard::ExpenseManagement::Base
         type: 'personal_report',
         data: [
           {
-            title: "Not Submitted Reports",
+            title: "Unsubmitted",
             count: self.reports.filter_status(1, user.id).count,
             total_amount: self.reports.filter_status(1, user.id).map {|report| report.total_amount}&.compact&.sum,
             filters: []
           },
 
           {
-            title: "Processing Reports",
+            title: "Processing",
             count: self.reports.filter_status(2, user.id).count,
             total_amount: self.reports.filter_status(2, user.id).map {|report| report.total_amount}&.compact&.sum,
             filters: []
           },
 
           {
-            title: "Rejected Reports",
+            title: "Rejected",
             count: self.reports.filter_status(4, user.id).count,
             total_amount: self.reports.filter_status(4, user.id).map {|report| report.total_amount}&.compact&.sum,
             filters: []
           },
 
           {
-            title: "Approved Reports",
+            title: "Approved",
             count: self.reports.filter_status(5, user.id).count,
             total_amount: self.reports.filter_status(5, user.id).map {|report| report.total_amount}&.compact&.sum,
             filters: []
