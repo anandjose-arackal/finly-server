@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_13_114239) do
+ActiveRecord::Schema.define(version: 2019_06_15_115836) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -712,6 +712,7 @@ ActiveRecord::Schema.define(version: 2019_06_13_114239) do
     t.integer "vendor_location_id"
     t.integer "advance_amount_id"
     t.integer "tax_rate_id"
+    t.json "payment_notification_users"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
