@@ -2,27 +2,29 @@
 # to so that the respective fields can be populated inside the dropdowns inside the PR show
 class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::PurchaseRequests::Base
 
-  attr_accessor :purchase_request
+  attr_accessor :purchase_request, :custom_fields_config
 
   class Procurements::PurchaseRequests::PurchaseRequestEditConfig::EditConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers, :department_mappings
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers, :department_mappings, :custom_fields_config
 
     def init
       self.purchase_request = params[:purchase_request]
+      self.custom_fields_config = params[:custom_fields_config]
       # self.locations = user.company.locations
       # Admin should also be initiator for the policy
       # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       # self.departments = user.company.departments
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
-      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
-      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+      initiating_user = self.purchase_request.present? ? purchase_request.creator : user
+      self.departments = Company::Departments::Index.(initiating_user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(initiating_user, params).policy_location_filter_mapping&.leaves
       # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       # self.departments = user.company.departments
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       # params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
-      self.policies = Policy::VendorPayments::Index.(user, params).policies
+      self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
       self.cost_centers = user.company.cost_centers
       self.reviewal_chains = []
       self.department_mappings = []
@@ -66,6 +68,9 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
     id = params[:id] || params[:purchase_request_id]
     self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request rescue nil
     # self.purchase_request = nil
+
+    load_custom_fields_config
+    params[:custom_fields_config] = self.custom_fields_config
   end
 
   def validate
@@ -78,6 +83,14 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
   def success
     params[:purchase_request] = self.purchase_request
     Procurements::PurchaseRequests::PurchaseRequestEditConfig::EditConfigPresenter.new(user, params, messages)
+  end
+
+  private
+
+  def load_custom_fields_config
+    configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
+    self.custom_fields_config = {}
+    self.custom_fields_config[:purchase_request] = configurations.with_parent_type(FieldParentType.id_for(:purchase_request))
   end
 
 end

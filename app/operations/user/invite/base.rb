@@ -41,8 +41,9 @@ class User::Invite::Base < BaseOperation
     # adding a default vendor payments initiator role for all invited users
     params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator), purpose_id: Purpose.id_for(:vendor_payments)}
     #########################################################################
-
-    params[:pending_invite][:team_mapping_attributes][:default] = true
+    unless params[:pending_invite][:team_mapping_attributes].blank?
+      params[:pending_invite][:team_mapping_attributes][:default] = true
+    end
     params[:pending_invite][:team_mapping_attributes] = [params[:pending_invite][:team_mapping_attributes]]
     params.require(:pending_invite).permit(:email, :mobile, :mobile_number, :company_id, :policy_id, team_mapping_attributes: [:default, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id],
                                role_mapping_attributes: [:user_role_id])

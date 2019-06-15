@@ -9,6 +9,8 @@
 # handle all type of validations DONE
 # reuse existing bulkvalidation DONE
 
+# DEPRECATED OPERATION, NOT BEING USED
+
 class BankTransfer::PaymentRequest::UnifiedPaymentTicket < BankTransfer::PaymentRequest::Base
 	attr_accessor :vendor_id, :vendor, :total_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
@@ -54,24 +56,23 @@ class BankTransfer::PaymentRequest::UnifiedPaymentTicket < BankTransfer::Payment
 	end
 
 	def validate
-	    if payments_attributes.blank?
-	      add_message :error, 'Nothing to process'
-	      return
-	    end
+		if payments_attributes.blank?
+			add_message :error, 'Nothing to process'
+			return
+		end
 
-	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
+		self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
 
-	    if validate_operation.success?
-	    	# total of all individual payments
-	    	# to be set in bpr
-	      self.total_amount = validate_operation.requested_amount
-	    else
-	      self.contents = validate_operation.contents
-	      self.headers = validate_operation.headers
-	      self.issues = validate_operation.issues
-	      add_message :error, "Some of the vendor data were found to have issues. Please correct them."
-	    end
-
+		if validate_operation.success?
+			# total of all individual payments
+			# to be set in bpr
+			self.total_amount = validate_operation.requested_amount
+		else
+			self.contents = validate_operation.contents
+			self.headers = validate_operation.headers
+			self.issues = validate_operation.issues
+			add_message :error, "Some of the vendor data were found to have issues. Please correct them."
+		end
 	end
 
 	def process

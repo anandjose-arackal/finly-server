@@ -83,44 +83,44 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
 
   def mailer_subject(user)
     if self.approving_user.present? && user.id == self.approving_user.id
-      "Invoice approved : #{self.invoice.invoice_number}"
+      "Invoice approved : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
       if approved
         if  (user.id == self.invoice.created_by.id)
           if auto_approve
-            return "Congratulations! Your invoice #{invoice.invoice_number} has been auto-approved"
+            return "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been auto-approved"
           else
-            return "Congratulations! Your invoice #{invoice.invoice_number} has been approved"
+            return "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been approved"
           end
         elsif self.invoice.document_role_users(:creditor).include?(user)
-          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} and is waiting your approval"   
+          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
         end
       elsif self.invoice.document_role_users(:creditor).include?(user)
-          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} and is waiting your approval"
+          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
       else
-        "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number}"
+        "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
       end
     end
   end
 
   def mailer_body(user)
     if self.approving_user.present? && user.id == self.approving_user.id
-      message = "You have successfully approved the invoice : #{self.invoice.invoice_number}"
+      message = "You have successfully approved the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
       if approved
         if (user.id == invoice.created_by.id)
           if auto_approve
-            message = "Congratulations! Your invoice #{invoice.invoice_number} has been auto-approved"
+            message = "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been auto-approved"
           else
-            message = "Congratulations! Your invoice #{invoice.invoice_number} has been approved"
+            message = "Congratulations! Your invoice #{invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) has been approved"
           end
         elsif self.invoice.document_role_users(:creditor).include?(user)
-          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} and is waiting your approval"
+          "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
         end
       elsif self.invoice.document_role_users(:creditor).include?(user)
-        "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} and is waiting your approval"
+        "#{approving_user.name} has approved the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) and is waiting your approval"
       else
-        message = "#{approving_user.name} has approved the invoice #{self.invoice.invoice_number}"
+        message = "#{approving_user.name} has approved the invoice #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
       end
     end
     message

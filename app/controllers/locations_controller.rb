@@ -1,6 +1,5 @@
-class LocationsController < ApplicationController
+class LocationsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web, :admin }
 
   def show
     @result = Company::Locations::Show.(current_user, params)
@@ -19,6 +18,16 @@ class LocationsController < ApplicationController
 
   def index
     @result = Company::Locations::Index.(current_user, params)
+    respond
+  end
+
+  def destroy
+    @result = Company::Locations::Destroy.(current_user, params)
+    respond
+  end
+
+  def bulk_destroy
+    @result = Company::Locations::BulkDestroy.(current_user, params)
     respond
   end
 end

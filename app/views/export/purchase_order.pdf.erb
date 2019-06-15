@@ -67,77 +67,181 @@
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
     </div> -->
   </div>
-  <div class="col col-xs-12 no-padding body-container">
-    <div class="col col-xs-4 vendor-details">
-      <h4 class="section-title">Vendor Details</h4>
-      <div class="col col-xs-12 no-padding mg-botm-8">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+
+  <% if @result.purchase_order.gstin_location&.address&.blank? %>
+
+    <div class="col col-xs-12 no-padding body-container">
+      <div class="col col-xs-4 vendor-details">
+        <h4 class="section-title">Vendor Details</h4>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_name %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Email</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor_poc_email.present? ? @result.purchase_order.vendor_poc_email : "--" %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_mobile_number.present? ? @result.purchase_order&.vendor_poc_mobile_number : "--" %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding mg-botm-8">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.mobile_number %></div>
+      <div class="col col-xs-4 billing-address">
+        <h4 class="section-title">Buyer Billing Address</h4>
+        <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+          <%= @result.purchase_order.company.name %>
+        </div>
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+          <% if @result.purchase_order.billing_address.present? %>
+            <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
+          <% else %>
+            <%= @result.purchase_order.location.address %>
+          <% end %>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding mg-botm-8">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+      <div class="col col-xs-4 shipping-address">
+        <h4 class="section-title">Buyer Shipping Address</h4>
+        <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+          <%= @result.purchase_order.company.name %>
+        </div>
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+          <% if @result.purchase_order.shipping_address.present? %>
+              <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
+          <% else %>
+              <%= @result.purchase_order.delivery_location.address %>
+          <% end %>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+    </div><br> <br>
+
+  <% else %>  
+
+    <div class="col col-xs-12 no-padding body-container">
+      <div class="col col-xs-3 vendor-details">
+        <h4 class="section-title">Vendor Details</h4>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+        </div>
+        <!-- <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.vendor.pan %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%#= @result.purchase_order.gstin_location&.gstin %></div>
+        </div> -->
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_name %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Email</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor_poc_email.present? ? @result.purchase_order.vendor_poc_email : "--" %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order&.vendor_poc_mobile_number.present? ? @result.purchase_order&.vendor_poc_mobile_number : "" %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.poc_name} - #{@result.purchase_order&.gstin_location&.poc_mobile_number}" %></div>
+      <div class="col col-xs-3 vendor-address">
+        <h4 class="section-title">Vendor Address</h4>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.business_name %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.gstin_location&.address %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
+      <div class="col col-xs-3 billing-address">
+        <h4 class="section-title">Buyer Billing Address</h4>
+        <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+          <%= @result.purchase_order.company.name %>
+        </div>
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+          <% if @result.purchase_order.billing_address.present? %>
+            <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
+          <% else %>
+            <%= @result.purchase_order.location.address %>
+          <% end %>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
+        </div>
       </div>
-    </div>
-    <div class="col col-xs-4 billing-address">
-      <h4 class="section-title">Billing Address</h4>
-      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.company.name %>
+      <div class="col col-xs-3 shipping-address">
+        <h4 class="section-title">Buyer Shipping Address</h4>
+        <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+          <%= @result.purchase_order.company.name %>
+        </div>
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+          <% if @result.purchase_order.shipping_address.present? %>
+              <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
+          <% else %>
+              <%= @result.purchase_order.delivery_location.address %>
+          <% end %>
+        </div>
+        <div class="col col-xs-12 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
+        </div>
+        <div class="col col-xs-12 no-padding">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
+        </div>
       </div>
-      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
-        <% if @result.purchase_order.billing_address.present? %>
-          <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
-        <% else %>
-          <%= @result.purchase_order.location.address %>
-        <% end %>
-      </div>
-      <div class="col col-xs-12 no-padding mg-botm-8">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
-      </div>
-      <div class="col col-xs-12 no-padding">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
-      </div>
-    </div>
-    <div class="col col-xs-4 shipping-address">
-      <h4 class="section-title">Shipping Address</h4>
-      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.company.name %>
-      </div>
-      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
-        <% if @result.purchase_order.shipping_address.present? %>
-            <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
-        <% else %>
-            <%= @result.purchase_order.delivery_location.address %>
-        <% end %>
-      </div>
-      <div class="col col-xs-12 no-padding mg-botm-8">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
-      </div>
-      <div class="col col-xs-12 no-padding">
-        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
-      </div>
-    </div>
-  </div><br> <br>
+    </div><br> <br>
+
+  <% end %>
   <div class="col col-xs-12 line-items-container mg-top-5" style="padding-top: 25px">
     <div class="col col-xs-12 no-padding">
       <table class="table table-responsive table-document-items">
@@ -149,7 +253,13 @@
           <th class="text-center">Qty</th>
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
-          <th class="text-right">Tax</th>
+          <th class="text-right">Tax
+          <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst)%>
+            (SGST + CGST)
+          <% else %>
+            (IGST)
+          <% end %>
+          </th>
           <th class="text-right">Total</th>
         </tr>
         </thead>
@@ -190,12 +300,30 @@
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
-              <td class="font-light-gray text-left">Tax*</td>
+              <td class="font-light-gray text-left">Tax*
+              <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst) %>
+                  (SGST + CGST)
+              <% else %>
+                  (IGST)
+              <% end %>
+              </td>
             <% else %>
-              <td class="font-light-gray text-left">Tax</td>
+              <td class="font-light-gray text-left">Tax
+              <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst) %>
+                  (SGST + CGST)
+              <% else %>
+                  (IGST)
+              <% end %>
+              </td>
             <% end %>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
+          <% if @result.purchase_order.advance_amount_required %>
+            <tr>
+              <td class="font-light-gray text-left">Advance Amount</td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.advance_amount&.value&.to_d.round(2) rescue 0 %></td>
+            </tr>
+          <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.balance_amount&.value&.to_d.round(2) rescue 0 %></td>

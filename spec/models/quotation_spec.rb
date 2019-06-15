@@ -2,7 +2,7 @@
 #
 # Table name: quotations
 #
-#  id                      :bigint(8)        not null, primary key
+#  id                      :bigint           not null, primary key
 #  vendor_name             :string(255)
 #  vendor_location         :string(255)
 #  estimated_delivery_time :string(255)

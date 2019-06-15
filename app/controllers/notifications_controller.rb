@@ -1,7 +1,6 @@
-class NotificationsController < ApplicationController
+class NotificationsController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def index
     @result = Notification::Index.(current_user, params)

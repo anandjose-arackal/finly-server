@@ -36,17 +36,17 @@ class Event::EInvoice::Retract < Event::EInvoice::Base
 
   def mailer_subject(user)
     if user.id == invoice.created_by.id
-      "Invoice retracted : #{self.invoice.invoice_number}"
+      "Invoice retracted : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{invoice.created_by.name} has retracted the invoice: #{self.invoice.invoice_number}"
+      "#{invoice.created_by.name} has retracted the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 
   def mailer_body(user)
     if user.id == invoice.created_by.id
-      "You have successfully retracted the invoice : #{self.invoice.invoice_number}"
+      "You have successfully retracted the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{invoice.created_by.name} has retracted the invoice '#{self.invoice.invoice_number}'."
+      "#{invoice.created_by.name} has retracted the invoice '#{self.invoice.invoice_number}' (Invoice ID: #{self.invoice.invoice_id})."
     end
   end
 

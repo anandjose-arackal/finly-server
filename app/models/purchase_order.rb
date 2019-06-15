@@ -42,18 +42,40 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  cost_center_id               :integer
 #  sub_department_id            :integer
-#  billing_address              :text(65535)
-#  shipping_address             :text(65535)
+#  billing_address              :text(16777215)
+#  shipping_address             :text(16777215)
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  advance_amount_id            :integer
+#  due_date                     :date
+#  advance_amount_status_id     :integer
+#  bank_account_id              :integer
+#  revised_po_id                :integer
+#  revision_of_id               :integer
+#  revision_number              :integer          default(0)
+#  note                         :text(65535)
+#  advance_tds_slab_id          :integer
+#  advance_tds_amount_id        :integer
+#  advance_amount_required      :boolean          default(FALSE)
+#  requested_advance_amount_id  :integer
+#  gstin_location_id            :bigint
+#  cost_allocation_items        :boolean          default(FALSE)
+#  internal_note                :text(65535)
+#  vendor_address               :text(65535)
+#  discount_type_id             :integer
+#  taxable_amount_id            :integer
 #
 
 class PurchaseOrder < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
@@ -113,7 +135,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :bank_account, optional: true
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
@@ -158,7 +180,7 @@ class PurchaseOrder < ApplicationRecord
       where user_id: user_ids
     end
   }
-  
+
   scope :with_budgetable_vendor_ids, -> (vendor_ids) {
     if vendor_ids.present?
       where vendor_id: vendor_ids
@@ -173,6 +195,7 @@ class PurchaseOrder < ApplicationRecord
         PurchaseOrderStatus.id_for(:approved),
         PurchaseOrderStatus.id_for(:auto_approved),
         PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:vendor_confirmed),
         PurchaseOrderStatus.id_for(:closed)
     ]
     where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
@@ -187,6 +210,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
+  scope :filter_cost_center_id, -> (cost_center_id) {where(cost_center_id: cost_center_id)}
 
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
@@ -240,10 +264,71 @@ class PurchaseOrder < ApplicationRecord
     where("DATE(created_at) = ?", created_at)
   }
 
-  scope :filter_status, -> (status_name) {
+  scope :filter_po_advance_status, -> (status_name) {
     all_statuses = AdvanceAmountStatus.all.pluck(:name)
     if status_name.present? && all_statuses.include?(status_name)
       where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
+    end
+  }
+
+  scope :filter_status, -> (status_name){
+    case status_name
+    when 'draft', :draft
+      filter_status_id PurchaseOrder.status_ids(:open, :rejected, :retracted)
+    when 'processing', :processing
+      filter_status_id PurchaseOrderStatus.id_for(:processing)
+    when 'approved', :approved
+      filter_status_id PurchaseOrder.status_ids(:approved, :auto_approved)
+    when 'sent_to_vendor', :sent_to_vendor
+      filter_status_id PurchaseOrderStatus.id_for(:sent_to_vendor)
+    when 'vendor_confirmed', :vendor_confirmed
+      filter_status_id PurchaseOrderStatus.id_for(:vendor_confirmed)
+    when 'closed', :closed
+      filter_status_id PurchaseOrderStatus.id_for(:closed)
+    when 'revised', :revised
+      filter_status_id PurchaseOrderStatus.id_for(:po_revised)
+    when 'voided', :voided
+      filter_status_id PurchaseOrderStatus.id_for(:voided)
+    when 'awaiting_approval', :awaiting_approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      # all
+    end
+  }
+
+  scope :filter_procurement_name, -> (name) {
+    joins(:procurement).where("procurements.name LIKE ?", "%#{name}%")
+  }
+
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
+  }
+
+  scope :filter_submission_date_from, -> (submission_date) {
+    date = Date.parse(submission_date) rescue nil
+    if date
+      where("submitted_at <= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_submission_date_to, -> (submission_date) {
+    date = Date.parse(submission_date) rescue nil
+    if date
+      where("submitted_at <= ?", date.end_of_day)
     end
   }
 
@@ -308,11 +393,82 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+  scope :exclude_revision_of_po, -> { where(revision_of_id: nil) }
+
+  scope :includes_for_index, -> {
+    includes(:user, :balance_amount, :vendor, :status, procurement: [:status_tags])
+  }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+  def status_tag_details
+    tag_ids = self.procurement.status_tags.pluck(:id)
+
+    data = {
+        grn: {},
+        invoice: {},
+        payment: {}
+    }
+
+    if tag_ids.include?(StatusTag.id_for(:payment_processed))
+      data[:payment][:status] = 'completed'
+      data[:payment][:status_text] = 'Payment Processed'
+      data[:procurement_status_text] = "Procurement Complete"
+    elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
+      data[:payment][:status] = 'processing'
+      data[:payment][:status_text] = 'Payment Processing'
+      data[:procurement_status_text] = 'Payment Processing'
+    else
+      data[:payment][:status] = 'init'
+      data[:payment][:status_text] = 'Payment Pending'
+      data[:procurement_status_text] = 'Payment Pending'
+    end
+
+    if tag_ids.include?(StatusTag.id_for(:shipment_received))
+      data[:grn][:status] = 'copmleted'
+      data[:grn][:status_text] = 'Shipment Received'
+      data[:procurement_status_text] = 'Shipment Received'
+    elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
+      data[:grn][:status] = 'processing'
+      data[:grn][:status_text] = 'Receiving Shipment'
+      data[:procurement_status_text] = 'Receiving Shipment'
+    else
+      data[:grn][:status] = 'init'
+      data[:grn][:status_text] = 'Awaiting Shipment'
+      data[:procurement_status_text] = 'Awaiting Shipment'
+    end
+
+    if tag_ids.include? StatusTag.id_for(:invoice_approved)
+      data[:invoice][:status] = 'completed'
+      data[:invoice][:status_text] = 'Invoice Approved'
+      data[:procurement_status_text] = 'Awaiting Shipment'
+    elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
+      data[:invoice][:status] = 'processing'
+      data[:invoice][:status_text] = 'Invoice Processing'
+      data[:procurement_status_text] = 'Invoice Processing'
+    else
+      data[:invoice][:status] = 'init'
+      if self.procurement.invoices.present?
+        data[:invoice][:status_text] = 'Invoice Processing'
+        data[:procurement_status_text] = 'Invoice Processing'
+      else
+        data[:procurement_status_text] = 'Awaiting Invoice'
+        data[:invoice][:status_text] = 'Awaiting Invoice'
+      end
+    end
+
+    if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(self.purchase_order_status_id)
+      data[:procurement_status_text] = "Awaiting PO Submission"
+    elsif PurchaseOrder.status_ids(:processing).include?(self.purchase_order_status_id)
+      data[:procurement_status_text] = "PO Processing"
+    else
+      # nothing
+    end
+    data
+  end
 
 
   template_config do
@@ -343,6 +499,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   template_merge :procurement_id, :user_id, :vendor_id
+
+  def awaiting_action(user)
+    return false if user.blank?
+    self.get_reviewers.include? user
+  end
 
   def all_items_shipped?
     shipped = true
@@ -485,7 +646,7 @@ class PurchaseOrder < ApplicationRecord
     {
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
-        advance_amount: precision_value(self.advance_amount&.value),
+        # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: precision_value(self.advance_amount&.value),
         balance_due: precision_value(self.balance_amount&.value),
         procurement_id: self.procurement_id,
@@ -499,7 +660,7 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: false
+        editable: true
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -553,6 +714,16 @@ class PurchaseOrder < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def generate_sequential_id?
+    purchase_order_status_id != PurchaseOrderStatus.id_for(:open)
+  end
+
 
   private
 
@@ -580,12 +751,24 @@ class PurchaseOrder < ApplicationRecord
       if item.is_a?(PurchaseOrderItem)
         item_quantity = (item.quantity || 0).to_f
         item_rate = (item.rate || 0).to_f
-        item_tax = (item.tax || 0).to_f
-        item_discount = (item.discount || 0).to_f
+        item_amount = (item_quantity * item_rate)
+        item_tax = (item.tax_rate&.rate || 0).to_f
+
+        case self.discount_type_id
+          # i.e. discount is given as a rate
+          when 1
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+          when 2
+            item_discount_amount = item.discount
+          else
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+        end
 
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
-        item_discount_amount = item_amount * item_discount / 100
+        # item_discount_amount = item_amount * item_discount / 100
         item_taxable_amount = item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
@@ -602,6 +785,23 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount.value = item_tax_amount
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+        end
+
+        # also set the CGST, SGST, and IGST amounts in the PO Line item
+        case self.gst_type_id
+          # i.e. it's a CGST + SGST case
+          when GstType.id_for(:cgst_sgst)
+            item.cgst = item_tax_amount / 2
+            item.sgst = item_tax_amount / 2
+            item.igst = 0
+          when GstType.id_for(:igst)
+            item.igst = item_tax_amount
+            item.cgst = 0
+            item.sgst = 0
+          else
+            item.igst = 0
+            item.cgst = 0
+            item.sgst = 0
         end
 
         if item.discount_amount.present?
@@ -652,15 +852,13 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if self.balance_amount.present?
-      self.balance_amount.value = total_amount
+      self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
-
-      # if self.advance_tds_slab.present?
 
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
       unless skip_adv_calculation
@@ -725,11 +923,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided)
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles
@@ -758,11 +956,11 @@ class PurchaseOrder < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed]
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed]
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
-          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         end
       end
     end
@@ -813,7 +1011,13 @@ class PurchaseOrder < ApplicationRecord
 
       # Update Purchase request item statuses
        # TODO- create status change trail 
-      PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+      # PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+      PurchaseRequestItem.with_ids(item_ids).each do |purchase_request_item|
+        purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:po_created)
+        if purchase_request_item.save
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_created))
+        end
+      end
 
       document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them
@@ -831,4 +1035,5 @@ class PurchaseOrder < ApplicationRecord
       end
     end
   end
+
 end

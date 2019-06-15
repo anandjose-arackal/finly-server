@@ -53,6 +53,7 @@ class Company < ApplicationRecord
   has_many :web_hook_tracks
   has_many :invoice_attachments
   has_many :export_configs
+  has_many :unique_identifiers
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -113,7 +114,7 @@ class Company < ApplicationRecord
 
   validates :name, presence: true
 
-  scope :with_id, -> (id) { where id: id }
+  scope :with_id, -> (id) {where id: id}
   scope :filter_ocr, -> (flag) {
     if flag == '1'
       joins(:feature_subscription).select('companies.*').where('ocr_enabled IS true')
@@ -129,9 +130,9 @@ class Company < ApplicationRecord
       joins(:itz_cash_property).select('companies.*').where("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
     end
   }
-  scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
+  scope :ocr_enabled, -> {joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true')}
 
-  scope :filter_status_id, -> (status_id) { where status_id: status_id }
+  scope :filter_status_id, -> (status_id) {where status_id: status_id}
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
@@ -179,6 +180,8 @@ class Company < ApplicationRecord
   scope :auto_sync_reports_enabled, -> {
     joins(:auto_sync_configs).select('companies.*').where(reports_sync: true)
   }
+
+  scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
   def vendor_payment_policies
     ids = self.policies.with_application("vp").pluck(:id)
@@ -466,7 +469,7 @@ class Company < ApplicationRecord
 
     # creating budget configurations
     self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,
-                                               enforce_expense_budget: false, enforce_invoice_budget: false).save
+                                            enforce_expense_budget: false, enforce_invoice_budget: false).save
 
     # creating custom export configurations for a company
     self.build_custom_export_configuration(custom_report: false, custom_invoice: false, custom_purchase_order: false).save

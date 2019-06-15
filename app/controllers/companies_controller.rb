@@ -1,6 +1,5 @@
-class CompaniesController < ApplicationController
+class CompaniesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def notify
     # todo

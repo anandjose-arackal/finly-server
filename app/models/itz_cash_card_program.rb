@@ -42,7 +42,8 @@ class ItzCashCardProgram < ApplicationRecord
       {
           name: "HDFC (PIN at POS)",
           bank: "HDFC",
-          product_code: "HDFFPD"
+          product_code: "HDFVFN",
+          charge_code: "HDFFPD"
       },
       {
           name: "Jotun Reward Card",

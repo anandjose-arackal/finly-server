@@ -2,7 +2,7 @@
 #
 # Table name: beneficiary_payments
 #
-#  id                 :bigint(8)        not null, primary key
+#  id                 :bigint           not null, primary key
 #  name               :string(255)
 #  vendor_id          :integer
 #  bank_account_id    :integer
@@ -24,11 +24,12 @@
 #  balance_due_id     :integer
 #  net_amount_id      :integer
 #  gross_amount_id    :integer
-#  roundoff_amount    :decimal(10, )
+#  roundoff_amount    :decimal(20, 10)
 #  cost_center_id     :integer
 #  invoice_number     :text(65535)
 #  invoice_date       :date
 #  invoice_due_date   :date
+#  advance_amount_id  :integer
 #
 
     #                 :id => :integer,
@@ -86,12 +87,14 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :tds_amount, optional: true, class_name: "Amount"
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :gross_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
 
   has_many :payments, as: :parent
 
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :payable_amount
+  accepts_nested_attributes_for :advance_amount
 
   # after_commit :calculate_tax_and_amount
 
@@ -134,7 +137,8 @@ class BeneficiaryPayment < ApplicationRecord
       # tds_rate: self.tds,
       paid_amount: self.payments.successful.joins(:amount).sum(:value),
       remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
-      original_amount: precision_value(self.original_amount&.value)
+      original_amount: precision_value(self.original_amount&.value),
+      advance_amount: precision_value(self.advance_amount&.value)
   	}
   end
 
@@ -161,7 +165,7 @@ class BeneficiaryPayment < ApplicationRecord
       tds_amount = gross_amount - new_gross_amount
 
       # net_amount = gross_amount - tds_amount
-      net_amount = self.original_amount.value - tds_amount
+      net_amount = self.original_amount.value - tds_amount - self.advance_amount&.value.to_f
     else # calculate proactively
       
       # calculate_exclusive_taxes
@@ -172,15 +176,15 @@ class BeneficiaryPayment < ApplicationRecord
       new_gross_amount = TaxCalculationUtils.tds_amount(original_amount, tds)
       tds_amount = original_amount - new_gross_amount
 
-      net_amount = original_amount + tax_amount - tds_amount
+      net_amount = original_amount + tax_amount - tds_amount - self.advance_amount&.value.to_f
     end
 
 
     self.roundoff_amount = self.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      balance_due_amount = precision_value (net_amount + self.roundoff_amount), 0
+      balance_due_amount = precision_value (net_amount + self.roundoff_amount)
     else
-      balance_due_amount = precision_value net_amount, 0
+      balance_due_amount = precision_value net_amount
     end
 
     # assign the respective calculated amounts to the payment and invoice object

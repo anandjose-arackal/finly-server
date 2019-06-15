@@ -1,7 +1,6 @@
-class BankTransfer::BankPaymentRequestsController < ApplicationController
+class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
-  before_action {finly_authorize! :web}
+  set_tokens_in_header :download_pending_attachment, :download_selected_attachment, :download_all_attachment
 
   def show
     @result = BankTransfer::PaymentRequest::Show.(current_user, params)
@@ -14,6 +13,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def new_pr
+    # DEPRECATED, NOT BEING USED
     logger.fatal "params from controller, #{params.inspect}"
     @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
     if @result.success?
@@ -203,7 +203,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def index_configurations
-    custom_field_op = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
+    custom_field_op = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
     @field_configurations = custom_field_op.field_configurations
     @policies = current_company.vendor_payment_policies
     respond_to do |format|
@@ -287,7 +287,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
       # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
       create_bulk_beneficiary_ticket(current_user, params)
     else
-      respond response: :failure, message: "WTF, tell me what type of ticket you want to create?"
+      respond response: :failure, message: "Invalid ticket type provided. Please provide one of either 'invoice', 'po_advance', 'beneficiary' or 'bulk_beneficiary'"
     end
   end
 

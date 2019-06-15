@@ -1,4 +1,4 @@
-class TdsSlabsController < ApplicationController
+class TdsSlabsController < BaseControllers::WebBase
 
   def create
     @result = TdsSlabs::Create.(current_user, params)

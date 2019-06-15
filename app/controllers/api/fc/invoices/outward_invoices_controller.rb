@@ -1,8 +1,7 @@
-class Api::Fc::Invoices::OutwardInvoicesController < ApplicationController
+class Api::Fc::Invoices::OutwardInvoicesController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }	
 
   # this action should create an invoice, as well as update it with the valid details
   def create_valid

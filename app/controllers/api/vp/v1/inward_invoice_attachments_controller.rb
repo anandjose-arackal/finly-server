@@ -1,8 +1,7 @@
-class Api::Vp::V1::InwardInvoiceAttachmentsController < ApplicationController
+class Api::Vp::V1::InwardInvoiceAttachmentsController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
 
   def create
     @result = BankTransfer::InvoiceAttachments::Create.(current_user, params)

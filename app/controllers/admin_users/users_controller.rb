@@ -1,5 +1,4 @@
-class AdminUsers::UsersController < ApplicationController
-  before_action -> { finly_authorize! :admin}
+class AdminUsers::UsersController < BaseControllers::AdminBase
 
   def new
     @states = State.all

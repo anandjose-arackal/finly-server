@@ -1,4 +1,4 @@
-class PingController < ApplicationController
+class PingController < BaseControllers::PublicBase
 
   def ping
     render json: {success: true}

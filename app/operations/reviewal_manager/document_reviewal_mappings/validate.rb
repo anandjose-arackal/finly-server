@@ -20,40 +20,43 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
     unless self.document.present?
       add_message :error, 'Document not found'
     end
+
   end
 
 
   def process
     # Check
     amount = get_document_amount
-    self.reviewal_levels.each do |level|
-      if level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).present?
-        valid_reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
-      else
-        valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
-      end
+    if self.reviewal_levels.present?
+      self.reviewal_levels.each do |level|
+        if level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).present?
+          valid_reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
+        else
+          valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
+        end
 
-      valid_reviewer_ids.compact!
+        valid_reviewer_ids.compact!
 
-      if valid_reviewer_ids.present?
-        level_specific_dlrms = dlrms.with_level_id(level.id)
+        if valid_reviewer_ids.present?
+          level_specific_dlrms = dlrms.with_level_id(level.id)
 
-        if level_specific_dlrms.present?
-          level_specific_dlrms.each do |dlrm|
-            unless valid_reviewer_ids.include? dlrm.reviewer_id
-              level_details = ['Level', level.level_number.to_s, level.name].join(" - ")
-              add_message :error, "Cannot set #{dlrm.reviewer.name} for '#{level_details}' as amount doesn't fall within threshold range of reviewer"
+          if level_specific_dlrms.present?
+            level_specific_dlrms.each do |dlrm|
+              unless valid_reviewer_ids.include? dlrm.reviewer_id
+                level_details = ['Level', level.level_number.to_s, level.name].join(" - ")
+                add_message :error, "Cannot set #{dlrm.reviewer.name} for '#{level_details}' as amount doesn't fall within threshold range of reviewer"
+              end
             end
+          else
+            add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
           end
         else
-          add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
-        end
-      else
-        # If Valid reviewers are not present, should check if DLRM is created for it
-        level_specific_dlrms = dlrms.with_level_id(level.id)
+          # If Valid reviewers are not present, should check if DLRM is created for it
+          level_specific_dlrms = dlrms.with_level_id(level.id)
 
-        if level_specific_dlrms.present?
-          add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
+          if level_specific_dlrms.present?
+            add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
+          end
         end
       end
     end

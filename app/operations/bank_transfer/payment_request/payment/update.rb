@@ -3,7 +3,8 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :payment_order, :payment_amount, :bp_params
+                :advance, :advance_amount, :payment_order, :payment_amount, :bp_params, :po_params,
+                :incoming_tds_for_po
 
   def init
     super
@@ -11,10 +12,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
     self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
-
-    if self.payment.parent_type == "BeneficiaryPayment"
-      construct_bp_params
-    end
 
   end
 
@@ -37,7 +34,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     # validate that the amount is being passed # todo - uncomment it later
-    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
+    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
       add_message :error, "Sub Total cannot be blank"
       return
     end
@@ -52,6 +49,19 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def pre_process
+
+    # if self.payment.parent_type == "BeneficiaryPayment"
+    #   construct_bp_params
+    # end
+
+    case self.payment.parent_type
+    when 'BeneficiaryPayment'
+      construct_bp_params
+    when 'PurchaseOrder'
+      construct_po_params
+      validate_po_params
+    end  
+
     # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
     if self.payment&.invoice.present? && self.payment_params[:invoice_attributes].present?
@@ -119,9 +129,14 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     if self.payment_params&.dig(:invoice_attributes, :category_id)
       self.payment_params[:category_id] = payment_params[:invoice_attributes][:category_id]
     end
+
+    if payment.parent_type == 'PurchaseOrder'
+      self.payment_params.delete(:invoice_attributes)
+    end
   end
 
   def process
+
     payment.assign_attributes(payment_params)
     unless self.payment.valid?
       add_message :error, self.payment.errors.full_messages
@@ -142,10 +157,26 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'BeneficiaryPayment'
       bp = BeneficiaryPayment.find_by(id: payment.parent_id)
       self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
+      self.bp_params[:advance_amount_attributes][:id] = bp.advance_amount_id
       bp.assign_attributes(self.bp_params)
       bp.calculate_tax_and_amount
       bp.save
+    when 'PurchaseOrder'
+      purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
+      # trigger the calculation only if tds sent and it is different from po tds
+      # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
+      if self.incoming_tds_for_po.present? && (self.incoming_tds_for_po.to_i != purchase_order.advance_tds_slab_id)
+        purchase_order.assign_attributes(self.po_params)
+        purchase_order.save
+        purchase_order.process_line_item_calculation
+        purchase_order.save
+      end
+      # self.payment_params.delete(:invoice_attributes)
+      # self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
+
+      payment.amount.update(value: purchase_order.advance_amount&.value)
     end
+
   end
 
   def post_process
@@ -184,24 +215,43 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      # 
+      # check to make sure no other ticket type has an explicit payment amount, coming from FE, sent to utils
+      case payment.parent_type
+      when 'Invoice'
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      else
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      end
     else
       # if there are, in fact, invoice items, use the invoice items library
-      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      case payment.parent_type
+      when 'Invoice'
+
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      else
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      end
     end
     return
   end
 
   def recalculate_totals
-    if payment.invoice.invoice_items.present?
-      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+    if payment.invoice&.invoice_items.present?
+      case payment.parent_type
+      when 'Invoice'
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      else
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      end
     else
       # if there are, in fact, invoice items, use the invoice items library
-      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      case payment.parent_type
+      when 'Invoice'
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      else
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+      end
     end
     self.payment.save
   end
@@ -215,9 +265,24 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:inclusive_of_taxes] = self.payment_params[:invoice_attributes][:inclusive_of_taxes]
     bp_payment[:tax] = self.payment_params[:invoice_attributes][:tax]
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
+    bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
+    bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
 
     self.bp_params = bp_payment
 
   end
 
+  def construct_po_params
+    po_payment = {}
+
+    po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+
+    self.po_params = po_payment
+  end
+
+  def validate_po_params
+    self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+  end
+
 end
+

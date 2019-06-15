@@ -244,7 +244,9 @@ class Expense::Manual::Update < Expense::Manual::Base
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count,
-                           from_cash_on_hand: expense.from_cash_on_hand
+                           from_cash_on_hand: expense.from_cash_on_hand,
+                           custom_fields: expense.custom_fields_label_values
+
     }
   end
 

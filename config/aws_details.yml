@@ -1,6 +1,0 @@
-aws_access_key_id: 'AKIAIIGMDMIVVJVRIGQQ'
-aws_secret_access_key: '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'
-aws_region_name: 'ap-south-1'
-sqs_queue_url_base: 'https://sqs.ap-south-1.amazonaws.com/749499857229/'
-s3_attachment_bucket_name: "finly-images"
-s3_host_name: "s3.ap-south-1.amazonaws.com"

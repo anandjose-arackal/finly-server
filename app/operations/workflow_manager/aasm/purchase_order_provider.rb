@@ -7,6 +7,7 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
     state :rejected
     state :auto_approved
     state :sent_to_vendor
+    state :vendor_confirmed
     state :closed
     state :voided
     # todo add unapprove etc
@@ -51,18 +52,23 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
       transitions :from => [:approved, :auto_approved], to: :sent_to_vendor
     end
 
+    event :vendor_confirmed do
+      transitions :from => :sent_to_vendor, to: :vendor_confirmed
+    end
+
     event :close do
-      transitions :from => [:approved, :auto_approved, :sent_to_vendor], :to => [:closed]
+      transitions :from => [:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed], :to => [:closed]
     end
 
     event :void do
-      transitions :from => [:approved, :auto_approved, :sent_to_vendor, :closed], to: :voided
+      transitions :from => [:approved, :auto_approved, :sent_to_vendor, :closed, :vendor_confirmed], to: :voided
     end
 
     event :reopen do
       transitions from: :closed, to: :auto_approved, guard: :is_auto_approve?
       transitions from: :closed, to: :approved, guard: :is_approve?
       transitions from: :closed, to: :sent_to_vendor, guard: :is_send_to_vendor?
+      transitions from: :closed, to: :vendor_confirmed, guard: :is_vendor_confirmed?
     end
 
     after_all_events :change_state
@@ -77,7 +83,7 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
   end
 
   def previous_state
-    ps = self.document.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+    ps = self.document.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     ps.last.action_id
   end
 
@@ -94,6 +100,11 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
     state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
+  end
+
+  def is_vendor_confirmed?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:vendor_confirmed) ) ? true : false
   end
 
   #

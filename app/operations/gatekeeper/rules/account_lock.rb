@@ -1,0 +1,96 @@
+Gatekeeper::Checker.new 'AccountLock' do
+
+  section 'on authorization' do
+
+    premise :user_login_invalid_password do
+      rule 'Multiple failed attempts should lock the account' do
+        user = params[:user]
+        policy = SecurityPolicy::Manager.for(user)
+        next if user.nil? or policy.nil?
+
+        auth_failure = user.user_auth_failures.build locked: false, ip: params[:ip], username: params[:username], invalid_password: true
+        next if policy.account_lock.within_timeframe.nil?
+
+        timeframe = Time.now - policy.account_lock.within_timeframe
+
+        # Check if the user password was changed post the timeframe. If so, consider that as the timeframe
+        if user.password_changed_at && user.password_changed_at > timeframe
+            timeframe = user.password_changed_at
+        end
+
+        if user.locked_at.blank? && user.user_auth_failures.within_time(timeframe).size >= policy.account_lock.max_attempts
+          user.update(locked_at: DateTime.now)
+          auth_failure.locked = true
+
+          message "#{user.id} - #{user.email} > Too many failed password attempts. Locking the account"
+
+          # Todo send lock mailer
+          response_code 401
+          level 3
+          fail
+        end
+        auth_failure.save
+      end
+    end
+
+    premise :user_login_invalid_username do
+      rule 'Record invalid username' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], invalid_username: true
+      end
+    end
+
+    premise :user_login_blank_username do
+      rule 'Record blank username' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], blank_username: true
+      end
+    end
+
+    premise :user_login_blank_password do
+      rule 'Record blank password' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], blank_password: true
+      end
+    end
+
+    premise :user_login_attempt do
+      rule 'Do not allow locked accounts to login' do
+        user = params[:user]
+        if user.access_locked?
+          # user.user_auth_failures.create locked: true
+          message "#{user.id} - #{user.email} > Account has been temporarily locked"
+          level 3
+          response_code 401
+          fail
+        end
+      end
+    end
+
+    premise :user_login_success do
+      rule 'Clear the lock and reset failed attempts upon login' do
+        user = params[:user]
+        if user.locked_at.present?
+          user.locked_at = nil
+          user.save
+        end
+      end
+    end
+
+  end
+
+  section 'Browsers' do
+    before do
+      skip unless RequestStoreUtil.current_session&.web?
+      skip unless RequestStoreUtil.current_user.access_locked?
+    end
+
+    premise :on_authenticated_request do
+      rule 'Do not allow access to locked accounts' do
+        message 'User Account is locked'
+        session_status_id UserSessionStatus.id_for(:blocked)
+        level 5
+        response_code 401
+        fail
+      end
+    end
+  end
+
+end

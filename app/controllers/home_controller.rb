@@ -1,4 +1,4 @@
-class HomeController < ApplicationController
+class HomeController < BaseControllers::PublicBase
   layout :resolve_layout
 
   # before_action :check_first_login

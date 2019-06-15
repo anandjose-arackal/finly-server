@@ -11,12 +11,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   def process
-    if self.purchase_order.po_number.blank?
-      op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-      if op.success?
-        self.purchase_order.po_number = op.document_number
-      end
-    end
+    # if self.purchase_order.po_number.blank?
+    #   op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+    #   if op.success?
+    #     self.purchase_order.po_number = op.document_number
+    #   end
+    # end
   end
 
   def success
@@ -35,8 +35,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       # self.departments = user.company.departments.leaves
       # self.locations = user.company.locations.includes(:state).leaves
       params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
-      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
-      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+      self.departments = Company::Departments::Index.(self.purchase_order.user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(self.purchase_order.user, params).policy_location_filter_mapping&.leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
       if purchase_order.user.departments.present?
@@ -103,6 +103,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         if user_in_level? || document_owner?
           actions[:send_mail] = {url: Rails.application.routes.url_helpers.procure_configs_send_mail_path, method: "POST"}
           actions[:mark_send_to_vendor] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_send_to_vendor_path(purchase_order_id: purchase_order.id), method: "PUT"}
+          actions[:mark_vendor_confirmed] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_vendor_confirmed_path(purchase_order_id: purchase_order.id), method: "PUT"}
 
           # todo
           if purchase_order.can_unapprove?(user)
@@ -122,7 +123,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         actions[:download] = true
       end
 
-      if purchase_order.sent_to_vendor?
+      if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
         if user_in_level? || document_owner?
           actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
           actions[:close] = {
@@ -219,6 +220,9 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_reviewer(user)
     # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
     return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
+    return if purchase_order.validate_if_auditor(user)
+    # Payment ticket credtor has access to inward invoice show, hence giving access to view purchase order too
+    return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
     raise_unauthorized_exception
   end
 end

@@ -1,7 +1,8 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
-              :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
+              :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note, :vendor_poc_name, :vendor_poc_email, :vendor_poc_mobile_number, :discount_type_id
+
 json.vendor @result.purchase_order.vendor.as_json
 
 json.vendor do
@@ -76,6 +77,7 @@ json.discount do
   json.value @result.purchase_order.discount_amount&.value&.round(2)
   json.id @result.purchase_order.discount_amount&.id
   json.currency_id @result.purchase_order.discount_amount&.currency&.id
+  json.discount_type_id @result.purchase_order.discount_type_id
 end
 json.balance_due do
   json.value @result.purchase_order.balance_amount&.value&.round(2)
@@ -244,8 +246,8 @@ end
 
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
-    json.location (gstin_location.location&.to_s + " - " + gstin_location.state&.name&.to_s)
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
+    json.location (gstin_location.location&.to_s + " - " + gstin_location.state&.name&.to_s) rescue ""
   end
 end
 

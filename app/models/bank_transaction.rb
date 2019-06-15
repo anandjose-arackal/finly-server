@@ -17,6 +17,8 @@
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
 #  bank_transaction_type_id    :integer
+#  account_name_check          :boolean          default(FALSE)
+#  beneficiary_full_name       :string(255)
 #
 
 class BankTransaction < ApplicationRecord
@@ -42,6 +44,8 @@ class BankTransaction < ApplicationRecord
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
 
   scope :processing_transactions, -> {where transfer_status_id: [BankTransferStatus.id_for(:processing), BankTransferStatus.id_for(:possible_failure)]}
+
+  scope :non_penny_test, -> { where.not(account_name_check: true) }
 
   def retriable?
     self.transfer_status_id == BankTransferStatus.id_for(:failed)

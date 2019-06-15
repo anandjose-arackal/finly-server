@@ -2,7 +2,7 @@
 #
 # Table name: rate_contracts
 #
-#  id                      :bigint(8)        not null, primary key
+#  id                      :bigint           not null, primary key
 #  name                    :string(255)
 #  vendor_id               :integer
 #  renewable               :boolean
@@ -14,7 +14,6 @@
 #  renewal_alert_period_id :integer
 #  note                    :string(255)
 #  company_id              :integer
-#  rate_contract_number    :string(255)
 #
 
 class RateContract < ApplicationRecord
@@ -25,14 +24,14 @@ class RateContract < ApplicationRecord
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :item, optional: true, class_name: 'Item'
-  belongs_to :renewal_alert_period, class_name: 'Period', foreign_key: :renewal_alert_period_id
+  belongs_to :renewal_alert_period, optional: true, class_name: 'Period', foreign_key: :renewal_alert_period_id
   belongs_to :company, optional: true
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
 
-  before_save :add_company
+  before_validation :add_company
 
-  validates :renewal_alert_period, :renewal_alert_number, presence: true
+  # validates :renewal_alert_period, :renewal_alert_number, presence: true
   validates :vendor, presence: true
 
   accepts_nested_attributes_for :rate_contract_line_items, allow_destroy: true
@@ -79,7 +78,9 @@ class RateContract < ApplicationRecord
   end
 
   def add_company
-    self.company_id = self.creator.company_id
+    if self.company_id.blank?
+      self.company_id = self.creator.company_id
+    end
   end
 
 

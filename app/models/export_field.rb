@@ -9,6 +9,7 @@
 #
 
 class ExportField < ApplicationRecord
+  include Seedable
 
   scope :with_id, ->(id) { where id: id }
 

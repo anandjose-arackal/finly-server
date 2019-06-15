@@ -24,6 +24,7 @@
 #  field_key               :string(255)
 #  sequence_number         :integer
 #  deleted_at              :datetime
+#  printable               :boolean          default(TRUE)
 #
 
 class FieldConfiguration < ApplicationRecord
