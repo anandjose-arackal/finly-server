@@ -29,7 +29,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
         type: 'personal_travel',
         data: [
           {
-            title: "Booking Pending",
+            title: "Pending",
             count: self.trips.filter_status('booking_pending')&.count,
             total_amount: self.trips.filter_status('booking_pending').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
             filters: []
@@ -43,7 +43,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
           },
 
           {
-            title: "Booking Confirmed",
+            title: "Confirmed",
             count: self.trips.filter_status('booking_confirmed')&.count,
             total_amount: self.trips.filter_status('booking_confirmed').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
             filters: []
