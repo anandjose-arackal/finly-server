@@ -32,6 +32,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
     self.payment_order = params[:payment_order]
+    self.background = params[:background]
     self.options = {}
     if payment_request.present?
       self.company = Company.find_by(id: company_id)
@@ -47,6 +48,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     elsif user.is_a?(AdminUser)
       self.company_id = payment_request.company_id
       self.company = Company.find_by(id: self.company_id)
+    end
+
+    if self.payment_order.present?
+      self.options = {}
+      self.options[:bank_transfer_type] = payment_order.bank_transfer_type
+      self.background = true # because transfers that happen through the approval flow are always bank transfers (which are in the background, always)
+      self.crediting_payments = self.payment_order.payments
     end
 
     # if it's not a payment request and is a PaymentOrder or a bunch of payments that are to be credited,
@@ -71,6 +79,11 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def validate
     # by this time the payment order will exist for sure
     # Call the payment validator class that validates the payment order
+
+    if self.crediting_payments.blank?
+      add_message :error, "No payments passed. Please try again"
+      return
+    end
 
     op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
     unless op.success?
@@ -112,14 +125,14 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       if self.background
         scheduled_at = self.crediting_payments.pluck(:scheduled_at).uniq&.compact.first
         if scheduled_at.present? && scheduled_at > DateUtils.local_date
+          add_message :success, "Payments have been successfully scheduled for later."
+        else
           # doing another check of the payment order's status here just in case
           PaymentProcessorRules::Event.(:check_order_status_is_pending, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
           options[:crediting_payment_ids] = self.crediting_payments.pluck(:id)
           # op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, options)
           op = AccountManager::Payments::BulkPaymentExecutor.call_async(self.payment_order, options)
           add_message :success, 'Payments have initiated, you can check their status from the order screen'
-        else
-          add_message :success, "Payments have been successfully scheduled for later."
         end
       else
         # doing another check of the payment order's status here just in case
