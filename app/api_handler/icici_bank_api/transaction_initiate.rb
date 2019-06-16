@@ -1,6 +1,6 @@
 class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
-  attr_accessor :payment, :icici_bank_transaction, :transfer_request
+  attr_accessor :payment, :icici_bank_transaction, :transfer_request, :receiving_account
 
   def initialize(params)
     # todo - temporary
@@ -34,7 +34,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     # self.company = Company.second
     super # so that the variables are initialized from the config file
     self.icici_bank_transaction = self.payment.reference_resource
-    self.receiving_account = self.icici_bank_transaction.receiving_account
+    self.receiving_account = self.payment.receiving_account
     super()
   end
 
@@ -49,7 +49,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: self.transfer_request.unique_request_number,
+        UNIQUEID: self.transfer_request.unique_reference_number,
         # UNIQUEID: "SAMPLEUNIQUEREFERENCE1",
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
         CREDITACC: self.receiving_account.account_number,
@@ -62,7 +62,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         # CURRENCY: "INR",
         TXNTYPE: self.icici_bank_transaction.transfer_type,
         # TXNTYPE: "OWN", # "RTG", "RGS"
-        # PAYEENAME: self.receiving_account.account_owner.name,
+        PAYEENAME: self.receiving_account.account_owner.name,
         # PAYEENAME: "Sreeram",
         REMARKS: self.payment.note,
         # REMARKS: "This is a test note",

@@ -13,7 +13,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
   # Once approved, the transaction will be executed and the UTR will be sent back to us using a callback request
   def credit(payment, options = {})
     super
-    transfer_type = options[:bank_transfer_type]
+    transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
     bank_transaction = payment.reference_resource
@@ -136,8 +136,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                         txn_type: transfer_request.transfer_type,
                                                         receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
-                                                        bank_response: transfer_request.transaction_result,
-                                                        remarks: self.payment.note,
+                                                        remarks: payment.note,
                                                         customer_induced: "N",
                                                         amount_attributes: {
                                                             value: payment.amount_value,
