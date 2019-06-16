@@ -26,7 +26,7 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
     # this will also create the bank transaction and YesBankTransferRequest non-persistent model
     # that is required for creating actually making the request with YesBank's servers
     self.transfer_request = create_transfer_request("IMPS", nil)
-    self.bank_transaction = self.company.bank_transactions.create(
+    self.bank_transaction = self.company.yes_bank_transactions.create(
        unique_request_number: self.transfer_request.generate_unique_reference,
        transfer_type: "IMPS",
        bank_reference_number: self.transfer_request.bank_reference_number,

@@ -10,7 +10,7 @@ class YesBankTransferProvider
     queue = Struct.new(:queue).new(response_handle)
 
     indifferent_params = params.with_indifferent_access
-    bank_transaction = BankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+    bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
     company = bank_transaction.company
