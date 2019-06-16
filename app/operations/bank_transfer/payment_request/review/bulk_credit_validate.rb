@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       else
         # check if the payment request can be credited by the selecting user
         # if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
-        if (payment_request.get_reviewers.include?(user) && !payment_request.open? && !payment_request.retracted? && !payment_request.rejected?) || (user.vendor_payments_admin? && payment_request.approved?) || (payment_request.document_role_users(:creditor).include?(user) && (payment_request.approved? || payment_request.auto_approved?))
+        if (payment_request.get_reviewers.include?(user) && !payment_request.open? && !payment_request.retracted? && !payment_request.rejected?) || (user.vendor_payments_admin? && (payment_request.approved? || payment_request.auto_approved?)) || (payment_request.document_role_users(:creditor).include?(user) && (payment_request.approved? || payment_request.auto_approved?))
           if hash[:allowed]
             self.processable_amount += payment_request.payment_order.amount_requested&.value
           else
@@ -144,10 +144,35 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
 
   private
 
+  def retrieve_initiating_account
+    case params[:initiating_account_type]
+      when 1, '1'
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return user.company.yes_bank_company_account
+          when "ICICI"
+            return user.company.icici_bank_company_account
+          else
+            return user.company.yes_bank_company_account
+        end
+      when 2, '2'
+        return user.bank_wallet
+      else
+        user.bank_wallet # i.e. finly money by default
+    end
+  end
+
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
       when 1, '1'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+          when "ICICI"
+            return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          else
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else
