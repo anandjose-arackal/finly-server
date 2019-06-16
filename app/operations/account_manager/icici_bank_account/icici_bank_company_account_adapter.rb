@@ -1,5 +1,7 @@
 class AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
+  attr_accessor :company
+
   def account_class
     IciciBankCompanyAccount
   end

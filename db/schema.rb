@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_10_192640) do
+ActiveRecord::Schema.define(version: 2019_06_13_114239) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4929,6 +4929,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_192640) do
     t.integer "controlling_level_id"
     t.integer "company_id"
     t.integer "cost_center_id"
+    t.integer "total_amount_id"
     t.index ["company_id"], name: "index_purchase_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_purchase_requests_on_controlling_level_id"
     t.index ["cost_center_id"], name: "index_purchase_requests_on_cost_center_id"
@@ -4938,6 +4939,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_192640) do
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["policy_id"], name: "index_purchase_requests_on_policy_id"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
+    t.index ["total_amount_id"], name: "index_purchase_requests_on_total_amount_id"
   end
 
   create_table "purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6914,6 +6916,8 @@ ActiveRecord::Schema.define(version: 2019_06_10_192640) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "vedor_code"
+    t.string "trade_name"
+    t.string "reject_note"
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"

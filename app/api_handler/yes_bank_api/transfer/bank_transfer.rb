@@ -137,11 +137,11 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def success?
-    self.bank_transaction.completed? || self.bank_transaction.processing?
+    (self.transfer_status_id == BankTransferStatus.id_for(:completed)) || (self.transfer_status_id == BankTransferStatus.id_for(:processing))
   end
 
   def failure?
-    self.bank_transaction.failed? || self.bank_transaction.possible_failure?
+    (self.transfer_status_id == BankTransferStatus.id_for(:failed)) || (self.transfer_status_id == BankTransferStatus.id_for(:possible_failure))
   end
 
   def success

@@ -40,7 +40,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     ################# Start Source account validations #######################
 
-    # todo - temporary as the tests are failing saying this rule isn't defined
     op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment, source_account_adapter: self.source_account_adapter, receiving_account_adapter: self.receiving_account_adapter})
     unless op.success?
       add_message :error, op.messages
