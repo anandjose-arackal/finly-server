@@ -37,7 +37,8 @@ class Company < ApplicationRecord
   has_many :company_balance_histories
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
-  has_many :bank_transactions
+  has_many :yes_bank_transactions
+  has_many :icici_bank_transactions
   has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
@@ -47,6 +48,7 @@ class Company < ApplicationRecord
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one :icici_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -59,6 +61,7 @@ class Company < ApplicationRecord
   has_one :collect_company_detail
   has_one :enforce_budget_configuration
   has_one :custom_export_configuration, as: :configurable
+  has_one :icici_bank_config
 
   has_many :payment_orders
   has_many :user_groups
@@ -452,6 +455,7 @@ class Company < ApplicationRecord
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save

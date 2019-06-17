@@ -10,7 +10,7 @@ class YesBankTransferProvider
     queue = Struct.new(:queue).new(response_handle)
 
     indifferent_params = params.with_indifferent_access
-    bank_transaction = BankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
+    bank_transaction = YesBankTransaction.find_by(id: indifferent_params[:bank_transaction_id])
     self.account_number = indifferent_params[:account_number]
     self.ifsc = indifferent_params[:ifsc]
     company = bank_transaction.company
@@ -61,6 +61,6 @@ class YesBankTransferProvider
 
   # this method will create a transfer request for a penny transfer to the beneficiary account
   def create_transfer_request(transfer_type, reference_number)
-    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company_id)
+    tr = YesBankTransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company_id)
   end
 end

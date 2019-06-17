@@ -172,7 +172,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   end
 
   # to be used when PO can have multiple advance payments in future
-  # 
+  #
   # def process
   #   # self.payment_request_params = bank_payment_request_params
   #   # self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
@@ -251,6 +251,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   private
 
   def parse_payment_order_data
+    initiating_account = retrieve_initiating_account(user.company)
     policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
@@ -262,7 +263,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
             currency_id: 1
         },
         payment_mode: self.payment_mode,
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: "vp",
@@ -314,5 +315,72 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     end
     payment_params
   end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+      when "YES"
+        initiating_account = user.company.yes_bank_company_account
+      when "ICICI"
+        initiating_account = user.company.icici_bank_company_account
+      else
+        initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
+  end
+
+  # def bank_payment_request_params
+  #   payment_params = [{
+  #       payment_type_id: PaymentType.id_for(:credit),
+  #       application: RequestStore.store[:current_app],
+  #       receiving_user_type: self.receiving_account&.account_owner&.class&.name,
+  #       receiving_user_id: self.receiving_account&.account_owner_id,
+  #       initiating_user_type: "User",
+  #       initiating_user_id: user.id,
+  #       initiating_account_type: user.company.yes_bank_company_account&.class&.name,
+  #       initiating_account_id: user.company.yes_bank_company_account&.id,
+  #       receiving_account_type: "BankAccount",
+  #       receiving_account_id: self.receiving_account.id,
+  #       payment_status_id: PaymentStatus.id_for(:pending_approval),
+  #       payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
+  #       payment_mode: self.payment_mode,
+  #       amount_attributes: {
+  #           value: self.total_advance_amount,
+  #           currency_id: Currency.first.id
+  #       },
+  #       date: DateUtils.local_date,
+  #       purchase_order_id: self.purchase_order.id
+  #                     }]
+  #   payment_order_params = {
+  #       initiating_user: user,
+  #       payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+  #       company_id: user.company_id,
+  #       amount_requested_attributes: {
+  #           value: self.total_advance_amount,
+  #           currency_id: 1
+  #       },
+  #       payment_mode: self.payment_mode,
+  #       initiating_account_type: user.company.yes_bank_company_account&.class&.name,
+  #       receiving_account_type: "BankAccount",
+  #       payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
+  #       application: RequestStore.store[:current_app],
+  #       currency_id: 1,
+  #       scheduled_at: self.scheduled_at,
+  #       payments_attributes: payment_params
+  #   }
+  #   bank_payment_request_params = {
+  #       owner_id: user.id,
+  #       status_id: BankPaymentRequestStatus.id_for(:open),
+  #       controlling_user_id: user.id,
+  #       requested_amount_attributes: {
+  #           value: self.total_advance_amount,
+  #           currency_id: 1
+  #       },
+  #       description: self.description,
+  #       beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
+  #       policy_id: self.policy_id,
+  #       payment_order_attributes: payment_order_params
+  #   }
+  #   return bank_payment_request_params
+  # end
 
 end
