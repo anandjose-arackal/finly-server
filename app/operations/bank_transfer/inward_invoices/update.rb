@@ -89,7 +89,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
+      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value.to_i
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
       end
