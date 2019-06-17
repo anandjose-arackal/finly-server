@@ -37,7 +37,7 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
   belongs_to :cost_center, optional: true
-
+  belongs_to :total_amount, optional: true, class_name: "Amount", dependent: :destroy
   has_many :attachments, as: :resource, dependent: :destroy
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
@@ -147,14 +147,13 @@ class PurchaseRequest < ApplicationRecord
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
-      total_cost: calculate_total_amount,
-      controlling_user: self.get_reviewers&.first&.name
+      total_cost: self&.total_amount&.value,
+      controlling_user: self.get_reviewers&.first&.name,
+      rejection_note: self.reject_note
     }
   end
 
   def calculate_total_amount
-    # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
-    # Amount.where(id: amount_ids)&.pluck(:value).sum
     self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
@@ -303,6 +302,19 @@ class PurchaseRequest < ApplicationRecord
 
   def can_delete?
     (self.draft? || self.retracted? || self.rejected?) rescue false
+  end
+
+  def update_total_amount
+    updated_amount = calculate_total_amount
+    if updated_amount.present?
+      if self.total_amount.present?
+        self.total_amount.update_attributes(value: updated_amount)
+      else
+        if self.create_total_amount(currency_id: 1, value: updated_amount)
+          self.save
+        end
+      end
+    end
   end
 
   private

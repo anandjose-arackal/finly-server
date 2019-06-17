@@ -768,6 +768,7 @@ class PurchaseOrder < ApplicationRecord
 
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
+        # item_discount_amount = item_amount * item_discount / 100
         item_taxable_amount = item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
@@ -851,9 +852,9 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if self.balance_amount.present?
-      self.balance_amount.value = total_amount
+      self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)

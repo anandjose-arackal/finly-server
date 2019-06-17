@@ -193,19 +193,23 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def pre_process
     # update gstin location id
-    if self.gstin_location.present?
-      self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+    if inward_invoice_params[:gst_type_id].blank?
+      if self.gstin_location.present?
+        self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
 
-      shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
-      if self.gstin_location.state_code == shipping_location&.state_code
-        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+        shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+        if self.gstin_location.state_code == shipping_location&.state_code
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+        else
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+        end
       else
         self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
       end
-    else
-      self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
     end
-
+    if self.gstin_location.present?
+      self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+    end
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?

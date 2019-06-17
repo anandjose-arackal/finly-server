@@ -8,6 +8,7 @@
 #  active     :boolean          default(TRUE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  gl_code    :string(255)
 #
 
 class MoneyRequestItemCategory < ApplicationRecord
