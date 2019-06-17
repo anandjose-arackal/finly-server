@@ -151,24 +151,36 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Company Export', id: 'export', url: 'export/params={"view":"admin"}'}
   end
 
+  def users
+    {name: 'Users', id: 'users', url: 'users/params={"view":"admin"}'}
+  end
+
+  def load_company_balance
+    {name: 'Load Company Balance', id: 'load-company-balance', url: '/transfers/register'}
+  end
+
+  def statements
+    {name: 'Statements', id: 'statements', url: 'company_statements/params={"view":"admin"}'}
+  end
+
   def create
     {name: 'Create', id: 'create', url: 'create'}
   end
 
   def create_expense
-    {name: 'Create Expense', id: 'create_expense', url: 'create_expense'}
+    {name: 'Create Expense', id: 'create_expense', url: 'expenses/new_expense/params={"view":"personal"}'}
   end
 
   def create_trip
-    {name: 'Create Trip', id: 'create_trip', url: 'create_trip'}
+    {name: 'Create Trip', id: 'create_trip', url: 'trips/params={"view":"personal",  "create": "true"}'}
   end
 
   def create_report
-    {name: 'Create Report', id: 'create_report', url: 'create_report'}
+    {name: 'Create Report', id: 'create_report', url: 'reports/params={"view":"personal", "create": "true"}'}
   end
 
   def create_money_request
-    {name: 'Create Money Request', id: 'create_money_request', url: 'create_money_request'}
+    {name: 'Create Money Request', id: 'create_money_request', url: 'money_requests/params={"view":"personal", "create": "true"}'}
   end
 
 end
