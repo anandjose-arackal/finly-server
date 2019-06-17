@@ -1,4 +1,5 @@
-class Authenticator::Providers::MultiEntityLogin < AUthenticator::Providers::Base
+class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Base
+
 
 
 end

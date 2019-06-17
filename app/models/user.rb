@@ -321,6 +321,9 @@ class User < ApplicationRecord
   scope :include_all_accounts_with_balance, -> {includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance])}
   scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
   scope :with_email, ->(email) {where email: email}
+  scope :with_email_or_mobile_number, -> (email, mobile_number) {
+    where('email = ? OR mobile_number = ?', email, mobile_number)
+  }
   scope :with_subscription, -> (application) {
     ids = self.pluck(:id)
     app = nil
