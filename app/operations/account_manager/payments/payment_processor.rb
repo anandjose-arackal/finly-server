@@ -57,6 +57,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.crediting_payments = self.payment_order.payments
     end
 
+
     # if it's not a payment request and is a PaymentOrder or a bunch of payments that are to be credited,
     # set crediting_payments as that list of payments
     if payment_order.blank? and payment_request.present?
@@ -68,7 +69,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.crediting_payments = self.payment_order.payments
       self.options = {}
       self.options[:bank_transfer_type] = payment_order.bank_transfer_type
-      self.background = true
+      self.background |= true
     end
 
     # if none of the above, i.e. payment request or payment order both are not present,
