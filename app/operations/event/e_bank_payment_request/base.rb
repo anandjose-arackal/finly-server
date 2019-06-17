@@ -69,12 +69,13 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = bank_payment_request_view_role user
+    params[:cc_emails] = cc_emails_from_beneficiary_payments
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
 
     attr_accessor :bank_payment_request, :action_name, :subject_val, :body_val,
-                  :event_id, :company, :view_role_id, :view_url, :payment
+                  :event_id, :company, :view_role_id, :view_url, :payment, :cc_emails
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
@@ -86,6 +87,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       self.company = user.company
       self.view_role_id = params[:role_id]
       self.view_url = generate_view_url
+      self.cc_emails = params[:cc_emails]
     end
 
     def validate
@@ -123,6 +125,18 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params=" + suffix
     end
 
+  end
+
+  private
+  def cc_emails_from_beneficiary_payments
+    emails = []
+    beneficiary_payment_ids = self.bank_payment_request.payment_order.payments.pluck(:beneficiary_payment_id) rescue nil
+    if beneficiary_payment_ids.present?
+      user.company.beneficiary_payments.where(id: beneficiary_payment_ids).pluck(:payment_notification_users).each{|cc_emails| emails << cc_emails["cc_emails"]}
+      return emails.flatten.compact
+    end
+
+    return nil
   end
 
 end

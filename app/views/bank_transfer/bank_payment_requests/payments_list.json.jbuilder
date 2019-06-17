@@ -27,6 +27,7 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.payment_notification_users payment&.parent&.payment_notification_users
     json.retriable do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
