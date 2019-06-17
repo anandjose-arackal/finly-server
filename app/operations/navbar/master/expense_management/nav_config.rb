@@ -5,13 +5,13 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
+          :receipts,
           {expenses: [:your_expenses, :company_expenses]},
-          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
-          {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
           {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
-          {users: [:team_users, :company_users]},
+          {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
+          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
           {settlements: [:team_settlements, :company_settlements]},
-          :analytics,
+          # :analytics,
           {export: [:team_exports, :company_exports]},
           {create: [:create_expense, :create_trip, :create_report, :create_money_request]}
       ]
@@ -49,6 +49,10 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_expenses
     {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin"}'}
+  end
+
+  def receipts
+    {name: 'Receipts', id: 'receipts', url: 'receipts/params={"view":"personal"}'}
   end
 
   def trips
