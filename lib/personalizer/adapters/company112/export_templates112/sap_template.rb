@@ -9,36 +9,32 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
     users = user.company.users
     reports = Report.where(user_id: users.pluck(:id)).processed
     self.headers = [
-        'Vendor Number',
-        'Doc Date',
-        'Ref Doc no',
+        'SAP Employee ID',
+        'Date',
+        'Grade',
         'Amount',
-        'Text',
-        'G/L code',
-        'Debit / Crd Ind',
-        'Amount',
-        'Text1',
-        'cost center',
-        'profit center',
-        'count'
+        'Bus.Place',
+        'Plant',
+        'Cost Center',
+        'Profit Center',
+        'GL Code',
+        'Text'
     ]
     self.contents = []
     count = 1
     reports.each do |report|
       report.expenses.each do |expense|
         self.contents << [
-            expense.merchant_name,
+            sap_id(expense.user),
             expense.date,
-            expense.id,
+            grade(expense.user),
             expense.amount.value,
+            expense.merchant_name,
             '',
-            "GLCODE_#{expense.category.id}",
-            'Debit',
-            expense.amount.value,
             '',
-            'Cost Center 1',
-            'Profit Center 1',
-            count
+            '',
+            expense.category&.gl_code,
+            ''
         ]
         count += 1
       end
@@ -47,6 +43,26 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
 
   def success
     Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
+  end
+
+  def profit_center(user)
+    user.gl_config&.dig(:"New Profit centre")
+  end
+
+  def cost_center(user)
+    user.gl_config&.dig(:"New Cost Centre")
+  end
+
+  def sap_id(user)
+    user.gl_config&.dig(:"SAP ID")
+  end
+
+  def grade(user)
+    ''
+  end
+
+  def plant(user)
+    ''
   end
 
 end

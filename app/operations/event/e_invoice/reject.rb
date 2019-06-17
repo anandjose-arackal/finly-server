@@ -62,17 +62,17 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
   def mailer_subject(user)
     if user == self.rejecting_user
-      "You rejected the invoice : #{self.invoice.invoice_number}"
+      "You rejected the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number}"
+      "#{rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 
   def mailer_body(user)
     if user == self.rejecting_user
-      "You have rejected the invoice: #{self.invoice.invoice_number}"
+      "You have rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number}"
+      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 

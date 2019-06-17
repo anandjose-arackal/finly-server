@@ -66,6 +66,8 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
+#  discount_type_id             :integer
+#  taxable_amount_id            :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -644,7 +646,7 @@ class PurchaseOrder < ApplicationRecord
     {
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
-        advance_amount: precision_value(self.advance_amount&.value),
+        # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: precision_value(self.advance_amount&.value),
         balance_due: precision_value(self.balance_amount&.value),
         procurement_id: self.procurement_id,
@@ -658,7 +660,7 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: false
+        editable: true
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -749,12 +751,24 @@ class PurchaseOrder < ApplicationRecord
       if item.is_a?(PurchaseOrderItem)
         item_quantity = (item.quantity || 0).to_f
         item_rate = (item.rate || 0).to_f
-        item_tax = (item.tax || 0).to_f
-        item_discount = (item.discount || 0).to_f
+        item_amount = (item_quantity * item_rate)
+        item_tax = (item.tax_rate&.rate || 0).to_f
+
+        case self.discount_type_id
+          # i.e. discount is given as a rate
+          when 1
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+          when 2
+            item_discount_amount = item.discount
+          else
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+        end
 
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
-        item_discount_amount = item_amount * item_discount / 100
+        # item_discount_amount = item_amount * item_discount / 100
         item_taxable_amount = item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
@@ -771,6 +785,23 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount.value = item_tax_amount
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+        end
+
+        # also set the CGST, SGST, and IGST amounts in the PO Line item
+        case self.gst_type_id
+          # i.e. it's a CGST + SGST case
+          when GstType.id_for(:cgst_sgst)
+            item.cgst = item_tax_amount / 2
+            item.sgst = item_tax_amount / 2
+            item.igst = 0
+          when GstType.id_for(:igst)
+            item.igst = item_tax_amount
+            item.cgst = 0
+            item.sgst = 0
+          else
+            item.igst = 0
+            item.cgst = 0
+            item.sgst = 0
         end
 
         if item.discount_amount.present?
@@ -821,15 +852,13 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if self.balance_amount.present?
-      self.balance_amount.value = total_amount
+      self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
-
-      # if self.advance_tds_slab.present?
 
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
       unless skip_adv_calculation
@@ -981,8 +1010,14 @@ class PurchaseOrder < ApplicationRecord
       item_ids = options[:item_ids]
 
       # Update Purchase request item statuses
-       # TODO- create status change trail
-      PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+       # TODO- create status change trail 
+      # PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+      PurchaseRequestItem.with_ids(item_ids).each do |purchase_request_item|
+        purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:po_created)
+        if purchase_request_item.save
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_created))
+        end
+      end
 
       document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them

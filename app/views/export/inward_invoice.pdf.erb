@@ -52,19 +52,19 @@
       <h4 class="section-title">Billed From (Vendor)</h4>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.display_name %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor&.display_name %></div>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.mobile_number %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor&.mobile_number %></div>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.pan %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor&.pan %></div>
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.gst %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor&.gst %></div>
       </div>
     </div>
     <div class="col col-xs-4 billing-address">
@@ -76,7 +76,7 @@
         <% if @result.invoice.billing_address.present? %>
           <%= simple_format @result.invoice.billing_address, {}, wrapper_tag: "div" %>
         <% else %>
-          <%= @result.invoice.location.address %>
+          <%= @result.invoice.location&.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
@@ -97,16 +97,16 @@
         <% if @result.invoice.shipping_address.present? %>
           <%= simple_format @result.invoice.shipping_address, {}, wrapper_tag: "div" %>
         <% else %>
-          <%= @result.invoice.delivery_location.address %>
+          <%= @result.invoice.delivery_location&.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location.gstin %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location&.gstin %></div>
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location.pan %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location&.pan %></div>
       </div>
     </div>
   </div><br> <br>

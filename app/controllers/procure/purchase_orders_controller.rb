@@ -171,6 +171,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf/paginated_bootstrap.html.erb",
+                 template: "export/purchase_order",
                  print_media_type: true,
                  margin: { :bottom => 12 },
                  dpi: 650,

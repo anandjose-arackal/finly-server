@@ -89,7 +89,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    end
 
 	    unless self.policy.present?
-	        add_message :error, 'Policy not found'
+				add_message :error, 'Policy not found'
+				return
 	    end
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
@@ -134,33 +135,33 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	end
 
 	def success
-	    params[:bank_payment_request_id] = self.bank_payment_request.id
-			params[:bank_payment_request] = self.bank_payment_request
-	    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter.new(user, params, messages)
+    params[:bank_payment_request_id] = self.bank_payment_request.id
+    params[:bank_payment_request] = self.bank_payment_request
+    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter.new(user, params, messages)
 	end
 
 	def failure
-	    params[:issues] = self.issues
-	    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter.new(user, params, messages)
+    params[:issues] = self.issues
+    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter.new(user, params, messages)
 	end
 
 	class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-	    attr_accessor :bank_payment_request_id, :bank_payment_request
+    attr_accessor :bank_payment_request_id, :bank_payment_request
 
-	    def init
-	      self.bank_payment_request_id = params[:bank_payment_request_id]
-				self.bank_payment_request = params[:bank_payment_request]
-	    end
+    def init
+      self.bank_payment_request_id = params[:bank_payment_request_id]
+      self.bank_payment_request = params[:bank_payment_request]
+    end
 	end
 
 	class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-	    attr_accessor :issues
+    attr_accessor :issues
 
-	    def init
-	      self.issues = params[:issues]
-	    end
+    def init
+      self.issues = params[:issues]
+    end
 	end
 
 

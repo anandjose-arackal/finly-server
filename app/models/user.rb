@@ -279,7 +279,7 @@ class User < ApplicationRecord
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { # passed argument is only for has scope, no effect here
+  scope :filter_vendor_payments_reviewers, -> (flag) {# passed argument is only for has scope, no effect here
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
 
   # Use only for has_scope filter, scope to policy_user_roles
@@ -695,23 +695,24 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id){
+  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id) {
     # policy = Policy.find_by_id policy_id
     # if policy.present?
     #   user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_initiator)).pluck(:user_id)
     #   without_id(user_ids)
     # end
     role_ids = [UserRole.id_for(:non_po_initiator)]
-    filter_unassigned_roles_for_policy(policy_id, role_ids)    
+    filter_unassigned_roles_for_policy(policy_id, role_ids)
   }
 
-  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids){
+  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id([role_ids]).pluck(:user_id)
       without_id(user_ids)
     end
   }
+
 
   before_save :strip_whitespace
 
@@ -756,47 +757,75 @@ class User < ApplicationRecord
 
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
-    return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
-    return if min_password_score < 2
+    # return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
+    return if password.blank?
+    requirement = []
+    fail = false
+    if security_policy.password.mandate_uppercase?
+      requirement << '1 uppercase'
+      fail = true unless password =~ /(?=.*?[A-Z])/
+    end
+    if security_policy.password.mandate_lowercase?
+      requirement << '1 lowercase'
+      fail = true unless password =~ /(?=.*?[a-z])/
+    end
+    if security_policy.password.mandate_numbers?
+      requirement << '1 digit'
+      fail = true unless password =~ /(?=.*?[0-9])/
+    end
+    if security_policy.password.mandate_special_chars?
+      requirement << '1 special character'
+      fail = true unless password =~ /(?=.*?[#?!@$%^&*-])/
+    end
 
-    errors.add :password, 'Complexity requirement not met. Please use: 1 uppercase, 1 lowercase, 1 digit and 1 special character'
+    if fail
+      errors.add :password, "Complexity requirement not met. Requirement: #{requirement.join(', ')}"
+    end
   end
 
-  def min_password_score
-    level_3_req = UserRole.ids_for(
-        :admin,
-        :finance_manager,
-        :creditor,
-        :bank_payment_request_creditor
-    )
+  # def min_password_score
+  #   level_3_req = UserRole.ids_for(
+  #       :admin,
+  #       :finance_manager,
+  #       :creditor,
+  #       :bank_payment_request_creditor
+  #   )
+  #
+  #   level_2_req = UserRole.ids_for(
+  #       :auditor,
+  #       :manager,
+  #       :reviewer,
+  #       :purchase_request_reviewer,
+  #       :purchase_order_reviewer,
+  #       :invoice_reviewer,
+  #       :bank_payment_request_reviewer,
+  #       :item_master_manager,
+  #       :inventory_manager,
+  #       :vendor_reviewer,
+  #       :policy_admin,
+  #       :vendor_manager,
+  #       :bank_payment_request_auditor,
+  #       :budget_manager
+  #   )
+  #
+  #   return 1 if company_id == 2
+  #   return 3 if role_mapping.role(level_3_req).present?
+  #   return 2 if role_mapping.role(level_2_req).present?
+  #   1
+  # end
 
-    level_2_req = UserRole.ids_for(
-        :auditor,
-        :manager,
-        :reviewer,
-        :purchase_request_reviewer,
-        :purchase_order_reviewer,
-        :invoice_reviewer,
-        :bank_payment_request_reviewer,
-        :item_master_manager,
-        :inventory_manager,
-        :vendor_reviewer,
-        :policy_admin,
-        :vendor_manager,
-        :bank_payment_request_auditor,
-        :budget_manager
-    )
-
-    return 1 if company_id == 2
-    return 3 if role_mapping.role(level_3_req).present?
-    return 2 if role_mapping.role(level_2_req).present?
-    1
+  def password_expired?
+    return false if new_record?
+    expire_after = security_policy.password.expire_after
+    return false if expire_after.blank?
+    (password_changed_at || created_at) < expire_after.seconds.ago
   end
 
   # Expires user if password is weak, old passwords and inactivity
   def verify_expiration!(password = nil)
-    return false
     return true if expired? and !otp_verified
+
+    nil_password = password.nil?
 
     expired = false
     expired ||= expired?
@@ -806,12 +835,22 @@ class User < ApplicationRecord
       expired ||= password_weak?
     end
 
+    self.password = nil if nil_password
+
     expire! if expired
     expired
   end
 
   def expire!
     super and update(otp_verified: false)
+  end
+
+  def security_policy
+    SecurityPolicy::Manager.for(self)
+  end
+
+  def min_password_score
+    security_policy.password.minimum_score
   end
 
   def password_weak?
@@ -829,7 +868,7 @@ class User < ApplicationRecord
   def name
     return nil if first_name.blank? and last_name.blank?
     name = first_name
-    "#{name} #{last_name}"
+    "#{first_name} #{last_name}"
   end
 
   alias_method :requested_by_user_name, :name
@@ -1055,7 +1094,27 @@ class User < ApplicationRecord
   def self.find_for_database_authentication(conditions = {})
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
-    find_by(mobile_number: username) || find_by(email: username)
+    user = find_by(mobile_number: username) || find_by(email: username)
+    return user if user.present?
+
+    authenticate_with_employee_id(username)
+  end
+
+  def self.authenticate_with_employee_id(username)
+    employee_id = username
+    subdomain = nil
+    # Check for subdomain in username
+    if not username =~ Constants::VALID_EMAIL_FORMAT and username.include?(".")
+      subdomain, employee_id = username.split('.')
+    end
+    # Check for subdomain from path
+    if subdomain.nil? && RequestStoreUtil.current_request&.subdomains(0)&.first.present?
+      subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
+    end
+    return nil if subdomain.blank? or employee_id.blank?
+
+    employee_id = employee_id&.to_s
+    Company.find_by(subdomain: subdomain)&.users&.joins(:profile)&.where('user_profiles.employee_id =?', employee_id)&.first
   end
 
   def manager_activateable?
@@ -1247,89 +1306,95 @@ class User < ApplicationRecord
 
   # ********** User Roles for Vendor Payments ******************
 
-  def is_vendor_manager?(document=nil)
+  def is_vendor_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_manager), document)
   end
 
-  def is_vendor_initiator?(document=nil)
+  def is_vendor_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_creator?(document=nil)
+  def is_vendor_creator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_reviewer?(document=nil)
+  def is_vendor_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
   end
 
-  def is_item_master_manager?(document=nil)
+  def is_item_master_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
   end
 
-  def is_purchase_order_initiator?(document=nil)
+  def is_purchase_order_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_initiator), document)
   end
 
-  def is_purchase_order_reviewer?(document=nil)
+  def is_purchase_order_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
-  def is_purchase_order_auditor?(document=nil)
+  def is_purchase_order_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_auditor), document)
   end
 
-  def is_purchase_request_initiator?(document=nil)
+  def is_purchase_request_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
   end
 
-  def is_purchase_request_reviewer?(document=nil)
+  def is_purchase_request_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
 
-  def is_purchase_request_auditor?(document=nil)
+  def is_purchase_request_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_auditor), document)
   end
 
-  def is_bank_payment_request_initiator?(document=nil)
+  def is_bank_payment_request_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
   end
 
-  def is_bank_payment_request_reviewer?(document=nil)
+  def is_bank_payment_request_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
   end
 
-  def is_bank_payment_request_auditor?(document=nil)
+  def is_bank_payment_request_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor), document)
   end
 
-  def is_bank_payment_request_creditor?(document=nil)
+  def is_bank_payment_request_creditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), document)
   end
 
-  def is_invoice_initiator?(document=nil)
+  def is_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_initiator), document)
   end
 
-  def is_invoice_reviewer?(document=nil)
+  def is_invoice_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
   end
 
-  def is_invoice_auditor?(document=nil)
+  def is_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_auditor), document)
   end
 
-  def is_budget_manager?(document=nil)
+  def is_budget_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:budget_manager), document)
   end
 
-  def is_goods_receiver?(document=nil)
+  def is_goods_receiver?(document = nil)
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
-  def is_inventory_manager?(document=nil)
+  def is_inventory_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
+
+  def access_locked?
+    locked_at and locked_at > security_policy.account_lock.locking_period.ago
+  end
+
+  alias_method :locked?, :access_locked?
 
   # ************ User Role for vendor payments ******************
 

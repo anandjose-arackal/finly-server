@@ -25,7 +25,7 @@ RSpec.describe 'UserSessions::Events::Create' do
         RSpec::Mocks.with_temporary_scope do
           @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1,
                              status_id: UserSessionStatus.id_for(:authorized)
-          allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path}))
+          allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path, ip: @ip, remote_ip: @ip}))
           allow(RequestStoreUtil).to receive(:current_app).and_return(:em)
           allow(RequestStoreUtil).to receive(:current_session).and_return(@session1)
 
@@ -56,7 +56,7 @@ RSpec.describe 'UserSessions::Events::Create' do
         RSpec::Mocks.with_temporary_scope do
           @message = 'Revoked message'
           @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1, status_id: UserSessionStatus.id_for(:revoked), message: @message
-          allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path}))
+          allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path, ip: @ip, remote_ip: @ip}))
           allow(RequestStoreUtil).to receive(:current_app).and_return(:em)
           allow(RequestStoreUtil).to receive(:current_session).and_return(@session1)
 

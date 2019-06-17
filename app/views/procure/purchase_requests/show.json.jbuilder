@@ -4,6 +4,7 @@ json.result do
     json.purchase_request_number @result.purchase_request.order_number
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
+    json.rejection_note @result.purchase_request&.reject_note
     # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
       json.name @result.purchase_request.creator&.name
@@ -25,6 +26,9 @@ json.result do
     json.policy do 
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
+    end
+    json.custom_fields do
+      json.array! @result.purchase_request&.custom_fields
     end
     json.total_cost @result.purchase_request.calculate_total_amount
     json.total_items @result.line_items_count

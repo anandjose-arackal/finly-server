@@ -228,7 +228,7 @@ class Expense::Base < BaseOperation
           return true
         end
       end
-      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.controlling_user.id == user.id
+      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.get_reviewers.pluck(:id).include?(user.id)
         return true
       end
       false

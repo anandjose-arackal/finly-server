@@ -49,6 +49,18 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
       # any changes to be made here? #todo
+      
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.bank_payment_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        self.bank_payment_request.destroy
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
     else
       add_message :error, self.bank_payment_request.errors.full_messages
     end
@@ -59,7 +71,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
     # Set status to unpaid if done via a procurement
     if inward_invoice.procurement_id.present?
-      inward_invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+      inward_invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
     end
   end
 
@@ -93,7 +105,9 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         note: self.inward_invoice.note,
         category_id: self.inward_invoice.category_id,
         date: DateUtils.local_date,
-        invoice_id: self.inward_invoice.id
+        invoice_id: self.inward_invoice.id,
+        parent_type: self.inward_invoice.class.name,
+        parent_id: self.inward_invoice.id
     }]
     payment_order_params = {
         initiating_user: user,

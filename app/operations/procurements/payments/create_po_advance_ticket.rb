@@ -57,9 +57,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     # params[:purchase_order_id] = 1733
     # params[:scheduled_at] = "2019-02-28"
     # params[:payment_mode] = 'neft'
-    # params[:po_advance_attributes] = [{purchase_order_id: 1733, advance_amount: '300' }]
+    # params[:po_advance_attributes] = [{purchase_order_id: 1733, advance_amount: '300', advance_tds_slab_id: '1' }]
     id = params[:id] || params[:purchase_order_id] || params[:po_id]
-    self.purchase_order = user.company.purchase_orders.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.description = params[:description]
     self.payment_mode = params[:payment_mode]
@@ -172,6 +171,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     self.all_purchase_orders = user.company.purchase_orders.where(id: po_ids)
   end
 
+  # to be used when PO can have multiple advance payments in future
+  # 
   # def process
   #   # self.payment_request_params = bank_payment_request_params
   #   # self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
@@ -256,7 +257,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
         company_id: user.company_id,
         amount_requested_attributes: {
-            value: self.total_advance_amount,
+            # value: self.total_advance_amount,
+            value: 0,
             currency_id: 1
         },
         payment_mode: self.payment_mode,
@@ -273,7 +275,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
-            value: self.total_advance_amount,
+            # value: self.total_advance_amount,
+            value: 0,
             currency_id: 1
         },
         beneficiary_type_id: 2,
@@ -305,65 +308,11 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
           purchase_order_id: purchase_order&.id,
           payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
           parent_type: purchase_order&.class.name,
-          parent_id: purchase_order&.id
+          parent_id: purchase_order&.id,
+          advance_tds_slab_id: po_advance[:advance_tds_slab_id]
       }
     end
     payment_params
   end
-
-  # def bank_payment_request_params
-  #   payment_params = [{
-  #       payment_type_id: PaymentType.id_for(:credit),
-  #       application: RequestStore.store[:current_app],
-  #       receiving_user_type: self.receiving_account&.account_owner&.class&.name,
-  #       receiving_user_id: self.receiving_account&.account_owner_id,
-  #       initiating_user_type: "User",
-  #       initiating_user_id: user.id,
-  #       initiating_account_type: user.company.yes_bank_company_account&.class&.name,
-  #       initiating_account_id: user.company.yes_bank_company_account&.id,
-  #       receiving_account_type: "BankAccount",
-  #       receiving_account_id: self.receiving_account.id,
-  #       payment_status_id: PaymentStatus.id_for(:pending_approval),
-  #       payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
-  #       payment_mode: self.payment_mode,
-  #       amount_attributes: {
-  #           value: self.total_advance_amount,
-  #           currency_id: Currency.first.id
-  #       },
-  #       date: DateUtils.local_date,
-  #       purchase_order_id: self.purchase_order.id
-  #                     }]
-  #   payment_order_params = {
-  #       initiating_user: user,
-  #       payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
-  #       company_id: user.company_id,
-  #       amount_requested_attributes: {
-  #           value: self.total_advance_amount,
-  #           currency_id: 1
-  #       },
-  #       payment_mode: self.payment_mode,
-  #       initiating_account_type: user.company.yes_bank_company_account&.class&.name,
-  #       receiving_account_type: "BankAccount",
-  #       payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
-  #       application: RequestStore.store[:current_app],
-  #       currency_id: 1,
-  #       scheduled_at: self.scheduled_at,
-  #       payments_attributes: payment_params
-  #   }
-  #   bank_payment_request_params = {
-  #       owner_id: user.id,
-  #       status_id: BankPaymentRequestStatus.id_for(:open),
-  #       controlling_user_id: user.id,
-  #       requested_amount_attributes: {
-  #           value: self.total_advance_amount,
-  #           currency_id: 1
-  #       },
-  #       description: self.description,
-  #       beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
-  #       policy_id: self.policy_id,
-  #       payment_order_attributes: payment_order_params
-  #   }
-  #   return bank_payment_request_params
-  # end
 
 end

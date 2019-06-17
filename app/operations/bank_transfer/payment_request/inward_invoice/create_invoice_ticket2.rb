@@ -119,6 +119,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, "This invoice, with id #{invoice.id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
         return
       end
+      if invoice.bank_account.blank?
+        add_message :error, "This invoice, with id #{invoice.id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
+        return
+      end
+
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
       end
@@ -178,9 +183,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       bank_account = invoice.vendor&.bank_accounts&.where(default_account: true).first
       payment_params << {
           name: invoice.vendor&.name,
-          bank_account_number: bank_account&.account_number,
-          ifsc: bank_account&.ifsc,
-          account_id: bank_account&.id,
+          bank_account_number: (invoice.bank_account&.account_number || bank_account&.account_number),
+          ifsc: (invoice.bank_account&.ifsc || bank_account&.ifsc),
+          account_id: ( invoice.bank_account&.id || bank_account&.id),
           requested_amount: self.payable_amounts[invoice.id],
           payment_type_id: PaymentType.id_for(:credit),
           application: RequestStore.store[:current_app],

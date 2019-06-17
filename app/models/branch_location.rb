@@ -49,6 +49,10 @@ class BranchLocation < ApplicationRecord
   scope :with_ids, -> (ids) { where id: ids }
   scope :include_state, -> { includes :state }
 
+  def state_code
+    self.state&.state_code
+  end
+
   def address
     address = ""
     if self.address_1.present?
@@ -94,9 +98,10 @@ class BranchLocation < ApplicationRecord
   end
 
   def as_json(options={})
+    display_name = options&.dig(:tree) ? full_name : name
     {
         id: self.id,
-        name: self.full_name,
+        name: display_name,
         gstin: self.gstin,
         pan: self.pan,
         address_1: self.address_1,
@@ -106,7 +111,7 @@ class BranchLocation < ApplicationRecord
         pin: self.pin,
         address: self.address,
         location_code: self.location_code,
-        state_code: self.state&.code,
+        state_code: self.state&.state_code,
         billable: self.billable_location,
         shippable: self.shippable_location
     }

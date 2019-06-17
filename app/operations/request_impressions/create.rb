@@ -49,7 +49,7 @@ class RequestImpressions::Create < BaseOperation
   protected
 
   def enrich_username(args)
-    args[:username] = params[:username] || params[:email_mobile] || params[:email]
+    args[:username] = (params[:username] || params[:email_mobile] || params[:email])&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
   end
 
   def enrich_request(args)
@@ -71,13 +71,13 @@ class RequestImpressions::Create < BaseOperation
     # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
     data = geo_ip&.data
-    args[:continent_name] = data&.dig('continent', 'names', 'en')
-    args[:continent_code] = data&.dig('continent', 'code')
-    args[:country_name] = data&.dig('country', 'names', 'en')
-    args[:country_code] = data&.dig('country', 'iso_code')
-    args[:region_code] = data&.dig('subdivisions')&.first&.dig('iso_code')
-    args[:region_name] = data&.dig('subdivisions')&.first&.dig('names', 'en')
-    args[:city] = data&.dig('city', 'names', 'en')
+    args[:continent_name] = data&.dig('continent', 'names', 'en')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:continent_code] = data&.dig('continent', 'code')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:country_name] = data&.dig('country', 'names', 'en')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:country_code] = data&.dig('country', 'iso_code')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:region_code] = data&.dig('subdivisions')&.first&.dig('iso_code')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:region_name] = data&.dig('subdivisions')&.first&.dig('names', 'en')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+    args[:city] = data&.dig('city', 'names', 'en')&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
     args[:zip] = data&.dig('postal', 'code')
     args[:latitude] = data&.dig('location', 'latitude')
     args[:longitude] = data&.dig('location', 'longitude')

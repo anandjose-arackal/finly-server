@@ -27,7 +27,7 @@ class CustomField < ApplicationRecord
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest', 'Booking', 'YesBankVendor']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest', 'Booking', 'YesBankVendor', 'PurchaseRequest', 'PurchaseRequestItem']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
   scope :only_drop_downs, -> { where value_type: 'FieldDropDownSelection' }
@@ -36,6 +36,10 @@ class CustomField < ApplicationRecord
   scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense'] }
   scope :with_parent_report, -> { where parent_type: ['Report'] }
   scope :with_drop_down_selection, -> (drop_down_selection_id) { where value_type: 'FieldDropDownSelection', value_id: drop_down_selection_id }
+  scope :with_text_value, -> (text) {
+    text_value_ids = FieldText.where('value like ?', text)
+    where(value_type: "FieldText", value_id: text_value_ids)
+  }
   scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type}
   scope :with_multi_select_selection, -> (multiselect_selection_id) {
     multi_select_ids = self.where(value_type: "FieldMultiselectSelection").pluck(:value_id)

@@ -13,6 +13,6 @@ class Admin::Companies::Vendors::Exports::AsXml < Vendors::Exports::AsXml
 
   def init
     self.company = Company.find_by_id params[:company_id].to_i
-    self.vendors = company.yes_bank_vendors.includes(:gstin_locations, :bank_accounts)
+    self.vendors = company.yes_bank_vendors.authorized.includes(:gstin_locations, :bank_accounts)
   end
 end

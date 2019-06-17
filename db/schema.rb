@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_173719) do
+ActiveRecord::Schema.define(version: 2019_06_13_114239) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -133,7 +133,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -339,7 +339,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
   end
 
-  create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "base_url"
     t.string "name"
     t.string "username"
@@ -372,7 +372,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_approval_routes_on_user_id"
   end
 
-  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "resource_id"
     t.string "resource_type"
     t.string "attachment_file_name"
@@ -384,9 +384,12 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "creator_id"
+    t.index ["company_id"], name: "index_artifacts_on_company_id"
+    t.index ["creator_id"], name: "index_artifacts_on_creator_id"
+    t.index ["resource_id", "resource_type"], name: "index_artifacts_on_resource_id_and_resource_type"
   end
 
-  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "resource_id"
     t.string "resource_type"
     t.string "file_file_name"
@@ -398,6 +401,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.index ["company_id"], name: "index_attachments_on_company_id"
+    t.index ["creator_id"], name: "index_attachments_on_creator_id"
+    t.index ["resource_id", "resource_type"], name: "index_attachments_on_resource_id_and_resource_type"
   end
 
   create_table "authentications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -500,7 +506,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id"
   end
 
-  create_table "bank_account_masters", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "bank_account_masters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "account_number"
     t.string "ifsc"
     t.string "account_name"
@@ -532,6 +538,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "bank_account_master_id"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
+    t.index ["created_at"], name: "index_bank_accounts_on_created_at"
     t.index ["deleted_at"], name: "index_bank_accounts_on_deleted_at"
     t.index ["ifsc"], name: "index_bank_accounts_on_ifsc"
     t.index ["name"], name: "index_bank_accounts_on_name"
@@ -620,7 +627,10 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "approved_at"
     t.integer "company_id"
     t.decimal "max_payment_amount", precision: 20, scale: 5
+    t.text "rejection_note"
+    t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
+    t.index ["created_at"], name: "index_bank_payment_requests_on_created_at"
     t.index ["deleted_at"], name: "index_bank_payment_requests_on_deleted_at"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -654,6 +664,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["beneficiary_bank_account_id"], name: "index_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_bank_transactions_on_company_id"
     t.index ["transfer_status_id"], name: "index_bank_transactions_on_transfer_status_id"
+    t.index ["unique_request_number"], name: "index_bank_transactions_on_unique_request_number"
   end
 
   create_table "bank_transfer_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -662,13 +673,13 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "vendor_id"
     t.integer "bank_account_id"
@@ -695,22 +706,31 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.text "invoice_number"
     t.date "invoice_date"
     t.date "invoice_due_date"
+    t.integer "payment_agreement_id"
+    t.string "note"
+    t.integer "location_id"
+    t.integer "vendor_location_id"
     t.integer "advance_amount_id"
+    t.integer "tax_rate_id"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
+    t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
     t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
+    t.index ["gross_amount_id"], name: "index_beneficiary_payments_on_gross_amount_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
     t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
     t.index ["invoice_due_date"], name: "index_beneficiary_payments_on_invoice_due_date"
     t.index ["invoice_number"], name: "index_beneficiary_payments_on_invoice_number", length: 20
+    t.index ["net_amount_id"], name: "index_beneficiary_payments_on_net_amount_id"
     t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
     t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
     t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
     t.index ["sub_department_id"], name: "index_beneficiary_payments_on_sub_department_id"
     t.index ["tax_amount_id"], name: "index_beneficiary_payments_on_tax_amount_id"
+    t.index ["tds_amount_id"], name: "index_beneficiary_payments_on_tds_amount_id"
     t.index ["tds_slab_id"], name: "index_beneficiary_payments_on_tds_slab_id"
     t.index ["vendor_id"], name: "index_beneficiary_payments_on_vendor_id"
   end
@@ -761,6 +781,13 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["transaction_amount_id"], name: "index_bill_of_supplies_on_transaction_amount_id"
     t.index ["user_id"], name: "index_bill_of_supplies_on_user_id"
     t.index ["vendor_id"], name: "index_bill_of_supplies_on_vendor_id"
+  end
+
+  create_table "billing_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "booking_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1129,6 +1156,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.date "date"
     t.integer "sub_department_id"
     t.integer "procurement_id"
+    t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
   create_table "budgets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1435,7 +1463,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_cash_on_hands_on_user_id"
   end
 
-  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "company_id", null: false
     t.string "name", null: false
     t.string "gl_code"
@@ -1451,8 +1479,10 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
+    t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
+    t.index ["name"], name: "index_categories_on_name"
   end
 
   create_table "channel_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1502,6 +1532,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "active", default: true, null: false
     t.integer "base_currency_id", default: 1
     t.integer "status_id", default: 1, null: false
+    t.boolean "test_account", default: false
+    t.string "subdomain"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1825,7 +1857,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "designation"
   end
 
-  create_table "cost_centers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "cost_centers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "application"
     t.integer "company_id"
@@ -1834,6 +1866,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.string "cost_center_code"
+    t.string "ancestry"
+    t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
   end
@@ -2157,7 +2191,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["vendor_id"], name: "index_delivery_challans_on_vendor_id"
   end
 
-  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
     t.datetime "created_at", null: false
@@ -2283,7 +2317,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "receiptable_document_id", null: false
     t.string "receiptable_document_type", null: false
@@ -2308,14 +2342,14 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_document_message_receipts_on_user_id"
   end
 
-  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_document_message_types_on_name"
   end
 
-  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "order"
     t.integer "user_id"
     t.integer "type_id"
@@ -2574,6 +2608,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "deleted_at"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
+    t.index ["created_at"], name: "index_expenses_on_created_at"
     t.index ["deleted_at"], name: "index_expenses_on_deleted_at"
     t.index ["expense_status_id"], name: "index_expenses_on_expense_status_id"
     t.index ["expense_tax_type_id"], name: "index_expenses_on_expense_tax_type_id"
@@ -2648,7 +2683,6 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "custom_currency_conversion", default: false
     t.boolean "vendor_empanelment_workflow", default: false
     t.boolean "purchase_requisition_system"
-    t.boolean "request_encryption_enabled", default: false
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -2842,11 +2876,6 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
     t.datetime "date"
     t.integer "sequence_number"
-    t.string "transaction_type_string"
-    t.string "purpose_string"
-    t.decimal "closing_balance_number", precision: 10, scale: 5
-    t.decimal "amount_number", precision: 10, scale: 5
-    t.string "formatted_date"
     t.index ["amount_id"], name: "index_finly_transactions_on_amount_id"
     t.index ["associated_transaction_id"], name: "index_finly_transactions_on_associated_transaction_id"
     t.index ["associated_transaction_type"], name: "index_finly_transactions_on_associated_transaction_type"
@@ -2862,7 +2891,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
-  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
     t.text "params"
@@ -2879,6 +2908,19 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
 
+  create_table "general_invoices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.integer "department_id"
+    t.integer "location_id"
+    t.integer "cost_center_id"
+    t.integer "payment_term_id"
+    t.boolean "auto_pay"
+    t.text "note"
+    t.integer "billing_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "gst_state_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -2893,7 +2935,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
-  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "vendor_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2910,7 +2952,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
   end
 
-  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "gstin"
     t.string "legal_name_of_business"
     t.string "state"
@@ -2924,11 +2966,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
     t.text "address"
     t.string "trade_name"
-    t.index ["gstin"], name: "index_gstins_on_gstin"
-    t.index ["status"], name: "index_gstins_on_status"
   end
 
-  create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "AGGRNAME"
     t.string "AGGRID"
     t.string "URN"
@@ -3092,9 +3132,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "cost_center_id"
     t.string "unit_of_measurement"
     t.integer "department_id"
-    t.decimal "sgst", precision: 10, scale: 5
-    t.decimal "cgst", precision: 10, scale: 5
-    t.decimal "igst", precision: 10, scale: 5
+    t.decimal "sgst", precision: 20
+    t.decimal "cgst", precision: 20
+    t.decimal "igst", precision: 20
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
@@ -3220,8 +3260,13 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "cost_allocation_items", default: false
     t.text "narration"
     t.string "po_number"
+    t.integer "payment_agreement_id"
     t.integer "bank_account_id"
+    t.integer "vendor_location_id"
+    t.integer "billing_type_id"
+    t.text "rejection_note"
     t.index ["address_id"], name: "index_invoices_on_address_id"
+    t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
     t.index ["deleted_at"], name: "index_invoices_on_deleted_at"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
@@ -3293,7 +3338,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "item_expense_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "item_expense_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -3806,6 +3851,16 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "notify_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.integer "document_id"
+    t.string "document_type"
+    t.boolean "enabled"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "oauth_access_grants", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "resource_owner_id", null: false
     t.integer "application_id", null: false
@@ -3850,7 +3905,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
-  create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "encrypted_password", null: false
     t.string "password_archivable_type", null: false
     t.integer "password_archivable_id", null: false
@@ -4008,6 +4063,39 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "dependent_field_configuration_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "payment_agreement_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "payment_agreement_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "payment_agreements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "order_number"
+    t.string "title"
+    t.integer "policy_id"
+    t.datetime "agreement_date"
+    t.datetime "execution_date"
+    t.datetime "expiration_date"
+    t.datetime "renewal_date"
+    t.text "note"
+    t.boolean "no_expiration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "creator_id"
+    t.integer "controlling_level_id"
+    t.integer "status_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.text "reject_note"
+    t.integer "company_id"
   end
 
   create_table "payment_file_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4213,6 +4301,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
+    t.index ["created_at"], name: "index_payments_on_created_at"
+    t.index ["date"], name: "index_payments_on_date"
     t.index ["deleted_at"], name: "index_payments_on_deleted_at"
     t.index ["external_reference_id"], name: "index_payments_on_external_reference_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
@@ -4222,6 +4312,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["purchase_order_id"], name: "fk_rails_65acc3c87d"
     t.index ["receiving_user_id"], name: "index_payments_on_receiving_user_id"
     t.index ["reference_id"], name: "index_payments_on_reference_id"
+    t.index ["reference_resource_type", "reference_resource_id"], name: "index_payments_on_reference_resource"
   end
 
   create_table "per_diem_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4320,14 +4411,15 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id"
   end
 
-  create_table "policy_cost_center_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "policy_cost_center_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "cost_center_id"
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "enabled"
   end
 
-  create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "department_id"
     t.boolean "enabled"
@@ -4344,7 +4436,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["policy_id"], name: "index_policy_field_mappings_on_policy_id"
   end
 
-  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "location_id"
     t.integer "department_id"
     t.integer "policy_id"
@@ -4354,7 +4446,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "creator_id"
   end
 
-  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "location_id"
     t.boolean "enabled"
@@ -4425,6 +4517,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
+    t.index ["procurement_document_id", "procurement_document_type"], name: "index_procurement_attachments_on_procurement_document"
     t.index ["user_id"], name: "index_procurement_attachments_on_user_id"
   end
 
@@ -4514,6 +4607,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["deleted_at"], name: "index_procurements_on_deleted_at"
     t.index ["procurement_status_id"], name: "index_procurements_on_procurement_status_id"
     t.index ["procurement_track_id"], name: "index_procurements_on_procurement_track_id"
+    t.index ["procurement_type"], name: "index_procurements_on_procurement_type"
     t.index ["user_id"], name: "index_procurements_on_user_id"
     t.index ["vendor_id"], name: "index_procurements_on_vendor_id"
   end
@@ -4538,7 +4632,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "prepaid_cards"
   end
 
-  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -4575,9 +4669,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "unit_of_measurement"
     t.integer "purchase_request_item_id"
     t.integer "department_id"
-    t.decimal "cgst", precision: 10, scale: 5
-    t.decimal "sgst", precision: 10, scale: 5
-    t.decimal "igst", precision: 10, scale: 5
+    t.decimal "cgst", precision: 20, scale: 10
+    t.decimal "sgst", precision: 20
+    t.decimal "igst", precision: 20
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
     t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
@@ -4623,7 +4717,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.text "procurement_term_text"
+    t.text "procurement_term_text", limit: 16777215
     t.integer "controlling_user_id"
     t.integer "controlling_user_role_id"
     t.integer "controlling_for_user_id"
@@ -4657,12 +4751,13 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.bigint "gstin_location_id"
     t.boolean "cost_allocation_items", default: false
     t.text "internal_note"
-    t.text "vendor_address"
-    t.integer "discount_type_id"
     t.integer "taxable_amount_id"
+    t.text "vendor_address"
     t.string "vendor_poc_name"
     t.string "vendor_poc_email"
     t.string "vendor_poc_mobile_number"
+    t.integer "discount_type_id"
+    t.text "rejection_note"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4691,13 +4786,13 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["vendor_id"], name: "index_purchase_orders_on_vendor_id"
   end
 
-  create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "purchase_request_item_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "purchase_request_id"
     t.integer "item_id"
     t.integer "vendor_id"
@@ -4731,16 +4826,20 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["vendor_id"], name: "index_purchase_request_items_on_vendor_id"
   end
 
-  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "location_id"
+    t.integer "department_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
@@ -4748,14 +4847,12 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "approved_at"
     t.string "order_number"
     t.text "reject_note"
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.integer "controlling_level_id"
-    t.integer "company_id"
     t.integer "cost_center_id"
+    t.integer "company_id"
+    t.integer "total_amount_id"
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
+    t.index ["total_amount_id"], name: "index_purchase_requests_on_total_amount_id"
   end
 
   create_table "purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4859,7 +4956,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "reference_type_id"
   end
 
-  create_table "quotations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "quotations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "vendor_name"
     t.string "vendor_location"
     t.string "estimated_delivery_time"
@@ -4880,7 +4977,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["quotation_number"], name: "index_quotations_on_quotation_number"
   end
 
-  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "location_id"
     t.integer "item_id"
     t.datetime "start_date"
@@ -4891,7 +4988,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "amount_id"
   end
 
-  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "vendor_id"
     t.boolean "renewable"
@@ -4903,6 +5000,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "renewal_alert_period_id"
     t.string "note"
     t.integer "company_id"
+    t.string "rate_contract_number"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5221,7 +5319,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
-  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "ip", null: false
     t.string "ip_type"
     t.string "user_agent"
@@ -5326,6 +5424,21 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "security_deposits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.integer "vendor_location_id"
+    t.integer "cost_center_id"
+    t.integer "department_id"
+    t.integer "location_id"
+    t.text "note"
+    t.text "description"
+    t.integer "payable_amount_id"
+    t.integer "original_amount_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "payment_agreement_id"
+  end
+
   create_table "signedup_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.string "mobile_number"
@@ -5352,6 +5465,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "state_code"
   end
 
   create_table "status_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5418,7 +5532,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
-  create_table "tax_per_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "tax_per_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "document_type"
     t.bigint "document_id"
     t.string "tax_rate_type"
@@ -5728,14 +5842,14 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
   end
 
-  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_user_agent_client_statuses_on_name"
   end
 
-  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "user_agent", null: false
     t.integer "user_id", null: false
     t.integer "status_id", null: false
@@ -5753,7 +5867,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["verification_mode"], name: "index_user_agent_clients_on_verification_mode"
   end
 
-  create_table "user_auth_failures", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_auth_failures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.boolean "locked"
     t.datetime "created_at", null: false
@@ -5843,3 +5957,1194 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_user_department_mappings_on_user_id"
   end
 
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "timestamp"
+    t.string "user_agent"
+    t.string "timezone"
+    t.string "fingerprint"
+    t.string "language"
+    t.string "system_language"
+    t.string "browser"
+    t.string "browser_version"
+    t.string "browser_engine"
+    t.string "browser_engine_version"
+    t.string "os_name"
+    t.string "os_version"
+    t.integer "screen_width"
+    t.integer "screen_height"
+    t.integer "device_x_dpi"
+    t.integer "device_y_dpi"
+    t.integer "color_depth"
+    t.boolean "java_enabled"
+    t.string "java_version"
+    t.boolean "flash_enabled"
+    t.string "flash_version"
+    t.boolean "silver_light_enabled"
+    t.string "silver_light_version"
+    t.boolean "is_mime_types"
+    t.string "mime_types_list"
+    t.text "fonts_list"
+    t.boolean "is_local_storage"
+    t.boolean "is_session_storage"
+    t.boolean "is_cookie"
+    t.text "plugins"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_mobile"
+    t.integer "status_id", null: false
+    t.text "message"
+  end
+
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_device_statuses_on_name"
+  end
+
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.string "fingerprint"
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "client_id"
+    t.string "client_type"
+    t.text "message"
+    t.index ["company_id"], name: "index_user_devices_on_company_id"
+    t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
+    t.index ["status_id"], name: "index_user_devices_on_status_id"
+    t.index ["user_id"], name: "index_user_devices_on_user_id"
+    t.index ["verification_mode"], name: "index_user_devices_on_verification_mode"
+  end
+
+  create_table "user_group_item_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "user_group_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_deleted", default: false
+    t.integer "user_group_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_user_group_item_mappings_on_deleted_at"
+    t.index ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id"
+    t.index ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id"
+    t.index ["user_id"], name: "index_user_group_item_mappings_on_user_id"
+  end
+
+  create_table "user_group_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "user_group_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_group_items_on_name"
+    t.index ["user_group_id"], name: "index_user_group_items_on_user_group_id"
+  end
+
+  create_table "user_groups", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_deleted", default: false
+    t.string "application"
+    t.datetime "deleted_at"
+    t.index ["company_id"], name: "index_user_groups_on_company_id"
+    t.index ["deleted_at"], name: "index_user_groups_on_deleted_at"
+    t.index ["name"], name: "index_user_groups_on_name"
+  end
+
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_ip_statuses_on_name"
+  end
+
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.integer "accuracy_radius"
+    t.index ["ip"], name: "index_user_ips_on_ip"
+    t.index ["ip_type"], name: "index_user_ips_on_ip_type"
+    t.index ["status_id"], name: "index_user_ips_on_status_id"
+    t.index ["user_id"], name: "index_user_ips_on_user_id"
+    t.index ["verification_mode"], name: "index_user_ips_on_verification_mode"
+  end
+
+  create_table "user_login_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "ip_address"
+    t.string "referrer"
+    t.string "application"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_login_tracks_on_user_id"
+  end
+
+  create_table "user_manager_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "manager_id"
+    t.integer "finance_manager_id"
+    t.integer "approves_to_id"
+    t.integer "approves_finance_to_id"
+    t.integer "greater_than_amount_id"
+    t.boolean "default", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "policy_id", null: false
+    t.integer "purpose_id"
+    t.integer "travel_manager_id"
+    t.boolean "manager_violation_only"
+    t.boolean "finance_violation_only"
+    t.integer "travel_booking_selector_id"
+    t.integer "travel_booking_approves_to_id"
+    t.integer "travel_approves_to_id"
+    t.boolean "approves_to_violation_only", default: false
+    t.boolean "approves_finance_to_violation_only", default: false
+    t.index ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id"
+    t.index ["approves_to_id"], name: "index_user_manager_mappings_on_approves_to_id"
+    t.index ["finance_manager_id"], name: "index_user_manager_mappings_on_finance_manager_id"
+    t.index ["greater_than_amount_id"], name: "index_user_manager_mappings_on_greater_than_amount_id"
+    t.index ["manager_id"], name: "index_user_manager_mappings_on_manager_id"
+    t.index ["policy_id"], name: "index_user_manager_mappings_on_policy_id"
+    t.index ["user_id"], name: "index_user_manager_mappings_on_user_id"
+  end
+
+  create_table "user_panel_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.boolean "disburse"
+    t.boolean "expense_management"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "yes_bank_account_transfer"
+    t.boolean "invoicing_system", default: false
+    t.boolean "travel_request", default: false
+    t.index ["user_id"], name: "index_user_panel_subscriptions_on_user_id"
+  end
+
+  create_table "user_permissions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.boolean "create_beneficiaries"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "edit_terms_within_po", default: false
+    t.boolean "crud_inventory_item_po", default: true
+    t.boolean "crud_inventory_item_non_po", default: true
+    t.index ["company_id"], name: "index_user_permissions_on_company_id"
+    t.index ["user_id"], name: "index_user_permissions_on_user_id"
+  end
+
+  create_table "user_pocket_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_pockets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.integer "balance_id"
+    t.integer "user_pocket_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "account_code"
+    t.boolean "atm_withdrawal_pocket", default: false
+    t.integer "user_id"
+    t.integer "base_currency_id"
+    t.integer "company_pocket_template_id"
+    t.boolean "active", default: true
+    t.index ["balance_id"], name: "index_user_pockets_on_balance_id"
+    t.index ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id"
+  end
+
+  create_table "user_profiles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "avatar_file_name"
+    t.string "avatar_content_type"
+    t.integer "avatar_file_size"
+    t.datetime "avatar_updated_at"
+    t.boolean "kyc_verified"
+    t.string "gcm_sender_id"
+    t.string "employee_id"
+    t.string "payroll_id"
+    t.integer "default_currency_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "date_of_birth"
+    t.string "gender"
+    t.string "address_1"
+    t.string "address_2"
+    t.string "city"
+    t.integer "state_id"
+    t.string "pin_code"
+    t.string "signature_file_name"
+    t.string "signature_content_type"
+    t.integer "signature_file_size"
+    t.datetime "signature_updated_at"
+    t.string "signature_title"
+    t.index ["default_currency_id"], name: "index_user_profiles_on_default_currency_id"
+    t.index ["state_id"], name: "fk_rails_9207fd1f96"
+    t.index ["user_id"], name: "index_user_profiles_on_user_id"
+  end
+
+  create_table "user_role_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "user_role_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "purpose_id"
+    t.integer "company_department_id"
+    t.integer "branch_location_id"
+    t.index ["user_id"], name: "index_user_role_mappings_on_user_id"
+    t.index ["user_role_id"], name: "index_user_role_mappings_on_user_role_id"
+  end
+
+  create_table "user_roles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_session_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_session_id", null: false
+    t.string "http_method"
+    t.string "app"
+    t.string "path"
+    t.string "controller", null: false
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "view"
+    t.integer "status_id"
+    t.string "message"
+    t.integer "response_code"
+    t.integer "current_resolution_height"
+    t.integer "current_resolution_width"
+    t.integer "mouse_pos_x"
+    t.integer "mouse_pos_y"
+    t.string "ip"
+    t.index ["action"], name: "index_user_session_events_on_action"
+    t.index ["app"], name: "index_user_session_events_on_app"
+    t.index ["controller"], name: "index_user_session_events_on_controller"
+    t.index ["path"], name: "index_user_session_events_on_path"
+    t.index ["user_session_id"], name: "index_user_session_events_on_user_session_id"
+  end
+
+  create_table "user_session_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.string "app"
+    t.string "device"
+    t.string "view"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id"
+    t.string "message"
+    t.index ["app"], name: "index_user_session_notifications_on_app"
+    t.index ["company_id"], name: "index_user_session_notifications_on_company_id"
+    t.index ["device"], name: "index_user_session_notifications_on_device"
+    t.index ["user_id"], name: "index_user_session_notifications_on_user_id"
+    t.index ["view"], name: "index_user_session_notifications_on_view"
+  end
+
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_session_statuses_on_name"
+  end
+
+  create_table "user_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.string "ip", null: false
+    t.string "ip_type"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.text "landing_page"
+    t.string "app_version"
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.string "utm_source"
+    t.string "utm_medium"
+    t.string "utm_term"
+    t.string "utm_content"
+    t.string "utm_campaign"
+    t.datetime "started_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "access_token_id"
+    t.datetime "last_request_at"
+    t.bigint "duration"
+    t.integer "status_id"
+    t.string "message"
+    t.string "login_username"
+    t.integer "accuracy_radius"
+    t.string "username"
+    t.integer "user_device_id"
+    t.text "user_agent"
+    t.integer "user_ip_id"
+    t.integer "user_agent_client_id"
+    t.integer "admin_user_id"
+    t.text "admin_access_reason"
+    t.text "admin_access_reason_details"
+    t.string "scopes"
+    t.string "admin_access_requested_by"
+    t.index ["company_id"], name: "index_user_sessions_on_company_id"
+    t.index ["ip"], name: "index_user_sessions_on_ip"
+    t.index ["latitude"], name: "index_user_sessions_on_latitude"
+    t.index ["longitude"], name: "index_user_sessions_on_longitude"
+    t.index ["started_at"], name: "index_user_sessions_on_started_at"
+    t.index ["user_id"], name: "index_user_sessions_on_user_id"
+  end
+
+  create_table "user_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "name", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_tags_on_user_id"
+  end
+
+  create_table "user_team_group_item_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_group_id", null: false
+    t.integer "user_group_item_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_team_id"
+    t.index ["user_group_id"], name: "index_user_team_group_item_mappings_on_user_group_id"
+    t.index ["user_group_item_id"], name: "index_user_team_group_item_mappings_on_user_group_item_id"
+    t.index ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id"
+  end
+
+  create_table "user_teams", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name", null: false
+    t.string "application"
+    t.index ["company_id"], name: "index_user_teams_on_company_id"
+  end
+
+  create_table "user_wallet_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "CreateUserWallets", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_wallet_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_wallet_id", null: false
+    t.integer "user_wallet_track_action_id", null: false
+    t.integer "amount_id", null: false
+    t.integer "action_user_id", null: false
+    t.integer "balance_after_action_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_user_id"], name: "index_user_wallet_tracks_on_action_user_id"
+    t.index ["amount_id"], name: "index_user_wallet_tracks_on_amount_id"
+    t.index ["balance_after_action_id"], name: "index_user_wallet_tracks_on_balance_after_action_id"
+    t.index ["user_wallet_id"], name: "index_user_wallet_tracks_on_user_wallet_id"
+    t.index ["user_wallet_track_action_id"], name: "index_user_wallet_tracks_on_user_wallet_track_action_id"
+  end
+
+  create_table "user_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "balance_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_user_wallets_on_balance_id"
+    t.index ["user_id"], name: "index_user_wallets_on_user_id"
+  end
+
+  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "email", default: ""
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.integer "failed_attempts", default: 0, null: false
+    t.string "unlock_token"
+    t.datetime "locked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id", null: false
+    t.string "mobile_number"
+    t.boolean "active", default: true, null: false
+    t.string "invitation_token"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer "invitation_limit"
+    t.integer "invited_by_id"
+    t.string "invited_by_type"
+    t.integer "invitations_count", default: 0
+    t.string "otp"
+    t.datetime "otp_sent_at"
+    t.datetime "otp_verified_at"
+    t.boolean "otp_verified", default: false, null: false
+    t.integer "otp_count", default: 0, null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.boolean "mobile_only_invite", default: false
+    t.string "mothers_maiden_name"
+    t.boolean "verified", default: false
+    t.integer "otp_request_type_id"
+    t.boolean "default_password", default: false
+    t.boolean "point_of_contact", default: false
+    t.integer "otp_attempts", default: 0
+    t.integer "user_delegate_id"
+    t.boolean "delegation_enabled"
+    t.text "gl_config"
+    t.boolean "vacation_delegate_enabled"
+    t.datetime "password_changed_at"
+    t.datetime "last_activity_at"
+    t.datetime "expired_at"
+    t.index ["company_id"], name: "index_users_on_company_id"
+    t.index ["email"], name: "index_users_on_email"
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invitations_count"], name: "index_users_on_invitations_count"
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "vehicle_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "vehicle_name", null: false
+    t.integer "rate_id", null: false
+    t.integer "distance_unit_id", null: false
+    t.integer "policy_id"
+    t.boolean "is_deleted", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_vehicle_rates_on_deleted_at"
+    t.index ["distance_unit_id"], name: "index_vehicle_rates_on_distance_unit_id"
+    t.index ["is_deleted"], name: "index_vehicle_rates_on_is_deleted"
+    t.index ["policy_id"], name: "index_vehicle_rates_on_policy_id"
+    t.index ["rate_id"], name: "index_vehicle_rates_on_rate_id"
+  end
+
+  create_table "vendor_account_transactions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "vendor_account_id"
+    t.integer "transaction_type_id"
+    t.integer "amount_id"
+    t.integer "payment_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amount_id"], name: "index_vendor_account_transactions_on_amount_id"
+    t.index ["payment_id"], name: "index_vendor_account_transactions_on_payment_id"
+    t.index ["transaction_type_id"], name: "index_vendor_account_transactions_on_transaction_type_id"
+    t.index ["vendor_account_id"], name: "index_vendor_account_transactions_on_vendor_account_id"
+  end
+
+  create_table "vendor_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "balance_id"
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_vendor_accounts_on_balance_id"
+    t.index ["vendor_id"], name: "index_vendor_accounts_on_vendor_id"
+  end
+
+  create_table "vendor_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "attached_file_file_name"
+    t.string "attached_file_content_type"
+    t.integer "attached_file_file_size"
+    t.datetime "attached_file_updated_at"
+    t.text "description"
+    t.integer "yes_bank_vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "attachment_type"
+    t.index ["yes_bank_vendor_id"], name: "index_vendor_attachments_on_yes_bank_vendor_id"
+  end
+
+  create_table "vendor_payment_wallets", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "balance_id"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_vendor_payment_wallets_on_balance_id"
+    t.index ["user_id"], name: "index_vendor_payment_wallets_on_user_id"
+  end
+
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "tds_rates_list_id"
+    t.index ["vendor_id"], name: "index_vendor_tds_rates_on_vendor_id"
+  end
+
+  create_table "vendor_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_vendor_types_on_company_id"
+  end
+
+  create_table "version_associations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "version_id"
+    t.string "foreign_key_name", null: false
+    t.integer "foreign_key_id"
+    t.index ["foreign_key_name", "foreign_key_id"], name: "index_version_associations_on_foreign_key"
+    t.index ["version_id"], name: "index_version_associations_on_version_id"
+  end
+
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "item_type", limit: 191, null: false
+    t.integer "item_id", null: false
+    t.string "event", null: false
+    t.string "whodunnit"
+    t.text "object", limit: 4294967295
+    t.datetime "created_at", precision: 6
+    t.integer "transaction_id"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+    t.index ["transaction_id"], name: "index_versions_on_transaction_id"
+  end
+
+  create_table "virtual_account_collect_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.boolean "found_virtual_account"
+    t.boolean "update_company_balance"
+    t.boolean "create_payment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "account_transaction_id"
+    t.text "note"
+  end
+
+  create_table "virtual_account_purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "virtual_account_transactions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "beneficiary_account_ifsc"
+    t.string "transfer_type"
+    t.string "beneficiary_full_name"
+    t.string "transfer_id"
+    t.string "transfer_timestamp"
+    t.string "transfer_currency"
+    t.string "transfer_amount"
+    t.string "remitter_account_no"
+    t.string "remitter_account_ifsc"
+    t.string "remitter_account_type"
+    t.string "remitter_full_name"
+    t.string "remitter_address"
+    t.string "note"
+    t.string "credited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "virtual_account_id"
+    t.boolean "processed"
+    t.boolean "receiving_account_credited"
+    t.string "beneficiary_account_no"
+  end
+
+  create_table "virtual_bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "account_number"
+    t.string "ifsc"
+    t.text "description"
+    t.integer "parent_id"
+    t.string "parent_type"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "expires_by"
+    t.integer "purpose_id"
+    t.boolean "active", default: true
+    t.boolean "is_deleted", default: false
+    t.integer "initiating_user_id"
+    t.string "name"
+    t.integer "receiving_account_id"
+    t.string "receiving_account_type"
+    t.integer "maximum_transaction_amount_id"
+    t.integer "minimum_transaction_amount_id"
+    t.integer "allowed_transaction_count"
+    t.boolean "neft", default: true
+    t.boolean "imps", default: true
+    t.boolean "rtgs", default: true
+    t.boolean "current_account", default: true
+    t.boolean "savings_account", default: true
+    t.boolean "upi", default: true
+    t.date "active_after"
+    t.date "active_on"
+    t.integer "maximum_amount_id"
+    t.integer "exact_transaction_amount_id"
+    t.string "application", null: false
+    t.integer "customer_id"
+    t.boolean "default_account"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_virtual_bank_accounts_on_deleted_at"
+  end
+
+  create_table "web_hook_event_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "web_hook_id", null: false
+    t.integer "web_hook_event_id", null: false
+    t.boolean "is_deleted", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_web_hook_event_mappings_on_deleted_at"
+    t.index ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted"
+    t.index ["web_hook_event_id"], name: "index_web_hook_event_mappings_on_web_hook_event_id"
+    t.index ["web_hook_id"], name: "index_web_hook_event_mappings_on_web_hook_id"
+  end
+
+  create_table "web_hook_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_web_hook_events_on_name"
+  end
+
+  create_table "web_hook_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "web_hook_id"
+    t.integer "web_hook_event_id"
+    t.integer "company_id"
+    t.text "url"
+    t.text "request_body"
+    t.text "request_header"
+    t.decimal "response_time", precision: 10
+    t.text "response_body", limit: 16777215
+    t.integer "response_status"
+    t.integer "attempt"
+    t.datetime "last_attempted_at"
+    t.boolean "attempt_success"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_web_hook_tracks_on_company_id"
+    t.index ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id"
+    t.index ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id"
+  end
+
+  create_table "web_hooks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.text "url", null: false
+    t.string "secret"
+    t.integer "created_by_user_id", null: false
+    t.integer "company_id", null: false
+    t.boolean "is_deleted", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "headers"
+    t.datetime "deleted_at"
+    t.index ["company_id"], name: "index_web_hooks_on_company_id"
+    t.index ["created_by_user_id"], name: "index_web_hooks_on_created_by_user_id"
+    t.index ["deleted_at"], name: "index_web_hooks_on_deleted_at"
+    t.index ["is_deleted"], name: "index_web_hooks_on_is_deleted"
+  end
+
+  create_table "whitelisted_ip_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "whitelisted_ips", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "ip_address", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "whitelisted_ip_type_id", null: false
+    t.index ["company_id"], name: "index_whitelisted_ips_on_company_id"
+    t.index ["ip_address"], name: "index_whitelisted_ips_on_ip_address"
+  end
+
+  create_table "yes_bank_company_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "company_id"
+    t.integer "wallet_balance_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "balance_id"
+    t.index ["company_id"], name: "index_yes_bank_company_accounts_on_company_id"
+  end
+
+  create_table "yes_bank_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.boolean "custom_bank_account", default: false
+    t.integer "company_id"
+    t.boolean "yes_bank_api_enabled", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "yes_bank_vendors", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "mobile_number"
+    t.boolean "authorized"
+    t.text "description"
+    t.boolean "is_deleted", default: false
+    t.string "pan"
+    t.string "tin"
+    t.string "gst"
+    t.boolean "gst_registered"
+    t.string "state"
+    t.integer "state_code_id"
+    t.integer "created_by_id"
+    t.integer "vendor_type_id"
+    t.string "address"
+    t.string "business_name"
+    t.integer "payment_term_id"
+    t.integer "currency_id"
+    t.integer "tds_rates_list_id"
+    t.string "vendor_id"
+    t.boolean "disabled", default: false
+    t.datetime "deleted_at"
+    t.string "vedor_code"
+    t.boolean "msme_registered", default: false
+    t.string "msme_registration_number"
+    t.integer "status_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.string "trade_name"
+    t.string "reject_note"
+    t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
+    t.index ["deleted_at"], name: "index_yes_bank_vendors_on_deleted_at"
+    t.index ["name"], name: "index_yes_bank_vendors_on_name"
+    t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
+    t.index ["vendor_id"], name: "index_yes_bank_vendors_on_vendor_id"
+    t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
+  end
+
+  add_foreign_key "accounting_system_configurations", "companies"
+  add_foreign_key "addresses", "states"
+  add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
+  add_foreign_key "admin_summary_mail_configs", "periods"
+  add_foreign_key "admin_summary_mail_configs", "users"
+  add_foreign_key "admin_user_role_mappings", "admin_user_roles"
+  add_foreign_key "admin_user_role_mappings", "admin_users"
+  add_foreign_key "agreements", "agreement_types"
+  add_foreign_key "amounts", "currencies"
+  add_foreign_key "approval_routes", "policies"
+  add_foreign_key "approval_routes", "purposes"
+  add_foreign_key "approval_routes", "users"
+  add_foreign_key "authentications", "users"
+  add_foreign_key "auto_submit_configs", "periods"
+  add_foreign_key "auto_sync_configs", "auto_sync_config_types"
+  add_foreign_key "auto_sync_configs", "companies"
+  add_foreign_key "auto_sync_configs", "periods"
+  add_foreign_key "balance_sheets", "users"
+  add_foreign_key "bank_accounts", "yes_bank_vendors"
+  add_foreign_key "bank_payment_request_comments", "users"
+  add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
+  add_foreign_key "bank_transactions", "amounts"
+  add_foreign_key "bank_transactions", "companies"
+  add_foreign_key "beneficiary_payments", "bank_accounts"
+  add_foreign_key "beneficiary_payments", "categories"
+  add_foreign_key "beneficiary_payments", "departments"
+  add_foreign_key "beneficiary_payments", "yes_bank_vendors", column: "vendor_id"
+  add_foreign_key "bill_of_supplies", "companies"
+  add_foreign_key "bill_of_supplies", "document_statuses"
+  add_foreign_key "bill_of_supplies", "payment_terms"
+  add_foreign_key "bill_of_supplies", "procurement_terms"
+  add_foreign_key "bill_of_supplies", "procurements"
+  add_foreign_key "bill_of_supplies", "users"
+  add_foreign_key "booking_attachments", "bookings"
+  add_foreign_key "booking_attachments", "companies"
+  add_foreign_key "booking_attachments", "users"
+  add_foreign_key "booking_requests", "booking_statuses"
+  add_foreign_key "booking_requests", "booking_types"
+  add_foreign_key "bookings", "booking_requests"
+  add_foreign_key "bookings", "booking_statuses"
+  add_foreign_key "bookings", "booking_types"
+  add_foreign_key "branch_locations", "companies"
+  add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_criteria_mappings", "budgets"
+  add_foreign_key "budget_modification_trails", "budgets"
+  add_foreign_key "budget_rule_branch_location_mappings", "branch_locations"
+  add_foreign_key "budget_rule_branch_location_mappings", "budget_rules"
+  add_foreign_key "budget_rule_category_mappings", "budget_rules"
+  add_foreign_key "budget_rule_category_mappings", "categories"
+  add_foreign_key "budget_rule_department_mappings", "budget_rules"
+  add_foreign_key "budget_rule_department_mappings", "departments"
+  add_foreign_key "budget_rule_expense_type_mappings", "budget_rules"
+  add_foreign_key "budget_rule_expense_type_mappings", "expense_types"
+  add_foreign_key "budget_rule_field_mappings", "budget_rules"
+  add_foreign_key "budget_rule_field_mappings", "field_configurations"
+  add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
+  add_foreign_key "budget_rules", "amounts"
+  add_foreign_key "budget_rules", "categories"
+  add_foreign_key "budget_rules", "periods"
+  add_foreign_key "budget_rules", "policies"
+  add_foreign_key "budget_rules", "rule_types"
+  add_foreign_key "budgets", "companies"
+  add_foreign_key "budgets", "periods"
+  add_foreign_key "budgets", "users"
+  add_foreign_key "callback_tracks", "companies"
+  add_foreign_key "card_assign_request_tracks", "card_assign_requests"
+  add_foreign_key "card_assign_requests", "admin_review_workflows"
+  add_foreign_key "card_assign_requests", "card_programs"
+  add_foreign_key "card_assign_requests", "cards"
+  add_foreign_key "card_assign_requests", "companies"
+  add_foreign_key "card_balance_histories", "amounts"
+  add_foreign_key "card_balance_histories", "cards"
+  add_foreign_key "card_configurations", "card_statuses"
+  add_foreign_key "card_expense_configs", "policies"
+  add_foreign_key "card_expenses", "card_transactions"
+  add_foreign_key "card_expenses", "expenses"
+  add_foreign_key "card_limits", "card_restrictions"
+  add_foreign_key "card_restrictions", "cards"
+  add_foreign_key "card_transactions", "cards"
+  add_foreign_key "card_transactions", "users"
+  add_foreign_key "cards", "card_types"
+  add_foreign_key "cards", "companies"
+  add_foreign_key "cards", "users"
+  add_foreign_key "cash_expense_configs", "policies"
+  add_foreign_key "cash_on_hands", "users"
+  add_foreign_key "categories", "companies"
+  add_foreign_key "collect_company_details", "companies"
+  add_foreign_key "company_accounts", "companies"
+  add_foreign_key "company_accounts", "company_account_types"
+  add_foreign_key "company_agreement_tracks", "agreements"
+  add_foreign_key "company_agreement_tracks", "users"
+  add_foreign_key "company_balance_histories", "companies"
+  add_foreign_key "company_branches", "collect_company_details"
+  add_foreign_key "company_branches", "companies"
+  add_foreign_key "company_configurations", "companies"
+  add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_departments", "companies"
+  add_foreign_key "company_funds_auto_transfer_configs", "companies"
+  add_foreign_key "company_funds_load_requests", "amounts"
+  add_foreign_key "company_funds_load_requests", "companies"
+  add_foreign_key "company_kyc_trails", "company_kycs"
+  add_foreign_key "company_kycs", "companies"
+  add_foreign_key "company_location_departments", "branch_locations"
+  add_foreign_key "company_location_departments", "company_departments"
+  add_foreign_key "company_pocket_templates", "companies"
+  add_foreign_key "company_pocket_templates", "user_pocket_types"
+  add_foreign_key "company_tags", "companies"
+  add_foreign_key "cost_centers", "companies"
+  add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "customer_account_transactions", "customer_accounts"
+  add_foreign_key "customer_accounts", "customers"
+  add_foreign_key "customer_attachments", "customers"
+  add_foreign_key "delivery_challans", "companies"
+  add_foreign_key "delivery_challans", "document_statuses"
+  add_foreign_key "delivery_challans", "payment_terms"
+  add_foreign_key "delivery_challans", "procurement_terms"
+  add_foreign_key "delivery_challans", "procurements"
+  add_foreign_key "delivery_challans", "users"
+  add_foreign_key "departments", "companies"
+  add_foreign_key "departments", "cost_centers"
+  add_foreign_key "distance_expenses", "expenses"
+  add_foreign_key "distances", "physical_units"
+  add_foreign_key "document_items", "items", column: "inventory_line_item_id"
+  add_foreign_key "document_items", "purchase_order_items"
+  add_foreign_key "document_level_reviewer_mappings", "policies"
+  add_foreign_key "document_number_configs", "companies"
+  add_foreign_key "document_number_configs", "document_number_config_types"
+  add_foreign_key "document_number_configs", "purposes"
+  add_foreign_key "document_slices", "receipts"
+  add_foreign_key "e_way_bills", "amounts"
+  add_foreign_key "e_way_bills", "companies"
+  add_foreign_key "e_way_bills", "payment_terms"
+  add_foreign_key "e_way_bills", "procurement_terms"
+  add_foreign_key "e_way_bills", "procurements"
+  add_foreign_key "e_way_bills", "users"
+  add_foreign_key "email_authorizations", "users"
+  add_foreign_key "expense_data_extracts", "amounts"
+  add_foreign_key "expense_data_extracts", "categories"
+  add_foreign_key "expense_rules", "categories"
+  add_foreign_key "expense_rules", "expense_rule_types"
+  add_foreign_key "expense_rules", "policies"
+  add_foreign_key "expense_rules", "rule_types"
+  add_foreign_key "expenses", "amounts"
+  add_foreign_key "expenses", "categories"
+  add_foreign_key "expenses", "expense_statuses"
+  add_foreign_key "expenses", "expense_tax_types"
+  add_foreign_key "expenses", "expense_types"
+  add_foreign_key "expenses", "reports"
+  add_foreign_key "expenses", "users"
+  add_foreign_key "export_configs", "companies"
+  add_foreign_key "export_configs", "export_config_types"
+  add_foreign_key "export_preferences", "companies"
+  add_foreign_key "export_preferences", "export_fields"
+  add_foreign_key "feedbacks", "feedback_types"
+  add_foreign_key "feedbacks", "users"
+  add_foreign_key "field_configurations", "companies"
+  add_foreign_key "field_configurations", "field_types"
+  add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "field_parent_mappings", "field_configurations"
+  add_foreign_key "field_parent_mappings", "field_parent_types"
+  add_foreign_key "finly_transactions", "amounts"
+  add_foreign_key "finly_transactions", "companies"
+  add_foreign_key "finly_transactions", "payment_purposes"
+  add_foreign_key "finly_transactions", "payments"
+  add_foreign_key "finly_transactions", "transaction_types"
+  add_foreign_key "individual_kyc_tracks", "individual_kycs"
+  add_foreign_key "individual_kycs", "admin_review_workflows"
+  add_foreign_key "individual_kycs", "companies"
+  add_foreign_key "individual_kycs", "users"
+  add_foreign_key "invoice_attachments", "invoices"
+  add_foreign_key "invoice_line_items", "categories"
+  add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoice_number_configs", "invoice_number_config_types"
+  add_foreign_key "invoice_number_configs", "purposes"
+  add_foreign_key "invoices", "addresses"
+  add_foreign_key "invoices", "gstin_locations"
+  add_foreign_key "invoices", "payment_terms"
+  add_foreign_key "inward_document_items", "inward_documents"
+  add_foreign_key "inward_document_items", "items", column: "inventory_line_item_id"
+  add_foreign_key "inward_document_items", "purchase_order_items"
+  add_foreign_key "inward_documents", "companies"
+  add_foreign_key "inward_documents", "procurements"
+  add_foreign_key "inward_documents", "users"
+  add_foreign_key "items", "categories"
+  add_foreign_key "items", "companies"
+  add_foreign_key "items", "supply_item_types"
+  add_foreign_key "items", "tax_rates"
+  add_foreign_key "itz_cash_company_accounts", "companies"
+  add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
+  add_foreign_key "itz_cash_dmt_senders", "users"
+  add_foreign_key "itz_cash_properties", "companies"
+  add_foreign_key "kyc_documents", "company_kyc_document_types"
+  add_foreign_key "kyc_documents", "company_kycs"
+  add_foreign_key "login_agreement_mappings", "agreements"
+  add_foreign_key "login_agreement_mappings", "users"
+  add_foreign_key "manager_summary_mail_configs", "periods"
+  add_foreign_key "manager_summary_mail_configs", "users"
+  add_foreign_key "manual_expenses", "expenses"
+  add_foreign_key "mcc_category_mappings", "categories"
+  add_foreign_key "money_request_comments", "expenses"
+  add_foreign_key "money_request_comments", "money_requests"
+  add_foreign_key "money_request_comments", "payments"
+  add_foreign_key "money_request_comments", "users"
+  add_foreign_key "money_request_item_categories", "companies"
+  add_foreign_key "money_request_items", "amounts"
+  add_foreign_key "money_request_items", "categories"
+  add_foreign_key "money_request_items", "money_requests"
+  add_foreign_key "money_request_processor_mappings", "amounts"
+  add_foreign_key "money_request_processor_mappings", "payments"
+  add_foreign_key "money_request_processor_mappings", "users"
+  add_foreign_key "money_request_processors", "companies"
+  add_foreign_key "money_request_processors", "payment_orders"
+  add_foreign_key "money_request_tracks", "money_request_tracking_actions"
+  add_foreign_key "money_request_tracks", "money_requests"
+  add_foreign_key "money_request_tracks", "payments"
+  add_foreign_key "money_requests", "payment_modes"
+  add_foreign_key "money_requests", "payments"
+  add_foreign_key "money_requests", "policies"
+  add_foreign_key "money_requests", "travel_requests"
+  add_foreign_key "money_requests", "users"
+  add_foreign_key "new_card_requests", "card_types"
+  add_foreign_key "new_card_requests", "companies"
+  add_foreign_key "notifications", "notification_types"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "notifier_type_configurations", "notifier_types", column: "event_id"
+  add_foreign_key "notifier_type_configurations", "users"
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "outward_invoice_attachments", "companies"
+  add_foreign_key "outward_invoice_attachments", "outward_invoices"
+  add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_trails", "amounts"
+  add_foreign_key "outward_invoice_trails", "outward_invoices"
+  add_foreign_key "outward_invoice_trails", "users"
+  add_foreign_key "outward_invoices", "amounts"
+  add_foreign_key "outward_invoices", "customers"
+  add_foreign_key "outward_invoices", "locations"
+  add_foreign_key "outward_invoices", "outward_invoice_types"
+  add_foreign_key "outward_invoices", "payment_terms"
+  add_foreign_key "outward_invoices", "users"
+  add_foreign_key "payment_file_configurations", "companies"
+  add_foreign_key "payment_orders", "companies"
+  add_foreign_key "payment_orders", "payment_order_statuses"
+  add_foreign_key "payment_receivables", "amounts"
+  add_foreign_key "payment_receivables", "companies"
+  add_foreign_key "payment_receivables", "customers"
+  add_foreign_key "payment_receivables", "payment_receivable_statuses"
+  add_foreign_key "payments", "amounts"
+  add_foreign_key "payments", "categories"
+  add_foreign_key "payments", "payment_types"
+  add_foreign_key "payments", "procurements"
+  add_foreign_key "payments", "purchase_orders"
+  add_foreign_key "per_diem_expenses", "expenses"
+  add_foreign_key "per_diem_expenses", "per_diems"
+  add_foreign_key "policies", "companies"
+  add_foreign_key "policy_configurations", "policies"
+  add_foreign_key "policy_field_mappings", "field_configurations"
+  add_foreign_key "policy_field_mappings", "policies"
+  add_foreign_key "policy_user_mappings", "policies"
+  add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "policy_user_roles", "policies"
+  add_foreign_key "policy_user_roles", "user_roles"
+  add_foreign_key "policy_user_roles", "users"
+  add_foreign_key "procurement_attachments", "users"
+  add_foreign_key "procurement_charges", "amounts"
+  add_foreign_key "procurement_comments", "users"
+  add_foreign_key "procurement_status_taggables", "procurements"
+  add_foreign_key "procurement_status_taggables", "status_tags"
+  add_foreign_key "procurement_terms", "companies"
+  add_foreign_key "procurements", "companies"
+  add_foreign_key "procurements", "procurement_statuses"
+  add_foreign_key "procurements", "procurement_tracks"
+  add_foreign_key "procurements", "users"
+  add_foreign_key "purchase_order_items", "items", column: "inventory_line_item_id"
+  add_foreign_key "purchase_order_items", "purchase_orders"
+  add_foreign_key "purchase_orders", "companies"
+  add_foreign_key "purchase_orders", "gst_types"
+  add_foreign_key "purchase_orders", "gstin_locations"
+  add_foreign_key "purchase_orders", "payment_terms"
+  add_foreign_key "purchase_orders", "policies"
+  add_foreign_key "purchase_orders", "procurement_terms"
+  add_foreign_key "purchase_orders", "procurements"
+  add_foreign_key "purchase_orders", "purchase_order_statuses"
+  add_foreign_key "purchase_orders", "users"
+  add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
+  add_foreign_key "quickbooks_configurations", "users"
+  add_foreign_key "quickbooks_departments", "companies"
+  add_foreign_key "quickbooks_finly_integrations_users", "companies"
+  add_foreign_key "quickbooks_finly_integrations_users", "users"
+  add_foreign_key "quickbooks_payment_types", "companies"
+  add_foreign_key "receipt_email_parse_failures", "users"
+  add_foreign_key "receipt_emails", "expenses"
+  add_foreign_key "receipts", "receipt_emails"
+  add_foreign_key "receipts", "users"
+  add_foreign_key "report_comments", "expenses"
+  add_foreign_key "report_comments", "report_comment_actions"
+  add_foreign_key "report_comments", "reports"
+  add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
+  add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
+  add_foreign_key "report_tracks", "report_statuses"
+  add_foreign_key "report_tracks", "report_tracking_actions"
+  add_foreign_key "report_tracks", "reports"
+  add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
+  add_foreign_key "reports", "report_statuses"
+  add_foreign_key "reports", "users"
+  add_foreign_key "resource_templates", "users"
+  add_foreign_key "reviewal_levels", "policies"
+  add_foreign_key "sso_keys", "companies"
+  add_foreign_key "tally_configurations", "companies"
+  add_foreign_key "tax_rates", "companies"
+  add_foreign_key "time_expenses", "expenses"
+  add_foreign_key "time_objects", "physical_units"
+  add_foreign_key "transaction_details", "amounts"
+  add_foreign_key "transaction_details", "finly_transactions"
+  add_foreign_key "transcribed_expenses", "amounts"
+  add_foreign_key "transcribed_expenses", "expenses"
+  add_foreign_key "transcribed_expenses", "receipts"
+  add_foreign_key "transcribed_expenses", "users"
+  add_foreign_key "travel_members", "booking_requests"
+  add_foreign_key "travel_members", "bookings"
+  add_foreign_key "travel_request_comments", "travel_requests"
+  add_foreign_key "travel_request_comments", "users"
+  add_foreign_key "travel_request_destinations", "travel_requests"
+  add_foreign_key "travel_request_trails", "travel_requests"
+  add_foreign_key "travel_requests", "policies"
+  add_foreign_key "travel_requests", "users"
+  add_foreign_key "unique_identifiers", "companies"
+  add_foreign_key "unique_identifiers", "purposes"
+  add_foreign_key "user_balance_histories", "companies"
+  add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_branch_location_mappings", "branch_locations"
+  add_foreign_key "user_branch_location_mappings", "users"
+  add_foreign_key "user_delegate_mappings", "users"
+  add_foreign_key "user_department_mappings", "departments"
+  add_foreign_key "user_department_mappings", "users"
+  add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
+  add_foreign_key "user_group_item_mappings", "users"
+  add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_groups", "companies"
+  add_foreign_key "user_login_tracks", "users"
+  add_foreign_key "user_manager_mappings", "policies"
+  add_foreign_key "user_manager_mappings", "users"
+  add_foreign_key "user_panel_subscriptions", "users"
+  add_foreign_key "user_permissions", "companies"
+  add_foreign_key "user_permissions", "users"
+  add_foreign_key "user_profiles", "states"
+  add_foreign_key "user_profiles", "users"
+  add_foreign_key "user_role_mappings", "user_roles"
+  add_foreign_key "user_role_mappings", "users"
+  add_foreign_key "user_session_notifications", "companies"
+  add_foreign_key "user_session_notifications", "users"
+  add_foreign_key "user_tags", "users"
+  add_foreign_key "user_team_group_item_mappings", "user_group_items"
+  add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
+  add_foreign_key "user_wallet_tracks", "amounts"
+  add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
+  add_foreign_key "user_wallet_tracks", "user_wallets"
+  add_foreign_key "user_wallets", "users"
+  add_foreign_key "users", "companies"
+  add_foreign_key "vehicle_rates", "policies"
+  add_foreign_key "vendor_account_transactions", "amounts"
+  add_foreign_key "vendor_account_transactions", "payments"
+  add_foreign_key "vendor_account_transactions", "vendor_accounts"
+  add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "vendor_types", "companies"
+  add_foreign_key "web_hook_event_mappings", "web_hook_events"
+  add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
+  add_foreign_key "whitelisted_ips", "companies"
+  add_foreign_key "yes_bank_company_accounts", "companies"
+  add_foreign_key "yes_bank_vendors", "companies"
+  add_foreign_key "yes_bank_vendors", "tds_rates_lists"
+  add_foreign_key "yes_bank_vendors", "vendor_types"
+end

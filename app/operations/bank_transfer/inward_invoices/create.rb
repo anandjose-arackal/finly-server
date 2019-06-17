@@ -16,6 +16,10 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
     self.inward_invoice_parameters[:receiving_account_type] = "BankAccount"
     self.inward_invoice_parameters[:invoice_status_id] = InwardInvoiceStatus.id_for(:unpaid)
 
+    #strip_invoice_number
+    if self.inward_invoice_parameters&.dig(:invoice_number).present?
+      self.inward_invoice_parameters[:invoice_number] =self.inward_invoice_parameters[:invoice_number]&.strip
+    end
     # removing the remove_file attribute from invoice attachments
     if self.inward_invoice_parameters&.dig(:invoice_attachments_attributes).present?
       self.inward_invoice_parameters[:invoice_attachments_attributes].each do |attachment_params|

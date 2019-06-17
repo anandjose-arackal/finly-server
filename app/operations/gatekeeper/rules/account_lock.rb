@@ -1,20 +1,32 @@
 Gatekeeper::Checker.new 'AccountLock' do
 
-  LOCKING_PERIOD ||= 30.minutes
-
   section 'on authorization' do
 
     premise :user_login_invalid_password do
-      rule 'More than 5 failed attempts should lock the account' do
+      rule 'Multiple failed attempts should lock the account' do
         user = params[:user]
+        policy = SecurityPolicy::Manager.for(user)
+        next if user.nil? or policy.nil?
+
         auth_failure = user.user_auth_failures.build locked: false, ip: params[:ip], username: params[:username], invalid_password: true
-        if user.user_auth_failures.within_time(Time.now - LOCKING_PERIOD).size >= 4 && !user.locked_at.present?
+        next if policy.account_lock.within_timeframe.nil?
+
+        timeframe = Time.now - policy.account_lock.within_timeframe
+
+        # Check if the user password was changed post the timeframe. If so, consider that as the timeframe
+        if user.password_changed_at && user.password_changed_at > timeframe
+            timeframe = user.password_changed_at
+        end
+
+        if user.locked_at.blank? && user.user_auth_failures.within_time(timeframe).size >= policy.account_lock.max_attempts
           user.update(locked_at: DateTime.now)
           auth_failure.locked = true
 
           message "#{user.id} - #{user.email} > Too many failed password attempts. Locking the account"
+
+          # Todo send lock mailer
           response_code 401
-          level 5
+          level 3
           fail
         end
         auth_failure.save
@@ -42,10 +54,10 @@ Gatekeeper::Checker.new 'AccountLock' do
     premise :user_login_attempt do
       rule 'Do not allow locked accounts to login' do
         user = params[:user]
-        if user.locked_at.present? && (Time.now - user.locked_at) < LOCKING_PERIOD
+        if user.access_locked?
           # user.user_auth_failures.create locked: true
           message "#{user.id} - #{user.email} > Account has been temporarily locked"
-          level 5
+          level 3
           response_code 401
           fail
         end
@@ -55,7 +67,7 @@ Gatekeeper::Checker.new 'AccountLock' do
     premise :user_login_success do
       rule 'Clear the lock and reset failed attempts upon login' do
         user = params[:user]
-        if user.locked_at.present? || user.failed_attempts
+        if user.locked_at.present?
           user.locked_at = nil
           user.save
         end

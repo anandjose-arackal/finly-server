@@ -8,7 +8,7 @@
 #  product_id               :string(255)
 #  description              :string(255)
 #  hsn_sac                  :string(255)
-#  quantity                 :integer
+#  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
 #  tax                      :decimal(20, 5)
 #  tds                      :decimal(20, 5)
@@ -33,6 +33,9 @@
 #  unit_of_measurement      :string(255)
 #  purchase_request_item_id :integer
 #  department_id            :integer
+#  cgst                     :decimal(10, 5)
+#  sgst                     :decimal(10, 5)
+#  igst                     :decimal(10, 5)
 #
 
 class PurchaseOrderItem < ApplicationRecord

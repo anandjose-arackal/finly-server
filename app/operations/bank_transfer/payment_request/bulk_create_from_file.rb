@@ -51,6 +51,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     rescue Ole::Storage::FormatError => e
       add_message :error, "File Format error. Please re-save your Excel sheet in Microsoft 2007 format or greater."
     end
+
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
     Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"

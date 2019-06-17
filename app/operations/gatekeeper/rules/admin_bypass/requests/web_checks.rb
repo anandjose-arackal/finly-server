@@ -1,7 +1,7 @@
 Gatekeeper::Checker.new 'AdminBypass > Request' do
 
   before do
-    skip unless RequestStoreUtil.current_session&.web?
+    skip unless RequestStoreUtil.current_session&.admin_bypass?
     skip unless RequestStoreUtil.current_session&.admin_user_id.present?
   end
 
@@ -12,7 +12,6 @@ Gatekeeper::Checker.new 'AdminBypass > Request' do
       session = RequestStoreUtil.current_session
       next if request.remote_ip == session.ip
       next if request.remote_ip == session.user_ip&.ip
-      next if Rails.env.development?
 
       message 'Browser IP mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
@@ -57,12 +56,12 @@ Gatekeeper::Checker.new 'AdminBypass > Request' do
 
     end
 
-    rule 'Session should timeout after 10 minute of inactivity' do
+    rule 'Session should timeout after 1 hour of inactivity' do
       session = RequestStoreUtil.current_session
 
-      if Time.now - Time.parse(session.last_request_at.to_s) > 10.minutes
+      if Time.now - Time.parse(session.last_request_at.to_s) > 1.hour
         message 'Session timeout'
-        session_status_id UserSessionStatus.id_for(:revoked)
+        session_status_id UserSessionStatus.id_for(:expired)
         response_code 401
         level 1
         fail
