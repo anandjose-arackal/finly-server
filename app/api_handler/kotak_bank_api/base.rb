@@ -12,6 +12,23 @@ class KotakBankApi::Base < BaseHandler
     'kotak_bank'
   end
 
+  def base_url
+    if params.present? and params[:base_url].present?
+      (params[:base_url] or params['base_url'])
+    elsif env_key.present?
+      ENV["#{env_key}_base"] + "?apikey=#{self.configuration['API_KEY']}"
+    else
+      nil
+    end
+  end
+
+  def path
+    key = self.env_key
+    if key.present?
+      ENV["#{key}_path"]
+    end
+  end
+
   def init
     # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
     # self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
@@ -21,6 +38,7 @@ class KotakBankApi::Base < BaseHandler
 
 
     if Rails.env.production?
+      # TODO store data in sercure storage
       values = Finly::SecureStorage::Connector.read('core/kotak_bank')
     else
       path = "#{Rails.root}/config/kotak_bank_config.yml"
@@ -44,11 +62,11 @@ class KotakBankApi::Base < BaseHandler
     self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
-    self.auth_username = self.configuration['username']
-    self.auth_password = self.configuration['password']
-    self.application_id = self.configuration['application_id']
-    self.customer_id = self.configuration['customer_id']
-    self.account_number = self.configuration['account_number']
+    # self.auth_username = self.configuration['username']
+    # self.auth_password = self.configuration['password']
+    # self.application_id = self.configuration['application_id']
+    # self.customer_id = self.configuration['customer_id']
+    self.account_number = self.configuration['ACCOUNT_NUMBER']
     # now calling the load_connection method to initialize the connection
     super()
   end
@@ -57,7 +75,8 @@ class KotakBankApi::Base < BaseHandler
   end
 
   def validate
-    unless client_id.present? && client_secret.present? && auth_username.present? && auth_password.present?
+    # unless client_id.present? && client_secret.present? && auth_username.present? && auth_password.present?
+    unless client_id.present? && client_secret.present?
       add_message :error, "Invalid parameters, try again"
     end
   end
@@ -72,9 +91,9 @@ class KotakBankApi::Base < BaseHandler
 
   # because this is common for all Yes Bank API calls
   def process
-    p = self.path
+    # p = self.path
     if Rails.env.production?
-      self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
+      self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_kotak_bank_api.log', sync: true)
     end
 
     self.start_time = DateUtils.local_date_time
@@ -82,20 +101,19 @@ class KotakBankApi::Base < BaseHandler
     begin
       # printing posting path and params unless it's production environment
       unless Rails.env.production?
-        puts "Posting Path: #{p}"
+        # puts "Posting Path: #{p}"
         puts "Post Params: #{self.template}"
       end
 
+
       self.response = self.connection.post do |req|
-        req.url p
+        # req.url p
         req.headers['Content-Type'] = 'application/xml'
-        req.headers['X-IBM-Client-Id'] = client_id
-        req.headers['X-IBM-Client-Secret'] = client_secret
         req.body = template
       end
 
       self.end_time = DateUtils.local_date_time
-
+      debugger
       if Rails.env.production?
         post_params_hash = (Hash.from_xml(template) rescue nil)
         response_hash = (Hash.from_xml(self.response.body) rescue nil)
@@ -164,7 +182,6 @@ class KotakBankApi::Base < BaseHandler
 
   end
 
-
   protected
 
   def load_connection(url = base_url)
@@ -194,6 +211,6 @@ class KotakBankApi::Base < BaseHandler
 
   def load_soap_template
     action = bank_action
-    self.template = Liquid::Template.parse(File.read("#{Rails.root}/app/api_handler/yes_bank_api/templates/#{action}.hbs"))
+    self.template = Liquid::Template.parse(File.read("#{Rails.root}/app/api_handler/kotak_bank_api/templates/#{action}.hbs"))
   end
 end

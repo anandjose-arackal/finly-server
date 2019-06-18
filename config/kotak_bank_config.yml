@@ -1,0 +1,19 @@
+default: &default
+  grant_type: "client_credentials"
+  client_id: "vivek.a@finly.io"
+  client_secret: "password"
+  MESSAGE_SOURCE: "FINLY"
+  CLIENT_CODE: "TEMPTEST1"
+  PRODUCT_CODE: "WPAY"
+  ACCOUNT_NUMBER: "09582650000173"
+  API_KEY: "l7xx9e2c880d0b4549049ff62c5bf595c310"
+
+2: &sample
+  <<: *default
+
+
+development:
+  default:
+    <<: *default
+  2:
+    <<: *sample

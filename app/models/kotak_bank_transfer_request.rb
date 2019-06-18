@@ -6,7 +6,7 @@ class KotakBankTransferRequest < NonPersistentModel
   attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
                 :transfer_currency_code, :transfer_amount, :unique_reference_number,
                 :bank_reference_number, :company_id,
-                :bank_error_message, :transaction_result, :beneficiary_full_name
+                :bank_error_message, :transaction_result, :beneficiary_full_name,
                 :error_code
 
   belongs_to :company, optional: true
@@ -20,30 +20,31 @@ class KotakBankTransferRequest < NonPersistentModel
   validates :transfer_type, presence: true
 
   def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, unique_reference_number, company_id, transfer_currency = "INR")
-    self.new({
+    transfer_request = self.new({
         beneficiary_account_number: beneficiary_account_number,
         beneficiary_name: beneficiary_name,
         ifsc: ifsc,
         transfer_type: transfer_type,
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
-        unique_reference_number: unique_reference_number,
+        # unique_reference_number: generate_unique_reference,
         company_id: company_id
     })
+
+    transfer_request.unique_reference_number = transfer_request.generate_unique_reference
+    transfer_request
   end
 
   def generate_unique_reference
-    if self.unique_reference_number.present?
-      return self.unique_reference_number
-    end
-    ref = nil
-    loop do
-      ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      if YesBankTransaction.find_by(unique_request_number: ref).blank?
-        self.unique_reference_number = ref
-        break
-      end
-    end
+    # loop do
+    #   ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+    #   break
+    #   # if KotakBankTransaction.find_by(unique_request_number: ref).blank?
+    #   #   self.unique_reference_number = ref
+    #   #   break
+    #   # end
+    # end
+    ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
     ref
   end
 

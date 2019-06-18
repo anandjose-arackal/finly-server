@@ -1,0 +1,2 @@
+class KotakBankConfig < ApplicationRecord
+end

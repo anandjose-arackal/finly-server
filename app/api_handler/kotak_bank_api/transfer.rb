@@ -35,7 +35,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
       return
     end
 
-    unless transfer_request.class.name == "TransferRequest"
+    unless transfer_request.class.name == "KotakBankTransferRequest"
       add_message :error, "Invalid parameters"
       return
     end
@@ -67,6 +67,9 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     # handle the various error cases here
     # case 500
     case self.response.status
+      when 400
+        add_message :error, "Invalid API Key"
+        self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -141,16 +144,16 @@ class KotakBankApi::Transfer < KotakBankApi::Base
   def success
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params, messages)
+    KotakBankApi::Transfer::TransactionSuccessPresenter.new(params, messages)
   end
 
   def failure
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params, messages)
+    KotakBankApi::Transfer::TransactionFailurePresenter.new(params, messages)
   end
 
-  class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class KotakBankApi::Transfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request, :bank_transaction
 
@@ -161,7 +164,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     end
   end
 
-  class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+  class KotakBankApi::Transfer::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :transfer_request, :bank_transaction
 
@@ -185,11 +188,15 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     beneficiary_name = beneficiary_name[0..30]&.strip
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
+    debugger
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.unique_reference_number,
-        'APP_ID' => application_id,
-        'CUSTOMER_ID' => customer_id,
+        'MESSAGE_SOURCE' => 'FINLY',
+        'CLIENT_CODE' => "#{self.configuration['CLIENT_CODE']}",
+        # 'APP_ID' => application_id,
+        # 'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,
+        'PRODUCT_CODE' => "#{self.configuration['PRODUCT_CODE']}",
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
@@ -197,7 +204,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount,
         'BENEFICIARY_EMAIL' => (self.beneficiary_email.present? ? (self.beneficiary_email) : ("noreply@finly.io")),
-        'BENEFICIARY_MOBILE_NUMBER' => (self.beneficiary_mobile_number.present? ? (self.beneficiary_mobile_number) : ("7975520468"))
+        'BENEFICIARY_MOBILE_NUMBER' => (self.beneficiary_mobile_number.present? ? (self.beneficiary_mobile_number) : ("7975520468")),
+        'PAYMENT_DATE' => Date.today.strftime()
     )
   end
 

@@ -49,6 +49,7 @@ class Company < ApplicationRecord
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
   has_one :icici_bank_company_account
+  has_one :kotak_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks

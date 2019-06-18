@@ -65,7 +65,9 @@ default: &default
   icici_bank_transaction_status:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionInquiry'
-
+  kotak_bank:
+    base: 'https://apigwuat.kotak.com:8443'
+    path: 'cms_generic_service'
 
 staging:
   <<: *default

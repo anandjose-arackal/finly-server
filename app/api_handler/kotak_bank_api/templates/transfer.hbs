@@ -1,174 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:pay="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd">
-   <soap:Header/>
+   <soap:Header />
    <soap:Body>
       <pay:Payment>
          <pay:RequestHeader>
-            <pay:MessageId>{{MESSAGE_ID}}</pay:MessageId> <!-- Unique ID -->
+            <pay:MessageId>{{UNIQUE_REFERENCE_NUMBER}}</pay:MessageId> <!-- Unique ID -->
             <pay:MsgSource>{{MESSAGE_SOURCE}}</pay:MsgSource> <!-- Initials of Entity eg. FINLY -->
             <pay:ClientCode>{{CLIENT_CODE}}</pay:ClientCode><!-- TEMPTEST1 -->
-            <!--Optional:-->
-            <pay:BatchRefNmbr>?</pay:BatchRefNmbr>
-            <!--Optional:-->
-            <pay:HeaderChecksum>?</pay:HeaderChecksum>
-            <!--Optional:-->
-            <pay:ReqRF1>?</pay:ReqRF1>
-            <!--Optional:-->
-            <pay:ReqRF2>?</pay:ReqRF2>
-            <!--Optional:-->
-            <pay:ReqRF3>?</pay:ReqRF3>
-            <!--Optional:-->
-            <pay:ReqRF4>?</pay:ReqRF4>
-            <!--Optional:-->
-            <pay:ReqRF5>?</pay:ReqRF5>
          </pay:RequestHeader>
          <pay:InstrumentList> 
-            <!--1 or more repetitions:-->
             <pay:instrument>
-               <pay:InstRefNo>{{MESSAGE_ID}}</pay:InstRefNo> <!-- Message ID can be mentioned -->
+               <pay:InstRefNo>{{UNIQUE_REFERENCE_NUMBER}}</pay:InstRefNo> <!-- Message ID can be mentioned -->
+               <pay:MyProdCode>{{PRODUCT_CODE}}</pay:MyProdCode><!-- Client master maintainance is done at Banks end for each client. Bank will provide the MYPRODUCT which needs to be passed in Production. In case of UAT, you need to use CMSPAY as the MYPRODUCT -->
                <!--Optional:-->
-               <pay:CompanyId>?</pay:CompanyId>
-               <!--Optional:-->
-               <pay:CompBatchId>?</pay:CompBatchId>
-               <!--Optional:-->
-               <pay:ConfidentialInd>?</pay:ConfidentialInd>
-               <pay:MyProdCode>{{MYPRODUCT}}</pay:MyProdCode><!-- Client master maintainance is done at Banks end for each client. Bank will provide the MYPRODUCT which needs to be passed in Production. In case of UAT, you need to use CMSPAY as the MYPRODUCT -->
-               <!--Optional:-->
-               <pay:CompTransNo>?</pay:CompTransNo>
                <!--Optional:-->
                <!-- Basis the IFSC code and amount, pls mention the payment type
                   - in case Kotak to Kotak transfer- Payment type will be IFT
                   - In case other bank transfer value is below 2lakhs, NEFT
                   - In case other bank transfer with value above 2 lakhs- RTGS
                   - IMPS in case of IMPS enabled IFSC codes. Here the cap for the amount is 2 lakhs -->
-               <pay:PayMode>{{PAYMENT_MODE}}</pay:PayMode>
-               <pay:TxnAmnt>{{TRANSACTION_AMOUNT}}</pay:TxnAmnt> <!-- 20,2 -->
+               <pay:PayMode>{{TRANSFER_TYPE}}</pay:PayMode>
+               <pay:TxnAmnt>{{TRANSFER_AMOUNT}}</pay:TxnAmnt> <!-- 20,2 -->
                <!--Optional:-->
                <pay:AccountNo>{{ACCOUNT_NUMBER}}</pay:AccountNo><!-- Mention your Account number maintained in Kotak which needs to be debited for the amount and credited to the beneficiary. -->
                <!--Optional:-->
-               <pay:DrRefNmbr>?</pay:DrRefNmbr>
                <!--Optional:-->
-               <pay:DrDesc>{{DR_DESC}}</pay:DrDesc><!-- In case Accounting and Authorisation is maintained at Instrument then only mentioned description will be passed in statement else std narration will be passed -->
+               <pay:DrDesc>FUND TRANSFER</pay:DrDesc><!-- In case Accounting and Authorisation is maintained at Instrument then only mentioned description will be passed in statement else std narration will be passed -->
                <!--Optional:-->
                <pay:PaymentDt>{{PAYMENT_DATE}}</pay:PaymentDt><!-- Format expected: YYYY-MM-DD -->
-               <!--Optional:-->
-               <pay:BankCdInd>?</pay:BankCdInd>
-               <!--Optional:-->
-               <pay:BeneBnkCd>?</pay:BeneBnkCd>
                <!--Optional:-->
                <pay:RecBrCd>{{BENEFICIARY_IFSC}}</pay:RecBrCd><!-- Mention the Beneficiary bank IFSC code. It will be always 11 digit -->
                <!--Optional:-->
                <pay:BeneAcctNo>{{BENEFICIARY_ACCOUNT_NUMBER}}</pay:BeneAcctNo><!-- Mention the Beneficiary bank account number -->
                <!--Optional:-->
                <pay:BeneName>{{BENEFICIARY_NAME}}</pay:BeneName><!-- Mention the Beneficiary name. -->
-               <!--Optional:-->
-               <pay:BeneCode>?</pay:BeneCode>
-               <!--Optional:-->
-               <pay:BeneEmail>?</pay:BeneEmail>
-               <!--Optional:-->
-               <pay:BeneFax>?</pay:BeneFax>
-               <!--Optional:-->
-               <pay:BeneMb>?</pay:BeneMb>
-               <!--Optional:-->
-               <pay:BeneAddr1>?</pay:BeneAddr1>
-               <!--Optional:-->
-               <pay:BeneAddr2>?</pay:BeneAddr2>
-               <!--Optional:-->
-               <pay:BeneAddr3>?</pay:BeneAddr3>
-               <!--Optional:-->
-               <pay:BeneAddr4>?</pay:BeneAddr4>
-               <!--Optional:-->
-               <pay:BeneAddr5>?</pay:BeneAddr5>
-               <!--Optional:-->
-               <pay:city>?</pay:city>
-               <!--Optional:-->
-               <pay:zip>?</pay:zip>
-               <!--Optional:-->
-               <pay:Country>?</pay:Country>
-               <!--Optional:-->
-               <pay:State>?</pay:State>
-               <!--Optional:-->
-               <pay:TelephoneNo>?</pay:TelephoneNo>
-               <!--Optional:-->
-               <pay:BeneId>?</pay:BeneId>
-               <!--Optional:-->
-               <pay:BeneTaxId>?</pay:BeneTaxId>
-               <!--Optional:-->
-               <pay:AuthPerson>?</pay:AuthPerson>
-               <!--Optional:-->
-               <pay:AuthPersonId>?</pay:AuthPersonId>
-               <!--Optional:-->
-               <pay:DeliveryMode>?</pay:DeliveryMode>
-               <!--Optional:-->
-               <pay:PayoutLoc>?</pay:PayoutLoc>
-               <!--Optional:-->
-               <pay:PickupBr>?</pay:PickupBr>
-               <!--Optional:-->
-               <pay:PaymentRef>?</pay:PaymentRef>
-               <!--Optional:-->
-               <pay:ChgBorneBy>?</pay:ChgBorneBy>
-               <!--Optional:-->
-               <pay:InstDt>{{INSTRUMENT_DATE}}</pay:InstDt><!-- Format expected: YYYY-MM-DD -->
-               <!--Optional:-->
-               <pay:MICRNo>{{INSTRUMENT_NUMBER}}</pay:MICRNo><!-- Applicable only in case of Physical payments i.e cheque and DD -->
-               <!--Optional:-->
-               <pay:CreditRefNo>?</pay:CreditRefNo>
-               <!--Optional:-->
-               <pay:PaymentDtl>?</pay:PaymentDtl>
-               <!--Optional:-->
-               <pay:PaymentDtl1>?</pay:PaymentDtl1>
-               <!--Optional:-->
-               <pay:PaymentDtl2>?</pay:PaymentDtl2>
-               <!--Optional:-->
-               <pay:PaymentDtl3>?</pay:PaymentDtl3>
-               <!--Optional:-->
-               <pay:MailToAddr1>?</pay:MailToAddr1>
-               <!--Optional:-->
-               <pay:MailToAddr2>?</pay:MailToAddr2>
-               <!--Optional:-->
-               <pay:MailToAddr3>?</pay:MailToAddr3>
-               <!--Optional:-->
-               <pay:MailToAddr4>?</pay:MailToAddr4>
-               <!--Optional:-->
-               <pay:MailTo>?</pay:MailTo>
-               <!--Optional:-->
-               <pay:ExchDoc>?</pay:ExchDoc>
-               <!--Optional:-->
-               <pay:InstChecksum>?</pay:InstChecksum>
-               <!--Optional:-->
-               <pay:InstRF1>?</pay:InstRF1>
-               <!--Optional:-->
-               <pay:InstRF2>?</pay:InstRF2>
-               <!--Optional:-->
-               <pay:InstRF3>?</pay:InstRF3>
-               <!--Optional:-->
-               <pay:InstRF4>?</pay:InstRF4>
-               <!--Optional:-->
-               <pay:InstRF5>?</pay:InstRF5>
-               <!--Optional:-->
-               <pay:InstRF6>?</pay:InstRF6>
-               <!--Optional:-->
-               <pay:InstRF7>?</pay:InstRF7>
-               <!--Optional:-->
-               <pay:InstRF8>?</pay:InstRF8>
-               <!--Optional:-->
-               <pay:InstRF9>?</pay:InstRF9>
-               <!--Optional:-->
-               <pay:InstRF10>?</pay:InstRF10>
-               <!--Optional:-->
-               <pay:InstRF11>?</pay:InstRF11>
-               <!--Optional:-->
-               <pay:InstRF12>?</pay:InstRF12>
-               <!--Optional:-->
-               <pay:InstRF13>?</pay:InstRF13>
-               <!--Optional:-->
-               <pay:InstRF14>?</pay:InstRF14>
-               <!--Optional:-->
-               <pay:InstRF15>?</pay:InstRF15>
-               <!--Optional:-->
-               <pay:EnrichmentSet>
-                  <!--1 or more repetitions:-->
-                  <pay:Enrichment>?</pay:Enrichment>
-               </pay:EnrichmentSet>
+               <pay:InstDt>{{PAYMENT_DATE}}</pay:InstDt><!-- Format expected: YYYY-MM-DD -->
             </pay:instrument>
          </pay:InstrumentList>
       </pay:Payment>

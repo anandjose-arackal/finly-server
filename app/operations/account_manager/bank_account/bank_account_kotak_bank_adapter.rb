@@ -225,7 +225,8 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
   end
 
   def create_transfer_request(payment, transfer_type, reference_number)
-    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
+    # tr = KotakBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
+    tr = KotakBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, nil, account.company_id)
   end
 
 end
