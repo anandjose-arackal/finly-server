@@ -1,6 +1,6 @@
 class Procurements::PurchaseOrders::PoAdvances < Procurements::PurchaseOrders::Base
 
-  attr_accessor :purchase_orders, :advance_payments, :ids
+  attr_accessor :purchase_order, :advance_payments, :ids
 
   class Procurements::PurchaseOrders::PoAdvances::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -13,16 +13,21 @@ class Procurements::PurchaseOrders::PoAdvances < Procurements::PurchaseOrders::B
   end
 
   def init
-    self.purchase_orders = ::Procurements::PurchaseOrders::Index.(user, params).purchase_orders
-    # # id = params[:id] || params[:purchase_order_id]
-    # # self.purchase_order = user.company.purchase_orders.find_by(id: id)
-    # self.ids = user.company.procurements.pluck(:id).uniq
-    # # self.advance_payments = Payment.where(procurement_id: ids)
+    # id = params[:id] || params[:purchase_order_id]
+    # self.purchase_order = user.company.purchase_orders.find_by(id: id)
+    self.ids = user.company.procurements.pluck(:id).uniq
+    # self.advance_payments = Payment.where(procurement_id: ids)
+  end
+
+  def validate
+    # if self.purchase_order.blank?
+    #   add_message :error, "Purchase order not found"
+    # end
   end
 
   def process
     # self.advance_payments = self.purchase_order.advance_payments
-    self.advance_payments = Payment.where(procurement_id: self.purchase_orders.pluck(:procurement_id))
+    self.advance_payments = Payment.where(procurement_id: self.ids)
   end
 
   def success
