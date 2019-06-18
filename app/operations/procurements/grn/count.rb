@@ -14,10 +14,24 @@ class Procurements::Grn::Count < Procurements::Base
   def process
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = [7, 2, 3] # [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
-    result = Procurements::Grn::Pending::Index.(user, params)
+
+    # REFACTORING NEEDED
+    # SEPRATE OPERATIONS ARE USED TO GET GRN PENDING & RECEIVED
+    # CREATE OPERATION : Procurements::Grns::Index which should work for both
+    #
+
+    # Temporary statues till code is refactored
+
+    shipment_received = Procurements::Grn::Received::Index.(user, params)&.count || 0
+    receiving_shipment = Procurements::Grn::Pending::Index.(user, params)&.count || 0
+    status_count = {
+      receiving_shipment: receiving_shipment,
+      shipment_received: shipment_received
+    }
+    # result = Procurements::Grn::Pending::Index.(user, params)
     if result.success?
-      self.count = result.procurements.size
-      self.status_count = result.get_status_counts
+      self.count = receiving_shipment
+      self.status_count = status_count
     else
       add_message :error, result.messages[:error]
     end 
