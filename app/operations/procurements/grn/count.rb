@@ -29,12 +29,9 @@ class Procurements::Grn::Count < Procurements::Base
       shipment_received: shipment_received
     }
     # result = Procurements::Grn::Pending::Index.(user, params)
-    if result.success?
-      self.count = receiving_shipment
-      self.status_count = status_count
-    else
-      add_message :error, result.messages[:error]
-    end 
+    self.count = receiving_shipment
+    self.status_count = status_count
+    
   end
 
   def success
