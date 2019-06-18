@@ -294,6 +294,7 @@ class BeneficiaryPayment < ApplicationRecord
 
   def agreement_based_json
     {
+      id: self.id,
       vendor_id: self.vendor_id,
       vendor_name: self.vendor&.name,
       vendor_location_id: self.vendor_location_id,
