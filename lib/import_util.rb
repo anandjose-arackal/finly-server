@@ -46,7 +46,7 @@ class ImportUtil
           val = row[j]
         end
         val = cleanup_email(val)
-        val = cleanup_account_number(key, val)
+        # val = cleanup_account_number(key, val)
         map[key] = val
       end
       add_line = false
@@ -98,6 +98,7 @@ class ImportUtil
     unless key.to_s.include?("account_number")
       return raw_value
     end
+    debugger
     raw_value = raw_value.to_i.to_s
     return raw_value
   end
