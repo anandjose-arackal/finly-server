@@ -109,7 +109,10 @@ class BeneficiaryPayment < ApplicationRecord
     return (self.status_id == BeneficiaryPaymentStatus.id_for(:unpaid))
   end
 
-  def as_json
+  def as_json(options={})
+    if options[:payment_agreement]
+      return agreement_based_json
+    end
   	{
   	  id: self.id,
       tax_amount: precision_value(self.tax_amount&.value),
@@ -288,5 +291,27 @@ class BeneficiaryPayment < ApplicationRecord
   #   new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
   #   self.tds_amount = self.gross_amount - new_gross_amount
   # end
+
+  def agreement_based_json
+    {
+      vendor_id: self.vendor_id,
+      vendor_name: self.vendor&.name,
+      vendor_location_id: self.vendor_location_id,
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
+      department_attributes: { id: self.department_id, name: self.department&.name },
+      location_attributes: { id: self.location_id, name: self.location&.name },
+      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name }, 
+      vendor_name: self.vendor&.name,
+      bank_account_id: self.bank_account_id,
+      note: self.note,
+      inclusive_of_taxes: self.inclusive_of_taxes,
+      gst_type_id: self.gst_type_id,
+      tax_rate_id: self.tax_rate_id,
+      tds_slab_id: self.tds_slab_id,
+      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
+
+    }
+  end
 
 end

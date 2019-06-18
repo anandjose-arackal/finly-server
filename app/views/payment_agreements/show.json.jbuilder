@@ -30,7 +30,7 @@ json.results do
   end
 
   json.beneficiary_payment_details do
-    json.merge! @result.beneficiary_payments.as_json
+    json.merge! @result.beneficiary_payments.as_json(payment_agreement: true)
   end
 
 
