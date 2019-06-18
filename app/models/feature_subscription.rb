@@ -31,6 +31,7 @@
 #  vendor_empanelment_workflow :boolean          default(FALSE)
 #  purchase_requisition_system :boolean
 #  request_encryption_enabled  :boolean          default(FALSE)
+#  group_entity_structure      :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord
