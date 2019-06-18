@@ -128,15 +128,15 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def settlements
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements/params={"view":"finance"}'}
+    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def team_settlements
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements/params={"view":"finance"}'}
+    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def company_settlements
-    {name: 'Company Settlements', id: 'settlements', url: 'settlements/params={"view":"admin"}'}
+    {name: 'Company Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"admin"}'}
   end
 
   def export
