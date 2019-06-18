@@ -69,7 +69,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = bank_payment_request_view_role user
-    params[:cc_emails] = cc_emails_from_beneficiary_payments
+    params[:cc_emails] = cc_emails_from_beneficiary_payments unless cc_emails_from_beneficiary_payments.blank?
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
@@ -132,11 +132,15 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     emails = []
     beneficiary_payment_ids = self.bank_payment_request.payment_order.payments.pluck(:beneficiary_payment_id) rescue nil
     if beneficiary_payment_ids.present?
-      user.company.beneficiary_payments.where(id: beneficiary_payment_ids).pluck(:payment_notification_users).each{|cc_emails| emails << cc_emails["cc_emails"]}
+      begin
+        user.company.beneficiary_payments.where(id: beneficiary_payment_ids).pluck(:payment_notification_users).each{|cc_emails| emails << cc_emails["cc_emails"]}
+      rescue
+        return nil
+      end
       return emails.flatten.compact
     end
 
-    return nil
+    nil
   end
 
 end
