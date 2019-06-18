@@ -143,6 +143,7 @@ class BeneficiaryPayment < ApplicationRecord
       original_amount: precision_value(self.original_amount&.value),
       advance_amount: precision_value(self.advance_amount&.value),
       vendor_id: self.vendor_id,
+      vendor_name: self.vendor&.name,
       vendor_location_id: self.vendor_location_id,
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
       department_attributes: { id: self.department_id, name: self.department&.name },

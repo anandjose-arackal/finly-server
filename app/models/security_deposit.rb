@@ -17,16 +17,17 @@ class SecurityDeposit < ApplicationRecord
     {
       id: self.id, 
       vendor_id: self.vendor_id,
-      vendor_name: self&.vendor&.name
+      vendor_name: self&.vendor&.name,
       cost_center_id: self.cost_center_id,
       vendor_location_id: self.vendor_location_id,
       department_id: self.department_id,
       location_id: self.location_id,
       description: self.description,
       note: self.note,
-      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id },
       payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id}
     }
+
   end
 
 
