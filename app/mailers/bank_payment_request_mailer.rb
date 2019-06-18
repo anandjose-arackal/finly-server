@@ -4,7 +4,7 @@ class BankPaymentRequestMailer < ApplicationMailer
     return unless presenter.validate
     @data = presenter
     cc_emails = presenter.cc_emails rescue nil
-    mail to: presenter.recipient, cc: "rais.ahmed@finly.io", subject: presenter.subject, template_name: 'template'
+    mail to: presenter.recipient, cc: cc_emails, subject: presenter.subject, template_name: 'template'
   end
 
 end
