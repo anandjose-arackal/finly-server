@@ -44,7 +44,6 @@ class PaymentAgreements::Base < BaseOperation
             :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :tds_applicable,
             discount_amount_attributes: [:id, :currency_id, :value], 
             tax_amount_attributes: [:id, :currency_id, :value],
-            total_amount_attributes: [:id, :value, :currency_id],
             raw_amount_attributes: [:id, :value, :currency_id]
           ],
         discount_amount_attributes: [:id, :currency_id, :value],
@@ -56,7 +55,7 @@ class PaymentAgreements::Base < BaseOperation
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id]
       ],
-      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :tds_slab_id, :tax_rate_id, 
+      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes,:gst_type_id, :tds_slab_id, :tax_rate_id, 
         tax_amount_attributes: [:id, :value, :currency_id],
         payable_amount_attributes: [:id, :currency_id, :value],
         original_amount_attributes: [:id, :currency_id, :value]
