@@ -28,6 +28,7 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
+#  rejection_note               :text(65535)
 #
 
 class BankPaymentRequest < ApplicationRecord

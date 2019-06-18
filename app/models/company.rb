@@ -9,6 +9,9 @@
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
 #  status_id        :integer          default(1), not null
+#  test_account     :boolean          default(FALSE)
+#  subdomain        :string(255)
+#  group_id         :integer
 #
 
 class Company < ApplicationRecord
@@ -16,6 +19,7 @@ class Company < ApplicationRecord
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
+  belongs_to :group, class_name: "CompanyGroup"
 
   has_many :users
   has_many :cards

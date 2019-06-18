@@ -31,7 +31,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  user_id                      :integer
-#  procurement_term_text        :text(65535)
+#  procurement_term_text        :text(16777215)
 #  controlling_user_id          :integer
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
@@ -68,6 +68,10 @@
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
 #  taxable_amount_id            :integer
+#  vendor_poc_name              :string(255)
+#  vendor_poc_email             :string(255)
+#  vendor_poc_mobile_number     :string(255)
+#  rejection_note               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord

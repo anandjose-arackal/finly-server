@@ -83,6 +83,10 @@
 #  narration                       :text(65535)
 #  po_number                       :string(255)
 #  bank_account_id                 :integer
+#  payment_agreement_id            :integer
+#  vendor_location_id              :integer
+#  billing_type_id                 :integer
+#  rejection_note                  :text(65535)
 #
 
 class Invoice < ApplicationRecord
