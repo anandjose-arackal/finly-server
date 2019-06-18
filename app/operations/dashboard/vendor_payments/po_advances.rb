@@ -47,7 +47,7 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
           title: "Teams' Purchase Orders",
           data: [
             {
-              title: "Pending PO Advances",
+              title: "PO Advances",
               count: apply_scopes(purchase_orders, {filter_all_advances: true})&.count,
               filters: []
             },

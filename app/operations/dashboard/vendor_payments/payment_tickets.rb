@@ -62,7 +62,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               ]
             },
             {
-              title: "Credited",
+              title: "paid",
               count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
               filters: [
                 {filter_status: 'credited'}
