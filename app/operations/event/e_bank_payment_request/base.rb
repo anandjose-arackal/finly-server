@@ -69,7 +69,9 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = bank_payment_request_view_role user
-    params[:cc_emails] = cc_emails_from_beneficiary_payments unless cc_emails_from_beneficiary_payments.blank?
+    if self.bank_payment_request.present? && self.bank_payment_request.credited?
+      params[:cc_emails] = cc_emails_from_beneficiary_payments unless cc_emails_from_beneficiary_payments.blank?
+    end
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
