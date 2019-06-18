@@ -152,7 +152,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def users
-    {name: 'Users', id: 'users', url: 'users/params={"view":"admin"}'}
+    {name: 'Users', id: 'users', url: '#users/params={"view":"admin"}'}
   end
 
   def load_company_balance
@@ -160,7 +160,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def statements
-    {name: 'Statements', id: 'statements', url: 'company_statements/params={"view":"admin"}'}
+    {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
   end
 
   def create
