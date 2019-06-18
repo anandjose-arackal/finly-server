@@ -200,7 +200,8 @@ class UsersController < BaseControllers::WebBase
 
   # this will be in the cog menu, the list of companies will be part of the cog menu
   def group_entities
-
+    @result = User::GroupEntities.(current_user, params)
+    respond
   end
 
   private

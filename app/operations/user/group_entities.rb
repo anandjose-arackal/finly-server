@@ -1,6 +1,6 @@
 class User::GroupEntities < User::Base
 
-  attr_accessor :companies, :email, :mobile_number
+  attr_accessor :companies, :email, :mobile_number, :group
 
   class User::GroupEntities::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -15,14 +15,24 @@ class User::GroupEntities < User::Base
   def init
     self.email = user.email
     self.mobile_number = user.mobile_number
+    self.group = CompanyGroup.find_by(id: user.company.group_id)
   end
 
   def validate
+    if self.group.blank?
+      add_message :error, "Your corporate doesn't have group entity feature enabled"
+      return
+    end
 
+    unless user.company.group_entity_structure_enabled?
+      add_message :error, "Your corporate doesn't have group entity feature enabled"
+      return
+    end
   end
 
   def process
-    users = User.with_email_or_mobile_number(self.email, self.mobile_number)
+    companies = self.group.companies
+    users = User.with_company_id(companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
     self.companies = Company.with_id(users.pluck(:company_id))
   end
 

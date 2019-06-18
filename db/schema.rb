@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_17_144110) do
+ActiveRecord::Schema.define(version: 2019_06_18_083903) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2673,6 +2673,7 @@ ActiveRecord::Schema.define(version: 2019_06_17_144110) do
     t.boolean "vendor_empanelment_workflow", default: false
     t.boolean "purchase_requisition_system"
     t.boolean "request_encryption_enabled", default: false
+    t.boolean "group_entity_structure", default: false
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end

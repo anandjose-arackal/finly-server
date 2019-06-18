@@ -9,4 +9,6 @@
 #
 
 class CompanyGroup < ApplicationRecord
+
+  has_many :companies
 end
