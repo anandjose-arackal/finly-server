@@ -3509,6 +3509,7 @@ Rails.application.routes.draw do
     patch 'take_control', to: "payment_agreements#take_control", as: :take_control
     patch 'return_control', to: "payment_agreements#return_control", as: :return_control
     get 'upcoming_invoices', to: "payment_agreements#upcoming_invoices", as: :upcoming_invoices
+    get 'invoice_history', to: "payment_agreements#invoice_history", as: :invoice_history
     get 'attachments', to: "payment_agreements#attachments", as: :attachments
     collection do
       get 'document_config', to: 'payment_agreements#document_config', as: :document_config
