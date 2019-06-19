@@ -5,13 +5,13 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
+          :receipts,
           {expenses: [:your_expenses, :company_expenses]},
-          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
-          {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
           {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
-          {users: [:team_users, :company_users]},
+          {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
+          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
           {settlements: [:team_settlements, :company_settlements]},
-          :analytics,
+          # :analytics,
           {export: [:team_exports, :company_exports]},
           {create: [:create_expense, :create_trip, :create_report, :create_money_request]}
       ]
@@ -49,6 +49,10 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_expenses
     {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin"}'}
+  end
+
+  def receipts
+    {name: 'Receipts', id: 'receipts', url: 'receipts/params={"view":"personal"}'}
   end
 
   def trips
@@ -124,15 +128,15 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def settlements
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements/params={"view":"finance"}'}
+    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def team_settlements
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements/params={"view":"finance"}'}
+    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def company_settlements
-    {name: 'Company Settlements', id: 'settlements', url: 'settlements/params={"view":"admin"}'}
+    {name: 'Company Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"admin"}'}
   end
 
   def export
@@ -147,24 +151,36 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Company Export', id: 'export', url: 'export/params={"view":"admin"}'}
   end
 
+  def users
+    {name: 'Users', id: 'users', url: '#users/params={"view":"admin"}'}
+  end
+
+  def load_company_balance
+    {name: 'Load Company Balance', id: 'load-company-balance', url: '/transfers/register'}
+  end
+
+  def statements
+    {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
+  end
+
   def create
     {name: 'Create', id: 'create', url: 'create'}
   end
 
   def create_expense
-    {name: 'Create Expense', id: 'create_expense', url: 'create_expense'}
+    {name: 'Create Expense', id: 'create_expense', url: 'expenses/new_expense/params={"view":"personal"}'}
   end
 
   def create_trip
-    {name: 'Create Trip', id: 'create_trip', url: 'create_trip'}
+    {name: 'Create Trip', id: 'create_trip', url: 'trips/params={"view":"personal",  "create": "true"}'}
   end
 
   def create_report
-    {name: 'Create Report', id: 'create_report', url: 'create_report'}
+    {name: 'Create Report', id: 'create_report', url: 'reports/params={"view":"personal", "create": "true"}'}
   end
 
   def create_money_request
-    {name: 'Create Money Request', id: 'create_money_request', url: 'create_money_request'}
+    {name: 'Create Money Request', id: 'create_money_request', url: 'money_requests/params={"view":"personal", "create": "true"}'}
   end
 
 end
