@@ -592,7 +592,7 @@ class Invoice < ApplicationRecord
   def as_json(options={})
     if options[:payment_agreement]
       return agreement_based_json
-    elsif options[:payment_history]
+    elsif options[:payment_history] || options[:upcoming_invoices]
       return payment_history_json
     else
       {

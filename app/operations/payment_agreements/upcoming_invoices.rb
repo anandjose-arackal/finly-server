@@ -9,6 +9,7 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
   def validate
     if payment_agreement.blank?
       add_message :error, 'Agreement not found'
+      return
     end
 
     unless payment_agreement.approved? || payment_agreement.approved?
