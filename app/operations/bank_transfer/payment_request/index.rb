@@ -229,7 +229,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
             result[:draft] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:processing)
             result[:processing] += payment_tickets_counts[status.id]
-          when BankPaymentRequestStatus.id_for(:approved)
+          when BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:auto_approved)
             result[:approved] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:credited)
             result[:credited] += payment_tickets_counts[status.id]
