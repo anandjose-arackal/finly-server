@@ -108,5 +108,10 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  def invoice_history
+    @result = PaymentAgreements::InvoiceHistory.(current_user, params)
+    respond
+  end
+
 
 end
