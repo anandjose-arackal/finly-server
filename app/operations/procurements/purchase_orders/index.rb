@@ -18,10 +18,10 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     end
 
     # if user.vendor_payments_reviewer? && params[:team_po]
-    if user.vendor_payments_reviewer?
-      self.purchase_orders = ::PurchaseOrder.role_based_reviewer_associated_items(user, UserRole.id_for(:purchase_order_reviewer))
-      return
-    end
+    # if user.vendor_payments_reviewer?
+    #   self.purchase_orders = ::PurchaseOrder.role_based_reviewer_associated_items(user, UserRole.id_for(:purchase_order_reviewer))
+    #   return
+    # end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.purchase_orders = ::PurchaseOrder.associated_items(user, ::PurchaseOrder.roles) || PurchaseOrder.none
