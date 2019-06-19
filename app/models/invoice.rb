@@ -885,7 +885,7 @@ class Invoice < ApplicationRecord
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
       bank_account_attributes: {id: self.id, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
-      status: self&.status&.titleize,
+      status: self&.status&.name&.titleize,
       due_date: self&.due_date&.to_date,
       creation_date: self.created_at.to_date
     }
