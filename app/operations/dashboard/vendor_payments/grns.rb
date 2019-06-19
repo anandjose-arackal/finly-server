@@ -13,7 +13,6 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
     Dashboard::VendorPayments::Grns::DashboardPresenter.new(user, params, messages)
   end
 
-
   class Dashboard::VendorPayments::Grns::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurements, :counts
 

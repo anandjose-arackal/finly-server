@@ -15,8 +15,8 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
   class Dashboard::VendorPayments::POAdvances::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders, :counts
 
-    has_scope :filter_all_advances
-    has_scope :filter_payable_advances
+    has_scope :filter_all_advances, type: :boolean
+    has_scope :filter_payable_advances, type: :boolean
 
     # General Filters from frontend
     has_scope :filter_policy_id
@@ -47,7 +47,7 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
           title: "Teams' Purchase Orders",
           data: [
             {
-              title: "Pending PO Advances",
+              title: "PO Advances",
               count: apply_scopes(purchase_orders, {filter_all_advances: true})&.count,
               filters: []
             },
