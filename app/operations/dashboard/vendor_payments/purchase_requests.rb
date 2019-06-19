@@ -51,14 +51,14 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
               title: "Processing",
               count: apply_scopes(purchase_requests, {filter_status_id: PurchaseRequestStatus.id_for(:awaiting_approval)})&.count,
               filters: [
-                {filter_po_status: PurchaseRequestStatus.id_for(:awaiting_approval)}
+                {filter_by_status_id: PurchaseRequestStatus.id_for(:awaiting_approval)}
               ]
             },
             {
               title: "Approved",
               count: apply_scopes(purchase_requests, {filter_status_id: PurchaseRequestStatus.id_for(:approved)})&.count,
               filters: [
-                {filter_po_status: PurchaseRequestStatus.id_for(:approved)}
+                {filter_by_status_id: PurchaseRequestStatus.id_for(:approved)}
               ]
             }
           ]
@@ -87,7 +87,7 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
                 {search_type: 'user_details'},
                 {search_query: user.email},
                 {search_by_email: user.email},
-                {filter_po_status: PurchaseRequestStatus.id_for(:awaiting_approval)}
+                {filter_by_status_id: PurchaseRequestStatus.id_for(:awaiting_approval)}
               ]
             },
             {
@@ -97,7 +97,7 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
                 {search_type: 'user_details'},
                 {search_query: user.email},
                 {search_by_email: user.email},
-                {filter_po_status: PurchaseRequestStatus.id_for(:approved)}
+                {filter_by_status_id: PurchaseRequestStatus.id_for(:approved)}
               ]
             }
           ]
