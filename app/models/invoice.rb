@@ -592,6 +592,8 @@ class Invoice < ApplicationRecord
   def as_json(options={})
     if options[:payment_agreement]
       agreement_based_json
+    elsif options[:payment_history]
+      payment_history_json
     else
       {
           id: self.id,
@@ -884,10 +886,19 @@ class Invoice < ApplicationRecord
       notify_users: self.notify_users&.as_json,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
       bank_account_attributes: {id: self.id, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
-      status: self&.status&.name&.titleize,
-      due_date: self&.due_date&.to_date,
-      creation_date: self.created_at.to_date
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location }
+    }
+  end
+
+  def payment_history_json
+    {
+      id: self.id,
+      invoice_number: self.invoice_number,
+      vendor_name: self.vendor&.name,
+      due_date: self.due_date&.to_date,
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+      status: self&.status&.name&.titleize
     }
   end
 
