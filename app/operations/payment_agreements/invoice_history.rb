@@ -40,7 +40,7 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
 
     def init
       # self.invoices = params[:invoices]
-      self.invoices = user.company.invoices
+      self.invoices = user.company.inward_invoices
     end
   end
 
