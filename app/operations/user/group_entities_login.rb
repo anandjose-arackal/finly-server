@@ -2,6 +2,28 @@ class User::GroupEntitiesLogin < User::Base
 
   attr_accessor :email_mobile, :companies, :email, :mobile_number, :group
 
+  class User::GroupEntitiesLogin::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :companies
+
+    def init
+      self.companies = params[:companies]
+    end
+
+  end
+
+  def pre_validate
+    # validating password of the user first things first
+    if params[:password].blank?
+      add_message :error, 'Please enter your password before logging in'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Username or Password'
+      return
+    end
+  end
+
   def init
     self.email_mobile = params[:email_mobile]
     self.user = User.find_for_database_authentication(username: self.email_mobile)
@@ -19,18 +41,22 @@ class User::GroupEntitiesLogin < User::Base
       return
     end
 
-    unless user.company.group_entity_structure_enabled?
+    unless self.company.group_entity_structure_enabled?
       add_message :error, "Your corporate doesn't have group entity feature enabled"
       return
     end
   end
 
   def process
-
+    self.group = self.company.group
+    group_companies = self.group.companies
+    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+    self.companies = Company.with_id(users.pluck(:company_id))
   end
 
   def success
-
+    params[:companies] = self.companies
+    User::GroupEntitiesLogin::CompaniesPresenter.new(user, params, messages)
   end
 
 end

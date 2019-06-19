@@ -31,8 +31,8 @@ class User::GroupEntities < User::Base
   end
 
   def process
-    companies = self.group.companies
-    users = User.with_company_id(companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+    group_companies = self.group.companies
+    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
     self.companies = Company.with_id(users.pluck(:company_id))
   end
 

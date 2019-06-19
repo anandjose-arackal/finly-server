@@ -195,7 +195,8 @@ class UsersController < BaseControllers::WebBase
 
   # this will be at the time of login, to return the list of companies that this user is a part of
   def group_entities_login
-
+    @result = User::GroupEntitiesLogin.(current_user, params)
+    respond
   end
 
   # this will be in the cog menu, the list of companies will be part of the cog menu
