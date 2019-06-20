@@ -10,5 +10,5 @@
 
 class CompanyGroup < ApplicationRecord
 
-  has_many :companies
+  has_many :companies, foreign_key: :group_id
 end

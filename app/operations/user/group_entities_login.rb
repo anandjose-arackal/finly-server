@@ -14,19 +14,23 @@ class User::GroupEntitiesLogin < User::Base
 
   def pre_validate
     # validating password of the user first things first
-    if params[:password].blank?
-      add_message :error, 'Please enter your password before logging in'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Username or Password'
-      return
+    unless StringUtils.to_bool(RequestStore.store[:skip_password])
+      if params[:password].blank?
+        add_message :error, 'Please enter your password before logging in'
+        return
+      end
+      unless user.valid_password?(params[:password])
+        add_message :error, 'Invalid Username or Password'
+        return
+      end
     end
   end
 
   def init
     self.email_mobile = params[:email_mobile]
     self.user = User.find_for_database_authentication(username: self.email_mobile)
+    self.email = self.user.email
+    self.mobile_number = self.mobile_number
     self.company = self.user&.company
   end
 
