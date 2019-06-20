@@ -819,6 +819,12 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+    roundoff_amount = self.roundoff_amount.to_f
+    if roundoff_amount != 0
+      total_amount = precision_value (total_amount + roundoff_amount)
+    else
+      total_amount = precision_value total_amount
+    end
 
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount
