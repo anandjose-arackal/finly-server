@@ -3041,11 +3041,13 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/report#processing_cancel'
         post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
         get 'payment_file', to: 'settlement/report#processing_payment_file'
+        get '/:id', to: 'settlement/reports#processing_show'
       end
       get 'completed', to: 'settlement/report#completed_index'
       get 'completed/count', to: 'settlement/report#completed_count'
       get 'completed/batch', to: 'settlement/report#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
+      get 'completed/:id', to: 'settlement/reports#completed_show'
     end
     scope :money_requests do
       get 'pending', to: 'settlement/money_requests#pending_index'
@@ -3058,11 +3060,13 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/money_requests#processing_cancel'
         post 'mark_as_paid', to: 'settlement/money_requests#processing_mark_paid'
         get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
+      	get '/:id', to: 'settlement/money_requests#processing_show'
       end
       get 'completed', to: 'settlement/money_requests#completed_index'
       get 'completed/count', to: 'settlement/money_requests#completed_count'
       get 'completed/batch', to: 'settlement/money_requests#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/money_requests#completed_batch_count'
+      get 'completed/:id', to: 'settlement/money_requests#completed_show'
     end
   end
 
