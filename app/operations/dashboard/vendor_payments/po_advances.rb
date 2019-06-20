@@ -47,14 +47,14 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
           title: "Teams' Purchase Orders",
           data: [
             {
-              title: "PO Advances",
-              count: apply_scopes(purchase_orders, {filter_all_advances: true})&.count,
-              filters: []
+              title: "Initiated",
+              count: apply_scopes(purchase_orders, {filter_po_advance_status: 'initated'})&.count,
+              filters: [{filter_po_advance_status: 'initiated'}]
             },
             {
-              title: "Payable POs",
-              count: apply_scopes(purchase_orders, {filter_payable_advances: true})&.count,
-              filters: []
+              title: "To Be Processed",
+              count: apply_scopes(purchase_orders, {filter_po_advance_status: 'to_be_processed'})&.count,
+              filters: [{filter_po_advance_status: 'to_be_processed'}]
             }
           ]
         }
