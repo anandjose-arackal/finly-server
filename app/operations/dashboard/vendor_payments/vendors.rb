@@ -4,6 +4,10 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
   def init
     params[:non_deleted] = true
     params[:authorized] = true
+    # Set date filters
+    params[:filter_creation_date] = {} if params[:filter_date_from].present? || params[:filter_date_to].present?
+    params[:filter_creation_date][:from] = params[:filter_date_from] if params[:filter_date_from].present?
+    params[:filter_creation_date][:to] = params[:filter_date_to] if params[:filter_date_to].present?
     self.vendors = ::Vendors::Index.(user, params).vendors
   end
 
@@ -54,6 +58,22 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
           ]
         }
         self.counts.push(reviewer_data)
+      end
+
+      # Set Date Filters in Filters
+      # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      self.counts.each do |count_object|
+        count_object[:data].each do |data|
+           if params[:filter_creation_date].present? && params[:filter_creation_date][:from].present?
+             filter_date = {'filter_creation_date[from]': params[:filter_creation_date][:from]}
+             data[:filters].push(filter_date)
+           end
+
+          if params[:filter_creation_date].present? && params[:filter_creation_date][:to].present?
+             filter_date = {'filter_creation_date[to]': params[:filter_creation_date][:to]}
+             data[:filters].push(filter_date)
+           end
+        end
       end
     end
   end
