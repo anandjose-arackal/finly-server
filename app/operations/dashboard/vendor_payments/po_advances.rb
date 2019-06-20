@@ -3,6 +3,9 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
 
   def init
     params[:filter_po_advances]
+    # Set date filters
+    params[:filter_creation_date_from] = params[:filter_date_from] if params[:filter_date_from].present?
+    params[:filter_creation_date_to] = params[:filter_date_to] if params[:filter_date_to].present?
     self.purchase_orders = Procurements::PurchaseOrders::Index.(user, params).purchase_orders
   end
 
@@ -60,6 +63,22 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
           ]
         }
         self.counts.push(creditor_data)
+      end
+
+      # Set Date Filters in Filters
+      # Done becauase the filters in index page and the filters passed in dashboard for date filters are different
+      self.counts.each do |count_object|
+        count_object[:data].each do |data|
+          if params[:filter_creation_date_from].present?
+            date_filter_from = {filter_creation_date_from: params[:filter_creation_date_from]}
+            data[:filters].push(date_filter_from)
+          end
+
+          if params[:filter_creation_date_to].present?
+            date_filter_to = {filter_creation_date_to: params[:filter_creation_date_to]}
+            data[:filters].push(date_filter_to)
+          end
+        end
       end
     end
   end
