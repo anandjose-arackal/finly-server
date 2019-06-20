@@ -131,7 +131,11 @@ class InvoiceLineItem < ApplicationRecord
       tax_rate: self.tax_rate.as_json,
       cost_center: self.cost_center.as_json,
       unit_of_measurement: self.unit_of_measurement,
-      department: self.department.as_json, 
+      department: self.department.as_json,
+      cgst: '5.0',
+      igst: nil,
+      sgst: nil
+
     }
   end
 
