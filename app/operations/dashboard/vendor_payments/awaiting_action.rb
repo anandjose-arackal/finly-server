@@ -62,7 +62,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     if document_types[:purchase_requests]
       purchase_requests = PurchaseRequest.awaiting_action_items(user)
       if params[:filter_date_from].present? || params[:filter_date_to].present?
-        purchase_requests = purchase_requests.filter_by_date_range(from: params[:filter_date_from], to: params[:filter_date_to])
+        purchase_requests = purchase_requests.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
       end
       data = {
         title: "Purchase Requests",
@@ -121,7 +121,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         po_invoices = awaiting_invoices.filter_invoice_type('po_invoice')
 
         if params[:filter_date_from].present? || params[:filter_date_to].present?
-          po_invoices = po_invoices.filter_creation_date(from: params[:filter_date_from], to: params[:filter_date_to])
+          po_invoices = po_invoices.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
         end
         data = {
           title: "PO Invoices",
@@ -150,7 +150,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         non_po_invoices = awaiting_invoices.filter_invoice_type('non_po_invoice')
 
         if params[:filter_date_from].present? || params[:filter_date_to].present?
-          non_po_invoices = non_po_invoices.filter_creation_date(from: params[:filter_date_from], to: params[:filter_date_to])
+          non_po_invoices = non_po_invoices.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
         end
 
         data = {
@@ -180,7 +180,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       payment_tickets = BankPaymentRequest.awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
-        payment_tickets = payment_tickets.filter_date(from: params[:filter_date_from], to: params[:filter_date_to])
+        payment_tickets = payment_tickets.filter_date(params[:filter_date_from], params[:filter_date_to])
       end
 
       data = {
@@ -207,7 +207,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       vendors = YesBankVendor.awaiting_action_items(user)
 
       if params[:filter_date_from].present? || params[:filter_date_to].present?
-        vendors = vendors.filter_creation_date(from: params[:filter_date_from], to: params[:filter_date_to])
+        vendors = vendors.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
       end
 
       data = {
