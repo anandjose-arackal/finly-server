@@ -75,7 +75,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               ]
             },
             {
-              title: "Credited",
+              title: "Paid",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:paid)})&.count,
               filters: [
                 {filter_invoice_type: invoice_type},
