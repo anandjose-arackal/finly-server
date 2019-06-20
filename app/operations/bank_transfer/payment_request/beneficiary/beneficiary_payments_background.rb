@@ -63,6 +63,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
               currency_id: Currency.first.id
           },
           note: payment[:note],
+          # payment_notification_users: payment[:payment_notification_users],
           date: DateUtils.local_date,
           external_reference_id: payment[:external_reference_id],
           department_id: payment[:department_id],
@@ -202,6 +203,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       company_id: self.company_id,
       gst_type_id: payment[:gst_type_id],
       tds_slab_id: payment[:tds_slab_id],
+      payment_notification_users: payment[:payment_notification_users],
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
