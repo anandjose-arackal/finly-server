@@ -41,24 +41,24 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
       if user.is_bank_payment_request_creditor?
 
         # policy_ids = Policy::Index.(user, params).policies
-        
         creditor_data = {
           type: 'creditor',
           title: "Teams' Purchase Orders",
           data: [
             {
-              title: "Initiated",
-              count: apply_scopes(purchase_orders, {filter_po_advance_status: 'initated'})&.count,
-              filters: [{filter_po_advance_status: 'initiated'}]
+              title: "Pending",
+              # count: apply_scopes(purchase_orders, {filter_all_advances: true, filter_po_advance_status: 'initiated'})&.count,
+              count: purchase_orders.filter_all_advances.filter_po_advance_status('pending')&.count,
+              filters: [{filter_po_advance_status: 'pending'}]
             },
             {
               title: "To Be Processed",
-              count: apply_scopes(purchase_orders, {filter_po_advance_status: 'to_be_processed'})&.count,
+              # count: apply_scopes(purchase_orders, {filter_all_advances: true, filter_po_advance_status: 'to_be_processed'})&.count,
+              count: purchase_orders.filter_all_advances.filter_po_advance_status('to_be_processed')&.count,
               filters: [{filter_po_advance_status: 'to_be_processed'}]
             }
           ]
         }
-
         self.counts.push(creditor_data)
       end
     end
