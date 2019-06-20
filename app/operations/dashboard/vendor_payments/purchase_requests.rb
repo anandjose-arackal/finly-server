@@ -2,6 +2,10 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
   attr_accessor :purchase_requests
 
   def init
+    # Set Date Filters
+    params[:filter_by_date_range] = {}
+    params[:filter_by_date_range][:from] = params[:filter_date_from] if params[:filter_date_from].present?
+    params[:filter_by_date_range][:to] = params[:filter_date_to] if params[:filter_date_to].present?
     self.purchase_requests = Procurements::PurchaseRequests::Index.(user, params).purchase_requests
   end
 
@@ -103,6 +107,22 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
           ]
         }
         self.counts.push(personal_data)
+      end
+
+      # Set Date Filters in Filters
+      # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      self.counts.each do |count_object|
+        count_object[:data].each do |data|
+           if params[:filter_by_date_range].present? && params[:filter_by_date_range][:from].present?
+             filter_date = {'filter_by_date_range[from]': params[:filter_by_date_range][:from]}
+             data[:filters].push(filter_date)
+           end
+
+          if params[:filter_by_date_range].present? && params[:filter_by_date_range][:to].present?
+             filter_date = {'filter_by_date_range[to]': params[:filter_by_date_range][:to]}
+             data[:filters].push(filter_date)
+           end
+        end
       end
 
       # if user.is_purchase_request_reviewer?
