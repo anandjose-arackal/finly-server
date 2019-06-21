@@ -184,7 +184,8 @@ class KotakBankApi::Base < BaseHandler
 
   protected
 
-  def load_connection(url = base_url)
+  # def load_connection(url = base_url)
+  def load_connection(url = 'https://apigwuat.kotak.com:8443/cms_generic_service?apikey=l7xx9e2c880d0b4549049ff62c5bf595c310')
     # adding the ssl options here for the request
     # verify certificate only in production
     verify = Rails.env.production? ? true : false

@@ -7,10 +7,15 @@
             <pay:MessageId>{{UNIQUE_REFERENCE_NUMBER}}</pay:MessageId> <!-- Unique ID -->
             <pay:MsgSource>{{MESSAGE_SOURCE}}</pay:MsgSource> <!-- Initials of Entity eg. FINLY -->
             <pay:ClientCode>{{CLIENT_CODE}}</pay:ClientCode><!-- TEMPTEST1 -->
+            <pay:BatchRefNmbr>23</pay:BatchRefNmbr>
+            <pay:HeaderChecksum />
          </pay:RequestHeader>
          <pay:InstrumentList> 
             <pay:instrument>
                <pay:InstRefNo>{{UNIQUE_REFERENCE_NUMBER}}</pay:InstRefNo> <!-- Message ID can be mentioned -->
+               <pay:CompanyId />
+               <pay:CompBatchId />
+               <pay:ConfidentialInd />
                <pay:MyProdCode>{{PRODUCT_CODE}}</pay:MyProdCode><!-- Client master maintainance is done at Banks end for each client. Bank will provide the MYPRODUCT which needs to be passed in Production. In case of UAT, you need to use CMSPAY as the MYPRODUCT -->
                <!--Optional:-->
                <!--Optional:-->
@@ -35,6 +40,9 @@
                <!--Optional:-->
                <pay:BeneName>{{BENEFICIARY_NAME}}</pay:BeneName><!-- Mention the Beneficiary name. -->
                <pay:InstDt>{{PAYMENT_DATE}}</pay:InstDt><!-- Format expected: YYYY-MM-DD -->
+               <pay:EnrichmentSet>
+                 <pay:Enrichment />
+               </pay:EnrichmentSet>
             </pay:instrument>
          </pay:InstrumentList>
       </pay:Payment>
