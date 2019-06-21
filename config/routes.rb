@@ -2999,7 +2999,7 @@ Rails.application.routes.draw do
 
   get 'users/all_cards', to: 'users#all_cards', as: :all_cards
   resources :users, only: [:create, :update, :index, :destroy, :show]
-  get 'users/group_entities_login', to: 'users#group_entities_login', as: :group_entities_login
+  post 'users/group_entities_login', to: 'users#group_entities_login', as: :group_entities_login
   get 'users/group_entities', to: 'users#group_entities', as: :group_entities
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
