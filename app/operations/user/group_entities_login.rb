@@ -13,17 +13,7 @@ class User::GroupEntitiesLogin < User::Base
   end
 
   def pre_validate
-    # validating password of the user first things first
-    unless StringUtils.to_bool(RequestStore.store[:skip_password])
-      if params[:password].blank?
-        add_message :error, 'Please enter your password before logging in'
-        return
-      end
-      unless user.valid_password?(params[:password])
-        add_message :error, 'Invalid Username or Password'
-        return
-      end
-    end
+
   end
 
   def init
@@ -35,6 +25,18 @@ class User::GroupEntitiesLogin < User::Base
   end
 
   def validate
+    # validating password of the user first things first
+    unless StringUtils.to_bool(RequestStore.store[:skip_password])
+      if params[:password].blank?
+        add_message :error, 'Please enter your password before logging in'
+        return
+      end
+      unless user.valid_password?(params[:password])
+        add_message :error, 'Invalid Username or Password'
+        return
+      end
+    end
+
     if user.blank?
       add_message :error, "User not found"
       return
