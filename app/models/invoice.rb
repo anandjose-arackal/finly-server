@@ -885,7 +885,7 @@ class Invoice < ApplicationRecord
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
-      bank_account_attributes: {id: self.id, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
+      bank_account_attributes: {id: self.id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location }
     }
   end
