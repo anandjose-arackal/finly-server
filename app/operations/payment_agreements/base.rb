@@ -61,8 +61,7 @@ class PaymentAgreements::Base < BaseOperation
         original_amount_attributes: [:id, :currency_id, :value]
 
       ],
-      security_deposits_attributes: [:id, :_destroy, :vendor_id, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id, 
-        payable_amount_attributes: [:id, :currency_id, :value],
+      security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id, 
         original_amount_attributes: [:id, :currency_id, :value]
       ]
       

@@ -38,9 +38,7 @@ class SecurityDeposit < ApplicationRecord
       location_attributes: { id: self.location_id, name: self.location&.name },
       cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name }, 
       note: self.note,
-      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
-      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
-
+      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id}
     }
 
   end
