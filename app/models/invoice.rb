@@ -886,7 +886,7 @@ class Invoice < ApplicationRecord
       notify_users: self.notify_users&.as_json,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
       bank_account_attributes: {id: self.id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location }
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address }
     }
   end
 
