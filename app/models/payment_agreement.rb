@@ -78,7 +78,8 @@ class PaymentAgreement < ApplicationRecord
       expiration_date: self.expiration_date&.to_date,
       no_expiration: self.no_expiration,
       renewal_date: self.renewal_date&.to_date,
-      note: self.note
+      note: self.note,
+      renewal_reminder_date: self.renewal_reminder_date
     }
   end
 

@@ -49,6 +49,8 @@ class WorkflowManager::Base < BaseOperation
       self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestItemProvider.new user, workflow_input
     when 'YesBankVendor'
       self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
+    when 'PaymentAgreement'
+      self.aasm_document = ::WorkflowManager::Aasm::PaymentAgreementProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

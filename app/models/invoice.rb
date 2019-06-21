@@ -740,6 +740,11 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def invoice_bank_account
+    user = self.created_by
+    user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
+  end
+
   private
 
   def payment_agreement_updations
@@ -885,7 +890,7 @@ class Invoice < ApplicationRecord
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
-      bank_account_attributes: {id: self.id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
+      bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address }
     }
   end
