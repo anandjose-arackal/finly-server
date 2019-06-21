@@ -23,9 +23,8 @@ class User::Invite::Resend < User::Invite::Base
   end
 
   def authorize
-    unless user.admin? or user.id == invited_user.invited_by_id
-      messages[:error] << 'Only inviting users or admins can delete invites.'
-      raise_unauthorized_exception
+    unless user.admin? or user.vendor_payment_admin? or user.id == invited_user.invited_by_id
+      messages[:error] << 'Only inviting users or admins can resend invites.'
     end
   end
 
