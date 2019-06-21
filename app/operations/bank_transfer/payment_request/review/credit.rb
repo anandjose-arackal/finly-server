@@ -123,7 +123,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     else
       add_message :error, op.messages[:error]
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
       return
     end
   end

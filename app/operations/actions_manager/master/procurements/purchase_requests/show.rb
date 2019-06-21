@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsManager::Master::Base
 
   register_handle :purchase_request_show
-  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item ]
+  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item, :delete]
 
   def initialize(user=nil, params=nil)
     super
@@ -85,7 +85,9 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     #   end
     # end
     # ############# Reviewer logic end #########################
-    purchase_request.get_reviewers.include?(user) && PurchaseRequest.status_ids(:awaiting_approval).include?(purchase_request.purchase_request_status_id)
+    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
+      purchase_request.get_reviewers.include?(user) && PurchaseRequest.status_ids(:awaiting_approval).include?(purchase_request.purchase_request_status_id)
+    end
   end
 
   def unapprove
@@ -199,8 +201,8 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
   end
 
-  def delete_pr
-    purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?
+  def delete
+    purchase_request.draft? || purchase_request.retracted? || purchase_request.rejected?
   end
 
 end

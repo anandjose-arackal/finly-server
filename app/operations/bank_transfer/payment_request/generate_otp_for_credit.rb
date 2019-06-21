@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
 
   include MathUtil
 
-  attr_accessor :otp, :bank_payment_request
+  attr_accessor :otp, :bank_payment_request, :bank_payment_requests
 
   OTP_RESEND_TIMER = 60
 
@@ -18,14 +18,16 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
       id = id.split(",")
     end
 
-    self.bank_payment_request = BankPaymentRequest.where(id: id).first
-    # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id).first
+    # self.bank_payment_request = BankPaymentRequest.where(id: id).first
+    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id)
   end
 
   def validate
-    unless self.bank_payment_request.can_credit?
-      add_message :error, "Payment ticket cannot be credited at this stage"
-      return
+    self.bank_payment_requests.each do |bpr|
+      unless bpr.can_credit?
+        add_message :error, "Payment ticket ID #{bpr.id} cannot be credited at this stage"
+        return
+      end
     end
 
     if user.otp.present? and user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
@@ -47,7 +49,7 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
   def process
     # save the OTP inside the bank payment request that was created
     send_mobile_otp
-    self.bank_payment_request.update(otp: self.otp, otp_sent_at: DateUtils.local_date_time, otp_attempts: 0)
+    self.bank_payment_requests.update_all(otp: self.otp, otp_sent_at: DateUtils.local_date_time, otp_attempts: 0)
     # self.bank_payment_requests.update_all(otp: self.otp, otp_created_at: DateUtils.local_date_time, otp_attempts: 0)
   end
 

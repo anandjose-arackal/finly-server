@@ -25,7 +25,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   def credit(payment, options = {})
     super
-    transfer_type = options[:bank_transfer_type]
+    transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
     bank_transaction = payment.reference_resource

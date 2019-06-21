@@ -284,10 +284,8 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse('01-01-1990') if from.blank?
-    to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
   }
 
@@ -299,8 +297,8 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
@@ -620,6 +618,7 @@ class Invoice < ApplicationRecord
             file_name: self.invoice_attachments.first&.attached_file&.original_filename
         },
         net_amount: precision_value(self.net_amount&.value),
+        original_amount: self.include_original_amount,
         gross_amount: precision_value(self.gross_amount&.value),
         custom_fields: self.custom_fields,
         category_id: self.category_id,
@@ -640,8 +639,17 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        invoice_items: invoice_items.as_json
     }
+  end
+
+  def include_original_amount
+    if self.invoice_items.present?
+        precision_value(self.amount&.value)
+    else
+        precision_value(self.original_amount&.value)
+    end
   end
 
   # For user role as invoice initiator
@@ -653,7 +661,7 @@ class Invoice < ApplicationRecord
   # For user role as invoice reviewer
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self) || user.vendor_payment_admin?
   end
 
   def is_crediting_user?(user = nil)

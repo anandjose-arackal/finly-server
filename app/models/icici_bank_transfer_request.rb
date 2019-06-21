@@ -58,9 +58,7 @@ class IciciBankTransferRequest < NonPersistentModel
     }
   end
 
-  private
-
-  def retrieve_transfer_type(transfer_type)
+  def self.retrieve_transfer_type(transfer_type)
     case transfer_type.upcase
       when "RTGS"
         return "RTG"
