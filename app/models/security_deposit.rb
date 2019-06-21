@@ -14,18 +14,32 @@ class SecurityDeposit < ApplicationRecord
 
 
   def as_json
+    # {
+    #   id: self.id, 
+    #   vendor_id: self.vendor_id,
+    #   vendor_name: self&.vendor&.name,
+    #   cost_center_id: self.cost_center_id,
+    #   vendor_location_id: self.vendor_location_id,
+    #   department_id: self.department_id,
+    #   location_id: self.location_id,
+    #   description: self.description,
+    #   note: self.note,
+    #   original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id },
+    #   payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id}
+    # }
+
     {
-      id: self.id, 
-      vendor_id: self.vendor_id,
-      vendor_name: self&.vendor&.name,
-      cost_center_id: self.cost_center_id,
-      vendor_location_id: self.vendor_location_id,
-      department_id: self.department_id,
-      location_id: self.location_id,
-      description: self.description,
+      id: self.id,
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
+      bank_account_attributes: {id: self.id, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
+      department_attributes: { id: self.department_id, name: self.department&.name },
+      location_attributes: { id: self.location_id, name: self.location&.name },
+      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name }, 
       note: self.note,
-      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id },
-      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id}
+      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
+
     }
 
   end
