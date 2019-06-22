@@ -16,7 +16,7 @@ end
 json.cost_centers @result.cost_centers.as_json
 
 json.reviewal_chains do
-  json.array! @result.policy_reviewal_chain do |chain|
+  json.array! @result.reviewal_chains do |chain|
     json.policy_id chain[:policy_id]
     json.reviewal_chain do
       json.array! chain[:reviewal_chain] do |item|

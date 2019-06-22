@@ -13,7 +13,7 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
       initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
       self.departments = self.policy.departments&.leaves
       self.locations = self.policy.locations&.leaves
-      self.policy_reviewal_chain = policy_reviewal_chain
+      self.reviewal_chains = policy_reviewal_chain
       self.payment_terms = user.company.payment_terms
       self.cost_centers = self.policy.cost_centers
     end
