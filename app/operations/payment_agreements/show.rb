@@ -39,8 +39,7 @@ class PaymentAgreements::Show < PaymentAgreements::Base
       self.rental_invoices = params[:rental_invoices]
       self.security_deposits  = params[:security_deposits]
       self.beneficiary_payments = params[:beneficiary_payments]
-      # self.reviewal_chain = payment_agreement.get_reviewal_chain if !payment_agreement.draft? && !payment_agreement.retracted? && !payment_agreement.rejected?
-      self.reviewal_chain = payment_agreement.get_reviewal_chain
+      self.reviewal_chain = payment_agreement.get_reviewal_chain if !payment_agreement.draft? && !payment_agreement.retracted? && !payment_agreement.rejected?
 
     end
 
