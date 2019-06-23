@@ -43,16 +43,16 @@ class SecurityDeposit < ApplicationRecord
       bank_accounts: fetch_vendor_bank_accounts.as_json
     }
 
-  private
+  end
 
+  private
+  
   def fetch_vendor_locations
     self.vendor&.gstin_locations&.as_json
   end
 
   def fetch_vendor_bank_accounts
     self.vendor&.bank_accounts&.non_deleted&.as_json
-  end
-
   end
 
 

@@ -27,7 +27,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     end
 
 
-    if self.payment_agreement.save
+    if self.payment_agreement.save!
       params[:reviewal_document] = self.payment_agreement
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
