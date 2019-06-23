@@ -2,7 +2,7 @@ class ActionsManager::Master::Base
 
   cattr_accessor :data_map
 
-  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request
+  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request, :payment_agreement
 
   MASTERS ||= {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',

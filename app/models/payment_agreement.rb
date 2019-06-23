@@ -110,4 +110,16 @@ class PaymentAgreement < ApplicationRecord
     end
     return status_ids.flatten.compact
   end
+
+  # For user role as payment agreement initiator
+  def is_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), self)
+  end
+
+  # For user role as payment agreement reviewer
+  def is_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), self)
+  end
 end
