@@ -153,7 +153,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def create_payment_agreement
-    {name: 'New Agreements', id: 'create', url: 'agreements/params={}'}
+    {name: 'New Agreements', id: 'create', url: 'agreements/new'}
   end
 
   def attachments
