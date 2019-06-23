@@ -102,4 +102,12 @@ class PaymentAgreement < ApplicationRecord
   def get_default_provider
     'PaymentAgreementProvider'
   end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push PaymentAgreementStatus.id_for(status)
+    end
+    return status_ids.flatten.compact
+  end
 end
