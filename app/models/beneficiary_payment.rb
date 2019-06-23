@@ -309,7 +309,19 @@ class BeneficiaryPayment < ApplicationRecord
       tds_slab_id: self.tds_slab_id,
       original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
       payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id}
+      vendor_locations: fetch_vendor_locations.as_json,
+      bank_accounts: fetch_vendor_bank_accounts.as_json
     }
+  end
+
+  private
+
+  def fetch_vendor_locations
+    self.vendor&.gstin_locations&.as_json
+  end
+
+  def fetch_vendor_bank_accounts
+    self.vendor&.bank_accounts&.non_deleted&.as_json
   end
 
 end

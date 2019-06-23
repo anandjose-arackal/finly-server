@@ -10,6 +10,22 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
   def process
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
+    if payment_agreement.valid?
+      # Set validation of DLRMs
+      if PaymentAgreement.status_ids(:open, :retracted, :rejected).include?(payment_agreement.status_id) && purchase_order.creator_id == user.id
+
+        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
+          reviewal_document: self.payment_agreement,
+          document_reviewer_mappings_params: document_reviewer_mappings_params
+        })
+
+        unless dlrm_validation_op.success?
+          add_message :error, dlrm_validation_op.messages[:error]
+          return
+        end
+      end
+    end
+
 
     if self.payment_agreement.save
       params[:reviewal_document] = self.payment_agreement

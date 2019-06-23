@@ -83,8 +83,16 @@ class PaymentAgreement < ApplicationRecord
     }
   end
 
+  def self.document_owner_attribute
+    'creator_id'
+  end
+
   def self.document_status_attribute
     'status_id'
+  end
+
+  def self.document_status_class_name
+    'PaymentAgreementStatus'
   end
 
   def self.roles

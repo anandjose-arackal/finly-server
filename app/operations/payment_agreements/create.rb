@@ -26,21 +26,23 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       # self.payment_agreement.creator_id = user.id
       # Create document level reviewer mapping
       # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.payment_agreement
+      params[:reviewal_document] = self.payment_agreement.reload
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
+        self.payment_agreement.destroy
         add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
       end
-      return
     else
       add_message :error, payment_agreement.errors.full_messages
-      return
     end
 
   end
 
   def post_process
-    add_message :success, 'Successfully created agreement'
+    unless has_errors?
+      add_message :success, 'Successfully created agreement'
+    end
   end
 
   def success
