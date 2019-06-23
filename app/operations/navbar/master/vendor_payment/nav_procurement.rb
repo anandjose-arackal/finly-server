@@ -50,7 +50,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_team
     return nil unless user.is_purchase_order_reviewer?
-    {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
+    # {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
+    {name: 'Team POs', id: 'procure', url: 'purchase_orders/params={"team_po":"true"}'}
   end
 
   def po_company
@@ -181,7 +182,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_approved_items
-    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator? || user.is_purchase_request_auditor?)
+    return nil unless user.company.purchase_requisition_enabled? && (user.is_purchase_order_initiator? || user.is_inventory_manager? || user.vp_admin_or_auditor? || user.is_purchase_request_auditor?)
     { name: 'Approved Items', id: 'procure', url: 'po_approval_items/params={}'}
   end
 

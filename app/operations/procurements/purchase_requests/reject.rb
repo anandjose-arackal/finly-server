@@ -1,10 +1,10 @@
 class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::Base
 
-  def validate
+  attr_accessor :reject_note
+
+  def init
     super
-    if params[:reject_note].blank?
-      add_message :error, 'Please add reject note'
-    end
+    self.reject_note = params[:reject_note]
   end
 
   def process
@@ -19,7 +19,8 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
           add_message :error, op.messages[:error]
           raise ActiveRecord::Rollback
         end
-        self.purchase_request.update(reject_note: params[:reject_note])
+
+        self.purchase_request.update(reject_note: reject_note)
         self.workflow_output = op.workflow_output
 
         raise ActiveRecord::Rollback unless reject_all_line_items
@@ -30,8 +31,10 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
   end
 
   def post_process
-    reject_all_line_items
-    add_message :success, "You've rejected reviewal of purchase request"
+    unless has_errors?
+      reject_all_line_items
+      add_message :success, "You've rejected reviewal of purchase request"
+    end
   end
 
   private

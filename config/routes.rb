@@ -3189,6 +3189,12 @@ Rails.application.routes.draw do
   get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
+  # keep this above
+  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'  
+  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'  
+  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'  
+  # keep this above
+  
   resources :locations
 
   resources :departments
@@ -3625,6 +3631,7 @@ Rails.application.routes.draw do
     put 'purchase_requests/bulk_approve', to: 'purchase_requests#bulk_approve'
     put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
     put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
+    delete 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
       post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
@@ -3671,6 +3678,7 @@ Rails.application.routes.draw do
     post 'inward_invoices/bulk_upload_items', to: 'inward_invoices#bulk_upload_items'
     get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
+    get 'inward_invoices/filter_config', to: 'inward_invoices#filter_config'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'

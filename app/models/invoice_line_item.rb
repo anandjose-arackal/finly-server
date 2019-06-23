@@ -5,7 +5,7 @@
 #  id                     :integer          not null, primary key
 #  invoice_id             :integer
 #  description            :string(255)
-#  quantity               :integer
+#  quantity               :decimal(20, 5)
 #  rate                   :decimal(20, 10)
 #  tax                    :decimal(20, 10)
 #  discount               :decimal(20, 10)
@@ -29,11 +29,13 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
+#  sgst                   :decimal(10, 5)
+#  cgst                   :decimal(10, 5)
+#  igst                   :decimal(10, 5)
 #
 
 class InvoiceLineItem < ApplicationRecord
   include MathUtil
-
 
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
@@ -117,12 +119,18 @@ class InvoiceLineItem < ApplicationRecord
       tax: self.tax,
       discount: self.discount,
       category_id: self.category_id,
+      category_name: category&.name,
       gst_type_id: self.gst_type_id,
       tax_amount_id: self.tax_amount_id,
+      tax_amount: precision_value(tax_amount&.value),
+      discount_amount: precision_value(discount_amount&.value),
+      amount: precision_value(amount&.value),
       discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
       amount_attributes: {id: self.amount_id, value: precision_value(self.amount&.value), currency_id: self.amount&.currency_id},
+      total_amount: precision_value(net_amount&.value),,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id, line_item_id: self.id },
       hsn_sac: self.hsn_sac,
+      taxable_amount: precision_value(taxable_amount&.value),
       taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.taxable_amount&.currency_id },
       inventory_line_item_id: self.inventory_line_item_id,
       item_info: self.item_info,
@@ -133,7 +141,6 @@ class InvoiceLineItem < ApplicationRecord
       unit_of_measurement: self.unit_of_measurement,
       department: self.department.as_json,
       gst_attributes: { cgst: '5.0', igst: nil, sgst: nil }
-
     }
   end
 

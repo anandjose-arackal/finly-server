@@ -118,6 +118,8 @@ RSpec.describe 'OtpVerification' do
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
           allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_ip).and_return(double(otp_verify?: true))
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_user_agent).and_return(double(otp_verify?: true))
 
           post '/oauth/token.json', params: {
               email: @user1.email,
@@ -156,6 +158,8 @@ RSpec.describe 'OtpVerification' do
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
           allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_ip).and_return(double(otp_verify?: true))
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_user_agent).and_return(double(otp_verify?: true))
 
           post '/oauth/token.json', params: {
               email: @user1.email,
@@ -194,6 +198,8 @@ RSpec.describe 'OtpVerification' do
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
           allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_ip).and_return(double(otp_verify?: true))
+          allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_user_agent).and_return(double(otp_verify?: true))
 
           post '/oauth/token.json', params: {
               email: @user1.email,

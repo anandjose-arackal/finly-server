@@ -24,11 +24,12 @@
 #  balance_due_id     :integer
 #  net_amount_id      :integer
 #  gross_amount_id    :integer
-#  roundoff_amount    :decimal(10, )
+#  roundoff_amount    :decimal(20, 10)
 #  cost_center_id     :integer
 #  invoice_number     :text(65535)
 #  invoice_date       :date
 #  invoice_due_date   :date
+#  advance_amount_id  :integer
 #
 
     #                 :id => :integer,

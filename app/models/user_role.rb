@@ -20,6 +20,7 @@ class UserRole < ApplicationRecord
   scope :auditor, -> { where(id: UserRole.id_for(:auditor)) }
   scope :travel_manager, -> { where(id: UserRole.id_for(:travel_manager)) }
 
+  ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
   VALUES = {
       admin: 1,
       finance_manager: 2,
@@ -61,6 +62,7 @@ class UserRole < ApplicationRecord
       payment_agreement_reviewer: 34,
       payment_agreement_auditor: 35
   }
+  ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 
   VALUES_EM = {
       admin: 1,

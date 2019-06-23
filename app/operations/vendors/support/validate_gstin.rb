@@ -55,8 +55,8 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     response_trade_name = gstin_master.trade_name
 
     if request_business_name.present? && (response_business_name.present? || response_trade_name.present?)
-      self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
-      self.trade_name_match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_trade_name)
+      self.match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(request_business_name), StringUtils.clear_generic_keywords(response_business_name))
+      self.trade_name_match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(request_business_name), StringUtils.clear_generic_keywords(response_trade_name))
     end
     #   # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
     #   self.api_response = self.connection.get
@@ -125,6 +125,11 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
   def make_api_call
     setup_connection
+
+    if self.connection.blank?
+      add_message :error, "Something went wrong, try again later"
+      return false
+    end
 
     Rails.logger.info "Making GSTIN Search API Call"
     self.api_response = self.connection.get

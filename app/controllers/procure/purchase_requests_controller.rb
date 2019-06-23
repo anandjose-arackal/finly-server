@@ -25,6 +25,11 @@ class Procure::PurchaseRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_destroy
+    @result = Procurements::PurchaseRequests::BulkDestroy.(current_user, params)
+    respond
+  end
+
   # def create_and_submit
   #   @result = Procurements::PurchaseRequests::CreateAndSubmit.(current_user, params)
   #   respond

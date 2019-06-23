@@ -89,7 +89,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
+      if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
       end
@@ -193,10 +193,23 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def pre_process
     # update gstin location id
+    if inward_invoice_params[:gst_type_id].blank?
+      if self.gstin_location.present?
+        self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+
+        shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+        if self.gstin_location.state_code == shipping_location&.state_code
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+        else
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+        end
+      else
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    end
     if self.gstin_location.present?
       self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
     end
-
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?
@@ -212,6 +225,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
     if self.inward_invoice_params[:inclusive_of_taxes].blank?
       self.inward_invoice_params[:inclusive_of_taxes] = false
+    end
+
+    #strip_invoice_number
+    if self.inward_invoice_params&.dig(:invoice_number).present?
+      self.inward_invoice_params[:invoice_number] =self.inward_invoice_params[:invoice_number]&.strip
     end
 
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)

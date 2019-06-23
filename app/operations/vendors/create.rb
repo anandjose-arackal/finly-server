@@ -61,16 +61,16 @@ class Vendors::Create < Vendors::Base
         validate_attachment(vendor_parameters, :pan)
       end
 
-    if vendor_parameters[:pan].present?
-      existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
-      if existing_pan.present?
-        add_message :error, "Another Vendor existed with this PAN"
-      end
-    end
+      # if vendor_parameters[:pan].present?
+      #   existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
+      #   if existing_pan.present?
+      #     add_message :error, "Another Vendor exists with this PAN"
+      #   end
+      # end
 
-    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-      validate_attachment(vendor_parameters, :msme_certificate)
-    end
+      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+        validate_attachment(vendor_parameters, :msme_certificate)
+      end
 
       if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
         validate_attachment(vendor_parameters, :gstin)
@@ -82,30 +82,30 @@ class Vendors::Create < Vendors::Base
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
-    if self.vendor_parameters[:bank_accounts_attributes].present?
-      self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-        ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], ifsc: account_params[:ifsc], account_owner_type: "YesBankVendor")
-        if ba.present?
-          existing_vendor = ba.account_owner
-          if existing_vendor.authorized
-            add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
-            break
-          else
-            self.similar_vendors.push(existing_vendor)
-            self.vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
-          end
-        end
-      end
-    end
+    # if self.vendor_parameters[:bank_accounts_attributes].present?
+    #   self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
+    #     ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], ifsc: account_params[:ifsc], account_owner_type: "YesBankVendor")
+    #     if ba.present?
+    #       existing_vendor = ba.account_owner
+    #       if existing_vendor.authorized
+    #         add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
+    #         break
+    #       else
+    #         self.similar_vendors.push(existing_vendor)
+    #         self.vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
+    #       end
+    #     end
+    #   end
+    # end
 
-    # There should be only one unique vendor inside similar vendors
-    similar_vendor_ids = self.similar_vendors.map(&:id).uniq.reject {|id| id.blank? }
-    if similar_vendor_ids.length > 1
-      add_message :error, "There are other vendors present with the provided bank accounts"
-      return
-    end
+    # # There should be only one unique vendor inside similar vendors
+    # similar_vendor_ids = self.similar_vendors.map(&:id).uniq.reject {|id| id.blank? }
+    # if similar_vendor_ids.length > 1
+    #   add_message :error, "There are other vendors present with the provided bank accounts"
+    #   return
+    # end
 
-    self.vendor = self.similar_vendors.first rescue nil
+    # self.vendor = self.similar_vendors.first rescue nil
   end
 
   def pre_process

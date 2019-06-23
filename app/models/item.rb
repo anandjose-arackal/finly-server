@@ -27,6 +27,7 @@
 #  user_id              :integer
 #  active               :boolean          default(TRUE)
 #  item_expense_type_id :integer
+#  tds_applicable       :boolean          default(TRUE)
 #
 
 class Item < ApplicationRecord

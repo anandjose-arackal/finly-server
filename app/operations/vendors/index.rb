@@ -21,6 +21,7 @@ class Vendors::Index < Vendors::Base
     has_scope :authorized, type: :boolean
     has_scope :filter_gstin
     has_scope :filter_pan
+    has_scope :filter_creation_date, using: [:from, :to], type: :hash
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
@@ -82,11 +83,11 @@ class Vendors::Index < Vendors::Base
       return
     end
 
-    if user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.vendors = user.company.yes_bank_vendors.approved.or(user.vendors)
-    else
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       role_based_data = ::YesBankVendor.associated_items(user, ::YesBankVendor.roles) || ::YesBankVendor.none
       self.vendors = user.company.yes_bank_vendors.approved.or(role_based_data)
+    else
+      self.vendors = user.company.yes_bank_vendors.approved
     end
 
   end

@@ -3,8 +3,6 @@ Gatekeeper::Checker.new 'On New Request' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session.admin_user_id.present?
-    skip
-    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :on_authenticated_request do
@@ -33,7 +31,7 @@ Gatekeeper::Checker.new 'On New Request' do
     #   fail
     # end
 
-    rule 'User agent is required for the request' do
+    rule 'UserAgent is required for the request' do
       if RequestStoreUtil.current_request.user_agent.nil?
         message 'User agent is blank in the request'
         session_status_id UserSessionStatus.id_for(:blocked)
@@ -51,7 +49,7 @@ Gatekeeper::Checker.new 'On New Request' do
       message 'UserAgent mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
-      level 3
+      level 1
       fail
 
     end
@@ -67,10 +65,13 @@ Gatekeeper::Checker.new 'On New Request' do
       fail
     end
 
-    rule 'Session should timeout after 30 minute of inactivity' do
+    rule 'Session should timeout on inactivity' do
       session = RequestStoreUtil.current_session
+      policy = RequestStoreUtil.security_policy
 
-      if Time.now - Time.parse(session.last_request_at.to_s) > 30.minutes
+      next if policy.browser_client.inactivity_timeout.nil?
+
+      if Time.now - Time.parse(session.last_request_at.to_s) > policy.browser_client.inactivity_timeout
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:expired)
         response_code 401
@@ -143,6 +144,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_client.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -206,6 +209,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_ip.status_id == UserIpStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_ip.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -241,6 +246,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_user_agent.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false

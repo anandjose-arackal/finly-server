@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -37,6 +37,15 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
+    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    self.payment_order_custom_fields.each do |custom_field_config|
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+          self.headers << "#{custom_field_config.field_name} ID"
+        else
+          self.headers << "#{custom_field_config.field_name}"
+      end
+    end
 
     self.issues = []
 
@@ -89,11 +98,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
-      
 
 
       self.error_messages = []
       self.issue_item = {}
+
+      # adding the custom fields for the particular invoice, using a ghost invoice
+      self.ghost_invoice = Invoice.new
+      custom_fields = {custom_fields: item[:custom_fields]} || {}
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+
+      op = CustomField::Validate.(self.ghost_invoice)
+      unless op.success?
+        self.error_messages << op.messages[:error]
+        self.valid = false
+        self.issue_item[:custom_fields] = op.messages[:error]
+      end
 
       # new requirement
       # SET key as array to hold mupltiple errors
@@ -292,7 +315,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_invoice_number(invoice_number)
-    ( /\A[a-zA-Z0-9\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
+    ( /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)
@@ -339,6 +362,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   def retrieve_header_names
     [
         "Name",
+        "Business Name",
         "Account Number",
         "IFSC",
         "Sub Total",

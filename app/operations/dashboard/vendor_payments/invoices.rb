@@ -2,7 +2,11 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
   attr_accessor :invoices
 
   def init
-    self.invoices = Procurements::Invoices::Index.(user, params).invoices
+    # Set date filters
+    params[:filter_creation_date] = {} if params[:filter_date_from].present? || params[:filter_date_to].present?
+    params[:filter_creation_date][:from] = params[:filter_date_from] if params[:filter_date_from].present?
+    params[:filter_creation_date][:to] = params[:filter_date_to] if params[:filter_date_to].present?
+    self.invoices = BankTransfer::InwardInvoices::Index.(user, params).invoices
   end
 
   def success
@@ -75,8 +79,8 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               ]
             },
             {
-              title: "Credited",
-              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:credited)})&.count,
+              title: "Paid",
+              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:paid)})&.count,
               filters: [
                 {filter_invoice_type: invoice_type},
                 {filter_status: "paid"}
@@ -121,6 +125,22 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
           ]
         }
         self.counts.push(personal_data)
+      end
+
+      # Set Date Filters in Filters
+      # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      self.counts.each do |count_object|
+        count_object[:data].each do |data|
+           if params[:filter_creation_date].present? && params[:filter_creation_date][:from].present?
+             filter_date = {'filter_creation_date[from]': params[:filter_creation_date][:from]}
+             data[:filters].push(filter_date)
+           end
+
+          if params[:filter_creation_date].present? && params[:filter_creation_date][:to].present?
+             filter_date = {'filter_creation_date[to]': params[:filter_creation_date][:to]}
+             data[:filters].push(filter_date)
+           end
+        end
       end
 
       # if user.is_invoice_reviewer? || user.vendor_payments_admin?

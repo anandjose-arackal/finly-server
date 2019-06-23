@@ -32,4 +32,9 @@ class CostCentersController < BaseControllers::WebBase
     end
   end
 
+  def bulk_destroy
+    @result = CostCenters::BulkDestroy.(current_user, params)
+    respond
+  end
+
 end

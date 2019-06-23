@@ -5,6 +5,8 @@ json.locations do
       # json.id location.id
       # json.name location.name
     end
+  else
+    [] # add something here otherwise FE breaks if key not present
   end
 end
 
@@ -60,3 +62,5 @@ json.reviewal_chains do
   end
 end
 json.reviewal_chain @result&.purchase_request&.get_reviewal_chain
+
+json.pr_custom_fields_config @result.custom_fields_config[:purchase_request]

@@ -1,6 +1,8 @@
 # called when user adds excel sheet or manually adds new payments
 # This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
 
+# # DEPRECATED OPERATION, NOT BEING USED
+
 class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperation
   sidekiq_options queue: :payments_queue
 

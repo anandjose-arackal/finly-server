@@ -37,10 +37,15 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       add_message :error, "This transaction is not in processing state"
       return
     end
+
+    if bank_transaction.account_name_check?
+      add_message :error, "This kind of bank transaction does not need status checking"
+      return
+    end
   end
 
   def pre_process
-    if self.payment.collect_funds_withdrawal?
+    if self.payment&.collect_funds_withdrawal?
       RequestStore.store[:current_app] = :fc
     end
   end
