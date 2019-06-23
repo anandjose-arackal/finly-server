@@ -232,17 +232,15 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
-  scope :filter_payable_advances, -> (enabled) {
-    if StringUtils.to_bool(enabled)
-      where(purchase_order_status_id: [
-          PurchaseOrderStatus.id_for(:approved),
-          PurchaseOrderStatus.id_for(:auto_approved)
-      ],
-            advance_amount_status_id: [
-                AdvanceAmountStatus.id_for(:to_be_processed),
-                AdvanceAmountStatus.id_for(:failed)
-            ])
-    end
+  scope :filter_payable_advances, -> {
+    where(purchase_order_status_id: [
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved)
+    ],
+          advance_amount_status_id: [
+              AdvanceAmountStatus.id_for(:to_be_processed),
+              AdvanceAmountStatus.id_for(:failed)
+          ])
   }
 
   scope :filter_all_advances, -> {
@@ -821,6 +819,12 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+    roundoff_amount = self.roundoff_amount.to_f
+    if roundoff_amount != 0
+      total_amount = precision_value (total_amount + roundoff_amount)
+    else
+      total_amount = precision_value total_amount
+    end
 
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount

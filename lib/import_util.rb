@@ -46,7 +46,7 @@ class ImportUtil
           val = row[j]
         end
         val = cleanup_email(val)
-        val = cleanup_account_number(key, val)
+        # val = cleanup_account_number(key, val)
         map[key] = val
       end
       add_line = false

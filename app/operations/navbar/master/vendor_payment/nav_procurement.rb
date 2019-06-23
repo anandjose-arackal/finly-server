@@ -50,7 +50,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_team
     return nil unless user.is_purchase_order_reviewer?
-    {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
+    # {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
+    {name: 'Team POs', id: 'procure', url: 'purchase_orders/params={"team_po":"true"}'}
   end
 
   def po_company
