@@ -906,7 +906,9 @@ class Invoice < ApplicationRecord
       notify_users: self.notify_users&.as_json,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address }
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+      vendor_locations: fetch_vendor_locations.as_json,
+      bank_accounts: fetch_vendor_bank_accounts.as_json
     }
   end
 
@@ -921,6 +923,14 @@ class Invoice < ApplicationRecord
       status: self&.status&.name&.titleize,
       creation_date: self.created_at.to_date
     }
+  end
+
+  def fetch_vendor_locations
+    self.vendor&.gstin_locations&.as_json
+  end
+
+  def fetch_vendor_bank_accounts
+    self.vendor&.bank_accounts&.non_deleted&.as_json
   end
 
 end
