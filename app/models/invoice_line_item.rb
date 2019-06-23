@@ -127,7 +127,7 @@ class InvoiceLineItem < ApplicationRecord
       amount: precision_value(amount&.value),
       discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
       amount_attributes: {id: self.amount_id, value: precision_value(self.amount&.value), currency_id: self.amount&.currency_id},
-      total_amount: precision_value(net_amount&.value),,
+      total_amount: precision_value(net_amount&.value),
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id, line_item_id: self.id },
       hsn_sac: self.hsn_sac,
       taxable_amount: precision_value(taxable_amount&.value),
