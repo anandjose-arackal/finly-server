@@ -1,6 +1,7 @@
 class PaymentAgreements::Base < BaseOperation
 
-  attr_accessor :company
+  attr_accessor :company, :workflow_output, :payment_agreement
+
 
   def pre_validate
     if user.blank? || params.blank?
