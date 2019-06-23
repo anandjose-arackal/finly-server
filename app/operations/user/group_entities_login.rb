@@ -19,8 +19,8 @@ class User::GroupEntitiesLogin < User::Base
   def init
     self.email_mobile = params[:email_mobile]
     self.user = User.find_for_database_authentication(username: self.email_mobile)
-    self.email = self.user.email
-    self.mobile_number = self.mobile_number
+    self.email = self.user&.email
+    self.mobile_number = self.user&.mobile_number
     self.company = self.user&.company
   end
 
@@ -31,7 +31,7 @@ class User::GroupEntitiesLogin < User::Base
         add_message :error, 'Please enter your password before logging in'
         return
       end
-      unless user.valid_password?(params[:password])
+      unless user&.valid_password?(params[:password])
         add_message :error, 'Invalid Username or Password'
         return
       end

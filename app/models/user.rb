@@ -824,6 +824,11 @@ class User < ApplicationRecord
     (password_changed_at || created_at) < expire_after.seconds.ago
   end
 
+  def email_required?
+    # todo - can be made conditional later
+    false
+  end
+
   # Expires user if password is weak, old passwords and inactivity
   def verify_expiration!(password = nil)
     return true if expired? and !otp_verified
