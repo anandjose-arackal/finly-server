@@ -664,6 +664,7 @@ class Invoice < ApplicationRecord
           discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
       }
     end
+  end
 
   def include_original_amount
     if self.invoice_items.present?

@@ -20,6 +20,8 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     #   amount = 0
     when 'PurchaseRequest'
       amount = document&.total_amount&.value
+    when 'PaymentAgreement'
+      amount = document&.total_amount&.value rescue 0
     else
       amount = 0
     end
