@@ -60,7 +60,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
-    if self.policy.blank?
+    if self.policy.blank? && self.inward_invoice.policy_id.blank?
       add_message :error, "Policy cannot be blank"
       return
     end
