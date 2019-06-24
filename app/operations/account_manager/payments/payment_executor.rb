@@ -133,6 +133,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         return
     end
 
+
     # Debit funds from account
     unless debit_adapter.blank? or debit_adapter.debit(payment, options)
        # Debit failed
