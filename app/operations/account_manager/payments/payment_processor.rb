@@ -41,6 +41,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.background = params[:background] || self.payment_request.background
     end
 
+
     # setting the company id based on whether it's a user or an AdminUser
     if user.is_a?(User)
       self.company_id = user.company_id
@@ -50,6 +51,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company = Company.find_by(id: self.company_id)
     end
 
+    # if the payment order is already present, need to add the variables here
     if self.payment_order.present?
       self.options = {}
       self.options[:bank_transfer_type] = payment_order.bank_transfer_type
@@ -69,7 +71,10 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.crediting_payments = self.payment_order.payments
       self.options = {}
       self.options[:bank_transfer_type] = payment_order.bank_transfer_type
-      self.background |= true
+      # setting background to true only if it was ever blank, i.e. not set before
+      if self.background.nil?
+        self.background = true
+      end
     end
 
     # if none of the above, i.e. payment request or payment order both are not present,

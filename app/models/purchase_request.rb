@@ -54,13 +54,25 @@ class PurchaseRequest < ApplicationRecord
   accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
 
-  scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
+
   scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}
 
   scope :with_ids, -> (ids) { where id: ids }
+
+  scope :filter_by_status_id,  -> (status_id) {
+    if status_id == 'awaiting_approval'
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      where purchase_request_status_id: status_id
+    end
+  }
 
 
   scope :filter_by_location_id, -> (id) {

@@ -30,8 +30,10 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   def init
     # at this point the payments are all homogenous, so adapters can be initiated with the first payment's details
-    self.source_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
+    self.source_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account, payment_order.payments.first)
+    self.receiving_account_adapter = retrieve_adapter(payment_order.payments.first.receiving_account, payment_order.payments.first)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
+    self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
     if self.crediting_payments.blank?
       self.crediting_payments = self.payment_order.payments
     end
@@ -87,50 +89,34 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
     # checking if all the users who're being credited have the eligibility
     # only needs to be done if it's a credit
-    if payment_order.credit?
-      valid = true
-      payment_order.payments.each do |payment|
-        receiving_account_adapter = retrieve_adapter payment.receiving_account, payment
-        unless receiving_account_adapter.eligibility(payment.amount_value)
-          valid = false
-          # If the object exists, i.e only validator is not being called
-          if payment.id.present?
-            payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
-                                          system_message_type_id: SystemMessageType.id_for(:error)).save
-          end
-        end
-      end
-      unless valid
-        add_message :error, 'Some of the payments cannot be processed because of lack of eligibility'
-      end
-    end
+    # if payment_order.credit?
+    #   valid = true
+    #   payment_order.payments.each do |payment|
+    #     receiving_account_adapter = retrieve_adapter payment.receiving_account, payment
+    #     unless receiving_account_adapter.eligibility(payment.amount_value)
+    #       valid = false
+    #       # If the object exists, i.e only validator is not being called
+    #       if payment.id.present?
+    #         payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+    #                                       system_message_type_id: SystemMessageType.id_for(:error)).save
+    #       end
+    #     end
+    #   end
+    #   unless valid
+    #     add_message :error, 'Some of the payments cannot be processed because of lack of eligibility'
+    #   end
+    # end
 
     if payment_order.debit?
       # checking the balance of the receiving account for a debit
-      self.receiving_account_adapter = retrieve_adapter payment.receiving_account
-      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {receiving_account_adapter: self.receiving_account_adapter,
-                                                                               crediting_payments: self.crediting_payments})
+      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {crediting_payments: self.crediting_payments,
+                                                                            receiving_account_adapter: self.receiving_account_adapter})
 
       unless op.success?
-        add_message :error, op.messages
+        add_message :error, op.message
         return
       end
 
-      # valid = true
-      # payment_order.payments.each do |payment|
-      #   receiving_account_adapter = retrieve_adapter payment.receiving_account
-      #   unless receiving_account_adapter.balance >= payment.amount_value
-      #     valid = false
-      #     # If the object exists, i.e only validator is not being called
-      #     if payment.id.present?
-      #       payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
-      #                                     system_message_type_id: SystemMessageType.id_for(:error)).save
-      #     end
-      #   end
-      # end
-      # unless valid
-      #   add_message :error, "There isn't enough balance in the source account for this transaction"
-      # end
     end
   end
 

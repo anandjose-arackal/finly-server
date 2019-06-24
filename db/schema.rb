@@ -702,6 +702,7 @@ ActiveRecord::Schema.define(version: 2019_06_16_210127) do
     t.date "invoice_date"
     t.date "invoice_due_date"
     t.integer "advance_amount_id"
+    t.json "payment_notification_users"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"

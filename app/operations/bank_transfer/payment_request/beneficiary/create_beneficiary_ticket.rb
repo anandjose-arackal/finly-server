@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
 
 	def pre_validate
 	    if user.blank?
