@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_15_194304) do
+ActiveRecord::Schema.define(version: 2019_06_24_102210) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3547,6 +3547,29 @@ ActiveRecord::Schema.define(version: 2019_06_15_194304) do
   create_table "kotak_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "kotak_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "amount_id"
+    t.integer "company_id"
+    t.integer "transfer_status_id"
+    t.integer "beneficiary_account_id"
+    t.string "utr"
+    t.string "response_status_code"
+    t.string "unique_reference_number"
+    t.string "transfer_type"
+    t.string "beneficiary_account_number"
+    t.string "beneficiary_account_ifsc"
+    t.string "beneficiary_name"
+    t.string "narration"
+    t.date "payment_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
+    t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
+    t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
+    t.index ["transfer_status_id"], name: "index_kotak_bank_transactions_on_transfer_status_id"
+    t.index ["unique_reference_number"], name: "index_kotak_bank_transactions_on_unique_reference_number"
   end
 
   create_table "kyc_documents", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

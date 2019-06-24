@@ -67,55 +67,100 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     # handle the various error cases here
     # case 500
     case self.response.status
-      when 400
-        add_message :error, "Invalid API Key"
-        self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      when 404
-        add_message :error, "The service is temporarily down. Please try again later"
-        self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      when 401
-        add_message :error, "Unauthorized."
-        self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      when 500
-        self.parsed_response = Hash.from_xml(response.body)
-        ap parsed_response
-        self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
-        # if the transfer failed, we will see it the error message here, else it'll be nil
-        self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
-        case self.error_code
-          # potential failure cases
-          when "ns:E504", "ns:502", "ns:E500"
-            self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
-            Event::EAlert::Create.(nil, title: 'E:504 - Timeout error',description: "Errors: Timout error - check sideki logs. <br><br> #{payment.as_json}", subject: 'Finly Vendor Payments - E:504')
-          # definite failure case
-          when "ns:E406", "ns:E6001", "ns:E6002", "ns:E6003", "ns:E8000", "ns:E1001", "ns:E1002", "ns:E1003", "ns:E1004", "ns:E1028", "flex:E18", "flex:E307",
-            "flex:E404", "flex:E449", "flex:E8036", "flex:E8087", "flex:E9072", "npci:E08", "npci:EM1", "npci:EM2", "npci:EM3", "npci:EM4", "npci:EM5", "npci:E307",
-            "npci:E449", "atom:E307", "atom:E404", "atom:E449", "sfms:E99", "sfms:E70", "sfms:E18", "ns:E9001", "ns:E9002", "ns:E400"
-            self.transfer_status_id = BankTransferStatus.id_for(:failed)
-          when "ns:E429", "nsE402", "ns:E410", "ns:E403"
-            # have to trigger a mailer or something - either transaction limit reached, or not enough balance or something on those lines
-            self.transfer_status_id = BankTransferStatus.id_for(:failed)
-          else
-            self.transfer_status_id = BankTransferStatus.id_for(:failed)
-        end
-      when 200
-        self.parsed_response = Hash.from_xml(response.body)
-        ap parsed_response
-        # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
-        self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
-        self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
-        self.transfer_request.beneficiary_full_name = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("nameWithBeneficiaryBank")
-        if self.transfer_request.bank_reference_number.present?
-          if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
-            self.transfer_status_id = BankTransferStatus.id_for(:completed)
-          elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
-            self.transfer_status_id = BankTransferStatus.id_for(:processing)
-          end
+    when 400
+      add_message :error, "Invalid API Key"
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    when 403
+      add_message :error, "Schema Validation Error"
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    when 404
+      add_message :error, "The service is temporarily down. Please try again later"
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    when 401
+      add_message :error, "Unauthorized."
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    when 500
+      self.parsed_response = Hash.from_xml(response.body)
+      ap parsed_response
+      self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
+      # if the transfer failed, we will see it the error message here, else it'll be nil
+      self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
+      case self.error_code
+        # potential failure cases
+        when "ns:E504", "ns:502", "ns:E500"
+          self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
+          Event::EAlert::Create.(nil, title: 'E:504 - Timeout error',description: "Errors: Timout error - check sideki logs. <br><br> #{payment.as_json}", subject: 'Finly Vendor Payments - E:504')
+        # definite failure case
+        when "ns:E406", "ns:E6001", "ns:E6002", "ns:E6003", "ns:E8000", "ns:E1001", "ns:E1002", "ns:E1003", "ns:E1004", "ns:E1028", "flex:E18", "flex:E307",
+          "flex:E404", "flex:E449", "flex:E8036", "flex:E8087", "flex:E9072", "npci:E08", "npci:EM1", "npci:EM2", "npci:EM3", "npci:EM4", "npci:EM5", "npci:E307",
+          "npci:E449", "atom:E307", "atom:E404", "atom:E449", "sfms:E99", "sfms:E70", "sfms:E18", "ns:E9001", "ns:E9002", "ns:E400"
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        when "ns:E429", "nsE402", "ns:E410", "ns:E403"
+          # have to trigger a mailer or something - either transaction limit reached, or not enough balance or something on those lines
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        else
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      end
+    when 200
+      self.parsed_response = Hash.from_xml(response.body)
+
+      ap parsed_response
+      # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
+      debugger
+      acknowledgement = parsed_response["Envelope"]&.dig("Body")&.dig("Payment")&.dig("AckHeader")
+
+      status_code = acknowledgement["StatusCd"]
+
+      if status_code.present?
+        case status_code
+        when "000"
+          # Success | All Instruments accepted Successfully
+          self.transfer_status_id = BankTransferStatus.id_for(:completed)
+        when "001"
+          # Error | XML Schema validation failed
+        when "002"
+          # Error | Duplicate Message Id
+          # Should ideally reinitiate the transaction
+        when "003"
+          # Error | Invalid Client Code
+        when "004"
+          # Error | Duplicate Instrument Ref Number within Request
+        when "005"
+          # Error | Request Partially Accepted
+        when "006"
+          # Error | Instrument rejected due to data validation failure
+        when "007"
+          # Error | Instrument validated successfully
+        when "008"
+          # Error | Invalid Web service consumer IP address
+        when "009"
+          # Error | All Instruments rejected due to data validation failure
+        when "010"
+          # Error | Default user not found for given client
+        when "011"
+          # Error | System encountered severe error. Please contact admin
         end
       else
+        # Did not get expected response
+        add_message :error, "Unknown Response"
+        self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      end
+
+      # self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
+      # self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+      # self.transfer_request.beneficiary_full_name = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("nameWithBeneficiaryBank")
+      # if self.transfer_request.bank_reference_number.present?
+      #   if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
+      #     self.transfer_status_id = BankTransferStatus.id_for(:completed)
+      #   elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
+      #     self.transfer_status_id = BankTransferStatus.id_for(:processing)
+      #   end
+      # end
+    else
         # do nothing?
     end
     # create the bank transaction right here
+    #
     self.company = Company.find_by(id: self.transfer_request.company_id)
     if self.payment&.reference_resource&.is_a?(BankTransaction) || self.bank_transaction.present?
       # just update the bank transaction with the latest details
@@ -188,7 +233,6 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     beneficiary_name = beneficiary_name[0..30]&.strip
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
-    debugger
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.unique_reference_number,
         'MESSAGE_SOURCE' => 'FINLY',

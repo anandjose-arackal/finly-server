@@ -113,7 +113,6 @@ class KotakBankApi::Base < BaseHandler
       end
 
       self.end_time = DateUtils.local_date_time
-      debugger
       if Rails.env.production?
         post_params_hash = (Hash.from_xml(template) rescue nil)
         response_hash = (Hash.from_xml(self.response.body) rescue nil)

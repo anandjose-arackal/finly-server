@@ -1,0 +1,24 @@
+# == Schema Information
+#
+# Table name: kotak_bank_transactions
+#
+#  id                         :bigint           not null, primary key
+#  amount_id                  :integer
+#  company_id                 :integer
+#  transfer_status_id         :integer
+#  beneficiary_account_id     :integer
+#  utr                        :string(255)
+#  response_status_code       :string(255)
+#  unique_reference_number    :string(255)
+#  transfer_type              :string(255)
+#  beneficiary_account_number :string(255)
+#  beneficiary_account_ifsc   :string(255)
+#  beneficiary_name           :string(255)
+#  narration                  :string(255)
+#  payment_date               :date
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#
+
+class KotakBankTransaction < ApplicationRecord
+end

@@ -9,6 +9,8 @@
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
 #  status_id        :integer          default(1), not null
+#  test_account     :boolean          default(FALSE)
+#  subdomain        :string(255)
 #
 
 class Company < ApplicationRecord
