@@ -920,7 +920,8 @@ class Invoice < ApplicationRecord
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       status: self&.status&.name&.titleize,
-      creation_date: self.created_at.to_date
+      creation_date: self.created_at.to_date,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds }
     }
   end
 

@@ -66,7 +66,7 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
-  after_save :budget_trail_entry, :update_taxable_amount , :update_net_amount
+  after_save :budget_trail_entry, :update_taxable_amount, :update_net_amount
   after_destroy :budget_trail_destroy
 
   def tax
@@ -140,8 +140,7 @@ class InvoiceLineItem < ApplicationRecord
       tax_rate: self.tax_rate.as_json,
       cost_center: self.cost_center.as_json,
       unit_of_measurement: self.unit_of_measurement,
-      department: self.department.as_json,
-      gst_attributes: { cgst: '5.0', igst: nil, sgst: nil }
+      department: self.department.as_json
     }
   end
 
@@ -164,16 +163,16 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def update_taxable_amount
-    rate = self.rate
-    quantity = self.quantity
-    discount_percentage = self.discount
-    amount_before_discount = rate*quantity
-    taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
-    if self.taxable_amount.present?
-      self.taxable_amount.update(value: taxable_amt)
-    else
-      self.taxable_amount.create(value: taxable_amt, currency_id: 1)
-    end
+    # rate = self.rate
+    # quantity = self.quantity
+    # discount_percentage = self.discount
+    # amount_before_discount = rate*quantity
+    # taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+    # if self.taxable_amount.present?
+    #   self.taxable_amount.update(value: taxable_amt)
+    # else
+    #   self.taxable_amount.create(value: taxable_amt, currency_id: 1)
+    # end
   end
 
   def update_net_amount
