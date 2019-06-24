@@ -3041,13 +3041,13 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/report#processing_cancel'
         post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
         get 'payment_file', to: 'settlement/report#processing_payment_file'
-        get '/:id', to: 'settlement/reports#processing_show'
+        get '/:id', to: 'settlement/report#processing_show'
       end
       get 'completed', to: 'settlement/report#completed_index'
       get 'completed/count', to: 'settlement/report#completed_count'
       get 'completed/batch', to: 'settlement/report#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
-      get 'completed/:id', to: 'settlement/reports#completed_show'
+      get 'completed/:id', to: 'settlement/report#completed_show'
     end
     scope :money_requests do
       get 'pending', to: 'settlement/money_requests#pending_index'

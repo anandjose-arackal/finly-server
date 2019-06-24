@@ -2,7 +2,7 @@ user_count = 0
 request_count = 0
 json.actions @result.actions_for(@result.money_request_processor)
 json.items do
-  json.array! @result.mappings do |item|
+  json.array! @result.paginated_mappings do |item|
     user_count += 1
     json.user item.user
     json.amount item.amount

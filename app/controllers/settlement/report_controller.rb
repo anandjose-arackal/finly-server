@@ -37,6 +37,11 @@ class Settlement::ReportController < BaseControllers::WebBase
     respond
   end
 
+  def processing_show
+    @result = Settlement::SReport::Processing::Show.(current_user, params)
+    respond
+  end
+
   def processing_count
     @result = Settlement::SReport::Processing::Index.(current_user, params)
     respond
@@ -59,6 +64,11 @@ class Settlement::ReportController < BaseControllers::WebBase
 
   def completed_batch_index
     @result = Settlement::SReport::Completed::BatchIndex.(current_user, params)
+    respond
+  end
+
+  def completed_show
+    @result = Settlement::SReport::Completed::Show.(current_user, params)
     respond
   end
 

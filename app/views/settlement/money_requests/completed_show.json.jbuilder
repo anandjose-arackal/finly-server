@@ -1,7 +1,7 @@
 user_count = 0
 money_request_count = 0
 json.items do
-  json.array! @result.mappings do |item|
+  json.array! @result.paginated_mappings do |item|
     if item.status.completed?
       user_count += 1
     end

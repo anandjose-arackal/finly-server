@@ -45,7 +45,7 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
 
       self.mappings = self.report_processor_group.mappings
       per_page = params[:per_page] || 30
-      self.paginated_mappings = self.report_processor_group&.include_for_show.paginate(page: params[:page], per_page: per_page)
+      self.paginated_mappings = self.mappings.paginate(page: params[:page], per_page: per_page)
     end
 
     def actions_for(processor_group)

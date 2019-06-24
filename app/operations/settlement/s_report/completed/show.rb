@@ -11,7 +11,7 @@ class Settlement::SReport::Completed::Show < Settlement::SReport::Completed::Bas
   def init
     request_id = params[:id] || params[:report_id] || params[:report_processor_group_id]
 
-    self.report_processor_group = current_company.report_processor_groups.not_completed&.find_by(id: request_id)
+    self.report_processor_group = current_company.report_processor_groups.completed&.find_by(id: request_id)
     if finance_view?
       self.report_processor_group = self.report_processor_groups.created_by_user(user.id)&.find_by(id: request_id)
     end
@@ -45,7 +45,7 @@ class Settlement::SReport::Completed::Show < Settlement::SReport::Completed::Bas
 
       self.mappings = self.report_processor_group.mappings
       per_page = params[:per_page] || 30
-      self.paginated_mappings = self.report_processor_group&.include_for_show.paginate(page: params[:page], per_page: per_page)
+      self.paginated_mappings = self.mappings.paginate(page: params[:page], per_page: per_page)
     end
 
   end
