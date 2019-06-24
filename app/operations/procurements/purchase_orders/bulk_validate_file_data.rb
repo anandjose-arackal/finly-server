@@ -104,6 +104,12 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       else
         single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
         item[:single_item] = single_item
+
+        if single_item.supply_item_type_id != (SupplyItemType.id_for(:po_item) || SupplyItemType.id_for(:po_non_po_item) || nil)
+          self.valid = false
+          self.error_messages << "Selected item is not included in the list of PO items in the inventory list."
+          self.issue_item[:item_number] = "Selected item is not included in the list of PO items in the inventory list."
+        end
       end
 
       unless validate_amount rate
@@ -202,6 +208,25 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
           item[:cost_center_id] = self.cost_centers.where(id: cost_center_id)&.first&.id
         end
 
+        # set variables for calculation
+        item_quantity = (quantity || 0).to_f
+        item_rate = (rate || 0).to_f
+        item_tax = (self.tax_rates.find_by(id: tax_rate_id)&.rate || 0).to_f
+        item_discount = (discount || 0).to_f
+
+        # do calculation
+        item_amount = (item_quantity * item_rate)
+        item_discount_amount = item_amount * item_discount / 100
+        item_taxable_amount = item_amount - item_discount_amount
+        item_tax_amount = item_taxable_amount * item_tax / 100
+        item_total_amount = item_taxable_amount + item_tax_amount
+
+        # assign to hash
+        item[:item_amount] = item_amount
+        item[:item_discount_amount] = item_discount_amount
+        item[:item_taxable_amount] = item_taxable_amount
+        item[:item_tax_amount] = item_tax_amount
+        item[:item_total_amount] = item_total_amount
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?

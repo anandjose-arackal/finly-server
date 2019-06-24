@@ -20,5 +20,11 @@ json.bulk_items do
 
 		json.cost_center_id item[:cost_center_id]
 		json.cost_center_name item[:cost_center_name]
+
+		json.item_amount item[:item_amount]
+        json.item_discount_amount item[:item_discount_amount]
+        json.item_taxable_amount item[:item_taxable_amount]
+        json.item_tax_amount item[:item_tax_amount]
+        json.item_total_amount item[:item_total_amount]
 	end
 end
