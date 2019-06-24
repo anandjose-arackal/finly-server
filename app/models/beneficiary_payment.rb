@@ -64,12 +64,13 @@
 
 
 class BeneficiaryPayment < ApplicationRecord
-  include MathUtil
+  include MathUtil, Templatable
   
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :bank_account, optional: true
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :creator, optional: true, class_name: 'User'
 
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
@@ -100,6 +101,8 @@ class BeneficiaryPayment < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
 
   # after_commit :calculate_tax_and_amount
+
+  after_create :update_creator_id
 
   def tax_rate
   	self.tax
@@ -314,6 +317,10 @@ class BeneficiaryPayment < ApplicationRecord
     }
   end
 
+  def document_owner_id
+    'creator_id'
+  end
+
   private
 
   def fetch_vendor_locations
@@ -324,4 +331,9 @@ class BeneficiaryPayment < ApplicationRecord
     self.vendor&.bank_accounts&.non_deleted&.as_json
   end
 
+  def update_creator_id
+    if self.creator_id.blank?
+      self.update(creator: RequestStore.store[:current_user])
+    end
+  end
 end

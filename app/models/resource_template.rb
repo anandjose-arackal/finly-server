@@ -17,6 +17,8 @@ class ResourceTemplate < ApplicationRecord
   validates :name, presence: true
   validates :resource_type, presence: true
 
+  after_create :update_user_id
+
   TEMPLATABLES = {}
 
   has_many :purchase_orders
@@ -50,6 +52,14 @@ class ResourceTemplate < ApplicationRecord
   def valid_resource
     if self.resource.blank?
       errors.add :error, 'creating template'
+    end
+  end
+
+  private
+
+  def update_user_id
+    if self.user_id.blank?
+      self.update(user: RequestStore[:current_user])
     end
   end
 

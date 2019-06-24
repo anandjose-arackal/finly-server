@@ -57,6 +57,7 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
 
   validates :description, presence: true
   validates :quantity, presence: true
@@ -65,7 +66,7 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
-  after_save :budget_trail_entry
+  after_save :budget_trail_entry, :update_taxable_amount , :update_net_amount
   after_destroy :budget_trail_destroy
 
   def tax
@@ -160,6 +161,24 @@ class InvoiceLineItem < ApplicationRecord
     if self.parent&.is_a?(Invoice)
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
+  end
+
+  def update_taxable_amount
+    rate = self.rate
+    quantity = self.quantity
+    discount_percentage = self.discount
+    amount_before_discount = rate*quantity
+    taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+    if self.taxable_amount.present?
+      self.taxable_amount.update(value: taxable_amt)
+    else
+      self.taxable_amount.create(value: taxable_amt, currency_id: 1)
+    end
+  end
+
+  def update_net_amount
+    # tax_rate = self.tax_rate&.rate
+    # cgst = self.cgst
   end
 
 end
