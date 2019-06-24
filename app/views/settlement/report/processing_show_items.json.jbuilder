@@ -3,6 +3,7 @@ report_count = 0
 json.items do
   json.array! @result.paginated_mappings do |item|
     user_count += 1
+    json.id item.id
     json.user item.user
     json.amount item.amount
     json.completed_on DateUtils.date_formatted item.completed_at

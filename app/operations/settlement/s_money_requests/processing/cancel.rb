@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequests::Processing::Base
-  attr_accessor :money_request_processor
+  attr_accessor :money_request_processor, :pending_mappings
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -40,11 +40,26 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
     end
   end
 
+  def pre_process    
+    # new feature - in a batch, user can choose which items to cancel individually
+    if params[:request_ids].present?
+      self.pending_mappings = self.money_request_processor.mappings.not_completed.where id: params[:request_ids]
+    else
+      self.pending_mappings = self.money_request_processor.mappings.not_completed
+    end
+
+    if params[:request_ids].present? && self.pending_mappings.blank?
+      add_message :error, "Request details not sent or found."
+      return
+    end
+  end
+
   def process
     if self.money_request_processor.process_via_finly?
       payment_order = self.money_request_processor.payment_order
       if payment_order.present? and (payment_order.pending? or payment_order.scheduled? or payment_order.in_progress?)
-        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order)
+        payment_ids = self.pending_mappings.pluck(:payment_ids) rescue []
+        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order, payment_ids: payment_ids)
         unless result.success?
           add_message :error, result.messages[:error]
           return
@@ -52,10 +67,11 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
       end
     end
 
-    pending_mappings = self.money_request_processor.mappings.not_completed
-    pending_mappings_id = pending_mappings.pluck(:id)
+    # new feature - in a batch, user can choose which items to cancel individually
+    # pending_mappings = self.money_request_processor.mappings.not_completed
+    pending_mappings_id = self.pending_mappings.pluck(:id)
     ::MoneyRequest.with_processor_mapping(pending_mappings_id).update_all(money_request_processor_mapping_id: nil)
-    pending_mappings.update_all(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
+    self.pending_mappings.update_all(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
     if money_request_processor.partially_completed?
       self.money_request_processor.update(status_id: MoneyRequestProcessorStatus.id_for(:completed))
     else

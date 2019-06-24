@@ -5,6 +5,7 @@ json.items do
     if item.status.completed?
       user_count += 1
     end
+    json.id item.id
     json.user item.user
     json.amount item.amount
     json.completed_on DateUtils.datetime_formatted item.completed_at
