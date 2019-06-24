@@ -42,6 +42,11 @@ class Settlement::MoneyRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def processing_show_items
+    @result = Settlement::SMoneyRequests::Processing::Show.(current_user, params)
+    respond
+  end
+
   def processing_count
     @result = Settlement::SMoneyRequests::Processing::Index.(current_user, params)
     respond
@@ -73,6 +78,11 @@ class Settlement::MoneyRequestsController < BaseControllers::WebBase
   end
 
   def completed_show
+    @result = Settlement::SMoneyRequests::Completed::Show.(current_user, params)
+    respond
+  end
+
+  def completed_show_items
     @result = Settlement::SMoneyRequests::Completed::Show.(current_user, params)
     respond
   end
