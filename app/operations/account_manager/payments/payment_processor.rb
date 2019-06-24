@@ -41,7 +41,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.background = params[:background] || self.payment_request.background
     end
 
-
     # setting the company id based on whether it's a user or an AdminUser
     if user.is_a?(User)
       self.company_id = user.company_id
