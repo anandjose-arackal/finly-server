@@ -71,6 +71,7 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :creator, optional: true, class_name: 'User'
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id

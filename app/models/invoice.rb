@@ -907,7 +907,8 @@ class Invoice < ApplicationRecord
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json
+      bank_accounts: fetch_vendor_bank_accounts.as_json,
+      note: self.note
     }
   end
 
@@ -921,7 +922,9 @@ class Invoice < ApplicationRecord
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       status: self&.status&.name&.titleize,
       creation_date: self.created_at.to_date,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds }
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+      agreement_type: self.invoice_type&.name,
+      payment_agreement_id: self.invoice&.payment_agreement_id
     }
   end
 

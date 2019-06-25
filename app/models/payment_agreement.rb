@@ -13,6 +13,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :rental_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:rental_invoice))}, class_name: 'Invoice', dependent: :destroy
 
   has_many :beneficiary_payments, dependent: :destroy
+  
   has_many :notify_users, as: :document, dependent: :destroy 
   has_many :security_deposits, dependent: :destroy
 

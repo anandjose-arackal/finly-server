@@ -23,6 +23,7 @@ class ResourceTemplate < ApplicationRecord
 
   has_many :purchase_orders
   has_many :invoices
+  has_many :beneficiary_payments
 
   scope :with_resource_type, ->(resource_type) {where resource_type: resource_type}
   scope :filter_resource_type, ->(resource_type) {with_resource_type(resource_type)}

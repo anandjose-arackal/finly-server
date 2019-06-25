@@ -10,10 +10,6 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
     if payment_agreement.blank?
       add_message :error, 'Agreement not found'
     end
-
-    # unless payment_agreement.approved? || payment_agreement.approved?
-    #   add_message :error, 'Payment agreement should be approved for raising invoices'
-    # end
   end
 
   def process
@@ -24,8 +20,6 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
       self.invoices = payment_agreement.rental_invoices
     when payment_agreement.beneficiary_payments.present?
       self.invoices = payment_agreement.beneficiary_payments
-    when payment_agreement.security_deposits.present?
-      self.invoices = payment_agreement.security_deposits
     end
   end
 
