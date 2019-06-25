@@ -924,7 +924,7 @@ class Invoice < ApplicationRecord
       creation_date: self.created_at.to_date,
       tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
       agreement_type: self.invoice_type&.name,
-      payment_agreement_id: self.invoice&.payment_agreement_id
+      payment_agreement_id: self.payment_agreement_id
     }
   end
 
