@@ -10,6 +10,28 @@ json.results do
         end
       end
     end
+
+    if payment_agreement.rental_invoices.present?
+      json.agreement_type 'rental_invoice'
+      json.agreement_type_display_name 'Rental Invoice'
+      json.rental_invoices do
+        json.array!(payment_agreement.rental_invoices) do |rental_invoice|
+          json.vendor_name rental_invoice&.vendor&.name
+        end
+      end
+    end
+
+    if payment_agreement.beneficiary_payments.present?
+      json.agreement_type 'beneficiary_payment'
+      json.agreement_type_display_name 'Beneficiary Payment'
+      json.beneficiary_payments do
+        json.array!(payment_agreement.beneficiary_payments) do |beneficiary_payment|
+          json.vendor_name beneficiary_payment&.vendor&.name
+        end
+      end
+    end
+
+
   end
 end
 json.count @result.count
