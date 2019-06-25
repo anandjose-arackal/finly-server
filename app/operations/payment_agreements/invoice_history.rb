@@ -26,7 +26,7 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
 
   def success
     params[:invoices] = self.invoices
-    PaymentAgreements::InvoiceHistory::UpcomingInvoicesPresenter.new(user, params, messages)    
+    PaymentAgreements::InvoiceHistory::UpcomingInvoicesPresenter.new(user, params, messages)
   end
 
   class PaymentAgreements::InvoiceHistory::UpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -34,8 +34,7 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
     attr_accessor :invoices
 
     def init
-      # self.invoices = params[:invoices]
-      self.invoices = user.company.inward_invoices
+      self.invoices = params[:invoices]
     end
   end
 

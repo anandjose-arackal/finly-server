@@ -22,7 +22,7 @@ class PaymentAgreements::Base < BaseOperation
             :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
             :category_id, :description, :id, :remove_line_item,
             :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :tds_applicable,
-            discount_amount_attributes: [:id, :currency_id, :value], 
+            discount_amount_attributes: [:id, :currency_id, :value],
             tax_amount_attributes: [:id, :currency_id, :value],
             total_amount_attributes: [:id, :value, :currency_id],
             raw_amount_attributes: [:id, :value, :currency_id]
