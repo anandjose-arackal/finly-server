@@ -33,13 +33,13 @@ class PaymentAgreements::Index < PaymentAgreements::Base
 
     has_scope :filter_title
     has_scope :filter_vendor_id
-    has_scope :filter_vendor_name
     has_scope :filter_policy_id
     has_scope :filter_creation_date
     has_scope :filter_creator_id
     has_scope :created_by_name
     has_scope :filter_status_id
     has_scope :filter_status
+    has_scope :filter_invoice_due_date, using: [:from, :to], type: :hash
 
 
     def init

@@ -11,7 +11,7 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :general_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:general_invoice))}, class_name: 'Invoice', dependent: :destroy
   has_many :rental_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:rental_invoice))}, class_name: 'Invoice', dependent: :destroy
-
+  has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
   
   has_many :notify_users, as: :document, dependent: :destroy 
@@ -32,7 +32,11 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_vendor_id, -> (vendor_id){
-    joins(:general_invoices).where('invoices.vendor_id = ?', vendor_id).or(joins(:rental_invoices).where('invoices.vendor_id = ?', vendor_id)).or(joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id))
+    ids = joins(:general_invoices).where('invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+
+    ids+= joins(:rental_invoices).where('invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+    ids+= joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+    where(id: ids)
   }
 
   # scope :filter_vendor_name, -> (name){
@@ -43,12 +47,18 @@ class PaymentAgreement < ApplicationRecord
     where policy_id: id
   }
 
-  scope :filter_creation_date, -> (from, to){
+  scope :filter_creation_date, -> (date){
+    unless date.blank?
+      where(created_at: date.to_date.beginning_of_day..date.to_date.end_of_day)
+    end
+  }
+
+  scope :filter_invoice_due_date, ->(from, to){
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
-    where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+    joins(:invoices).where('DATE(due_date) >= ? && DATE(due_date) <= ?', from, to)
   }
 
   scope :filter_creator_id, -> (id){
