@@ -15,9 +15,10 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
 
   def init
     self.icici_bank_transaction = params[:icici_bank_transaction]
+    super()
   end
 
-  def icici_bank_action
+  def env_key
     'icici_bank_transaction_status'
   end
 
@@ -27,7 +28,8 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: self.icici_bank_transaction.unique_request_number
+        UNIQUEID: "FINLYIFS61894902085",
+        # UNIQUEID: self.icici_bank_transaction.unique_request_number
     }
   end
 
@@ -48,9 +50,11 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         self.transaction_status_response = self.parsed_response["STATUS"]
         case self.transaction_status_response
           when "SUCCESS"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+            utr = self.parsed_response["UTRNUMBER"]
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
           when "PROCESSING"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+            utr = self.parsed_response["UTRNUMBER"]
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
           when "SUSPECT"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
           when "PENDING"
