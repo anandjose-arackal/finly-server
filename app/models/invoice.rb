@@ -908,7 +908,8 @@ class Invoice < ApplicationRecord
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,
       bank_accounts: fetch_vendor_bank_accounts.as_json,
-      note: self.note
+      note: self.note,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds }
     }
   end
 
