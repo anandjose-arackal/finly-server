@@ -168,6 +168,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
             return user.company.yes_bank_company_account
           when "ICICI"
             return user.company.icici_bank_company_account
+          when "KOTAK"
+            return user.company.kotak_bank_company_account
           else
             return user.company.yes_bank_company_account
         end
@@ -186,6 +188,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
           when "ICICI"
             return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          when "KOTAK"
+            return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
           else
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

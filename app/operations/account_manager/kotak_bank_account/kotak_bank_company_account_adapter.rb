@@ -65,33 +65,34 @@ class AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter < Account
     self.company = self.account.company
     # jugaad here to enable transferring to the current account for companies whose current account is connected -
     # if the viewing application is Finly Collect, the pool balance is always shown (even if the company has their current account connected)
-    if (self.company.vendor_payments_enabled? && self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && self.company.current_account_connected?)
-      return 99999999999999999 if options[:payment_process]
-
-      handle = self.object_id
-      # YesBankBalanceProvider.perform_async(handle, self.company.id)]
-
-      # TODO TO BE CREATED
-      KotakBankBalanceProvider.perform_async(handle, self.company.id) # todo to be created
-      timeout = 30
-      now = Time.now
-      while (Time.now - now) < timeout
-        result = Resque.reserve(handle)
-        next if result.blank?
-
-        args = result.args.first
-        success = args&.dig('success')
-        message = args&.dig('message')
-        return 0 unless success
-
-        balance = args['balance']
-        balance = balance if balance.class.name == String.name
-        payment_order = options[:payment_order]
-        blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-        return (balance.to_f - blocked_amount_for_payments.to_f)
-      end
-      return 0
-    end
+    # if (self.company.vendor_payments_enabled? && self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && self.company.current_account_connected?)
+    #   return 99999999999999999 if options[:payment_process]
+    #
+    #   handle = self.object_id
+    #   # YesBankBalanceProvider.perform_async(handle, self.company.id)]
+    #
+    #   # TODO TO BE CREATED
+    #   KotakBankBalanceProvider.perform_async(handle, self.company.id) # todo to be created
+    #   timeout = 30
+    #   now = Time.now
+    #   while (Time.now - now) < timeout
+    #     result = Resque.reserve(handle)
+    #     next if result.blank?
+    #
+    #     args = result.args.first
+    #     success = args&.dig('success')
+    #     message = args&.dig('message')
+    #     return 0 unless success
+    #
+    #     balance = args['balance']
+    #     balance = balance if balance.class.name == String.name
+    #     payment_order = options[:payment_order]
+    #     blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+    #     return (balance.to_f - blocked_amount_for_payments.to_f)
+    #   end
+    #   return 0
+    # end
+    return 99999999999999999 if options[:payment_process]
   end
 
   def database_balance
