@@ -31,13 +31,13 @@ class PaymentAgreement < ApplicationRecord
     where title: "#{title}"
   }
 
-  scope :filter_vendor_id, -> (id){
-    where vendor_id: id
+  scope :filter_vendor_id, -> (vendor_id){
+    joins(:general_invoices).where('invoices.vendor_id = ?', vendor_id).or(joins(:rental_invoices).where('invoices.vendor_id = ?', vendor_id)).or(joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id))
   }
 
-  scope :filter_vendor_name, -> (name){
-    joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
-  }
+  # scope :filter_vendor_name, -> (name){
+  #   joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
+  # }
 
   scope :filter_policy_id, -> (id){
     where policy_id: id
