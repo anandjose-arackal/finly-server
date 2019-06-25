@@ -13,14 +13,15 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
   end
 
   def process
-    case 
-    when payment_agreement.general_invoices.present?
-      self.invoices = payment_agreement.general_invoices
-    when payment_agreement.rental_invoices.present?
-      self.invoices = payment_agreement.rental_invoices
-    when payment_agreement.beneficiary_payments.present?
-      self.invoices = payment_agreement.beneficiary_payments
-    end
+    self.invoices = payment_agreement.invoices
+    # case 
+    # when payment_agreement.general_invoices.present?
+    #   self.invoices = payment_agreement.general_invoices
+    # when payment_agreement.rental_invoices.present?
+    #   self.invoices = payment_agreement.rental_invoices
+    # when payment_agreement.beneficiary_payments.present?
+    #   self.invoices = payment_agreement.beneficiary_payments
+    # end
   end
 
   def success
