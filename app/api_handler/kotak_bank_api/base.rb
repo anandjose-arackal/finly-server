@@ -1,5 +1,4 @@
 class KotakBankApi::Base < BaseHandler
-
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
@@ -108,7 +107,11 @@ class KotakBankApi::Base < BaseHandler
 
       self.response = self.connection.post do |req|
         # req.url p
-        req.headers['Content-Type'] = 'application/xml'
+        req.headers['Content-Type'] = "application/soap+xml;charset=UTF-8"
+        req.headers['action'] = "/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Payment"
+        # req.headers['Accept-Encoding'] = "gzip,deflate"
+        # req.headers['Connection'] = "Keep-Alive"
+        # req.headers['Host'] = "apigwuat.kotak.com:8443"
         req.body = template
       end
 
@@ -190,9 +193,9 @@ class KotakBankApi::Base < BaseHandler
     verify = Rails.env.production? ? true : false
     # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
     ssl_options = {
-        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
-        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
-        verify: verify
+        # client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
+        # client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
+        # verify: verify
     }
     logger = Logger.new $stderr
     logger.level = Logger::DEBUG
@@ -203,8 +206,8 @@ class KotakBankApi::Base < BaseHandler
         faraday.response :logger, logger # log requests to STDOUT
       end
       faraday.options[:timeout] = 60 # time out is 60 seconds
-      faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
-      faraday.use FaradayMiddleware::FollowRedirects, limit: 5
+      # faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
+      # faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
   end

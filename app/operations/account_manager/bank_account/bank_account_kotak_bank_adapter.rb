@@ -5,18 +5,6 @@
 
 class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager::BaseAdapter
 
-  PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
-  FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
-  if Rails.env.production?
-    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
-  else
-    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
-  end
-  TEMPORARY_ERRORS_FROM_BANK = [
-      "Acquiring Bank CBS or node offline",
-      "Rejected/Failed at downstream system"
-  ]
-
   attr_accessor :errors, :company
 
   def account_class
@@ -25,7 +13,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
 
   def credit(payment, options = {})
     super
-    transfer_type = options[:bank_transfer_type]
+    transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
     bank_transaction = payment.reference_resource
@@ -58,6 +46,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       return false
     end
 
+    # Initiates transaction
     op = KotakBankApi::Transfer.({
         transfer_request: transfer_request,
         payment: payment
@@ -88,6 +77,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         else
           self.company = account.account_owner.company
         end
+        # todo kotak : populate bank_error_message
         if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message) && self.company.auto_retry_payment_enabled?
           payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
         else
@@ -114,64 +104,64 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    [YesBankCompanyAccount, VendorPaymentWallet]
+    [KotakBankCompanyAccount, VendorPaymentWallet]
   end
 
   def debitable_accounts
     []
   end
 
-  def on_completion(options)
-    payment = options[:payment]
-    if payment&.completed?
-      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
-      # trigger the webhook callback for this particular payment's credit confirmation
-      # setting the parameters for the callback method and executing it
-      execute_callback(payment)
-      # if the payment happens to also have an invoice, update the invoice status accordingly
-      if payment.invoice.present?
-        payment.invoice.update_invoice_status
-      end
-    end
-  end
-
-  def on_failure(options)
-    # trigger the webhook callback for failed payments
-    payment = options[:payment]
-    if payment&.failed?
-      execute_callback(payment)
-    end
-  end
-
-  def execute_callback(payment)
-    post_params = {
-        payment_id: payment.id,
-        payment_amount: payment.amount_value,
-        note: payment.note,
-        status: payment.payment_status&.name,
-        receiving_account: {
-            receiving_account_type: "BankAccount",
-            receiving_account_id: payment.receiving_account&.id,
-            receiving_account_number: payment.receiving_account&.account_number,
-            receiving_account_ifsc: payment.receiving_account&.ifsc
-        },
-        bank_reference_number: payment.reference_resource&.bank_reference_number
-    }
-    if payment.failed?
-      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
-    end
-    # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
-    company = payment.initiating_user&.company
-    op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
-    if company.web_hooks.present?
-      callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
-      if op.success?
-        callback_track.update(success: true, response: (op.body rescue nil))
-      else
-        callback_track.update(success: false, response: (op.body rescue nil))
-      end
-    end
-  end
+  # def on_completion(options)
+  #   payment = options[:payment]
+  #   if payment&.completed?
+  #     op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+  #     # trigger the webhook callback for this particular payment's credit confirmation
+  #     # setting the parameters for the callback method and executing it
+  #     execute_callback(payment)
+  #     # if the payment happens to also have an invoice, update the invoice status accordingly
+  #     if payment.invoice.present?
+  #       payment.invoice.update_invoice_status
+  #     end
+  #   end
+  # end
+  #
+  # def on_failure(options)
+  #   # trigger the webhook callback for failed payments
+  #   payment = options[:payment]
+  #   if payment&.failed?
+  #     execute_callback(payment)
+  #   end
+  # end
+  #
+  # def execute_callback(payment)
+  #   post_params = {
+  #       payment_id: payment.id,
+  #       payment_amount: payment.amount_value,
+  #       note: payment.note,
+  #       status: payment.payment_status&.name,
+  #       receiving_account: {
+  #           receiving_account_type: "BankAccount",
+  #           receiving_account_id: payment.receiving_account&.id,
+  #           receiving_account_number: payment.receiving_account&.account_number,
+  #           receiving_account_ifsc: payment.receiving_account&.ifsc
+  #       },
+  #       bank_reference_number: payment.reference_resource&.bank_reference_number
+  #   }
+  #   if payment.failed?
+  #     post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
+  #   end
+  #   # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
+  #   company = payment.initiating_user&.company
+  #   op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
+  #   if company.web_hooks.present?
+  #     callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
+  #     if op.success?
+  #       callback_track.update(success: true, response: (op.body rescue nil))
+  #     else
+  #       callback_track.update(success: false, response: (op.body rescue nil))
+  #     end
+  #   end
+  # end
 
   private
 
@@ -191,7 +181,8 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    # todo kotak : Set the right attributes
+    bank_transaction = company.kotak_bank_transactions.create(unique_reference_number: transfer_request.generate_unique_reference,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
@@ -199,7 +190,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
                                          bank_response: transfer_request.transaction_result,
                                          amount_attributes: {
                                              value: payment.amount_value,
-                                             currency_id: Currency.first.id
+                                             currency_id: Currency.default_currency_id
                                          })
     payment.with_lock do
       if payment.reference_resource.present?
@@ -226,7 +217,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
 
   def create_transfer_request(payment, transfer_type, reference_number)
     # tr = KotakBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
-    tr = KotakBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, nil, account.company_id)
+    tr = KotakBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
   end
 
 end

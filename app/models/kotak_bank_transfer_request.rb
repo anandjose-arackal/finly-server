@@ -36,15 +36,19 @@ class KotakBankTransferRequest < NonPersistentModel
   end
 
   def generate_unique_reference
-    # loop do
-    #   ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-    #   break
-    #   # if KotakBankTransaction.find_by(unique_request_number: ref).blank?
-    #   #   self.unique_reference_number = ref
-    #   #   break
-    #   # end
-    # end
-    ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+    if self.unique_reference_number.present?
+      return self.unique_reference_number
+    end
+    ref = nil
+    loop do
+      # ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      break
+      if KotakBankTransaction.find_by(unique_reference_number: ref).blank?
+        self.unique_reference_number = ref
+        break
+      end
+    end
     ref
   end
 

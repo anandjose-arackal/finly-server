@@ -106,7 +106,6 @@ class KotakBankApi::Transfer < KotakBankApi::Base
 
       ap parsed_response
       # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
-      debugger
       acknowledgement = parsed_response["Envelope"]&.dig("Body")&.dig("Payment")&.dig("AckHeader")
 
       status_code = acknowledgement["StatusCd"]

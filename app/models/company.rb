@@ -41,6 +41,7 @@ class Company < ApplicationRecord
   has_many :field_configurations, as: :configurable
   has_many :yes_bank_transactions
   has_many :icici_bank_transactions
+  has_many :kotak_bank_transactions
   has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
