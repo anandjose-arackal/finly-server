@@ -25,7 +25,7 @@ class PaymentAgreement < ApplicationRecord
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
 
-  AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice'}, {rental_invoice: 'Invoice - Rental Invoice'}, {beneficiary_payment: 'Payment - Beneficiary Payment'}, {security_deposit: 'Payment - Security Deposit'}]
+  AGREEMENT_TYPES = [{id: 'general_invoice', name: 'Invoice - General Invoice'}, {id: 'rental_invoice', name: 'Invoice - Rental Invoice'}, {id: 'beneficiary_payment', name: 'Payment - Beneficiary Payment'}, {id: 'security_deposit', name: 'Payment - Security Deposit'}]
 
   scope :filter_title, -> (title) {
     where title: "#{title}"
@@ -59,7 +59,9 @@ class PaymentAgreement < ApplicationRecord
     where status_id: id
   }
 
-
+  scope :filter_status, -> (name){
+    where status_id: PaymentAgreementStatus.id_for(name.to_sym)
+  }
 
 
   def as_json

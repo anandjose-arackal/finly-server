@@ -39,12 +39,12 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     has_scope :filter_creator_id
     has_scope :created_by_name
     has_scope :filter_status_id
+    has_scope :filter_status
 
 
     def init
       self.payment_agreements = params[:payment_agreements]
-      # # Remove
-      # self.payment_agreements = user.company.payment_agreements
+      self.payment_agreements = apply_scopes(payment_agreements, params)
       self.paginated_payment_agreements = payment_agreements.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PaymentAgreement.none
       self.count = payment_agreements&.count
     end
