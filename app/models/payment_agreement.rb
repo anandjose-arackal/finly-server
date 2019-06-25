@@ -70,7 +70,9 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_status, -> (name){
-    where status_id: PaymentAgreementStatus.id_for(name.to_sym)
+    if name.present?
+      where status_id: PaymentAgreementStatus.id_for(name.to_sym)
+    end
   }
 
 

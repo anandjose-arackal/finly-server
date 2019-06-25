@@ -1,5 +1,5 @@
 json.results do
-  json.array!(@result.payment_agreements) do |payment_agreement|
+  json.array!(@result.paginated_payment_agreements) do |payment_agreement|
     json.merge! payment_agreement.as_json
     if payment_agreement.general_invoices.present?
       json.agreement_type 'general_invoice'
