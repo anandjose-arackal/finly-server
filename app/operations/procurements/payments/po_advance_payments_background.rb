@@ -40,6 +40,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
     self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
+      reconstruct_po_advance(payment)
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -124,5 +125,17 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
       end
       return ba
     end
+  end
+
+  # used when tds slab for advance amount is changed from the pt create page
+  def reconstruct_po_advance(payment)
+    purchase_order = PurchaseOrder.find_by(id: payment[:parent_id])
+    unless payment[:advance_tds_slab_id].blank? || (payment[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id)
+      purchase_order.advance_tds_slab_id = payment[:advance_tds_slab_id]
+      purchase_order.save
+      purchase_order.process_line_item_calculation
+      purchase_order.save
+    end
+    payment[:requested_amount] = purchase_order.advance_amount&.value
   end
 end

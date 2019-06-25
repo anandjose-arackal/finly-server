@@ -232,17 +232,15 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
-  scope :filter_payable_advances, -> (enabled) {
-    if StringUtils.to_bool(enabled)
-      where(purchase_order_status_id: [
-          PurchaseOrderStatus.id_for(:approved),
-          PurchaseOrderStatus.id_for(:auto_approved)
-      ],
-            advance_amount_status_id: [
-                AdvanceAmountStatus.id_for(:to_be_processed),
-                AdvanceAmountStatus.id_for(:failed)
-            ])
-    end
+  scope :filter_payable_advances, -> {
+    where(purchase_order_status_id: [
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved)
+    ],
+          advance_amount_status_id: [
+              AdvanceAmountStatus.id_for(:to_be_processed),
+              AdvanceAmountStatus.id_for(:failed)
+          ])
   }
 
   scope :filter_all_advances, -> {
@@ -646,7 +644,7 @@ class PurchaseOrder < ApplicationRecord
     {
         original_amount: precision_value(self.total_after_tax&.value),
         total_advance_amount: total_adv_amount,
-        advance_amount: precision_value(self.advance_amount&.value),
+        # advance_amount: precision_value(self.advance_amount&.value),
         payable_advance_amount: precision_value(self.advance_amount&.value),
         balance_due: precision_value(self.balance_amount&.value),
         procurement_id: self.procurement_id,
@@ -660,7 +658,7 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: false
+        editable: true
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -768,7 +766,7 @@ class PurchaseOrder < ApplicationRecord
 
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
-        item_discount_amount = item_amount * item_discount / 100
+        # item_discount_amount = item_amount * item_discount / 100
         item_taxable_amount = item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
@@ -821,6 +819,12 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+    roundoff_amount = self.roundoff_amount.to_f
+    if roundoff_amount != 0
+      total_amount = precision_value (total_amount + roundoff_amount)
+    else
+      total_amount = precision_value total_amount
+    end
 
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount
@@ -852,15 +856,13 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if self.balance_amount.present?
-      self.balance_amount.value = total_amount
+      self.balance_amount.value = total_amount&.round
     else
-      self.build_balance_amount(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount&.round, currency_id: 1)
     end
 
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
-
-      # if self.advance_tds_slab.present?
 
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
       unless skip_adv_calculation
