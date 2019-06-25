@@ -123,4 +123,31 @@ class PaymentAgreement < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), self)
   end
+
+  def self.open_status_ids(user)
+    PaymentAgreementStatus.ids_for([:open, :draft])
+  end
+
+  def self.role_based_associated_status_ids(user)
+    PaymentAgreementStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed)
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:payment_agreement_initiator) == role_id.to_i)
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved]
+        elsif (UserRole.id_for(:payment_agreement_reviewer) == role_id.to_i)
+          statuses += [:awaiting_approval, :approved, :auto_approved]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
 end
