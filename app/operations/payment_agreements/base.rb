@@ -15,7 +15,7 @@ class PaymentAgreements::Base < BaseOperation
 
       :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, 
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :invoice_status_id, :tds_slab_id, :roundoff_amount, :vendor_id, :vendor_location_id,
+      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :invoice_status_id, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :vendor_location_id,
 
         invoice_items_attributes: [
             :quantity, :unit_of_measurement, :department_id,
@@ -36,7 +36,7 @@ class PaymentAgreements::Base < BaseOperation
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id]
       ],
-      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :invoice_status_id, :tds_slab_id, :roundoff_amount,
+      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :invoice_status_id, :tds_slab_id, :discount_type_id, :roundoff_amount,
 
         invoice_items_attributes: [
             :quantity, :unit_of_measurement, :department_id,

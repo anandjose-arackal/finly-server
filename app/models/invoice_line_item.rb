@@ -132,7 +132,7 @@ class InvoiceLineItem < ApplicationRecord
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id, line_item_id: self.id },
       hsn_sac: self.hsn_sac,
       taxable_amount: precision_value(taxable_amount&.value),
-      taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.taxable_amount&.currency_id },
+      taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.taxable_amount&.value), currency_id: self.taxable_amount&.currency_id },
       inventory_line_item_id: self.inventory_line_item_id,
       item_info: self.item_info,
       comment: self.comment,
@@ -163,21 +163,26 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def update_taxable_amount
-    # rate = self.rate
-    # quantity = self.quantity
-    # discount_percentage = self.discount
-    # amount_before_discount = rate*quantity
-    # taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
-    # if self.taxable_amount.present?
-    #   self.taxable_amount.update(value: taxable_amt)
-    # else
-    #   self.taxable_amount.create(value: taxable_amt, currency_id: 1)
-    # end
+    rate = self.rate
+    quantity = self.quantity
+    discount_percentage = self.discount
+    amount_before_discount = rate*quantity
+    taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+    if self.taxable_amount.present?
+      self.taxable_amount.update(value: taxable_amt)
+    else
+      self.create_taxable_amount(value: taxable_amt, currency_id: 1)
+    end
   end
 
   def update_net_amount
-    # tax_rate = self.tax_rate&.rate
-    # cgst = self.cgst
+    taxable_amt = self.taxable_amount.value
+    tax_percentage = self.tax_rate.rate
+    net_amount = taxable_amt + (taxable_amt*tax_percentage.to_f/100)
+    if self.net_amount.present?
+      self.net_amount.update(value: net_amount)
+    else
+      self.create_net_amount(value: net_amount, currency_id: 1)      
+    end
   end
-
 end
