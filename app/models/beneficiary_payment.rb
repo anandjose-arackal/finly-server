@@ -316,7 +316,10 @@ class BeneficiaryPayment < ApplicationRecord
       payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
       vendor_locations: fetch_vendor_locations.as_json,
       bank_accounts: fetch_vendor_bank_accounts.as_json,
-      agreement_type: 'beneficiary'
+      agreement_type: 'beneficiary',
+      vendor_name: self.vendor&.name,
+      vendor_id: self.vendor_id
+
     }
   end
 

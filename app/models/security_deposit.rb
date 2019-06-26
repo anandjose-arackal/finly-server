@@ -9,6 +9,8 @@ class SecurityDeposit < ApplicationRecord
   belongs_to :original_amount, optional: true, class_name: "Amount"
   belongs_to :bank_account, optional: true
 
+  has_many :payments, as: :parent
+
   accepts_nested_attributes_for :payable_amount, :original_amount
 
 
