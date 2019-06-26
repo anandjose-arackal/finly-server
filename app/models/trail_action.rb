@@ -52,7 +52,9 @@ class TrailAction < ApplicationRecord
         :forward,
         # Purchase Request
         :po_created,
-        :po_deleted
+        :po_deleted,
+        :invoice_created,
+        :payment_ticket_created
     ]
   end
 end

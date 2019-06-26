@@ -8,8 +8,13 @@ class SecurityDeposit < ApplicationRecord
   belongs_to :payable_amount, optional: true, class_name: "Amount"
   belongs_to :original_amount, optional: true, class_name: "Amount"
   belongs_to :bank_account, optional: true
+  belongs_to :company, optional: true
+  belongs_to :creator, optional: true, class_name: "User"
+  belongs_to :payment_agreement, optional: true
 
   has_many :payments, as: :parent
+
+  after_create :update_creator_id, :update_company_id
 
   accepts_nested_attributes_for :payable_amount, :original_amount
 
@@ -48,8 +53,9 @@ class SecurityDeposit < ApplicationRecord
       vendor_id: self.vendor_id,
       payment_agreement_id: self.payment_agreement_id,
       vendor_name: self.vendor&.name,
-      creation_date: self.creation_date.to_date,
+      creation_date: self.created_at.to_date,
       agreement_type: 'security_deposit'
+
     }
   end
 
@@ -61,6 +67,18 @@ class SecurityDeposit < ApplicationRecord
 
   def fetch_vendor_bank_accounts
     self.vendor&.bank_accounts&.non_deleted&.as_json
+  end
+
+  def update_creator_id
+    if self.creator_id.blank?
+      self.update(creator: RequestStore.store[:current_user])
+    end
+  end
+
+  def update_company_id
+    if self.company_id.blank?
+      self.update(company_id: self.payment_agreement.company_id)
+    end
   end
 
 end

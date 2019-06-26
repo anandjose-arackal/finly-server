@@ -31,6 +31,16 @@ json.results do
       end
     end
 
+    if payment_agreement.security_deposits.present?
+      json.agreement_type 'security_deposit'
+      json.agreement_type_display_name 'Security Deposit'
+      json.security_deposits do
+        json.array!(payment_agreement.security_deposits) do |security_deposit|
+          json.vendor_name security_deposit&.vendor&.name
+        end
+      end
+    end
+
 
   end
 end

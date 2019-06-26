@@ -93,8 +93,11 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :payment_agreement, optional: true
 
   has_many :payments, as: :parent
+
+  has_many :trails, as: :parent
 
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :tax_amount
@@ -103,7 +106,7 @@ class BeneficiaryPayment < ApplicationRecord
 
   # after_commit :calculate_tax_and_amount
 
-  after_create :update_creator_id
+  after_create :update_creator_id, :update_company_id
 
   def tax_rate
   	self.tax
@@ -321,7 +324,6 @@ class BeneficiaryPayment < ApplicationRecord
       vendor_name: self.vendor&.name,
       vendor_id: self.vendor_id,
       creation_date: self.created_at.to_date
-
     }
   end
 
@@ -342,6 +344,12 @@ class BeneficiaryPayment < ApplicationRecord
   def update_creator_id
     if self.creator_id.blank?
       self.update(creator: RequestStore.store[:current_user])
+    end
+  end
+
+  def update_company_id
+    if self.company_id.blank?
+      self.update(company_id: RequestStore.store[:current_user].company_id)
     end
   end
 end

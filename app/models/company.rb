@@ -56,6 +56,7 @@ class Company < ApplicationRecord
   has_many :unique_identifiers
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_many :beneficiary_payments
+  has_many :security_deposits
 
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner

@@ -280,7 +280,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     when 'po_advance'
       # operation = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
       create_po_advance_ticket(current_user, params)
-    when 'beneficiary'
+    when 'beneficiary', 'security_deposit'
       # operation = BankTransfer::PaymentRequest::CreateBeneficiaryTicket.(current_user, params)
       create_beneficiary_ticket(current_user, params)
     when 'bulk_beneficiary'

@@ -38,7 +38,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	add_message :error, 'Please specify a scheduled date for your payment ticket.'
 	    	return
 	    end
-
 	    valid_date = Date.parse(params[:scheduled_at]) rescue false 
 	    unless valid_date
 	        add_message :error, 'Invalid date provided'
@@ -130,8 +129,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-
+			# ::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: params[:created_from_payment_agreement], agreement_type: params[:agreement_type], document_id: params[:document_id], ticket_type: params[:ticket_type]})
 	end
 
 	def success
