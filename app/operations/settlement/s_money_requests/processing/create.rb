@@ -230,7 +230,7 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
     post_operation = 'Settlement::SMoneyRequests::Processing::PostOperation'
     post_operation_payload = {}
     self.payment_request = ::PaymentRequest.(user, self.money_request_processor.source_account,
-        receiving_account_class, :credit, :advance,
+        receiving_account_class, :credit, :advance, bank_transfer_type: self.bank_transfer_type,
         background: true, scheduled_at: self.money_request_processor.scheduled_at)
     self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
     self.money_request_processor.payment_order = self.payment_request.build_payment_order

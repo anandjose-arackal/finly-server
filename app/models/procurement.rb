@@ -81,6 +81,20 @@ class Procurement < ApplicationRecord
     where "procurements.name LIKE ?", "%#{name}%"
   }
 
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
+  }
+
   scope :filter_policy_id, -> (policy_id) {
     filtered_ids = PurchaseOrder.filter_policy_id(policy_id).pluck(:procurement_id)
     filtered_ids += Invoice.filter_policy_id(policy_id).pluck(:procurement_id)

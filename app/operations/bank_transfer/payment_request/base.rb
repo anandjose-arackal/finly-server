@@ -20,7 +20,14 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
     if user.company_admin? && params[:initiating_account_type]
       case params[:initiating_account_type]
         when 1, '1', "CompanyAccount"
-          self.initiating_account = user.company.yes_bank_company_account
+          case user.company.feature_subscription.bank_service_provider
+            when "YES"
+              self.initiating_account = user.company.yes_bank_company_account
+            when "ICICI"
+              self.initiating_account = user.company.icici_bank_company_account
+            else
+              self.initiating_account = user.company.yes_bank_company_account
+          end
         when 2, '2', "FinlyCredits"
           self.initiating_account = user.bank_wallet
         else

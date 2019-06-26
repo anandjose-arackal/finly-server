@@ -28,6 +28,7 @@
 #  em_tax_tracking             :boolean          default(FALSE)
 #  procurement                 :boolean          default(FALSE)
 #  custom_currency_conversion  :boolean          default(FALSE)
+#  bank_service_provider       :string(255)
 #  vendor_empanelment_workflow :boolean          default(FALSE)
 #  purchase_requisition_system :boolean
 #  request_encryption_enabled  :boolean          default(FALSE)

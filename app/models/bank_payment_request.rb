@@ -27,6 +27,10 @@
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
 #  company_id                   :integer
+#  bank_account_provider_id     :integer
+#  otp                          :string(255)
+#  otp_sent_at                  :datetime
+#  otp_attempts                 :integer
 #  max_payment_amount           :decimal(20, 5)
 #  rejection_note               :text(65535)
 #
@@ -351,7 +355,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   end
 
   def can_credit?
-    approved?
+    approved? || processing? || auto_approved?
   end
 
   def can_take_control?

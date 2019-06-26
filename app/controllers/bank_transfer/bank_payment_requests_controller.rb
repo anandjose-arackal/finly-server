@@ -291,6 +291,10 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond_success_failure
+  end
 
 
   private

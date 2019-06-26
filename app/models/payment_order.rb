@@ -26,6 +26,7 @@
 #  post_operation            :text(65535)
 #  post_operation_payload    :text(65535)
 #  api_initiated             :boolean          default(FALSE)
+#  bank_account_provider_id  :integer
 #
 
 class PaymentOrder < ApplicationRecord
@@ -62,6 +63,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :amount_processed, optional: true, class_name: 'Amount'
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
+  belongs_to :bank_account_provider, optional: true
 
   serialize :post_operation_payload, Hash
 
