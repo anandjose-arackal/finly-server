@@ -4,7 +4,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
 
   class PaymentAgreements::DocumentConfig::DocumentConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policies, :payment_agreement, :payment_agreement_types, :tax_rates, :payment_terms, :billing_types
+    attr_accessor :policies, :payment_agreement, :payment_agreement_types, :tax_rates, :payment_terms, :billing_types, :period
 
     def init
       self.payment_agreement = params[:payment_agreement]
@@ -14,6 +14,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
       self.tax_rates = user.company.tax_rates
       self.payment_terms = user.company.payment_terms
       self.billing_types = BillingType.all
+      self.period = Period.where(name: 'month')
     end
   end
 

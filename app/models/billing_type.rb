@@ -5,7 +5,7 @@ class BillingType < ApplicationRecord
 
     def self.values
       [
-        :one_time
+        :one_time, :fixed_periodic
 
       ]
     end

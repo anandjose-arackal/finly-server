@@ -1,0 +1,2 @@
+class InvoiceFrequency < ApplicationRecord
+end

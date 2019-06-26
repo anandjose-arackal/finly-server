@@ -28,3 +28,7 @@ end
 json.billing_types do
   json.merge! @result.billing_types.as_json
 end
+
+json.period do
+  json.merge! @result.period.as_json
+end

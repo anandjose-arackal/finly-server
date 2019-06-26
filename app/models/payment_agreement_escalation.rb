@@ -1,0 +1,2 @@
+class PaymentAgreementEscalation < ApplicationRecord
+end
