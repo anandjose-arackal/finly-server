@@ -14,7 +14,7 @@ class SecurityDeposit < ApplicationRecord
 
 
 
-  def as_json
+  def as_json(options={})
     # {
     #   id: self.id, 
     #   vendor_id: self.vendor_id,
@@ -40,9 +40,15 @@ class SecurityDeposit < ApplicationRecord
       note: self.note,
       original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
       vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json
+      bank_accounts: fetch_vendor_bank_accounts.as_json,
+      net_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      balance_due_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      vendor_id: self.vendor_id,
+      payment_agreement_id: self.payment_agreement_id,
+      vendor_name: self.vendor&.name,
+      creation_date: self.creation_date.to_date,
+      agreement_type: 'security_deposit'
     }
-
   end
 
   private
@@ -54,6 +60,5 @@ class SecurityDeposit < ApplicationRecord
   def fetch_vendor_bank_accounts
     self.vendor&.bank_accounts&.non_deleted&.as_json
   end
-
 
 end

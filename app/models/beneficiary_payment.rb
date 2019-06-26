@@ -117,49 +117,50 @@ class BeneficiaryPayment < ApplicationRecord
   def as_json(options={})
     if options[:payment_agreement]
       return agreement_based_json
-    end
-  	{
-  	  id: self.id,
-      tax_amount: precision_value(self.tax_amount&.value),
-      tds_amount: precision_value(self.tds_amount&.value),
-      tax: precision_value(self.tax),
-      # tds: precision_value(self.tds),
-      tds: precision_value(self.tds_slab&.tds),
-      gst_type_id: self.gst_type_id,
-      # tax_type_id: self.tax_type_id,
-      # tds_type_id: self.tds_type_id,
-      inclusive_of_taxes: self.inclusive_of_taxes,
-      roundoff_amount: self.roundoff_amount,
-      net_payable_amount: self.balance_due&.value,
-      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id },
-      balance_due: self.balance_due&.value,
-      taxable_amount: precision_value(self.gross_amount&.value),
-      editable: self.unpaid?,
-      tax_rate: precision_value(self.tax_rate),
-      tds_rate: precision_value(self.tds_slab&.tds),
-      net_amount: precision_value(self.net_amount&.value),
-      gross_amount: precision_value(self.gross_amount&.value),
-      category_id: self.category_id,
-      category_name: self.category&.name,
-      # cost_center_id: self.cost_center_id,
-      # cost_center_name: self.cost_center&.name,
-      tds_slab_id: self.tds_slab_id,
-      tds_slab_name: self.tds_slab&.name,
-      # tds_rate: self.tds,
-      paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
-      original_amount: precision_value(self.original_amount&.value),
-      advance_amount: precision_value(self.advance_amount&.value),
-      vendor_id: self.vendor_id,
-      vendor_name: self.vendor&.name,
-      vendor_location_id: self.vendor_location_id,
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
-      department_attributes: { id: self.department_id, name: self.department&.name },
-      location_attributes: { id: self.location_id, name: self.location&.name },
-      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
-      note: self.note
+    else
+    	{
+    	  id: self.id,
+        tax_amount: precision_value(self.tax_amount&.value),
+        tds_amount: precision_value(self.tds_amount&.value),
+        tax: precision_value(self.tax),
+        # tds: precision_value(self.tds),
+        tds: precision_value(self.tds_slab&.tds),
+        gst_type_id: self.gst_type_id,
+        # tax_type_id: self.tax_type_id,
+        # tds_type_id: self.tds_type_id,
+        inclusive_of_taxes: self.inclusive_of_taxes,
+        roundoff_amount: self.roundoff_amount,
+        net_payable_amount: self.balance_due&.value,
+        payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id },
+        balance_due: self.balance_due&.value,
+        taxable_amount: precision_value(self.gross_amount&.value),
+        editable: self.unpaid?,
+        tax_rate: precision_value(self.tax_rate),
+        tds_rate: precision_value(self.tds_slab&.tds),
+        net_amount: precision_value(self.net_amount&.value),
+        gross_amount: precision_value(self.gross_amount&.value),
+        category_id: self.category_id,
+        category_name: self.category&.name,
+        # cost_center_id: self.cost_center_id,
+        # cost_center_name: self.cost_center&.name,
+        tds_slab_id: self.tds_slab_id,
+        tds_slab_name: self.tds_slab&.name,
+        # tds_rate: self.tds,
+        paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+        original_amount: precision_value(self.original_amount&.value),
+        advance_amount: precision_value(self.advance_amount&.value),
+        vendor_id: self.vendor_id,
+        vendor_name: self.vendor&.name,
+        vendor_location_id: self.vendor_location_id,
+        vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
+        department_attributes: { id: self.department_id, name: self.department&.name },
+        location_attributes: { id: self.location_id, name: self.location&.name },
+        cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+        note: self.note
 
-  	}
+    	}
+    end
   end
 
   # private
@@ -297,7 +298,7 @@ class BeneficiaryPayment < ApplicationRecord
   #   self.tds_amount = self.gross_amount - new_gross_amount
   # end
 
-  def agreement_based_json
+  def agreement_based_json(options={})
     {
       id: self.id,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
@@ -314,7 +315,17 @@ class BeneficiaryPayment < ApplicationRecord
       original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
       payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
       vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json
+      bank_accounts: fetch_vendor_bank_accounts.as_json,
+      agreement_type: 'beneficiary'
+    }
+  end
+
+  def upcoming_payments_json
+    {
+      id: self.id,
+      vendor_name: self.vendor&.name,
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id}
     }
   end
 
