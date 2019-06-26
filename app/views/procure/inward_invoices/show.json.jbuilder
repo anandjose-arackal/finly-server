@@ -188,7 +188,8 @@ json.invoice_item_categories do
   end
 end
 json.cost_centers do
-  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+  # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+  json.array! @result.cost_centers do |cost_center|
     json.id cost_center.id
     json.name cost_center.name
   end
