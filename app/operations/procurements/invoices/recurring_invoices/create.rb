@@ -62,7 +62,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case
     when resource.is_a?(Invoice)
     self.invoice = resource.amoeba_dup
-    if self.invoice.save! && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice))
+    if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice))
       return true
     end
     when resource.is_a?(BeneficiaryPayment)

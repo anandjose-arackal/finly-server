@@ -17,7 +17,7 @@ class BillingType < ApplicationRecord
     def as_json
       {
         id: self.id,
-        name: self.name
+        name: self.name&.titleize
       }
     end
 end

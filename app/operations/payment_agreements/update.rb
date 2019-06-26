@@ -27,7 +27,8 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     end
 
 
-    if self.payment_agreement.save!
+    if self.payment_agreement.save
+      update_amount_attributes
       params[:reviewal_document] = self.payment_agreement
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
@@ -56,4 +57,24 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       self.payment_agreement = params[:payment_agreement]
     end
   end
+
+  private
+  def update_amount_attributes
+    if payment_agreement.general_invoices.present?
+      payment_agreement.general_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+    end
+
+    if payment_agreement.rental_invoices.present?
+      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+    end
+
+    # if payment_agreement.beneficiary_payments.present?
+    #   payment_agreement.beneficiary_payments
+    # end
+
+    # if payment_agreement.security_deposits.present?
+    #   payment_agreement.security_deposits
+    # end
+  end
+
 end

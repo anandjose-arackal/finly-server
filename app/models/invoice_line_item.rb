@@ -66,7 +66,7 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
-  after_save :budget_trail_entry, :update_taxable_amount, :update_net_amount
+  after_save :budget_trail_entry, :update_taxable_amount, :update_net_amount, :update_tax_amount
   after_destroy :budget_trail_destroy
 
   def tax
@@ -144,6 +144,35 @@ class InvoiceLineItem < ApplicationRecord
     }
   end
 
+  def update_taxable_amount_value
+    rate = self.rate
+    quantity = self.quantity
+    discount_percentage = self.discount
+    amount_before_discount = rate*quantity
+    taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+    if self.taxable_amount.present?
+      self.taxable_amount.update(value: taxable_amt)
+    else
+      self.create_taxable_amount(value: taxable_amt, currency_id: 1)
+    end
+  end
+
+  def update_net_amount_value
+    taxable_amt = self.taxable_amount.value
+    tax_percentage = self.tax_rate.rate
+    net_amount = taxable_amt + (taxable_amt*tax_percentage.to_f/100)
+    if self.net_amount.present?
+      self.net_amount.update(value: net_amount)
+    else
+      self.create_net_amount(value: net_amount, currency_id: 1)      
+    end
+  end
+
+  def update_tax_amount_value
+  end
+
+
+
   private
 
   def budget_trail_entry
@@ -159,30 +188,6 @@ class InvoiceLineItem < ApplicationRecord
   def budget_trail_destroy
     if self.parent&.is_a?(Invoice)
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
-    end
-  end
-
-  def update_taxable_amount
-    rate = self.rate
-    quantity = self.quantity
-    discount_percentage = self.discount
-    amount_before_discount = rate*quantity
-    taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
-    if self.taxable_amount.present?
-      self.taxable_amount.update(value: taxable_amt)
-    else
-      self.create_taxable_amount(value: taxable_amt, currency_id: 1)
-    end
-  end
-
-  def update_net_amount
-    taxable_amt = self.taxable_amount.value
-    tax_percentage = self.tax_rate.rate
-    net_amount = taxable_amt + (taxable_amt*tax_percentage.to_f/100)
-    if self.net_amount.present?
-      self.net_amount.update(value: net_amount)
-    else
-      self.create_net_amount(value: net_amount, currency_id: 1)      
     end
   end
 end
