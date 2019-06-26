@@ -14,8 +14,11 @@ class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
     # for now just saving the details into a model - can later be changed to the operation
     Rails.logger.level = 0
     ap params
-    ap params.to_json
-
+    ap params.to_json rescue nil
+    error_logger = Logger.new("#{Rails.root}/log/request_params.log")
+    error_logger.error("Params sent in request: #{params.to_json}") rescue nil
+    error_logger.error("Params being sent in request: #{params}")
+    
     IciciTransactionCallback.create(
                                 AGGRNAME: params[:AGGRNAME],
                                 AGGRID: params[:AGGRID],
@@ -27,7 +30,6 @@ class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
                                 CORPID: params[:CORPID],
                                 USERID: params[:USERID]
     )
-
   end
 
 end

@@ -1,6 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  config.log_level = :debug
 
   # Code is not reloaded between requests.
   config.cache_classes = true
@@ -53,7 +54,6 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.logger.level = Logger::DEBUG
 
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
