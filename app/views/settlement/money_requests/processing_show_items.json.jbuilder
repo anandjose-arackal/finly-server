@@ -12,6 +12,7 @@ json.items do
     json.receiving_account_type item.processor_accountable_type
     json.receiving_account item.processor_accountable
     json.note item.note
+    json.utr item.payment&.reference_resource&.bank_reference_number
     json.money_requests do
       json.array! item.money_requests do |money_request|
 

@@ -14,6 +14,7 @@ json.items do
     json.receiving_account_type item.processor_accountable_type
     json.receiving_account item.processor_accountable
     json.note item.note
+    json.utr item.payment&.reference_resource&.bank_reference_number
     json.reports do
       json.array! item.reports do |report|
         if item.status.completed?
