@@ -275,11 +275,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def nature_of_expense(invoice_line_item)
-    invoice_line_item.parent.custom_fields.map{|cf| cf.with_field_key(:nature_of_expense).first&.string_value}
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_expense' }&.first
   end
 
   def nature_of_office(invoice_line_item)
-    invoice_line_item.parent.custom_fields.map{|cf| cf.with_field_key(:nature_of_office).first&.string_value}
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_office' }&.first
   end
 
   def item_code(invoice_line_item)
