@@ -32,7 +32,7 @@ class SecurityDeposit < ApplicationRecord
     {
       id: self.id,
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
-      bank_account_attributes: {id: self.bank_account.id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
+      bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       department_attributes: { id: self.department_id, name: self.department&.name },
       location_attributes: { id: self.location_id, name: self.location&.name },

@@ -36,6 +36,9 @@ class ResourceTemplate < ApplicationRecord
     scope key, -> {with_resource_type(key)}
     accepts_nested_attributes_for key
     TEMPLATABLES[klass.table_name] = klass
+    # For models with relation to themselves 'Self Joins'
+    # association_reflections =  klass.reflect_on_all_associations(:has_many).map{|c| [c.plural_name, c.class_name]}.to_h
+    # TEMPLATABLES.merge!(association_reflections)
   end
 
   def resource
