@@ -61,11 +61,17 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   private
   def update_amount_attributes
     if payment_agreement.general_invoices.present?
+      payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
       payment_agreement.general_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+      payment_agreement.general_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
+      payment_agreement.general_invoices.map(&:update_net_amount_value)
     end
 
     if payment_agreement.rental_invoices.present?
+      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
       payment_agreement.rental_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
+      payment_agreement.rental_invoices.map(&:update_net_amount_value)
     end
 
     # if payment_agreement.beneficiary_payments.present?

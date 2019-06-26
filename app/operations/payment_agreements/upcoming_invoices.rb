@@ -1,5 +1,5 @@
 class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
-  attr_accessor :invoices, :payment_agreement, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices
+  attr_accessor :invoices, :payment_agreement, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices, :policies
 
   def init
     id = params[:id] || params[:payment_agreement_id]
@@ -18,16 +18,15 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
   end
 
   def process
-    case 
-    when payment_agreement.general_invoices.present?
-      self.general_invoices = payment_agreement.general_invoices
-    when payment_agreement.rental_invoices.present?
-      self.rental_invoices = payment_agreement.rental_invoices
-    when payment_agreement.beneficiary_payments.present?
-      self.beneficiary_payments = payment_agreement.beneficiary_payments
-    when payment_agreement.security_deposits.present?
-      self.security_deposits = payment_agreement.security_deposits
-    end
+    self.general_invoices = payment_agreement.general_invoices if payment_agreement.general_invoices.present?
+
+    self.rental_invoices = payment_agreement.rental_invoices if payment_agreement.rental_invoices.present?
+
+    self.beneficiary_payments = payment_agreement.beneficiary_payments if payment_agreement.beneficiary_payments.present?
+
+    self.security_deposits = payment_agreement.security_deposits if payment_agreement.security_deposits.present?
+    initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
+    self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies 
   end
 
   def success
@@ -35,18 +34,20 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
     params[:security_deposits] = self.security_deposits
     params[:general_invoices] = self.general_invoices
     params[:rental_invoices] = self.rental_invoices
+    params[:policies] = self.policies
     PaymentAgreements::UpcomingInvoices::UpcomingInvoicesPresenter.new(user, params, messages)    
   end
 
   class PaymentAgreements::UpcomingInvoices::UpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices
+    attr_accessor :invoices, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices, :policies
 
     def init
       self.beneficiary_payments = params[:beneficiary_payments]
       self.security_deposits = params[:security_deposits]
       self.general_invoices = params[:general_invoices]
       self.rental_invoices = params[:rental_invoices]
+      self.policies = params[:policies]
     end
   end
 

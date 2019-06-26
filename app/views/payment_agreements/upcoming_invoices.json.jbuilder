@@ -5,4 +5,11 @@ json.results do
     json.merge! @result.beneficiary_payments.as_json(upcoming_payments: true) if @result.beneficiary_payments.present?
     json.merge! @result.security_deposits.as_json(upcoming_payments: true) if @result.security_deposits.present?
   end
+
+  json.policies do
+    json.array!(@result.policies) do |policy|
+      json.id policy.id
+      json.name policy.name
+    end
+  end
 end

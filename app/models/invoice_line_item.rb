@@ -169,9 +169,15 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def update_tax_amount_value
+    taxable_amt = self.taxable_amount.value
+    tax_percentage = self.tax_rate.rate
+    tax_amount = taxable_amt*tax_percentage.to_f/100
+    if tax_amount.present?
+      self.tax_amount.update(value: tax_amount)
+    else
+      self.create_tax_amount(value: tax_amount, currency_id: 1)
+    end
   end
-
-
 
   private
 
