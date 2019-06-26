@@ -66,7 +66,7 @@ class InvoiceLineItem < ApplicationRecord
   # removing for now
   # validates_presence_of :unit_of_measurement
   # validates_presence_of :department, if: :check_outward_invoice?
-  after_save :budget_trail_entry, :update_taxable_amount, :update_net_amount, :update_tax_amount
+  after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
   def tax
@@ -160,22 +160,22 @@ class InvoiceLineItem < ApplicationRecord
   def update_net_amount_value
     taxable_amt = self.taxable_amount.value
     tax_percentage = self.tax_rate.rate
-    net_amount = taxable_amt + (taxable_amt*tax_percentage.to_f/100)
+    net_value = taxable_amt + (taxable_amt*tax_percentage.to_f/100)
     if self.net_amount.present?
-      self.net_amount.update(value: net_amount)
+      self.net_amount.update(value: net_value)
     else
-      self.create_net_amount(value: net_amount, currency_id: 1)      
+      self.create_net_amount(value: net_value, currency_id: 1)      
     end
   end
 
   def update_tax_amount_value
     taxable_amt = self.taxable_amount.value
     tax_percentage = self.tax_rate.rate
-    tax_amount = taxable_amt*tax_percentage.to_f/100
-    if tax_amount.present?
-      self.tax_amount.update(value: tax_amount)
+    tax_value = taxable_amt*tax_percentage.to_f/100
+    if self.tax_amount.present?
+      self.tax_amount.update(value: tax_value)
     else
-      self.create_tax_amount(value: tax_amount, currency_id: 1)
+      self.create_tax_amount(value: tax_value, currency_id: 1)
     end
   end
 

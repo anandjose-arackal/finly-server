@@ -18,7 +18,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     # self.payment_agreement.company_id = user.company_id
-    if self.payment_agreement.save
+    if self.payment_agreement.save && self.payment_agreement.reload
       update_amount_attributes
       abp_attachment_ids = get_attachment_ids(params)
       Attachment.update_resource({ids: abp_attachment_ids, resource_id: self.payment_agreement.id, user: user}) if abp_attachment_ids.present?
@@ -70,19 +70,19 @@ class PaymentAgreements::Create < PaymentAgreements::Base
   end
 
   def update_amount_attributes
-    if payment_agreement.general_invoices.present?
-      payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
-      payment_agreement.general_invoices.map{|i| i.items.map(&:update_net_amount_value)}
-      payment_agreement.general_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
-      payment_agreement.general_invoices.map(&:update_net_amount_value)
-    end
+    # if payment_agreement.general_invoices.present?
+    #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
+    #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+    #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
+    #   payment_agreement.general_invoices.map(&:update_net_amount_value)
+    # end
 
-    if payment_agreement.rental_invoices.present?
-      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
-      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_net_amount_value)}
-      payment_agreement.rental_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
-      payment_agreement.rental_invoices.map(&:update_net_amount_value)
-    end
+    # if payment_agreement.rental_invoices.present?
+    #   payment_agreement.rental_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
+    #   payment_agreement.rental_invoices.map{|i| i.items.map(&:update_net_amount_value)}
+    #   payment_agreement.rental_invoices.map{|i| i.items.map(&:update_tax_amount_value)}
+    #   payment_agreement.rental_invoices.map(&:update_net_amount_value)
+    # end
 
     # if payment_agreement.beneficiary_payments.present?
     #   payment_agreement.beneficiary_payments

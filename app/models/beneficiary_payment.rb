@@ -320,15 +320,6 @@ class BeneficiaryPayment < ApplicationRecord
     }
   end
 
-  def upcoming_payments_json
-    {
-      id: self.id,
-      vendor_name: self.vendor&.name,
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id}
-    }
-  end
-
   def document_owner_id
     'creator_id'
   end

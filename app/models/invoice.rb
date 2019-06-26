@@ -760,14 +760,14 @@ class Invoice < ApplicationRecord
   end
 
   def update_net_amount_value
-    taxable_amt = self.taxable_amount.value
-    tds_percentage = self.tds_slab&.tds
-    net_amount = taxable_amt - (taxable_amt*tds_percentage.to_f/100)
-    if self.net_amount.present?
-      self.net_amount.update(value: net_amount)
-    else
-      self.create_net_amount(value: net_amount, currency_id: 1)      
-    end
+    # taxable_amt = self.items
+    # tds_percentage = self.tds_slab&.tds
+    # net_value = taxable_amt - (taxable_amt*tds_percentage.to_f/100)
+    # if self.net_amount.present?
+    #   self.net_amount.update(value: net_value)
+    # else
+    #   self.create_net_amount(value: net_value, currency_id: 1)      
+    # end
   end
 
   private
