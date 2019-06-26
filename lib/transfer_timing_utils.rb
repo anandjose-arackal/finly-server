@@ -1,6 +1,7 @@
 class TransferTimingUtils
 
   def self.within_timeframe?(payment_mode = nil, date = nil)
+    date = date
     if date.nil?
       date = DateUtils.local_date
     elsif date.class.name == String.name
