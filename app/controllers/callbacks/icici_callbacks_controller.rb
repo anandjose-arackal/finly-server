@@ -12,6 +12,9 @@ class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
   # and trigger whatever associated logic we have wrt to the payment
   def transactions
     # for now just saving the details into a model - can later be changed to the operation
+    ap params
+    ap params.to_json
+
     IciciTransactionCallback.create(
                                 AGGRNAME: params[:AGGRNAME],
                                 AGGRID: params[:AGGRID],
@@ -23,6 +26,7 @@ class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
                                 CORPID: params[:CORPID],
                                 USERID: params[:USERID]
     )
+
   end
 
 end
