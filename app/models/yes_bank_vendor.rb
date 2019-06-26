@@ -153,6 +153,12 @@ class YesBankVendor < ApplicationRecord
     approved
   }
 
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('yes_bank_vendors.created_at >= ? && yes_bank_vendors.created_at <= ?', from, to)
+  }
+
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
   }

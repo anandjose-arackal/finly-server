@@ -290,6 +290,12 @@ class Invoice < ApplicationRecord
     where('date >= ? && date <= ?', from, to)
   }
 
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from, to)
+  }
+
   scope :filter_invoice_date, -> (from) {
     from = Date.parse(from) rescue Date.today
     where('date = ?', from)

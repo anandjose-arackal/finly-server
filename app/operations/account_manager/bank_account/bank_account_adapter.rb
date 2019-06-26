@@ -12,16 +12,16 @@ class AccountManager::BankAccount::BankAccountAdapter < AccountManager::BaseAdap
       raise 'Bank account payments require the Payment object as well'
     end
 
-    case payment.company.feature_subscription.bank_service_provider
-    when "YES"
-      self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
-    when "ICICI"
-      self.bank_account_adapter = AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
-    when "KOTAK"
-      self.bank_account_adapter = AccountManager::BankAccount::BankAccountKotakBankAdapter.new(self.account)
-    else
-      self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
-      # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    case payment.payment_order.company.feature_subscription.bank_service_provider
+      when "YES"
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+      when "ICICI"
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+      when "KOTAK"
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountKotakBankAdapter.new(self.account)
+      else
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+        # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
     end
 
     # todo - uncomment this when multi-bank support is implemented
