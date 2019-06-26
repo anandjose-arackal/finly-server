@@ -319,7 +319,8 @@ class BeneficiaryPayment < ApplicationRecord
       bank_accounts: fetch_vendor_bank_accounts.as_json,
       agreement_type: 'beneficiary',
       vendor_name: self.vendor&.name,
-      vendor_id: self.vendor_id
+      vendor_id: self.vendor_id,
+      creation_date: self.created_at.to_date
 
     }
   end

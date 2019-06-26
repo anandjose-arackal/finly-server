@@ -59,8 +59,7 @@ class PaymentAgreements::Base < BaseOperation
       beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
         tax_amount_attributes: [:id, :value, :currency_id],
         payable_amount_attributes: [:id, :currency_id, :value],
-        original_amount_attributes: [:id, :currency_id, :value],
-        resource_template_attributes: [:name, :resource_type]
+        original_amount_attributes: [:id, :currency_id, :value]
 
       ],
       security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id, 

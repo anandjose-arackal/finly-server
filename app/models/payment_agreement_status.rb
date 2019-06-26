@@ -10,7 +10,9 @@ class PaymentAgreementStatus < ApplicationRecord
         :auto_approved,
         :retracted,
         :rejected,
-        :closed
+        :closed,
+        :invoice_created,
+        :payment_ticket_created
     ]
   end
 
