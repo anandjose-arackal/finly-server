@@ -123,7 +123,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       end
 
       # checking to make sure the PO is approved
-      unless purchase_order.approved? || purchase_order.auto_approved?
+      unless purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
         row_details << "Purchase Order is not approved"
         self.contents << row_details
         errors_found = true
