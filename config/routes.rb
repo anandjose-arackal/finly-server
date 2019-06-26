@@ -3041,7 +3041,10 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/report#processing_cancel'
         post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
         get 'payment_file', to: 'settlement/report#processing_payment_file'
+        get '/:id/generate_template_file', to: 'settlement/report#generate_template_file'
+        post '/:id/process_template_file', to: 'settlement/report#process_template_file'
         get '/:id', to: 'settlement/report#processing_show'
+        patch '/:id', to: 'settlement/report#processing_update'
         get '/:id/items', to: 'settlement/report#processing_show_items'
       end
       get 'completed', to: 'settlement/report#completed_index'
@@ -3062,7 +3065,10 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/money_requests#processing_cancel'
         post 'mark_as_paid', to: 'settlement/money_requests#processing_mark_paid'
         get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
+        get '/:id/generate_template_file', to: 'settlement/money_requests#generate_template_file'
+        post '/:id/process_template_file', to: 'settlement/money_requests#process_template_file'
       	get '/:id', to: 'settlement/money_requests#processing_show'
+        patch '/:id', to: 'settlement/money_requests#processing_update'
       	get '/:id/items', to: 'settlement/money_requests#processing_show_items'
       end
       get 'completed', to: 'settlement/money_requests#completed_index'

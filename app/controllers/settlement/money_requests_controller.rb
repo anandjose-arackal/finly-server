@@ -47,6 +47,11 @@ class Settlement::MoneyRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def processing_update
+    @result = Settlement::SMoneyRequests::Processing::Update.(current_user, params)
+    respond
+  end
+
   def processing_count
     @result = Settlement::SMoneyRequests::Processing::Index.(current_user, params)
     respond
@@ -55,6 +60,28 @@ class Settlement::MoneyRequestsController < BaseControllers::WebBase
   def processing_payment_file
     @result = Settlement::SMoneyRequests::Processing::GeneratePaymentFile.(current_user, params)
     respond
+  end
+
+  # generates excel to gather UTR from user in bulk and process those money request batches marked as outside finly
+  def generate_template_file
+    @result = Settlement::SMoneyRequests::Processing::GenerateTemplateFile.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  # used to process uploaded template file to process money request batches marked as outside finly
+  def process_template_file
+    @result = Settlement::SMoneyRequests::Processing::ProcessTemplateFile.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'settlement/money_requests/process_template_file'
+    end
   end
 
   def completed_index

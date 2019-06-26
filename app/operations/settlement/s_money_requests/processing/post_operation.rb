@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :money_request_processor
+  attr_accessor :payment_order, :money_request_processor, :remaining_mappings, :utr
 
   def pre_validate
     if object.blank?
@@ -28,6 +28,26 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     end
   end
 
+  def pre_process
+    if params[:request_ids].present?
+      self.pending_mappings = self.money_request_processor.mappings.not_completed.where id: params[:request_ids]
+    else
+      self.pending_mappings = self.money_request_processor.mappings.not_completed
+    end
+
+    if self.pending_mappings.blank?
+      add_message :error, "No Money Request found which can be processed."
+      return
+    end
+
+    self.utr = params[:utr].present? ? params[:utr] : {}
+
+    # Since now we can change individual item's status,
+    # we check to see if any mappings are remaining to be processed,
+    # if so, then we DONT change the entire batch's status
+    self.remaining_mappings = self.money_request_processor.mappings.not_completed - self.pending_mappings
+  end
+
   def process
     group_completed_status = MoneyRequestProcessorStatus.id_for(:completed)
     group_failed_status = MoneyRequestProcessorStatus.id_for(:failed)
@@ -51,11 +71,11 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     MoneyRequestProcessorMapping.transaction do
       ::MoneyRequest.transaction do
         MoneyRequestTrack.transaction do
-          self.money_request_processor.mappings.each do |mapping|
+          self.money_request_processor.pending_mappings.each do |mapping|
             if rejected or marked_as_completed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed)
+                             marked_as_completed: marked_as_completed, bank_reference_number: self.utr[mapping.id])
               mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                                 controlling_for_user_id: nil, controlling_for_user_role_id: nil,
                                                 status_id: request_status, payment_id: mapping.payment&.id)
@@ -87,10 +107,10 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     if has_success and has_failure
       self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                           marked_as_completed: marked_as_completed, processed_amount: processed_amount)
-    elsif has_success
+    elsif has_success and self.remaining_mappings.blank?
       self.money_request_processor.update(status_id: group_completed_status, completed_at: DateTime.now,
                                           marked_as_completed: marked_as_completed,processed_amount: processed_amount)
-    elsif has_failure
+    elsif has_failure and self.remaining_mappings.blank?
       self.money_request_processor.update(status_id: group_failed_status,processed_amount: processed_amount)
     end
   end
