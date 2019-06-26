@@ -49,7 +49,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     end
 
     # we need this flag, since not all items will be credited through bank transfer
-    self.processable_advances = self.parsed_data.collect {|data| data if StringUtils.to_bool(data[:mark_as_paid].downcase rescue nil)}.compact
+    self.processable_advances = self.parsed_data.collect {|data| data if StringUtils.to_bool(data[:mark_as_paid]&.downcase)}.compact
   end
 
   def validate
@@ -70,7 +70,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
   end
 
   def pre_process
-    self.pending_items = self.money_request_processor.mappings.not_completed.where id: self.processable_advances.pluck :advance_id
+    self.pending_items = self.money_request_processor.mappings.not_completed.where id: self.processable_advances.pluck(:advance_id)
     self.pending_item_ids = self.pending_items.pluck(:id) rescue []
     
     if self.pending_items.blank?
