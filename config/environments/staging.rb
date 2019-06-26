@@ -53,7 +53,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = Logger::DEBUG
+  config.logger.level = Logger::DEBUG
 
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true

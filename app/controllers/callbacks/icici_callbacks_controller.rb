@@ -12,6 +12,7 @@ class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
   # and trigger whatever associated logic we have wrt to the payment
   def transactions
     # for now just saving the details into a model - can later be changed to the operation
+    Rails.logger.level = 0
     ap params
     ap params.to_json
 
