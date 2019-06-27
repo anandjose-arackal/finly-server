@@ -954,7 +954,10 @@ class Invoice < ApplicationRecord
       note: self.note,
       tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
       invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
-      payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment }
+      payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment },
+      billing_start_date: self.billing_start_date,
+      billing_day_of_month: billing_day_of_month
+
     }
   end
 
