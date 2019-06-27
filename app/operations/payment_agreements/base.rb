@@ -41,7 +41,7 @@ class PaymentAgreements::Base < BaseOperation
       rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :roundoff_amount,
 
         invoice_items_attributes: [
-            :quantity, :unit_of_measurement, :department_id,
+            :quantity, :department_id,
             :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
             :category_id, :description, :id, :remove_line_item,
             :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :tds_applicable,
