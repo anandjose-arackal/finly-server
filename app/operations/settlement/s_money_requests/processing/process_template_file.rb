@@ -110,6 +110,11 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     add_message :success, "Succesfully processed file."
   end
 
+  def success
+    params[:just_show_excel] = false
+    Settlement::SMoneyRequests::Processing::ProcessTemplateFile::SuccessPresenter.new(user, params, messages)    
+  end
+
   # this method should create the temporary file that can be linked in the front end
   def failure
     if self.just_show_excel
@@ -134,6 +139,15 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
     def init
       self.result_file_path = params[:result_file_path]
+      self.just_show_excel = params[:just_show_excel]
+    end
+  end
+
+  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::FailurePresenter
+
+    attr_accessor :just_show_excel
+
+    def init
       self.just_show_excel = params[:just_show_excel]
     end
   end

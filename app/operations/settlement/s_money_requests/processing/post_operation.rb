@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :money_request_processor, :remaining_mappings, :utr
+  attr_accessor :payment_order, :money_request_processor, :remaining_mappings, :utr, :pending_mappings
 
   def pre_validate
     if object.blank?
@@ -71,7 +71,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     MoneyRequestProcessorMapping.transaction do
       ::MoneyRequest.transaction do
         MoneyRequestTrack.transaction do
-          self.money_request_processor.pending_mappings.each do |mapping|
+          self.pending_mappings.each do |mapping|
             if rejected or marked_as_completed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
@@ -105,6 +105,9 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     end
     processed_amount.value = self.money_request_processor.payment_order&.amount_processed&.value || self.money_request_processor.total_amount.value
     if has_success and has_failure
+      self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                          marked_as_completed: marked_as_completed, processed_amount: processed_amount)
+    elsif has_success and self.remaining_mappings.present?
       self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                           marked_as_completed: marked_as_completed, processed_amount: processed_amount)
     elsif has_success and self.remaining_mappings.blank?

@@ -1,7 +1,7 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
 # 
 class Settlement::SReport::Processing::Update < Settlement::SReport::Processing::Base
-  attr_accessor :report_processor_group, :pending_mapping
+  attr_accessor :report_processor_group, :mapping, :pending_mappings
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -16,7 +16,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, 'Batch not found'
       return
     end
-    unless params[:id].blank?
+    if params[:id].blank?
       add_message :error, "Request details not sent"
       return
     end
@@ -34,11 +34,11 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       return
     end
     
-    self.pending_mapping = self.report_processor_group.mappings.not_completed.find_by id: params[:id]
+    self.mapping = self.report_processor_group.mappings.find_by id: params[:id]
   end
 
   def validate
-    if self.pending_mapping.blank?
+    if self.mapping.blank?
       add_message :error, "Request details not found."
       return
     end
@@ -46,32 +46,104 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
   def pre_process
     params[:report_processor_group_mapping].delete([:batch_id])
+
+    if !!params.dig(:utr)
+      request_params[:bank_reference_number] = params.dig(:utr)
+      params[:report_processor_group_mapping].delete(:utr)
+    end
+
+    request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])
+    
+    # flag to make sure, we dont create tracks again if item is already marked completed even if spurious request comes from FE
+    request_params[:marked_as_completed] = (self.mapping.completed?) ? false : request_params[:marked_as_completed] 
+
+    if request_params[:marked_as_completed]
+      request_params[:status_id] = ReportProcessorGroupStatus.id_for(:completed)
+      request_params[:completed_at] = DateTime.now
+    end
+
   end
 
   def process
-    request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])
-    if request_params[:marked_as_completed]
-      request_params[:status_id] = MoneyRequestProcessorStatus.id_for(:completed)
-      request_params[:completed_at] = DateTime.now
-    end
-    self.pending_mapping.assign_attributes(request_params)
+    self.mapping.assign_attributes(request_params)
 
-    if self.pending_mapping.valid?
-      self.pending_mapping.save
+    if self.mapping.valid?
+      self.mapping.save
+      update_mapping_data if request_params[:marked_as_completed] # only update report and its tracks if mapping is not completed
     else
-      add_message :error, self.pending_mapping.errors.full_messages
+      add_message :error, self.mapping.errors.full_messages
       return
     end
   end
 
   def post_process
     add_message :success, 'Updated Successfully'
+    if self.pending_mappings.blank?
+      add_message :success, "All items credited. Batch status now set to Completed."
+    end
   end
 
   private
 
   def request_params
     params.require(:report_processor_group_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id)
+  end
+
+  def update_mapping_data
+    report_comment_action = ReportCommentAction.id_for(:report_settled)
+    marked_as_closed = false
+    event = 'settle'
+
+    self.mapping.reports.each do |report|
+      parameters = {
+        document: report,
+        aasm_event: event
+      }
+
+      created_by_user = User.find_by id: self.report_processor_group.created_by_user_id
+      op = WorkflowManager::Base.(created_by_user, parameters)
+
+      if op.success?
+        # Update the trail with payment info
+        op.workflow_output[:trail]&.update(payment_id: self.mapping.payment&.id)
+        generate_comment(report, self.mapping, report_comment_action, marked_as_closed)
+      end
+    end
+
+    update_batch # update the batch status to completed or partially_completed if there are no other pending items left in the batch to be credited.
+  end
+
+  def generate_comment(report, mapping, report_comment_action, marked_as_closed)
+    comment = ''
+    if mapping.note.present?
+      comment += " with a note '#{mapping.note}'"
+    end
+    if mapping.payment.present?
+      comment += ". Payment ID: #{mapping.payment&.id}"
+    end
+    unless marked_as_closed
+      comment += " via #{self.report_processor_group.payment_type.humanize}"
+    end
+    report.comments.build(user: self.report_processor_group.created_by_user,
+                          report_comment_action_id: report_comment_action, content: comment).save
+  end
+
+  def update_batch
+    completed_status = ReportProcessorGroupStatus.id_for(:completed)
+    partially_complete_status = ReportProcessorGroupStatus.id_for(:partially_completed)
+    self.pending_mappings = self.report_processor_group.mappings.not_completed
+    
+    set_status = (self.pending_mappings.blank?) ? completed_status : partially_complete_status
+
+    if self.report_processor_group.processed_amount.blank?
+      processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
+    else
+      processed_amount = self.report_processor_group.processed_amount
+    end
+    processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount&.value
+
+    self.report_processor_group.update(status_id: set_status, completed_at: DateTime.now,
+                                          marked_as_completed: true,processed_amount: processed_amount)
   end
 
 end

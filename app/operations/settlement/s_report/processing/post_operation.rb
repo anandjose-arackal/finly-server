@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr
+  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings
 
   def pre_validate
     if object.blank?
@@ -73,7 +73,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     ReportProcessorGroupMapping.transaction do
       Report.transaction do
         ReportTrack.transaction do
-          self.report_processor_group.pending_mappings.each do |mapping|
+          self.pending_mappings.each do |mapping|
             if marked_as_completed or marked_as_closed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
@@ -144,6 +144,10 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
     processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
     if has_success and has_failure
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                         marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
+                                         processed_amount: processed_amount)
+    elsif has_success and self.remaining_mappings.present?
       self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
                                          processed_amount: processed_amount)

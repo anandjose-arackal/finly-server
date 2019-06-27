@@ -37,6 +37,8 @@ class ReportProcessorGroupMapping < ApplicationRecord
   accepts_nested_attributes_for :reports
   accepts_nested_attributes_for :system_messages
 
+  delegate :completed?, :pending?, :cancelled?, :scheduled?, :failed?, :scheduled?, :processing?, to: :status
+
   scope :with_id, -> (id) { where id: id }
   scope :with_processor_group_id, -> (group_id) { where processor_group_id: group_id }
   scope :with_user_id, -> (user_id) { where user_id: user_id }
