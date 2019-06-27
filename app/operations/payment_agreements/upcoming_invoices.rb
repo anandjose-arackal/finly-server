@@ -19,9 +19,9 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
 
   def process
     # General and Rental are recurring, use past invoice trail to check if invoice is due
-    self.general_invoices = payment_agreement.general_invoices.due_invoices if payment_agreement.general_invoices.present?
+    self.general_invoices = payment_agreement.general_invoices.where("DATE(agreement_based_next_due_date) <= ?", Date.today) if payment_agreement.general_invoices.present?
 
-    self.rental_invoices = payment_agreement.rental_invoices.due_invoices if payment_agreement.rental_invoices.present?
+    self.rental_invoices = payment_agreement.rental_invoices.where("DATE(agreement_based_next_due_date) <= ?", Date.today) if payment_agreement.rental_invoices.present?
 
     self.beneficiary_payments = payment_agreement.beneficiary_payments if payment_agreement.beneficiary_payments.present?
 

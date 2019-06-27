@@ -1,6 +1,9 @@
 class PaymentAgreement < ApplicationRecord
 
   include Transitionable
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :order_number, purpose: :payment_agreement, editable: false, prefix: 'PA'
 
   belongs_to :company, optional: true
   belongs_to :status, optional: true, class_name: "PaymentAgreementStatus"
@@ -11,6 +14,8 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :general_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:general_invoice))}, class_name: 'Invoice', dependent: :destroy
   has_many :rental_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:rental_invoice))}, class_name: 'Invoice', dependent: :destroy
+  has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
+
   has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
   

@@ -151,7 +151,7 @@ class InvoiceLineItem < ApplicationRecord
     amount_before_discount = rate*quantity
     taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
     if self.taxable_amount.present?
-      self.taxable_amount.update(value: taxable_amt)
+      self.taxable_amount.update_column('value', taxable_amt)
     else
       self.create_taxable_amount(value: taxable_amt, currency_id: 1)
     end

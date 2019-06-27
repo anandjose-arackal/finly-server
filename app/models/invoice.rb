@@ -774,6 +774,34 @@ class Invoice < ApplicationRecord
     # end
   end
 
+  def update_taxable_and_orig_amount_value
+    taxable_val = []
+    raw_val = []
+    if self.items.present?
+      self.items.each do |item|
+        rate = item.rate
+        quantity = item.quantity
+        discount_percentage = item.discount
+        amount_before_discount = rate*quantity
+        taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+        raw_val << amount_before_discount
+        taxable_val << taxable_amt
+      end
+    end
+
+    if self.original_amount.present?
+      self.original_amount.update(value: raw_val.sum)
+    else
+      self.create_original_amount(value: raw_val.sum, currency_id: 1)
+    end
+    
+    if self.taxable_amount.present?
+      self.taxable_amount.update(value: taxable_val.sum)
+    else
+      self.create_taxable_amount(value: taxable_val.sum, currency_id: 1)
+    end
+  end
+
   private
 
   def payment_agreement_updations

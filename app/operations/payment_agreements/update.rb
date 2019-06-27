@@ -29,6 +29,8 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
     if self.payment_agreement.save
       update_amount_attributes
+      set_due_date_for_general_invoice
+      set_due_date_for_rental_invoice
       params[:reviewal_document] = self.payment_agreement
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
@@ -63,20 +65,25 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def update_amount_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
-        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
+        general_invoice.update_taxable_and_orig_amount_value
+        general_invoice.items.map(&:update_taxable_amount_value)
+        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
+        # general_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
+        general_invoice.save!
       end
     end
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
-        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        rental_invoice.update_taxable_amount_value
+        rental_invoice.items.map(&:update_taxable_amount_value)
+        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        # rental_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        rental_invoice.save!
       end
     end
-
-    self.payment_agreement.save
-
 
     # if payment_agreement.general_invoices.present?
     #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
@@ -99,6 +106,35 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     # if payment_agreement.security_deposits.present?
     #   payment_agreement.security_deposits
     # end
+  end
+
+
+  def set_due_date_for_general_invoice
+    self.payment_agreement.general_invoices.map do |general_invoice|
+      number = general_invoice.invoice_frequency&.number
+      period_id = general_invoice.invoice_frequency&.period_id
+      billing_start_date = general_invoice.billing_start_date&.to_date
+      # Set rules for calculation of payment date based on period set
+      case 
+      when period_id == Period.id_for(:month)
+        due_date = billing_date + number.to_i.month rescue nil
+        general_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
+      end
+    end
+  end
+
+  def set_due_date_for_rental_invoice
+    self.payment_agreement.rental_invoices.map do |rental_invoice|
+      number = rental_invoice.invoice_frequency&.number
+      period_id = rental_invoice.invoice_frequency&.period_id
+      billing_start_date = rental_invoice.billing_start_date&.to_date
+      # Set rules for calculation of payment date based on period set
+      case 
+      when period_id == Period.id_for(:month)
+        due_date = billing_date + number.to_i.month rescue nil
+        rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
+      end
+    end
   end
 
 end
