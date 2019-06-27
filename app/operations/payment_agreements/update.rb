@@ -76,15 +76,15 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
-        rental_invoice.update_taxable_amount_value
+        rental_invoice.update_taxable_and_orig_amount_value
         rental_invoice.items.map(&:update_taxable_amount_value)
-        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        # rental_invoice.save!
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        rental_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         rental_invoice.save!
       end
+      end
     end
-
     # if payment_agreement.general_invoices.present?
     #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}
     #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_net_amount_value)}
