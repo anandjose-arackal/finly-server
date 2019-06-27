@@ -71,6 +71,10 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     end
   end
 
+  # Need to make it close to invoice
+  # All amount attrbutes are not being updated using InvoiceUtil
+  # Will check it
+
   def update_amount_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
@@ -80,6 +84,9 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         # general_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
         general_invoice.save!
+        if general_invoice.tds_slab_id.present?
+          apply_tds_on_amount(general_invoice)
+        end
       end
     end
 
@@ -91,6 +98,9 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         # rental_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         rental_invoice.save!
+        if rental_invoice.tds_slab_id.present?
+          apply_tds_on_amount(rental_invoice)
+        end
       end
     end
 
@@ -142,6 +152,20 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       when period_id == Period.id_for(:month)
         due_date = billing_start_date
         rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
+      end
+    end
+  end
+
+  def apply_tds_on_amount(invoice)
+    if invoice.tds_slab_id.present?
+      tds_percentage = invoice&.tds_slab&.tds.to_f
+      # Substract tds from sum of net amount of items
+      item_net_amount_sum = invoice.items.joins(:net_amount).pluck('amounts.value').sum
+      net_amt = item_net_amount_sum - (item_net_amount_sum*tds_percentage/100)
+      if invoice.net_amount.present?
+        invoice.net_amount.update(value: net_amt)
+      else
+        invoice.create_net_amount(value: net_amt, currency_id: 1)
       end
     end
   end
