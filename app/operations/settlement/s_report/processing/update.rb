@@ -12,7 +12,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, 'User not found'
       return
     end
-    unless params[:report_processor_group_mapping][:report_processor_group_id].present?
+    unless params.dig(:batch_id).present?
       add_message :error, 'Batch not found'
       return
     end
@@ -28,16 +28,16 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(params[:report_processor_group_mapping][:report_processor_group_id])
-    self.pending_mapping = self.report_processor_group.mappings.not_completed.find_by id: params[:id]
-  end
-
-  def validate
+    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(params.dig(:batch_id))
     unless report_processor_group.present?
       add_message :error, 'Batch not found'
       return
     end
+    
+    self.pending_mapping = self.report_processor_group.mappings.not_completed.find_by id: params[:id]
+  end
 
+  def validate
     if self.pending_mapping.blank?
       add_message :error, "Request details not found."
       return
@@ -45,11 +45,12 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   end
 
   def pre_process
-    params[:report_processor_group_mapping].delete([:report_processor_group_id])
+    params[:report_processor_group_mapping].delete([:batch_id])
   end
 
   def process
-    if StringUtils.to_bool(request_params[:marked_as_completed])
+    request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])
+    if request_params[:marked_as_completed]
       request_params[:status_id] = MoneyRequestProcessorStatus.id_for(:completed)
       request_params[:completed_at] = DateTime.now
     end
