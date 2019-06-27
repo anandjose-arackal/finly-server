@@ -15,27 +15,26 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
 
 
   def edit_btn
-    return true
-    # if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
-    #   return true
-    # end
+    if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
+      return true if payment_agreement.action_users(:return_control).include?(user)
+    end
 
-    #  # If PR initiator OR (admin+ PR initiator)
-    # if user.is_payment_agreement_initiator? && user.vendor_payments_admin? 
-    #   if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
-    #     return true
-    #   end 
-    # end
+     # If PR initiator OR (admin+ PR initiator)
+    if user.is_payment_agreement_initiator? && user.vendor_payments_admin? 
+      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
+        return true
+      end 
+    end
 
-    # if user.is_payment_agreement_initiator? && document_owner? 
-    #   if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
-    #     return true
-    #   end 
-    # end
+    if user.is_payment_agreement_initiator? && document_owner? 
+      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
+        return true
+      end 
+    end
 
-    # if payment_agreement.is_reviewing_user?
-    #   payment_agreement.action_users(:approve).include?(user)
-    # end
+    if payment_agreement.is_reviewing_user?
+      payment_agreement.action_users(:approve).include?(user)
+    end
   end
 
   def submit
