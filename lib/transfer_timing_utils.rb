@@ -114,4 +114,19 @@ class TransferTimingUtils
     end
   end
 
+  def self.add_business_days(date, no_of_days=1)
+    date_count  = 0
+    if date.blank?
+      date = DateTime.now
+    end
+    business_date = date
+    loop do
+      business_date = business_date + 1.day
+      if bank_holidays.exclude?(business_date.strftime("%d-%m-%Y")) && [1,6].exclude?(business_date.wday)
+        date_count += 1
+      end
+      return business_date if date_count == no_of_days
+    end
+  end
+
 end
