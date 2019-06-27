@@ -60,6 +60,7 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
       add_message :error, "Company cannot be blank"
       return
     end
+
   end
 
   def process
