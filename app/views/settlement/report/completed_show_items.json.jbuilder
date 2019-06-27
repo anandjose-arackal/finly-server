@@ -1,10 +1,12 @@
 user_count = 0
 report_count = 0
+item_count = 0
 json.items do
   json.array! @result.paginated_mappings do |item|
     if item.status.completed?
       user_count += 1
     end
+    item_count += 1
     json.id item.id
     json.user item.user
     json.amount item.amount
@@ -43,3 +45,4 @@ json.items do
 end
 json.user_count user_count
 json.report_count report_count
+json.count item_count

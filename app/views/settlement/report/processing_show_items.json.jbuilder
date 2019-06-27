@@ -1,8 +1,10 @@
 user_count = 0
 report_count = 0
+item_count = 0
 json.items do
   json.array! @result.paginated_mappings do |item|
     user_count += 1
+    item_count += 1
     json.id item.id
     json.user item.user
     json.amount item.amount
@@ -13,6 +15,7 @@ json.items do
     json.receiving_account item.processor_accountable
     json.note item.note
     json.utr item.payment&.reference_resource&.bank_reference_number
+    json.actions @result.item_actions(item)
     json.reports do
       json.array! item.reports do |report|
 
@@ -42,3 +45,4 @@ json.items do
 end
 json.user_count user_count
 json.report_count report_count
+json.count item_count

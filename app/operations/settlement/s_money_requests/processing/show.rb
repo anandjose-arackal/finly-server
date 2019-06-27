@@ -68,6 +68,13 @@ class Settlement::SMoneyRequests::Processing::Show < Settlement::SMoneyRequests:
       actions
     end
 
+    def item_actions(item)
+      actions = {}
+      unless item.completed? or item.cancelled?
+        actions[:mark_as_completed] = true
+      end
+    end
+
   end
 
 end
