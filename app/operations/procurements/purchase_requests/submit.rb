@@ -26,8 +26,8 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
             # if purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
             if purchase_request_status == 'auto_approved'
               trail_action = 'auto_approve'
-            elsif purchase_request_status == 'approved'
-              trail_action = 'approve'
+            elsif purchase_request_status == 'awaiting_approval'
+              trail_action = 'submit'
             end
             purchase_request.purchase_request_items.each do |item|
               item.status_id = PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym)

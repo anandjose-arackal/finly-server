@@ -228,7 +228,13 @@ class PurchaseRequest < ApplicationRecord
     PurchaseRequestItem.with_ids(filtered_approved_item_ids).each do |item|
       item.rejected = false
       item.status_id = PurchaseRequestItemStatus.id_for(self.reload&.status&.name&.to_sym)
-      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
+      pr_status = self&.status&.name
+      if pr_status == 'approved'
+        trail_status = 'approve'
+      elsif pr_status == 'auto_approved'
+        trail_status = 'auto_approve'
+      end
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(trail_status))
         return false
       end
     end unless filtered_approved_item_ids.blank?

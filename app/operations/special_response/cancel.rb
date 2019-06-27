@@ -19,7 +19,7 @@ class SpecialResponse::Cancel < BaseOperation
 
       # i.e. only if it's a valid Request Number that was generated from our system it will parsed and refunded to the respective company
       if request_number&.include?("FINLY") && request_number&.length == 20
-        bank_transaction = BankTransaction.find_by unique_request_number: request_number
+        bank_transaction = YesBankTransaction.find_by unique_request_number: request_number
 
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))

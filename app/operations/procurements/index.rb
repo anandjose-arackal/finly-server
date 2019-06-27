@@ -101,6 +101,11 @@ class Procurements::Index < Procurements::Base
     #   procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
     #   procurement_ids += user.company.inward_invoices.with_type_non_po_invoice.pluck(:procurement_id)
     # end
+    # If admin, select all procurements
+    if user.vendor_payment_admin? || user.vendor_payments_auditor?
+      procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
+      procurement_ids += user.company.inward_invoices.with_type_non_po_invoice.pluck(:procurement_id)
+    end
 
     # self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
 
