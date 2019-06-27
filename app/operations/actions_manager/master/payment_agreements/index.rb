@@ -4,7 +4,7 @@ class ActionsManager::Master::PaymentAgreements::Index < ActionsManager::Master:
   register_actions [:create_payment_agreement]
 
   def create_payment_agreement
-    true
+    user.is_payment_agreement_initiator? || user.vendor_payment_admin?
   end
 
   def bulk_action
