@@ -1,11 +1,11 @@
 class PaymentAgreements::Update < PaymentAgreements::Base
-  attr_accessor :payment_agreement, :payment_agreement_params
+  attr_accessor :payment_agreement, :payment_agreement_params, :document_reviewer_mappings_params
 
   def init
     super
     self.payment_agreement_params = payment_agreement_parameters
     self.payment_agreement = user.company.payment_agreements.find_by_id(params[:id])
-
+    self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
   end
 
   def process
@@ -32,6 +32,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       set_due_date_for_general_invoice
       set_due_date_for_rental_invoice
       params[:reviewal_document] = self.payment_agreement
+      params[:document_reviewer_mappings] = document_reviewer_mappings_params
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
@@ -116,7 +117,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       # Set rules for calculation of payment date based on period set
       case 
       when period_id == Period.id_for(:month)
-        due_date = billing_date + number.to_i.month rescue nil
+        due_date = billing_start_date
         general_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
     end
@@ -130,7 +131,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       # Set rules for calculation of payment date based on period set
       case 
       when period_id == Period.id_for(:month)
-        due_date = billing_date + number.to_i.month rescue nil
+        due_date = billing_start_date
         rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
     end

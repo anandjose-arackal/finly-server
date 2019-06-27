@@ -67,7 +67,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def set_next_due_date_for_upcoming_invoice(trail, resource)
     # 'Resource' here means agreement based invoice i.e. general or rental
     agreement_expiration_date = payment_agreement.expiration_date.to_date
-    if agreement_expiration_date.present? and agreement_expiration_date >= Date.today
+    if (agreement_expiration_date.present? and agreement_expiration_date >= Date.today) || payment_agreement.no_expiration
       last_invoice_created_at = trail.created_at.to_date
       number = resource.invoice_frequency&.number
       period_id = resource.invoice_frequency&.period_id

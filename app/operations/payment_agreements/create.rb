@@ -126,7 +126,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       # Set rules for calculation of payment date based on period set
       case 
       when period_id == Period.id_for(:month)
-        due_date = billing_date + number.to_i.month rescue nil
+        due_date = billing_date
         general_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
     end
@@ -140,7 +140,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       # Set rules for calculation of payment date based on period set
       case 
       when period_id == Period.id_for(:month)
-        due_date = billing_date + number.to_i.month rescue nil
+        due_date = billing_start_date
         rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
     end
