@@ -759,6 +759,8 @@ class User < ApplicationRecord
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
     # return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
     return if password.blank?
+    return unless security_policy.gatekeeper.enabled?
+
     requirement = []
     fail = false
     if security_policy.password.mandate_uppercase?
