@@ -82,7 +82,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        general_invoice.save
+        rental_invoice.save
       end
     end
 
