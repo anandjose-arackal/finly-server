@@ -1,6 +1,6 @@
 class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices::Base
 
-  attr_accessor :beneficiary_payment, :payment_agreement_type_id, :payment_agreement, :beneficiary_payment, :general_invoice, :rental_invoice, :template, :document, :invoice, :payment_agreement_type, :procurement_id
+  attr_accessor :payment_agreement_type_id, :payment_agreement, :general_invoice, :rental_invoice, :template, :document, :invoice, :payment_agreement_type, :procurement_id
 
   def init
     self.payment_agreement_type_id = params[:payment_agreement_type_id]
@@ -18,10 +18,6 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   def process
     case payment_agreement_type
-    when 'beneficiary'
-      self.beneficiary_payment = user.company.beneficiary_payments.find_by_id payment_agreement_type_id
-      params[:template_id] = beneficiary_payment.resource_template_id
-      self.template = beneficiary_payment.resource_template
     when 'general_invoice'
       self.general_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
       params[:template_id] = general_invoice.resource_template_id
@@ -30,10 +26,6 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       self.rental_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
       params[:template_id] = rental_invoice.resource_template_id
       self.template = rental_invoice.resource_template
-    end
-
-    if beneficiary_payment.present?
-      invoice_created = apply_template(beneficiary_payment)
     end
 
     if general_invoice.present?
@@ -63,14 +55,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     when resource.is_a?(Invoice)
     self.invoice = resource.amoeba_dup
     if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice))
+      Trail.create(parent_type: 'Invoice', parent_id: self.invoice.id, action_user_id: user.id, action_id: TrailAction.id_for(:invoice_created))
       return true
     end
-    when resource.is_a?(BeneficiaryPayment)
     end
   end
-
-
-
-
-
 end

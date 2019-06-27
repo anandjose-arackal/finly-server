@@ -18,9 +18,10 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
   end
 
   def process
-    self.general_invoices = payment_agreement.general_invoices if payment_agreement.general_invoices.present?
+    # General and Rental are recurring, use past invoice trail to check if invoice is due
+    self.general_invoices = payment_agreement.general_invoices.due_invoices if payment_agreement.general_invoices.present?
 
-    self.rental_invoices = payment_agreement.rental_invoices if payment_agreement.rental_invoices.present?
+    self.rental_invoices = payment_agreement.rental_invoices.due_invoices if payment_agreement.rental_invoices.present?
 
     self.beneficiary_payments = payment_agreement.beneficiary_payments if payment_agreement.beneficiary_payments.present?
 

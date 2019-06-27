@@ -74,18 +74,17 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       self.payment_agreement.general_invoices.each do |general_invoice|
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
+        general_invoice.save
       end
     end
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        general_invoice.save
       end
     end
-
-    self.payment_agreement.save
-
 
     # if payment_agreement.general_invoices.present?
     #   payment_agreement.general_invoices.map{|i| i.items.map(&:update_taxable_amount_value)}

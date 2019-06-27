@@ -146,6 +146,11 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       payment = ::Payment.new(payment_param)
       # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
+
+        # Trail will help w.r.t. invoice history
+        if ['security_deposit', 'beneficiary'].include?(agreement_type)
+          create_trail
+        end
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id]) if self.beneficiary_payments.present?
         beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid)) if beneficiary_payments.present?
@@ -274,5 +279,9 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     else
       return beneficiary_payment.id
     end
+  end
+
+  def create_trail
+    Trail.create(parent_type: set_payment_parent_type, parent_id: set_payment_parent_id, action_user_id: user.id, action_id: TrailAction.id_for(:payment_ticket_created))
   end
 end

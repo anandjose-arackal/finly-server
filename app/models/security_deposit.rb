@@ -13,6 +13,7 @@ class SecurityDeposit < ApplicationRecord
   belongs_to :payment_agreement, optional: true
 
   has_many :payments, as: :parent
+  has_many :trails, as: :parent
 
   after_create :update_creator_id, :update_company_id
 
