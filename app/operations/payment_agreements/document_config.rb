@@ -8,6 +8,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
 
     def init
       self.payment_agreement = params[:payment_agreement]
+      params[:filter_role_id] = [UserRole.id_for(:payment_agreement_initiator)]
       initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
       self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
       self.payment_agreement_types = ::PaymentAgreement::AGREEMENT_TYPES
