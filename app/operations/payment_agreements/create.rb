@@ -76,8 +76,8 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       self.payment_agreement.general_invoices.each do |general_invoice|
         general_invoice.update_taxable_and_orig_amount_value
         general_invoice.items.map(&:update_taxable_amount_value)
-        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
-        general_invoice.save!
+        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
+        # general_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
         general_invoice.save!
       end
@@ -87,8 +87,8 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         rental_invoice.update_taxable_and_orig_amount_value
         rental_invoice.items.map(&:update_taxable_amount_value)
-        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        rental_invoice.save!
+        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
+        # rental_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         rental_invoice.save!
       end
