@@ -40,6 +40,14 @@ class YesBankTransferProvider
           bank_transaction: bank_transaction
       })
 
+      # updating the bank transaction with the new details
+      bank_transaction.update(
+          bank_reference_number: transfer_request.bank_reference_number,
+          transfer_status_id: op.transfer_status_id,
+          bank_response: transfer_request.transaction_result,
+          beneficiary_full_name: transfer_request.beneficiary_full_name
+      )
+
       # return the balance given by the API
       if op.success? && !bank_transaction.beneficiary_full_name.blank?
         full_name = bank_transaction.beneficiary_full_name
