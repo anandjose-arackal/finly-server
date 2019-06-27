@@ -92,7 +92,6 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         rental_invoice.save!
       end
-      end
     end
 
     # if payment_agreement.general_invoices.present?
