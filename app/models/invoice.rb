@@ -760,7 +760,7 @@ class Invoice < ApplicationRecord
 
   def invoice_bank_account
     user = self.created_by
-    user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
+    return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
   end
 
   def update_net_amount_value
