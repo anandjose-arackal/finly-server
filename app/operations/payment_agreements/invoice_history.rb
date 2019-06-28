@@ -13,7 +13,7 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
   end
 
   def process
-    self.invoices = payment_agreement.recurring_invoices.with_status_id(InwardInvoiceStatus.id_for(:closed))
+    self.invoices = payment_agreement.recurring_invoices
 
     # Payment Ticket history
   end
