@@ -64,7 +64,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def trips_awaiting_approval
-    {name: 'Awaiting Approval', id: 'trips', url: 'trips/params={"view":"manager"}'}
+    {name: 'Awaiting Approval', id: 'trips', url: 'trips/params={"view":"manager", "filter_awaiting_approval":"true"}'}
   end
 
   def team_trips
@@ -88,7 +88,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def reports_awaiting_approval
-    {name: 'Awaiting Approval', id: 'reports', url: 'reports/params={"view":"manager"}'}
+    {name: 'Awaiting Approval', id: 'reports', url: 'reports/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_reports
@@ -108,7 +108,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def money_requests_awaiting_approval
-    {name: 'Awaiting Approval', id: 'money_requests', url: 'money_requests/params={"view":"manager"}'}
+    {name: 'Awaiting Approval', id: 'money_requests', url: 'money_requests/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_money_requests
