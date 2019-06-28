@@ -227,7 +227,6 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   end
 
   def payments_list
-    puts "ROUTES PARAMS FROM BankTransfer PAUYMENT LIST", params.inspect, current_user.inspect
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
     respond
   end
@@ -291,6 +290,10 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond_success_failure
+  end
 
 
   private

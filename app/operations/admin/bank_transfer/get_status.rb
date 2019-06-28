@@ -14,11 +14,11 @@ class Admin::BankTransfer::GetStatus < Admin::Base
   def init
     if params["unique_request_number"]
       self.unique_request_number = params["unique_request_number"]
-      self.bank_transaction = BankTransaction.find_by(unique_request_number: self.unique_request_number)
-      self.bank_transaction = BankTransaction.find_by(bank_reference_number: self.unique_request_number) if self.bank_transaction.blank?
+      self.bank_transaction = YesBankTransaction.find_by(unique_request_number: self.unique_request_number)
+      self.bank_transaction = YesBankTransaction.find_by(bank_reference_number: self.unique_request_number) if self.bank_transaction.blank?
       if self.bank_transaction.nil?
         payment = Payment.find_by(id: self.unique_request_number.to_i)
-        if payment.present? and payment.reference_resource_type == 'BankTransaction'
+        if payment.present? and payment.reference_resource_type == 'YesBankTransaction'
           self.bank_transaction = payment.reference_resource
         end
       end

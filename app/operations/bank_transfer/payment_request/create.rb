@@ -281,6 +281,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           initiating_account_id: initiating_account.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,
+          company_id: user.company_id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: params[:bank_transfer_type],

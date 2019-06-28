@@ -149,7 +149,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -275,11 +275,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def nature_of_expense(invoice_line_item)
-    invoice_line_item.parent.custom_fields.with_field_key(:nature_of_expense).first&.string_value
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_expense' }&.first
   end
 
   def nature_of_office(invoice_line_item)
-    invoice_line_item.parent.custom_fields.with_field_key(:nature_of_office).first&.string_value
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_office' }&.first
   end
 
   def item_code(invoice_line_item)
