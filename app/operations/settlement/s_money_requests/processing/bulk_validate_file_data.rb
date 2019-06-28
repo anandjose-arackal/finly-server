@@ -51,6 +51,7 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
   def process
     self.item_details.each do |item|
       advance_id = item[:advance_id] || item["advance_id"]
+      utr = item[:utr] || item["utr"]
 
       self.error_messages = []
       self.issue_item = {}
@@ -59,6 +60,14 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
         self.valid = false
         self.error_messages << "Advance ID should not be removed."
         self.issue_item[:advance_id] = "Advance ID should not be removed."
+      end
+
+      if utr.present?
+        unless validate_utr utr
+          self.valid = false
+          self.error_messages << "UTR is only allowed to be alphanumeric."
+          self.issue_item[:utr] = "UTR is only allowed to be alphanumeric."
+        end
       end
 
       if valid
@@ -98,6 +107,10 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
 
 
   private
+
+  def validate_utr(utr)
+    ( /\A[a-zA-Z0-9]*\Z/.match(utr) ) ? true : false
+  end
 
   def retrieve_header_names
     [

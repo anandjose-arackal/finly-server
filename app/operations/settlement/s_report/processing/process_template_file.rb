@@ -9,7 +9,8 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
                 :report_processor_group, 
                 :pending_items, 
                 :pending_item_ids,
-                :processable_reports, 
+                :completed_items,
+                :edge_case 
                 :just_show_excel,
                 :associated_utr
 
@@ -48,8 +49,12 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
       add_message :error, "File Format error. Please re-save your Excel sheet in 2007 format or greater."
     end
 
-    # we need this flag, since not all items will be credited through bank transfer
-    self.processable_reports = self.parsed_data.collect {|data| data if StringUtils.to_bool(data[:mark_as_paid]&.downcase)}.compact
+    # deal with an edge case where neither utr nor mark_as_paid column is filled up
+    empty_rows = self.parsed_data.collect {|data| data if (data[:utr].blank? && (!!StringUtils.to_bool(data[:mark_as_paid]&.downcase) == false))}.compact
+    self.edge_case = (empty_rows.count == self.parsed_data.count)
+
+    # a flag, used to handle failure logic, whether to show excel file or just the errors
+    self.just_show_excel = true
   end
 
   def validate
@@ -63,23 +68,13 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
       return
     end
 
-    if self.processable_reports.blank?
+    if self.edge_case
       add_message :error, "None of the reports were marked as paid."
       return
     end
   end
 
   def pre_process
-    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.processable_reports.pluck(:report_id)
-    self.pending_item_ids = self.pending_items.pluck(:id) rescue []
-    
-    if self.pending_items.blank?
-      add_message :error, "Details for reports were not found for this batch."
-      return
-    end
-  end
-
-  def process
     self.validate_operation = Settlement::SReport::Processing::BulkValidateFileData.(user, {item_details: self.parsed_data})
     if validate_operation.success?
 
@@ -90,15 +85,31 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
       return
     end
 
+    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.validate_operation.item_details.pluck(:advance_id)
+    self.pending_item_ids = self.pending_items.pluck(:id) rescue []
+
+    # user is allowed to update utr for completed items
+    self.completed_items = self.report_processor_group.mappings.completed.where id: self.validate_operation.item_details.pluck(:advance_id)
+  end
+
+  def process
     # 
     # we will use this to cleanly map report ids and utr
     self.associated_utr = {}
-    self.processable_reports.pluck(:report_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.validate_operation.item_details.pluck(:report_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
 
-    result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
+    # utr can be updated for items which are already completed
+    self.completed_items.each do |item|
+      if item.bank_reference_number != self.associated_utr[item.id]&.strip
+        item.update(bank_reference_number: self.associated_utr[item.id])
+      end
+    end
 
-    # a flag, used to handle failure logic, whether to show excel file or just the errors
-    self.just_show_excel = true
+    # only if anything is pending, we call the post_opertion to update the item and in turn the batch
+    if self.pending_item_ids.present?
+      result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
+    end
+
     unless result.success?
       self.just_show_excel = false
       add_message :error, result.messages[:error]
@@ -118,7 +129,8 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   # this method should create the temporary file that can be linked in the front end
   def failure
     if self.just_show_excel
-      result = Settlement::SReport::Processing::GenerateTemplateFile.(user, {content: self.contents})
+      params[:content] = self.contents
+      result = Settlement::SReport::Processing::GenerateTemplateFile.(user, params)
 
       if result.success?
         params[:just_show_excel] = self.just_show_excel

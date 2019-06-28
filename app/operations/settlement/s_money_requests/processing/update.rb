@@ -52,6 +52,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     if !!params.dig(:utr)
       request_params[:bank_reference_number] = params.dig(:utr)
       params[:money_request_processor_mapping].delete(:utr)
+
+      # if utr is there, we automatically assume the item can be marked as completed
+      request_params[:marked_as_completed] = true
     end
 
     request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])

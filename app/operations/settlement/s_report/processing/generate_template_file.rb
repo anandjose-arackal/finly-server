@@ -36,7 +36,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.report_processor_group.mappings.not_completed.each do |item|
+      self.report_processor_group.mappings.each do |item|
         item_contents << processor_details(self.report_processor_group, item)
       end
     end
@@ -56,6 +56,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
   private
 
   def processor_details(processor, item)
+    marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
     [
       item.id,
       processor.created_by_user&.name,
@@ -64,6 +65,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       item.user&.name,
       item.note,
       item.amount&.value,
+      item.bank_reference_number,
+      marked_as_completed
     ]
   end
 
