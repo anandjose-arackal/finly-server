@@ -34,28 +34,28 @@ class Dashboard::ExpenseManagement::MoneyRequests < Dashboard::ExpenseManagement
             title: "Unsubmitted",
             count: self.money_requests.filter_status(1, user.id)&.count,
             total_amount: self.money_requests.filter_status(1, user.id).map {|mr| mr.total_amount}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 1}]
           },
 
           {
             title: "Processing",
             count: self.money_requests.filter_status(2, user.id)&.count,
             total_amount: self.money_requests.filter_status(2, user.id).map {|mr| mr.total_amount}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 2}]
           },
 
           {
             title: "Rejected",
             count: self.money_requests.filter_status(4, user.id)&.count,
             total_amount: self.money_requests.filter_status(4, user.id).map {|mr| mr.total_amount}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 4}]
           },
 
           {
             title: "Approved",
             count: self.money_requests.filter_status(5, user.id)&.count,
             total_amount: self.money_requests.filter_status(5, user.id).map {|mr| mr.total_amount}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 5}]
           }
         ]
 

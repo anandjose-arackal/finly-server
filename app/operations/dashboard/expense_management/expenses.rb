@@ -32,7 +32,7 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
             title: "Unreported",
             count: apply_scopes(self.expenses, {filter_status: 2})&.count,
             total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 2}]
           }
         ]
 
