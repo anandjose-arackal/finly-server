@@ -236,8 +236,8 @@ class Budget < ApplicationRecord
         email: user.email
 
       },
-      sub_budgets: budget_children&.as_json,
-      sub_budgets_count: budget_children.size
+      sub_budgets: children&.as_json,
+      sub_budgets_count: children.size
     }
   end
 
@@ -257,8 +257,8 @@ class Budget < ApplicationRecord
         email: user.email
 
       },
-      sub_budgets: budget_children.map(&:budget_criteria_as_json),
-      sub_budgets_count: budget_children.size
+      sub_budgets: children.map(&:budget_criteria_as_json),
+      sub_budgets_count: children.size
     }
   end
 
@@ -270,8 +270,8 @@ class Budget < ApplicationRecord
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       spent_amount: processor_instance.spent_amount,
-      sub_budgets: budget_children.map(&:timeline_criteria_as_json),
-      sub_budgets_count: budget_children.size
+      sub_budgets: children.map(&:timeline_criteria_as_json),
+      sub_budgets_count: children.size
     }
   end
 
@@ -279,7 +279,7 @@ class Budget < ApplicationRecord
     {
       id: id,
       name: name,
-      sub_budgets: budget_children.map(&:only_name_as_json)
+      sub_budgets: children.map(&:only_name_as_json)
     }
   end
 
