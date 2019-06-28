@@ -73,6 +73,7 @@ class Settlement::SMoneyRequests::Processing::Show < Settlement::SMoneyRequests:
       unless item.completed? or item.cancelled?
         actions[:mark_as_completed] = true
       end
+      actions
     end
 
   end

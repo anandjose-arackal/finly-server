@@ -12,7 +12,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       add_message :error, 'User not found'
       return
     end
-    unless params.dig(:batch_id).present?
+    unless params.dig(:money_request_processor_mapping, :batch_id).present?
       add_message :error, 'Batch not found'
       return
     end
@@ -28,13 +28,14 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    self.money_request_processor = groups_presenter.money_request_processors.find_by_id(params.dig(:batch_id))
+    self.money_request_processor = groups_presenter.money_request_processors.find_by_id(params.dig(:money_request_processor_mapping, :batch_id))
     unless money_request_processor.present?
       add_message :error, 'Batch not found'
       return
     end
     
     self.mapping = self.money_request_processor.mappings.find_by id: params[:id]
+    self.pending_mappings = self.money_request_processor.mappings.not_completed
   end
 
   def validate

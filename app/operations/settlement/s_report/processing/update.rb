@@ -12,7 +12,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, 'User not found'
       return
     end
-    unless params.dig(:batch_id).present?
+    unless params.dig(:report_processor_group_mapping, :batch_id).present?
       add_message :error, 'Batch not found'
       return
     end
@@ -28,13 +28,14 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(params.dig(:batch_id))
+    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(params.dig(:report_processor_group_mapping, :batch_id))
     unless report_processor_group.present?
       add_message :error, 'Batch not found'
       return
     end
     
     self.mapping = self.report_processor_group.mappings.find_by id: params[:id]
+    self.pending_mappings = self.report_processor_group.mappings.not_completed
   end
 
   def validate

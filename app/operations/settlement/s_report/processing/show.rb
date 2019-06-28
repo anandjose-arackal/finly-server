@@ -74,6 +74,7 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
       unless item.completed? or item.cancelled?
         actions[:mark_as_completed] = true
       end
+      actions
     end
 
   end
