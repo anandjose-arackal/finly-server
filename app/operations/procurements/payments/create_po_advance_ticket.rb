@@ -144,7 +144,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
-      if advance_amount >= purchase_order.balance_amount&.value
+
+      if advance_amount > purchase_order.balance_amount&.value
         row_details << "Advance cannot be greater than the balance amount in the PO"
         self.contents << row_details
         errors_found = true
@@ -172,7 +173,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   end
 
   # to be used when PO can have multiple advance payments in future
-  # 
+  #
   # def process
   #   # self.payment_request_params = bank_payment_request_params
   #   # self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
@@ -251,6 +252,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   private
 
   def parse_payment_order_data
+    initiating_account = retrieve_initiating_account(user.company)
     policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
@@ -262,7 +264,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
             currency_id: 1
         },
         payment_mode: self.payment_mode,
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: "vp",
@@ -313,6 +315,18 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       }
     end
     payment_params
+  end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+      when "YES"
+        initiating_account = user.company.yes_bank_company_account
+      when "ICICI"
+        initiating_account = user.company.icici_bank_company_account
+      else
+        initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
   end
 
 end
