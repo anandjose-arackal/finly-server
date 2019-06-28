@@ -10,7 +10,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
                 :pending_items, 
                 :pending_item_ids,
                 :completed_items,
-                :edge_case 
+                :edge_case,
                 :just_show_excel,
                 :associated_utr
 
