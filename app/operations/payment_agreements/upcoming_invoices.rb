@@ -19,13 +19,13 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
 
   def process 
     # General and Rental are recurring, use past invoice trail to check if invoice is due
-    self.general_invoices = payment_agreement.general_invoices.where("agreement_based_next_due_date <= ?", Date.today) if payment_agreement.general_invoices.present?
-    self.general_invoices = general_invoices.or(payment_agreement.general_invoices.where(agreement_based_next_due_date: nil))
+    self.general_invoices = payment_agreement.general_invoices.where("agreement_based_next_due_date <= ?", Date.today) rescue Invoice.none
+    self.general_invoices = general_invoices.or(payment_agreement.general_invoices.where(agreement_based_next_due_date: nil)) rescue Invoice.none
 
-    self.rental_invoices = payment_agreement.rental_invoices.where("agreement_based_next_due_date <= ?", Date.today) if payment_agreement.rental_invoices.present?
-    self.rental_invoices = rental_invoices.or(payment_agreement.rental_invoices.where(agreement_based_next_due_date: nil))
+    self.rental_invoices = payment_agreement.rental_invoices.where("agreement_based_next_due_date <= ?", Date.today) rescue Invoice.none
+    self.rental_invoices = rental_invoices.or(payment_agreement.rental_invoices.where(agreement_based_next_due_date: nil)) rescue Invoice.none
 
-    self.beneficiary_payments = payment_agreement.beneficiary_payments if payment_agreement.beneficiary_payments.present?
+    self.beneficiary_payments = payment_agreement.beneficiary_payments
 
     self.security_deposits = payment_agreement.security_deposits if payment_agreement.security_deposits.present?
     initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
