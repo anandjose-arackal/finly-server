@@ -54,7 +54,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     self.edge_case = (empty_rows.count == self.parsed_data.count)
 
     # a flag, used to handle failure logic, whether to show excel file or just the errors
-    self.just_show_excel = true
+    self.just_show_excel = false
   end
 
   def validate
@@ -79,17 +79,18 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     if validate_operation.success?
 
     else
+      self.just_show_excel = true
       self.contents = validate_operation.contents
       self.headers = validate_operation.headers
       add_message :error, "Some of the reports have errors, please check the downloaded file to resolve them"
       return
     end
 
-    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.validate_operation.item_details.pluck(:advance_id)
+    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.validate_operation.item_details.pluck(:report_id)
     self.pending_item_ids = self.pending_items.pluck(:id) rescue []
 
     # user is allowed to update utr for completed items
-    self.completed_items = self.report_processor_group.mappings.completed.where id: self.validate_operation.item_details.pluck(:advance_id)
+    self.completed_items = self.report_processor_group.mappings.completed.where id: self.validate_operation.item_details.pluck(:report_id)
   end
 
   def process
@@ -108,12 +109,11 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
       result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
-    end
-
-    unless result.success?
-      self.just_show_excel = false
-      add_message :error, result.messages[:error]
-      return
+      unless result.success?
+        self.just_show_excel = false
+        add_message :error, result.messages[:error]
+        return
+      end
     end
   end
 
@@ -122,7 +122,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   end
 
   def success
-    params[:just_show_excel] = self.just_show_excel
+    params[:just_show_excel] = false
     Settlement::SReport::Processing::ProcessTemplateFile::SuccessPresenter.new(user, params, messages)    
   end
 

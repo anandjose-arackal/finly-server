@@ -42,6 +42,7 @@ class MoneyRequestProcessorMapping < ApplicationRecord
   scope :with_user_id, -> (user_id) { where user_id: user_id }
   scope :with_processor_id, -> (group_id) { where processor_id: group_id }
   scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
+  scope :completed, -> { where status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :pending, -> { where status_id: MoneyRequestProcessorStatus.id_for(:pending) }
   scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }

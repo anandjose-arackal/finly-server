@@ -54,7 +54,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     self.edge_case = (empty_rows.count == self.parsed_data.count)
     
     # a flag, used to handle failure logic, whether to show excel file or just the errors
-    self.just_show_excel = true
+    self.just_show_excel = false
   end
 
   def validate
@@ -79,6 +79,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     if validate_operation.success?
 
     else
+      self.just_show_excel = true
       self.contents = validate_operation.contents
       self.headers = validate_operation.headers
       add_message :error, "Some of the advances have errors, please check the downloaded file to resolve them"
@@ -109,12 +110,11 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
       result = Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
-    end
-
-    unless result.success?
-      self.just_show_excel = false
-      add_message :error, result.messages[:error]
-      return
+      unless result.success?
+        self.just_show_excel = false
+        add_message :error, result.messages[:error]
+        return
+      end
     end
   end
 

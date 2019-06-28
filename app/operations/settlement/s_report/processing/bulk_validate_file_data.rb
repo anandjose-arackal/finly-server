@@ -50,16 +50,16 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
 
   def process
     self.item_details.each do |item|
-      advance_id = item[:advance_id] || item["advance_id"]
+      report_id = item[:report_id] || item["report_id"]
       utr = item[:utr] || item["utr"]
 
       self.error_messages = []
       self.issue_item = {}
 
-      if advance_id.blank?
+      if report_id.blank?
         self.valid = false
         self.error_messages << "Advance ID should not be removed."
-        self.issue_item[:advance_id] = "Advance ID should not be removed."
+        self.issue_item[:report_id] = "Advance ID should not be removed."
       end
 
       if utr.present?
