@@ -47,7 +47,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     if self.payment.credit?
-      op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment, options: self.options, source_account_adapter: self.source_account_adapter})
+      op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment, options: self.options, source_account_adapter: self.source_account_adapter, payment_process: true})
       unless op.success?
         add_message :error, op.message
         return
@@ -86,7 +86,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     if self.payment.debit?
       op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter,
-                                                                            source_account_adapter: self.source_account_adapter})
+                                                                            source_account_adapter: self.source_account_adapter, payment_process: true})
       unless op.success?
         add_message :error, op.message
         return

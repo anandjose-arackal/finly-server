@@ -52,20 +52,22 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         UNIQUEID: self.transfer_request.unique_reference_number,
         # UNIQUEID: "SAMPLEUNIQUEREFERENCE1",
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
-        CREDITACC: self.receiving_account.account_number,
-        # CREDITACC: "000405002777",
-        IFSC: self.receiving_account.ifsc,
-        # IFSC: "ICIC0000011",
-        AMOUNT: self.icici_bank_transaction.amount.value,
+        # CREDITACC: self.receiving_account.account_number,
+        CREDITACC: "000405002777",
+        # IFSC: self.receiving_account.ifsc,
+        # IFSC: "DLXB0000092",
+        IFSC: "ICIC0000011",
+        AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
         # AMOUNT: "200",
         CURRENCY: self.icici_bank_transaction.amount.currency.country_code,
         # CURRENCY: "INR",
-        TXNTYPE: self.icici_bank_transaction.transfer_type,
+        TXNTYPE: "OWN",
+        # TXNTYPE: self.icici_bank_transaction.transfer_type,
         # TXNTYPE: "OWN", # "RTG", "RGS"
         PAYEENAME: self.receiving_account.account_owner.name,
         # PAYEENAME: "Sreeram",
-        REMARKS: self.payment.note,
-        # REMARKS: "This is a test note",
+        # REMARKS: self.payment.note,
+        REMARKS: "This is a test note",
         CUSTOMERINDUCED: "N"
     }
   end
@@ -79,9 +81,13 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def post_process
     case self.response.status
       when 404
-
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        add_message :error, "Service temporarily unavailable"
+        self.transfer_request.bank_error_message = "Service temporarily unavailable"
       when 500
-
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        add_message :error, "Service temporarily unavailable"
+        self.transfer_request.bank_error_message = "Service temporarily unavailable"
       when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
@@ -96,6 +102,11 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
             else
               # handle it gracefully
           end
+        elsif self.parsed_response["RESPONSE"] == "FAILURE"
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          error_message = self.parsed_response["message"]
+          add_message :error, error_message
+          self.transfer_request.bank_error_message
         end
     end
   end

@@ -1,13 +1,14 @@
 class TransferTimingUtils
 
   def self.within_timeframe?(payment_mode = nil, date = nil)
+    date = date
     if date.nil?
       date = DateUtils.local_date
     elsif date.class.name == String.name
       date = DateUtils.parse_date date
     end
     if date <= Date.today
-      date = DateTime.now
+      date = DateUtils.local_date
     else
       date.change(hour: 8, min: 1, sec: 0)
     end
@@ -92,7 +93,7 @@ class TransferTimingUtils
   def self.next_valid_date(date, payment_mode)
     # date = date
     if date.blank?
-      date = DateTime.now
+      date = DateUtils.local_date
     end
     return date.to_date if within_timeframe? payment_mode, date
     return date.to_date if payment_mode == "IMPS"

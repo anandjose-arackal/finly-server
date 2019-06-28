@@ -238,7 +238,9 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_payable_advances, -> {
     where(purchase_order_status_id: [
         PurchaseOrderStatus.id_for(:approved),
-        PurchaseOrderStatus.id_for(:auto_approved)
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:vendor_confirmed)
     ],
           advance_amount_status_id: [
               AdvanceAmountStatus.id_for(:to_be_processed),
