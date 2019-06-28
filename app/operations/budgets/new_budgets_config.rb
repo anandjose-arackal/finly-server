@@ -7,11 +7,13 @@ class Budgets::NewBudgetsConfig < Budgets::Base
   end
 
   def process
-    self.root_budgets = user.company.budgets.roots.reorder(end_date: :desc)
+    company_budgets = user.company.budgets
+    
+    # self.root_budgets = user.company.budgets.roots.reorder(end_date: :desc)
+    self.root_budgets = company_budgets.roots.reorder(end_date: :desc)
 
     # we want to give FE all root, their children, and their grand children
-    # self.all_budgets = user.company.budgets.roots.reorder(end_date: :desc)
-    self.all_budgets = self.root_budgets
+    self.all_budgets = company_budgets.reorder(end_date: :desc)
   end
 
   def success

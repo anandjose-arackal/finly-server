@@ -86,6 +86,13 @@ json.budget_trail_items do
   end
 end
 
+json.budget_trail_items_count do
+  json.expenses_count @result.spent_entities[0]&.count
+  json.payments_count @result.spent_entities[1]&.count
+  json.purchase_order_items_count @result.spent_entities[2]&.count
+  json.invoice_items_count @result.spent_entities[3]&.count
+end
+
 json.associated_vendors do
   json.array!(budget.budgetable_vendors) do |vendor|
     json.id vendor.id

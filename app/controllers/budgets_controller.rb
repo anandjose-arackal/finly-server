@@ -9,6 +9,11 @@ class BudgetsController < BaseControllers::WebBase
     respond
   end
 
+  def show_trail_items
+    @result = Budgets::ShowTrailItems.(current_user, params)
+    respond
+  end
+
   def sub_budgets
     @result = Budgets::SubBudgets.(current_user, params)
     respond
