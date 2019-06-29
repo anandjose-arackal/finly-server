@@ -49,13 +49,25 @@ class Budgets::Update < Budgets::Base
         end_date: self.budget.end_date,
         amount: self.budget.budget_amount&.value
     }
+
+    if params.dig(:budget, :type)
+      # on a temp basis based on design, support increase and reduction of budgets
+      case params[:budget][:type]
+      when 'increase'
+        self.budget_params[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f + (self.budget_params[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
+      when 'reduce'
+        self.budget_params[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f - (self.budget_params[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
+      end
+
+      params[:budget].delete(:type)
+    end
   end
 
   def process
     if budget.update_attributes(budget_params)
       add_message :success, 'Successfully updated budget'
     else
-      add_message :error, money_request.errors.full_messages
+      add_message :error, budget.errors.full_messages
     end
   end
 
