@@ -1,7 +1,7 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
 # 
 class Settlement::SReport::Processing::Update < Settlement::SReport::Processing::Base
-  attr_accessor :report_processor_group, :mapping, :pending_mappings
+  attr_accessor :report_processor_group, :mapping, :pending_mappings, :request_params
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -36,6 +36,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     
     self.mapping = self.report_processor_group.mappings.find_by id: params[:id]
     self.pending_mappings = self.report_processor_group.mappings.not_completed
+    self.request_params = mapping_params
   end
 
   def validate
@@ -46,7 +47,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   end
 
   def pre_process
-    params[:report_processor_group_mapping].delete([:batch_id])
+    params[:report_processor_group_mapping].delete(:batch_id)
 
     if request_params[:bank_reference_number].present?
       unless validate_utr request_params[:bank_reference_number]
@@ -59,7 +60,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     end
 
     request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])
-    
+
     # flag to make sure, we dont create tracks again if item is already marked completed even if spurious request comes from FE
     request_params[:marked_as_completed] = (self.mapping.completed?) ? false : request_params[:marked_as_completed] 
 
@@ -91,7 +92,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
   private
 
-  def request_params
+  def mapping_params
     params.require(:report_processor_group_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id)
   end
 

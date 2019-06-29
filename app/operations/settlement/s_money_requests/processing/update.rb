@@ -1,7 +1,7 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
 # 
 class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequests::Processing::Base
-  attr_accessor :money_request_processor, :mapping, :pending_mappings
+  attr_accessor :money_request_processor, :mapping, :pending_mappings. :request_params
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -36,6 +36,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     
     self.mapping = self.money_request_processor.mappings.find_by id: params[:id]
     self.pending_mappings = self.money_request_processor.mappings.not_completed
+    self.request_params = mapping_params
   end
 
   def validate
@@ -46,7 +47,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   end
 
   def pre_process
-    params[:money_request_processor_mapping].delete([:batch_id])
+    params[:money_request_processor_mapping].delete(:batch_id)
 
     if request_params[:bank_reference_number].present?
       unless validate_utr request_params[:bank_reference_number]
@@ -90,7 +91,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
 
   private
 
-  def request_params
+  def mapping_params
     params.require(:money_request_processor_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id)
   end
 
