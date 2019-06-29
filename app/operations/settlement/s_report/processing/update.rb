@@ -48,9 +48,11 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   def pre_process
     params[:report_processor_group_mapping].delete([:batch_id])
 
-    if !!params.dig(:utr)
-      request_params[:bank_reference_number] = params.dig(:utr)
-      params[:report_processor_group_mapping].delete(:utr)
+    if request_params[:bank_reference_number].present?
+      unless validate_utr request_params[:bank_reference_number]
+        add_message :error, "UTR is only allowed to be alphanumberic."
+        return
+      end
 
       # if utr is there, we automatically assume the item can be marked as completed
       request_params[:marked_as_completed] = true
@@ -148,6 +150,10 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
     self.report_processor_group.update(status_id: set_status, completed_at: DateTime.now,
                                           marked_as_completed: true,processed_amount: processed_amount)
+  end
+
+  def validate_utr(utr)
+    ( /\A[a-zA-Z0-9]*\Z/.match(utr) ) ? true : false
   end
 
 end

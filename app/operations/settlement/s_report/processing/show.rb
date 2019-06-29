@@ -52,18 +52,22 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
       actions = {}
       if processor_group.pending? or processor_group.scheduled? or processor_group.failed?
         actions[:cancel] = true
+        actions[:import] = true
       end
 
       if processor_group.partially_completed?
         actions[:cancel_pending] = true
+        actions[:import] = true
       end
 
       if processor_group.process_outside_finly?
         actions[:mark_as_paid] = true
+        actions[:import] = true
       end
 
       if processor_group.payment_file?
         actions[:generate_payment_file] = true
+        actions[:import] = true
       end
 
       actions
@@ -73,6 +77,9 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
       actions = {}
       unless item.completed? or item.cancelled?
         actions[:mark_as_completed] = true
+        actions[:edit_utr] = true
+      else
+        actions[:edit_utr] = true
       end
       actions
     end

@@ -48,10 +48,11 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   def pre_process
     params[:money_request_processor_mapping].delete([:batch_id])
 
-    # FE may send it in key named `utr`
-    if !!params.dig(:utr)
-      request_params[:bank_reference_number] = params.dig(:utr)
-      params[:money_request_processor_mapping].delete(:utr)
+    if request_params[:bank_reference_number].present?
+      unless validate_utr request_params[:bank_reference_number]
+        add_message :error, "UTR is only allowed to be alphanumberic."
+        return
+      end
 
       # if utr is there, we automatically assume the item can be marked as completed
       request_params[:marked_as_completed] = true
@@ -128,6 +129,10 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
 
     self.money_request_processor.update(status_id: set_status, completed_at: DateTime.now,
                                           marked_as_completed: true,processed_amount: processed_amount)
+  end
+
+  def validate_utr(utr)
+    ( /\A[a-zA-Z0-9]*\Z/.match(utr) ) ? true : false
   end
 
 end
