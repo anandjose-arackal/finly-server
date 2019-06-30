@@ -40,7 +40,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   end
 
   def validate
-    if self.mapping.blank?
+    if self.mapping.blank? or self.mapping&.cancelled?
       add_message :error, "Request details not found."
       return
     end

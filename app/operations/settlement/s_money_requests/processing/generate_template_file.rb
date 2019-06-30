@@ -36,7 +36,7 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.money_request_processor.mappings.each do |item|
+      self.money_request_processor.mappings.exclude_cancelled.each do |item|
         item_contents << processor_details(self.money_request_processor, item)
       end
     end

@@ -40,7 +40,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   end
 
   def validate
-    if self.mapping.blank?
+    if self.mapping.blank? or self.mapping&.cancelled?
       add_message :error, "Request details not found."
       return
     end

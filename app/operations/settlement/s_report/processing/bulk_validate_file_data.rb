@@ -41,7 +41,7 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
     self.issues = []
 
     self.batch = params[:batch]
-    self.mappings = self.batch.mappings
+    self.mappings = self.batch.mappings.exclude_cancelled
 
     self.processable_mappings = []
   end

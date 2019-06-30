@@ -36,7 +36,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.report_processor_group.mappings.each do |item|
+      self.report_processor_group.mappings.exclude_cancelled.each do |item|
         item_contents << processor_details(self.report_processor_group, item)
       end
     end

@@ -9,7 +9,7 @@ class Settlement::SReport::Processing::Index < Settlement::SReport::Processing::
   end
 
   def init
-    self.report_processor_groups = current_company.report_processor_groups.not_completed_including_cancelled
+    self.report_processor_groups = current_company.report_processor_groups.not_completed
     if finance_view?
       self.report_processor_groups = self.report_processor_groups.created_by_user(user.id)
     end
