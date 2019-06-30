@@ -83,6 +83,8 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
 
     if report_group_processor.partially_completed?
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:completed))
+    elsif self.report_group_processor.mappings.not_completed.present?
+      # dont do anything for now
     else
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
     end

@@ -74,6 +74,8 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
     self.pending_mappings.update_all(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
     if money_request_processor.partially_completed?
       self.money_request_processor.update(status_id: MoneyRequestProcessorStatus.id_for(:completed))
+    elsif self.money_request_processor.mappings.not_completed.present?
+      # dont do anything for now
     else
       self.money_request_processor.update(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
     end
