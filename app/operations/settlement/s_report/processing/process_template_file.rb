@@ -11,6 +11,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
                 :pending_item_ids,
                 :completed_items,
                 :edge_case,
+                :processable_mappings,
                 :just_show_excel,
                 :associated_utr
 
@@ -42,16 +43,12 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   def init
 
     self.file = params[:file]
-    headers = [:report_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :mark_as_paid]
+    headers = [:item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :mark_as_paid]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
       add_message :error, "File Format error. Please re-save your Excel sheet in 2007 format or greater."
     end
-
-    # deal with an edge case where neither utr nor mark_as_paid column is filled up
-    empty_rows = self.parsed_data.collect {|data| data if (data[:utr].blank? && (!!StringUtils.to_bool(data[:mark_as_paid]&.downcase) == false))}.compact
-    self.edge_case = (empty_rows.count == self.parsed_data.count)
 
     # a flag, used to handle failure logic, whether to show excel file or just the errors
     self.just_show_excel = false
@@ -67,17 +64,16 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
       add_message :error, 'Items in this batch cannot be processed at this stage'
       return
     end
-
-    if self.edge_case
-      add_message :error, "None of the reports were marked as paid."
-      return
-    end
   end
 
   def pre_process
-    self.validate_operation = Settlement::SReport::Processing::BulkValidateFileData.(user, {item_details: self.parsed_data})
+    self.validate_operation = Settlement::SReport::Processing::BulkValidateFileData.(user, {item_details: self.parsed_data, batch: self.report_processor_group})
     if validate_operation.success?
-
+      self.processable_mappings = self.validate_operation.processable_mappings
+      if self.processable_mappings.blank?
+        add_message :error, "No processable reports found"
+        return
+      end
     else
       self.just_show_excel = true
       self.contents = validate_operation.contents
@@ -86,18 +82,18 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
       return
     end
 
-    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.validate_operation.item_details.pluck(:report_id)
+    self.pending_items = self.report_processor_group.mappings.not_completed.where id: self.processable_mappings.pluck(:item_id)
     self.pending_item_ids = self.pending_items.pluck(:id) rescue []
 
     # user is allowed to update utr for completed items
-    self.completed_items = self.report_processor_group.mappings.completed.where id: self.validate_operation.item_details.pluck(:report_id)
+    self.completed_items = self.report_processor_group.mappings.completed.where id: self.processable_mappings.pluck(:item_id)
   end
 
   def process
     # 
     # we will use this to cleanly map report ids and utr
     self.associated_utr = {}
-    self.validate_operation.item_details.pluck(:report_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.processable_mappings.pluck(:item_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
 
     # utr can be updated for items which are already completed
     self.completed_items.each do |item|
