@@ -1,7 +1,7 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
 # 
 class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequests::Processing::Base
-  attr_accessor :money_request_processor, :mapping, :pending_mappings. :request_params
+  attr_accessor :money_request_processor, :mapping, :pending_mappings, :request_params
 
   def authorized_user_types
     [:admin, :finance_manager]
