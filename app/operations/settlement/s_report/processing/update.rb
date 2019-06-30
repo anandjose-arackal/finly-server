@@ -81,12 +81,31 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       add_message :error, self.mapping.errors.full_messages
       return
     end
+
+    if self.report_processor_group.completed?
+      params[:redirect] = true
+    else
+      params[:redirect] = false
+    end
   end
 
   def post_process
     add_message :success, 'Updated Successfully'
     if self.pending_mappings.blank?
       add_message :success, "All items credited. Batch status now set to Completed."
+    end
+  end
+
+  def success
+    Settlement::SReport::Processing::Update::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Settlement::SReport::Processing::Update::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :redirect
+
+    def init
+      # Helps to know in frontend if they should redirect to settlement index or simply re-render the same settlement show page
+      self.redirect = params[:redirect]
     end
   end
 

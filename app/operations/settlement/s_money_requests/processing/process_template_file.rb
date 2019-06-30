@@ -112,6 +112,12 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
         return
       end
     end
+
+    if self.money_request_processor.completed?
+      params[:redirect] = true
+    else
+      params[:redirect] = false
+    end
   end
 
   def post_process
@@ -144,20 +150,24 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
   class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :result_file_path, :just_show_excel
+    attr_accessor :result_file_path, :just_show_excel, :redirect
 
     def init
       self.result_file_path = params[:result_file_path]
       self.just_show_excel = params[:just_show_excel]
+      # Helps to know in frontend if they should redirect to settlement index or simply re-render the same settlement show page
+      self.redirect = params[:redirect]
     end
   end
 
   class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :just_show_excel
+    attr_accessor :just_show_excel, :redirect
 
     def init
       self.just_show_excel = params[:just_show_excel]
+      # Helps to know in frontend if they should redirect to settlement index or simply re-render the same settlement show page
+      self.redirect = params[:redirect]
     end
   end
 
