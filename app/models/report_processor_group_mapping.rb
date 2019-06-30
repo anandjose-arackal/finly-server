@@ -43,7 +43,8 @@ class ReportProcessorGroupMapping < ApplicationRecord
   scope :with_processor_group_id, -> (group_id) { where processor_group_id: group_id }
   scope :with_user_id, -> (user_id) { where user_id: user_id }
   scope :pending, -> { where status_id: ReportProcessorGroupStatus.id_for(:pending) }
-  scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
+  scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.ids_for([:completed, :cancelled]) }
+  scope :not_completed_including_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
   scope :sum_amounts, -> { joins(:amount).sum(:INR) }

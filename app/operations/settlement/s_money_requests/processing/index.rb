@@ -9,7 +9,7 @@ class Settlement::SMoneyRequests::Processing::Index < Settlement::SMoneyRequests
   end
 
   def init
-    self.money_request_processors = current_company.money_request_processors.not_completed
+    self.money_request_processors = current_company.money_request_processors.not_completed_including_cancelled
     if finance_view?
       self.money_request_processors = self.money_request_processors.created_by_user(user.id)
     end

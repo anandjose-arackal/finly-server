@@ -77,7 +77,9 @@ class Settlement::SMoneyRequests::Processing::Show < Settlement::SMoneyRequests:
       unless item.completed? or item.cancelled?
         actions[:mark_as_completed] = true
         actions[:edit_utr] = true
-      else
+      end
+      
+      if item.completed?        
         actions[:edit_utr] = true
       end
       actions
