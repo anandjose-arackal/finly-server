@@ -270,8 +270,9 @@ class Budget < ApplicationRecord
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       spent_amount: processor_instance.spent_amount,
+      consumed_budget: consumed_budget,
       sub_budgets: children.map(&:timeline_criteria_as_json),
-      sub_budgets_count: children.size
+      sub_budgets_count: children.size,
     }
   end
 
@@ -281,6 +282,11 @@ class Budget < ApplicationRecord
       name: name,
       sub_budgets: children.map(&:only_name_as_json)
     }
+  end
+
+  def consumed_budget
+    # calculate in persentage how much budget amount is actually spent
+    ((processor_instance.spent_amount / self.budget_amount.value) * 100) rescue 0
   end
 
   def validate_if_owner?(user)

@@ -15,9 +15,11 @@ json.start_date @result.budget.start_date&.strftime("%d-%b-%Y")
 json.end_date @result.budget.end_date&.strftime("%d-%b-%Y")
 
 json.amounts do
-  json.budget_amount do
-    json.extract! @result.budget.budget_amount, :id, :value
-  end
+    json.budget_amount do
+      # json.extract! @result.budget.budget_amount, :id, :value
+      json.id @result.budget.budget_amount&.id
+      json.value @result.budget.budget_amount&.value
+    end
   json.spent_amount do
     json.value @result.spent_amount
   end
