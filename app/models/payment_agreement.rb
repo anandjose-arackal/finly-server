@@ -25,6 +25,8 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :attachments, as: :resource, dependent: :destroy
 
+  validate :agreement_date_comparison, :expiration_date_if_allowed
+
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
@@ -167,6 +169,28 @@ class PaymentAgreement < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def agreement_date_comparison
+    if self.agreement_date.blank?
+      errors.add(:agreement_date, 'cannot be blank')
+    end
+
+    if self.execution_date.blank?
+      errors.add(:execution_date, 'cannot be blank')
+    end
+
+    if self.agreement_date.present? && self.execution_date.present?
+      if self.agreement_date > self.execution_date
+        errors.add(:agreement_date, 'cannot be greater than execution date')
+      end
+    end
+  end
+
+  def expiration_date_if_allowed
+    if self.no_expiration.blank? && self.expiration_date.blank?
+      errors.add(:expiration_date, ' cannot be blank or agreement should never expire')
+    end
   end
 
 end
