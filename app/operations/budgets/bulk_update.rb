@@ -49,8 +49,10 @@ class Budgets::BulkUpdate < Budgets::Base
 
   class Budgets::BulkUpdate::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
     attr_accessor :issues
-
-    self.issues = params[:issues]
+    
+    def init
+      self.issues = params[:issues]
+    end
   end
 
 
