@@ -1,6 +1,14 @@
 class Procurements::Invoices::Approve < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params
 
+  def personalizer
+    {
+        post_process: {
+            after: Personalizer::Process.new([:procurements, :invoices, :approve], :post_process, self)
+        }
+    }
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
