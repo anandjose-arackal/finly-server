@@ -29,6 +29,15 @@ class BudgetsController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_update
+    @result = Budgets::BulkUpdate.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/bulk_update'
+    end
+  end
+
   def destroy
     @result = Budgets::Destroy.(current_user, params)
     respond

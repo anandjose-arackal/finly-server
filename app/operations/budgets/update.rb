@@ -4,6 +4,7 @@ class Budgets::Update < Budgets::Base
 
   def init
     id = (params[:id] or params[:budget_id])
+    params[:include_children] = true
     self.budget = Budgets::Index.(user, params).budgets.find_by(id: id)
 
     self.budget_params = budget_params
