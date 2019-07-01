@@ -47,7 +47,7 @@ class Budgets::BulkUpdate < Budgets::Base
     Budgets::BulkUpdate::FailurePresenter.new(user, params, messages)
   end
 
-  class Budgets::BulkUpdate::FailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Budgets::BulkUpdate::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
     attr_accessor :issues
 
     self.issues = params[:issues]
