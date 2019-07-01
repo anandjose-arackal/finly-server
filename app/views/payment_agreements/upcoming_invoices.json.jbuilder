@@ -6,12 +6,12 @@ json.results do
     if @result.rental_invoices.present?
       json.merge! @result.rental_invoices.as_json(upcoming_invoices: true)
     end
-    # if @result.beneficiary_payments.present?
-    #   json.merge! @result.beneficiary_payments.as_json(payment_agreement: true)
-    # end
-    # if @result.security_deposits.present?
-    #   json.merge! @result.security_deposits.as_json(upcoming_payments: true)
-    # end
+    if @result.beneficiary_payments.present?
+      json.merge! @result.beneficiary_payments.as_json(payment_agreement: true)
+    end
+    if @result.security_deposits.present?
+      json.merge! @result.security_deposits.as_json(upcoming_payments: true)
+    end
   end
 
   json.policies do

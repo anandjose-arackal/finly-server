@@ -20,8 +20,10 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     # self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.save && self.payment_agreement.reload
       update_amount_attributes
-      set_due_date_for_general_invoice
-      set_due_date_for_rental_invoice
+      set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
+      set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
+      set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
+      set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
       abp_attachment_ids = get_attachment_ids(params)
       Attachment.update_resource({ids: abp_attachment_ids, resource_id: self.payment_agreement.id, user: user}) if abp_attachment_ids.present?
 
@@ -128,7 +130,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
   end
 
 
-  def set_due_date_for_general_invoice
+  def set_due_date_for_general_invoices
     self.payment_agreement.general_invoices.map do |general_invoice|
       number = general_invoice.invoice_frequency&.number
       period_id = general_invoice.invoice_frequency&.period_id
@@ -136,13 +138,13 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       # Set rules for calculation of payment date based on period set
       case 
       when period_id == Period.id_for(:month)
-        due_date = billing_date
+        due_date = billing_start_date
         general_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
     end
   end
 
-  def set_due_date_for_rental_invoice
+  def set_due_date_for_rental_invoices
     self.payment_agreement.rental_invoices.map do |rental_invoice|
       number = rental_invoice.invoice_frequency&.number
       period_id = rental_invoice.invoice_frequency&.period_id
@@ -153,6 +155,22 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         due_date = billing_start_date
         rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
       end
+    end
+  end
+
+  # Currently, beneficiary payments do not recurring, hence agreement execution date is the due date
+  # Agreement should be approved in order to create payment ticket from beneficicary payment
+  def set_due_date_for_beneficiary_payments
+    self.payment_agreement.beneficiary_payments.map do |beneficiary_payment|
+      execution_date = payment_agreement.execution_date&.to_date
+      beneficiary_payment.update(agreement_based_next_due_date: execution_date)
+    end
+  end
+
+  def set_due_date_for_security_deposits
+    self.payment_agreement.security_deposits.map do |security_deposit|
+      execution_date = payment_agreement.execution_date&.to_date
+      security_deposit.update(agreement_based_next_due_date: execution_date)
     end
   end
 
