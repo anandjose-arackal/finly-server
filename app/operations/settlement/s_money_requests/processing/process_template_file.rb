@@ -67,7 +67,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
   end
 
   def pre_process
-    self.validate_operation = Settlement::SMoneyRequests::Processing::BulkValidateFileData.(user, {item_details: self.parsed_data, batch: self.report_processor_group})
+    self.validate_operation = Settlement::SMoneyRequests::Processing::BulkValidateFileData.(user, {item_details: self.parsed_data, batch: self.money_request_processor})
     if validate_operation.success?
       self.processable_mappings = self.validate_operation.processable_mappings
       if self.processable_mappings.blank?
