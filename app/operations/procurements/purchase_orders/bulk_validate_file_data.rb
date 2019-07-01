@@ -105,7 +105,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
         item[:single_item] = single_item
 
-        if single_item.supply_item_type_id != (SupplyItemType.id_for(:po_item) || SupplyItemType.id_for(:po_non_po_item) || nil)
+        if [SupplyItemType.id_for(:po_item), SupplyItemType.id_for(:po_non_po_item), nil].exclude? single_item.supply_item_type_id
           self.valid = false
           self.error_messages << "Selected item is not included in the list of PO items in the inventory list."
           self.issue_item[:item_number] = "Selected item is not included in the list of PO items in the inventory list."
