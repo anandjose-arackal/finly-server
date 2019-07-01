@@ -25,6 +25,7 @@ class AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter < Account
   end
 
   def balance(options = {})
+    return 99999999999999999 if options[:payment_process]
     self.company = self.account.company
     handle = self.object_id
     IciciBankBalanceProvider.perform_async(handle, self.company.id)

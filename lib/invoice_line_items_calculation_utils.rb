@@ -120,14 +120,18 @@ class InvoiceLineItemsCalculationUtils
       return
     end
     # depending on the type of discount being sent
-    case item.parent.discount_type_id
-      # i.e. discount is given as a rate
-      when 1
-        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
-      when 2
-        self.discount_amount = item.discount.to_f
-      else
-        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    if item.parent.is_a?(OutwardInvoice)
+      self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    else
+      case item.parent.discount_type_id
+        # i.e. discount is given as a rate
+        when 1
+          self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+        when 2
+          self.discount_amount = item.discount.to_f
+        else
+          self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+      end
     end
     self.gross_amount = self.invoice_item_amount - self.discount_amount
   end

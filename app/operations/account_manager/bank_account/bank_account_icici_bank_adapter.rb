@@ -74,11 +74,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         # Payment with pending transaction will rerun through CronJobs
-        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message)
-          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
-        else
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        end
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
@@ -106,12 +102,26 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     []
   end
 
-  def on_completion
-
+  def on_completion(options)
+    payment = options[:payment]
+    if payment&.completed?
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+      # trigger the webhook callback for this particular payment's credit confirmation
+      # setting the parameters for the callback method and executing it
+      execute_callback(payment)
+      # if the payment happens to also have an invoice, update the invoice status accordingly
+      if payment.invoice.present?
+        payment.invoice.update_invoice_status
+      end
+    end
   end
 
-  def on_failure
-
+  def on_failure(options)
+    # trigger the web hook callback for failed payments
+    payment = options[:payment]
+    if payment&.failed?
+      execute_callback(payment)
+    end
   end
 
   private

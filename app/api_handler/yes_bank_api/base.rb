@@ -145,117 +145,6 @@ class YesBankApi::Base < BaseHandler
         # this is an anomaly, so send email and flag it
         Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
       end
-        # temporary - rescue SSL error to simulate various cases
-        # rescue Faraday::SSLError
-        #   # simulating different cases
-        #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
-        # self.response.status_code = 500
-        # self.parsed_response = {
-        #     "Envelope" => {
-        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-        #         "Body" => {
-        #             "Fault" => {
-        #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-        #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-        #                 "xmlns:npci" => "http://www.npci.org.in",
-        #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-        #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-        #                 "xmlns:pt" => "https://www.puratech.co.in/",
-        #                 "xmlns:http" => "http://www.quantiguous.com/services",
-        #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-        #                 "xmlns:atom" => "http://www.atomtech.in/imps",
-        #                 "xmlns:iib" => "http://www.ibm.com/iib",
-        #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-        #                 "Code" => {
-        #                     "Value" => "soapenv12:Sender",
-        #                     "Subcode" => {
-        #                         "Value" => "ns:E504",
-        #                         "Subcode" => {
-        #                             "Value" => "ns:E504"
-        #                         }
-        #                     }
-        #                 },
-        #                 "Reason" => {
-        #                     "Text" => "Bad Gateway"
-        #                 },
-        #                 "Detail" => {
-        #                     "ExceptionList" => {
-        #                         "RecoverableException" => {
-        #                             "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
-        #                             "Line" => "1304",
-        #                             "Function" => "ImbJniNode::evaluate",
-        #                             "Type" => "ComIbmRouteNode",
-        #                             "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
-        #                             "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
-        #                             "Catalog" => "BIPmsgs",
-        #                             "Severity" => "3",
-        #                             "Number" => "2230",
-        #                             "Text" => "Caught exception and rethrowing",
-        #                             "Insert" => {
-        #                                 "Type" => "14",
-        #                                 "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
-        #                             },
-        #                         }
-        #                     }
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
-        #
-
-        # self.parsed_response = {
-        #     "Envelope" => {
-        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-        #         "Body" => {
-        #             "transferResponse" => {
-        #                 "xmlns:io" => "http://www.quantiguous.com/services",
-        #                 "version" => "2.0",
-        #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
-        #                 "attemptNo" => "1",
-        #                 "transferType" => "IMPS",
-        #                 "lowBalanceAlert" => "false",
-        #                 "transactionStatus" => {
-        #                     "statusCode" => "COMPLETED",
-        #                     "subStatusCode" => "0",
-        #                     "bankReferenceNo" => "736015422593",
-        #                     "beneficiaryReferenceNo" => nil
-        #                 },
-        #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
-        #                 "requestReferenceNo" => "FINLYIMPS71012974914"
-        #             }
-        #         }
-        #     }
-        # }
-
-        #
-        # self.parsed_response = {
-        #     "Envelope" => {
-        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-        #         "Body" => {
-        #             "Fault" => {
-        #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-        #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-        #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-        #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-        #                 "xmlns:pt" => "https://www.puratech.co.in/",
-        #                 "xmlns:http" => "http://www.quantiguous.com/services",
-        #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-        #                 "xmlns:iib" => "http://www.ibm.com/iib",
-        #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-        #                 "Code" => {
-        #                     "Value" => "soapenv12:Sender",
-        #                     "Subcode" => {
-        #                         "Value" => "ns:E1001"
-        #                     }
-        #                 },
-        #                 "Reason" => {
-        #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
     rescue Faraday::ResourceNotFound
       self.end_time = DateUtils.local_date_time
 
@@ -268,14 +157,6 @@ class YesBankApi::Base < BaseHandler
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      # rescue Exception => e
-      #   stack_trace = e.message
-      #   e.backtrace.each do |line|
-      #     stack_trace += "\n#{line}"
-      #   end
-      #   if Rails.env.production?
-      #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
-      #   end
     end
 
   end
@@ -291,8 +172,11 @@ class YesBankApi::Base < BaseHandler
     ssl_options = {
         client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
-        verify: verify
+        verify: verify,
+        version: :SSLv23
     }
+    # SSLv23 - will use the latest version of TLS that the destination supports. If that happens to be TLS 1.2, that will be used, otherwise the highest supported version:
+    # https://stackoverflow.com/questions/11059059/is-it-possible-to-enable-tls-v1-2-in-ruby-if-so-how
     logger = Logger.new $stderr
     logger.level = Logger::DEBUG
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|

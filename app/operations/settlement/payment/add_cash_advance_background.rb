@@ -65,8 +65,9 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
 
     self.payment_purpose = :cash_advance
 
+    bank_transfer_type = payment_param[:payment_mode]&.upcase
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
-    init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
+    init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account, bank_transfer_type: bank_transfer_type})
 
     destination_pocket_id = params[:destination_pocket_id]
     self.destination_pocket = UserPocket.find_by id: destination_pocket_id
@@ -127,7 +128,8 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     initiating_account = options[:initiating_account]
     amount = options[:amount]
     receiving_account = options[:receiving_account] || to_user.user_pockets.cash_pockets_only.find_by(id: params[:destination_pocket_id])
-    self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose)
+    bank_transfer_type = options[:bank_transfer_type]
+    self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose, {bank_transfer_type: bank_transfer_type})
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end
 
