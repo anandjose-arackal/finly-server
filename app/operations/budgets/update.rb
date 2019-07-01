@@ -36,7 +36,7 @@ class Budgets::Update < Budgets::Base
     # check to make sure the sum of all child budgets is less than the sum of all parent budgets
     if parent_budget.present?
       sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value)
-      if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount_value
+      if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
         add_message :error, "Sum of child budgets should be less than or equal to parent budget"
         return
       end

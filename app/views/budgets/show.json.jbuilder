@@ -155,7 +155,9 @@ json.sub_budgets do
 
     json.amounts do
       json.budget_amount do
-        json.extract! @result.budget.budget_amount, :id, :value
+        # json.extract! @result.budget.budget_amount, :id, :value
+        json.id @result.budget.budget_amount&.id
+        json.value @result.budget.budget_amount&.value
       end
       json.spent_amount do
         json.value @result.spent_amount
