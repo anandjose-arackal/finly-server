@@ -94,6 +94,8 @@ class TransferTimingUtils
     # date = date
     if date.blank?
       date = DateUtils.local_date
+    else
+      date = date.to_date
     end
     return date.to_date if within_timeframe? payment_mode, date
     return date.to_date if payment_mode == "IMPS"
