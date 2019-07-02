@@ -1,13 +1,13 @@
 class Budgets::Update < Budgets::Base
 
-  attr_accessor :previous_values
+  attr_accessor :previous_values, :budget_parameters
 
   def init
     id = (params[:id] or params[:budget_id])
     params[:include_children] = true
     self.budget = Budgets::Index.(user, params).budgets.find_by(id: id)
 
-    self.budget_params = budget_params
+    self.budget_parameters = budget_params
   end
 
   def validate
@@ -32,15 +32,17 @@ class Budgets::Update < Budgets::Base
     #   end
     # end
 
-    parent_budget = self.budget.parent
-    # check to make sure the sum of all child budgets is less than the sum of all parent budgets
-    if parent_budget.present?
-      sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value)
-      if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
-        add_message :error, "Sum of child budgets should be less than or equal to parent budget"
-        return
-      end
-    end
+    # this logic expects first to update the parent and then the child.
+    # for now remove this check, coz we now have n-level nesting, and this is not feasible for the user to do
+    # parent_budget = self.budget.parent
+    # # check to make sure the sum of all child budgets is less than the sum of all parent budgets
+    # if parent_budget.present?
+    #   sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value)
+    #   if (sum_of_child_budgets + budget_parameters&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
+    #     add_message :error, "Sum of child budgets should be less than or equal to parent budget"
+    #     return
+    #   end
+    # end
   end
 
   def pre_process
@@ -55,9 +57,9 @@ class Budgets::Update < Budgets::Base
       # on a temp basis based on design, support increase and reduction of budgets
       case params[:budget][:type]
       when 'increase'
-        self.budget_params[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f + (self.budget_params[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
+        self.budget_parameters[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f + (self.budget_parameters[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
       when 'reduce'
-        self.budget_params[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f - (self.budget_params[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
+        self.budget_parameters[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f - (self.budget_parameters[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
       end
 
       params[:budget].delete(:type)
@@ -65,7 +67,7 @@ class Budgets::Update < Budgets::Base
   end
 
   def process
-    if budget.update_attributes(budget_params)
+    if budget.update_attributes(budget_parameters)
       add_message :success, 'Successfully updated budget'
     else
       add_message :error, budget.errors.full_messages

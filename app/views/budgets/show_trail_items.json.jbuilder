@@ -5,7 +5,7 @@ json.budget_trail_items do
 
     # first will be the list of expenses
     json.expenses do
-      json.array!(@result.paginated_entities) do |expense|
+      json.array!(@result.paginated_entities.includes_budget_show) do |expense|
         json.user_name expense.user&.name
         json.category_name expense.category&.name
         json.date expense.date.strftime("%Y-%B-%d")
@@ -48,7 +48,7 @@ json.budget_trail_items do
       end
     end
 
-  when 'invoice_items'    
+  when 'invoice_items'
 
     # list of invoice line items
     json.invoice_items do

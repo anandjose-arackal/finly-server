@@ -19,7 +19,8 @@ class Budgets::BulkUpdate < Budgets::Base
 
   def process
     params[:budget_items].each do |item|
-      item[:budget_id] = params.dig(:item, :budget_id)
+      item[:budget] = {}
+      item[:budget][:budget_amount_attributes] = item[:budget_amount_attributes]
       if item[:budget_id].blank?
         add_message :error, "Budget details missing. Please contact customer support."
         break

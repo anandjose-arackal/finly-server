@@ -270,7 +270,7 @@ class Budget < ApplicationRecord
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       spent_amount: processor_instance.spent_amount,
-      consumed_budget: consumed_budget,
+      consumed_budget: consumed_budget.round(3),
       sub_budgets: children.map(&:timeline_criteria_as_json),
       sub_budgets_count: children.size,
     }
