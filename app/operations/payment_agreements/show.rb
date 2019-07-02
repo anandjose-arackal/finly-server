@@ -49,7 +49,7 @@ class PaymentAgreements::Show < PaymentAgreements::Base
 
   private
   def validate_document_access
-    return if payment_agreement.validate_if_owner?(user)
+    return if payment_agreement.validate_if_owner(user)
     return if payment_agreement.validate_if_admin(user) && (!payment_agreement.draft? || (payment_agreement.creator_id == user.id) || payment_agreement.creator_id.blank?)
 
     return if payment_agreement.validate_if_reviewer(user)
