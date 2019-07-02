@@ -50,7 +50,7 @@ class IciciBankApi::Base < BaseHandler
     # start of the path for posting data to ICICI's servers
     begin
 
-      puts "Posting path: #{p}"
+      puts "Posting path: #{base_url} #{p}"
       puts "Post Params: #{raw_params}"
 
       self.response = self.connection.post do |req|
