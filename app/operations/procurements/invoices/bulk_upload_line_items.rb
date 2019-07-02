@@ -37,7 +37,7 @@ class Procurements::Invoices::BulkUploadLineItems < Procurements::Invoices::Base
   end
 
   def process
-    self.validate_operation = Procurements::Invoices::BulkValidateFileData.(user, {item_details: self.parsed_data})
+    self.validate_operation = Procurements::Invoices::BulkValidateFileData.(user, {item_details: self.parsed_data, gst_type_id: params[:gst_type_id]})
     Rails.logger.fatal "FROM BulkUploadLineItems validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
 

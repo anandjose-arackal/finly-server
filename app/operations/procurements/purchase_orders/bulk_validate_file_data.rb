@@ -2,17 +2,19 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers, :tax_rates
+                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers, :tax_rates,
+                :summary
 
   class Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :contents, :headers, :item_details, :issues
+    attr_accessor :contents, :headers, :item_details, :issues, :summary
 
     def init
       self.contents = params[:contents]
       self.headers = params[:headers]
       self.item_details = params[:item_details]
       self.issues = params[:issues]
+      self.summary = params[:summary]
     end
 
   end
@@ -51,6 +53,16 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.tax_rates = user.company.tax_rates.non_deleted
 
     self.cost_centers = user.company.cost_centers
+
+    self.summary = {}
+    self.summary[:sum_of_item_amount] = 0
+    self.summary[:sum_of_item_discount_amount] = 0
+    self.summary[:sum_of_item_taxable_amount] = 0
+    self.summary[:sum_of_item_tax_amount] = 0
+    self.summary[:sum_of_item_total_amount] = 0
+    self.summary[:sum_of_item_tax_split_igst] = 0
+    self.summary[:sum_of_item_tax_split_cgst] = 0
+    self.summary[:sum_of_item_tax_split_sgst] = 0
     
   end
 
@@ -221,12 +233,42 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
 
+        case params[:gst_type_id]
+        # i.e. it's a CGST + SGST case
+        when GstType.id_for(:cgst_sgst)
+          item_cgst = item_tax_amount / 2
+          item_sgst = item_tax_amount / 2
+          item_igst = 0
+        when GstType.id_for(:igst)
+          item_igst = item_tax_amount
+          item_cgst = 0
+          item_sgst = 0
+        else
+          item_igst = 0
+          item_cgst = 0
+          item_sgst = 0
+        end
+
         # assign to hash
         item[:item_amount] = item_amount
         item[:item_discount_amount] = item_discount_amount
         item[:item_taxable_amount] = item_taxable_amount
         item[:item_tax_amount] = item_tax_amount
         item[:item_total_amount] = item_total_amount
+        item[:item_tax_split_igst] = item_igst
+        item[:item_tax_split_cgst] = item_cgst
+        item[:item_tax_split_sgst] = item_sgst
+
+        # calculate all line items attributes
+        self.summary[:sum_of_item_amount] += item_amount
+        self.summary[:sum_of_item_discount_amount] += item_discount_amount
+        self.summary[:sum_of_item_taxable_amount] += item_taxable_amount
+        self.summary[:sum_of_item_tax_amount] += item_tax_amount
+        self.summary[:sum_of_item_total_amount] += item_total_amount
+        self.summary[:sum_of_item_tax_split_igst] += item_igst
+        self.summary[:sum_of_item_tax_split_cgst] += item_cgst
+        self.summary[:sum_of_item_tax_split_sgst] += item_sgst
+
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
@@ -251,6 +293,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     params[:headers] = self.headers
     params[:item_details] = self.item_details
     params[:issues] = self.issues
+    params[:summary] = self.summary
     Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter.new(user, params, messages)
   end
 

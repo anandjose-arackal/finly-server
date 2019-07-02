@@ -28,3 +28,5 @@ json.bulk_items do
         json.item_total_amount item[:item_total_amount]
 	end
 end
+
+json.summary @result.summary
