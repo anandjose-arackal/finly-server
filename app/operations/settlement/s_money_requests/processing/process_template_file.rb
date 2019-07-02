@@ -148,7 +148,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     end
   end
 
-  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::FailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :result_file_path, :just_show_excel, :redirect
 

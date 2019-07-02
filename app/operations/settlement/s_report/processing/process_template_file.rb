@@ -147,7 +147,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     end
   end
 
-  class Settlement::SReport::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::FailurePresenter
+  class Settlement::SReport::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :just_show_excel, :redirect
 
