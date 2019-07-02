@@ -26,6 +26,9 @@ json.bulk_items do
         json.item_taxable_amount item[:item_taxable_amount]
         json.item_tax_amount item[:item_tax_amount]
         json.item_total_amount item[:item_total_amount]
+        json.item_tax_split_igst item[:item_tax_split_igst]
+        json.item_tax_split_cgst item[:item_tax_split_cgst]
+        json.item_tax_split_sgst item[:item_tax_split_sgst]
 	end
 end
 

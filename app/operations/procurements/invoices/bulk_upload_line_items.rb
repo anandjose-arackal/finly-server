@@ -50,7 +50,7 @@ class Procurements::Invoices::BulkUploadLineItems < Procurements::Invoices::Base
   end
 
   def success
-    # params[:parsed_data] = self.parsed_data
+    params[:summary] = self.validate_operation.summary
     params[:parsed_data] = self.validate_operation.item_details
     Procurements::Invoices::BulkUploadLineItems::SuccessPresenter.new(user, params, messages)
   end
@@ -77,10 +77,11 @@ class Procurements::Invoices::BulkUploadLineItems < Procurements::Invoices::Base
 
   class Procurements::Invoices::BulkUploadLineItems::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :parsed_data
+    attr_accessor :parsed_data, :summary
 
     def init
       self.parsed_data = params[:parsed_data]
+      self.summary = params[:summary]
     end
   end
 
