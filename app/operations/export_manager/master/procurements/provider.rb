@@ -24,6 +24,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
              approval_pending_level_number: {spreadsheet: true, pdf: false},
              approval_pending_level_name: {spreadsheet: true, pdf: false},
              approval_pending_reviewers: {spreadsheet: true, pdf: false},
+             approved_reviewers: {spreadsheet: true, pdf:false},
              policy: {spreadsheet: false, pdf: true},
              department: {spreadsheet: true, pdf: true},
              sub_department: {spreadsheet: true, pdf: true},
@@ -120,6 +121,10 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   def approval_pending_reviewers(procurement)
     procurement&.purchase_order&.get_reviewers&.map(&:name)&.join(", ")
+  end
+
+  def approved_reviewers(procurement)
+    procurement&.purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.map{|dlr| dlr.reviewer.name}&.join(" ,")
   end
 
   def vendor_tds_rate(procurement)

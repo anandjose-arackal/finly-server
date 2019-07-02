@@ -22,9 +22,6 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.run
   end
 
-  # def initialize
-
-  # end
 
   def pre_validate
     if self.bank_payment_request.blank?

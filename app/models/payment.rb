@@ -46,6 +46,9 @@
 #  location_id                    :integer
 #  deleted_at                     :datetime
 #  beneficiary_payment_id         :integer
+#  bank_account_provider_id       :integer
+#  otp                            :string(255)
+#  opt_attempts                   :integer
 #
 
 class Payment < ApplicationRecord
@@ -65,7 +68,7 @@ class Payment < ApplicationRecord
   belongs_to :original_payment_for_refund, optional: true, class_name: "Payment"
   belongs_to :category, optional: true
   belongs_to :department, optional: true
-  belongs_to :beneficiary_payment, optional: true
+  belongs_to :company, optional: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -289,7 +292,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
     end
   }
 
@@ -631,8 +634,8 @@ class Payment < ApplicationRecord
     }
   end
 
-      
-      
+
+
 
   private
 

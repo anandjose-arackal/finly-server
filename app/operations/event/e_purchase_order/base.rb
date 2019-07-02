@@ -1,5 +1,5 @@
 class Event::EPurchaseOrder::Base < Event::SetNotifier
-  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id
+  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id, :include_attachments
 
   def pre_validate
     unless user.present?
@@ -24,6 +24,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     self.workflow_output = params[:workflow_output]
     self.controlling_users = []
     self.role_id = params[:role_id]
+    self.include_attachments = self.purchase_order&.approved?
   end
 
   def validate
@@ -67,6 +68,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     params[:button_name] = self.mailer_button_name(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
+    params[:include_attachments] = self.include_attachments
     # params[:role_id] = report_view_role(user)
     # if params[:email_authorization]
     #   params[:action_url_token] = get_token(user)
@@ -116,7 +118,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
 
   class Event::EPurchaseOrder::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :purchase_order, :user, :body_val, :subject_val, :button_val, :event_id,
-                  :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url
+                  :action_name, :comment_body, :view_url, :company, :action_url_token, :action_url, :include_attachments
 
     def initialize(user, params)
       self.purchase_order = params[:purchase_order]
@@ -129,6 +131,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
       self.comment_body = params[:comment_body]
       self.view_url = generate_url.html_safe
       self.company = user.company
+      self.include_attachments = params[:include_attachments]
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
       #   action_url = generate_action_url(user, role_id)
