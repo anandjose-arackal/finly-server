@@ -215,6 +215,22 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
 
+        case params[:gst_type_id]
+        # i.e. it's a CGST + SGST case
+        when GstType.id_for(:cgst_sgst), GstType.id_for(:cgst_sgst).to_s
+          item_cgst = item_tax_amount / 2
+          item_sgst = item_tax_amount / 2
+          item_igst = 0
+        when GstType.id_for(:igst), GstType.id_for(:igst).to_s
+          item_igst = item_tax_amount
+          item_cgst = 0
+          item_sgst = 0
+        else
+          item_igst = 0
+          item_cgst = 0
+          item_sgst = 0
+        end
+
         # assign to hash
         item[:item_amount] = item_amount
         item[:item_discount_amount] = item_discount_amount
