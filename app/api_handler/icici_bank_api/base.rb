@@ -58,7 +58,11 @@ class IciciBankApi::Base < BaseHandler
         req.headers['accept'] = "*/*"
         req.headers['content-type'] = "text/plain"
         req.headers['apikey'] = self.company_details["API_KEY"]
-        req.headers['x-forwarded-for'] = "35.154.97.60" # todo - temporary, will be changed in production
+        if Rails.env.production?
+          req.headers['x-forwarded-for'] = "13.232.176.84" # production background server address
+        else
+          req.headers['x-forwarded-for'] = "35.154.97.60" # todo - temporary, will be changed in production
+        end
 
         req.body = request_params
       end
