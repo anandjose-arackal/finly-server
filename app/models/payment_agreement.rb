@@ -72,16 +72,77 @@ class PaymentAgreement < ApplicationRecord
     where creator_id: id
   }
 
-  scope :filter_status_id, -> (id){
-    where status_id: id
-  }
-
   scope :filter_status, -> (name){
     if name.present?
       where status_id: PaymentAgreementStatus.id_for(name.to_sym)
     end
   }
 
+  scope :filter_by_date_range, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+  }
+
+  scope :with_status_ids, -> (status_ids) {where status_id: status_ids}
+
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
+  }
+
+  scope :filter_user_id, -> (ids) {
+    where creator_id: ids
+  }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+
+  scope :filter_location_id, -> (location_id) {where location_id: location_id}
+
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
+  # Repitition for dashboard
+  scope :filter_by_status_id,  -> (status_id) {
+    if status_id == 'awaiting_approval'
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      where status_id: status_id
+    end
+  }
+
+  scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
+
+  scope :not_draft, -> { where.not status_id: PaymentAgreementStatus.id_for(:draft) }
+
+  scope :filter_awaiting_approval, -> (boolean) {
+    user_id = RequestStore.store[:current_user]&.id
+
+    if user_id.present?
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
 
   def as_json
     {

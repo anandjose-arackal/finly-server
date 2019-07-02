@@ -38,8 +38,12 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     has_scope :filter_creator_id
     has_scope :created_by_name
     has_scope :filter_status_id
-    has_scope :filter_status
+    has_scope :filter_status # TODO: remove it
     has_scope :filter_invoice_due_date, using: [:from, :to], type: :hash
+    has_scope :filter_by_date_range, using: [:from, :to], type: :hash
+    has_scope :filter_by_status_id
+    has_scope :filter_awaiting_approval
+    has_scope :search_by_email
 
 
     def init
