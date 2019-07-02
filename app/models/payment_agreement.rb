@@ -35,7 +35,7 @@ class PaymentAgreement < ApplicationRecord
   AGREEMENT_TYPES = [{id: 'general_invoice', name: 'Invoice - General Invoice'}, {id: 'rental_invoice', name: 'Invoice - Rental Invoice'}, {id: 'beneficiary_payment', name: 'Payment - Beneficiary Payment'}, {id: 'security_deposit', name: 'Payment - Security Deposit'}]
 
   scope :filter_title, -> (title) {
-    where title: "#{title}"
+    where('payment_agreements.title LIKE ?', "%#{title}%")
   }
 
   scope :filter_vendor_id, -> (vendor_id){
@@ -142,6 +142,10 @@ class PaymentAgreement < ApplicationRecord
       ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_ids(ids)
     end
+  }
+
+  scope :search_title, -> (search_query) {
+    where('payment_agreements.title LIKE ?', "%#{search_query}%")
   }
 
   def as_json
