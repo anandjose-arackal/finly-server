@@ -10,8 +10,10 @@ class PaymentAgreements::Show < PaymentAgreements::Base
   def validate
     if self.payment_agreement.blank? || payment_agreement.company_id != user.company_id
       add_message :error, "Agreement not found for this user."
+      return
     end
     # Add role based validations
+    validate_document_access
   end
 
   def process
@@ -43,5 +45,15 @@ class PaymentAgreements::Show < PaymentAgreements::Base
 
     end
 
+  end
+
+  private
+  def validate_document_access
+    return if payment_agreement.validate_if_owner?(user)
+    return if payment_agreement.validate_if_admin(user) && (!payment_agreement.draft? || (payment_agreement.creator_id == user.id) || payment_agreement.creator_id.blank?)
+
+    return if payment_agreement.validate_if_reviewer(user)
+    return if purchase_order.validate_if_auditor(user)
+    raise_unauthorized_exception
   end
 end

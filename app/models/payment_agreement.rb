@@ -254,4 +254,10 @@ class PaymentAgreement < ApplicationRecord
     end
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:payment_agreement_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
 end
