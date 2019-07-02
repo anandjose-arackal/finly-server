@@ -32,26 +32,10 @@ class Budgets::Update < Budgets::Base
     #   end
     # end
 
-    # this logic expects first to update the parent and then the child.
-    # for now remove this check, coz we now have n-level nesting, and this is not feasible for the user to do
-    # parent_budget = self.budget.parent
-    # # check to make sure the sum of all child budgets is less than the sum of all parent budgets
-    # if parent_budget.present?
-    #   sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value)
-    #   if (sum_of_child_budgets + budget_parameters&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
-    #     add_message :error, "Sum of child budgets should be less than or equal to parent budget"
-    #     return
-    #   end
-    # end
-  end
-
-  def pre_process
-    self.previous_values = {
-        name: self.budget.name,
-        start_date: self.budget.start_date,
-        end_date: self.budget.end_date,
-        amount: self.budget.budget_amount&.value
-    }
+    if budget_params[:budget_amount_attributes].blank?
+      add_message :error, "Please specifiy the budget amount."
+      return
+    end
 
     if params.dig(:budget, :type)
       # on a temp basis based on design, support increase and reduction of budgets
@@ -62,8 +46,35 @@ class Budgets::Update < Budgets::Base
         self.budget_parameters[:budget_amount_attributes][:value] = ((self.budget.budget_amount&.value).to_f - (self.budget_parameters[:budget_amount_attributes][:value]).to_f) rescue self.budget.budget_amount&.value
       end
 
+      if self.budget_parameters[:budget_amount_attributes][:value].to_f < 0
+        add_message :error, "Budget amount cannot be less than 0."
+        return
+      end
+
       params[:budget].delete(:type)
     end
+
+    # this logic expects first to update the parent and then the child, if
+    # budget of child exceeds that of its parent
+    parent_budget = self.budget.parent
+    # check to make sure the sum of all child budgets is less than the sum of all parent budgets
+    if parent_budget.present?
+      # sums of all child budgets EXCEPT the budget we are processing now in this op
+      sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value) 
+      if (sum_of_child_budgets + budget_parameters&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
+        add_message :error, "Sum of child budgets should be less than or equal to parent budget"
+        return
+      end
+    end
+  end
+
+  def pre_process
+    self.previous_values = {
+        name: self.budget.name,
+        start_date: self.budget.start_date,
+        end_date: self.budget.end_date,
+        amount: self.budget.budget_amount&.value
+    }
   end
 
   def process

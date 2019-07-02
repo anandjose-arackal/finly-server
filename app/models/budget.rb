@@ -308,10 +308,11 @@ class Budget < ApplicationRecord
   end
 
   def recalculate_parent_budget
-    if self.parent.present?
-      sum_children = self.parent.children.joins(:budget_amount).sum(:value)
-      self.parent.budget_amount.update(value: sum_children)
-    end
+    # parent budget amount should not be dependent on the sum of its child budgets amount
+    # if self.parent.present?
+    #   sum_children = self.parent.children.joins(:budget_amount).sum(:value)
+    #   self.parent.budget_amount.update(value: sum_children)
+    # end
   end
 
   def reassign_parent_mappings
