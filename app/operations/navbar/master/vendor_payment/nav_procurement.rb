@@ -121,6 +121,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_payment_agreements
+    return nil unless user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor?
     {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
   end
 
@@ -153,6 +154,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def create_payment_agreement
+    return nil unless user.is_payment_agreement_initiator? || user.vendor_payments_admin?
     {name: 'New Agreements', id: 'create', url: 'agreements/new'}
   end
 
