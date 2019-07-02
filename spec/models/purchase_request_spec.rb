@@ -19,6 +19,7 @@
 #  controlling_level_id       :integer
 #  company_id                 :integer
 #  cost_center_id             :integer
+#  total_amount_id            :integer
 #
 
 require 'rails_helper'

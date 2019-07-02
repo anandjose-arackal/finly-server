@@ -2,7 +2,7 @@
 #
 # Table name: icici_bank_transactions
 #
-#  id                    :bigint(8)        not null, primary key
+#  id                    :bigint           not null, primary key
 #  aggr_id               :string(255)
 #  aggr_name             :string(255)
 #  created_at            :datetime         not null

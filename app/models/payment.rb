@@ -48,7 +48,9 @@
 #  beneficiary_payment_id         :integer
 #  bank_account_provider_id       :integer
 #  otp                            :string(255)
-#  opt_attempts                   :integer
+#  otp_attempts                   :integer
+#  on_hold                        :boolean
+#  disabled                       :boolean
 #
 
 class Payment < ApplicationRecord

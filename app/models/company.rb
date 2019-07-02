@@ -9,6 +9,9 @@
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
 #  status_id        :integer          default(1), not null
+#  test_account     :boolean          default(FALSE)
+#  subdomain        :string(255)
+#  group_id         :integer
 #
 
 class Company < ApplicationRecord
@@ -351,6 +354,10 @@ class Company < ApplicationRecord
 
   def auto_retry_payment_enabled?
     self.configuration.auto_retry_payment
+  end
+
+  def bank_service_provider
+    self.feature_subscription.bank_service_provider
   end
 
   def more_than_one_subscription?

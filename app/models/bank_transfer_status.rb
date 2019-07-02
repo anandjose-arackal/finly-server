@@ -13,7 +13,7 @@ class BankTransferStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    [:completed, :processing, :failed, :possible_failure, :open, :pending, :cancelled, :suspect, :pending_for_processing]
+    [:completed, :processing, :failed, :possible_failure, :open, :pending, :cancelled, :suspect, :pending_for_processing, :pending_utr]
   end
 
   def completed?
