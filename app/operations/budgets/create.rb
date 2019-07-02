@@ -7,6 +7,17 @@ class Budgets::Create < Budgets::Base
 
   def validate
     budgetables = budget_params[:budget_criteria_mappings_attributes]
+
+    if budget_params[:budget_amount_attributes].blank?
+      add_message :error, "Please specifiy the budget amount."
+      return
+    end
+
+    if budgetables.blank?
+      add_message :error, "Budget criteria details needs to be specified."
+      return
+    end
+
     budgetables.each do |budgetable|
       unless ["Category", "CostCenter", "YesBankVendor", "Department", "Location", "User"].include?(budgetable[:budgetable_type])
         add_message :error, "Invalid criteria provided"
