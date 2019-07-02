@@ -19,7 +19,11 @@ class IciciBankApi::Base < BaseHandler
 
   def encrypt_params(params = {})
     json_params = params.to_json
-    path = Dir.home + '/certificates/icici_certificates_final/cibnextapiuat.pem'
+    if Rails.env.production?
+      path = Dir.home + '/certificates/icici_certificates_final/cibnextapiprod.pem'
+    else
+      path = Dir.home + '/certificates/icici_certificates_final/cibnextapiuat.pem'
+    end
     cert = OpenSSL::X509::Certificate.new(File.read(path))
     public_key = cert.public_key
     encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
@@ -28,7 +32,11 @@ class IciciBankApi::Base < BaseHandler
   def decrypt_response(body)
     # enter logic to parse the encrypted response
     # first decrypt the response
-    path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
+    if Rails.env.production?
+      path = Dir.home + '/certificates/icici_certificates_final/finly_icici_production.key'
+    else
+      path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
+    end
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
     self.decrypted_response = private_key.private_decrypt(Base64.decode64(body))
     parsed_response = JSON.parse(decrypted_response)
