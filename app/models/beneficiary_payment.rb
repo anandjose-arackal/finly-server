@@ -2,34 +2,35 @@
 #
 # Table name: beneficiary_payments
 #
-#  id                 :bigint           not null, primary key
-#  name               :string(255)
-#  vendor_id          :integer
-#  bank_account_id    :integer
-#  category_id        :integer
-#  department_id      :integer
-#  original_amount_id :integer
-#  tax_amount_id      :integer
-#  payable_amount_id  :integer
-#  inclusive_of_taxes :boolean
-#  gst_type_id        :integer
-#  tax                :decimal(10, )
-#  tds_slab_id        :integer
-#  company_id         :integer
-#  sub_department_id  :integer
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  status_id          :integer
-#  tds_amount_id      :integer
-#  balance_due_id     :integer
-#  net_amount_id      :integer
-#  gross_amount_id    :integer
-#  roundoff_amount    :decimal(20, 10)
-#  cost_center_id     :integer
-#  invoice_number     :text(65535)
-#  invoice_date       :date
-#  invoice_due_date   :date
-#  advance_amount_id  :integer
+#  id                         :bigint           not null, primary key
+#  name                       :string(255)
+#  vendor_id                  :integer
+#  bank_account_id            :integer
+#  category_id                :integer
+#  department_id              :integer
+#  original_amount_id         :integer
+#  tax_amount_id              :integer
+#  payable_amount_id          :integer
+#  inclusive_of_taxes         :boolean
+#  gst_type_id                :integer
+#  tax                        :decimal(10, )
+#  tds_slab_id                :integer
+#  company_id                 :integer
+#  sub_department_id          :integer
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  status_id                  :integer
+#  tds_amount_id              :integer
+#  balance_due_id             :integer
+#  net_amount_id              :integer
+#  gross_amount_id            :integer
+#  roundoff_amount            :decimal(20, 10)
+#  cost_center_id             :integer
+#  invoice_number             :text(65535)
+#  invoice_date               :date
+#  invoice_due_date           :date
+#  advance_amount_id          :integer
+#  payment_notification_users :json
 #
 
     #                 :id => :integer,
