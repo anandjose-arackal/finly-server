@@ -62,7 +62,8 @@ class IciciBankApi::AccountStatement < IciciBankApi::Base
     decipher.iv = iv
     actual_statement_json = decipher.update(data) # decrypting the actual data which should give us the un-parsed JSON of the statement
     actual_statement_json << decipher.final
-    return actual_statement_json
+    parsed_response = JSON.parse(actual_statement_json)
+    return parsed_response
   end
 
 
@@ -75,20 +76,22 @@ class IciciBankApi::AccountStatement < IciciBankApi::Base
         self.parsed_response = {}
         add_message :error, "Service temporarily unavailable"
       when 200
-        self.parsed_response = JSON.parse(self.decrypted_response)
-        if self.parsed_response["Response"] == "SUCCESS"
+        if self.parsed_response["Response"] == "SUCCESS" || self.parsed_response["RESPONSE"]&.upcase == "SUCCESS"
           # parse the records and create the transactions in the IciciBankTransaction Model
-
+          records = self.parsed_response["Record"]
+          op = BankTransfer::Icici::Statement::Create.(self.company, records)
+        else
+          add_message :error, (self.parsed_response["MESSAGE"] || self.parsed_response["Message"])
         end
     end
   end
 
   def success?
-    self.parsed_response["Response"]&.upcase == "SUCCESS"
+    self.parsed_response["Response"]&.upcase == "SUCCESS" || self.parsed_response["RESPONSE"]&.upcase == "SUCCESS"
   end
 
   def failure?
-    if self.parsed_response["Response"]&.upcase == "FAILURE"
+    if self.parsed_response["Response"]&.upcase == "FAILURE" || self.parsed_response["RESPONSE"]&.upcase == "FAILURE"
       add_message :error, "Registration was not successful"
       return true
     end
@@ -99,32 +102,25 @@ class IciciBankApi::AccountStatement < IciciBankApi::Base
   end
 
   def success
-    IciciBankApi::Registration::RegistrationSuccessPresenter.new(params, messages)
+    IciciBankApi::AccountStatement::StatementSuccessPresenter.new(params, messages)
   end
 
   def failure
-    IciciBankApi::Registration::RegistrationFailurePresenter.new(params, messages)
+    IciciBankApi::AccountStatement::StatementFailurePresenter.new(params, messages)
   end
 
-  class IciciBankApi::Registration::RegistrationSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
-    attr_accessor :transfer_request, :bank_transaction
+  class IciciBankApi::AccountStatement::StatementSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     def initialize(params, messages)
       self.messages = messages
-      self.transfer_request = params[:transfer_request]
-      self.bank_transaction = params[:bank_transaction]
     end
   end
 
-  class IciciBankApi::Registration::RegistrationFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+  class IciciBankApi::AccountStatement::StatementFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :transfer_request, :bank_transaction
 
     def initialize(params, messages)
       self.messages = messages
-      self.transfer_request = params[:transfer_request]
-      self.bank_transaction = params[:bank_transaction]
     end
   end
 
