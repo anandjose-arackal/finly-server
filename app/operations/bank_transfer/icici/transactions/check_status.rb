@@ -27,6 +27,7 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
     if op.success?
       if self.bank_transaction.completed?
         self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        self.payment.system_messages.destroy_all
       elsif self.bank_transaction.failed?
         self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       end
