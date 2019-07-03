@@ -84,6 +84,10 @@ class UserSession < ApplicationRecord
     self.user_device&.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
   end
 
+  def revoke
+    
+  end
+
   def verified?
     # Todo temporary workaround as user device, ip, client verification is only implemented for the web
     return true unless web?
