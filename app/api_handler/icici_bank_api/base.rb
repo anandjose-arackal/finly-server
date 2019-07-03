@@ -18,6 +18,14 @@ class IciciBankApi::Base < BaseHandler
     super()
   end
 
+  def file_logger_base_params
+    {}
+  end
+
+  def file_logger_params(logger_params)
+    file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
+  end
+
   def encrypt_params(params = {})
     json_params = params.to_json
     if Rails.env.production?
@@ -85,24 +93,24 @@ class IciciBankApi::Base < BaseHandler
       # now parse the response and store it in the parsed_response
       self.parsed_response = decrypt_response(self.response.body)
 
-      # if Rails.env.production?
-      #   post_params_hash = raw_api_params
-      #   response_hash = self.parsed_response
-      #   status_code = self.response.status rescue nil
-      #   file_logger.info(
-      #       file_logger_params(
-      #           {
-      #               path: p,
-      #               post_params: post_params_hash,
-      #               response: response_hash,
-      #               status: status_code,
-      #               icici_bank_action: env_key,
-      #               request_time: (self.end_time - self.start_time),
-      #               success: true
-      #           }
-      #       )
-      #   )
-      # end
+      if Rails.env.production?
+        post_params_hash = raw_api_params
+        response_hash = self.parsed_response
+        status_code = self.response.status rescue nil
+        file_logger.info(
+            file_logger_params(
+                {
+                    path: p,
+                    post_params: post_params_hash,
+                    response: response_hash,
+                    status: status_code,
+                    icici_bank_action: env_key,
+                    request_time: (self.end_time - self.start_time),
+                    success: true
+                }
+            )
+        )
+      end
 
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       # handle this case by updating the bank transaction to possible failure and then checking the
