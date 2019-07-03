@@ -171,16 +171,15 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
 
     def user_in_level?
-      current_level = invoice.level
-      amount = invoice&.net_amount&.value || 0
+      # current_level = invoice.level
+      # amount = invoice&.net_amount&.value || 0
 
-      if current_level.present?
-        if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
-          return true
-        end
-      end
-
-      false
+      # if current_level.present?
+        # if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
+        #   return true
+        # end
+      # end
+      invoice.get_reviewers.include?(user)
     end
   end
 
