@@ -75,8 +75,8 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
             if utr.present? && (self.icici_bank_transaction.imps? || self.icici_bank_transaction.rtgs?)
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
             else
-              # it is going to continue being in the pending_utr stage, till the statements API confirms the UTR
-              # so do nothing?
+              # in this case just the status of the payment is confirmed, but the UTR is not available, so just update the transaction status
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
             end
           when "PROCESSING"
             utr = self.parsed_response["UTRNUMBER"]
