@@ -43,6 +43,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
   def raw_api_params
     remarks = self.payment.note.blank? ? "Test note" : self.payment.note
+    payee_name = self.receiving_account.account_owner.business_name
     {
         AGGRID: self.company_details["AGGR_ID"],
         AGGRNAME: self.company_details["AGGR_NAME"],
@@ -63,7 +64,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         # TXNTYPE: "OWN",
         TXNTYPE: self.icici_bank_transaction.transfer_type,
         # TXNTYPE: "OWN", # "RTG", "RGS"
-        PAYEENAME: self.receiving_account.account_owner.name,
+        PAYEENAME: payee_name,
         # PAYEENAME: "Sreeram",
         REMARKS: remarks.to_s,
         # REMARKS: "This is a test note",
