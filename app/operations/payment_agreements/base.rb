@@ -182,5 +182,19 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  def set_due_date_for_beneficiary_payments
+    self.payment_agreement.beneficiary_payments.map do |beneficiary_payment|
+      execution_date = payment_agreement.execution_date&.to_date
+      beneficiary_payment.update(agreement_based_next_due_date: execution_date)
+    end
+  end
+
+  def set_due_date_for_security_deposits
+    self.payment_agreement.security_deposits.map do |security_deposit|
+      execution_date = payment_agreement.execution_date&.to_date
+      security_deposit.update(agreement_based_next_due_date: execution_date)
+    end
+  end
+
 
 end
