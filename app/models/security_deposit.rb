@@ -60,7 +60,8 @@ class SecurityDeposit < ApplicationRecord
       payment_agreement_id: self.payment_agreement_id,
       vendor_name: self.vendor&.name,
       creation_date: self.created_at.to_date,
-      agreement_type: 'security_deposit'
+      agreement_type: 'security_deposit',
+      status_attributes: {id: self.status&.id, name: self.status&.name, display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name}
 
     }
   end

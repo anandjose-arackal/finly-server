@@ -29,8 +29,8 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
     if self.payment_agreement.save
       update_amount_attributes
-      set_due_date_for_general_invoice
-      set_due_date_for_rental_invoice
+      set_due_date_for_general_invoices
+      set_due_date_for_rental_invoices
       params[:reviewal_document] = self.payment_agreement
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
