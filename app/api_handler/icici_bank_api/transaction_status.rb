@@ -78,15 +78,14 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
               # in this case just the status of the payment is confirmed, but the UTR is not available, so just update the transaction status
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
             end
-          when "PROCESSING"
-            utr = self.parsed_response["UTRNUMBER"]
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+          when "PENDING FOR PROCESSING"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
           when "SUSPECT"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
           when "PENDING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
           when "FAILURE"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
           when "CANCELLED"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
           else
