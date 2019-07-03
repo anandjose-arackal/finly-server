@@ -39,9 +39,13 @@ class IciciBankTransaction < ApplicationRecord
   validates :amount_id, presence: true
 
   delegate :amount_value, to: :amount
-  delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, :pending_for_processing?, :suspect?, to: :transfer_status
+  delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, :pending_for_processing?, :suspect?, :pending_utr?, to: :transfer_status
 
   accepts_nested_attributes_for :amount
+
+  scope :processing_transactions, -> {
+    where(transfer_status_id: BankTransferStatus.id_for(:pending_utr, :pending_for_processing))
+  }
 
   def bank_reference_number
     self.utr

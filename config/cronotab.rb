@@ -35,3 +35,4 @@ Crono.perform(BankTransferProcessRetry).every 30.minutes
 Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}
 # Crono.perform(IciciStatementsFetch).every 30.minutes
 # Crono.perform(FixSpuriousPayments).every 30.minutes
+# Crono.perform(IciciCheckPaymentStatus).every 15.minutes

@@ -3,7 +3,6 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   attr_accessor :payment, :icici_bank_transaction, :transfer_request, :receiving_account
 
   def initialize(params)
-    # todo - temporary
     self.transfer_request = params[:transfer_request]
     self.payment = params[:payment]
     self.params = {}
@@ -90,22 +89,25 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
       when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
-        if self.parsed_response["RESPONSE"] == "SUCCESS"
+        if self.parsed_response["RESPONSE"] == "SUCCESS" || self.parsed_response["Response"] == "SUCCESS"
           case self.parsed_response["STATUS"]
             when "PENDING FOR PROCESSING"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
             when "SUCCESS"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_utr))
             when "FAILURE"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+              error_message = self.parsed_response["Message"]
+              add_message :error, error_message
+              self.transfer_request.bank_error_message = error_message
             else
               # handle it gracefully
           end
-        elsif self.parsed_response["RESPONSE"] == "FAILURE"
+        elsif self.parsed_response["RESPONSE"] == "FAILURE" || self.parsed_response["Response"] == "FAILURE"
           self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-          error_message = self.parsed_response["message"]
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
           add_message :error, error_message
-          self.transfer_request.bank_error_message
+          self.transfer_request.bank_error_message = error_message
         end
     end
   end
