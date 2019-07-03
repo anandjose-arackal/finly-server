@@ -48,4 +48,8 @@ class BankTransferStatus < ApplicationRecord
     self.id == BankTransferStatus.id_for(:suspect)
   end
 
+  def pending_utr?
+    self.id == BankTransferStatus.id_for(:pending_utr)
+  end
+
 end

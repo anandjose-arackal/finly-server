@@ -57,8 +57,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
     if op.success?
-      if bank_transaction.completed?
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+      if bank_transaction.pending_utr?
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
