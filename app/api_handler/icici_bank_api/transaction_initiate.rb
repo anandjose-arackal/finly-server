@@ -42,6 +42,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def raw_api_params
+    remarks = self.payment.note.to_s
     {
         AGGRID: self.company_details["AGGR_ID"],
         AGGRNAME: self.company_details["AGGR_NAME"],
@@ -50,10 +51,10 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         URN: self.company.icici_bank_config.urn,
         UNIQUEID: self.transfer_request.unique_reference_number.to_s,
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
-        CREDITACC: self.receiving_account.account_number,
-        # CREDITACC: "000405002777",
-        IFSC: self.receiving_account.ifsc,
-        # IFSC: "DLXB0000092",
+        # CREDITACC: self.receiving_account.account_number,
+        CREDITACC: "000405002777",
+        # IFSC: self.receiving_account.ifsc,
+        IFSC: "DLXB0000092",
         # IFSC: "ICIC0000011",
         AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
         # AMOUNT: "200",
@@ -64,7 +65,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         # TXNTYPE: "OWN", # "RTG", "RGS"
         PAYEENAME: self.receiving_account.account_owner.name,
         # PAYEENAME: "Sreeram",
-        REMARKS: self.payment.note.to_s,
+        REMARKS: remarks,
         # REMARKS: "This is a test note",
         CUSTOMERINDUCED: "N"
     }
@@ -89,6 +90,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
       when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
+
         if self.parsed_response["RESPONSE"] == "SUCCESS" || self.parsed_response["Response"] == "SUCCESS"
           case self.parsed_response["STATUS"]
             when "PENDING FOR PROCESSING"
@@ -108,12 +110,18 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
+        else
+          # any other case must be a failure as well
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"] || self.parsed_response["message"]
+          add_message :error, error_message
+          self.transfer_request.bank_error_message = error_message
         end
     end
   end
 
   def success?
-    self.icici_bank_transaction.completed? || self.icici_bank_transaction.pending_for_processing?
+    self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.pending_for_processing?
   end
 
   def failure?

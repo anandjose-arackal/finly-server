@@ -142,8 +142,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.icici_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.icici_bank_transactions.build(unique_request_number: transfer_request.generate_unique_reference,
                                                         txn_type: transfer_request.transfer_type,
+                                                        transfer_type: transfer_request.transfer_type,
                                                         receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
                                                         remarks: payment.note,
@@ -152,6 +153,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                             value: payment.amount_value,
                                                             currency_id: Currency.first.id
                                                         })
+    bank_transaction.save
     payment.with_lock do
       if payment.reference_resource.present?
         return false

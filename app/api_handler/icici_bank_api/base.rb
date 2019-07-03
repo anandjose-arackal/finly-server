@@ -39,7 +39,7 @@ class IciciBankApi::Base < BaseHandler
     end
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
     self.decrypted_response = private_key.private_decrypt(Base64.decode64(body))
-    parsed_response = JSON.parse(decrypted_response)
+    parsed_response = JSON.parse(decrypted_response) rescue {}
     return parsed_response
   end
 

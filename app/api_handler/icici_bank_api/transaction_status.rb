@@ -28,8 +28,8 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: "FINLYIFS61894902085",
-        # UNIQUEID: self.icici_bank_transaction.unique_request_number
+        # UNIQUEID: "FINLYIFS61894902085",
+        UNIQUEID: self.icici_bank_transaction.unique_request_number
     }
   end
 
@@ -51,7 +51,12 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         case self.transaction_status_response
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+            if utr.present?
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+            else
+              # it is going to continue being in the pending_utr stage, till the statements API confirms the UTR
+              # so do nothing?
+            end
           when "PROCESSING"
             utr = self.parsed_response["UTRNUMBER"]
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
@@ -64,7 +69,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
           when "CANCELLED"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
           else
-
+            # do nothing?
         end
       else
         # handle it gracefully

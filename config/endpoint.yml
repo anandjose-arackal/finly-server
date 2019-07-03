@@ -175,3 +175,6 @@ production:
   icici_bank_validate_account:
     base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'ValidateLinkedAccount'
+  icici_bank_transaction_status:
+    base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'TransactionInquiry'
