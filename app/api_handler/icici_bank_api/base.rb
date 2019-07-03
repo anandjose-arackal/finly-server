@@ -1,6 +1,7 @@
 class IciciBankApi::Base < BaseHandler
 
-  attr_accessor :company_details, :company, :parsed_response, :decrypted_response
+  attr_accessor :company_details, :company, :parsed_response, :decrypted_response, :file_logger,
+                :start_time, :end_time
 
   def init
     self.company = user&.company if self.company.blank?
@@ -47,6 +48,12 @@ class IciciBankApi::Base < BaseHandler
     p = self.path
     raw_params = raw_api_params
     request_params = post_params
+
+    self.start_time = DateUtils.local_date_time
+
+    if Rails.env.production?
+      self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_icici_bank_api.log', sync: true)
+    end
     # start of the path for posting data to ICICI's servers
     begin
 
@@ -67,6 +74,8 @@ class IciciBankApi::Base < BaseHandler
         req.body = request_params
       end
 
+      self.end_time = DateUtils.local_date_time
+
       puts "Encrypted Response: "
       ap self.response.body
 
@@ -75,6 +84,25 @@ class IciciBankApi::Base < BaseHandler
 
       # now parse the response and store it in the parsed_response
       self.parsed_response = decrypt_response(self.response.body)
+
+      if Rails.env.production?
+        post_params_hash = raw_api_params
+        response_hash = self.parsed_response
+        status_code = self.response.status rescue nil
+        file_logger.info(
+            file_logger_params(
+                {
+                    path: p,
+                    post_params: post_params_hash,
+                    response: response_hash,
+                    status: status_code,
+                    icici_bank_action: env_key,
+                    request_time: (self.end_time - self.start_time),
+                    success: true
+                }
+            )
+        )
+      end
 
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       # handle this case by updating the bank transaction to possible failure and then checking the
