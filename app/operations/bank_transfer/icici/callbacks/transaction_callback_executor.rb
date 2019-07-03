@@ -1,10 +1,10 @@
-class BankTransfer::IciciCallbacks::TransactionCallbackExecutor < BaseOperation
+class BankTransfer::Icici::Callbacks::TransactionCallbackExecutor < BankTransfer::Icici::Callbacks::BaseCallbackExecutor
 
   attr_accessor :aggr_id, :corp_id, :user_id, :urn, :txn_status,
                 :request_id, :unique_id, :utr_number, :request_params,
                 :company
 
-  class BankTransfer::IciciCallbacks::TransactionCallbackExecutor::TransactionCallbackPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Icici::Callbacks::TransactionCallbackExecutor::TransactionCallbackPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :utr_number
 
