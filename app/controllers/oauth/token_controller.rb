@@ -48,7 +48,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       token.update(status_id: UserSessionStatus.id_for(:revoked))
       UserSession.find_by(access_token_id: token.id)&.update(status_id: UserSessionStatus.id_for(:revoked))
     end
-    render json: {}, status: 200
+    render json: {success: true}, status: 200
   end
 
   protected
