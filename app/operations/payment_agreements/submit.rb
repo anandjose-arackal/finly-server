@@ -18,6 +18,10 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
         add_message :error, 'Please add security deposit with rental invoice'
       end
     end
+
+    if payment_agreement.general_invoices.blank? && payment_agreement.beneficiary_payments.blank? && payment_agreement.security_deposits.blank?
+      add_message :error, 'Please add atleast one agreement item'
+    end
   end
 
   def process

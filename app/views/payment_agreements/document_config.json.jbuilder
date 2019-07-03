@@ -34,5 +34,5 @@ json.period do
 end
 
 json.gst_types do
-  json.merge! @result.gst_types.as_json if @result.gst_types.present?
+  json.merge! @result.gst_types.to_json if @result.gst_types.present?
 end

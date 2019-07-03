@@ -105,7 +105,7 @@ class BeneficiaryPayment < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
 
   # after_commit :calculate_tax_and_amount
-
+  validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
 
   def tax_rate
@@ -355,5 +355,41 @@ class BeneficiaryPayment < ApplicationRecord
 
   def update_status
     self.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+  end
+
+  def payment_agreement_related_fields
+    if self.payment_agreement.present?
+      if self.vendor_id.blank?
+        errors.add(:vendor, 'cannot be blank')
+      end
+      if self.vendor_location_id.blank?
+        errors.add(:vendor_location, 'cannot be blank')
+      end
+
+      if self.bank_account_id.blank?
+        errors.add(:bank_account, 'name cannot be blank')
+      end
+      if self.cost_center_id.blank?
+        errors.add(:cost_center, 'cannot be blank')
+      end
+      if self.department_id.blank?
+        errors.add(:department, 'cannot be blank')
+      end
+      if self.location_id.blank?
+        errors.add(:location, 'cannot be blank')
+      end
+      if self.original_amount_id.blank?
+        errors(:original_amount, 'cannot be blank')
+      end
+      if self.gst_type_id.blank?
+        errors(:tax_type, 'cannot be blank')
+      end
+      if self.tax_rate_id.blank?
+        errors(:tax, 'cannot be blank')
+      end
+      if payable_amount_id.blank?
+        errors(:payable_amount, 'cannot be blank')
+      end
+    end
   end
 end

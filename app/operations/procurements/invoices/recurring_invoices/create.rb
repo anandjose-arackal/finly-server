@@ -54,7 +54,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case
     when resource.is_a?(Invoice)
     self.invoice = resource.amoeba_dup
-    if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice), date: resource&.agreement_based_next_due_date&.to_date)
+    if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice), date: resource&.agreement_based_next_due_date&.to_date, due_date: resource.due_date)
       trail = Trail.create(parent_type: 'Invoice', parent_id: resource.id, action_user_id: user.id, action_id: TrailAction.id_for(:invoice_created))
       set_next_due_date_for_upcoming_invoice(trail, resource)
       return true

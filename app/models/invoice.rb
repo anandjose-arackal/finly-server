@@ -204,6 +204,8 @@ class Invoice < ApplicationRecord
 
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
 
+  validate :payment_agreement_related_fields
+
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
@@ -987,6 +989,11 @@ class Invoice < ApplicationRecord
 
   def fetch_vendor_bank_accounts
     self.vendor&.bank_accounts&.non_deleted&.as_json
+  end
+
+  def payment_agreement_related_fields
+    if self.payment_agreement.present?
+    end
   end
 
 end
