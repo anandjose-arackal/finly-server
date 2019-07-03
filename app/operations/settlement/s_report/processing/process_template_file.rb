@@ -52,6 +52,9 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
 
     # a flag, used to handle failure logic, whether to show excel file or just the errors
     self.just_show_excel = false
+
+    # a flag, used to tell FE if they have to redirect if batch is completed
+    params[:redirect] = false
   end
 
   def validate
@@ -114,8 +117,6 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
 
     if self.report_processor_group.completed?
       params[:redirect] = true
-    else
-      params[:redirect] = false
     end
   end
 

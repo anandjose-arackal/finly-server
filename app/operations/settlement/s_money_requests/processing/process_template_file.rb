@@ -52,6 +52,9 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
     # a flag, used to handle failure logic, whether to show excel file or just the errors
     self.just_show_excel = false
+
+    # a flag, used to tell FE if they have to redirect if batch is completed
+    params[:redirect] = false
   end
 
   def validate
@@ -115,8 +118,6 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
     if self.money_request_processor.completed?
       params[:redirect] = true
-    else
-      params[:redirect] = false
     end
   end
 
@@ -148,7 +149,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     end
   end
 
-  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::FailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :result_file_path, :just_show_excel, :redirect
 
@@ -160,7 +161,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     end
   end
 
-  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::FailurePresenter
+  class Settlement::SMoneyRequests::Processing::ProcessTemplateFile::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :just_show_excel, :redirect
 
