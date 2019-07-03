@@ -62,7 +62,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
       # checking for the balance in the source account
-      op = PaymentProcessorRules::Event.(:check_source_account_balance, {crediting_payments: self.crediting_payments, source_account_adapter: self.source_account_adapter, options: {payment_process: true}})
+      op = PaymentProcessorRules::Event.(:check_source_account_balance, {crediting_payments: self.crediting_payments, source_account_adapter: self.source_account_adapter, payment_process: true})
       unless op.success?
         add_message :error, op.messages
         return

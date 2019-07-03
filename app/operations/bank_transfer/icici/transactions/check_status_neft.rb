@@ -23,7 +23,7 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
     end
 
     unless self.bank_transaction.neft?
-      add_message :error, "THis is not a NEFT payment"
+      add_message :error, "This is not a NEFT payment"
       return
     end
   end
@@ -43,5 +43,4 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
     end
   end
 
-  
 end
