@@ -378,17 +378,18 @@ class BeneficiaryPayment < ApplicationRecord
       if self.location_id.blank?
         errors.add(:location, 'cannot be blank')
       end
-      if self.original_amount_id.blank?
-        errors(:original_amount, 'cannot be blank')
+      # Don't check for id as it is nested attribute
+      if self.original_amount.blank?
+        errors.add(:original_amount, 'cannot be blank')
       end
       if self.gst_type_id.blank?
-        errors(:tax_type, 'cannot be blank')
+        errors.add(:tax_type, 'cannot be blank')
       end
       if self.tax_rate_id.blank?
-        errors(:tax, 'cannot be blank')
+        errors.add(:tax, 'cannot be blank')
       end
-      if payable_amount_id.blank?
-        errors(:payable_amount, 'cannot be blank')
+      if self.payable_amount.blank?
+        errors.add(:payable_amount, 'cannot be blank')
       end
     end
   end
