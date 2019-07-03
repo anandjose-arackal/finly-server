@@ -179,10 +179,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         #   return true
         # end
       # end
-
-      return true if invoice.get_reviewers.include?(user)
-
-      false
+      invoice.get_reviewers.include?(user)
     end
   end
 
