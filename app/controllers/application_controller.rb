@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
-  before_filter :set_cache_buster
+  before_action :set_cache_buster
 
   around_action :save_request_impression
   before_action :finly_authorize!
