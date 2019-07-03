@@ -106,7 +106,7 @@ class BeneficiaryPayment < ApplicationRecord
 
   # after_commit :calculate_tax_and_amount
 
-  after_create :update_creator_id, :update_company_id
+  after_create :update_creator_id, :update_company_id, :update_status
 
   def tax_rate
   	self.tax
@@ -351,5 +351,9 @@ class BeneficiaryPayment < ApplicationRecord
     if self.company_id.blank?
       self.update(company_id: RequestStore.store[:current_user].company_id)
     end
+  end
+
+  def update_status
+    self.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
   end
 end

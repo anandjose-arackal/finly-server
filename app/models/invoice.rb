@@ -965,7 +965,7 @@ class Invoice < ApplicationRecord
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_number,
+      invoice_number: self.invoice_id,
       vendor_name: self.vendor&.name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -975,7 +975,9 @@ class Invoice < ApplicationRecord
       tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
       agreement_type: self.invoice_type&.name,
       payment_agreement_id: self.payment_agreement_id,
-      vendor_id: self.vendor_id
+      vendor_id: self.vendor_id,
+      agreement_number: self.payment_agreement&.order_number
+
     }
   end
 

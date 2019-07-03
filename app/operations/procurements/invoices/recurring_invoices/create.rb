@@ -54,7 +54,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case
     when resource.is_a?(Invoice)
     self.invoice = resource.amoeba_dup
-    if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice))
+    if self.invoice.save && self.invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice), date: resource&.agreement_based_next_due_date&.to_date)
       trail = Trail.create(parent_type: 'Invoice', parent_id: resource.id, action_user_id: user.id, action_id: TrailAction.id_for(:invoice_created))
       set_next_due_date_for_upcoming_invoice(trail, resource)
       return true
@@ -67,17 +67,22 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def set_next_due_date_for_upcoming_invoice(trail, resource)
     # 'Resource' here means agreement based invoice i.e. general or rental
     agreement_expiration_date = payment_agreement.expiration_date.to_date
-    if (agreement_expiration_date.present? and agreement_expiration_date >= Date.today) || payment_agreement.no_expiration
-      last_invoice_created_at = trail.created_at.to_date
-      number = resource.invoice_frequency&.number
-      period_id = resource.invoice_frequency&.period_id
-      billing_start_date = resource.billing_start_date&.to_date
-      if number.present?
-        case
-        when period_id == Period.id_for(:month)
-          next_invoice_due_date = last_invoice_created_at + number.to_i.month
-          resource.update(agreement_based_next_due_date: next_invoice_due_date)
+    if (agreement_expiration_date.present? && (agreement_expiration_date >= Date.today) || payment_agreement.no_expiration)
+      case
+      when invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+        last_invoice_created_at = trail.created_at.to_date
+        number = resource.invoice_frequency&.number
+        period_id = resource.invoice_frequency&.period_id
+        billing_start_date = resource.billing_start_date&.to_date
+        if number.present?
+          case
+          when period_id == Period.id_for(:month)
+            next_invoice_due_date = last_invoice_created_at + number.to_i.month
+            resource.update(agreement_based_next_due_date: next_invoice_due_date)
+          end
         end
+      when invoice.billing_type_id == BillingType.id_for(:one_time)
+        resource.update(agreement_based_next_due_date: resource&.execution_date&.to_date)
       end
     end
   end

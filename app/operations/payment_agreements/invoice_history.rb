@@ -14,8 +14,6 @@ class PaymentAgreements::InvoiceHistory < PaymentAgreements::Base
 
   def process
     self.invoices = payment_agreement.recurring_invoices
-
-    # Payment Ticket history
   end
 
   def success

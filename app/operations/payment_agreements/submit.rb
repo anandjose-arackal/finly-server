@@ -9,6 +9,14 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
   def validate
     if payment_agreement.blank?
       add_message :error, 'Agreement not found'
+      return
+    end
+
+    # Rental should not submit without security deposit
+    if self.payment_agreement.rental_invoices.present?
+      if self.payment_agreement.security_deposits.blank?
+        add_message :error, 'Please add security deposit with rental invoice'
+      end
     end
   end
 

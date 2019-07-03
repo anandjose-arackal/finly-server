@@ -150,6 +150,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
         # Trail will help w.r.t. invoice history
         if ['security_deposit', 'beneficiary'].include?(agreement_type)
+          update_status
           create_trail
         end
         # perform the required calculations
@@ -294,7 +295,13 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     end
   end
 
+  private
   def create_trail
     Trail.create(parent_type: set_payment_parent_type, parent_id: set_payment_parent_id, action_user_id: user.id, action_id: TrailAction.id_for(:payment_ticket_created))
+  end
+
+  def update_status
+    self.security_deposit.update(status_id: SecurityDepositStatus.id_for(:processing)) if self.agreement_type == 'security_deposit'
+    self.beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:processing)) if self.agreement_type == 'beneficiary'
   end
 end

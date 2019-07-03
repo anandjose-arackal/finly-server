@@ -22,13 +22,17 @@ end
 json.payment_agreement_types @result.payment_agreement_types
 
 json.payment_terms do
-  json.merge! @result.payment_terms.as_json
+  json.merge! @result.payment_terms.as_json if @result.payment_terms.present?
 end
 
 json.billing_types do
-  json.merge! @result.billing_types.as_json
+  json.merge! @result.billing_types.as_json if @result.billing_types.present?
 end
 
 json.period do
-  json.merge! @result.period.as_json
+  json.merge! @result.period.as_json if @result.period.present?
+end
+
+json.gst_types do
+  json.merge! @result.gst_types.as_json if @result.gst_types.present?
 end

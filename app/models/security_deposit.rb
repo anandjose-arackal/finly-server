@@ -11,11 +11,12 @@ class SecurityDeposit < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :creator, optional: true, class_name: "User"
   belongs_to :payment_agreement, optional: true
+  belongs_to :status, optional: true, class_name: 'SecurityDepositStatus'
 
   has_many :payments, as: :parent
   has_many :trails, as: :parent
 
-  after_create :update_creator_id, :update_company_id
+  after_create :update_creator_id, :update_company_id, :update_status
 
   accepts_nested_attributes_for :payable_amount, :original_amount
 
@@ -80,6 +81,10 @@ class SecurityDeposit < ApplicationRecord
     if self.company_id.blank?
       self.update(company_id: self.payment_agreement.company_id)
     end
+  end
+
+  def update_status
+    self.update(status_id: SecurityDepositStatus.id_for(:unpaid))
   end
 
 end
