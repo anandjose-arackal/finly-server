@@ -23,7 +23,6 @@
 #  unique_request_number :string(255)
 #  utr                   :string(255)
 #  transfer_status_id    :integer
-
 #  company_id            :integer
 #  request_id            :string(255)
 #
@@ -33,6 +32,7 @@ class IciciBankTransaction < ApplicationRecord
   belongs_to :receiving_account, class_name: "BankAccount"
   belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
   belongs_to :bank_transaction_type, optional: true
+  belongs_to :company
 
   has_one :payment, as: :reference_resource
 
@@ -44,10 +44,23 @@ class IciciBankTransaction < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   scope :processing_transactions, -> {
-    where(transfer_status_id: BankTransferStatus.id_for(:pending_utr, :pending_for_processing))
+    where(transfer_status_id: BankTransferStatus.ids_for(:pending_utr, :pending_for_processing))
   }
 
   def bank_reference_number
     self.utr
   end
+
+  def imps?
+    self.txn_type == "IFS"
+  end
+
+  def rtgs?
+    self.txn_type == "RTG"
+  end
+
+  def neft?
+    self.txn_type == "RGS"
+  end
+
 end

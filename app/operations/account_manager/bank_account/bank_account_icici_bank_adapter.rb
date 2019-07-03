@@ -59,7 +59,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     if op.success?
       if bank_transaction.pending_utr?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
-        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
+        create_system_message_for_processing(payment)
+        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)

@@ -42,7 +42,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def raw_api_params
-    remarks = self.payment.note.to_s
+    remarks = self.payment.note.blank? ? "Test note" : self.payment.note
     {
         AGGRID: self.company_details["AGGR_ID"],
         AGGRNAME: self.company_details["AGGR_NAME"],
@@ -51,10 +51,10 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         URN: self.company.icici_bank_config.urn,
         UNIQUEID: self.transfer_request.unique_reference_number.to_s,
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
-        # CREDITACC: self.receiving_account.account_number,
-        CREDITACC: "000405002777",
-        # IFSC: self.receiving_account.ifsc,
-        IFSC: "DLXB0000092",
+        CREDITACC: self.receiving_account.account_number,
+        # CREDITACC: "000405002777",
+        IFSC: self.receiving_account.ifsc,
+        # IFSC: "DLXB0000092",
         # IFSC: "ICIC0000011",
         AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
         # AMOUNT: "200",
@@ -65,7 +65,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         # TXNTYPE: "OWN", # "RTG", "RGS"
         PAYEENAME: self.receiving_account.account_owner.name,
         # PAYEENAME: "Sreeram",
-        REMARKS: remarks,
+        REMARKS: remarks.to_s,
         # REMARKS: "This is a test note",
         CUSTOMERINDUCED: "N"
     }
