@@ -47,6 +47,22 @@ class IciciBankTransaction < ApplicationRecord
     where(transfer_status_id: BankTransferStatus.ids_for(:pending_utr, :pending_for_processing))
   }
 
+  scope :completed, -> {
+    where(transfer_status_id: BankTransferStatus.id_for(:completed))
+  }
+
+  scope :neft, -> {
+    where(transfer_type: "RGS")
+  }
+
+  scope :imps, -> {
+    where(transfer_type: "IFS")
+  }
+
+  scope :rtgs, -> {
+    where(transfer_type: "RTG")
+  }
+
   def bank_reference_number
     self.utr
   end
