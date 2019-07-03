@@ -23,12 +23,13 @@
 #  unique_request_number :string(255)
 #  utr                   :string(255)
 #  transfer_status_id    :integer
+
 #  company_id            :integer
 #  request_id            :string(255)
 #
 
 class IciciBankTransaction < ApplicationRecord
-  belongs_to :amount
+  belongs_to :amount, optional: true
   belongs_to :receiving_account, class_name: "BankAccount"
   belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
   belongs_to :bank_transaction_type, optional: true
@@ -36,7 +37,6 @@ class IciciBankTransaction < ApplicationRecord
   has_one :payment, as: :reference_resource
 
   validates :unique_request_number, presence: true
-  validates :amount_id, presence: true
 
   delegate :amount_value, to: :amount
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, :pending_for_processing?, :suspect?, :pending_utr?, to: :transfer_status
