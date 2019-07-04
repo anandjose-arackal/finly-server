@@ -48,6 +48,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def company_expenses
+    return nil unless user.admin?
     {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin"}'}
   end
 
@@ -64,18 +65,22 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def trips_awaiting_approval
-    {name: 'Awaiting Approval', id: 'trips', url: 'trips/params={"view":"manager", "filter_awaiting_approval":"true"}'}
+    return nil unless user.manager? || user.admin?
+    {name: 'Awaiting Approval', id: 'trips', url: 'trips/params={"view":"manager", "filter_status":"processing"}'}
   end
 
   def team_trips
+    return nil unless user.manager? || user.admin?
     {name: 'Team Trips', id: 'trips', url: 'trips/params={"view":"manager"}'}
   end
 
   def travel_manager_trips
-    {name: 'Travel Manager Trips', id: 'trips', url: 'trips/params={"view":"travel_manager"}'}
+    return nil unless user.travel_manager? || user.admin?
+    {name: 'Travel Manager Trips', id: 'trips', url: 'trips/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
+    return nil unless user.admin?
     {name: 'Company Trips', id: 'trips', url: 'trips/params={"view":"admin"}'}
   end
 
@@ -88,14 +93,17 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def reports_awaiting_approval
+    return nil unless user.manager? || user.admin?
     {name: 'Awaiting Approval', id: 'reports', url: 'reports/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_reports
+    return nil unless user.manager? || user.admin?
     {name: 'Team Reports', id: 'reports', url: 'reports/params={"view":"manager"}'}
   end
 
   def company_reports
+    return nil unless user.admin?
     {name: 'Company Reports', id: 'reports', url: 'reports/params={"view":"admin"}'}
   end
 
@@ -108,50 +116,62 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def money_requests_awaiting_approval
+    return nil unless user.manager? || user.admin?
     {name: 'Awaiting Approval', id: 'money_requests', url: 'money_requests/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_money_requests
+    return nil unless user.manager? || user.admin?
     {name: 'Team Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"manager"}'}
   end
 
   def company_money_requests
+    return nil unless user.admin?
     {name: 'Company Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"admin"}'}
   end
 
   def team_users
+    return nil unless user.manager? || user.admin?
     {name: 'Team Users', id: 'users', url: 'users/params={"view":"manager"}'}
   end
 
   def company_users
+    return nil unless user.admin?
     {name: 'Company Users', id: 'users', url: 'users/params={"view":"admin"}'}
   end
 
   def settlements
+    return nil unless user.finance_manager? || user.admin?
     {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def team_settlements
+    return nil unless user.finance_manager? || user.admin?
     {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def company_settlements
+    return nil unless user.admin?
     {name: 'Company Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"admin"}'}
   end
 
   def export
+    return nil unless user.manager? || user.admin?
     {name: 'Team Export', id: 'export', url: 'export/params={"view":"manager"}'}
   end
 
   def team_exports
+    return nil unless user.manager? || user.admin?
     {name: 'Team Export', id: 'export', url: 'export/params={"view":"manager"}'}
   end
 
   def company_exports
+    return nil unless user.admin?
     {name: 'Company Export', id: 'export', url: 'export/params={"view":"admin"}'}
   end
 
   def users
+    return nil unless user.admin?
     {name: 'Users', id: 'users', url: '#users/params={"view":"admin"}'}
   end
 
@@ -160,6 +180,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def statements
+    return nil unless user.admin?
     {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
   end
 
