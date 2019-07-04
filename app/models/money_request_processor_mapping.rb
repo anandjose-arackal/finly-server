@@ -46,7 +46,6 @@ class MoneyRequestProcessorMapping < ApplicationRecord
   scope :exclude_cancelled, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:cancelled) }
   scope :completed, -> { where status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :pending, -> { where status_id: MoneyRequestProcessorStatus.id_for(:pending) }
-  scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
   scope :pluck_processor_id, -> { pluck :processor_id }
 
