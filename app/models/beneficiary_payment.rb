@@ -389,9 +389,6 @@ class BeneficiaryPayment < ApplicationRecord
       if self.tax_rate_id.blank?
         errors.add(:tax, 'cannot be blank')
       end
-      if self.payable_amount.blank?
-        errors.add(:payable_amount, 'cannot be blank')
-      end
     end
   end
 end

@@ -18,7 +18,7 @@ class SecurityDeposit < ApplicationRecord
   has_many :payments, as: :parent
   has_many :trails, as: :parent
 
-  validates :vendor, :vendor_location, :bank_account, :cost_center, :department, :location, :original_amount, :payable_amount, presence: true
+  validates :vendor, :vendor_location, :bank_account, :cost_center, :department, :location, :original_amount, presence: true
 
   after_create :update_creator_id, :update_company_id, :update_status
 

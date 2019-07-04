@@ -119,41 +119,16 @@ class PaymentAgreements::Base < BaseOperation
     #   payment_agreement.rental_invoices.map(&:update_net_amount_value)
     # end
 
-    # if payment_agreement.beneficiary_payments.present?
-    #   payment_agreement.beneficiary_payments
-    # end
-
-    # if payment_agreement.security_deposits.present?
-    #   payment_agreement.security_deposits
-    # end
-  end
-
-
-  def set_due_date_for_general_invoices
-    self.payment_agreement.general_invoices.map do |general_invoice|
-      number = general_invoice.invoice_frequency&.number
-      period_id = general_invoice.invoice_frequency&.period_id
-      billing_start_date = general_invoice.billing_start_date&.to_date
-      # Set rules for calculation of payment date based on period set
-      case 
-      when period_id == Period.id_for(:month)
-        due_date = billing_start_date
-        general_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
-      end
+    if payment_agreement.beneficiary_payments.present?
+      payment_agreement.beneficiary_payments.each do |beneficiary_payment|
+        update_payable_amount(beneficiary_payment)
+      end 
     end
-  end
 
-  def set_due_date_for_rental_invoices
-    self.payment_agreement.rental_invoices.map do |rental_invoice|
-      number = rental_invoice.invoice_frequency&.number
-      period_id = rental_invoice.invoice_frequency&.period_id
-      billing_start_date = rental_invoice.billing_start_date&.to_date
-      # Set rules for calculation of payment date based on period set
-      case 
-      when period_id == Period.id_for(:month)
-        due_date = billing_start_date
-        rental_invoice.update(agreement_based_next_due_date: due_date) if due_date.present?
-      end
+    if payment_agreement.security_deposits.present?
+      payment_agreement.security_deposits.each do |security_deposit|
+        update_payable_amount(security_deposit)
+      end 
     end
   end
 
@@ -171,6 +146,16 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  def update_payable_amount(document)
+    original_amt = document.original_amount.value
+    if document.payable_amount.present?
+      document.payable_amount.update(value: original_amt)
+    else
+      document.create_payable_amount(value: original_amt, currency_id: 1)
+    end
+  end
+
+
   # Invoice Utils calculating wrong amount, need to check
   # Updating explicitly
   def update_balance_due_amount(invoice, amount= nil)
@@ -182,18 +167,61 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  def set_due_date_for_general_invoices
+    execution_date = self.payment_agreement&.execution_date&.to_date
+    self.payment_agreement.general_invoices.map {|general_invoice| general_invoice.update(payment_agreement_upcoming_date: execution_date)}
+    # self.payment_agreement.general_invoices.map do |general_invoice|
+      # number = general_invoice.invoice_frequency&.number
+      # period_id = general_invoice.invoice_frequency&.period_id
+      # billing_start_date = general_invoice.billing_start_date&.to_date
+      
+      # Set rules for calculation of payment date based on period set
+      # During create and update of payment_agreement i.e. during adding/updating agreement items, use execution date to set the first due date
+      # Once agreement is approved, no agreement items should be added
+      # general_invoice.update(payment_agreement_upcoming_date: execution_date)
+
+
+      # case 
+      # when period_id == Period.id_for(:month)
+      #   due_date = billing_start_date
+      #   general_invoice.update(payment_agreement_upcoming_date: due_date) if due_date.present?
+      # end
+    # end
+  end
+
+  def set_due_date_for_rental_invoices
+    execution_date = self.payment_agreement&.execution_date&.to_date
+    self.payment_agreement.general_invoices.map {|rental_invoice| rental_invoice.update(payment_agreement_upcoming_date: execution_date)}
+    # self.payment_agreement.rental_invoices.map do |rental_invoice|
+      # number = rental_invoice.invoice_frequency&.number
+      # period_id = rental_invoice.invoice_frequency&.period_id
+      # billing_start_date = rental_invoice.billing_start_date&.to_date
+      # rental_invoice.update(payment_agreement_upcoming_date: execution_date)
+
+
+      # Set rules for calculation of payment date based on period set
+      # case 
+      # when period_id == Period.id_for(:month)
+      #   due_date = billing_start_date
+      #   rental_invoice.update(payment_agreement_upcoming_date: due_date) if due_date.present?
+      # end
+    # end
+  end
+
+
   def set_due_date_for_beneficiary_payments
-    self.payment_agreement.beneficiary_payments.map do |beneficiary_payment|
-      execution_date = payment_agreement.execution_date&.to_date
-      beneficiary_payment.update(agreement_based_next_due_date: execution_date)
-    end
+    execution_date = payment_agreement.execution_date&.to_date
+    self.payment_agreement.beneficiary_payments.map {|beneficiary_payment| beneficiary_payment.update(payment_agreement_upcoming_date: execution_date)}
   end
 
   def set_due_date_for_security_deposits
-    self.payment_agreement.security_deposits.map do |security_deposit|
-      execution_date = payment_agreement.execution_date&.to_date
-      security_deposit.update(agreement_based_next_due_date: execution_date)
-    end
+    execution_date = payment_agreement.execution_date&.to_date
+    self.payment_agreement.security_deposits.map {|security_deposit| security_deposit.update(payment_agreement_upcoming_date: execution_date)}
+
+    # self.payment_agreement.security_deposits.map do |security_deposit|
+      
+    #   security_deposit.update(payment_agreement_upcoming_date: execution_date)
+    # end
   end
 
 
