@@ -55,7 +55,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case
     when resource.is_a?(Invoice)
     invoice = resource.amoeba_dup
-    if invoice.save && update_invoice_attributes(resource, invoice, {invoice_type: 'recurring_invoice'})
+    if invoice.save && update_invoice_attributes(resource, invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
       # Create trail for general/rental_invoice that recurring invoice has been created
       trail_options = {action: 'invoice_created', parent: resource, parent_type: 'Invoice'}
       create_trail(trail_options)
@@ -80,8 +80,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
           add_message :error, 'Cannot set upcoming date'
           return
         end
+        set_upcoming_invoice_status(next_upcoming_invoice, true)
         set_payment_agreement_upcoming_invoice_date(next_upcoming_invoice, upcoming_date)
-        set_set_payment_agreement_upcoming_invoice_due_date(next_upcoming_invoice)
+        set_payment_agreement_upcoming_invoice_due_date(previous_upcoming_invoice, next_upcoming_invoice)
         create_trail(trail_options)
       end
     end
@@ -90,7 +91,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   # Some attributes are set here, some are nullified in model as per logic used in other places, hence updating explicitly 
   def update_invoice_attributes(original_invoice, new_invoice, options={})
-    new_invoice.update(created_by: user, procurement_id: procurement_id, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), due_date: original_invoice.due_date)
+    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), due_date: original_invoice.due_date)
+    new_invoice.update(procurement_id: procurement_id) if options[:update_procurement]
   end
 
 
@@ -119,19 +121,18 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   #   end
   # end
 
-  def get_next_due_date_for_upcoming_invoice
-  end
-
   def create_trail(options={})
     Trail.create(parent_type: options[:parent_type], parent_id: options[:parent].id, action_user_id: user.id, action_id: TrailAction.id_for(options[:action].to_sym))
   end
 
   def set_payment_agreement_upcoming_invoice_date(upcoming_invoice, upcoming_date)
     set_upcoming_invoice_status(upcoming_invoice, true)
+    upcoming_invoice.update(payment_agreement_upcoming_date: upcoming_date)
   end
 
-  def set_set_payment_agreement_upcoming_invoice_due_date(invoice)
-    calculate_due_date(invoice)
+  def set_payment_agreement_upcoming_invoice_due_date(previous_invoice, next_invoice)
+    due_date = calculate_due_date(previous_invoice)
+    next_invoice.update(due_date: due_date)
   end
 
   # Sets true if payment agreement invoice is upcoming.
@@ -152,7 +153,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
         if number.present?
           case
           when period_id == Period.id_for(:month)
-            next_invoice_due_date = previous_invoice.payment_agreement_upcoming_invoice_date + number.to_i.month
+            next_invoice_due_date = previous_invoice.payment_agreement_upcoming_date + number.to_i.month
             return next_invoice_due_date
           end
         end
@@ -167,6 +168,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   # Calculation of due date will be on the basis of previous due date and payment_term
   # due_date = previous_due_date + no_of_day_in_payment_term
   def calculate_due_date(invoice=nil)
+    due_date = invoice.payment_agreement_upcoming_date + invoice.payment_term.days_after.to_i
   end
 
   def next_upcoming_invoice_required(previous_upcoming_invoice)

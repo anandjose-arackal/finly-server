@@ -13,7 +13,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
       self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
       self.payment_agreement_types = ::PaymentAgreement::AGREEMENT_TYPES
       self.tax_rates = user.company.tax_rates
-      self.payment_terms = user.company.payment_terms
+      self.payment_terms = user.company.payment_terms.where.not(days_after: nil)
       self.billing_types = BillingType.all
       self.period = Period.where(name: 'month')
       self.gst_types = GstType.all

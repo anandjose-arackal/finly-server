@@ -25,9 +25,10 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
     self.rental_invoices = payment_agreement.rental_invoices.where("payment_agreement_upcoming_date <= ?", Date.today) rescue Invoice.none
     self.rental_invoices = rental_invoices.or(payment_agreement.rental_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
 
-    self.beneficiary_payments = payment_agreement.beneficiary_payments
+    self.beneficiary_payments = payment_agreement.beneficiary_payments.where("payment_agreement_upcoming_date <= ?", Date.today) rescue BeneficiaryPayment.none
 
-    self.security_deposits = payment_agreement.security_deposits if payment_agreement.security_deposits.present?
+    self.security_deposits = payment_agreement.security_deposits.where("payment_agreement_upcoming_date <= ?", Date.today) rescue SecurityDeposit.none
+
     initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
     self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
   end
