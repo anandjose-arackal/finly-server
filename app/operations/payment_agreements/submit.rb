@@ -19,7 +19,7 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
       end
     end
 
-    if payment_agreement.general_invoices.blank? && payment_agreement.beneficiary_payments.blank? && payment_agreement.security_deposits.blank?
+    if payment_agreement.general_invoices.blank? && payment_agreement.beneficiary_payments.blank? && payment_agreement.security_deposits.blank? && payment_agreement.rental_invoices.blank?
       add_message :error, 'Please add atleast one agreement item'
     end
   end

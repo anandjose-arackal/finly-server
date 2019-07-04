@@ -211,17 +211,22 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_beneficiary_payments
     execution_date = payment_agreement.execution_date&.to_date
-    self.payment_agreement.beneficiary_payments.map {|beneficiary_payment| beneficiary_payment.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+    self.payment_agreement.beneficiary_payments.map {|beneficiary_payment| beneficiary_payment.update(payment_agreement_upcoming_date: execution_date)}
   end
 
   def set_due_date_for_security_deposits
     execution_date = payment_agreement.execution_date&.to_date
-    self.payment_agreement.security_deposits.map {|security_deposit| security_deposit.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+    self.payment_agreement.security_deposits.map {|security_deposit| security_deposit.update(payment_agreement_upcoming_date: execution_date)}
 
     # self.payment_agreement.security_deposits.map do |security_deposit|
       
     #   security_deposit.update(payment_agreement_upcoming_date: execution_date)
     # end
+  end
+
+  def update_line_item_attributes
+    self.payment_agreement.general_invoices.map{|general_invoice| general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)} if self.payment_agreement.general_invoices.present?
+    self.payment_agreement.rental_invoices.map{|rental_invoice| rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)} if self.payment_agreement.rental_invoices.present?
   end
 
 

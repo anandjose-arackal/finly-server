@@ -33,6 +33,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
       set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
       set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
+      update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
       params[:reviewal_document] = self.payment_agreement
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
