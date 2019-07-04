@@ -4,7 +4,14 @@ json.array!(@result.paginated_vendors) do |vendor|
   json.business_name  vendor.business_name || ""
   json.value vendor.id
 
-  label = vendor.name || vendor.business_name || ""
+  if vendor.name.present?
+    label = vendor.name
+  elsif vendor.business_name.present?
+    label = vendor.business_name
+  else
+    label = ""
+  end
+  # label = vendor.name || vendor.business_name || ""
   label += " - #{vendor.vendor_id}"
   json.label label
   json.id vendor.id
