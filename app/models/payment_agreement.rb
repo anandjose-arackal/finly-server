@@ -148,7 +148,7 @@ class PaymentAgreement < ApplicationRecord
     where('payment_agreements.title LIKE ?', "%#{search_query}%")
   }
 
-  def as_json
+  def as_json(options={})
     {
       id: self.id,
       agreement_number: self.order_number,
@@ -166,7 +166,8 @@ class PaymentAgreement < ApplicationRecord
       no_expiration: self.no_expiration,
       renewal_date: self.renewal_date&.to_date,
       note: self.note,
-      renewal_reminder_date: self.renewal_reminder_date
+      renewal_reminder_date: self.renewal_reminder_date,
+      vendors: get_related_vendors(options)
     }
   end
 
@@ -262,6 +263,17 @@ class PaymentAgreement < ApplicationRecord
     if self.policy.present? && self.policy.policy_user_roles.present?
       self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:payment_agreement_auditor), user_id: user.id).present? rescue false
     end
+  end
+
+  def get_related_vendors(options)
+    vendors = []
+    if options[:list_vendors]
+      vendors << self.general_invoices.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
+      vendors << self.rental_invoices.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
+      vendors << self.security_deposits.joins(:vendors).pluck('yes_bank_vendors.name') rescue [] if self.rental_invoices.blank?
+      vendors << self.beneficiary_payments.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
+    end
+    return vendors.flatten.compact
   end
 
 end
