@@ -83,7 +83,7 @@ class PaymentAgreements::Base < BaseOperation
         # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
         # general_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
-        general_invoice.save!
+        general_invoice.save
         if general_invoice.tds_slab_id.present?
           apply_tds_on_amount(general_invoice)
         end
@@ -98,7 +98,7 @@ class PaymentAgreements::Base < BaseOperation
         # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
         # rental_invoice.save!
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        rental_invoice.save!
+        rental_invoice.save
         if rental_invoice.tds_slab_id.present?
           apply_tds_on_amount(rental_invoice)
         end
@@ -169,7 +169,7 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_general_invoices
     execution_date = self.payment_agreement&.execution_date&.to_date
-    self.payment_agreement.general_invoices.map {|general_invoice| general_invoice.update(payment_agreement_upcoming_date: execution_date)}
+    self.payment_agreement.general_invoices.map {|general_invoice| general_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
     # self.payment_agreement.general_invoices.map do |general_invoice|
       # number = general_invoice.invoice_frequency&.number
       # period_id = general_invoice.invoice_frequency&.period_id
@@ -191,7 +191,7 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_rental_invoices
     execution_date = self.payment_agreement&.execution_date&.to_date
-    self.payment_agreement.general_invoices.map {|rental_invoice| rental_invoice.update(payment_agreement_upcoming_date: execution_date)}
+    self.payment_agreement.general_invoices.map {|rental_invoice| rental_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
     # self.payment_agreement.rental_invoices.map do |rental_invoice|
       # number = rental_invoice.invoice_frequency&.number
       # period_id = rental_invoice.invoice_frequency&.period_id
@@ -211,12 +211,12 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_beneficiary_payments
     execution_date = payment_agreement.execution_date&.to_date
-    self.payment_agreement.beneficiary_payments.map {|beneficiary_payment| beneficiary_payment.update(payment_agreement_upcoming_date: execution_date)}
+    self.payment_agreement.beneficiary_payments.map {|beneficiary_payment| beneficiary_payment.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
   end
 
   def set_due_date_for_security_deposits
     execution_date = payment_agreement.execution_date&.to_date
-    self.payment_agreement.security_deposits.map {|security_deposit| security_deposit.update(payment_agreement_upcoming_date: execution_date)}
+    self.payment_agreement.security_deposits.map {|security_deposit| security_deposit.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
 
     # self.payment_agreement.security_deposits.map do |security_deposit|
       

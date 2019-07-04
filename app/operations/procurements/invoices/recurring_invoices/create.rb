@@ -55,7 +55,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case
     when resource.is_a?(Invoice)
     invoice = resource.amoeba_dup
-    if invoice.save && update_invoice_attributes(resource, invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
+    invoice.invoice_id = nil
+    if invoice.save
+      update_invoice_attributes(resource, invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
       # Create trail for general/rental_invoice that recurring invoice has been created
       trail_options = {action: 'invoice_created', parent: resource, parent_type: 'Invoice'}
       create_trail(trail_options)
@@ -74,7 +76,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       optional_params = {invoice_type: previous_upcoming_invoice.invoice_type.name}
       # Create trail to log that next upcoming invoice has been created against the previous general/rental_invoice
       trail_options = {action: 'upcoming_invoice_created', parent: previous_upcoming_invoice, parent_type: 'Invoice'}
-      if next_upcoming_invoice.save && update_invoice_attributes(previous_upcoming_invoice, next_upcoming_invoice, optional_params)
+      next_upcoming_invoice.invoice_id = nil
+      if next_upcoming_invoice.save
+        update_invoice_attributes(previous_upcoming_invoice, next_upcoming_invoice, optional_params)
         upcoming_date = invoice_upcoming_date(previous_upcoming_invoice)
         if upcoming_date.blank?
           add_message :error, 'Cannot set upcoming date'
@@ -137,7 +141,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   # Sets true if payment agreement invoice is upcoming.
   # Set false if actual recurring invoice has been created against payment agreement invoice 
-  def set_upcoming_invoice_status(invoice=nil, boolean_status)
+  def set_upcoming_invoice_status(invoice, boolean_status)
     invoice.update(is_payment_agreement_upcoming_invoice: boolean_status)
   end
 
@@ -145,7 +149,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   # Return next upcoming date w.r.t the previous invoice and that will be previous invoice upcoming date + invoice frequency
   def invoice_upcoming_date(previous_invoice)
     agreement_expiration_date = payment_agreement.expiration_date&.to_date
-    if (agreement_expiration_date.present? && (agreement_expiration_date >= Date.today) || payment_agreement.no_expiration)
+    if (agreement_expiration_date.present? && agreement_expiration_date >= Date.today) || payment_agreement.no_expiration
       case
       when previous_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         number = previous_invoice.invoice_frequency&.number

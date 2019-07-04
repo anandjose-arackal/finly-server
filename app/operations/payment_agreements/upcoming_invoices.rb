@@ -19,15 +19,15 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
 
   def process 
     # General and Rental are recurring, use past invoice trail to check if invoice is due
-    self.general_invoices = payment_agreement.general_invoices.where("payment_agreement_upcoming_date <= ?", Date.today) rescue Invoice.none
-    self.general_invoices = general_invoices.or(payment_agreement.general_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
+    self.general_invoices = payment_agreement.general_invoices.where("payment_agreement_upcoming_date <= ?", Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue Invoice.none
+    # self.general_invoices = general_invoices.or(payment_agreement.general_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
 
-    self.rental_invoices = payment_agreement.rental_invoices.where("payment_agreement_upcoming_date <= ?", Date.today) rescue Invoice.none
-    self.rental_invoices = rental_invoices.or(payment_agreement.rental_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
+    self.rental_invoices = payment_agreement.rental_invoices.where("payment_agreement_upcoming_date <= ?", Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue Invoice.none
+    # self.rental_invoices = rental_invoices.or(payment_agreement.rental_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
 
-    self.beneficiary_payments = payment_agreement.beneficiary_payments.where("payment_agreement_upcoming_date <= ?", Date.today) rescue BeneficiaryPayment.none
+    # self.beneficiary_payments = payment_agreement.beneficiary_payments.where("payment_agreement_upcoming_date <= ?", Date.today) rescue BeneficiaryPayment.none
 
-    self.security_deposits = payment_agreement.security_deposits.where("payment_agreement_upcoming_date <= ?", Date.today) rescue SecurityDeposit.none
+    # self.security_deposits = payment_agreement.security_deposits.where("payment_agreement_upcoming_date <= ?", Date.today) rescue SecurityDeposit.none
 
     initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
     self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies

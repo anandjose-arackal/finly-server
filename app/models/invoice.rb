@@ -477,6 +477,7 @@ class Invoice < ApplicationRecord
     nullify :invoice_number
     nullify :date
     nullify :due_date
+    nullify :payment_agreement_upcoming_date
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 

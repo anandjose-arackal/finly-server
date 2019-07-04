@@ -26,7 +26,6 @@ class GstType < ApplicationRecord
   alias_method :cgst?, :cgst_sgst?
 
   # def as_json(options={})
-  #   binding.pry
   #   {
   #     id: self.id,
   #     name: self.name
