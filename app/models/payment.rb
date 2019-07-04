@@ -294,7 +294,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
     end
   }
 

@@ -1,4 +1,4 @@
-class BankTransferStatusChecker < ApplicationJob
+class YesBankStatusChecker < ApplicationJob
 
   def perform
     pending_transactions = YesBankTransaction.processing_transactions.non_penny_test.all

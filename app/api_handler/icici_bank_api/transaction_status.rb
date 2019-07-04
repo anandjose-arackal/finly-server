@@ -1,7 +1,7 @@
 class IciciBankApi::TransactionStatus < IciciBankApi::Base
 
   attr_accessor :icici_bank_transaction, :api_response_success,
-                :transaction_status_response
+                :transaction_status_response, :params
 
   class IciciBankApi::TransactionStatus::TransactionStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -13,13 +13,34 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
 
   end
 
+  def initialize(bank_transaction, params = {})
+    self.icici_bank_transaction = bank_transaction
+    self.params = {}
+  end
+
+  def self.call(bank_transaction)
+    self.new(bank_transaction).run
+  end
+
   def init
-    self.icici_bank_transaction = params[:icici_bank_transaction]
+    self.company = self.icici_bank_transaction&.company
     super()
   end
 
   def env_key
     'icici_bank_transaction_status'
+  end
+
+  def validate
+    if self.icici_bank_transaction.blank?
+      add_message :error, "No transaction passed"
+      return
+    end
+
+    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr?
+      add_message :error, "Only pending UTR and pending for processing cases can be checked for status"
+      return
+    end
   end
 
   def raw_api_params
@@ -28,8 +49,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: "FINLYIFS61894902085",
-        # UNIQUEID: self.icici_bank_transaction.unique_request_number
+        UNIQUEID: self.icici_bank_transaction.unique_request_number
     }
   end
 
@@ -51,20 +71,25 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         case self.transaction_status_response
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
-          when "PROCESSING"
-            utr = self.parsed_response["UTRNUMBER"]
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+            # This is because only IMPS and RTGS transactions return the URT in the API
+            if utr.present? && (self.icici_bank_transaction.imps? || self.icici_bank_transaction.rtgs?)
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+            else
+              # in this case just the status of the payment is confirmed, but the UTR is not available, so just update the transaction status
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+            end
+          when "PENDING FOR PROCESSING"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
           when "SUSPECT"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
           when "PENDING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
           when "FAILURE"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failure))
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
           when "CANCELLED"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
           else
-
+            # do nothing?
         end
       else
         # handle it gracefully

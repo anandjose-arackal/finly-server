@@ -60,11 +60,11 @@ class IciciBankTransferRequest < NonPersistentModel
 
   def self.retrieve_transfer_type(transfer_type)
     case transfer_type.upcase
-      when "RTGS"
+      when "RTGS", "rtgs"
         return "RTG"
-      when "NEFT"
+      when "NEFT", "neft"
         return "RGS"
-      when "IMPS"
+      when "IMPS", "imps"
         return "IFS"
       else # anomalous case, return nothing
         return ""

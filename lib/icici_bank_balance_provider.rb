@@ -1,6 +1,6 @@
 class IciciBankBalanceProvider
   include Sidekiq::Worker
-  sidekiq_options queue: :payments_critical_queue
+  sidekiq_options queue: :yes_bank_balance_queue
 
   def perform(response_handle, company_id)
     queue = Struct.new(:queue).new(response_handle)
