@@ -80,9 +80,10 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
 #
 
 class Invoice < ApplicationRecord
@@ -287,6 +288,12 @@ class Invoice < ApplicationRecord
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from, to)
   }
 
   scope :filter_invoice_date, -> (from) {
