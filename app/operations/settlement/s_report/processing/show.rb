@@ -52,12 +52,10 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
       actions = {}
       if processor_group.pending? or processor_group.scheduled? or processor_group.failed?
         actions[:cancel] = true
-        actions[:import] = true
       end
 
       if processor_group.partially_completed?
         actions[:cancel_pending] = true
-        actions[:import] = true
       end
 
       if processor_group.process_outside_finly?
@@ -75,13 +73,15 @@ class Settlement::SReport::Processing::Show < Settlement::SReport::Processing::B
 
     def item_actions(item)
       actions = {}
-      unless item.completed? or item.cancelled?
-        actions[:mark_as_completed] = true
-        actions[:edit_utr] = true
-      end
-      
-      if item.completed?        
-        actions[:edit_utr] = true
+      if item.processor_group.process_outside_finly?
+        unless item.completed? or item.cancelled?
+          actions[:mark_as_completed] = true
+          actions[:edit_utr] = true
+        end
+
+        if item.completed?
+          actions[:edit_utr] = true
+        end
       end
       actions
     end
