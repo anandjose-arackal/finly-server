@@ -149,13 +149,13 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       if payment.save
 
         # Trail will help w.r.t. invoice history
-        if ['security_deposit', 'beneficiary'].include?(agreement_type)
+        if from_payment_agreement && ['security_deposit', 'beneficiary'].include?(agreement_type)
           update_status
           create_trail
         end
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id]) if self.beneficiary_payments.present?
-        beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid)) if beneficiary_payments.present?
+        beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid)) if beneficiary_payments.present? && !from_payment_agreement
 
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
