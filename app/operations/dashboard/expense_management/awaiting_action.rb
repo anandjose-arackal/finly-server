@@ -36,7 +36,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Reports awaiting approval",
         type: 'reports',
         count: Report.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_status: 99}],
+        filters: [{view: 'manager', filter_status: 99}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -46,7 +46,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Reports awaiting credit",
         type: 'reports',
         count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_status: 99}],
+        filters: [{view: 'finance_manager', filter_status: 99}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -58,7 +58,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Money Requests awaiting approval",
         type: 'money_requests',
         count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_status: 99}],
+        filters: [{view: 'manager', filter_status: 99}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -68,7 +68,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Money Requests awaiting credit",
         type: 'money_requests',
         count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_status: 99}],
+        filters: [{view: 'finance_manager', filter_status: 99}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -80,7 +80,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Trips awaiting approval",
         type: 'trips',
         count: TravelRequest.reviewer_associated_items(user).or(TravelRequest.reviewer_associated_booking_items(user)).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}],
+        filters: [{view: 'manager', filter_status: 'processing'}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -90,7 +90,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Trips awaiting credit",
         type: 'trips',
         count: TravelRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}],
+        filters: [{{view: 'finance_manager', filter_status: 'booking_confirmed'}}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -100,7 +100,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Trips pending booking",
         type: 'trips',
         count: TravelRequest.travel_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}],
+        filters: [{view: 'travel_manager', filter_status: 'booking_pending'}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
