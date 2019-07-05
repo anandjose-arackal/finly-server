@@ -18,13 +18,20 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   )
 
   register_structure(
-      :cog, [
+      :cog_menu, [
       :users,
       :load_company_balance, :statements,
-      :organization_account,
-      :finly_vendor_payments, :finly_disburse, :finly_collect, :finly_insights
-  ]
+      :organization_account
+      ]
   )
+
+  register_structure(
+      :cog_modules, [
+      :finly_vendor_payments, :finly_disburse, :finly_collect, :finly_insights
+      ]
+  )
+
+
 
   def self.accept?
     return false unless RequestStoreUtil.current_company&.feature_subscription&.expense_management_enabled
@@ -75,7 +82,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def travel_manager_trips
-    return nil unless user.travel_manager? || user.admin?
+    return nil unless user.travel_manager?
     {name: 'Travel Manager Trips', id: 'trips', url: 'trips/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
