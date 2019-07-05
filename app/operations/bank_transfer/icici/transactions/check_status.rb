@@ -36,6 +36,11 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
         self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         self.payment_order.update_order_status
         self.payment_order.update_processed_amount
+      elsif self.bank_transaction.rejected?
+        self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        self.payment.system_messages.build(content: "This payment has been rejected from your net banking dashboard", system_message_type_id: SystemMessageType.id_for(:error)).save
+        self.payment_order.update_order_status
+        self.payment_order.update_processed_amount
       end
     end
   end
