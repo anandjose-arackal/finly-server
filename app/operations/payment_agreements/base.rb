@@ -119,11 +119,11 @@ class PaymentAgreements::Base < BaseOperation
     #   payment_agreement.rental_invoices.map(&:update_net_amount_value)
     # end
 
-    if payment_agreement.beneficiary_payments.present?
-      payment_agreement.beneficiary_payments.each do |beneficiary_payment|
-        update_payable_amount(beneficiary_payment)
-      end 
-    end
+    # if payment_agreement.beneficiary_payments.present?
+    #   payment_agreement.beneficiary_payments.each do |beneficiary_payment|
+    #     update_payable_amount(beneficiary_payment)
+    #   end 
+    # end
 
     if payment_agreement.security_deposits.present?
       payment_agreement.security_deposits.each do |security_deposit|
