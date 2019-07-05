@@ -12,4 +12,5 @@ class IciciStatementsFetch < ActiveJob::Base
       end
     end
   end
+
 end

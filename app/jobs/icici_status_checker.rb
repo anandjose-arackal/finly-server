@@ -6,7 +6,7 @@ class IciciStatusChecker < ApplicationJob
     pending_transactions.each do |bank_transaction|
       BankTransfer::Icici::Transactions::CheckStatus.(bank_transaction)
     end
-
+    
     # For NEFT payments alone, since the UTR doesn't come in the status API we have to further compare it with the 
     # statements to ensure the UTR is available
     pending_neft_transactions = IciciBankTransaction.neft.completed
