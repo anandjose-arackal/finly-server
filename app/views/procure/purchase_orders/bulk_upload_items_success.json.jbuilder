@@ -21,24 +21,15 @@ json.bulk_items do
 		json.cost_center_id item[:cost_center_id]
 		json.cost_center_name item[:cost_center_name]
 
-		json.item_amount sprintf '%.2f', item[:item_amount]
-        json.item_discount_amount sprintf '%.2f', item[:item_discount_amount]
-        json.item_taxable_amount sprintf '%.2f', item[:item_taxable_amount]
-        json.item_tax_amount sprintf '%.2f', item[:item_tax_amount]
-        json.item_total_amount sprintf '%.2f', item[:item_total_amount]
-        json.item_tax_split_igst sprintf '%.2f', item[:item_tax_split_igst]
-        json.item_tax_split_cgst sprintf '%.2f', item[:item_tax_split_cgst]
-        json.item_tax_split_sgst sprintf '%.2f', item[:item_tax_split_sgst]
+		json.item_amount item[:item_amount]
+        json.item_discount_amount item[:item_discount_amount]
+        json.item_taxable_amount item[:item_taxable_amount]
+        json.item_tax_amount item[:item_tax_amount]
+        json.item_total_amount item[:item_total_amount]
+        json.item_tax_split_igst item[:item_tax_split_igst]
+        json.item_tax_split_cgst item[:item_tax_split_cgst]
+        json.item_tax_split_sgst item[:item_tax_split_sgst]
 	end
 end
 
-json.summary do
-	json.sum_of_item_amount sprintf '%.2f', @result.summary[:sum_of_item_amount]
-    json.sum_of_item_discount_amount sprintf '%.2f', @result.summary[:sum_of_item_discount_amount]
-    json.sum_of_item_taxable_amount sprintf '%.2f', @result.summary[:sum_of_item_taxable_amount]
-    json.sum_of_item_tax_amount sprintf '%.2f', @result.summary[:sum_of_item_tax_amount]
-    json.sum_of_item_total_amount sprintf '%.2f', @result.summary[:sum_of_item_total_amount]
-    json.sum_of_item_tax_split_igst sprintf '%.2f', @result.summary[:sum_of_item_tax_split_igst]
-    json.sum_of_item_tax_split_cgst sprintf '%.2f', @result.summary[:sum_of_item_tax_split_cgst]
-    json.sum_of_item_tax_split_sgst sprintf '%.2f', @result.summary[:sum_of_item_tax_split_sgst]
-end
+json.summary @result.summary
