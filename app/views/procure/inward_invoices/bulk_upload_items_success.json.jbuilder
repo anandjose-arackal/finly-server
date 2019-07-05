@@ -32,7 +32,7 @@ json.bulk_items do
 	end
 end
 
-json.summmary do
+json.summary do
 	json.sum_of_item_amount sprintf '%.2f', @result.summary[:sum_of_item_amount]
     json.sum_of_item_discount_amount sprintf '%.2f', @result.summary[:sum_of_item_discount_amount]
     json.sum_of_item_taxable_amount sprintf '%.2f', @result.summary[:sum_of_item_taxable_amount]
