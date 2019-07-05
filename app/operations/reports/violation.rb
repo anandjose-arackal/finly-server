@@ -249,7 +249,7 @@ class Reports::Violation < Reports::Base
                                                 .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
 
     # Expenses without different usage_date ranges from expense date
-    expenses.with_usage_date_type.usage_date_within(start_date, end_date).each do |exp|
+    expenses.with_usage_date_type.usage_date_within(start_date, end_date).filter_category_id(categories&.pluck(:id)).each do |exp|
       if exp.usage_date_end.blank?
         # If only a single date is defined in usage_date range, add the cost to current budget
         total_expenses += exp.amount.send(base_currency_code.to_sym)
@@ -265,7 +265,7 @@ class Reports::Violation < Reports::Base
     end
 
     # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
-    expenses = expenses.without_usage_date_type.with_date_range(start_date, end_date).filter_category_id(categories&.pluck(:id))
+    expenses = expenses.filter_category_id(categories&.pluck(:id))
 
     if rule.amount.present?
       # Rule is independent of receipt
