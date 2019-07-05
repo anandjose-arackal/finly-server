@@ -80,6 +80,8 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
             end
           when "PENDING FOR PROCESSING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
+          when "REJECTED"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
           when "SUSPECT"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
           when "PENDING"

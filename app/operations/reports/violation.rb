@@ -330,6 +330,7 @@ class Reports::Violation < Reports::Base
           return if rule.departments.present? and not rule.departments.pluck(:id).any? {|department| expense.user.user_department_mappings.pluck(:department_id).include? department }
           departments = rule.departments
 
+
           if available_budget < 0
             type = categories.present? ? 'category' : 'total'
             message = rule.rule_in_words(violation: true, violation_type: violation_type, exceeded_by: available_budget.abs)
