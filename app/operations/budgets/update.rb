@@ -37,6 +37,20 @@ class Budgets::Update < Budgets::Base
       return
     end
 
+    if !!budget_params[:start_date] or !!budget_params[:end_date]
+      valid_date = Date.parse(budget_params[:start_date]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid start date provided'
+          return
+      end
+
+      valid_date = Date.parse(budget_params[:end_date]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid end date provided'
+          return
+      end
+    end
+
     if params.dig(:budget, :type)
       # on a temp basis based on design, support increase and reduction of budgets
       case params[:budget][:type]
@@ -59,6 +73,18 @@ class Budgets::Update < Budgets::Base
     parent_budget = self.budget.parent
     # check to make sure the sum of all child budgets is less than the sum of all parent budgets
     if parent_budget.present?
+      if !!budget_params[:start_date] or !!budget_params[:end_date]
+        unless parent_budget.start_date <= Date.parse(budget_params[:start_date])
+          add_message :error, "Start date for this budget should be after the start date for the selected parent budget."
+          return
+        end
+
+        unless parent_budget.end_date >= Date.parse(budget_params[:end_date])
+          add_message :error, "End date for this budget should be earlier than the end date for the selected parent budget."
+          return
+        end
+      end
+
       # sums of all child budgets EXCEPT the budget we are processing now in this op
       sum_of_child_budgets = parent_budget.children.without_id(self.budget.id).joins(:budget_amount).sum(:value) 
       if (sum_of_child_budgets + budget_parameters&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
