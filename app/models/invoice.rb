@@ -995,6 +995,16 @@ class Invoice < ApplicationRecord
 
   def payment_agreement_related_fields
     if self.payment_agreement.present?
+      errors.add(:vendor, 'cannot be blank') if self.vendor_id.blank?
+      errors.add(:vendor_location, 'cannot be blank') if self.vendor_location_id.blank?
+      errors.add(:bank_account, 'name cannot be blank') if self.bank_account_id.blank?
+      errors.add(:department, 'name cannot be blank') if self.department_id.blank?
+      errors.add(:location, 'name cannot be blank') if self.location_id.blank?
+      errors.add(:cost_center, 'name cannot be blank') if self.cost_center_id.blank?
+      errors.add(:payment_term, 'name cannot be blank') if self.payment_term_id.blank?
+      if self.billing_type_id == BillingType.id_for(:fixed_periodic)
+        errors.add(:vendor_location, 'cannot be blank') if self.invoice_frequency_id.blank?
+      end
     end
   end
 

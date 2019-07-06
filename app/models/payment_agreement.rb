@@ -25,6 +25,8 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :attachments, as: :resource, dependent: :destroy
 
+  validates_associated :invoices
+
   validate :agreement_date_comparison, :expiration_date_if_allowed
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
