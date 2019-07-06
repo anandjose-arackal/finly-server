@@ -7,6 +7,9 @@ default: &default
   PRODUCT_CODE: "WPAY"
   ACCOUNT_NUMBER: "09582650000173"
   API_KEY: "l7xx9e2c880d0b4549049ff62c5bf595c310"
+  HEADERS:
+    transfer: '/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Payment'
+    transaction_status: '/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Reversal'
 
 2: &sample
   <<: *default

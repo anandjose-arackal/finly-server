@@ -66,8 +66,11 @@ default: &default
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionInquiry'
   kotak_bank:
-    base: 'https://apigwuat.kotak.com:8443'
-    path: 'cms_generic_service'
+    base: 'https://apigwuat.kotak.com:8443/cms_generic_service'
+    path: ''
+  kotak_bank_auth:
+    base: 'https://apigwuat.kotak.com:8443/k2/auth/oauth/v2/token'
+    path: ''
 
 staging:
   <<: *default
@@ -180,3 +183,9 @@ production:
   icici_bank_transaction_status:
     base: 'https://api.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'TransactionInquiry'
+  kotak_bank:
+    base: 'https://apigwuat.kotak.com:8443/cms_generic_service'
+    path: ''
+  kotak_bank_auth:
+    base: 'https://apigwuat.kotak.com:8443/k2/auth/oauth/v2/token'
+    path: ''

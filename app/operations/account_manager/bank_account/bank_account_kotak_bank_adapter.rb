@@ -56,7 +56,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     bank_transaction = op.bank_transaction
     if op.success?
       if bank_transaction.completed?
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        payment.update(payment_status_id: PaymentStatus.id_for(:initiated))
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
@@ -181,17 +181,25 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
+
     # todo kotak : Set the right attributes
-    bank_transaction = company.kotak_bank_transactions.create(unique_reference_number: transfer_request.generate_unique_reference,
-                                         transfer_type: transfer_request.transfer_type,
-                                         bank_reference_number: transfer_request.bank_reference_number,
-                                         beneficiary_bank_account: self.account,
-                                         transfer_status_id: transfer_status_id,
-                                         bank_response: transfer_request.transaction_result,
-                                         amount_attributes: {
-                                             value: payment.amount_value,
-                                             currency_id: Currency.default_currency_id
-                                         })
+    kotak_bank_transaction_params = {
+        unique_reference_number: transfer_request.generate_unique_reference,
+        transfer_type: transfer_request.transfer_type,
+        utr: transfer_request.bank_reference_number,
+        beneficiary_account: self.account,
+        beneficiary_account_number: self.account.account_number,
+        beneficiary_account_ifsc: self.account.ifsc,
+        beneficiary_name: self.account.name,
+        transfer_status_id: transfer_status_id,
+        narration: payment.note,
+        amount_attributes: {
+            value: payment.amount_value,
+            currency_id: Currency.first.id
+        }
+    }
+    bank_transaction = company.kotak_bank_transactions.new(kotak_bank_transaction_params)
+    bank_transaction.save
     payment.with_lock do
       if payment.reference_resource.present?
         return false

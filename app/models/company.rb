@@ -11,7 +11,6 @@
 #  status_id        :integer          default(1), not null
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
-#  group_id         :integer
 #
 
 class Company < ApplicationRecord

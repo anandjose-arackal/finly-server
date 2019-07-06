@@ -33,4 +33,6 @@ class KotakBankCompanyAccount < ApplicationRecord
   scope :sum_balances, -> {
     joins(:balance).sum(:value)
   }
+
+  delegate :balance_value, to: :balance
 end

@@ -137,12 +137,16 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         return 0
       end
       case account
-        when :vendor_payment_wallet
-          adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-          return adapter.balance
-        when :company_credits
-          adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-          return adapter.balance
+      when :vendor_payment_wallet
+        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+        return adapter.balance
+      when :company_credits
+        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        return adapter.balance
+      # Sreeram: Uncomment while doing multi bank bank support
+      # when :kotak_bank_account
+      #   adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      #   return adapter.balance
       end
     end
 
@@ -458,6 +462,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           # credit the payment request from company credits
           if user.vendor_payments_admin?
             balance = retrieve_balance(:company_credits, user)
+            # balance = retrieve_balance(:kotak_bank_account, user)
             if balance >= bank_payment_request.requested_amount_value
               enabled = true
             end

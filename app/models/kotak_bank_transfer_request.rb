@@ -3,11 +3,23 @@
 
 class KotakBankTransferRequest < NonPersistentModel
 
-  attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
-                :transfer_currency_code, :transfer_amount, :unique_reference_number,
-                :bank_reference_number, :company_id,
-                :bank_error_message, :transaction_result, :beneficiary_full_name,
-                :error_code
+  attr_accessor :beneficiary_account_number,
+                :ifsc,
+                :beneficiary_name,
+                :transfer_type,
+                :transfer_currency_code,
+                :transfer_amount,
+                :unique_reference_number,
+                :bank_reference_number,
+                :company_id,
+                :bank_error_message,
+                :transaction_result,
+                :beneficiary_full_name,
+                :error_code,
+                :response_status_code,
+                :bank_response
+
+
 
   belongs_to :company, optional: true
 
@@ -24,7 +36,7 @@ class KotakBankTransferRequest < NonPersistentModel
         beneficiary_account_number: beneficiary_account_number,
         beneficiary_name: beneficiary_name,
         ifsc: ifsc,
-        transfer_type: transfer_type,
+        transfer_type: resolve_transfer_type(transfer_type),
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
         # unique_reference_number: generate_unique_reference,
@@ -39,10 +51,15 @@ class KotakBankTransferRequest < NonPersistentModel
     if self.unique_reference_number.present?
       return self.unique_reference_number
     end
+
     ref = nil
     loop do
       # ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      if transfer_type == "IMPSA"
+        ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..6]}"
+      else
+        ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      end
       break
       if KotakBankTransaction.find_by(unique_reference_number: ref).blank?
         self.unique_reference_number = ref
@@ -50,6 +67,11 @@ class KotakBankTransferRequest < NonPersistentModel
       end
     end
     ref
+  end
+
+  def self.resolve_transfer_type(transfer_type)
+    return "IMPSA" if transfer_type == "IMPS"
+    transfer_type
   end
 
   def as_json(options={})

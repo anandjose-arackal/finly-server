@@ -3,7 +3,7 @@ class KotakBankApi::Base < BaseHandler
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
                 :configuration, :company_id, :account_number,
-                :start_time, :end_time, :file_logger, :payment
+                :start_time, :end_time, :file_logger, :payment, :grant_type
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -16,6 +16,7 @@ class KotakBankApi::Base < BaseHandler
       (params[:base_url] or params['base_url'])
     elsif env_key.present?
       ENV["#{env_key}_base"] + "?apikey=#{self.configuration['API_KEY']}"
+      # ENV["#{env_key}_base"] + "?apikey=#{self.configuration['API_KEY']}"
     else
       nil
     end
@@ -29,19 +30,12 @@ class KotakBankApi::Base < BaseHandler
   end
 
   def init
-    # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
-    # self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
-    # unless config_path.present?
-    #   add_message :error, "Server error, try again later"
-    # end
-
-
     if Rails.env.production?
       # TODO store data in sercure storage
       values = Finly::SecureStorage::Connector.read('core/kotak_bank')
     else
-      path = "#{Rails.root}/config/kotak_bank_config.yml"
-      values = YAML.load_file(path)
+      file_path = "#{Rails.root}/config/kotak_bank_config.yml"
+      values = YAML.load_file(file_path)
     end
 
 
@@ -61,6 +55,7 @@ class KotakBankApi::Base < BaseHandler
     self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
+    self.grant_type = self.configuration['grant_type']
     # self.auth_username = self.configuration['username']
     # self.auth_password = self.configuration['password']
     # self.application_id = self.configuration['application_id']
@@ -104,14 +99,14 @@ class KotakBankApi::Base < BaseHandler
         puts "Post Params: #{self.template}"
       end
 
+      #todo - kotak: remove below 1 line
+      puts "Post Params: #{self.template}"
+
 
       self.response = self.connection.post do |req|
         # req.url p
         req.headers['Content-Type'] = "application/soap+xml;charset=UTF-8"
-        req.headers['action'] = "/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Payment"
-        # req.headers['Accept-Encoding'] = "gzip,deflate"
-        # req.headers['Connection'] = "Keep-Alive"
-        # req.headers['Host'] = "apigwuat.kotak.com:8443"
+        req.headers['action'] = self.configuration['HEADERS'][bank_action]
         req.body = template
       end
 
@@ -187,7 +182,7 @@ class KotakBankApi::Base < BaseHandler
   protected
 
   # def load_connection(url = base_url)
-  def load_connection(url = 'https://apigwuat.kotak.com:8443/cms_generic_service?apikey=l7xx9e2c880d0b4549049ff62c5bf595c310')
+  def load_connection(url = base_url)
     # adding the ssl options here for the request
     # verify certificate only in production
     verify = Rails.env.production? ? true : false

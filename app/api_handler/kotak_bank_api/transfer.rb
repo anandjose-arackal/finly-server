@@ -4,9 +4,6 @@ class KotakBankApi::Transfer < KotakBankApi::Base
                 :error_code, :transfer_status_id, :company, :bank_transaction, :payment,
                 :account, :beneficiary_mobile_number, :beneficiary_email
 
-  # in this context, success would imply one of these transactions
-  SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
-
   def initialize(params)
     self.transfer_request = params[:transfer_request]
     self.payment = params[:payment]
@@ -81,26 +78,6 @@ class KotakBankApi::Transfer < KotakBankApi::Base
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
     when 500
       self.parsed_response = Hash.from_xml(response.body)
-      # ap parsed_response
-      # self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
-      # # if the transfer failed, we will see it the error message here, else it'll be nil
-      # self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
-      # case self.error_code
-      #   # potential failure cases
-      #   when "ns:E504", "ns:502", "ns:E500"
-      #     self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
-      #     Event::EAlert::Create.(nil, title: 'E:504 - Timeout error',description: "Errors: Timout error - check sideki logs. <br><br> #{payment.as_json}", subject: 'Finly Vendor Payments - E:504')
-      #   # definite failure case
-      #   when "ns:E406", "ns:E6001", "ns:E6002", "ns:E6003", "ns:E8000", "ns:E1001", "ns:E1002", "ns:E1003", "ns:E1004", "ns:E1028", "flex:E18", "flex:E307",
-      #     "flex:E404", "flex:E449", "flex:E8036", "flex:E8087", "flex:E9072", "npci:E08", "npci:EM1", "npci:EM2", "npci:EM3", "npci:EM4", "npci:EM5", "npci:E307",
-      #     "npci:E449", "atom:E307", "atom:E404", "atom:E449", "sfms:E99", "sfms:E70", "sfms:E18", "ns:E9001", "ns:E9002", "ns:E400"
-      #     self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      #   when "ns:E429", "nsE402", "ns:E410", "ns:E403"
-      #     # have to trigger a mailer or something - either transaction limit reached, or not enough balance or something on those lines
-      #     self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      #   else
-      #     self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      # end
     when 200
       self.parsed_response = Hash.from_xml(response.body)
 
@@ -114,30 +91,68 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         case status_code
         when "000"
           # Success | All Instruments accepted Successfully
+          self.transfer_request.response_status_code = status_code
           self.transfer_status_id = BankTransferStatus.id_for(:completed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "001"
           # Error | XML Schema validation failed
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "002"
           # Error | Duplicate Message Id
           # Should ideally reinitiate the transaction
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "003"
           # Error | Invalid Client Code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.response_status_code = status_code
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "004"
           # Error | Duplicate Instrument Ref Number within Request
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.response_status_code = status_code
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "005"
+          # todo - kotak (Check what this means)
+          # Mostly when multiple payments are sent in one request and few of the requests were accepted
           # Error | Request Partially Accepted
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "006"
           # Error | Instrument rejected due to data validation failure
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "007"
+          # todo - kotak (Check what this means)
           # Error | Instrument validated successfully
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "008"
           # Error | Invalid Web service consumer IP address
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "009"
           # Error | All Instruments rejected due to data validation failure
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "010"
           # Error | Default user not found for given client
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         when "011"
           # Error | System encountered severe error. Please contact admin
+          self.transfer_request.response_status_code = status_code
+          self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          self.transfer_request.transaction_result = acknowledgement["StatusRem"]
         end
       else
         # Did not get expected response
@@ -145,30 +160,22 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       end
 
-      # self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
-      # self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
-      # self.transfer_request.beneficiary_full_name = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("nameWithBeneficiaryBank")
-      # if self.transfer_request.bank_reference_number.present?
-      #   if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
-      #     self.transfer_status_id = BankTransferStatus.id_for(:completed)
-      #   elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
-      #     self.transfer_status_id = BankTransferStatus.id_for(:processing)
-      #   end
-      # end
+
     else
         # do nothing?
     end
     # create the bank transaction right here
     #
     self.company = Company.find_by(id: self.transfer_request.company_id)
-    if self.payment&.reference_resource&.is_a?(BankTransaction) || self.bank_transaction.present?
+    if self.payment&.reference_resource&.is_a?(KotakBankTransaction) || self.bank_transaction.present?
       # just update the bank transaction with the latest details
       self.bank_transaction = self.bank_transaction || payment.reference_resource
+      # UTR is never updated here, as Kotak Bank Payment api never returns UTR
       self.bank_transaction.update(
-                          bank_reference_number: self.transfer_request.bank_reference_number,
                           transfer_status_id: self.transfer_status_id,
+                          response_status_code: self.transfer_request.response_status_code,
                           bank_response: self.transfer_request.transaction_result,
-                          beneficiary_full_name: self.transfer_request.beneficiary_full_name
+                          beneficiary_name: self.transfer_request.beneficiary_name
       )
       self.payment&.update(retry_count: self.payment.retry_count.to_f + 1)
     else

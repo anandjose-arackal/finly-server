@@ -34,7 +34,6 @@
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
 #  otp_count                    :integer
-#  rejection_note               :text(65535)
 #
 
 class BankPaymentRequest < ApplicationRecord
