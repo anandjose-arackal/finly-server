@@ -33,11 +33,11 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
     end
 
     if payment_agreement.is_reviewing_user?
-      payment_agreement.action_users(:approve).include?(user)
+      return payment_agreement.action_users(:approve).include?(user)
     end
     if user.is_payment_agreement_initiator? && user.vendor_payments_admin?
       if payment_agreement.awaiting_approval?
-        payment_agreement.action_users(:return_control).include?(user)
+        return payment_agreement.action_users(:return_control).include?(user)
       end  
     end
   end
