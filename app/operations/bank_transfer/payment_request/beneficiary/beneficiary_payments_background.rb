@@ -150,7 +150,6 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
         # Trail will help w.r.t. invoice history
         if from_payment_agreement && ['security_deposit', 'beneficiary'].include?(agreement_type)
-          update_status
           create_trail
         end
         # perform the required calculations

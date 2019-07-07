@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type
 
 	def pre_validate
 	    if user.blank?
@@ -70,6 +70,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
+		self.from_payment_agreement = params[:created_from_payment_agreement]
+		self.agreement_type = params[:agreement_type]
+		self.security_deposit = user.company.security_deposits.find_by_id(params[:document_id]) if self.agreement_type == 'security_deposit'
+		self.beneficiary_payment = user.company.beneficiary_payments.find_by_id(params[:document_id]) if self.agreement_type == 'beneficiary'
 		end
 
 
@@ -90,6 +94,13 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    unless self.policy.present?
 				add_message :error, 'Policy not found'
 				return
+	    end
+
+	    if from_payment_agreement
+	    	if self.beneficiary_payment.blank? && self.security_deposit.blank?
+	    		add_message :error, 'Document not found, unable to process'
+	    		return
+	    	end
 	    end
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
@@ -129,7 +140,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: params[:created_from_payment_agreement], agreement_type: params[:agreement_type], document_id: params[:document_id], ticket_type: params[:ticket_type]})
+      update_status if self.from_payment_agreement # Setting up this status for payment agreement
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
 	end
 
 	def success
@@ -217,4 +229,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		end
 		initiating_account
 	end
+
+  def update_status
+    self.security_deposit.update(status_id: SecurityDepositStatus.id_for(:processing)) if self.agreement_type == 'security_deposit'
+    self.beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:processing)) if self.agreement_type == 'beneficiary'
+  end
 end
