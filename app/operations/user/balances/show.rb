@@ -1,6 +1,6 @@
 class User::Balances::Show < User::Base
 
-  attr_accessor :balances, :current_app, :selected_user, :actions,
+  attr_accessor :balances, :current_app, :selected_user, :actions, :company,
                 :wallet_info, :company_credits_info, :card_info, :user_pockets_info
 
   # using *_info is being used to store all balances and eligibility for this particular user
@@ -16,6 +16,7 @@ class User::Balances::Show < User::Base
       self.selected_user = user
     end
     self.balances = {company_credits: [], finly_money: [], cards: [], user_pockets: []}
+    self.company = self.selected_user.company
     retrieve_balances
   end
 
@@ -35,7 +36,13 @@ class User::Balances::Show < User::Base
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
         if (selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
-          set_yes_bank_balances
+          if selected_user.company.bank_service_provider == "YES"
+            set_yes_bank_balances
+          elsif selected_user.company.bank_service_provider == "ICICI"
+            set_icici_bank_balances
+          else
+            set_yes_bank_balances
+          end
         end
         # showing user pocket balances based on whether they have expense management enabled
         if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
@@ -43,7 +50,13 @@ class User::Balances::Show < User::Base
         end
       when 'vp'
         if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
-          set_yes_bank_balances
+          if selected_user.company.bank_service_provider == "YES"
+            set_yes_bank_balances
+          elsif selected_user.company.bank_service_provider == "ICICI"
+            set_icici_bank_balances
+          else
+            set_yes_bank_balances
+          end
         end
       when 'ft'
         # Adding expense management balances in this section if it's enabled for that user
@@ -100,6 +113,8 @@ class User::Balances::Show < User::Base
         return AccountManager::Wallet::WalletAdapter.new(account)
       when 'YesBankCompanyAccount'
         return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
+      when 'IciciBankCompanyAccount'
+        return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(account)
       when 'CashOnHand'
         return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
       when 'ItzCashCompanyAccount'
@@ -130,7 +145,13 @@ class User::Balances::Show < User::Base
 
   def retrieve_balances
     itz_cash_company_adapter = retrieve_adapter selected_user.company.itz_cash_company_account
-    yes_bank_company_adapter = retrieve_adapter selected_user.company.yes_bank_company_account
+    if self.company.bank_service_provider == "YES"
+      company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
+    elsif self.company.bank_service_provider == "ICICI"
+      company_account_adapter = retrieve_adapter self.company.icici_bank_company_account
+    else
+      company_account_adapter = retrieve_adapter self.company.yes_bank_company_account
+    end
     wallet_adapter = retrieve_adapter user.wallet
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
 
@@ -149,7 +170,7 @@ class User::Balances::Show < User::Base
     end
     self.company_credits_info = {
         yes_bank: {
-            balance: yes_bank_company_adapter.balance
+            balance: company_account_adapter.balance
         },
         itz_cash: {
             balance: comp_balance
@@ -189,6 +210,23 @@ class User::Balances::Show < User::Base
   end
 
   def set_yes_bank_balances
+    if selected_user.vendor_payments_admin? || (selected_user.company.bank_reimbursement_enabled? || selected_user.admin?)
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
+      self.balances[:company_credits] << {
+          name: "Bank Transfer Credits",
+          type: "bank",
+          balance: self.company_credits_info[:yes_bank][:balance]
+      }
+    end
+    self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
+    self.balances[:finly_money] << {
+        name: "Bank Transfer Pocket",
+        type: "bank",
+        balance: self.wallet_info[:yes_bank][:balance]
+    }
+  end
+
+  def set_icici_bank_balances
     if selected_user.vendor_payments_admin? || (selected_user.company.bank_reimbursement_enabled? || selected_user.admin?)
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {

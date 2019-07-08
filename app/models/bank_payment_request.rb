@@ -28,6 +28,12 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
+#  bank_account_provider_id     :integer
+#  otp                          :string(255)
+#  otp_sent_at                  :datetime
+#  otp_attempts                 :integer
+#  otp_count                    :integer
+#  rejection_note               :text(65535)
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -252,6 +258,18 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     where(id: bpr_ids)
   }
 
+  scope :filter_custom_field_text, -> (key, value) {
+    if value.present?
+      raw_po_ids = self.pluck(:payment_order_id)
+      raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+      field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_text_value(value).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+      po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+      bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+      where(id: bpr_ids)
+    end
+  }
+
   scope :filter_policy_id, -> (policy_id) {
     where policy_id: policy_id
   }
@@ -338,7 +356,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   end
 
   def can_credit?
-    approved?
+    approved? || processing? || auto_approved?
   end
 
   def can_take_control?

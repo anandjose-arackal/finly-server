@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   attr_accessor :payment_requests, :result, :initiating_account_adapter, :payment_orders,
                 :initiating_account, :creditable_payment_requests, :creditable_payment_orders,
-                :view_role
+                :view_role, :otp
 
   def pre_validate
     super
@@ -19,6 +19,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   def init
     ids = params[:payment_request_ids] || params[:bank_payment_request_ids] || params[:ids]
+    self.otp = params[:otp]
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end
@@ -61,6 +62,18 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     unless requested_amount <= self.initiating_account_adapter.balance
       add_message :error, "You do not have enough balance in the initiating account to initiate this transfer"
       # todo = should trigger a mailer or notification preferably
+      return
+    end
+
+    #checking if the OTP for all the payment tickets are the same as the one passed in the request
+    otp = self.payment_requests.pluck(:otp).uniq
+    unless otp.size == 1
+      add_message :error, "Invalid OTP, try again"
+      return
+    end
+
+    unless otp.first == self.otp
+      add_message :error, "Wrong OTP entered. Please enter the right OTP and try again"
       return
     end
   end
@@ -150,7 +163,14 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   def retrieve_initiating_account
     case params[:initiating_account_type]
       when 1, '1'
-        return user.company.yes_bank_company_account
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return user.company.yes_bank_company_account
+          when "ICICI"
+            return user.company.icici_bank_company_account
+          else
+            return user.company.yes_bank_company_account
+        end
       when 2, '2'
         return user.bank_wallet
       else
@@ -161,7 +181,14 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
       when 1, '1'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+          when "YES"
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+          when "ICICI"
+            return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          else
+            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else

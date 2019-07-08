@@ -9,6 +9,9 @@
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
 #  status_id        :integer          default(1), not null
+#  test_account     :boolean          default(FALSE)
+#  subdomain        :string(255)
+#  group_id         :integer
 #
 
 class Company < ApplicationRecord
@@ -37,7 +40,8 @@ class Company < ApplicationRecord
   has_many :company_balance_histories
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
-  has_many :bank_transactions
+  has_many :yes_bank_transactions
+  has_many :icici_bank_transactions
   has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
@@ -47,6 +51,7 @@ class Company < ApplicationRecord
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one :icici_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -54,11 +59,14 @@ class Company < ApplicationRecord
   has_many :invoice_attachments
   has_many :export_configs
   has_many :unique_identifiers
+  has_many :beneficiary_payments
+  has_many :icici_statements
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
   has_one :enforce_budget_configuration
   has_one :custom_export_configuration, as: :configurable
+  has_one :icici_bank_config
 
   has_many :payment_orders
   has_many :user_groups
@@ -349,6 +357,10 @@ class Company < ApplicationRecord
     self.configuration.auto_retry_payment
   end
 
+  def bank_service_provider
+    self.feature_subscription.bank_service_provider
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
@@ -452,6 +464,7 @@ class Company < ApplicationRecord
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save

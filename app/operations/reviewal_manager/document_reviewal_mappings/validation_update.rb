@@ -7,6 +7,8 @@ class ReviewalManager::DocumentReviewalMappings::ValidationUpdate < ReviewalMana
   def init
     self.document = params[:reviewal_document]
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings_params]
+
+
     # DLRM wont' be there
     # self.dlrms = self.document.document_level_reviewer_mappings.includes(:level, :reviewer)
     self.policy = user.company.policies.non_deleted.find_by id: self.document.policy_id
@@ -22,12 +24,14 @@ class ReviewalManager::DocumentReviewalMappings::ValidationUpdate < ReviewalMana
     unless self.document.present?
       add_message :error, 'Document not found'
     end
+
+
   end
 
   def process
     # Check
     amount = get_document_amount
-    if self.reviewal_levels.present?
+    if self.reviewal_levels.with_associated_entity_type(self.document.class.name).present?
       self.reviewal_levels.each do |level|
         if level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).present?
           valid_reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
@@ -86,7 +90,7 @@ class ReviewalManager::DocumentReviewalMappings::ValidationUpdate < ReviewalMana
   private
 
   def get_level_reviewer_data(level_id)
-    self.document_reviewer_mappings_params.each do |drm|
+    self.document_reviewer_mappings_params&.each do |drm|
       if drm[:level_id].to_i == level_id
         return drm
       end

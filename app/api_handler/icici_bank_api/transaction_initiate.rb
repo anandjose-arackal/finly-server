@@ -1,0 +1,166 @@
+class IciciBankApi::TransactionInitiate < IciciBankApi::Base
+
+  attr_accessor :payment, :icici_bank_transaction, :transfer_request, :receiving_account
+
+  def initialize(params)
+    self.transfer_request = params[:transfer_request]
+    self.payment = params[:payment]
+    self.params = {}
+  end
+
+  def self.call(transfer_request)
+    self.new(transfer_request).run
+  end
+
+  def pre_validate
+    if transfer_request.blank?
+      add_message :error, "Invalid parameters"
+      return
+    end
+
+    unless transfer_request.class.name == "IciciBankTransferRequest"
+      add_message :error, "Invalid parameters"
+    end
+
+    unless transfer_request.valid?
+      add_message :error, transfer_request.errors
+      return
+    end
+  end
+
+  def init
+    self.company = self.payment.company
+    # self.company = Company.second
+    super # so that the variables are initialized from the config file
+    self.icici_bank_transaction = self.payment.reference_resource
+    self.receiving_account = self.payment.receiving_account
+    super()
+  end
+
+  def env_key
+    'icici_bank_transaction_initiate'
+  end
+
+  def raw_api_params
+    remarks = self.payment.note.blank? ? "Test note" : self.payment.note
+    payee_name = self.receiving_account.account_owner.business_name
+    {
+        AGGRID: self.company_details["AGGR_ID"],
+        AGGRNAME: self.company_details["AGGR_NAME"],
+        CORPID: self.company_details["CORP_ID"],
+        USERID: self.company_details["USER_ID"],
+        URN: self.company.icici_bank_config.urn,
+        UNIQUEID: self.transfer_request.unique_reference_number.to_s,
+        DEBITACC: self.company_details["DEBIT_ACC_NO"],
+        CREDITACC: self.receiving_account.account_number,
+        # CREDITACC: "000405002777",
+        IFSC: self.receiving_account.ifsc,
+        # IFSC: "DLXB0000092",
+        # IFSC: "ICIC0000011",
+        AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
+        # AMOUNT: "200",
+        CURRENCY: self.icici_bank_transaction.amount.currency.country_code,
+        # CURRENCY: "INR",
+        # TXNTYPE: "OWN",
+        TXNTYPE: self.icici_bank_transaction.transfer_type,
+        # TXNTYPE: "OWN", # "RTG", "RGS"
+        PAYEENAME: payee_name,
+        # PAYEENAME: "Sreeram",
+        REMARKS: remarks.to_s,
+        # REMARKS: "This is a test note",
+        CUSTOMERINDUCED: "N"
+    }
+  end
+
+  def post_params
+    encrypt_params(
+        raw_api_params
+    )
+  end
+
+  def post_process
+    case self.response.status
+      when 404
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        add_message :error, "Service temporarily unavailable"
+        self.transfer_request.bank_error_message = "Service temporarily unavailable"
+      when 500
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        add_message :error, "Service temporarily unavailable"
+        self.transfer_request.bank_error_message = "Service temporarily unavailable"
+      when 200
+        # mark the transaction as processing.
+        # log the parsed params so that we can get visibility on the transaction
+
+        if self.parsed_response["RESPONSE"] == "SUCCESS" || self.parsed_response["Response"] == "SUCCESS"
+          case self.parsed_response["STATUS"]
+            when "PENDING FOR PROCESSING"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
+            when "SUCCESS"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_utr))
+            when "FAILURE"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+              error_message = self.parsed_response["Message"]
+              add_message :error, error_message
+              self.transfer_request.bank_error_message = error_message
+            else
+              # handle it gracefully
+          end
+        elsif self.parsed_response["RESPONSE"] == "FAILURE" || self.parsed_response["Response"] == "FAILURE"
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
+          add_message :error, error_message
+          self.transfer_request.bank_error_message = error_message
+        else
+          # any other case must be a failure as well
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"] || self.parsed_response["message"]
+          add_message :error, error_message
+          self.transfer_request.bank_error_message = error_message
+        end
+    end
+  end
+
+  def success?
+    self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.pending_for_processing?
+  end
+
+  def failure?
+    self.icici_bank_transaction.failed? || self.icici_bank_transaction.possible_failure?
+  end
+
+  def success
+    params[:bank_transaction] = self.icici_bank_transaction
+    params[:transfer_request] = self.transfer_request
+    IciciBankApi::TransactionInitiate::TransactionSuccessPresenter.new(params, messages)
+  end
+
+  def failure
+    params[:bank_transaction] = self.icici_bank_transaction
+    params[:transfer_request] = self.transfer_request
+    IciciBankApi::TransactionInitiate::TransactionFailurePresenter.new(params, messages)
+  end
+
+  class IciciBankApi::TransactionInitiate::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :transfer_request, :bank_transaction
+
+    def initialize(params, messages)
+      self.messages = messages
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
+    end
+  end
+
+  class IciciBankApi::TransactionInitiate::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+
+    attr_accessor :transfer_request, :bank_transaction
+
+    def initialize(params, messages)
+      self.messages = messages
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
+    end
+  end
+
+end
