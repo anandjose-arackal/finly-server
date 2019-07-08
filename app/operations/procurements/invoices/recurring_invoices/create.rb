@@ -54,10 +54,23 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     # Resource can be general_invoice or rental_invoice
     case
     when resource.is_a?(Invoice)
-    invoice = resource.amoeba_dup
-    invoice.invoice_id = nil
-    if invoice.save
-      update_invoice_attributes(resource, invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
+      binding.pry
+    new_invoice = resource.amoeba_dup
+    new_invoice.invoice_id = nil
+    if new_invoice.save
+
+      
+      # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
+      items = new_invoice.items.group(:description).having('count("description") > 1').count(:description)
+      items.each do |key, value|
+        duplicates = new_invoice.items.where(description: key)[1..value-1]
+        duplicates.each(&:destroy)
+      end
+
+      ######## Temp fix for demo only ########
+
+
+      update_invoice_attributes(resource, new_invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
       # Create trail for general/rental_invoice that recurring invoice has been created
       trail_options = {action: 'invoice_created', parent: resource, parent_type: 'Invoice'}
       create_trail(trail_options)
