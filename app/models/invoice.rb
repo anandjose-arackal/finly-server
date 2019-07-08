@@ -1002,8 +1002,8 @@ class Invoice < ApplicationRecord
       errors.add(:location, 'name cannot be blank') if self.location_id.blank?
       errors.add(:cost_center, 'name cannot be blank') if self.cost_center_id.blank?
       errors.add(:payment_term, 'name cannot be blank') if self.payment_term_id.blank?
-      if self.billing_type_id == BillingType.id_for(:fixed_periodic)
-        errors.add(:vendor_location, 'cannot be blank') if self.invoice_frequency_id.blank?
+      if self.billing_type_id == BillingType.id_for(:fixed_periodic) && (self.invoice_frequency.number.blank? || self.invoice_frequency.period_id.blank?)
+        errors.add(:invoice_frequency, 'cannot be blank') 
       end
     end
   end
