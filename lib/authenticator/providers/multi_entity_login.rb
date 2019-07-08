@@ -1,29 +1,22 @@
 class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Base
 
-  attr_accessor :company_id
+  attr_accessor :company_id, :logged_in_user, :target_user
 
   def self.accept?(request)
     scopes = request.params[:scope]&.split(" ")
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first)
+    scopes&.size == 1 and ["multi_entity_login"].include?(scopes&.first)
   end
 
   def authenticate
-    return unless super
+    fail_with_event :on_blank_company_id, 'Target company not specified'
+    fail_with_event :on_blank_auth_token, 'Invalid request'
 
-    logged_in_user = Doorkeeper::AccessToken.find_by(token: auth_token)
+    # now find the logged in user
+    self.logged_in_user = Doorkeeper::AccessToken.find_by(token: auth_token)
+    self.target_user = for_user
 
-
-    master_users = Finly::SecureStorage::Connector.read('core/master_users')
-    unless master_users.include?(unauthenticated_user.email)
-      fail_with_event :on_unauthorized_master_login_attempt, 'User does not have the permission to login'
-      return
-    end
-
-    unless unauthenticated_user.valid_master_password?(params[:master_password])
-      fail_with_event :on_invalid_master_password, 'Invalid master password'
-      return
-    end
+    fail_with_event :on_non_matching_user_credentials, "Target user does not have the same credentials as currently logged in user"
 
     self.authenticated_user = for_user
   end
@@ -37,41 +30,24 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
     params[:auth_token]
   end
 
-  def on_blank_username(message)
-    Gatekeeper::Event.(:user_login_blank_username, ip: request.remote_ip)
-    params[:user] = self.unauthenticated_user
-    params[:message] = message || 'Blank Password'
+  def on_blank_company_id(message)
+    Gatekeeper::Event.(:multi_entity_missing_blank_company, ip: request.remote_ip)
+    params[:user] = self.logged_in_user
+    params[:message] = message || "Company ID not passed"
     UserSessions::Create.(:failed, params)
   end
 
-  def on_blank_password(message)
-    Gatekeeper::Event.(:user_login_blank_password, username: username, ip: request.remote_ip)
-    params[:user] = self.unauthenticated_user
-    params[:message] = message || 'Blank Password'
+  def on_blank_auth_token(message)
+    Gatekeeper::Event.(:multi_entity_missing_auth_token, ip: request.remote_ip)
+    params[:user] = self.logged_in_user
+    params[:message] = message || "Missing auth token"
     UserSessions::Create.(:failed, params)
   end
 
-  def on_invalid_username(message)
-    Gatekeeper::Event.(:user_login_invalid_username, username: username, ip: request.remote_ip)
-    params[:user] = self.unauthenticated_user
-    params[:message] = message || 'Invalid Username'
-    UserSessions::Create.(:failed, params)
-  end
-
-  def on_attempt(message)
-    result = Gatekeeper::Event.(:user_login_attempt, user: self.unauthenticated_user, username: username, ip: request.remote_ip)
-    unless result.success?
-      params[:user] = self.unauthenticated_user
-      params[:message] = result.message
-      UserSessions::Create.(:blocked, params)
-      block
-    end
-  end
-
-  def on_invalid_password(message)
-    Gatekeeper::Event.(:user_login_invalid_password, user: self.unauthenticated_user, username: username, ip: request.remote_ip)
-    params[:user] = self.unauthenticated_user
-    params[:message] = message || 'Invalid Password'
+  def on_non_matching_user_credentials(message)
+    Gatekeeper::Event.(:multi_entity_mismatch_user_credentials, ip: request.remote_ip)
+    params[:user] = self.logged_in_user
+    params[:message] = message || "Mismatched user credentials"
     UserSessions::Create.(:failed, params)
   end
 

@@ -15,6 +15,7 @@ class Authenticator::Providers::Base
     fail_with_event :on_blank_password, 'Blank password' and return if password.blank?
     fail_with_event :on_invalid_username, 'User not found' and return if unauthenticated_user.blank?
 
+
     on_event :on_attempt
     return if failed? or blocked?
 
