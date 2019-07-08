@@ -1,6 +1,6 @@
 class Budgets::GenerateSampleFile < Budgets::Base
 
-  attr_accessor :sample_file, :company, :headers, :content,
+  attr_accessor :sample_file, :company, :headers, :content, :sheets
 
   def init
     self.company = user.company
@@ -17,6 +17,18 @@ class Budgets::GenerateSampleFile < Budgets::Base
             name: "Budget Import"
         }
     ]
+
+    # adding user IDs to the sheet
+    user_headers = ["User Name", "User ID"]
+    user_contents = []
+    self.company.users.each do |user|
+      user_contents << [user.name, user.id]
+    end
+    self.sheets << {
+        item_headers: user_headers,
+        item_contents: user_contents,
+        name: "Users"
+    }
 
     # adding category IDs to the sheet
     categories_headers = ["Category Name", "Category ID"]
@@ -68,17 +80,19 @@ class Budgets::GenerateSampleFile < Budgets::Base
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    self.response = Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
   end
 
   private
 
   def default_headers
     [
+        "Parent Budget ID(optional)",
         "Budget Name",
         "Amount",
         "Start Date (dd-mm-yyyy)",
         "End Date (dd-mm-yyyy)",
+        "Users Budgetable",
         "Categories Budgetable",
         "Departments Budgetable",
         "Locations Budgetable",

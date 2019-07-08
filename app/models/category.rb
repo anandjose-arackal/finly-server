@@ -47,6 +47,8 @@ class Category < ApplicationRecord
 
   scope :active, -> { where active: true }
   scope :with_id, ->(id) { where id: id }
+  scope :with_ids, -> (ids) { where id: ids }
+
   scope :with_name, ->(name) { where name: name }
   scope :others, -> { where name: 'Other' }
   scope :with_purpose, -> (purposes) {

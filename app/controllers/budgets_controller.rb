@@ -70,7 +70,14 @@ class BudgetsController < BaseControllers::WebBase
 
   def sample_import_file
     @result = Budgets::GenerateSampleFile.(current_user, params)
-    respond
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+
   end
 
   def import

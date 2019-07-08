@@ -3529,7 +3529,9 @@ Rails.application.routes.draw do
   ######## Budget apis start ######
 
   get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  get 'budgets/generate_template_file', to: 'budgets#sample_import_file', as: :generate_import_file
   post 'budgets/import', to: 'budgets#import', as: :budget_import
+  post 'budgets/process_template_file', to: 'budgets#import', as: :process_template_file
   get 'budgets/:id/give_me_children', to: 'budgets#sub_budgets', as: :sub_budgets
   post 'budgets/bulk_update', to: 'budgets#bulk_update', as: :bulk_update_budgets
   ## Budget apis start ##
