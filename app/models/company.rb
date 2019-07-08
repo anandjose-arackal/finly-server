@@ -61,6 +61,7 @@ class Company < ApplicationRecord
   has_many :export_configs
   has_many :unique_identifiers
   has_many :beneficiary_payments
+  has_many :icici_statements
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -359,6 +360,10 @@ class Company < ApplicationRecord
 
   def group_entity_structure_enabled?
     self.feature_subscription.group_entity_structure
+  end
+
+  def bank_service_provider
+    self.feature_subscription.bank_service_provider
   end
 
   def more_than_one_subscription?

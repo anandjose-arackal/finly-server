@@ -4,7 +4,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   # todo: Policy admins are permitted to create only for their policy and users within the policy
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def pre_validate
@@ -44,6 +44,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   end
 
   def authorize
+    return true if user.vendor_payment_admin?
     if not user.company_admin? and user.policy_admin?
       policy_id = config_params[:configurable_id]
       policies_presenter = Policy::Index.(user, view: 'admin')

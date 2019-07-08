@@ -161,7 +161,11 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+    if item.parent.class.name == 'OutwardInvoice'
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
+    else
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+    end
     self.tax_amount = self.net_amount - self.gross_amount
 
     # setting the SGST, CGST and IGST values for the invoice
@@ -187,7 +191,11 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
+    if item.parent.class.name == 'OutwardInvoice'
+      self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax))
+    else
+      self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
+    end
     self.tax_amount = self.after_discount_amount - self.gross_amount
 
     # setting the SGST, CGST and IGST values for the invoice
