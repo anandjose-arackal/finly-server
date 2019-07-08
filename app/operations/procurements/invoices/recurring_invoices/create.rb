@@ -54,12 +54,11 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     # Resource can be general_invoice or rental_invoice
     case
     when resource.is_a?(Invoice)
-      binding.pry
     new_invoice = resource.amoeba_dup
     new_invoice.invoice_id = nil
     if new_invoice.save
 
-      
+
       # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
       items = new_invoice.items.group(:description).having('count("description") > 1').count(:description)
       items.each do |key, value|
