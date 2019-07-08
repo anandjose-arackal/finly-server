@@ -27,6 +27,7 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.retriable do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
@@ -77,6 +78,7 @@ json.payments do
         json.tds_rate precision_value invoice.tds_rate
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
+        json.invoice_id invoice.id
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url

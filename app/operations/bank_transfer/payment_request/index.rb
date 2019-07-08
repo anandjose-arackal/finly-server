@@ -167,6 +167,15 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = params[:payment_requests]
       set_scopes
       self.payment_requests = apply_scopes(payment_requests)
+
+      # slightly dirty logic for the custom field text search #TODO - refactor later
+      if params[:filter_custom_text_selection].present?
+        params[:filter_custom_text_selection].each do |key, value|
+          self.payment_requests = self.payment_requests.filter_custom_field_text(key, value)
+        end
+      end
+      ######################## dirty logic end ####################################
+
       per_page = params[:per_page] || 30
       page = params[:page] || 1
       # if self.payment_requests.present?
@@ -196,7 +205,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     end
 
     def status_count
-      pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited)
+      pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited, :auto_approved)
       po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
@@ -220,7 +229,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
             result[:draft] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:processing)
             result[:processing] += payment_tickets_counts[status.id]
-          when BankPaymentRequestStatus.id_for(:approved)
+          when BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:auto_approved)
             result[:approved] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:credited)
             result[:credited] += payment_tickets_counts[status.id]

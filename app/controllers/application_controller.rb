@@ -1,4 +1,4 @@
-require 'require_all'
+require "require_all"
 
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
+
+  before_action :set_cache_buster
 
   around_action :save_request_impression
   before_action :finly_authorize!
@@ -38,18 +40,18 @@ class ApplicationController < ActionController::Base
   # handles 404 errors
   def not_found
     respond_to do |format|
-      format.html {render file: "#{Rails.root}/public/404", layout: false, status: :not_found}
-      format.xml {head :not_found}
-      format.any {head :not_found}
+      format.html { render file: "#{Rails.root}/public/404", layout: false, status: :not_found }
+      format.xml { head :not_found }
+      format.any { head :not_found }
     end
   end
 
   # handles 500 errors
   def error
     respond_to do |format|
-      format.html {render file: "#{Rails.root}/public/500", layout: false, status: :error}
-      format.xml {head :not_found}
-      format.any {head :not_found}
+      format.html { render file: "#{Rails.root}/public/500", layout: false, status: :error }
+      format.xml { head :not_found }
+      format.any { head :not_found }
     end
   end
 
@@ -57,12 +59,12 @@ class ApplicationController < ActionController::Base
     # store last url - this is needed for post-login redirect to whatever the user last visited.
     return unless request.get?
     if request.path != "/users/sign_in" &&
-        request.path != "/users/sign_up" &&
-        request.path != "/users/password/new" &&
-        request.path != "/users/password/edit" &&
-        request.path != "/users/confirmation" &&
-        request.path != "/users/sign_out" &&
-        !request.xhr? # don't store ajax calls
+       request.path != "/users/sign_up" &&
+       request.path != "/users/password/new" &&
+       request.path != "/users/password/edit" &&
+       request.path != "/users/confirmation" &&
+       request.path != "/users/sign_out" &&
+       !request.xhr? # don't store ajax calls
       session[:previous_url] = request.fullpath
     end
   end
@@ -70,9 +72,9 @@ class ApplicationController < ActionController::Base
   def respond_to_ajax_with_success(redirect_path = root_path, force = false)
     redirect_path = request.referrer if request.referrer && !force
     respond_to do |format|
-      format.html {redirect_to redirect_path}
-      format.js {redirect_to redirect_path, turbolinks: true}
-      format.json {}
+      format.html { redirect_to redirect_path }
+      format.js { redirect_to redirect_path, turbolinks: true }
+      format.json { }
     end
   end
 
@@ -82,19 +84,19 @@ class ApplicationController < ActionController::Base
         if request.present? && request.referrer.present?
           redirect_to request.referrer
         else
-          render partial: 'shared/flash_message'
+          render partial: "shared/flash_message"
         end
       end
       format.js do
-        render partial: 'shared/flash_message'
+        render partial: "shared/flash_message"
       end
-      format.json {}
+      format.json { }
     end
   end
 
   def after_sign_in_path_for(resource)
     if resource.is_a?(AdminUser)
-      'admin'
+      "admin"
     else
       root_path
     end
@@ -102,18 +104,18 @@ class ApplicationController < ActionController::Base
 
   def current_app
     # Check header to identify app
-    header_app = request.headers['App']
+    header_app = request.headers["App"]
     if header_app.present?
       case header_app
-      when 'ap', :ap
+      when "ap", :ap
         return :ap
-      when 'ft', :ft
+      when "ft", :ft
         return :ft
-      when 'vp', :vp
+      when "vp", :vp
         return :vp
-      when 'em', :em
+      when "em", :em
         return :em
-      when 'fc', :fc
+      when "fc", :fc
         return :fc
       end
     end
@@ -122,13 +124,13 @@ class ApplicationController < ActionController::Base
     path = URI(request.referrer).path if request.referrer.present?
     path = request.path if path.blank?
     if path.is_a?(String)
-      if path.starts_with?('/admin')
+      if path.starts_with?("/admin")
         return :ap
-      elsif path.starts_with?('/payments')
+      elsif path.starts_with?("/payments")
         return :vp
-      elsif path.starts_with?('/disburse')
+      elsif path.starts_with?("/disburse")
         return :ft
-      elsif path.starts_with?('/collect')
+      elsif path.starts_with?("/collect")
         return :fc
       end
     end
@@ -138,11 +140,11 @@ class ApplicationController < ActionController::Base
   def current_device
     path = request.path
     if path.is_a?(String)
-      if path.starts_with?('/api')
+      if path.starts_with?("/api")
         return :api
-      elsif path.starts_with?('/mobile')
+      elsif path.starts_with?("/mobile")
         return :mobile
-      elsif path.starts_with?('/desktop')
+      elsif path.starts_with?("/desktop")
         # todo desktop login
         return :desktop
       end
@@ -152,21 +154,21 @@ class ApplicationController < ActionController::Base
 
   def current_user
     if RequestStore.store[:current_user].present?
-      if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != 'User'
+      if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != "User"
         return RequestStore.store[:current_user]
       end
     end
     @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api')
+      if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api")
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
-      elsif scopes.include?('admin')
+      elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
     RequestStoreUtil.set_current_user @curr_user
-    if @curr_user.class.name == 'User'
+    if @curr_user.class.name == "User"
       RequestStoreUtil.set_current_company @curr_user&.company
     end
 
@@ -185,7 +187,7 @@ class ApplicationController < ActionController::Base
 
   def retrieve_delegate_user
     # header is going to send a 'delegate_for_user_id' attribute
-    delegate_for_user_id = request.headers['Delegate-For-User-Id']
+    delegate_for_user_id = request.headers["Delegate-For-User-Id"]
     delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
     if delegated_for_user.present?
       RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
@@ -209,8 +211,8 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json {render 'shared/success'}
-          format.html {}
+          format.json { render "shared/success" }
+          format.html { }
         end
         return
       elsif type[:response] == :failure
@@ -220,20 +222,20 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json {render 'layouts/application'}
-          format.html {}
+          format.json { render "layouts/application" }
+          format.html { }
         end
         return
       elsif type[:render].present?
         respond_to do |format|
-          format.json {render type[:render]}
-          format.html {}
+          format.json { render type[:render] }
+          format.html { }
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
-          format.json {render 'layouts/application'}
-          format.html {}
+          format.json { render "layouts/application" }
+          format.html { }
         end
         return
       end
@@ -244,25 +246,26 @@ class ApplicationController < ActionController::Base
           @result.render(self)
         else
           respond_to do |format|
-            format.js {}
-            format.json {}
-            format.html {}
-            format.xls {}
+            format.js { }
+            format.json { }
+            format.html { }
+            format.xls { }
           end
         end
       else
         respond_to do |format|
-          format.js {render 'layouts/application'}
-          format.json {render 'layouts/application'}
-          format.html {}
-          format.xls {}
+          format.js { render "layouts/application" }
+          format.json { render "layouts/application" }
+          format.html { }
+          format.xls { }
+          format.csv { }
         end
       end
     else
       respond_to do |format|
-        format.js {}
-        format.json {render 'layouts/application'}
-        format.html {}
+        format.js { }
+        format.json { render "layouts/application" }
+        format.html { }
       end
     end
   end
@@ -278,9 +281,9 @@ class ApplicationController < ActionController::Base
   def respond_failure(message = nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
-    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
+    @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, { error: messages })
     respond_to do |format|
-      format.json {render 'layouts/application'}
+      format.json { render "layouts/application" }
     end
   end
 
@@ -342,9 +345,9 @@ class ApplicationController < ActionController::Base
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
       # if doorkeeper_token.scopes.include?('web')
-        doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: 'UserSession does not exist')
-        head 401
-        return false
+      doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: "UserSession does not exist")
+      head 401
+      return false
       # else
       #   # todo better handle how existing logins are associated i.e mobile, API etc
       #   # params[:user] = current_user
@@ -380,7 +383,6 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-
     return false unless last_request_at_changed?(user_session)
 
     user_session.update(last_request_at: DateTime.now)
@@ -391,7 +393,7 @@ class ApplicationController < ActionController::Base
     return true if user_session.admin_user_id.present?
 
     return false unless user_session.authorized?
-    ['otp/resend', 'otp/verify', 'users/password', 'notifications/unread'].each {|path| return false if request.path.include?(path)}
+    ["otp/resend", "otp/verify", "users/password", "notifications/unread"].each { |path| return false if request.path.include?(path) }
     return false if current_user.expired?
     return false unless current_user.otp_verified
     return false unless user_session.verified?
@@ -432,11 +434,10 @@ class ApplicationController < ActionController::Base
   end
 
   def set_tokens_in_header
-
     if self.class.required_header_token_actions.include?(action_name) or self.class.required_header_token_actions.include?(action_name&.to_sym)
-      access_token = request.cookies['access_token']
+      access_token = request.cookies["access_token"]
       if access_token.present?
-        request.headers['Authorization'] = "Bearer #{access_token}"
+        request.headers["Authorization"] = "Bearer #{access_token}"
         RequestStoreUtil.set_skip_x_finly_rp_check
       end
     end
@@ -446,22 +447,22 @@ class ApplicationController < ActionController::Base
     QueryLogger.reset if ENABLE_QUERY_LOGGER
   end
 
-  FILE_LOGGER = LogStashLogger.new(type: :file, path: 'log/logstash_query_details.log', sync: true)
+  FILE_LOGGER = LogStashLogger.new(type: :file, path: "log/logstash_query_details.log", sync: true)
 
   def set_queries_counter
     return unless ENABLE_QUERY_LOGGER
-    return if params[:controller] == 'notifications' && params[:action] == 'unread'
+    return if params[:controller] == "notifications" && params[:action] == "unread"
     log = {
-        path: request.path,
-        controller: request.params[:controller],
-        action: request.params[:action],
-        total_query_time: QueryLogger.time,
-        queries_count: QueryLogger.count,
-        queries_summary: QueryLogger.summary,
-        # queries: QueryLogger.queries,
-        current_app: current_app,
-        current_device: current_device,
-        request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
+      path: request.path,
+      controller: request.params[:controller],
+      action: request.params[:action],
+      total_query_time: QueryLogger.time,
+      queries_count: QueryLogger.count,
+      queries_summary: QueryLogger.summary,
+      # queries: QueryLogger.queries,
+      current_app: current_app,
+      current_device: current_device,
+      request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s),
     }
     user = current_user rescue nil
     if user.present?
@@ -477,6 +478,12 @@ class ApplicationController < ActionController::Base
       log[:current_view] = view
     end
     FILE_LOGGER.info(log)
+  end
+
+  def set_cache_buster
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end
 
   # def track_request

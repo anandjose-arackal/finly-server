@@ -38,6 +38,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.payment_mode = self.bank_payment_request.payment_mode
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
+    initiating_account = retrieve_initiating_account(user.company)
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
       payment[:advance_amount] = (payment[:advance_amount].blank?) ? 0 : payment[:advance_amount]
@@ -51,8 +52,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           receiving_user_id: bank_account.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: YesBankCompanyAccount.name,
-          initiating_account_id: user.company.yes_bank_company_account.id,
+          initiating_account_type: initiating_account&.class&.name,
+          initiating_account_id: initiating_account&.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -63,6 +64,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
               currency_id: Currency.first.id
           },
           note: payment[:note],
+          # payment_notification_users: payment[:payment_notification_users],
           date: DateUtils.local_date,
           external_reference_id: payment[:external_reference_id],
           department_id: payment[:department_id],
@@ -188,6 +190,18 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     return bp
   end
 
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+      when "YES"
+        initiating_account = user.company.yes_bank_company_account
+      when "ICICI"
+        initiating_account = user.company.icici_bank_company_account
+      else
+        initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
+  end
+
   def beneficiary_payment_params(payment, vendor_id, bank_account_id)
     payment[:date] = payment[:invoice_date] || payment[:date]
     payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -202,6 +216,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       company_id: self.company_id,
       gst_type_id: payment[:gst_type_id],
       tds_slab_id: payment[:tds_slab_id],
+      payment_notification_users: payment[:payment_notification_users],
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],

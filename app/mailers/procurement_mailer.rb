@@ -6,8 +6,8 @@ class ProcurementMailer < ApplicationMailer
     @purchase_order = presenter.document
     @user = presenter.user
     @company = @user.company
-
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
+
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
          render_to_string(
              pdf: "purchase-order-#{@document.po_number}",
@@ -38,29 +38,31 @@ class ProcurementMailer < ApplicationMailer
     return unless presenter.validate
     @data = presenter
     @company = @data.user.company
+    @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
+    if @include_attachments
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id })
-    if @result.success?
-      @purchase_order = @data.purchase_order
-      @curr_user = @data.user
-      ########################################################
-      attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(
-             pdf: "purchase-order-#{@data.purchase_order.po_number}",
-             # dpi: '650',
-             encoding: 'UTF-8',
-             template: "export/purchase_order",
-             layout: "pdf/paginated_bootstrap.html.erb",
-             margin: { :bottom => 12 },
-             # layout: "pdf.html.erb",
-             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             # print_media_type: true
-         ),
-         dpi: '650'
-      )
+      if @result.success?
+        @purchase_order = @data.purchase_order
+        @curr_user = @data.user
+        attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
+           render_to_string(
+               pdf: "purchase-order-#{@data.purchase_order.po_number}",
+               # dpi: '650',
+               encoding: 'UTF-8',
+               template: "export/purchase_order",
+               layout: "pdf/paginated_bootstrap.html.erb",
+               margin: { :bottom => 12 },
+               # layout: "pdf.html.erb",
+               footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+               # print_media_type: true
+           ),
+           dpi: '650'
+        )
+      end
+    end
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
-    end
   end
 
 

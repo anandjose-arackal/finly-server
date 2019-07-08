@@ -318,6 +318,12 @@
             <% end %>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
+          <% if @result.purchase_order.advance_amount_required %>
+            <tr>
+              <td class="font-light-gray text-left">Advance Amount</td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.advance_amount&.value&.to_d.round(2) rescue 0 %></td>
+            </tr>
+          <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.balance_amount&.value&.to_d.round(2) rescue 0 %></td>

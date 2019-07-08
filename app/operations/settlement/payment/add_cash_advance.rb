@@ -62,8 +62,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     self.payment_purpose = StringUtils.to_bool(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
 
+    self.bank_transfer_type = payment_param[:payment_mode]&.upcase
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
-    init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
+    init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account, bank_transfer_type: self.bank_transfer_type})
 
     destination_pocket_id = params[:destination_pocket_id]
     self.destination_pocket = UserPocket.find_by id: destination_pocket_id

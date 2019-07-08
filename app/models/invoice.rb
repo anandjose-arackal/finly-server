@@ -80,9 +80,10 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
 #
 
 class Invoice < ApplicationRecord
@@ -178,7 +179,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :proforma_advance
 
   delegate :tax_amount_value, to: :tax_amount
-  delegate :tds_amount_value, to: :tax_amount
+  delegate :tds_amount_value, to: :tds_amount
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
@@ -284,11 +285,15 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse('01-01-1990') if from.blank?
-    to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from, to)
   }
 
   scope :filter_invoice_date, -> (from) {
@@ -299,8 +304,8 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
@@ -620,6 +625,7 @@ class Invoice < ApplicationRecord
             file_name: self.invoice_attachments.first&.attached_file&.original_filename
         },
         net_amount: precision_value(self.net_amount&.value),
+        original_amount: self.include_original_amount,
         gross_amount: precision_value(self.gross_amount&.value),
         custom_fields: self.custom_fields,
         category_id: self.category_id,
@@ -640,8 +646,17 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        invoice_items: invoice_items.as_json
     }
+  end
+
+  def include_original_amount
+    if self.invoice_items.present?
+        precision_value(self.amount&.value)
+    else
+        precision_value(self.original_amount&.value)
+    end
   end
 
   # For user role as invoice initiator
@@ -653,7 +668,7 @@ class Invoice < ApplicationRecord
   # For user role as invoice reviewer
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self) || user.vendor_payment_admin?
   end
 
   def is_crediting_user?(user = nil)

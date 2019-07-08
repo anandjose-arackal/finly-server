@@ -192,6 +192,14 @@ class Reports::Submit < Reports::Base
 
     # Email Authorization Ends
 
+    if report.auto_approved?
+      report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:verified))
+      op = Settlement::SReport::Approved.(user, report: report)
+      report.reload
+    else
+      report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:submitted))
+    end
+
     # If deligation performs action
      delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # adding comment regarding the change in status of this report

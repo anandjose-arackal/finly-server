@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
 
 	def pre_validate
 	    if user.blank?
@@ -168,6 +168,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	private
 
 	def parse_payment_order_data
+		initiating_account = retrieve_initiating_account(user.company)
 		policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
 		payment_order_attributes = {
 		    initiating_user_id: user.id,
@@ -180,7 +181,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    },
 		    payment_mode: self.payment_mode,
 		    # payment_mode: params[:payment_mode],
-		    initiating_account_type: YesBankCompanyAccount.name,
+		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
@@ -205,5 +206,17 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    api_initiated: false
 		}
 		bpr_attributes
+	end
+
+	def retrieve_initiating_account(company)
+		case company&.feature_subscription&.bank_service_provider
+			when "YES"
+				initiating_account = user.company.yes_bank_company_account
+			when "ICICI"
+				initiating_account = user.company.icici_bank_company_account
+			else
+				initiating_account = user.company.yes_bank_company_account
+		end
+		initiating_account
 	end
 end

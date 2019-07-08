@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: bank_transactions
+# Table name: yes_bank_transactions
 #
 #  id                          :integer          not null, primary key
 #  unique_request_number       :string(255)
@@ -21,7 +21,7 @@
 #  beneficiary_full_name       :string(255)
 #
 
-class BankTransaction < ApplicationRecord
+class YesBankTransaction < ApplicationRecord
   belongs_to :amount, optional: true
   belongs_to :company, optional: true
   belongs_to :beneficiary_bank_account, optional: true, class_name: "BankAccount"
@@ -51,6 +51,9 @@ class BankTransaction < ApplicationRecord
     self.transfer_status_id == BankTransferStatus.id_for(:failed)
   end
 
+  def utr
+    self.bank_reference_number
+  end
 
   private
 
