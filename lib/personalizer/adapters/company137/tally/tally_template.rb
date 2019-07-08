@@ -28,6 +28,9 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
       voucher_journal = 'Journal Vendor (18-19)'
 
       if request[expense.report_id][voucher_journal].blank?
+        if user.gl_config.blank? or user.gl_config&.dig(:cost_center).blank?
+          raise "GL has not been configured for the following user #{user.name}"
+        end
         request[expense.report_id][voucher_journal] = {
             name: voucher_journal,
             date: date,
@@ -36,8 +39,10 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
             period: "",
             narration: "",
             user: user,
+            cost_center: user.gl_config&.dig(:cost_center),
             transactions: {}
         }
+        
       end
 
       # Journal -> Debit ledger
