@@ -719,6 +719,18 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
+  around_update do
+    if encrypted_password_changed?
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+        other_users.each do |user|
+          user.update_columns(encrypted_password: self.encrypted_password)
+        end
+      end
+    end
+  end
+
   after_create do
     default_policy_id = self.company.default_policy.id
     # if the user us added to either one system and not the other, create a default mapping for him or her in both
