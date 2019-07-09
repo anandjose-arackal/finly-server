@@ -3000,10 +3000,10 @@ Rails.application.routes.draw do
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
   get 'users/all_cards', to: 'users#all_cards', as: :all_cards
-  resources :users, only: [:create, :update, :index, :destroy, :show]
   post 'users/group_entities_login', to: 'users#group_entities_login', as: :group_entities_login
-  get 'users/group_entities', to: 'users#group_entities', as: :group_entities
+  get 'group_entities_after_login', to: 'users#group_entities_after_login', as: :group_entities_after_login
   post 'multi_entity_login', to: 'multi_entity_login/token#create', as: :multi_entity_login
+  resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
     post 'user_details', to: 'users#user_details', as: :details
