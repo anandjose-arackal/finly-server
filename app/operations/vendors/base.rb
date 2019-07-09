@@ -100,8 +100,8 @@ class Vendors::Base < BaseOperation
           match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(business_name), StringUtils.clear_generic_keywords(gstin_master.legal_name_of_business))
           trade_name_match_percentile = StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(business_name), StringUtils.clear_generic_keywords(gstin_master.trade_name))
 
-          if match_percentile < 90 && trade_name_match_percentile < 90
-            add_message :error, "Business Name or Trade Name Match Percentile is below 90% for Location #{index + 1}"
+          if match_percentile < 60 && trade_name_match_percentile < 60
+            add_message :error, "Business Name or Trade Name Match Percentile is below 60% for Location #{index + 1}"
           end
         else
           add_message :error, "GSTIN Status is not Active for Location #{index + 1}"

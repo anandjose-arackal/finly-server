@@ -23,7 +23,7 @@ config/redis_config.yml
 config/gstin_verification_config.yml
 config/icici_bank_config.yml
 .rubocop.yml
-
+.vscode/
 
 # Ignore all logfiles and tempfiles.
 /log/*

@@ -49,7 +49,11 @@ class IciciBankApi::AccountStatement < IciciBankApi::Base
   end
 
   def decrypt_response(body)
-    path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
+    if Rails.env.production?
+      path = Dir.home + '/certificates/icici_certificates_final/finly_icici_production.key'
+    else
+      path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
+    end
     parsed_json = JSON.parse(body)
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
     decrypted_key = private_key.private_decrypt(Base64.decode64(parsed_json["encryptedKey"]))
