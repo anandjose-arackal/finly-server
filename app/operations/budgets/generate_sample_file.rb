@@ -2,33 +2,37 @@ class Budgets::GenerateSampleFile < Budgets::Base
 
   attr_accessor :sample_file, :company, :headers, :content, :sheets
 
+  def pre_validate
+
+  end
+  
   def init
     self.company = user.company
   end
 
   def process
     self.headers = default_headers
-    self.content = []
+    self.content = (params[:content].present?) ? params[:content] : []
 
     self.sheets = [
         {
             item_headers: self.headers,
             item_contents: self.content,
-            name: "Budget Import"
+            name: "Create Sub-Budgets for #{self.budget&.name}"
         }
     ]
 
     # adding user IDs to the sheet
-    user_headers = ["User Name", "User ID"]
-    user_contents = []
-    self.company.users.each do |user|
-      user_contents << [user.name, user.id]
-    end
-    self.sheets << {
-        item_headers: user_headers,
-        item_contents: user_contents,
-        name: "Users"
-    }
+    # user_headers = ["User Name", "User ID"]
+    # user_contents = []
+    # self.company.users.each do |user|
+    #   user_contents << [user.name, user.id]
+    # end
+    # self.sheets << {
+    #     item_headers: user_headers,
+    #     item_contents: user_contents,
+    #     name: "Users"
+    # }
 
     # adding category IDs to the sheet
     categories_headers = ["Category Name", "Category ID"]
@@ -67,16 +71,16 @@ class Budgets::GenerateSampleFile < Budgets::Base
     }
 
     # adding vendors to the sheet
-    vendor_headers = ["Vendor Name", "Vendor ID"]
-    vendor_content = []
-    self.company.yes_bank_vendors.authorized.each do |vendor|
-      vendor_content << [vendor.name, vendor.id]
-    end
-    self.sheets << {
-        item_headers: vendor_headers,
-        item_contents: vendor_content,
-        name: "Vendors"
-    }
+    # vendor_headers = ["Vendor Name", "Vendor ID"]
+    # vendor_content = []
+    # self.company.yes_bank_vendors.authorized.each do |vendor|
+    #   vendor_content << [vendor.name, vendor.id]
+    # end
+    # self.sheets << {
+    #     item_headers: vendor_headers,
+    #     item_contents: vendor_content,
+    #     name: "Vendors"
+    # }
   end
 
   def success
@@ -87,16 +91,13 @@ class Budgets::GenerateSampleFile < Budgets::Base
 
   def default_headers
     [
-        "Parent Budget ID(optional)",
         "Budget Name",
         "Amount",
         "Start Date (dd-mm-yyyy)",
         "End Date (dd-mm-yyyy)",
-        "Users Budgetable",
         "Categories Budgetable",
         "Departments Budgetable",
         "Locations Budgetable",
-        "Vendors Budgetable",
         "Expense? (Y/N)",
         "Payment? (Y/N)",
         "Purchase Order? (Y/N)"

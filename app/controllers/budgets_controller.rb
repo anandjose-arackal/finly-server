@@ -80,8 +80,19 @@ class BudgetsController < BaseControllers::WebBase
 
   end
 
+  # deprecated op
   def import
     @result = Budgets::Import.(current_user, params)
     respond
   end
+
+  def process_template_file
+    @result = Budgets::ProcessTemplateFile.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/process_template_file'
+    end
+  end
+
 end

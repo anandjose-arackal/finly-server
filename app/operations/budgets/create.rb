@@ -51,19 +51,19 @@ class Budgets::Create < Budgets::Base
     # check to make sure the sum of all child budgets is less than the sum of all parent budgets
     if parent_budget.present?
       unless parent_budget.start_date <= Date.parse(budget_params[:start_date])
-        add_message :error, "Start date for this budget should be after the start date for the selected parent budget."
+        add_message :error, "Start date for this budget should be after the start date(#{parent_budget.start_date.strftime("%d-%m-%Y")}) for the selected parent budget."
         return
       end
 
       unless parent_budget.end_date >= Date.parse(budget_params[:end_date])
-        add_message :error, "End date for this budget should be earlier than the end date for the selected parent budget."
+        add_message :error, "End date for this budget should be earlier than the end date(#{parent_budget.end_date.strftime("%d-%m-%Y")}) for the selected parent budget."
         return
       end
 
       # sums of all child budgets EXCEPT the budget we are processing now in this op
       sum_of_child_budgets = parent_budget.children.joins(:budget_amount).sum(:value)
       if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attributes, :value)&.to_f) > parent_budget.budget_amount&.value
-        add_message :error, "Sum of child budgets should be less than or equal to parent budget"
+        add_message :error, "Sum of child budgets should be less than or equal to parent budget(#{parent_budget.budget_amount.currency.symbol.to_s + parent_budget.budget_amount.value.to_s})"
         return
       end
     end
