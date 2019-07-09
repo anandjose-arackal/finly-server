@@ -3,10 +3,6 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
 
   # todo: Policy admins are permitted to create only for their policy and users within the policy
 
-  def authorized_user_types
-    [:admin, :vendor_payments_admin]
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
