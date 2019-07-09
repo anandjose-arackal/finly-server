@@ -1,6 +1,6 @@
 class User::GroupEntities < User::Base
 
-  attr_accessor :companies, :email, :mobile_number, :group
+  attr_accessor :companies, :email, :mobile_number, :group, :company
 
   class User::GroupEntities::CompaniesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -15,10 +15,16 @@ class User::GroupEntities < User::Base
   def init
     self.email = user.email
     self.mobile_number = user.mobile_number
-    self.group = CompanyGroup.find_by(id: user.company.group_id)
+    self.company = self.user.company
+    self.group = self.company.group
   end
 
   def validate
+    if self.company.blank?
+      add_message :error, "Company not found"
+      return
+    end
+
     if self.group.blank?
       add_message :error, "Your corporate doesn't have group entity feature enabled"
       return
