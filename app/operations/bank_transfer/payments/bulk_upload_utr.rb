@@ -45,11 +45,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource&.is_a?(BankTransaction)
+      if payment.reference_resource.present? && payment.reference_resource&.is_a?(YesBankTransaction)
         payment.reference_resource.update(bank_reference_number: utr)
       else
         # create a bank transaction for this particular payment
-        bank_transaction = BankTransaction.create(transfer_type: payment.payment_mode,
+        bank_transaction = YesBankTransaction.create(transfer_type: payment.payment_mode,
                                                   bank_reference_number: utr,
                                                   company_id: user.company_id,
                                                   transfer_status_id: BankTransferStatus.id_for(:completed),

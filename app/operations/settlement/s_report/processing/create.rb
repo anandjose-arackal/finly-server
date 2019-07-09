@@ -253,7 +253,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     post_operation = 'Settlement::SReport::Processing::PostOperation'
     post_operation_payload = {}
     self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
-        receiving_account_class, :credit, :reimbursement,
+        receiving_account_class, :credit, :reimbursement, bank_transfer_type: self.bank_transfer_type,
         background: true, scheduled_at: self.report_processor_group.scheduled_at)
     self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
     self.report_processor_group.payment_order = self.payment_request.build_payment_order

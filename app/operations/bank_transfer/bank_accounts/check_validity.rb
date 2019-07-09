@@ -23,10 +23,10 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
     self.ifsc = params[:ifsc]
     self.name = params[:name]
     self.company = user.company
-    # this will also create the bank transaction and TransferRequest non-persistent model
+    # this will also create the bank transaction and YesBankTransferRequest non-persistent model
     # that is required for creating actually making the request with YesBank's servers
     self.transfer_request = create_transfer_request("IMPS", nil)
-    self.bank_transaction = self.company.bank_transactions.create(
+    self.bank_transaction = self.company.yes_bank_transactions.create(
        unique_request_number: self.transfer_request.generate_unique_reference,
        transfer_type: "IMPS",
        bank_reference_number: self.transfer_request.bank_reference_number,
@@ -60,6 +60,7 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
       add_message :error, "Company cannot be blank"
       return
     end
+
   end
 
   def process
@@ -118,6 +119,6 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
 
   # this method will create a transfer request for a penny transfer to the beneficiary account
   def create_transfer_request(transfer_type, reference_number)
-    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company.id)
+    tr = YesBankTransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company.id)
   end
 end
