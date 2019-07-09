@@ -17,7 +17,7 @@ class User::GroupEntitiesLogin < User::Base
   end
 
   def init
-    self.email_mobile = params[:email_mobile]
+    self.email_mobile = params[:email_mobile] || params[:email]
     self.user = User.find_for_database_authentication(username: self.email_mobile)
     self.email = self.user&.email
     self.mobile_number = self.user&.mobile_number

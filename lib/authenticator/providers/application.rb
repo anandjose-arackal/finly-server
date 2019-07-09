@@ -10,6 +10,16 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
     User
   end
 
+  def company_id
+    params[:company_id]
+  end
+
+  def unauthenticated_user
+    raise "Model has not been defined" if model.nil?
+
+    self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
+  end
+
   def on_blank_username(message)
     Gatekeeper::Event.(:user_login_blank_username, ip: request.remote_ip)
     params[:user] = self.unauthenticated_user

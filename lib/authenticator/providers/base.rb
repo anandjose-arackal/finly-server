@@ -39,6 +39,7 @@ class Authenticator::Providers::Base
     params[:password]
   end
 
+
   def unauthenticated_user
     raise "Model has not been defined" if model.nil?
 

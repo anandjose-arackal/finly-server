@@ -1104,7 +1104,13 @@ class User < ApplicationRecord
   def self.find_for_database_authentication(conditions = {})
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
-    user = find_by(mobile_number: username) || find_by(email: username)
+    company_id = conditions[:company_id]
+    if company_id.present?
+      user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
+    else
+      user = find_by(mobile_number: username) || find_by(email: username)
+    end
+
     return user if user.present?
 
     authenticate_with_employee_id(username)
