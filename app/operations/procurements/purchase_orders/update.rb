@@ -159,8 +159,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
 
     if self.purchase_order_params[:requested_advance_amount_attributes][:value].present? && self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
-      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
-        add_message :error, "Advance amount can't be more than Total amount"
+      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > (params[:purchase_order][:balance_amount_attributes][:value].to_i + 1) # adding a buffer to account for roundoff amount
+        add_message :error, "Advance amount can't be more than the Balance Due for the entire PO."
         return
       end
       if self.purchase_order_params[:due_date].blank?
