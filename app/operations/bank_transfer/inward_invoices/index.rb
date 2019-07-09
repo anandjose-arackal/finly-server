@@ -8,6 +8,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     has_scope :filter_payable_invoices
     has_scope :invoice_date, using: [:from, :to], type: :hash
+    has_scope :filter_creation_date, using: [:from, :to], type: :hash
     has_scope :filter_invoice_date
     has_scope :due_date, using: [:from, :to], type: :hash
     has_scope :filter_due_date

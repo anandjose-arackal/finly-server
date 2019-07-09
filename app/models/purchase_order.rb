@@ -31,7 +31,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  user_id                      :integer
-#  procurement_term_text        :text(65535)
+#  procurement_term_text        :text(16777215)
 #  controlling_user_id          :integer
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
@@ -67,7 +67,10 @@
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
-#  taxable_amount_id            :integer
+#  vendor_poc_name              :string(255)
+#  vendor_poc_email             :string(255)
+#  vendor_poc_mobile_number     :string(255)
+#  rejection_note               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -235,7 +238,9 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_payable_advances, -> {
     where(purchase_order_status_id: [
         PurchaseOrderStatus.id_for(:approved),
-        PurchaseOrderStatus.id_for(:auto_approved)
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:vendor_confirmed)
     ],
           advance_amount_status_id: [
               AdvanceAmountStatus.id_for(:to_be_processed),
@@ -819,6 +824,12 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+    roundoff_amount = self.roundoff_amount.to_f
+    if roundoff_amount != 0
+      total_amount = precision_value (total_amount + roundoff_amount)
+    else
+      total_amount = precision_value total_amount
+    end
 
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount

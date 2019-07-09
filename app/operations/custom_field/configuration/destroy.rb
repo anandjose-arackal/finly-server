@@ -1,10 +1,6 @@
 class CustomField::Configuration::Destroy < CustomField::Configuration::Base
   attr_accessor :field_configuration
 
-  def authorized_user_types
-    [:admin]
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

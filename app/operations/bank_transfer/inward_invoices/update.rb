@@ -1,7 +1,7 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
-                :gstin_location, :cost_allocation_items
+                :gstin_location, :cost_allocation_items, :policy
 
 
   def personalizer
@@ -45,6 +45,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.cost_allocation_items = StringUtils.to_bool(self.inward_invoice_params[:cost_allocation_items])
     # self.inward_invoice_params.delete(:cost_allocation_items)
 
+    self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: self.inward_invoice_params[:policy_id])
+
   end
 
   def validate
@@ -55,6 +57,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     if self.inward_invoice_params[:invoice_number].blank?
       add_message :error, "Invoice number is required. You can input alphanumeric characters, dash and forward slash. No spaces allowed."
+      return
+    end
+
+    if self.policy.blank? && self.inward_invoice.policy_id.blank?
+      add_message :error, "Policy cannot be blank"
       return
     end
 
@@ -89,7 +96,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value.to_i
+      if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
       end

@@ -2,6 +2,10 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
   attr_accessor :payment_tickets
 
   def init
+    # Set date filters
+    params[:filter_date] = {}
+    params[:filter_date][:from] = params[:filter_date_from] if params[:filter_date_from].present?
+    params[:filter_date][:to] = params[:filter_date_to] if params[:filter_date_to].present?
     self.payment_tickets = BankTransfer::PaymentRequest::Index.(user, params).payment_requests
   end
 
@@ -108,6 +112,23 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
           ]
         }
         self.counts.push(personal_data)
+
+      end
+
+      # Set Date Filters in Filters
+      # Done because the filters in index page and the filters passed in dashboard for date filters are different
+      self.counts.each do |count_object|
+        count_object[:data].each do |data|
+           if params[:filter_date].present? && params[:filter_date][:from].present?
+             filter_date = {'filter_date[from]': params[:filter_date][:from]}
+             data[:filters].push(filter_date)
+           end
+
+          if params[:filter_date].present? && params[:filter_date][:to].present?
+             filter_date = {'filter_date[to]': params[:filter_date][:to]}
+             data[:filters].push(filter_date)
+           end
+        end
       end
 
     #   if user.vendor_payments_reviewer?
