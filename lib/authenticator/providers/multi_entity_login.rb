@@ -8,22 +8,32 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
     scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:multi_entity_login]
   end
 
+  def model
+    User
+  end
+
   def authenticate
+    self.company_id = params[:company_id]
+
     fail_with_event :on_blank_company_id, 'Target company not specified'
     fail_with_event :on_blank_auth_token, 'Invalid request'
 
     # now find the logged in user
-    self.logged_in_user = Doorkeeper::AccessToken.find_by(token: auth_token)
+    token = Doorkeeper::AccessToken.find_by(token: auth_token)
+    self.logged_in_user = model.find_by(id: token&.resource_owner_id)
+
+    fail_with_event :on_missing_logged_in_user, "Logged in user not found"
     self.target_user = for_user
 
-    fail_with_event :on_non_matching_user_credentials, "Target user does not have the same credentials as currently logged in user"
-
+    fail_with_event :on_missing_target_user, "No other user found"
+    
     self.authenticated_user = for_user
   end
 
   def for_user
-    self.company_id = params[:company_id]
-    User.with_company_id(self.company_id).with_email_or_mobile_number(params[:for_user_id]).first
+    email = self.logged_in_user.email
+    mobile_number = self.logged_in_user.mobile_number
+    User.with_company_id(self.company_id).with_email_or_mobile_number(email, mobile_number).first
   end
 
   def auth_token
@@ -31,24 +41,32 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
   end
 
   def on_blank_company_id(message)
-    Gatekeeper::Event.(:multi_entity_missing_blank_company, ip: request.remote_ip)
-    params[:user] = self.logged_in_user
-    params[:message] = message || "Company ID not passed"
-    UserSessions::Create.(:failed, params)
+    if self.company_id.blank?
+      params[:user] = self.logged_in_user
+      params[:message] = message || "Company ID not passed"
+      UserSessions::Create.(:failed, params)
+    end
   end
 
   def on_blank_auth_token(message)
-    Gatekeeper::Event.(:multi_entity_missing_auth_token, ip: request.remote_ip)
-    params[:user] = self.logged_in_user
-    params[:message] = message || "Missing auth token"
-    UserSessions::Create.(:failed, params)
+    if self.auth_token.blank?
+      params[:message] = message || "Auth token missing in request"
+      UserSessions::Create.(:failed, params)
+    end
   end
 
-  def on_non_matching_user_credentials(message)
-    Gatekeeper::Event.(:multi_entity_mismatch_user_credentials, ip: request.remote_ip)
-    params[:user] = self.logged_in_user
-    params[:message] = message || "Mismatched user credentials"
-    UserSessions::Create.(:failed, params)
+  def on_missing_logged_in_user(message)
+    if self.logged_in_user.blank?
+      params[:message] = message || "Mismatched user credentials"
+      UserSessions::Create.(:failed, params)
+    end
+  end
+
+  def on_missing_target_user(message)
+    if self.target_user.blank?
+      params[:message] = message || "Target user not found"
+      UserSessions::Create.(:failed, params)
+    end
   end
 
   def on_success(message)
