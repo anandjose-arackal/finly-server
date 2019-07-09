@@ -3,9 +3,9 @@ class Authenticator::Providers::MultiEntityLogin < Authenticator::Providers::Bas
   attr_accessor :company_id, :logged_in_user, :target_user
 
   def self.accept?(request)
-    scopes = request.params[:scope]&.split(" ")
+    scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["multi_entity_login"].include?(scopes&.first)
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and RequestStore.store[:multi_entity_login]
   end
 
   def authenticate
