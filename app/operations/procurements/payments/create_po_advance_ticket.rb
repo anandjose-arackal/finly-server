@@ -144,7 +144,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
-      if advance_amount >= purchase_order.balance_amount&.value
+      if advance_amount > purchase_order.balance_amount&.value
         row_details << "Advance cannot be greater than the balance amount in the PO"
         self.contents << row_details
         errors_found = true
@@ -163,7 +163,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     end
 
     if errors_found
-      add_message :error, self.contents #"Your advance payment has a few errors, please check the same and retry"
+      add_message :error, self.contents.flatten #"Your advance payment has a few errors, please check the same and retry"
       return
     end
 
