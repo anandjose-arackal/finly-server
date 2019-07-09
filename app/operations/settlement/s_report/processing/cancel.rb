@@ -75,11 +75,11 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
 
     # new feature - in a batch, user can choose which items to cancel individually
     # pending_mappings = self.report_group_processor.mappings.not_completed
-    self.pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
 
     pending_mappings_id = self.pending_mappings.pluck(:id)
     failed_reports = Report.with_processor_group_mapping(pending_mappings_id)
     failed_reports.update_all(report_processor_group_mapping_id: nil)
+    self.pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
 
     if report_group_processor.partially_completed?
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:completed))
