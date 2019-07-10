@@ -3,7 +3,7 @@ class Event::EPurchaseOrder::Remind < Event::EPurchaseOrder::Base
                 :controlling_users
 
   def action_name
-    'Purchase Order Approved'
+    'Purchase Order Approval Reminder'
   end
 
   def init
@@ -21,7 +21,8 @@ class Event::EPurchaseOrder::Remind < Event::EPurchaseOrder::Base
       amount = purchase_order.balance_amount&.value || 0
 
       # Find list of possible controlling user ids
-      controlling_users_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+      # controlling_users_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+        controlling_users_ids = purchase_order.get_reviewers.pluck(:id)      
 
       user_selected_reviewer = purchase_order.document_level_reviewer_mappings.with_level_ids(level.id).last&.reviewer
 
