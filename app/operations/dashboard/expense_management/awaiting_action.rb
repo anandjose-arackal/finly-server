@@ -1,5 +1,5 @@
 class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagement::Base
-  attr_accessor :result, :document_types, :reports
+  attr_accessor :result, :document_types, :reports, :money_requests
 
   has_scope :filter_invoice_type
 
@@ -27,6 +27,20 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     self.document_types[:travel_manager_trips] = true if user.travel_manager?
 
     self.result = []
+
+    reports_presenter = Reports::Index.(user, params)
+    unless reports_presenter.success?
+      add_message :error, reports_presenter.messages[:error]
+      return
+    end
+    self.reports = reports_presenter.reports.approved.without_associated_processor
+
+    money_requests_presenter = Object.const_get('MoneyRequests::Index').(user, params)
+    unless money_requests_presenter.success?
+      add_message :error, money_requests_presenter.messages[:error]
+      return
+    end
+    self.money_requests = money_requests_presenter.money_requests.approved.without_associated_processor
   end
 
   def process
@@ -45,7 +59,8 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
       data = {
         title: "Reports awaiting credit",
         type: 'reports',
-        count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+        # count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+        count: self.reports.count,
         route: 'settle_reports',
         filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
         awaiting_action: true # FE requires this to handle some logic in UI
@@ -68,9 +83,10 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
       data = {
         title: "Money Requests awaiting credit",
         type: 'money_requests',
-        count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        route: 'settle_money_requests'
-        filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}}],
+        # count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+        count: self.money_requests.count,
+        route: 'settle_money_requests',
+        filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
