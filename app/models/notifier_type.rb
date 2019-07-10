@@ -180,6 +180,8 @@ class NotifierType < ApplicationRecord
              {key: :vendor_take_control, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :vendor_return_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_update, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true}
             ]
 
