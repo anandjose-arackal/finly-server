@@ -74,6 +74,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
+    if self.purchase_order_params[:location_id].blank?
+      add_message :error, "Please specify a Billing Address."
+    end
+
+    if self.purchase_order_params[:delivery_location_id].blank?
+      add_message :error, "Please specify a Shipping Address."
+      return
+    end
+
+
     if self.purchase_order.quotations.present?
       quotes = self.purchase_order.quotations
       selected_quotes = quotes.map { |q| q if q.selected }.compact
