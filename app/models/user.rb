@@ -838,11 +838,6 @@ class User < ApplicationRecord
     (password_changed_at || created_at) < expire_after.seconds.ago
   end
 
-  def email_required?
-    # todo - can be made conditional later
-    false
-  end
-
   # Expires user if password is weak, old passwords and inactivity
   def verify_expiration!(password = nil)
     return true if expired? and !otp_verified
@@ -1052,11 +1047,6 @@ class User < ApplicationRecord
 
   def active_for_authentication?
     super && self.active # i.e. super && self.is_active
-  end
-
-  # overriding the requirement for emails by devise
-  def email_required?
-    false
   end
 
   def inactive_message
