@@ -39,12 +39,37 @@ class Event::EVendors::Update < Event::EVendors::Base
   end
 
   def mailer_body(user)
-    "Vendor details for #{self.document.business_name} were updated by #{user.name} \n" +
+    message = "Vendor details for #{self.document.business_name} were updated by #{user.name} \n\n"
+
     if params[:vendor_changes].present?
-      "These were the changes: \n" +
+
+      message += "These were the changes: \n"
+
+      # start bank account was changed
       if params[:vendor_changes][:bank_account_changed].present?
-        
+        params[:vendor_changes][:bank_accounts].each do |bank_account|
+          next if bank_account.blank?
+          message += "-----\n"
+          if bank_account[:name].present?
+            message += "Old Name - #{bank_account[:name].first}\n"
+            message += "New Name - #{bank_account[:name].last}\n"
+          end
+
+          if bank_account[:account_number].present?
+            message += "Old Account Number - #{bank_account[:account_number].first}\n"
+            message += "New Account Number - #{bank_account[:account_number].last}\n"
+          end
+
+          if bank_account[:ifsc].present?
+            message += "Old IFSC - #{bank_account[:ifsc].first}\n"
+            message += "New IFSC - #{bank_account[:ifsc].last}\n"
+          end
+        end
       end
-    end
+      # end bank_account changes
+
+    end # END vendor_changes
+
+    message
   end
 end

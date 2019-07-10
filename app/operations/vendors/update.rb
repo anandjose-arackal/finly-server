@@ -128,6 +128,7 @@ class Vendors::Update < Vendors::Base
   private
 
   def detect_changes_in_vendor(vendor)
+    return {} if vendor.bank_accounts.blank?
     {
       bank_account_changed: vendor.bank_accounts.map {|v| v.changes_to_save if v.changes_to_save.present?}.compact,
       bank_accounts: vendor.bank_accounts.map {|v| v.changes_to_save}
