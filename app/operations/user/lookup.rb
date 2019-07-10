@@ -4,7 +4,7 @@
 
 class User::Lookup < User::Base
 
-  attr_accessor :selected_user, :registered, :verified, :otp_verified, :default_password
+  attr_accessor :selected_user, :registered, :verified, :otp_verified, :default_password, :multi_entity_enabled
 
   def self.call(params)
     self.new(nil, params).run
@@ -45,6 +45,14 @@ class User::Lookup < User::Base
     end
     self.verified = selected_user.verified
     self.otp_verified = selected_user.otp_verified
+
+    RequestStore.store[:skip_password] = true
+    op = User::GroupEntitiesLogin.(nil, email_mobile: params[:email_mobile])
+    if op.success?
+      if op.companies.count > 1
+        self.multi_entity_enabled = true
+      end
+    end
   end
 
   def success
@@ -56,12 +64,13 @@ class User::Lookup < User::Base
     params[:verified] = self.verified
     params[:otp_verified] = self.otp_verified
     params[:set_password] = self.default_password
+    params[:multi_entity_enabled] = self.multi_entity_enabled
     User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number
+    attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number, :multi_entity_enabled
 
     def init
       if params[:registered]
@@ -76,6 +85,7 @@ class User::Lookup < User::Base
         self.otp_verified = true
         self.set_password = false
       end
+      self.multi_entity_enabled = params[:multi_entity_enabled]
     end
 
   end
