@@ -61,8 +61,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         type: 'settle_reports',
         # count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
         count: self.reports.count,
-        route: 'settle_reports',
-        filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
+        filters: [{view: 'finance', menu: {main: "settlements_dashboard"}}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
@@ -85,8 +84,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         type: 'settle_money_requests',
         # count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
         count: self.money_requests.count,
-        route: 'settle_money_requests',
-        filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
+        filters: [{view: 'finance', menu: {main: "settlements_dashboard"}}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
