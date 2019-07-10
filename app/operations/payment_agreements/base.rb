@@ -135,9 +135,10 @@ class PaymentAgreements::Base < BaseOperation
   def apply_tds_on_amount(invoice)
     if invoice.tds_slab_id.present?
       tds_percentage = invoice&.tds_slab&.tds.to_f
-      # Substract tds from sum of net amount of items
+      tds_value = calculate_tds_value(tds_percentage, invoice)
       item_net_amount_sum = invoice.items.joins(:net_amount).pluck('amounts.value').sum
-      net_amt = item_net_amount_sum - (item_net_amount_sum*tds_percentage/100)
+      # net_amt = item_net_amount_sum - (item_net_amount_sum*tds_percentage/100)
+      net_amt = item_net_amount_sum - tds_value
       if invoice.net_amount.present?
         invoice.net_amount.update(value: net_amt)
       else
@@ -227,6 +228,16 @@ class PaymentAgreements::Base < BaseOperation
   def update_line_item_attributes
     self.payment_agreement.general_invoices.map{|general_invoice| general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)} if self.payment_agreement.general_invoices.present?
     self.payment_agreement.rental_invoices.map{|rental_invoice| rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)} if self.payment_agreement.rental_invoices.present?
+  end
+
+  def calculate_tds_value(tds_percentage, invoice)
+    amount_arr = []
+    # Get value from line items
+    invoice.items.each do |item|
+      amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
+      amount_arr << amt*tds_percentage/100
+    end
+    return amount_arr.sum
   end
 
 
