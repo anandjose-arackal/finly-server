@@ -48,7 +48,7 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
     if user == self.document.user
       "New Comment on Purchase Order : #{self.document.po_number}"
     else
-      "#{document.user.name} has added a new comment to the purchase order: #{self.document.po_number}"
+      "#{user.name} has added a new comment to the purchase order: #{self.document.po_number}"
     end
   end
 
@@ -56,7 +56,7 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
     if user == self.document.user
       "New Comment on Purchase Order: #{self.document.po_number} \n Comment: #{self.document.comments&.last&.body}"
     else
-      "#{self.document.user.name} has added a new comment to the purchase order: #{self.document.po_number}\n Comment: #{self.document.comments&.last&.body}"
+      "#{user.name} has added a new comment to the purchase order: #{self.document.po_number}\n Comment: #{self.document.comments&.last&.body}"
     end
   end
 
