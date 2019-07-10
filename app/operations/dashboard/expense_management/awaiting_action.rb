@@ -58,7 +58,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     if self.document_types[:finance_manager_reports]
       data = {
         title: "Reports awaiting credit",
-        type: 'reports',
+        type: 'settle_reports',
         # count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
         count: self.reports.count,
         route: 'settle_reports',
@@ -82,7 +82,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     if self.document_types[:finance_manager_money_requests]
       data = {
         title: "Money Requests awaiting credit",
-        type: 'money_requests',
+        type: 'settle_money_requests',
         # count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
         count: self.money_requests.count,
         route: 'settle_money_requests',
