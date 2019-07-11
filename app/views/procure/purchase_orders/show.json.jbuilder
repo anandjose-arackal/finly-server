@@ -96,6 +96,11 @@ json.items do
     json.category_name item.category&.name
     json.category_id item.category_id
 
+    json.taxable_amount do
+      json.value item.taxable_amount&.value&.round(2)
+      json.id item.taxable_amount&.id
+      json.currency_id item.taxable_amount&.currency&.id
+    end
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id

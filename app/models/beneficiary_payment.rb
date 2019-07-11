@@ -30,6 +30,11 @@
 #  invoice_date               :date
 #  invoice_due_date           :date
 #  advance_amount_id          :integer
+#  payment_agreement_id       :integer
+#  note                       :string(255)
+#  location_id                :integer
+#  vendor_location_id         :integer
+#  tax_rate_id                :integer
 #  payment_notification_users :json
 #  payment_agreement_id       :integer
 #  note                       :string(255)

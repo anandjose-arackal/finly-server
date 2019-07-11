@@ -18,6 +18,7 @@ class Company < ApplicationRecord
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
+  belongs_to :group, optional: true, class_name: "CompanyGroup"
 
   has_many :users
   has_many :cards
@@ -356,6 +357,10 @@ class Company < ApplicationRecord
 
   def auto_retry_payment_enabled?
     self.configuration.auto_retry_payment
+  end
+
+  def group_entity_structure_enabled?
+    self.feature_subscription.group_entity_structure
   end
 
   def bank_service_provider
