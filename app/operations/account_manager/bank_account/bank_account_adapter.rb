@@ -17,6 +17,8 @@ class AccountManager::BankAccount::BankAccountAdapter < AccountManager::BaseAdap
         self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
       when "ICICI"
         self.bank_account_adapter = AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+      when "KOTAK"
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountKotakBankAdapter.new(self.account)
       else
         self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
         # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)

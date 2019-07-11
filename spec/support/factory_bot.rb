@@ -5,7 +5,6 @@ RSpec.configure do |config|
   FactoryBot.find_definitions
 
   # config.before do
-  #   debugger
   #   FactoryBot.find_definitions
   # end
 end
