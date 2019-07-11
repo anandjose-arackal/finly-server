@@ -30,7 +30,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
         self.contents << [
             expense.category.gl_code,
             '',
-            expense.user.gl_config&.dig(:department_code),
+            expense.user.gl_config&.dig(:location_code),
             expense.user.gl_config&.dig(:cost_center),
             '',
             '',
