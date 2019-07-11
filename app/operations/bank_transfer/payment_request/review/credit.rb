@@ -181,18 +181,18 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
-      when 1, '1'
-        case user.company&.feature_subscription&.bank_service_provider
-          when "YES"
-            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-          when "ICICI"
-            return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
-          when "KOTAK"
-            return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
-          else
-            return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-        end
-      when 2, '2'
+    when 1, '1'
+      case user.company&.feature_subscription&.bank_service_provider
+      when "YES"
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      when "ICICI"
+        return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+      when "KOTAK"
+        return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      else
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      end
+    when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)

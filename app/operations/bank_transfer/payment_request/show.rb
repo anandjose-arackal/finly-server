@@ -141,16 +141,21 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
         return adapter.balance
       when :company_credits
-        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
+          adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "ICICI"
+          adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KOTAK"
+          adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        else
+          adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
         return adapter.balance
-      # Sreeram: Uncomment while doing multi bank bank support
-      # when :kotak_bank_account
-      #   adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
-      #   return adapter.balance
       end
     end
 
-    ################## INITIATOR ACTIONS ########################
+      ################## INITIATOR ACTIONS ########################
     def retrieve_initiator_actions
       actions = {}
       if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)

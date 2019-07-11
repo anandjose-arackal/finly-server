@@ -164,14 +164,16 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     case params[:initiating_account_type]
       when 1, '1'
         case user.company&.feature_subscription&.bank_service_provider
-          when "YES"
-            return user.company.yes_bank_company_account
-          when "ICICI"
-            return user.company.icici_bank_company_account
-          else
-            return user.company.yes_bank_company_account
+        when "YES"
+          return user.company.yes_bank_company_account
+        when "ICICI"
+          return user.company.icici_bank_company_account
+        when "KOTAK"
+          return user.company.kotak_bank_company_account
+        else
+          return user.company.yes_bank_company_account
         end
-      when 2, '2'
+    when 2, '2'
         return user.bank_wallet
       else
         user.bank_wallet # i.e. finly money by default
@@ -186,6 +188,8 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
           when "ICICI"
             return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          when "KOTAK"
+            return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
           else
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

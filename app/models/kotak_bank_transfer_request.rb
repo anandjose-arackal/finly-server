@@ -2,7 +2,6 @@
 # contains shit like account number, ifsc, beneficiary name etc.
 
 class KotakBankTransferRequest < NonPersistentModel
-
   attr_accessor :beneficiary_account_number,
                 :ifsc,
                 :beneficiary_name,
@@ -56,9 +55,9 @@ class KotakBankTransferRequest < NonPersistentModel
     loop do
       # ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
       if transfer_type == "IMPSA"
-        ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..6]}"
+        ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
       else
-        ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+        ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..8]}"
       end
       break
       if KotakBankTransaction.find_by(unique_reference_number: ref).blank?
@@ -87,5 +86,4 @@ class KotakBankTransferRequest < NonPersistentModel
         company_name: company&.name
     }
   end
-
 end
