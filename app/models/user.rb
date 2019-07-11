@@ -551,6 +551,8 @@ class User < ApplicationRecord
     includes(:cards, :company)
   }
 
+  scope :includes_for_index, -> { includes(:profile) }
+
   # Gives list of user who are not part of a policy as finance manager
   scope :filter_unassigned_finance_for_policy, -> (policy_id) {
     policy = Policy.find_by id: policy_id
