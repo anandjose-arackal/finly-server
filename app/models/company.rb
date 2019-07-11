@@ -11,7 +11,6 @@
 #  status_id        :integer          default(1), not null
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
-#  group_id         :integer
 #
 
 class Company < ApplicationRecord
@@ -19,6 +18,7 @@ class Company < ApplicationRecord
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
+  belongs_to :group, optional: true, class_name: "CompanyGroup"
 
   has_many :users
   has_many :cards
@@ -42,6 +42,7 @@ class Company < ApplicationRecord
   has_many :field_configurations, as: :configurable
   has_many :yes_bank_transactions
   has_many :icici_bank_transactions
+  has_many :kotak_bank_transactions
   has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
@@ -52,6 +53,7 @@ class Company < ApplicationRecord
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
   has_one :icici_bank_company_account
+  has_one :kotak_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -355,6 +357,10 @@ class Company < ApplicationRecord
 
   def auto_retry_payment_enabled?
     self.configuration.auto_retry_payment
+  end
+
+  def group_entity_structure_enabled?
+    self.feature_subscription.group_entity_structure
   end
 
   def bank_service_provider

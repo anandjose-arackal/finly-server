@@ -196,6 +196,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         worksheet = workbook.add_worksheet(sheet[:name])
 
         sheet[:item_headers].each_with_index do |item, index|
+          format = workbook.add_format(:num_format => '@')
+          worksheet.set_column(index, index, item.length, format)
           worksheet.write( 0, index, item )
         end
 

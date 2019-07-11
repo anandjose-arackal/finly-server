@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_02_082807) do
+ActiveRecord::Schema.define(version: 2019_06_18_083903) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3010,22 +3010,6 @@ ActiveRecord::Schema.define(version: 2019_07_02_082807) do
     t.integer "transfer_status_id"
     t.integer "company_id"
     t.string "request_id"
-  end
-
-  create_table "icici_statements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "cheque_no"
-    t.datetime "txn_date"
-    t.decimal "amount", precision: 20, scale: 10
-    t.decimal "balance", precision: 20, scale: 10
-    t.datetime "value_date"
-    t.string "transaction_type"
-    t.string "transaction_id"
-    t.string "request_id"
-    t.integer "bank_transaction_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "company_id"
-    t.text "remarks"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
