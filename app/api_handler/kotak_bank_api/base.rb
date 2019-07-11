@@ -212,6 +212,8 @@ class KotakBankApi::Base < BaseHandler
     # verify certificate only in production
     verify = Rails.env.production? ? true : false
 
+    ssl_options = {}
+
     logger = Logger.new $stderr
     logger.level = Logger::DEBUG
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
