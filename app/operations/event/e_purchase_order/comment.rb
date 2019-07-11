@@ -45,19 +45,23 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
   end
 
   def mailer_subject(user)
-    if user == self.document.user
+    if current_action_user == self.document.user
       "New Comment on Purchase Order : #{self.document.po_number}"
     else
-      "#{user.name} has added a new comment to the purchase order: #{self.document.po_number}"
+      "#{current_action_user.name} has added a new comment to the purchase order: #{self.document.po_number}"
     end
   end
 
   def mailer_body(user)
-    if user == self.document.user
+    if current_action_user == self.document.user
       "New Comment on Purchase Order: #{self.document.po_number} \n Comment: #{self.document.comments&.last&.body}"
     else
-      "#{user.name} has added a new comment to the purchase order: #{self.document.po_number}\n Comment: #{self.document.comments&.last&.body}"
+      "#{current_action_user.name} has added a new comment to the purchase order: #{self.document.po_number}\n Comment: #{self.document.comments&.last&.body}"
     end
+  end
+
+  def current_action_user
+    RequestStore.store[:current_user]
   end
 
 end
