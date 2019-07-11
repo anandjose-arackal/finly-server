@@ -64,6 +64,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       end
     else
+
       # the difference between this and a failure is that the money is not debited back to the account till we're sure
       if bank_transaction.possible_failure?
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
