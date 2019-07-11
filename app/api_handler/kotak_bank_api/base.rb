@@ -83,7 +83,6 @@ class KotakBankApi::Base < BaseHandler
     file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
   end
 
-  # because this is common for all Yes Bank API calls
   def process
     # p = self.path
     if Rails.env.production?
@@ -99,8 +98,8 @@ class KotakBankApi::Base < BaseHandler
         puts "Post Params: #{self.template}"
       end
 
-      #todo - kotak: remove below 1 line
-      puts "Post Params: #{self.template}"
+      # todo - kotak: remove below 1 line
+      # puts "Post Params: #{self.template}"
 
 
       self.response = self.connection.post do |req|

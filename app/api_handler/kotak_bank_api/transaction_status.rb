@@ -2,8 +2,8 @@
 # which is the sum of all accounts we are maintaining in the system
 
 class KotakBankApi::TransactionStatus < KotakBankApi::Base
-  attr_accessor :request_reference_number, :request_status, :bank_status_code, :bank_transaction,
-                :bank_message, :bank_message_type, :bank_reference_number, :company_id, :transfer_status_id, :payment
+  attr_accessor :request_reference_number, :request_status, :bank_status_code, :bank_transaction, :retry,
+                :bank_message, :bank_message_type, :bank_reference_number, :company_id, :transfer_status_id, :payment, :new_message_id
 
   def initialize(params)
     self.params = params
