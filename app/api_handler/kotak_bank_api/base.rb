@@ -97,6 +97,7 @@ class KotakBankApi::Base < BaseHandler
         # puts "Posting Path: #{p}"
         puts "Post Params: #{self.template}"
       end
+      puts "Post Params: #{self.template}"
 
       # todo - kotak: remove below 1 line
       # puts "Post Params: #{self.template}"
