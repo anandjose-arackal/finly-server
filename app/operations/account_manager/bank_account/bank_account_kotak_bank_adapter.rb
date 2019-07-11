@@ -58,13 +58,10 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:initiated))
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
-      elsif bank_transaction.processing?
-        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
-        create_system_message_for_processing(payment)
-        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
+      else
+        # Handle Failed / Possible Failure
       end
     else
-
       # the difference between this and a failure is that the money is not debited back to the account till we're sure
       if bank_transaction.possible_failure?
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
@@ -78,13 +75,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         else
           self.company = account.account_owner.company
         end
-        # todo kotak : populate bank_error_message
-        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message) && self.company.auto_retry_payment_enabled?
-          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
-        else
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        end
-        error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
+        error_message = op.transfer_request.transaction_result || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
@@ -183,7 +174,6 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
 
-    # todo kotak : Set the right attributes
     kotak_bank_transaction_params = {
         unique_reference_number: transfer_request.generate_unique_reference,
         transfer_type: transfer_request.transfer_type,
