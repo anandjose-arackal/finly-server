@@ -16,7 +16,6 @@ class KotakBankApi::Base < BaseHandler
       (params[:base_url] or params['base_url'])
     elsif env_key.present?
       ENV["#{env_key}_base"] + "?apikey=#{self.configuration['API_KEY']}"
-      # ENV["#{env_key}_base"] + "?apikey=#{self.configuration['API_KEY']}"
     else
       nil
     end
@@ -31,7 +30,6 @@ class KotakBankApi::Base < BaseHandler
 
   def init
     if Rails.env.production?
-      # TODO store data in sercure storage
       values = Finly::SecureStorage::Connector.read('core/kotak_bank')
     else
       file_path = "#{Rails.root}/config/kotak_bank_config.yml"
@@ -68,13 +66,6 @@ class KotakBankApi::Base < BaseHandler
   def bank_action
   end
 
-  def validate
-    # unless client_id.present? && client_secret.present? && auth_username.present? && auth_password.present?
-    # unless client_id.present? && client_secret.present?
-    #   add_message :error, "Invalid parameters, try again"
-    # end
-  end
-
   def file_logger_base_params
     {}
   end
@@ -97,11 +88,6 @@ class KotakBankApi::Base < BaseHandler
         # puts "Posting Path: #{p}"
         puts "Post Params: #{self.template}"
       end
-      puts "Post Params: #{self.template}"
-
-      # todo - kotak: remove below 1 line
-      # puts "Post Params: #{self.template}"
-
 
       self.response = self.connection.post do |req|
         # req.url p
@@ -110,16 +96,29 @@ class KotakBankApi::Base < BaseHandler
         req.body = template
       end
 
+      # Used for logging
+      post_headers = {
+          'Content-Type': "application/soap+xml;charset=UTF-8",
+          'action': self.configuration['HEADERS'][bank_action]
+      }
+
       self.end_time = DateUtils.local_date_time
       if Rails.env.production?
         post_params_hash = (Hash.from_xml(template) rescue nil)
-        response_hash = (Hash.from_xml(self.response.body) rescue nil)
+
         status_code = self.response.status rescue nil
+        if status_code.present? && status_code == 200
+          response_hash = (Hash.from_xml(self.response.body) rescue nil)
+        else
+          response_hash = self.response.body
+        end
+
         file_logger.info(
             file_logger_params(
                 {
-                    path: p,
+                    path: base_url,
                     post_params: post_params_hash,
+                    post_headers: post_headers,
                     response: response_hash,
                     status: status_code,
                     bank_action: bank_action,
@@ -132,9 +131,23 @@ class KotakBankApi::Base < BaseHandler
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.end_time = DateUtils.local_date_time
 
+      # Used for logging
+      post_headers = {
+          'Content-Type': "application/soap+xml;charset=UTF-8",
+          'action': self.configuration['HEADERS'][bank_action]
+      }
+
       post_params_hash = (Hash.from_xml(template) rescue nil)
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, bank_action: bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
+        file_logger.warn(file_logger_params({
+                                                path: base_url,
+                                                post_params: post_params_hash,
+                                                post_headers: post_headers,
+                                                success: false,
+                                                bank_action: bank_action,
+                                                request_time: (self.end_time - self.start_time),
+                                                failure_reason: 'Timeout'
+                                            }))
       end
 
       self.timeout = true
@@ -142,7 +155,7 @@ class KotakBankApi::Base < BaseHandler
       self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
-      if self.payment&.reference_resource&.is_a?(BankTransaction)
+      if self.payment&.reference_resource&.is_a?(KotakBankTransaction)
         # just update the bank transaction with the latest details
         self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
@@ -160,8 +173,22 @@ class KotakBankApi::Base < BaseHandler
 
       post_params_hash = (Hash.from_xml(template) rescue nil)
 
+      # Used for logging
+      post_headers = {
+          'Content-Type': "application/soap+xml;charset=UTF-8",
+          'action': self.configuration['HEADERS'][bank_action]
+      }
+
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, bank_action: bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
+        file_logger.warn(file_logger_params({
+                                                path: base_url,
+                                                post_params: post_params_hash,
+                                                success: false,
+                                                post_headers: post_headers,
+                                                bank_action: bank_action,
+                                                request_time: (self.end_time - self.start_time),
+                                                failure_reason: 'Resource Not Found'
+                                            }))
       end
 
       self.resource_not_found = true
@@ -181,17 +208,10 @@ class KotakBankApi::Base < BaseHandler
 
   protected
 
-  # def load_connection(url = base_url)
   def load_connection(url = base_url)
-    # adding the ssl options here for the request
     # verify certificate only in production
     verify = Rails.env.production? ? true : false
-    # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
-    ssl_options = {
-        # client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
-        # client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
-        # verify: verify
-    }
+
     logger = Logger.new $stderr
     logger.level = Logger::DEBUG
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
