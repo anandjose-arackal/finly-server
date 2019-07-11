@@ -45,7 +45,7 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
   end
 
   def mailer_subject(user)
-    if current_action_user == self.document.user
+    if (current_action_user == self.document.user) && (current_action_user == user)
       "New Comment on Purchase Order : #{self.document.po_number}"
     else
       "#{current_action_user.name} has added a new comment to the purchase order: #{self.document.po_number}"
@@ -53,7 +53,7 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
   end
 
   def mailer_body(user)
-    if current_action_user == self.document.user
+    if (current_action_user == self.document.user) && (current_action_user == user)
       "New Comment on Purchase Order: #{self.document.po_number} \n Comment: #{self.document.comments&.last&.body}"
     else
       "#{current_action_user.name} has added a new comment to the purchase order: #{self.document.po_number}\n Comment: #{self.document.comments&.last&.body}"
