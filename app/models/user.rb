@@ -719,11 +719,11 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
-  around_update do
+  after_save do
     if encrypted_password_changed?
       if self.company.group_entity_structure_enabled? && self.company.group_id.present?
         group_companies = self.company.group.companies
-        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
         other_users.each do |user|
           user.update_columns(encrypted_password: self.encrypted_password)
         end
