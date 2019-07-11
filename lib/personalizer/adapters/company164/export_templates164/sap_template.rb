@@ -7,13 +7,13 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def init
     users = user.company.users
-    reports = Report.where(user_id: users.pluck(:id)).processed.includes(expenses:[:category,{manual_expense:[custom_fields: [:value]]},{card_expense:[custom_fields: [:value]]},{distance_expense:[custom_fields: [:value]]},{time_expense:[custom_fields: [:value]]},:amount])
+    reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount])
     self.headers = [
         'Account',
         'Sub Account',
         'Department',
         'Cost center',
-        'Tax',
+        'TAX',
         'Base Amount',
         'Debit',
         'Credit',
@@ -30,19 +30,18 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
         self.contents << [
             expense.category.gl_code,
             '',
-            '',
-            '',
+            expense.user.gl_config&.dig(:department_code),
+            expense.user.gl_config&.dig(:cost_center),
             '',
             '',
             expense.amount.value,
             '',
             expense.note,
-            expense.merchant_name,
+            report.user&.profile&.employee_id,
             '',
-            'SAC',
-            invoice_number(expense)
+            '',
+            report.id
         ]
-        count += 1
       end
     end
   end

@@ -253,11 +253,11 @@ class User < ApplicationRecord
   delegate :company_name, to: :company
 
   validates :company_id, presence: true
-  validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: {scope: :company_id}
   validates :user_panel_subscription, presence: true
   validate :password_complexity
 
@@ -321,6 +321,9 @@ class User < ApplicationRecord
   scope :include_all_accounts_with_balance, -> {includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance])}
   scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
   scope :with_email, ->(email) {where email: email}
+  scope :with_email_or_mobile_number, -> (email, mobile_number) {
+    where('email = ? OR mobile_number = ?', email, mobile_number)
+  }
   scope :with_subscription, -> (application) {
     ids = self.pluck(:id)
     app = nil
@@ -716,6 +719,18 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
+  around_update do
+    if encrypted_password_changed?
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+        other_users.each do |user|
+          user.update_columns(encrypted_password: self.encrypted_password)
+        end
+      end
+    end
+  end
+
   after_create do
     default_policy_id = self.company.default_policy.id
     # if the user us added to either one system and not the other, create a default mapping for him or her in both
@@ -1034,11 +1049,6 @@ class User < ApplicationRecord
     super && self.active # i.e. super && self.is_active
   end
 
-  # overriding the requirement for emails by devise
-  def email_required?
-    false
-  end
-
   def inactive_message
     "Sorry, this account has been deactivated."
   end
@@ -1096,7 +1106,13 @@ class User < ApplicationRecord
   def self.find_for_database_authentication(conditions = {})
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
-    user = find_by(mobile_number: username) || find_by(email: username)
+    company_id = conditions[:company_id]
+    if company_id.present?
+      user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
+    else
+      user = find_by(mobile_number: username) || find_by(email: username)
+    end
+
     return user if user.present?
 
     authenticate_with_employee_id(username)
