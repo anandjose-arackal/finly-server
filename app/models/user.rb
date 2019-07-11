@@ -719,7 +719,7 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
-  after_save do
+  before_save do
     if encrypted_password_changed?
       if self.company.group_entity_structure_enabled? && self.company.group_id.present?
         group_companies = self.company.group.companies
