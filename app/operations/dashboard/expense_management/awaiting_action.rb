@@ -106,7 +106,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Trips awaiting credit",
         type: 'trips',
         count: TravelRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{{view: 'finance_manager', filter_status: 'booking_confirmed'}}],
+        filters: [{view: 'finance_manager', filter_status: 'booking_confirmed'}],
         awaiting_action: true # FE requires this to handle some logic in UI
       }
       self.result.push data
