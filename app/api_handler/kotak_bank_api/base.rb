@@ -70,9 +70,9 @@ class KotakBankApi::Base < BaseHandler
 
   def validate
     # unless client_id.present? && client_secret.present? && auth_username.present? && auth_password.present?
-    unless client_id.present? && client_secret.present?
-      add_message :error, "Invalid parameters, try again"
-    end
+    # unless client_id.present? && client_secret.present?
+    #   add_message :error, "Invalid parameters, try again"
+    # end
   end
 
   def file_logger_base_params
