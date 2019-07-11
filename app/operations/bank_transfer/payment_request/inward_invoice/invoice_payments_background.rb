@@ -131,7 +131,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
-  def retrieve_initiating_account
+  def retrieve_initiating_account(company)
     case user.company&.feature_subscription&.bank_service_provider
     when "YES"
       initiating_account = user.company.yes_bank_company_account
