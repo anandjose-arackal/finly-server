@@ -213,7 +213,7 @@ json.sub_departments do
   end
 end
 json.tds_slabs do
-  json.array!(current_company.tds_slabs) do |tds_slab|
+  json.array!(current_company.tds_slabs.sort_by{|slab| @result.invoice.vendor.tds_rates.pluck(:id).include?(slab.id) ? 0 : 1}) do |tds_slab|
     json.id tds_slab.id
     json.name "#{tds_slab.tds}% - #{tds_slab.name} "
     json.tds tds_slab.tds
