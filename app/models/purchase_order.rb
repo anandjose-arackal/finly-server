@@ -790,6 +790,12 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
         end
 
+        if item.taxable_amount.present?
+          item.taxable_amount.value = item_taxable_amount
+        else
+          item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: 1)
+        end
+
         # also set the CGST, SGST, and IGST amounts in the PO Line item
         case self.gst_type_id
           # i.e. it's a CGST + SGST case
