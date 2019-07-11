@@ -943,7 +943,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles
