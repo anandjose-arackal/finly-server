@@ -1,7 +1,7 @@
 # 1 report = 1 voucher
 # Only reimbursable expenses are considered
 # Ledger = gl_code picked up from expense category
-# Employee GL Code = GL Code picked up from user.gl_config[:name]
+# Employee GL Code = GL Code picked up from user.gl_config[:gl_name]
 #
 # Case 1: No TDS or GST
 #   Journal:
@@ -19,8 +19,13 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
         request[expense.report_id] = {}
       end
 
+      gl_config = expense.user.gl_config
+      if gl_config.nil?
+        raise "GL has not been configured for the following user #{user.name}"
+      end
+
       date = ERB::Util.html_escape(configuration.date_for(expense))
-      user = ERB::Util.html_escape(expense.user.name)
+      user = ERB::Util.html_escape(gl_config[:gl_name])
 
       ledger_name = ERB::Util.html_escape expense.category.gl_name
       expense_amount = expense.amount.INR
@@ -28,9 +33,6 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
       voucher_journal = 'Journal Vendor (18-19)'
 
       if request[expense.report_id][voucher_journal].blank?
-        if user.gl_config.blank? or user.gl_config&.dig(:cost_center).blank?
-          raise "GL has not been configured for the following user #{user.name}"
-        end
         request[expense.report_id][voucher_journal] = {
             name: voucher_journal,
             date: date,
