@@ -564,7 +564,11 @@ class Payment < ApplicationRecord
   end
 
   def retriable?
-    self.failed?
+    if self.initiating_account.present? && self.initiating_account.is_a?(KotakBankCompanyAccount)
+      false
+    else
+      self.failed?
+    end
   end
 
   def invoice_amount
