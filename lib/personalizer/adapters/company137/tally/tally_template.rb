@@ -41,7 +41,7 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
             period: "",
             narration: "",
             user: user,
-            cost_center: user.gl_config&.dig(:cost_center),
+            cost_center: gl_config&.dig(:cost_center),
             transactions: {}
         }
         
