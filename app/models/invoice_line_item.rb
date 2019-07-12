@@ -56,6 +56,7 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
 
   validates :description, presence: true
   validates :quantity, presence: true

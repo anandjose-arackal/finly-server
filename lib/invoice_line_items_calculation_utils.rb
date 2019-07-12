@@ -18,6 +18,7 @@ class InvoiceLineItemsCalculationUtils
     self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = self.tds_applicable_amount = 0
     invoice.invoice_items.each_with_index do |item, index|
       self.item_taxable_amount = 0
+      self.gross_amount = 0
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         # self.after_tax_amount = item.quantity * item.rate
         self.invoice_item_amount = item.quantity * item.rate
@@ -81,7 +82,7 @@ class InvoiceLineItemsCalculationUtils
       # invoice item taxable amount
       if item.taxable_amount.present?
         item.taxable_amount.value = self.item_taxable_amount
-        item.net_amount.currency_id = Currency.first.id
+        item.taxable_amount.currency_id = Currency.first.id
       else
         item.taxable_amount = Amount.new(value: self.item_taxable_amount, currency_id: 1)
       end
