@@ -35,7 +35,7 @@ class KotakBankTransferRequest < NonPersistentModel
         beneficiary_account_number: beneficiary_account_number,
         beneficiary_name: beneficiary_name,
         ifsc: ifsc,
-        transfer_type: resolve_transfer_type(transfer_type),
+        transfer_type: transfer_type,
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
         # unique_reference_number: generate_unique_reference,
@@ -54,12 +54,12 @@ class KotakBankTransferRequest < NonPersistentModel
     ref = nil
     loop do
       # ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      if transfer_type == "IMPSA"
-        ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      else
-        ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..8]}"
-      end
-      break
+      # if transfer_type == "IMPSA"
+      #   ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      # else
+      #   ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..8]}"
+      # end
+      ref = "QUIK#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..8]}"
       if KotakBankTransaction.find_by(unique_reference_number: ref).blank?
         self.unique_reference_number = ref
         break
