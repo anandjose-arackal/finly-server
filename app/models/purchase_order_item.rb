@@ -47,6 +47,7 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :purchase_order, optional: true
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount"
   belongs_to :total_amount, optional: true, class_name: "Amount"
   belongs_to :category, optional: true
@@ -62,7 +63,7 @@ class PurchaseOrderItem < ApplicationRecord
   validates_presence_of :department
   validates_presence_of :rate
 
-  accepts_nested_attributes_for :tax_amount, :discount_amount,
+  accepts_nested_attributes_for :tax_amount, :discount_amount, :taxable_amount,
                                 :total_amount
 
   scope :with_id, -> (ids) {

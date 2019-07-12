@@ -98,12 +98,10 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     schedulable_payment_requests.each do |payment_request|
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_request.payment_order.payment_mode)
-      payment_request.payment_order.update(scheduled_at: next_date)
-      payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_request.payment_order.update(scheduled_at: next_date, payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_request.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled), scheduled_at: next_date)
       #todo workflow manager can be introduced here; which will also create a trail for it
     end
-    # self.creditable_payment_requests = self.payment_requests.without_id(schedulable_payment_request_ids)
-    # self.creditable_payment_orders = ::PaymentOrder.with_id(self.creditable_payment_requests.pluck(:payment_order_id))
   end
 
   def process
@@ -164,14 +162,16 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     case params[:initiating_account_type]
       when 1, '1'
         case user.company&.feature_subscription&.bank_service_provider
-          when "YES"
-            return user.company.yes_bank_company_account
-          when "ICICI"
-            return user.company.icici_bank_company_account
-          else
-            return user.company.yes_bank_company_account
+        when "YES"
+          return user.company.yes_bank_company_account
+        when "ICICI"
+          return user.company.icici_bank_company_account
+        when "KOTAK"
+          return user.company.kotak_bank_company_account
+        else
+          return user.company.yes_bank_company_account
         end
-      when 2, '2'
+    when 2, '2'
         return user.bank_wallet
       else
         user.bank_wallet # i.e. finly money by default
@@ -186,6 +186,8 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
           when "ICICI"
             return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          when "KOTAK"
+            return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
           else
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

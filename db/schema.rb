@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_02_082807) do
+ActiveRecord::Schema.define(version: 2019_07_10_150751) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -523,10 +523,18 @@ ActiveRecord::Schema.define(version: 2019_07_02_082807) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bank_account_provider_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.string "debit_account_number"
+    t.integer "bank_account_provider_type_id"
   end
 
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3560,6 +3568,46 @@ ActiveRecord::Schema.define(version: 2019_07_02_082807) do
     t.index ["company_id"], name: "index_itz_cash_properties_on_company_id"
   end
 
+  create_table "kotak_bank_company_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.integer "balance_id"
+  end
+
+  create_table "kotak_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "kotak_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "amount_id"
+    t.integer "company_id"
+    t.integer "transfer_status_id"
+    t.integer "beneficiary_account_id"
+    t.string "utr"
+    t.string "response_status_code"
+    t.string "unique_reference_number"
+    t.string "transfer_type"
+    t.string "beneficiary_account_number"
+    t.string "beneficiary_account_ifsc"
+    t.string "beneficiary_name"
+    t.string "narration"
+    t.date "payment_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "bank_response"
+    t.string "reversal_status_code"
+    t.text "reversal_response"
+    t.integer "reversal_api_counter", default: 0
+    t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
+    t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
+    t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
+    t.index ["response_status_code"], name: "index_kotak_bank_transactions_on_response_status_code"
+    t.index ["transfer_status_id"], name: "index_kotak_bank_transactions_on_transfer_status_id"
+    t.index ["unique_reference_number"], name: "index_kotak_bank_transactions_on_unique_reference_number"
+  end
+
   create_table "kyc_documents", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "company_kyc_document_type_id"
     t.integer "company_kyc_id"
@@ -4760,6 +4808,7 @@ ActiveRecord::Schema.define(version: 2019_07_02_082807) do
     t.decimal "cgst", precision: 20, scale: 10
     t.decimal "sgst", precision: 20
     t.decimal "igst", precision: 20
+    t.integer "taxable_amount_id"
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
@@ -4770,6 +4819,7 @@ ActiveRecord::Schema.define(version: 2019_07_02_082807) do
     t.index ["purchase_request_item_id"], name: "index_purchase_order_items_on_purchase_request_item_id"
     t.index ["tax_amount_id"], name: "index_purchase_order_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_purchase_order_items_on_tax_rate_id"
+    t.index ["taxable_amount_id"], name: "index_purchase_order_items_on_taxable_amount_id"
     t.index ["tds_amount_id"], name: "index_purchase_order_items_on_tds_amount_id"
     t.index ["total_amount_id"], name: "index_purchase_order_items_on_total_amount_id"
   end

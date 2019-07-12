@@ -1,6 +1,6 @@
 # this takes a list of spurious payments in the system - for example things like payments that are in progress
 # and such and handles them accordingly
-class FixSpuriousPayments < ActiveJob::Base
+class FixSpuriousPayments < ApplicationJob
 
   def perform
     # spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('created_at <= ?', (DateTime.now - 1.hour)).where(receiving_account_type: "BankAccount")

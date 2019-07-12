@@ -244,14 +244,18 @@ class PaymentOrder < ApplicationRecord
   def update_order_status
     status_ids = self.payments.pluck(:payment_status_id)
     if status_ids.include?(PaymentStatus.id_for(:failed))
-      # now further check if there are successes as well
-      if status_ids.include?(PaymentStatus.id_for(:completed))
+      # now further check if there are successes / initiated as well
+      if status_ids.include?(PaymentStatus.id_for(:completed)) || status_ids.include?(PaymentStatus.id_for(:initiated))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else # i.e. if there are only failures in this payment order
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       end
     else
-      self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      if status_ids.include?(PaymentStatus.id_for(:initiated))
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      else
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      end
     end
   end
 
