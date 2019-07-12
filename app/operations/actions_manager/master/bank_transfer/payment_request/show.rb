@@ -935,12 +935,21 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       return 0
     end
     case account
-      when :vendor_payment_wallet
-        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-        return adapter.balance
-      when :company_credits
+    when :vendor_payment_wallet
+      adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+      return adapter.balance
+    when :company_credits
+      case user.company&.feature_subscription&.bank_service_provider
+      when "YES"
         adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-        return adapter.balance
+      when "ICICI"
+        adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+      when "KOTAK"
+        adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      else
+        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      end
+      return adapter.balance
     end
   end
 

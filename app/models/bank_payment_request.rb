@@ -28,12 +28,12 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
+#  rejection_note               :text(65535)
 #  bank_account_provider_id     :integer
 #  otp                          :string(255)
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
 #  otp_count                    :integer
-#  rejection_note               :text(65535)
 #
 
 class BankPaymentRequest < ApplicationRecord
