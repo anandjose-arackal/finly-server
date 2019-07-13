@@ -14,7 +14,14 @@ class FieldText < ApplicationRecord
 
   validates :value, presence: true
 
+  after_save :update_value_in_custom_field
+  
+
   def as_json
     {value: self.value}
+  end
+
+  def update_value_in_custom_field
+    self.custom_field.update_column('configured_field_value', self.value)
   end
 end
