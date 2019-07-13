@@ -165,10 +165,10 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       # Currently assuming all companies will have only one account in each of the banks
       if params[:initiating_company_account_type].present?
         case params[:initiating_company_account_type]
-        when "KotakBankCompanyAccount"
-          user.company.kotak_bank_company_account
         when "IciciBankCompanyAccount"
           user.company.icici_bank_company_account
+        when "KotakBankCompanyAccount"
+          user.company.kotak_bank_company_account
         when "YesBankCompanyAccount"
           return user.company.yes_bank_company_account
         else
@@ -199,10 +199,10 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       # Currently assuming all companies will have only one account in each of the banks
       if params[:initiating_company_account_type].present?
         case params[:initiating_company_account_type]
-        when "KotakBankCompanyAccount"
-          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
         when "IciciBankCompanyAccount"
           return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KotakBankCompanyAccount"
+          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
         when "YesBankCompanyAccount"
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         else

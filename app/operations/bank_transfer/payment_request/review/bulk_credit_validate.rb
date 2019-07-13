@@ -7,18 +7,21 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
   class BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount, :source_account_balance,
-                  :wallet_balance, :company_credits_balance
+                  :wallet_balance, :company_credits_balance, :bank_accounts
 
     def init
       self.result = params[:result]
       self.processable_amount = params[:processable_amount]
       self.unprocessable_amount = params[:unprocessable_amount]
       self.scheduled_amount = params[:scheduled_amount]
+
       self.source_account_balance = params[:source_account_balance]
       self.wallet_balance = params[:wallet_balance]
       self.company_credits_balance = params[:company_credits_balance]
     end
 
+    # todo - multibank : See why we use it
+    # Used for enabling and disabling the credit button on frontend
     def processable?
       self.source_account_balance >= (self.processable_amount + self.scheduled_amount)
     end
@@ -110,6 +113,9 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       hash[:errors] = errors
       self.result << hash
     end
+
+
+
   end
 
   def post_process

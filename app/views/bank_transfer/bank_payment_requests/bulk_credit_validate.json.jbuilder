@@ -7,6 +7,8 @@ json.summary do
   json.company_credits_balance @result.company_credits_balance
 end
 
+json.bank_accounts @result.bank_accounts
+
 json.orders do
   json.array!(@result.result) do |payment_request|
     json.id payment_request[:id]
