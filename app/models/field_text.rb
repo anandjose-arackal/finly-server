@@ -22,6 +22,6 @@ class FieldText < ApplicationRecord
   end
 
   def update_value_in_custom_field
-    self.custom_field.update_column('configured_field_value', self.value)
+    self&.custom_field&.update_column('configured_field_value', self&.value)
   end
 end
