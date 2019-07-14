@@ -18,9 +18,9 @@ class BankTransfer::PaymentRequest::GetCompanyBankAccounts < BankTransfer::Payme
     def init
       self.bank_accounts = []
 
-      bank_accounts_op = AccountManager::CompanyBankAccounts::Index.(user, {balance: true})
+      bank_accounts_op = AccountManager::CompanyBankAccounts::Index.(user, {balance: true}) rescue nil
 
-      if bank_accounts_op.success?
+      if bank_accounts_op&.success?
         self.bank_accounts = bank_accounts_op.bank_accounts
       end
     end
