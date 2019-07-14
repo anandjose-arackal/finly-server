@@ -140,6 +140,7 @@ json.invoice do
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
+      json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
       json.amount precision_value item.amount&.value
       json.category_name item.category&.name
       json.description item.description

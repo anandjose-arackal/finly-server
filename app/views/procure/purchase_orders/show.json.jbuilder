@@ -112,6 +112,7 @@ json.items do
       json.id item.discount_amount&.id
       json.currency_id item.discount_amount&.currency&.id
     end
+    json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
     json.total_amount do
       json.value item.total_amount&.value&.round(2)
       json.id item.total_amount&.id
