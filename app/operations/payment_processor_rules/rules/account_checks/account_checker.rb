@@ -87,6 +87,4 @@ PaymentProcessorRules::Checker.new 'AccountChecker' do
     end
 
   end
-
-
 end
