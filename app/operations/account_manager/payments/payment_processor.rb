@@ -129,8 +129,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     if self.crediting_payments.present?
       if self.background
         scheduled_at = self.crediting_payments.pluck(:scheduled_at).uniq&.compact.first
-        # debugger # todo kotak remove nil assignment
-        # scheduled_at = nil
         if scheduled_at.present? && scheduled_at > DateUtils.local_date
           add_message :success, "Payments have been successfully scheduled for later."
         else

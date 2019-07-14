@@ -113,9 +113,6 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       hash[:errors] = errors
       self.result << hash
     end
-
-
-
   end
 
   def post_process
