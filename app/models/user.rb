@@ -551,6 +551,8 @@ class User < ApplicationRecord
     includes(:cards, :company)
   }
 
+  scope :includes_for_index, -> { includes(:profile) }
+
   # Gives list of user who are not part of a policy as finance manager
   scope :filter_unassigned_finance_for_policy, -> (policy_id) {
     policy = Policy.find_by id: policy_id
@@ -719,11 +721,11 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
-  around_update do
+  before_save do
     if encrypted_password_changed?
       if self.company.group_entity_structure_enabled? && self.company.group_id.present?
         group_companies = self.company.group.companies
-        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
         other_users.each do |user|
           user.update_columns(encrypted_password: self.encrypted_password)
         end

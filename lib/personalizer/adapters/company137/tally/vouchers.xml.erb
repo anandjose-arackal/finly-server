@@ -34,7 +34,7 @@
                       <CATEGORY>Primary Cost Category</CATEGORY>
                       <ISDEEMEDPOSITIVE><%= amount >= 0 ? 'No' : 'Yes' %></ISDEEMEDPOSITIVE>
                       <COSTCENTREALLOCATIONS.LIST>
-                        <NAME>SX GRU MUM F &amp; A</NAME>
+                        <NAME><%= details[:cost_center] %></NAME>
                         <AMOUNT><%= amount %></AMOUNT>
                       </COSTCENTREALLOCATIONS.LIST>
                     </CATEGORYALLOCATIONS.LIST>
