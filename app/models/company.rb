@@ -364,6 +364,7 @@ class Company < ApplicationRecord
 
   def agreement_based_payment_system_enabled?
     self.feature_subscription.agreement_based_payment_system
+  end
 
   def group_entity_structure_enabled?
     self.feature_subscription.group_entity_structure
@@ -431,15 +432,6 @@ class Company < ApplicationRecord
     policy_ids = self.policies.default.pluck(:id)
     policy_ids += self.policies.with_application(RequestStore[:current_app]).pluck(:id)
     Policy.with_id(policy_ids)
-  end
-
-  def dep_subdept_mapping
-    result = {}
-    departments = user.company.departments
-    sub_departments = user.company.departments.only_sub_departments
-    departments.each do |department|
-
-    end
   end
 
   def enforce_policy_enabled?
