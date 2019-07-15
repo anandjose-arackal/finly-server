@@ -27,11 +27,13 @@ json.trail do
       if item.is_a?(Invoice)
         json.id item&.created_by&.id
         json.name item&.created_by&.name
+        json.email item&.created_by&.email
       elsif item.is_a?(Payment)
 
       else
         json.id item&.user&.id
         json.name item&.user&.name
+        json.email item&.user&.email
       end
     end
 
