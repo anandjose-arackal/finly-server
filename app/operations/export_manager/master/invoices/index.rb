@@ -136,6 +136,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_net_payable_amount: {spreadsheet: true}
          ]
 
   def input
@@ -318,5 +319,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
+  def invoice_net_payable_amount(invoice_line_item)
+    invoice_line_item.parent.balance_due&.value || 0
+  end
 
 end
