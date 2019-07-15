@@ -48,7 +48,9 @@
 #  beneficiary_payment_id         :integer
 #  bank_account_provider_id       :integer
 #  otp                            :string(255)
-#  opt_attempts                   :integer
+#  otp_attempts                   :integer
+#  on_hold                        :boolean
+#  disabled                       :boolean
 #
 
 class Payment < ApplicationRecord
@@ -292,7 +294,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
     end
   }
 
@@ -562,7 +564,11 @@ class Payment < ApplicationRecord
   end
 
   def retriable?
-    self.failed?
+    if self.initiating_account.present? && self.initiating_account.is_a?(KotakBankCompanyAccount)
+      false
+    else
+      self.failed?
+    end
   end
 
   def invoice_amount

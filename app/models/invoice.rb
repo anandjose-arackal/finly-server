@@ -80,9 +80,18 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
+#  payment_agreement_id            :integer
+#  vendor_location_id              :integer
+#  billing_type_id                 :integer
+#  payment_agreement_escalation_id :integer
+#  invoice_frequency_id            :integer
+#  billing_start_date              :datetime
+#  billing_day_of_month            :integer
+#  agreement_based_next_due_date   :date
 #
 
 class Invoice < ApplicationRecord

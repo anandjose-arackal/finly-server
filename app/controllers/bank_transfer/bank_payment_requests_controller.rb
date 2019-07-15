@@ -216,6 +216,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def get_company_bank_accounts
+    @result = BankTransfer::PaymentRequest::GetCompanyBankAccounts.(current_user, params)
+    @respond
+  end
+
   def bulk_credit
     @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
     respond

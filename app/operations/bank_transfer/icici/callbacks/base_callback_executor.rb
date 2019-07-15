@@ -1,7 +1,7 @@
 # this class will contain the majority of the decrypting request and sending it to
 # the respective Callback executor
 
-class BankTransfer::IciciCallbacks::BaseCallbackExecutor < BaseOperation
+class BankTransfer::Icici::Callbacks::BaseCallbackExecutor < BaseOperation
 
   def initialize(encrypted_string)
 

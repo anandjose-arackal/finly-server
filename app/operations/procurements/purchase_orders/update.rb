@@ -74,6 +74,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
+    if self.purchase_order_params[:location_id].blank?
+      add_message :error, "Please specify a Billing Address."
+    end
+
+    if self.purchase_order_params[:delivery_location_id].blank?
+      add_message :error, "Please specify a Shipping Address."
+      return
+    end
+
+
     if self.purchase_order.quotations.present?
       quotes = self.purchase_order.quotations
       selected_quotes = quotes.map { |q| q if q.selected }.compact
@@ -159,8 +169,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
 
     if self.purchase_order_params[:requested_advance_amount_attributes][:value].present? && self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
-      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
-        add_message :error, "Advance amount can't be more than Total amount"
+      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > (params[:purchase_order][:balance_amount_attributes][:value].to_i + 1) # adding a buffer to account for roundoff amount
+        add_message :error, "Advance amount can't be more than the Balance Due for the entire PO."
         return
       end
       if self.purchase_order_params[:due_date].blank?

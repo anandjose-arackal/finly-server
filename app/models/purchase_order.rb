@@ -31,7 +31,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  user_id                      :integer
-#  procurement_term_text        :text(65535)
+#  procurement_term_text        :text(16777215)
 #  controlling_user_id          :integer
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
@@ -67,6 +67,10 @@
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
+#  vendor_poc_name              :string(255)
+#  vendor_poc_email             :string(255)
+#  vendor_poc_mobile_number     :string(255)
+#  rejection_note               :text(65535)
 #  taxable_amount_id            :integer
 #
 
@@ -788,6 +792,12 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
         end
 
+        if item.taxable_amount.present?
+          item.taxable_amount.value = item_taxable_amount
+        else
+          item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: 1)
+        end
+
         # also set the CGST, SGST, and IGST amounts in the PO Line item
         case self.gst_type_id
           # i.e. it's a CGST + SGST case
@@ -934,7 +944,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles

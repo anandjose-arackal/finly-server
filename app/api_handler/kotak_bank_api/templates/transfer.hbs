@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:pay="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd">
+   <soap:Header />
+   <soap:Body>
+      <pay:Payment>
+         <pay:RequestHeader>
+            <pay:MessageId>{{UNIQUE_REFERENCE_NUMBER}}</pay:MessageId>
+            <pay:MsgSource>{{MESSAGE_SOURCE}}</pay:MsgSource>
+            <pay:ClientCode>{{CLIENT_CODE}}</pay:ClientCode>
+            <pay:BatchRefNmbr />
+            <pay:HeaderChecksum />
+         </pay:RequestHeader>
+         <pay:InstrumentList> 
+            <pay:instrument>
+               <pay:InstRefNo>{{UNIQUE_REFERENCE_NUMBER}}</pay:InstRefNo>
+               <pay:CompanyId />
+               <pay:CompBatchId />
+               <pay:ConfidentialInd />
+               <pay:MyProdCode>{{PRODUCT_CODE}}</pay:MyProdCode>
+               <pay:PayMode>{{TRANSFER_TYPE}}</pay:PayMode>
+               <pay:TxnAmnt>{{TRANSFER_AMOUNT}}</pay:TxnAmnt>
+               <pay:AccountNo>{{ACCOUNT_NUMBER}}</pay:AccountNo>
+               <pay:DrDesc>FUND TRANSFER</pay:DrDesc>
+               <pay:PaymentDt>{{PAYMENT_DATE}}</pay:PaymentDt>
+               <pay:RecBrCd>{{BENEFICIARY_IFSC}}</pay:RecBrCd>
+               <pay:BeneAcctNo>{{BENEFICIARY_ACCOUNT_NUMBER}}</pay:BeneAcctNo>
+               <pay:BeneName>{{BENEFICIARY_NAME}}</pay:BeneName>
+               <pay:InstDt>{{PAYMENT_DATE}}</pay:InstDt>
+               <pay:EnrichmentSet>
+                 <pay:Enrichment />
+               </pay:EnrichmentSet>
+            </pay:instrument>
+         </pay:InstrumentList>
+      </pay:Payment>
+   </soap:Body>
+</soap:Envelope>

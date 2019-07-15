@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Created by TIBCO WSDL-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns0="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd" xmlns:ns1="http://www.kotak.com/schemas/CMS_Generic/Payment_Response.xsd" xmlns:ns2="http://www.kotak.com/schemas/CMS_Generic/Reversal_Request.xsd" xmlns:ns3="http://www.kotak.com/schemas/CMS_Generic/Reversal_Response.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://xmlns.kotak.com/CMS_Generic_Service" name="Untitled" targetNamespace="http://xmlns.kotak.com/CMS_Generic_Service">
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd" targetNamespace="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified">
+      <xsd:simpleType name="Amount_ST">
+        <xsd:restriction base="xsd:decimal">
+          <xsd:pattern value="d{0,16}(.d{1,4})?" />
+          <xsd:minExclusive value="0.0" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Date_ST">
+        <xsd:restriction base="xsd:date" />
+      </xsd:simpleType>
+      <xsd:complexType name="EnrichmentSetType">
+        <xsd:sequence>
+          <xsd:element name="Enrichment"  type="tns:MaxChar4000_ST" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="InitiateRequest">
+        <xsd:sequence>
+          <xsd:element name="RequestHeader" type="tns:RequestHeaderType" />
+          <xsd:element name="InstrumentList" type="tns:InstrumentListType" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="InstrumentListType">
+        <xsd:sequence>
+          <xsd:element name="instrument" type="tns:InstrumentType" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="InstrumentType">
+        <xsd:sequence>
+          <xsd:element name="InstRefNo" type="tns:MinChar1_MaxChar100_ST" />
+          <xsd:element name="CompanyId" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="CompBatchId" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="ConfidentialInd" type="tns:MaxChar1_ST" minOccurs="0" />
+          <xsd:element name="MyProdCode" type="tns:MinChar1_MaxChar20_ST" />
+          <xsd:element name="CompTransNo" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="PayMode" type="tns:MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="TxnAmnt" type="tns:Amount_ST" />
+          <xsd:element name="AccountNo" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="DrRefNmbr" type="tns:MaxChar14_ST" minOccurs="0" />
+          <xsd:element name="DrDesc" type="tns:MaxChar140_ST" minOccurs="0" />
+          <xsd:element name="PaymentDt" type="tns:Date_ST" minOccurs="0" />
+          <xsd:element name="BankCdInd" type="tns:MaxChar1_ST" minOccurs="0" />
+          <xsd:element name="BeneBnkCd" type="tns:MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="RecBrCd" type="tns:MaxChar30_ST" minOccurs="0" />
+          <xsd:element name="BeneAcctNo" type="tns:MaxChar30_ST" minOccurs="0" />
+          <xsd:element name="BeneName" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="BeneCode" type="tns:MaxChar50_ST" minOccurs="0" />
+          <xsd:element name="BeneEmail" type="tns:MaxChar500_ST" minOccurs="0" />
+          <xsd:element name="BeneFax" type="tns:MaxChar40_ST" minOccurs="0" />
+          <xsd:element name="BeneMb" type="tns:MaxChar32_ST" minOccurs="0" />
+          <xsd:element name="BeneAddr1" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="BeneAddr2" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="BeneAddr3" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="BeneAddr4" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="BeneAddr5" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="city" type="tns:MaxChar60_ST" minOccurs="0" />
+          <xsd:element name="zip" type="tns:ZipCode_ST" minOccurs="0" />
+          <xsd:element name="Country" type="tns:MaxChar60_ST" minOccurs="0" />
+          <xsd:element name="State" type="tns:MaxChar60_ST" minOccurs="0" />
+          <xsd:element name="TelephoneNo" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="BeneId" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="BeneTaxId" type="tns:MaxChar20_ST" minOccurs="0" />
+          <xsd:element name="AuthPerson" type="tns:MaxChar40_ST" minOccurs="0" />
+          <xsd:element name="AuthPersonId" type="tns:MaxChar15_ST" minOccurs="0" />
+          <xsd:element name="DeliveryMode" type="tns:MaxChar2_ST" minOccurs="0" />
+          <xsd:element name="PayoutLoc" type="tns:MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="PickupBr" type="tns:MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="PaymentRef" type="tns:MaxChar45_ST" minOccurs="0" />
+          <xsd:element name="ChgBorneBy" type="tns:MaxChar1_ST" minOccurs="0" />
+          <xsd:element name="InstDt" type="tns:Date_ST" minOccurs="0" />
+          <xsd:element name="MICRNo" type="tns:MaxChar6_ST" minOccurs="0" />
+          <xsd:element name="CreditRefNo" type="tns:MaxChar140_ST" minOccurs="0" />
+          <xsd:element name="PaymentDtl" type="tns:MaxChar140_ST" minOccurs="0" />
+          <xsd:element name="PaymentDtl1" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="PaymentDtl2" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="PaymentDtl3" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="MailToAddr1" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="MailToAddr2" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="MailToAddr3" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="MailToAddr4" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="MailTo" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ExchDoc" type="tns:MaxChar30_ST" minOccurs="0" />
+          <xsd:element name="InstChecksum" type="tns:MaxChar400_ST" minOccurs="0" />
+          <xsd:element name="InstRF1" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF2" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF3" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF4" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF5" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF6" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF7" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF8" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF9" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF10" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF11" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF12" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF13" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF14" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="InstRF15" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="EnrichmentSet" type="tns:EnrichmentSetType" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="MaxChar100_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="100" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar10_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="10" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar11_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="11" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar140_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="140" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar14_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="14" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar15_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="15" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar1_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="1" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar200_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="200" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar20_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="20" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar255_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="255" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar2_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="2" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar30_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="30" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar32_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="32" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar4000_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="4000" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar400_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="400" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar40_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="40" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar45_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="45" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar500_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="500" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar50_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="50" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar60_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="60" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar6_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="6" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar70_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="70" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar100_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="100" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar10_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="10" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar20_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="20" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:complexType name="RequestHeaderType">
+        <xsd:sequence>
+          <xsd:element name="MessageId" type="tns:MinChar1_MaxChar20_ST" />
+          <xsd:element name="MsgSource" type="tns:MinChar1_MaxChar20_ST" />
+          <xsd:element name="ClientCode" type="tns:MinChar1_MaxChar10_ST" />
+          <xsd:element name="BatchRefNmbr" type="tns:MaxChar100_ST" minOccurs="0" />
+          <xsd:element name="HeaderChecksum" type="tns:MaxChar400_ST" minOccurs="0" />
+          <xsd:element name="ReqRF1" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ReqRF2" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ReqRF3" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ReqRF4" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ReqRF5" type="tns:MaxChar200_ST" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="ZipCode_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[0-9]{0,10}" />
+          <xsd:minLength value="0" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="InitiateRequestRoot" type="tns:InitiateRequest" />
+      <xsd:element name="Payment" type="tns:InitiateRequest" />
+    </xsd:schema>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.kotak.com/schemas/CMS_Generic/Payment_Response.xsd" targetNamespace="http://www.kotak.com/schemas/CMS_Generic/Payment_Response.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified">
+      <xsd:complexType name="Acknowledgement">
+        <xsd:sequence>
+          <xsd:element name="MessageId" type="tns:MinChar1_MaxChar20_ST" />
+          <xsd:element name="StatusCd" type="tns:MinChar1_MaxChar10_ST" />
+          <xsd:element name="StatusRem" type="tns:MinChar1_MaxChar2000_ST" />
+          <xsd:element name="ResRF1" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ResRF2" type="tns:MaxChar200_ST" minOccurs="0" />
+          <xsd:element name="ResRF3" type="tns:MaxChar200_ST" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AcknowledgementType">
+        <xsd:sequence>
+          <xsd:element name="AckHeader" type="tns:Acknowledgement" />
+          <xsd:element name="InstrumentList" type="tns:InstrumentListType" minOccurs="0" />
+          <xsd:element name="FaultList" type="tns:FaultListType" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ErrorListType">
+        <xsd:sequence>
+          <xsd:element name="Error" type="tns:MinChar1_MaxChar2000_ST" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="FaultListType">
+        <xsd:sequence>
+          <xsd:element name="Fault" type="tns:FaultType" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="FaultType">
+        <xsd:sequence>
+          <xsd:element name="Code" type="tns:MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="Reason" type="tns:MinChar1_MaxChar2000_ST" />
+          <xsd:element name="InvalidField" type="tns:MaxChar50_ST" minOccurs="0" />
+          <xsd:element name="SubmittedFieldValue" type="tns:MaxChar4000_ST" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="InstrumentListType">
+        <xsd:sequence>
+          <xsd:element name="Instrument" type="tns:InstrumentType" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="InstrumentType">
+        <xsd:sequence>
+          <xsd:element name="InstRefNo" type="tns:MinChar1_MaxChar20_ST" />
+          <xsd:element name="InstStatusCd" type="tns:MinChar1_MaxChar10_ST" minOccurs="0" />
+          <xsd:element name="InstStatusRem" type="tns:MinChar1_MaxChar2000_ST" minOccurs="0" />
+          <xsd:element name="ErrorList" type="tns:ErrorListType" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="MaxChar10_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="10" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar200_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="200" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar4000_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="4000" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MaxChar50_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="0" />
+          <xsd:maxLength value="50" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar10_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="10" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar2000_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="2000" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="MinChar1_MaxChar20_ST">
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="20" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="AcknowledgementRoot" type="tns:AcknowledgementType" />
+      <xsd:element name="Payment" type="tns:AcknowledgementType" />
+    </xsd:schema>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kotak.com/schemas/CMS_Generic/Reversal_Request.xsd" targetNamespace="http://www.kotak.com/schemas/CMS_Generic/Reversal_Request.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified">
+      <xsd:element name="Client_Code" type="xsd:string" />
+      <xsd:element name="Date_Post" type="xsd:string" />
+      <xsd:element name="Details">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns2:Msg_Id" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Header">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns2:Req_Id" />
+            <xsd:element ref="ns2:Msg_Src" />
+            <xsd:element ref="ns2:Client_Code" />
+            <xsd:element ref="ns2:Date_Post" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Msg_Id" type="xsd:string" />
+      <xsd:element name="Msg_Src" type="xsd:string" />
+      <xsd:element name="Req_Id" type="xsd:string" />
+      <xsd:element name="Reversal">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns2:Header" />
+            <xsd:element ref="ns2:Details" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kotak.com/schemas/CMS_Generic/Reversal_Response.xsd" targetNamespace="http://www.kotak.com/schemas/CMS_Generic/Reversal_Response.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified">
+      <xsd:element name="Client_Code" type="xsd:string" />
+      <xsd:element name="Date_Post" type="xsd:string" />
+      <xsd:element name="Details">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns3:Rev_Detail" minOccurs="0" maxOccurs="unbounded" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Header">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns3:Req_Id" />
+            <xsd:element ref="ns3:Msg_Src" />
+            <xsd:element ref="ns3:Client_Code" />
+            <xsd:element ref="ns3:Date_Post" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Msg_Id" type="xsd:string" />
+      <xsd:element name="Msg_Src" type="xsd:string" />
+      <xsd:element name="Req_Id" type="xsd:string" />
+      <xsd:element name="Rev_Detail">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns3:Msg_Id" />
+            <xsd:element ref="ns3:Status_Code" />
+            <xsd:element ref="ns3:Status_Desc" />
+            <xsd:element ref="ns3:UTR" minOccurs="0" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Reversal">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="ns3:Header" />
+            <xsd:element ref="ns3:Details" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Status_Code" type="xsd:string" />
+      <xsd:element name="Status_Desc" type="xsd:string" />
+      <xsd:element name="UTR" nillable="true" type="xsd:string" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:service name="CMS_Generic_Service.serviceagent">
+    <wsdl:port name="CMS_Generic_WebAPI" binding="tns:CMS_Generic_WebAPIBinding">
+      <soap:address location="http://BPMdb:10330/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent" />
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:portType name="WebAPI">
+    <wsdl:operation name="Payment">
+      <wsdl:input message="tns:Pay_Request" />
+      <wsdl:output message="tns:Pay_Response" />
+    </wsdl:operation>
+    <wsdl:operation name="Reversal">
+      <wsdl:input message="tns:Rev_Request" />
+      <wsdl:output message="tns:Rev_Response" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CMS_Generic_WebAPIBinding" type="tns:WebAPI">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Payment">
+      <soap:operation style="document" soapAction="/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Payment" soapActionRequired="true" />
+      <wsdl:input>
+        <soap:body use="literal" parts="Request" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" parts="Response" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Reversal">
+      <soap:operation style="document" soapAction="/BusinessServices/StarterProcesses/CMS_Generic_Service.serviceagent/Reversal" soapActionRequired="true" />
+      <wsdl:input>
+        <soap:body use="literal" parts="Request" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" parts="Response" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:message name="Pay_Request">
+    <wsdl:part name="Request" element="ns0:Payment" />
+  </wsdl:message>
+  <wsdl:message name="Pay_Response">
+    <wsdl:part name="Response" element="ns1:Payment" />
+  </wsdl:message>
+  <wsdl:message name="Rev_Request">
+    <wsdl:part name="Request" element="ns2:Reversal" />
+  </wsdl:message>
+  <wsdl:message name="Rev_Response">
+    <wsdl:part name="Response" element="ns3:Reversal" />
+  </wsdl:message>
+</wsdl:definitions>

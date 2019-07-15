@@ -11,9 +11,9 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
   end
 
   def process
-    op = BankTransfer::YesBank::Index.(current_user, params)
+    op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
-      self.payment_order_ids = op.payment_orders.pluck(:id)
+      self.payment_order_ids = op.payment_requests.pluck(:payment_order_id)
     else
       add_message :error, op.messages[:error]
       return

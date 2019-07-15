@@ -27,6 +27,8 @@ class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
     end
 
     self.authenticated_user = for_user
+    self.authenticated_user = nil if self.authenticated_user.company_id == 150
+    self.authenticated_user
   end
 
   def for_user

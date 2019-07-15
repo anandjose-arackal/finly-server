@@ -90,7 +90,8 @@ json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
+                  :sgst, :cgst, :igst
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
@@ -98,6 +99,11 @@ json.items do
     json.category_id item.category_id
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
 
+    json.taxable_amount do
+      json.value item.taxable_amount&.value&.round(2)
+      json.id item.taxable_amount&.id
+      json.currency_id item.taxable_amount&.currency&.id
+    end
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id

@@ -2,7 +2,7 @@
 #
 # Table name: icici_bank_configs
 #
-#  id         :bigint(8)        not null, primary key
+#  id         :bigint           not null, primary key
 #  alias_id   :string(255)
 #  urn        :string(255)
 #  created_at :datetime         not null

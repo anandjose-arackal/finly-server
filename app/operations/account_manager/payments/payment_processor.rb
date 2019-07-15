@@ -75,7 +75,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         self.background = true
       end
     end
-
     # if none of the above, i.e. payment request or payment order both are not present,
     # the only remaining thing to check is crediting payments
     self.crediting_payments = params[:crediting_payments] if self.crediting_payments.blank?
@@ -123,7 +122,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
   def process
-    # now the actual execution of the payment order, based on whether it's
+    # now the actual execution of the payment orderapp/operations/payment_processor_rules/rules/status_checks/status_checker.rb:41, based on whether it's
     # synchronous or a background operation
 
     if self.crediting_payments.present?
@@ -135,7 +134,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
           # doing another check of the payment order's status here just in case
           PaymentProcessorRules::Event.(:check_order_status_is_pending, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
           options[:crediting_payment_ids] = self.crediting_payments.pluck(:id)
-          # todo - temporary for testing
           # op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, options)
           op = AccountManager::Payments::BulkPaymentExecutor.call_async(self.payment_order, options)
           add_message :success, 'Payments have initiated, you can check their status from the order screen'
