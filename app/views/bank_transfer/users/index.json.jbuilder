@@ -1,6 +1,7 @@
 json.results do
   json.array!(@result.paginated_team) do |user|
   json.extract! user, :id, :email, :mobile_number, :name, :active
+  json.employee_id user.profile&.employee_id
 
   # wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
   # Finly Credits

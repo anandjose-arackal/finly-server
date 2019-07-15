@@ -293,10 +293,9 @@ class KotakBankApi::TransactionStatus < KotakBankApi::Base
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => self.request_reference_number,
         'MESSAGE_SOURCE' => 'FINLY',
-        # 'CLIENT_CODE' => "#{self.configuration['CLIENT_CODE']}",
-        'CLIENT_CODE' => "TEMPTEST1",
+        'CLIENT_CODE' => "#{self.configuration['CLIENT_CODE']}",
         'DATE' => "#{Date.today.strftime("%d-%m-%Y")}"
-        )
+    )
   end
 
   # def set_success_response_parameters

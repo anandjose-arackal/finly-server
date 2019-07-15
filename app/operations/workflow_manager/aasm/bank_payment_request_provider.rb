@@ -77,8 +77,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
                    .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
         if dlrm.present?
           dlrm.update(
-            action_id: TrailAction.id_for(aasm.current_event),
-            action_taken_by_id: user.id
+              action_id: TrailAction.id_for(aasm.current_event),
+              action_taken_by_id: user.id
           )
         end
 

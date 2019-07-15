@@ -80,7 +80,8 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
       fix_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
-      self.paginated_team = users.paginate(page: params[:page], per_page: params[:per_page] || 30)
+      self.paginated_team = users.paginate(page: params[:page], per_page: params[:per_page] || 30).includes_for_index
+      self.paginated_team = self.paginated_team.includes_for_index
     end
 
     def fix_scopes

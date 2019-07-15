@@ -69,8 +69,8 @@ class Reports::Violation < Reports::Base
 
   def process
 
-    expense_rules = policy.expense_rules.non_deleted
-    budget_rules = policy.budget_rules.non_deleted
+    expense_rules = policy.expense_rules.non_deleted.includes(:greater_than_amount,:category)
+    budget_rules = policy.budget_rules.non_deleted.includes(:amount,:without_receipt_amount, :period, :budget_rule_category_mappings)
 
     selected_drop_down_items = nil
 
