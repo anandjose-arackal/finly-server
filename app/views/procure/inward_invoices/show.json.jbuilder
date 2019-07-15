@@ -218,6 +218,7 @@ json.tds_slabs do
     json.id tds_slab.id
     json.name "#{tds_slab.tds}% - #{tds_slab.name} "
     json.tds tds_slab.tds
+    json.preferred @result.invoice.vendor.tds_rates.pluck(:id).include?(tds_slab.id) rescue false
   end
 end
 

@@ -138,6 +138,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_type: {spreadsheet: true},
              third_level_approver: {spreadsheet: true},
              fourth_level_approver: {spreadsheet: true}
+             invoice_net_payable_amount: {spreadsheet: true}
          ]
 
   def input
@@ -354,6 +355,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
       end
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
+
+  def invoice_net_payable_amount(invoice_line_item)
+    invoice_line_item.parent&.balance_due&.value || 0
   end
 
 end
