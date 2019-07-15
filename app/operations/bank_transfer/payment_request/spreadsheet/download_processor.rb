@@ -116,7 +116,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Awaiting Action From",
                "Invoice Number",
                "Invoice Due Date",
-               "Invoice Date"]
+               "Invoice Date",
+               "Invoice ID"]
     headers += retrieve_custom_field_headers
     headers += ["Invoice Amount",
                 "Discount",
@@ -156,7 +157,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             reviewer_names,
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
-            payment.invoice&.date&.strftime("%d-%m-%Y")
+            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
         payment_details += [
