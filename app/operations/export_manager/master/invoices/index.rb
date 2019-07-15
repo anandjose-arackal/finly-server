@@ -320,7 +320,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def invoice_net_payable_amount(invoice_line_item)
-    invoice_line_item.parent.balance_due&.value || 0
+    invoice_line_item.parent&.balance_due&.value || 0
   end
 
 end
