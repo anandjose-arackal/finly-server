@@ -10,7 +10,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyTemplate < Pe
 
   def init
     users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).approved
+    self.reports = Report.where(user_id: users.pluck(:id)).settlement_viewable
     self.reports = apply_scopes(self.reports, params)
     self.reports = self.reports.includes({user: :profile},expenses:[:category,:amount,{manual_expense:[custom_fields: [:value]]},{card_expense:[custom_fields: [:value]]},{distance_expense:[custom_fields: [:value]]},{time_expense:[custom_fields: [:value]]}])
 
