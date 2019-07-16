@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:rev="http://www.kotak.com/schemas/CMS_Generic/Reversal_Request.xsd">
+   <soap:Header/>
+   <soap:Body>
+      <rev:Reversal>
+         <rev:Header>
+            <rev:Req_Id>{{UNIQUE_REFERENCE_NUMBER}}</rev:Req_Id>
+            <rev:Msg_Src>{{MESSAGE_SOURCE}}</rev:Msg_Src>
+            <rev:Client_Code>{{CLIENT_CODE}}</rev:Client_Code>
+            <rev:Date_Post>{{DATE}}</rev:Date_Post>
+         </rev:Header>
+         <rev:Details>
+            <rev:Msg_Id>{{UNIQUE_REFERENCE_NUMBER}}</rev:Msg_Id>
+         </rev:Details>
+      </rev:Reversal>
+   </soap:Body>
+</soap:Envelope>

@@ -3,7 +3,6 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   attr_accessor :payment, :icici_bank_transaction, :transfer_request, :receiving_account
 
   def initialize(params)
-    # todo - temporary
     self.transfer_request = params[:transfer_request]
     self.payment = params[:payment]
     self.params = {}
@@ -43,31 +42,32 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def raw_api_params
+    remarks = self.payment.note.blank? ? "Test note" : self.payment.note
+    payee_name = self.receiving_account.account_owner.business_name
     {
         AGGRID: self.company_details["AGGR_ID"],
         AGGRNAME: self.company_details["AGGR_NAME"],
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: self.transfer_request.unique_reference_number,
-        # UNIQUEID: "SAMPLEUNIQUEREFERENCE1",
+        UNIQUEID: self.transfer_request.unique_reference_number.to_s,
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
-        # CREDITACC: self.receiving_account.account_number,
-        CREDITACC: "000405002777",
-        # IFSC: self.receiving_account.ifsc,
+        CREDITACC: self.receiving_account.account_number,
+        # CREDITACC: "000405002777",
+        IFSC: self.receiving_account.ifsc,
         # IFSC: "DLXB0000092",
-        IFSC: "ICIC0000011",
+        # IFSC: "ICIC0000011",
         AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
         # AMOUNT: "200",
         CURRENCY: self.icici_bank_transaction.amount.currency.country_code,
         # CURRENCY: "INR",
-        TXNTYPE: "OWN",
-        # TXNTYPE: self.icici_bank_transaction.transfer_type,
+        # TXNTYPE: "OWN",
+        TXNTYPE: self.icici_bank_transaction.transfer_type,
         # TXNTYPE: "OWN", # "RTG", "RGS"
-        PAYEENAME: self.receiving_account.account_owner.name,
+        PAYEENAME: payee_name,
         # PAYEENAME: "Sreeram",
-        # REMARKS: self.payment.note,
-        REMARKS: "This is a test note",
+        REMARKS: remarks.to_s,
+        # REMARKS: "This is a test note",
         CUSTOMERINDUCED: "N"
     }
   end
@@ -91,28 +91,38 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
       when 200
         # mark the transaction as processing.
         # log the parsed params so that we can get visibility on the transaction
-        if self.parsed_response["RESPONSE"] == "SUCCESS"
+
+        if self.parsed_response["RESPONSE"] == "SUCCESS" || self.parsed_response["Response"] == "SUCCESS"
           case self.parsed_response["STATUS"]
             when "PENDING FOR PROCESSING"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
             when "SUCCESS"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_utr))
             when "FAILURE"
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+              error_message = self.parsed_response["Message"]
+              add_message :error, error_message
+              self.transfer_request.bank_error_message = error_message
             else
               # handle it gracefully
           end
-        elsif self.parsed_response["RESPONSE"] == "FAILURE"
+        elsif self.parsed_response["RESPONSE"] == "FAILURE" || self.parsed_response["Response"] == "FAILURE"
           self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-          error_message = self.parsed_response["message"]
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
           add_message :error, error_message
-          self.transfer_request.bank_error_message
+          self.transfer_request.bank_error_message = error_message
+        else
+          # any other case must be a failure as well
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"] || self.parsed_response["message"]
+          add_message :error, error_message
+          self.transfer_request.bank_error_message = error_message
         end
     end
   end
 
   def success?
-    self.icici_bank_transaction.completed? || self.icici_bank_transaction.pending_for_processing?
+    self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.pending_for_processing?
   end
 
   def failure?

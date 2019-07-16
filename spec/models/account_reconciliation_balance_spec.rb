@@ -2,7 +2,7 @@
 #
 # Table name: account_reconciliation_balances
 #
-#  id                        :bigint(8)        not null, primary key
+#  id                        :bigint           not null, primary key
 #  reconciliation_balance_id :integer
 #  account_id                :integer
 #  account_type              :integer

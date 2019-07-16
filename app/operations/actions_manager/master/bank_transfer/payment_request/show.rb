@@ -243,12 +243,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
       if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card?
-        company_credits = retrieve_balance(:company_credits, user) rescue nil
-        finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
+        return true
+        # company_credits = retrieve_balance(:company_credits, user) rescue nil
+        # finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
         # Allow credit even if the balance retreival fails
-        if (company_credits > 0) || (finly_money > 0) || company_credits.blank? || finly_money.blank?
-          return true
-        end
+        # if (company_credits > 0) || (finly_money > 0) || company_credits.blank? || finly_money.blank?
+        #   return true
+        # end
       end
     end
     ############# Admin logic end #######################
@@ -303,12 +304,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       #     return bank_payment_request.payment_order.partially_completed?
       #   end
       # end
-      finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
+      # finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
       if allow_credit && bank_payment_request.document_role_users(:creditor).include?(user)
         # Allow credit even if the balance retrieval fails
-        if (finly_money > 0) || finly_money.blank?
-          return true
-        end
+        # if (finly_money > 0) || finly_money.blank?
+        return true
+        # end
       end
     end
     ############# Creditor logic end ###########################
@@ -935,17 +936,26 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       return 0
     end
     case account
-      when :vendor_payment_wallet
-        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-        return adapter.balance
-      when :company_credits
+    when :vendor_payment_wallet
+      adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+      return adapter.balance
+    when :company_credits
+      case user.company&.feature_subscription&.bank_service_provider
+      when "YES"
         adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-        return adapter.balance
+      when "ICICI"
+        adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+      when "KOTAK"
+        adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      else
+        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      end
+      return adapter.balance
     end
   end
 
   def associated_users
-      BankTransfer::PaymentRequest::Review::AssociatedUsers.(user, bank_payment_request: bank_payment_request, user_before: bank_payment_request.controlling_user) rescue []
+    BankTransfer::PaymentRequest::Review::AssociatedUsers.(user, bank_payment_request: bank_payment_request, user_before: bank_payment_request.controlling_user) rescue []
   end
 
 end

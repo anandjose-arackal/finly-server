@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
       self.payments = apply_scopes(self.payments, params)
 
       self.paginated_payments = self.payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
-      if current_company.id == 118
+      if user.company.id == 118
         self.unpaid_payments = []
       else
         self.unpaid_payments = self.payments.unpaid

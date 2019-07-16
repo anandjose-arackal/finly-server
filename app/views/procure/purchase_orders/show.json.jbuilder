@@ -42,7 +42,7 @@ json.status do
 end
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
-  json.value @result.purchase_order.total_before_tax&.value&.round(2)
+  json.value (@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2) rescue 0 # in po we are not saving raw amount as of now. before tax amount needs to be inclusive of discount 
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
 json.advance_amount do
@@ -90,7 +90,8 @@ json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
+                  :sgst, :cgst, :igst
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
@@ -99,6 +100,11 @@ json.items do
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
 
+    json.taxable_amount do
+      json.value item.taxable_amount&.value&.round(2)
+      json.id item.taxable_amount&.id
+      json.currency_id item.taxable_amount&.currency&.id
+    end
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id

@@ -35,7 +35,8 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def pre_process
-
+    # update the payment mode for this payment alone
+    self.payment.update(payment_mode: params[:payment_mode])
   end
 
   def process

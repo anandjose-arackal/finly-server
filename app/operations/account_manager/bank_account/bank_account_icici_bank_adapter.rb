@@ -57,9 +57,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
     if op.success?
-      if bank_transaction.completed?
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
+      if bank_transaction.pending_utr?
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_system_message_for_processing(payment)
+        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
@@ -142,8 +143,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.icici_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.icici_bank_transactions.build(unique_request_number: transfer_request.generate_unique_reference,
                                                         txn_type: transfer_request.transfer_type,
+                                                        transfer_type: transfer_request.transfer_type,
                                                         receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
                                                         remarks: payment.note,
@@ -152,6 +154,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                             value: payment.amount_value,
                                                             currency_id: Currency.first.id
                                                         })
+    bank_transaction.save
     payment.with_lock do
       if payment.reference_resource.present?
         return false

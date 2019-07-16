@@ -29,9 +29,9 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
-#  sgst                   :decimal(10, 5)
-#  cgst                   :decimal(10, 5)
-#  igst                   :decimal(10, 5)
+#  sgst                   :decimal(20, )
+#  cgst                   :decimal(20, )
+#  igst                   :decimal(20, )
 #
 
 class InvoiceLineItem < ApplicationRecord
@@ -56,6 +56,7 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
 
   validates :description, presence: true
   validates :quantity, presence: true
