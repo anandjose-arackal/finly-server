@@ -170,12 +170,15 @@ class CustomField < ApplicationRecord
     has_dependent_cf = false
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items.exclude_deleted
-      options.each do |option|
-        if option.dependent_field_configurations.present?
-          dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
-          has_dependent_cf = true
-        end
-      end
+      # options.each do |option|
+      #   if option.dependent_field_configurations.present?
+      #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+      #     has_dependent_cf = true
+      #   end
+      # end
+      dependent_field_configuration_ids = options.joins(:dependent_field_configurations).pluck('field_configurations.id')
+      has_dependent_cf = true if dependent_field_configuration_ids.present?
+
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
       options = field_configuration.multiselect_items
     end
