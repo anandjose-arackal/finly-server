@@ -93,7 +93,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       data = get_data(result, mapping.reviewer_id)
 
       data[:reviewer_id] = mapping.reviewer_id
-      data[:reviewer_name] = mapping.reviewer.name
+      data[:reviewer_name] = mapping.reviewer&.name
       data[:reviewer] = mapping.reviewer
       data[:threshold] = mapping.threshold
       data[:id] = mapping.id
