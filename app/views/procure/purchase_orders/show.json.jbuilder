@@ -99,6 +99,7 @@ json.items do
     json.category_id item.category_id
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
+    json.purchase_request_item_quantity item&.purchase_request_item&.quantity
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
