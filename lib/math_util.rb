@@ -11,4 +11,8 @@ module MathUtil
   def self.generate_random_number(digits)
     (0...digits).map { (48 + rand(10)).chr }.join
   end
+
+  def self.number_with_rupee_delimiter(number)
+    ("%.2f" % number).reverse.gsub(/(?<=.{6})(\d\d?)/, ',\1').reverse
+  end
 end
