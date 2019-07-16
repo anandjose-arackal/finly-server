@@ -34,4 +34,22 @@ class ProcurementAttachment < ApplicationRecord
   }
 
   scope :with_id, -> (ids) { where id: ids }
+
+  def as_json
+    {
+      id: id,
+      description: description,
+      file_name: file_file_name,
+      file_size: file_size,
+      url: file&.url(:original, timestamp: false),
+      content_type: file_content_type
+    }
+  end
+
+  private
+
+  def file_size
+    f_size = file_file_size.to_f
+    (f_size / 1024).round(2).to_s + " KB"
+  end
 end

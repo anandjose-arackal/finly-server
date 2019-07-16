@@ -56,8 +56,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
           level_id: level.id,
           level_name: level.name,
           timestamp: timestamp,
-          reviewers: mappings
+          reviewers: mappings,
+          reviewer_data: get_mapping_data(mappings)
       }
+
       if selected_reviewer.present?
         level_data[:selected_reviewer] = selected_reviewer.reviewer
         level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
@@ -78,6 +80,77 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
 
     def init
       self.chain = params[:chain]
+    end
+  end
+
+
+
+  private
+
+  def get_mapping_data(mappings)
+    result = []
+    mappings.each do |mapping|
+      data = get_data(result, mapping.reviewer_id)
+
+      data[:reviewer_id] = mapping.reviewer_id
+      data[:reviewer_name] = mapping.reviewer&.name
+      data[:reviewer] = mapping.reviewer
+      data[:threshold] = mapping.threshold
+      data[:id] = mapping.id
+      data[:exception] = mapping.exception
+
+      if data[:touched]
+        # Next time if c_min lt mapping.threshold update c_min
+        data[:touched] = true
+        if data[:compare_min] < mapping.threshold
+          data[:compare_min] = mapping.threshold
+          update_max(result, mapping)
+        else
+          # put condition here
+        end
+      else
+        data[:min] = mapping.threshold
+        data[:compare_min] = mapping.threshold
+        data[:touched] = true
+        update_max(result, mapping)
+      end
+    end
+    result
+  end
+
+  def get_data(result, reviewer_id)
+    result.each do |data|
+      return data if data[:reviewer_id] == reviewer_id
+    end
+    data = {
+        touched: false,
+        max: 99999999999999,
+        default_max: true
+    }
+
+    result.push(data)
+    data
+  end
+
+  def update_max(result, mapping)
+    result.each do |data|
+      if mapping.threshold > 0
+        unless data[:reviewer_id] == mapping.reviewer_id
+          if data[:default_max]
+            if mapping.threshold > data[:compare_min]
+              data[:max] = mapping.threshold
+              data[:default_max] = false
+              data[:compare_max] = mapping.threshold
+            end
+          else
+            if data[:max] < mapping.threshold
+              if data[:compare_max] < mapping.threshold && data[:compare_min] > mapping.threshold
+                data[:compare_max] = mapping.threshold
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
