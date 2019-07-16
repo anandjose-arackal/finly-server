@@ -187,7 +187,7 @@ json.violations do
 end
 
 json.custom_fields do
-  json.array! @result.report.custom_fields.as_json({report_show: true})
+  json.array! @result.report.custom_fields.as_json
 end
 
 json.budgets do
