@@ -626,11 +626,18 @@ class Invoice < ApplicationRecord
         tds_rate: precision_value(self.tds_rate),
         discount_rate: precision_value(self.discount_rate),
         advance_rate: precision_value(self.advance_rate),
+        attachments: self.attachments.map(&:as_json),
+        # invoice_attachment: {
+        #     url: self.invoice_attachments.first&.attached_file&.url,
+        #     thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+        #     content_type: self.invoice_attachments.first&.attached_file&.content_type,
+        #     file_name: self.invoice_attachments.first&.attached_file&.original_filename
+        # },
         invoice_attachment: {
-            url: self.invoice_attachments.first&.attached_file&.url,
-            thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-            content_type: self.invoice_attachments.first&.attached_file&.content_type,
-            file_name: self.invoice_attachments.first&.attached_file&.original_filename
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
         },
         net_amount: precision_value(self.net_amount&.value),
         original_amount: self.include_original_amount,

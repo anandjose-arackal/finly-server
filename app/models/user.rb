@@ -1449,6 +1449,10 @@ class User < ApplicationRecord
     return company.departments.with_ids(department_ids)
   end
 
+  def email_required?
+    false
+  end
+
   private
 
 end
