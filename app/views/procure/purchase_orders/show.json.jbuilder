@@ -42,7 +42,7 @@ json.status do
 end
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
-  json.value @result.purchase_order.total_before_tax&.value&.round(2)
+  json.value (@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2) rescue 0 # in po we are not saving raw amount as of now. before tax amount needs to be inclusive of discount 
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
 json.advance_amount do
@@ -99,6 +99,7 @@ json.items do
     json.category_id item.category_id
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
+    json.purchase_request_item_quantity item&.purchase_request_item&.quantity
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
