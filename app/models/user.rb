@@ -551,6 +551,8 @@ class User < ApplicationRecord
     includes(:cards, :company)
   }
 
+  scope :includes_for_index, -> { includes(:profile) }
+
   # Gives list of user who are not part of a policy as finance manager
   scope :filter_unassigned_finance_for_policy, -> (policy_id) {
     policy = Policy.find_by id: policy_id
@@ -1445,6 +1447,10 @@ class User < ApplicationRecord
   def initiator_associated_departments(role_id)
     department_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_department_mappings).pluck('policy_department_mappings.department_id')
     return company.departments.with_ids(department_ids)
+  end
+
+  def email_required?
+    false
   end
 
   private

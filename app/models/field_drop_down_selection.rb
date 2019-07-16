@@ -15,6 +15,8 @@ class FieldDropDownSelection < ApplicationRecord
 
   validates :value_id, presence: true
 
+  after_save :update_value_in_custom_field
+
   scope :with_value, ->(value_id) { where value_id: value_id }
   scope :with_id, ->(id) { where id: id }
 
@@ -23,5 +25,9 @@ class FieldDropDownSelection < ApplicationRecord
         id: value_id,
         name: value&.name
     }
+  end
+
+  def update_value_in_custom_field
+    self&.custom_field&.update_column('configured_field_value', self&.value)
   end
 end

@@ -3346,6 +3346,7 @@ Rails.application.routes.draw do
 
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
+    get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests', to: 'bank_payment_requests#create'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'

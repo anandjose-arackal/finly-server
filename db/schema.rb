@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_10_150751) do
+ActiveRecord::Schema.define(version: 2019_07_12_122508) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2985,6 +2985,7 @@ ActiveRecord::Schema.define(version: 2019_07_10_150751) do
     t.datetime "updated_at", null: false
     t.integer "company_id"
     t.integer "balance_id"
+    t.boolean "enabled", default: false
   end
 
   create_table "icici_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -3573,6 +3574,7 @@ ActiveRecord::Schema.define(version: 2019_07_10_150751) do
     t.datetime "updated_at", null: false
     t.integer "company_id"
     t.integer "balance_id"
+    t.boolean "enabled", default: false
   end
 
   create_table "kotak_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -6920,6 +6922,7 @@ ActiveRecord::Schema.define(version: 2019_07_10_150751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "balance_id"
+    t.boolean "enabled", default: false
     t.index ["balance_id"], name: "index_yes_bank_company_accounts_on_balance_id"
     t.index ["company_id"], name: "index_yes_bank_company_accounts_on_company_id"
     t.index ["wallet_balance_id"], name: "index_yes_bank_company_accounts_on_wallet_balance_id"

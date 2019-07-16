@@ -77,9 +77,59 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
         add_message :error, "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"
       end
     end
+
+    # All Payments inside a payment ticket should have homogeneous initiating account type
+    payment_status_ids = [
+        PaymentStatus.id_for(:completed),
+        PaymentStatus.id_for(:failed),
+        PaymentStatus.id_for(:pending),
+        PaymentStatus.id_for(:in_progress),
+        PaymentStatus.id_for(:scheduled),
+        PaymentStatus.id_for(:cancelled),
+        PaymentStatus.id_for(:processing),
+        PaymentStatus.id_for(:possible_failure),
+        PaymentStatus.id_for(:pending_credit),
+        PaymentStatus.id_for(:pending_retry),
+        PaymentStatus.id_for(:initiated),
+    ]
+    initiating_account_types = self.bank_payment_request.payments.where(payment_status_id: payment_status_ids).pluck(:initiating_account_type).uniq
+
+    if initiating_account_types.length == 1
+      initiating_account_type = initiating_account_types.first
+
+      if initiating_account_type.present?
+        case initiating_account_type
+        when 'VendorPaymentWallet'
+          unless [1, '1'].include?(params[:initiating_account_type]) || params[:initiating_account_type].blank?
+            add_message :error, "You can only select 'Finly Money' for processing this payment ticket"
+          end
+        when 'YesBankCompanyAccount'
+          unless [2, '2'].include?(params[:initiating_account_type]) && (params[:initiating_company_account_type].blank? || initiating_account_type == params[:initiating_company_account_type])
+            add_message :error, "You can only select Yes Bank Company Account for processing this payment ticket"
+          end
+        when 'IciciBankCompanyAccount'
+          unless params[:initiating_company_account_type].present? && initiating_account_type == params[:initiating_company_account_type]
+            add_message :error, "You can only select Icici Bank Company Account for processing this payment ticket"
+          end
+        when 'KotakBankCompanyAccount'
+          unless params[:initiating_company_account_type].present? && initiating_account_type == params[:initiating_company_account_type]
+            add_message :error, "You can only select Kotak Bank Company Account for processing this payment ticket"
+          end
+        end
+      end
+    else
+      Event::EAlert::Create.(nil, {
+          title: 'BPR Payments have multiple initiating accounts',
+          description: "The BPR w/ ID: #{self.bank_payment_request.id} has payments with multiple initiating accounts",
+          subject: 'BPR Payments have multiple initiating accounts'
+      })
+    end
   end
 
   def pre_process
+    # Updating all payments with newly selected imitating account
+    self.bank_payment_request.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
+    self.bank_payment_request.payment_order.update_columns(initiating_account_type: initiating_account.class.name)
     # updating the initiating account for the payments
     # payment_order.update(initiating_account_type: initiating_account.class.name) # this probably doesn't make sense here because each individual payment now can be initiated from anywhere
     self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
@@ -161,36 +211,64 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   def retrieve_initiating_account
     case params[:initiating_account_type]
-      when 1, '1'
-        case user.company&.feature_subscription&.bank_service_provider
-          when "YES"
-            return user.company.yes_bank_company_account
-          when "ICICI"
-            return user.company.icici_bank_company_account
-          when "KOTAK"
-            return user.company.kotak_bank_company_account
-          else
-            return user.company.yes_bank_company_account
+    when 1, '1' # Company Credits
+      # Currently assuming all companies will have only one account in each of the banks
+      if params[:initiating_company_account_type].present?
+        case params[:initiating_company_account_type]
+        when "IciciBankCompanyAccount"
+          user.company.icici_bank_company_account
+        when "KotakBankCompanyAccount"
+          user.company.kotak_bank_company_account
+        when "YesBankCompanyAccount"
+          return user.company.yes_bank_company_account
+        else
+          return user.company.yes_bank_company_account
         end
-      when 2, '2'
-        return user.bank_wallet
       else
-        user.bank_wallet # i.e. finly money by default
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
+          return user.company.yes_bank_company_account
+        when "ICICI"
+          return user.company.icici_bank_company_account
+        when "KOTAK"
+          return user.company.kotak_bank_company_account
+        else
+          return user.company.yes_bank_company_account
+        end
+      end
+    when 2, '2' # Finly Money
+      return user.bank_wallet
+    else
+      user.bank_wallet # i.e. finly money by default
     end
   end
 
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
     when 1, '1'
-      case user.company&.feature_subscription&.bank_service_provider
-      when "YES"
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-      when "ICICI"
-        return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
-      when "KOTAK"
-        return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      # Currently assuming all companies will have only one account in each of the banks
+      if params[:initiating_company_account_type].present?
+        case params[:initiating_company_account_type]
+        when "IciciBankCompanyAccount"
+          return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KotakBankCompanyAccount"
+          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        when "YesBankCompanyAccount"
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        else
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       else
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "ICICI"
+          return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KOTAK"
+          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        else
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       end
     when 2, '2'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
