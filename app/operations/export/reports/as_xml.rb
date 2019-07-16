@@ -31,6 +31,7 @@ class Export::Reports::AsXml < Export::Reports::Base
     self.default_column_names = user.company.export_preferences.pluck(:name)
     self.custom_field_column_names = extract_custom_field_names(reports)
     self.preferences = user.company.export_preferences
+    self.loose_headers = []
   end
 
   def authorize
@@ -42,6 +43,8 @@ class Export::Reports::AsXml < Export::Reports::Base
   def process
     cf_data = generate_custom_field_data reports
     cf_headers = cf_data[:headers]
+    cf_loose_headers(cf_data)
+    cf_headers = cf_headers - self.loose_headers
     self.column_names = default_column_names + cf_headers
     self.data = []
     reports.each do |r|
@@ -64,4 +67,25 @@ class Export::Reports::AsXml < Export::Reports::Base
     Export::Base::ExportPresenter.new(user, {header: self.column_names, data: self.data, report_names: report_names}, messages)
   end
 
+  private
+  def cf_loose_headers(custom_fields_data)
+    config_ids = custom_fields_data[:configuration_ids]
+    values = custom_fields_data[:values]
+    cf_with_row_data = []
+    if config_ids.present? && values.present?
+      values.each do |key, val|
+        # Key is expense ID
+        # Val is custom_field hash
+        val.reject!{|k,v| v == nil }
+        cf_with_row_data << val.keys
+        cf_with_row_data = cf_with_row_data.flatten.compact.uniq
+      end
+      loose_header_ids = config_ids - cf_with_row_data
+      loose_header_ids.each do |id|
+        field_config = user.company.field_configurations.find_by_id id
+        self.loose_headers << field_config.field_name
+      end
+      self.loose_headers.uniq
+    end
+  end
 end

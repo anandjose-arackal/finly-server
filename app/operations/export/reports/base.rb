@@ -1,5 +1,8 @@
+# loose_headers is a work around. Multiple custom_fields(headers)  were duplicated in the excel despite having no data(value)
+# Once data is set against column, find loose headers and substract them from headers list
+
 class Export::Reports::Base < Export::Base
-  attr_accessor :company, :preference
+  attr_accessor :company, :preference, :loose_headers
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
