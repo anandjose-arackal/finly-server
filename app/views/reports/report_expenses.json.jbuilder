@@ -1,3 +1,11 @@
+# since report show API is now split in 4, we want to give the expenses actions here as well
+json.actions do
+  json.dummy 'dummy'
+  @result.actions.each do |key, value|
+    json.set! key, (value[:url] or value[:value])
+  end
+end
+
 expenses_sorted_by = params[:expenses_sorted_by] || 'category'
 json.expenses_sorted_by expenses_sorted_by
 if expenses_sorted_by == 'category'

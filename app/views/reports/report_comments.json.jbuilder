@@ -1,4 +1,9 @@
+user_inital = @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
+logged_in_user = @result.user.name.split(' ').first[0] + ((@result.user.name.split(' ')[1][0] rescue nil) or @result.user.name.split(' ').first[1])
 json.comments @result.comments do |comment|
+  json.report_id comment.report_id
+  json.user_initial user_initial
+  json.logged_in_user logged_in_user
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
   comment_u_id = nil
