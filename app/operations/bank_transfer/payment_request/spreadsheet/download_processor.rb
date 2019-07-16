@@ -35,7 +35,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
     if include_attachments
       files = []
       files << {name: 'export.xls', file_contents: exported_xls}
-      bank_payment_requests.include_attachments.each do |bpr|
+      bank_payment_requests.include_attachments.find_each(batch_size: 1000) do |bpr|
         file_name_prefix = "#{bpr.id}"
         count = 1
         bpr.payment_order&.payment_order_attachments&.each do |attachment|
