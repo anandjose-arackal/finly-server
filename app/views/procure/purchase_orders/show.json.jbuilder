@@ -39,6 +39,13 @@ end
 json.status do
   json.extract! @result.purchase_order&.status, :id, :name
 end
+# because po only saves the taxable value
+json.taxable_value do
+  json.id @result.purchase_order.total_before_tax&.id
+  json.value @result.purchase_order.total_before_tax&.value&.round(2)
+  json.currency_id @result.purchase_order.total_before_tax&.currency&.id
+end
+# because po does not save the raw value
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
   json.value @result.purchase_order.total_before_tax&.value&.round(2)
