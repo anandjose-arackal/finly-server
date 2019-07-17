@@ -30,6 +30,7 @@ json.vendor do
 end
 
 json.actions @result.actions
+json.user @result.purchase_order.user.as_json rescue nil
 
 if @result.purchase_order.advance_payments&.present?
   json.show_advance_payments true
