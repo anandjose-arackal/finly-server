@@ -27,7 +27,7 @@ json.summary do
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   # json.approvers @result.approvers
   json.name @result.bank_payment_request.name
-  json.show_payment_file_download (current_company.payment_file_configuration.present? && (current_user.company_admin? || current_user.vendor_payments_creditor?))
+  json.show_payment_file_download(current_company.payment_file_configuration.present? && (current_user.company_admin? || current_user.vendor_payments_creditor?))
 
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified
