@@ -88,69 +88,39 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   private
 
   def get_mapping_data(mappings)
+    mappings = mappings.as_json
     result = []
-    mappings.each do |mapping|
-      data = get_data(result, mapping.reviewer_id)
+    unique_reviewer_ids = mappings.map {|item| item['reviewer_id']}.uniq
 
-      data[:reviewer_id] = mapping.reviewer_id
-      data[:reviewer_name] = mapping.reviewer&.name
-      data[:reviewer] = mapping.reviewer
-      data[:threshold] = mapping.threshold
-      data[:id] = mapping.id
-      data[:exception] = mapping.exception
+    unique_reviewer_ids.each do |reviewer_id|
 
-      if data[:touched]
-        # Next time if c_min lt mapping.threshold update c_min
-        data[:touched] = true
-        if data[:compare_min] < mapping.threshold
-          data[:compare_min] = mapping.threshold
-          update_max(result, mapping)
-        else
-          # put condition here
-        end
+      sample = mappings.select {|item| item['reviewer_id'] == reviewer_id }[0]
+      min = mappings.select{|item| item['reviewer_id'] == reviewer_id}.min_by {|item| item['threshold']}['threshold']
+      compare_max = mappings.select{|item| item['reviewer_id'] == reviewer_id}.max_by {|item| item['threshold']}['threshold']
+
+      thresholds = mappings.select {|item| (item['reviewer_id'] != reviewer_id) && (item['threshold'] > compare_max) }&.map {|item| item['threshold']}
+
+      if thresholds.empty?
+        max = 99999999999999
       else
-        data[:min] = mapping.threshold
-        data[:compare_min] = mapping.threshold
-        data[:touched] = true
-        update_max(result, mapping)
+        max = thresholds.min
       end
+
+      reviewer = User.find_by id: reviewer_id
+
+      data = {
+          reviewer_id: reviewer_id,
+          reviewer_name: reviewer&.name,
+          reviewer: reviewer,
+          threshold: sample['threshold'],
+          id: sample['id'],
+          exception: sample['exception'],
+          min: min,
+          max: max
+      }
+
+      result.push(data)
     end
     result
-  end
-
-  def get_data(result, reviewer_id)
-    result.each do |data|
-      return data if data[:reviewer_id] == reviewer_id
-    end
-    data = {
-        touched: false,
-        max: 99999999999999,
-        default_max: true
-    }
-
-    result.push(data)
-    data
-  end
-
-  def update_max(result, mapping)
-    result.each do |data|
-      if mapping.threshold > 0
-        unless data[:reviewer_id] == mapping.reviewer_id
-          if data[:default_max]
-            if mapping.threshold > data[:compare_min]
-              data[:max] = mapping.threshold
-              data[:default_max] = false
-              data[:compare_max] = mapping.threshold
-            end
-          else
-            if data[:max] < mapping.threshold
-              if data[:compare_max] < mapping.threshold && data[:compare_min] > mapping.threshold
-                data[:compare_max] = mapping.threshold
-              end
-            end
-          end
-        end
-      end
-    end
   end
 end
