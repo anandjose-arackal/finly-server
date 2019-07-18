@@ -64,6 +64,7 @@ json.invoice do
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
+  json.user invoice.created_by.as_json rescue nil
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -258,9 +259,23 @@ json.reviewal_chains do
         # json.selected_reviewer item[:selected_reviewer]&.as_json
         # json.selected_reviewer_threshold item[:selected_reviewer_threshold]
         json.reviewers do
-          json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold
-            json.reviewer_details reviewer.reviewer.as_json
+          if current_company.present? && (current_company.id == 2 || current_company.id == 156)
+            json.array! item[:reviewer_data] do |data|
+              json.id data[:id]
+              json.exception data[:exception]
+              json.threshold data[:threshold]
+              json.reviewer_details do
+                min = MathUtil.number_with_rupee_delimiter(data[:min])
+                max = (data[:max].to_i == 99999999999999 ? '∞' : MathUtil.number_with_rupee_delimiter(data[:max]))
+                json.name "#{data[:reviewer_name]}(#{min} - #{max})"
+                json.id data[:reviewer_id]
+              end
+            end
+          else
+            json.array! item[:reviewers] do |reviewer|
+              json.extract! reviewer, :id, :exception, :threshold
+              json.reviewer_details reviewer.reviewer.as_json
+            end
           end
         end
       end

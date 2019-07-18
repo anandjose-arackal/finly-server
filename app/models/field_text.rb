@@ -17,7 +17,7 @@ class FieldText < ApplicationRecord
   after_save :update_value_in_custom_field
   
 
-  def as_json
+  def as_json(options={})
     {value: self.value}
   end
 

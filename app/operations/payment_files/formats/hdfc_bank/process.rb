@@ -46,7 +46,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           '',
           '',
           '',
-          Date.parse(payment[:date]).strftime('%d/%m/%Y'),
+          payment[:date].strftime('%d/%m/%Y'),
           '',
           payment[:beneficiary_ifsc],
           payment[:beneficiary_account_name],
