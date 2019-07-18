@@ -14,10 +14,6 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       add_message :error, 'GRN not found'
       return
     end
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
-      return
-    end
   end
 
   def pre_process
@@ -35,6 +31,11 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       if po_revision.present?
         self.purchase_order = self.po_revision
       end
+    end
+
+    unless self.purchase_order.present?
+      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
+      return
     end
 
     if is_approve?

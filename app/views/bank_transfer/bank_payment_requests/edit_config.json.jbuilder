@@ -18,7 +18,7 @@ json.reviewal_chains do
           end
         end
         json.reviewers do
-          if current_company.present? && current_company.id == 156
+          if current_company.present? && (current_company.id == 2 || current_company.id == 156)
             json.array! item[:reviewer_data] do |data|
               json.id data[:id]
               json.exception data[:exception]
