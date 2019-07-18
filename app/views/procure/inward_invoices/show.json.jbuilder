@@ -92,7 +92,8 @@ json.invoice do
   # adding the respective rates
   json.tax_rate precision_value invoice.tax_rate
   json.tds_rate precision_value invoice.tds_rate
-  json.discount_rate precision_value invoice.discount_rate
+  # json.discount_rate precision_value invoice.discount_rate
+  json.discount_rate precision_value ((invoice.discount_amount&.value / invoice.item_amounts_total) * 100).round(2) rescue 0
   json.advance_rate precision_value invoice.advance_rate
   #############################
   json.invoice_attachment do
