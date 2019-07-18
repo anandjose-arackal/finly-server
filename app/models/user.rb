@@ -62,9 +62,11 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
   devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :confirmable, :lockable
+         :recoverable, :rememberable, :trackable, :confirmable, :lockable,
+         :database_authenticatable
 
-  devise :database_authenticatable, :validatable, password_length: 8..128
+  # devise :database_authenticatable, :validatable, password_length: 8..128
+  # devise :database_authenticatable
   # devise-security gem
   devise :password_expirable, :password_archivable, :expirable #, :session_limitable, :secure_validatable
   # zxcvb-js gem
@@ -252,8 +254,14 @@ class User < ApplicationRecord
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
 
+  ############# Devise validateable validations ############
+  validates_presence_of     :password, if: :password_required?
+  validates_confirmation_of :password, if: :password_required?
+  validates_length_of       :password, within: (8..128), allow_blank: true
+  ################ End of Devise validateable ##############
+
   validates :company_id, presence: true
-  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
@@ -1449,10 +1457,14 @@ class User < ApplicationRecord
     return company.departments.with_ids(department_ids)
   end
 
-  def email_required?
-    false
+  protected
+
+  # Checks whether a password is needed or not. For validations only.
+  # Passwords are always required if it's a new record, or if the password
+  # or confirmation are being set somewhere.
+  def password_required?
+    !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
-  private
 
 end
