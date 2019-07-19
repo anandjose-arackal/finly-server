@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_12_122508) do
+ActiveRecord::Schema.define(version: 2019_07_16_122539) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2078,6 +2078,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.integer "dependent_parent_id"
     t.string "dependent_parent_type"
     t.string "field_key"
+    t.text "configured_field_value"
     t.index ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id"
     t.index ["parent_id"], name: "index_custom_fields_on_parent_id"
     t.index ["parent_type"], name: "index_custom_fields_on_parent_type"
