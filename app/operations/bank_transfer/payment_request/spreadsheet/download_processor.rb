@@ -134,7 +134,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
-    bank_payment_requests.include_for_data_retrieval.each do |pr|
+    bank_payment_requests.include_for_data_retrieval.find_each(batch_size: 1000) do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
