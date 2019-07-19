@@ -1,6 +1,6 @@
 class CalculateTaxableAmountForInvoiceLineItems < ActiveRecord::Migration[5.2]
   def change
-  	InvoiceLineItem.all.each do |item|
+    InvoiceLineItem.all.each do |item|
 		item_quantity = (item.quantity || 0).to_f
 	    item_rate = (item.rate || 0).to_f
 	    item_discount = (item.discount || 0).to_f
@@ -12,6 +12,6 @@ class CalculateTaxableAmountForInvoiceLineItems < ActiveRecord::Migration[5.2]
 	        item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: 1)
 	    end
 	    item.save
-	end
+		end
   end
 end
