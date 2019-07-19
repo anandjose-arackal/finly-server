@@ -41,6 +41,13 @@ end
 json.status do
   json.extract! @result.purchase_order&.status, :id, :name
 end
+# because po only saves the taxable value
+json.taxable_value do
+  json.id @result.purchase_order.total_before_tax&.id
+  json.value @result.purchase_order.total_before_tax&.value&.round(2)
+  json.currency_id @result.purchase_order.total_before_tax&.currency&.id
+end
+# because po does not save the raw value
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
   json.value (@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2) rescue 0 # in po we are not saving raw amount as of now. before tax amount needs to be inclusive of discount 
@@ -117,6 +124,7 @@ json.items do
       json.id item.discount_amount&.id
       json.currency_id item.discount_amount&.currency&.id
     end
+    json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
     json.total_amount do
       json.value item.total_amount&.value&.round(2)
       json.id item.total_amount&.id
