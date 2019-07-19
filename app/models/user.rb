@@ -62,9 +62,11 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
   devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :confirmable, :lockable
+         :recoverable, :rememberable, :trackable, :confirmable, :lockable,
+         :database_authenticatable
 
-  devise :database_authenticatable, :validatable, password_length: 8..128
+  # devise :database_authenticatable, :validatable, password_length: 8..128
+  # devise :database_authenticatable
   # devise-security gem
   devise :password_expirable, :password_archivable, :expirable #, :session_limitable, :secure_validatable
   # zxcvb-js gem
@@ -252,8 +254,14 @@ class User < ApplicationRecord
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
 
+  ############# Devise validateable validations ############
+  validates_presence_of     :password, if: :password_required?
+  validates_confirmation_of :password, if: :password_required?
+  validates_length_of       :password, within: (8..128), allow_blank: true
+  ################ End of Devise validateable ##############
+
   validates :company_id, presence: true
-  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
@@ -721,17 +729,7 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
-  before_save do
-    if encrypted_password_changed?
-      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
-        group_companies = self.company.group.companies
-        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
-        other_users.each do |user|
-          user.update_columns(encrypted_password: self.encrypted_password)
-        end
-      end
-    end
-  end
+  around_update :set_passwords_for_linked_users
 
   after_create do
     default_policy_id = self.company.default_policy.id
@@ -1449,10 +1447,34 @@ class User < ApplicationRecord
     return company.departments.with_ids(department_ids)
   end
 
-  def email_required?
-    false
+  protected
+
+  # Checks whether a password is needed or not. For validations only.
+  # Passwords are always required if it's a new record, or if the password
+  # or confirmation are being set somewhere.
+  def password_required?
+    !persisted? || !password.nil? || !password_confirmation.nil?
   end
 
-  private
+  def set_passwords_for_linked_users
+    if encrypted_password_changed?
+      reset_passwords = true
+    else
+      reset_passwords = false
+    end
+    yield
+    if reset_passwords
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+        other_users.each do |user|
+          next if user.id == self.id
+          user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
+          user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
+        end
+      end
+    end
+  end
+
 
 end
