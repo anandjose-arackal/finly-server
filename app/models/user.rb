@@ -729,18 +729,7 @@ class User < ApplicationRecord
 
   before_save :strip_whitespace
 
-  around_save do
-    if encrypted_password_changed?
-      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
-        group_companies = self.company.group.companies
-        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
-        other_users.each do |user|
-          user.update_columns(encrypted_password: self.encrypted_password)
-        end
-      end
-    end
-    yield
-  end
+  around_update :set_passwords_for_linked_users
 
   after_create do
     default_policy_id = self.company.default_policy.id
@@ -1465,6 +1454,26 @@ class User < ApplicationRecord
   # or confirmation are being set somewhere.
   def password_required?
     !persisted? || !password.nil? || !password_confirmation.nil?
+  end
+
+  def set_passwords_for_linked_users
+    if encrypted_password_changed?
+      reset_passwords = true
+    else
+      reset_passwords = false
+    end
+    yield
+    if reset_passwords
+      if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+        group_companies = self.company.group.companies
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+        other_users.each do |user|
+          next if user.id == self.id
+          user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
+          user.update_attributes(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
+        end
+      end
+    end
   end
 
 
