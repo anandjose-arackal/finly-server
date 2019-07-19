@@ -273,7 +273,12 @@ json.reviewal_chains do
             end
           else
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min
+              if max.present?
+                json.max reviewer.max
+              else
+                json.max '∞'
+              end
               json.reviewer_details reviewer.reviewer.as_json
             end
           end
