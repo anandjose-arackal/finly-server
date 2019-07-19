@@ -65,37 +65,17 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     end
 
     inward_document_params[:items_attributes].each do |item|
-      delivered = item[:delivered] || 0
-      accepted = item[:accepted] || 0
-      rejected = item[:rejected] || 0
-
       po_items = self.inward_document.items.find_by(id: item[:id])
-      
-      if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
-        add_message :error, "Negative quantity entered for #{po_items.description}"
-        break
-      end
 
-
-      remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
-      
-      if  remaining < delivered.to_f
-        add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
-        break
-      end 
-
-      if delivered.to_f > po_items.quantity.to_f
-        add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
-        break
-      end
-
-
-      unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
-        break
-      end
+      case po_items.inventory_line_item.product_type_id
+      when ProductType.id_for(:goods)
+        validations_for_goods(item, po_items)
+      when ProductType.id_for(:service)
+        validations_for_services(item, po_items)
+      end      
     end
 
+    # todo take care of this
     if self.procurement.invoices.present?
       inv_items = self.procurement.invoices.includes(:items)
       self.inward_document.items.each do |item|
@@ -135,7 +115,12 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     if inward_document.valid?
       # Keep track of delivered items in procurement items
       inward_document.items.each do |item|
-        po_item = update_purchase_order_item(item)
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:goods)
+          po_item = update_purchase_order_item(item)
+        when ProductType.id_for(:service)
+          po_item = update_service_item
+        end
 
         # item.update(previously_delivered: po_item.accepted)
       end
@@ -233,7 +218,63 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   end
 
+  def update_service_item(item)
+    purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_id
+
+    previously_billed_amount = purchase_order_item.previously_billed_amount
+    previously_billed_amount = (previously_billed_amount + item.billable_amount)
+
+    purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
+    purchase_order_item.save
+
+    purchase_order_item    
+  end
+
   def set_purchase_order_items
+  end
+
+  def validations_for_goods(item, po_items)
+    delivered = item[:delivered] || 0
+    accepted = item[:accepted] || 0
+    rejected = item[:rejected] || 0
+
+    if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
+      add_message :error, "Negative quantity entered for #{po_items.description}"
+      # break
+      return
+    end
+
+
+    remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
+    
+    if  remaining < delivered.to_f
+      add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
+      # break
+      return
+    end 
+
+    if delivered.to_f > po_items.quantity.to_f
+      add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
+      # break
+      return
+    end
+
+
+    unless delivered.to_f == accepted.to_f + rejected.to_f
+      add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
+      # break
+      return
+    end
+  end
+
+  def validations_for_services(item, po_items)
+    billable_amount = item[:billable_amount] || 0
+
+    if ( billable_amount + po_items.previously_billed_amount ) > po_items.order_amount
+      add_message :error, "For item - #{po_items.description}, billable amount has exceeded the order amount"
+      return
+    end
+
   end
 
 end

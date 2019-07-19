@@ -65,9 +65,15 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         if item.quantity != ( item.previously_delivered + ( item.accepted ) ) # if partially delivered, add in grn
           accepted_items << item.purchase_order_item_id
         end
+
+        if item.order_amount != ( item.previously_billed_amount + item.billable_amount )
+          accepted_items << item.purchase_order_item_id
+        end
       end
     end
 
+
+    # todo remove validation
     self.non_service_items = purchase_order.items.map {|item| item if item.inventory_line_item.product_type_id != ProductType.id_for(:service) }.compact
 
     if self.non_service_items.blank?
@@ -93,7 +99,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     # end
 
     for item in purchase_order.items
-      next if self.accepted_items.present? && !self.accepted_items.include?(item.id)       
+      next if self.accepted_items.present? && !self.accepted_items.include?(item.id) # if accepted_items does not include the random po item, skip
       next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
