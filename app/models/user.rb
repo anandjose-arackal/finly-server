@@ -404,8 +404,8 @@ class User < ApplicationRecord
 
   scope :user_search, -> (term) {
     if term.present?
-      ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
-                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+      ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
+                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
       ids.uniq!
       self.where(id: ids)
     end
