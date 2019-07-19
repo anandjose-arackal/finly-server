@@ -122,6 +122,12 @@ if payment.invoice.present?
 else
   json.raw_amount precision_value payment.amount_value
   json.original_amount precision_value payment.amount_value
+  if parent.present?
+    case parent.class.name
+    when 'PurchaseOrder'
+      json.original_amount precision_value parent.total_adv_amount
+    end
+  end
   json.invoice do
     json.net_amount precision_value payment.amount&.value
     json.roundoff_amount 0
