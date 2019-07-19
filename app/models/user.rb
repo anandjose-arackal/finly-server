@@ -1470,7 +1470,7 @@ class User < ApplicationRecord
         other_users.each do |user|
           next if user.id == self.id
           user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
-          user.update_attributes(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
+          user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
         end
       end
     end
