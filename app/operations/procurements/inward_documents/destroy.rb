@@ -92,7 +92,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
         accepted: purchase_order_item.accepted - item.accepted,
         rejected: purchase_order_item.rejected - item.rejected,
         delivered: purchase_order_item.delivered - item.delivered,
-        previously_billed_amount: purchase_order.previously_billed_amount - item.billable_amount
+        previously_billed_amount: purchase_order_item.previously_billed_amount - item.billable_amount
     }
 
     purchase_order_item.assign_attributes(po_item_params)
