@@ -172,7 +172,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   def inward_document_parameters
     params.require(:inward_document).permit(:id, :doc_number, :override_doc_number, :delivery_date,
-                                            items_attributes: [:id, :delivered, :accepted, :rejected, :comment],
+                                            items_attributes: [:id, :delivered, :accepted, :rejected, :comment, :billable_amount],
                                             attachments: []
     )
 

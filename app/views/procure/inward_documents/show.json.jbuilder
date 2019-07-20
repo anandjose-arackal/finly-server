@@ -8,9 +8,44 @@ if @result.inward_document.vendor.present?
 end
 
 
-json.items do
+json.items_original do
   json.array! @result.inward_document.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment
+  end
+end
+
+iwd_items = @result.inward_document.items.group_by(&:product_type_id)
+goods = iwd_items[ProductType.id_for(:goods)]
+service = iwd_items[ProductType.id_for(:service)]
+
+# json.items do 
+#   @result.inward_document.items.group_by(&:product_type_id).each do |id, items|
+#     if id == ProductType.id_for(:goods)
+#       json.goods do
+#         json.array! items do |item|
+#           json.extract! item,  :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment
+#         end
+#       end
+#     elsif id == ProductType.id_for(:service)
+#       json.service do
+#         json.array! items do |item|
+#           json.extract! item,  :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment, :previously_billed_amount, :order_amount, :billable_amount
+#         end
+#       end
+#     end
+#   end  
+# end
+
+json.items do
+  json.goods do
+    json.array! goods do |item|
+      json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment
+    end
+  end
+  json.service do
+    json.array! service do |item|
+      json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment, :previously_billed_amount, :order_amount, :billable_amount
+    end
   end
 end
 

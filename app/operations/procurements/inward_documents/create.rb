@@ -62,24 +62,27 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     if self.procurement.inward_documents.present?
       self.inward_document.items.each do |item|
         # if item.quantity != ( item.previously_delivered + ( item.accepted + item.rejected ) )
-        if item.quantity != ( item.previously_delivered + ( item.accepted ) ) # if partially delivered, add in grn
-          accepted_items << item.purchase_order_item_id
-        end
-
-        if item.order_amount != ( item.previously_billed_amount + item.billable_amount )
-          accepted_items << item.purchase_order_item_id
+        case item.product_type_id
+        when ProductType.id_for(:goods)          
+          if item.quantity != ( item.previously_delivered + ( item.accepted ) ) # if partially delivered, add in grn
+            accepted_items << item.purchase_order_item_id
+          end
+        when ProductType.id_for(:service)
+          if item.order_amount != ( item.previously_billed_amount + item.billable_amount )
+            accepted_items << item.purchase_order_item_id
+          end
         end
       end
     end
 
 
     # todo remove validation
-    self.non_service_items = purchase_order.items.map {|item| item if item.inventory_line_item.product_type_id != ProductType.id_for(:service) }.compact
+    # self.non_service_items = purchase_order.items.map {|item| item if item.inventory_line_item.product_type_id != ProductType.id_for(:service) }.compact
 
-    if self.non_service_items.blank?
-      add_message :error, "GRN can only be added for goods and not for services."
-      return
-    end
+    # if self.non_service_items.blank?
+    #   add_message :error, "GRN can only be added for goods and not for services."
+    #   return
+    # end
     validate_role
   end
 
@@ -100,7 +103,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
 
     for item in purchase_order.items
       next if self.accepted_items.present? && !self.accepted_items.include?(item.id) # if accepted_items does not include the random po item, skip
-      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      # next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
@@ -151,7 +154,11 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         previously_delivered: po_item.accepted,
         delivered: 0,
         accepted: 0,
-        rejected: 0
+        rejected: 0,
+        previously_billed_amount: po_item.previously_billed_amount,
+        order_amount: po_item.taxable_amount&.value,
+        billable_amount: 0,
+        product_type_id: po_item.inventory_line_item.product_type_id
     }
   end
 
