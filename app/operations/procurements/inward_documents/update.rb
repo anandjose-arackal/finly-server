@@ -224,7 +224,8 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     previously_billed_amount = purchase_order_item.previously_billed_amount
     if item.changes[:billable_amount].present?
-      previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
+      # previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
+      previously_billed_amount = previously_billed_amount + (item.changes[:billable_amount][1] - item.changes[:billable_amount][0])
     end
 
     purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)

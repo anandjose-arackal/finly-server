@@ -117,12 +117,14 @@ class Item < ApplicationRecord
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
+      product_type_label: product_type_label,
       rate_contract_vendors: rate_contract_vendors,
       user: user,
       active: active,
       item_expense_type_id: item_expense_type_id,
       item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable
+      tds_applicable: tds_applicable,
+      tds_applicable_label: (tds_applicable ? "yes" : "no")
     }
   end
 
@@ -162,6 +164,17 @@ class Item < ApplicationRecord
     purchase_order_items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
+  end
+
+  def product_type_label
+    label = ""
+    case product_type_id
+    when ProductType.id_for(:goods)
+      label = "goods"
+    when ProductType.id_for(:service)
+      label = "service"
+    end
+    label     
   end
 
 end
