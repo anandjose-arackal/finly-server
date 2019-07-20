@@ -27,8 +27,7 @@ json.bulk_items do
 			json.vendor_name item[:preferred_vendor_name]
 			json.vendor_id item[:preferred_vendor_id]
 		end
-
-		json.preferred_vendors item[:single_item]&.rate_contract_vendors
+		json.preferred_vendors item[:preferred_vendors]
 		json.rejected nil
 		json.status nil
 
