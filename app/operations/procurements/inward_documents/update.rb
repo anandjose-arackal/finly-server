@@ -274,6 +274,11 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def validations_for_services(item, po_items)
     billable_amount = item[:billable_amount] || 0
 
+    if billable_amount < 0
+      add_message :error, "Negative billable amount entered for #{po_items.description}"
+      return
+    end
+
     if ( billable_amount.to_f + po_items.previously_billed_amount.to_f ) > po_items.order_amount.to_f
       add_message :error, "For item - #{po_items.description}, billable amount has exceeded the order amount"
       return
