@@ -184,7 +184,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
-          igst: item.igst
+          igst: item.igst,
+          billable_amount_attributes: {
+              value: item.previously_billed_amount,
+              currency_id: 1
+          }
       }
     end
     

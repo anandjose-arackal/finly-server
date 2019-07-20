@@ -119,7 +119,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         when ProductType.id_for(:goods)
           po_item = update_purchase_order_item(item)
         when ProductType.id_for(:service)
-          po_item = update_service_item
+          po_item = update_service_item(item)
         end
 
         # item.update(previously_delivered: po_item.accepted)
@@ -270,7 +270,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def validations_for_services(item, po_items)
     billable_amount = item[:billable_amount] || 0
 
-    if ( billable_amount + po_items.previously_billed_amount ) > po_items.order_amount
+    if ( billable_amount.to_f + po_items.previously_billed_amount.to_f ) > po_items.order_amount.to_f
       add_message :error, "For item - #{po_items.description}, billable amount has exceeded the order amount"
       return
     end

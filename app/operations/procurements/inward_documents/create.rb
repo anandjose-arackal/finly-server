@@ -68,7 +68,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
             accepted_items << item.purchase_order_item_id
           end
         when ProductType.id_for(:service)
-          if item.order_amount != ( item.previously_billed_amount + item.billable_amount )
+          if item.order_amount.to_f != ( item.previously_billed_amount.to_f + item.billable_amount.to_f )
             accepted_items << item.purchase_order_item_id
           end
         end

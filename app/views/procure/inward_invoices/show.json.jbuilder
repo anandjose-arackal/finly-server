@@ -146,6 +146,8 @@ json.invoice do
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
+      json.billable_amount precision_value item.billable_amount&.value
+      json.product_type item.inventory_line_item.product_type_id
     end
   end
 
