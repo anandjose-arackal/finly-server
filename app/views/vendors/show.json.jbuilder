@@ -156,7 +156,7 @@ json.edit_config do
           json.reviewers do
             json.array! item[:reviewers] do |reviewer|
               json.extract! reviewer, :id, :exception, :threshold, :min
-              if max.present?
+              if reviewer.max.present?
                 json.max reviewer.max
               else
                 json.max '∞'
