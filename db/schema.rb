@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_16_210127) do
+ActiveRecord::Schema.define(version: 2019_07_02_082807) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1504,6 +1504,7 @@ ActiveRecord::Schema.define(version: 2019_06_16_210127) do
     t.integer "status_id", default: 1, null: false
     t.boolean "test_account", default: false
     t.string "subdomain"
+    t.integer "group_id"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1675,6 +1676,12 @@ ActiveRecord::Schema.define(version: 2019_06_16_210127) do
     t.index ["bank_type_id"], name: "index_company_funds_load_requests_on_bank_type_id"
     t.index ["company_id"], name: "index_company_funds_load_requests_on_company_id"
     t.index ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id"
+  end
+
+  create_table "company_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "company_kyc_document_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2686,6 +2693,7 @@ ActiveRecord::Schema.define(version: 2019_06_16_210127) do
     t.boolean "purchase_requisition_system"
     t.string "bank_service_provider"
     t.boolean "request_encryption_enabled", default: false
+    t.boolean "group_entity_structure", default: false
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -3002,6 +3010,22 @@ ActiveRecord::Schema.define(version: 2019_06_16_210127) do
     t.integer "transfer_status_id"
     t.integer "company_id"
     t.string "request_id"
+  end
+
+  create_table "icici_statements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "cheque_no"
+    t.datetime "txn_date"
+    t.decimal "amount", precision: 20, scale: 10
+    t.decimal "balance", precision: 20, scale: 10
+    t.datetime "value_date"
+    t.string "transaction_type"
+    t.string "transaction_id"
+    t.string "request_id"
+    t.integer "bank_transaction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.text "remarks"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

@@ -12,14 +12,14 @@ class TransferTimingUtils
     else
       date.change(hour: 8, min: 1, sec: 0)
     end
-    return true if date > DateUtils.local_date # because we are only checking for today's shit
+    return true if date > DateUtils.local_date # because we are only checking for today's payments
     case payment_mode&.upcase
       when "IMPS"
         return true
       when "NEFT", "RTGS"
         return false if (date.sunday?)
         return false if bank_holidays.include?(date.strftime("%d-%m-%Y"))
-        return daily_time_range(payment_mode).cover?(date) # i.e. if the timestamp
+        return daily_time_range(payment_mode).cover?(DateUtils.local_date_time) # i.e. if the current time falls into the transferable window
       else
         return false
     end
@@ -94,6 +94,8 @@ class TransferTimingUtils
     # date = date
     if date.blank?
       date = DateUtils.local_date
+    else
+      date = date.to_date
     end
     return date.to_date if within_timeframe? payment_mode, date
     return date.to_date if payment_mode == "IMPS"
