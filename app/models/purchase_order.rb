@@ -512,9 +512,17 @@ class PurchaseOrder < ApplicationRecord
   def all_items_shipped?
     shipped = true
     self.items.each do |item|
-      unless item.quantity == item.delivered
-        shipped = false
-        break
+      case item.inventory_line_item.product_type_id
+      when ProductType.id_for(:service)
+        unless item.quantity == item.delivered
+          shipped = false
+          break
+        end
+      when ProductType.id_for(:service)
+        unless item.previously_billed_amount == item.taxable_amount.value
+          shipped = false
+          break
+        end
       end
     end
     shipped
@@ -523,12 +531,20 @@ class PurchaseOrder < ApplicationRecord
   def all_items_accepted?(inward_document = nil)
     shipped = true
     self.items.each do |item|
-      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-      # Commenting this fetch for value for now.
-      # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
-      unless item.quantity == (item.accepted + 0)
-        shipped = false
-        break
+      # next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      case item.inventory_line_item.product_type_id
+      when ProductType.id_for(:service)
+        unless item.previously_billed_amount == item.taxable_amount.value
+          shipped = false
+          break
+        end
+      when ProductType.id_for(:goods)
+        # Commenting this fetch for value for now.
+        # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
+        unless item.quantity == (item.accepted + 0)
+          shipped = false
+          break
+        end
       end
     end
     shipped

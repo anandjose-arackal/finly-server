@@ -137,7 +137,7 @@ json.invoice do
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
-      json.tds_applicable item.inventory_line_item&.tds_applicable
+      json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -147,7 +147,14 @@ json.invoice do
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
       json.billable_amount precision_value item.billable_amount&.value
-      json.product_type item.inventory_line_item.product_type_id
+      product = ""
+      case item.inventory_line_item&.product_type_id
+      when ProductType.id_for(:goods)
+        product = "goods"
+      when ProductType.id_for(:service)
+        product = "service"
+      end      
+      json.product_type product
     end
   end
 
