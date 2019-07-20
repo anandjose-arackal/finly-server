@@ -25,4 +25,5 @@ class InwardDocumentItem < ApplicationRecord
   belongs_to :inward_document, optional: true
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :product_type, optional: true
+  belongs_to :purchase_order_item, optional: true
 end

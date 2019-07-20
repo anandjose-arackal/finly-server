@@ -40,7 +40,7 @@ class Item < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
-  belongs_to :product_type, optional: true, class_name: "ProductType", foreign_key: :product_type
+  belongs_to :product_type, optional: true#, class_name: "ProductType", foreign_key: :product_type_id
   belongs_to :user, optional: true
   belongs_to :item_expense_type, optional: true
 
