@@ -160,6 +160,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         real_q = item.accepted.to_i
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          next unless item.previously_billed_amount > 0 # todo modify based on feature subscription
           real_q = item.quantity
         end
       end
