@@ -68,7 +68,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         title: "Purchase Requests",
         type: 'purchase_requests',
         count: purchase_requests.count,
-        filters: [{filter_by_status_id: 'awaiting_approval'}]
+        filters: [{filter_awaiting_approval: '1'}]
       }
 
       if params[:filter_date_from].present?

@@ -24,10 +24,10 @@ class CustomField::Validate < CustomField::Base
   def process
     return if self.custom_fields.blank?
 
-    self.custom_fields.each do |field|
-      if field.field_configuration.mandatory and field.value.blank?
+    self.custom_fields.where("custom_fields.value_id IS NULL").joins(:field_configuration).where('field_configurations.mandatory = ?', true).each do |field|
+      # if field.field_configuration.mandatory and field.value.blank?
         add_message :error, "#{field.field_configuration.field_name} cannot be empty"
-      end
+      # end
     end
   end
 

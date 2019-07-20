@@ -7,6 +7,22 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     # self.inward_document = procurement.inward_documents.find_by id: inward_document_id
     self.inward_document = user.company.inward_documents.find_by id: inward_document_id
     # self.inward_document_params = inward_document_parameters
+  end
+
+  def validate
+    unless self.inward_document.present?
+      add_message :error, 'GRN not found'
+      return
+    end
+  end
+
+  def pre_process
+    # self.id_current_attachments = user.company.procurement_attachments.with_id(inward_document_params[:attachments])
+
+    # self.inward_document_params.delete(:attachments)
+
+    # self.id_old_attachments = self.inward_document.attachments
+
     self.procurement = self.inward_document.procurement
     self.purchase_order = self.procurement&.purchase_order
 
@@ -15,6 +31,11 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       if po_revision.present?
         self.purchase_order = self.po_revision
       end
+    end
+
+    unless self.purchase_order.present?
+      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
+      return
     end
 
     if is_approve?
@@ -29,26 +50,6 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     elsif is_vendor_confirmed?
       self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
     end
-
-  end
-
-  def validate
-    unless self.inward_document.present?
-      add_message :error, 'GRN not found'
-      return
-    end
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
-      return
-    end
-  end
-
-  def pre_process
-    # self.id_current_attachments = user.company.procurement_attachments.with_id(inward_document_params[:attachments])
-
-    # self.inward_document_params.delete(:attachments)
-
-    # self.id_old_attachments = self.inward_document.attachments
   end
 
   def process

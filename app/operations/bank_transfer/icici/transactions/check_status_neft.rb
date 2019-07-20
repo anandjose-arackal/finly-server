@@ -31,8 +31,12 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
   def process
     statement_entry = self.company.icici_statements.find_by(request_id: self.bank_transaction.unique_request_number)
     if statement_entry.present?
-      # todo - this needs to be verified if the UTR is, in fact the transaction_id
-      utr = statement_entry.transaction_id
+      # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
+      # 021341686931 - is the UTR
+      # FINLYRGS94365231618 is the request ID
+      utr = statement_entry.remarks.split("/").last(2).first rescue ""
+      # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
+      utr += "1DC"
       self.bank_transaction.update(utr: utr)
 
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))

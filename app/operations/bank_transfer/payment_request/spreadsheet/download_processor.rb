@@ -35,7 +35,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
     if include_attachments
       files = []
       files << {name: 'export.xls', file_contents: exported_xls}
-      bank_payment_requests.include_attachments.each do |bpr|
+      bank_payment_requests.include_attachments.find_each(batch_size: 1000) do |bpr|
         file_name_prefix = "#{bpr.id}"
         count = 1
         bpr.payment_order&.payment_order_attachments&.each do |attachment|
@@ -116,7 +116,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Awaiting Action From",
                "Invoice Number",
                "Invoice Due Date",
-               "Invoice Date"]
+               "Invoice Date",
+               "Invoice ID"]
     headers += retrieve_custom_field_headers
     headers += ["Invoice Amount",
                 "Discount",
@@ -133,7 +134,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
-    bank_payment_requests.include_for_data_retrieval.each do |pr|
+    bank_payment_requests.include_for_data_retrieval.find_each(batch_size: 1000) do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
@@ -156,7 +157,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             reviewer_names,
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
-            payment.invoice&.date&.strftime("%d-%m-%Y")
+            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
         payment_details += [

@@ -846,6 +846,9 @@
 #                                                          PATCH  /users/:id(.:format)                                                                                                users#update
 #                                                          PUT    /users/:id(.:format)                                                                                                users#update
 #                                                          DELETE /users/:id(.:format)                                                                                                users#destroy
+#                                     group_entities_login POST   /users/group_entities_login(.:format)                                                                               users#group_entities_login
+#                                           group_entities GET    /users/group_entities(.:format)                                                                                     users#group_entities
+#                                       multi_entity_login POST   /multi_entity_login(.:format)                                                                                       multi_entity_login/token#create
 #                                        user_user_summary GET    /users/:user_id/summary(.:format)                                                                                   users#summary
 #                                             user_details POST   /users/:user_id/user_details(.:format)                                                                              users#user_details
 #                                         user_update_team PATCH  /users/:user_id/update_user_team(.:format)                                                                          users#update_team
@@ -2997,6 +3000,9 @@ Rails.application.routes.draw do
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
   get 'users/all_cards', to: 'users#all_cards', as: :all_cards
+  post 'users/group_entities_login', to: 'users#group_entities_login', as: :group_entities_login
+  get 'group_entities_after_login', to: 'users#group_entities_after_login', as: :group_entities_after_login
+  post 'multi_entity_login', to: 'multi_entity_login/token#create', as: :multi_entity_login
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
@@ -3354,6 +3360,7 @@ Rails.application.routes.draw do
 
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
+    get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests', to: 'bank_payment_requests#create'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'

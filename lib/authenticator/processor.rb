@@ -4,7 +4,8 @@ class Authenticator::Processor
   PROVIDERS = [
       Authenticator::Providers::Application,
       Authenticator::Providers::Admin,
-      Authenticator::Providers::AdminBypass
+      Authenticator::Providers::AdminBypass,
+      Authenticator::Providers::MultiEntityLogin
   ]
 
   def initialize(request)

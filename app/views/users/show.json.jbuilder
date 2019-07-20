@@ -8,6 +8,7 @@ json.user do
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
   json.gender @result.selected_user.profile.gender rescue nil
+  json.employee_id @result.selected_user.profile&.employee_id
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
   json.activateable @result.selected_user.manager_activateable?
   json.enforce_policy do

@@ -45,6 +45,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def validate
+    # debugger # todo uncomment below
     unless self.payment_order.pending?
       add_message :error, "Payment order cannot be processed at this moment"
       return
@@ -80,7 +81,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
       if op.success? && ([PaymentStatus.id_for(:completed)].include?(payment.payment_status_id))
         processed_amount += payment.amount_value
         succeeded_transactions = true
-      elsif [PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)].include?(payment.payment_status_id)
+      elsif [PaymentStatus.id_for(:processing), PaymentStatus.id_for(:initiated), PaymentStatus.id_for(:possible_failure)].include?(payment.payment_status_id)
         processed_amount += payment.amount_value
         processing_transactions = true
       else
