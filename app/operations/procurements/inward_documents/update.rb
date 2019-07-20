@@ -84,6 +84,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
         next if item_q.blank? 
         next if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ))
+        next if item.product_type_id == ProductType.id_for(:service)
         # if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
         if item.previously_delivered < item_q.first.quantity
           add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
@@ -223,7 +224,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     previously_billed_amount = purchase_order_item.previously_billed_amount
     if item.changes[:billable_amount].present?
-      previously_billed_amount = (previously_billed_amount + item.billable_amount)
+      previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
     end
 
     purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
