@@ -158,8 +158,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         previously_billed_amount: po_item.previously_billed_amount,
         order_amount: po_item.taxable_amount&.value,
         billable_amount: 0,
-        product_type_id: po_item.inventory_line_item.product_type_id,
-        po_comment: po_item.comment
+        product_type_id: po_item.inventory_line_item.product_type_id
     }
   end
 
