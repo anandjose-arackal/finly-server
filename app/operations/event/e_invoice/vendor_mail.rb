@@ -21,7 +21,7 @@ class Event::EInvoice::VendorMail < Event::EInvoice::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
-    ProcurementMailer.notify_vendor(Event::EInvoice::VendorMail::MailerPresenter.new(user, params)).deliver_now
+    ProcurementMailer.delay.notify_vendor(Event::EInvoice::VendorMail::MailerPresenter.new(user, params))
   end 
 
   def process
