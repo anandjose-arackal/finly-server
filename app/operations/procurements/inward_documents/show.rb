@@ -1,5 +1,9 @@
 class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :purchase_order
+
+  def pre_validate
+  end
+
   def init
     inward_document_id = params[:id] || params[:inward_document_id]
     self.inward_document = InwardDocument.find_by id: inward_document_id

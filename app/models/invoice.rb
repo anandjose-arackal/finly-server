@@ -501,9 +501,11 @@ class Invoice < ApplicationRecord
   end
 
   def item_amounts_total
-    if self.invoice_items.present?
+    if self.invoice_items.present? && self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
+      return self.invoice_items.map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount.value else p.amount&.value end }.compact.sum
+    elsif self.invoice_items.present?
+      return self.invoice_items.map {|p| p.amount&.value }.compact.sum
     else
       return 0
     end

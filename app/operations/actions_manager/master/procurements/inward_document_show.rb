@@ -17,6 +17,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
 
   def update_document
+    return false unless user.company.feature_subscription.receipt_note_mandatory
     
     # editable
     if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
@@ -27,6 +28,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def editable
+    return false unless user.company.feature_subscription.receipt_note_mandatory
     # edit button only appears after we have updated it with some items 
     # do not show edit button while the doc has just been created
     # after doc has been updated with some delivered items, show the edit button
@@ -43,6 +45,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def delete
+    return false unless user.company.feature_subscription.receipt_note_mandatory
     if self.procurement.documents&.first&.class&.name != "Invoice"
       unless self.inward_document.id != self.procurement.inward_documents.last.id
         true
@@ -50,9 +53,9 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
     end
   end
 
-  def delete
-    true
-  end
+  # def delete
+  #   true
+  # end
 
   # # alias_method :invoice, :input
 

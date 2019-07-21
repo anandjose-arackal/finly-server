@@ -72,6 +72,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         end
       end
     end
+    
+    unless user.company.feature_subscription.receipt_note_mandatory
+      request_types[:grns] = false
+    end
+
   end
 
   def success

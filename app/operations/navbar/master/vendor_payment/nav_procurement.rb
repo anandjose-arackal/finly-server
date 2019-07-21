@@ -60,6 +60,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def receive
+    return nil unless user.company.feature_subscription.receipt_note_mandatory
     {name: 'Receive', id: 'receive', url: 'receive'}
   end
 

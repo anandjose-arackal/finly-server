@@ -11,6 +11,13 @@ class Procurements::Grn::Count < Procurements::Base
     end
   end
 
+  def pre_validate
+    unless user.company.feature_subscription.receipt_note_mandatory
+      add_message :error, "Receipt note is not enabled for your company. Please contact your admin or Finly Customer Support."
+      return
+    end
+  end
+
   def process
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = [7, 2, 3] # [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]

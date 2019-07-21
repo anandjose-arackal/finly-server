@@ -2,6 +2,13 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
   attr_accessor :procurements, :filter_procurement_type
 
+  def pre_validate
+    unless user.company.feature_subscription.receipt_note_mandatory
+      add_message :error, "Receipt note is not enabled for your company. Please contact your admin or Finly Customer Support."
+      return
+    end
+  end
+
   def init
     self.filter_procurement_type = params[:filter_procurement_type]
   end
