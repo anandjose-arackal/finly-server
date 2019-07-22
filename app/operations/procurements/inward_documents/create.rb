@@ -25,7 +25,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
 
   def validate
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create Receipt Note'
     end
 
     if self.purchase_order.closed?
@@ -33,7 +33,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     end
 
     if self.purchase_order.all_items_accepted?
-      add_message :error, "Cant add new GRN if previous GRN has all items shipped."
+      add_message :error, "Cant add new Receipt Note if previous Receipt Note has all items shipped."
     end
 
 

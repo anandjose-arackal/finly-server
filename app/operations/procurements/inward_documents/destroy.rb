@@ -11,7 +11,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return
     end
   end
@@ -34,7 +34,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     end
 
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
+      add_message :error, 'Purchase Order not found for this procurement, cannot delete Receipt Note'
       return
     end
 
@@ -72,7 +72,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   end
 
   def post_process
-    add_message :success, 'Successfully deleted GRN'
+    add_message :success, 'Successfully deleted Receipt Note'
   end
 
   private

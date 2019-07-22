@@ -240,7 +240,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "GRN",
+        title: "Receipt Note",
         type: 'receive',
         count: procurements.count,
         # filters: [{filter_status_tags: [7]}]

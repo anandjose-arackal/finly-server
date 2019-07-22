@@ -39,7 +39,7 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
 
   def validate_presence
     if self.inward_document.blank? || (inward_document.company_id != user.company_id)
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return false
     end
     true

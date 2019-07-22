@@ -23,16 +23,16 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create Receipt Note'
       return
     end
 
     if self.inward_document_params[:delivery_date].blank?
-      add_message :error, "Please add the delivery date for this GRN."
+      add_message :error, "Please add the delivery date for this Receipt Note."
       return
     end
 
@@ -54,13 +54,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     # end
 
     unless self.inward_document.id == self.procurement.inward_documents.last.id
-      add_message :error, "Cannot update old GRNs"
+      add_message :error, "Cannot update old Receipt Notes"
       return
     end
 
     # if invoice was added after adding a grn, block modification of current grn
     if self.procurement.documents&.first&.class&.name == "Invoice"
-      add_message :error, "You have added an Invoice for this GRN. If you want to modify it, delete the invoice."
+      add_message :error, "You have added an Invoice for this Receipt Note. If you want to modify it, delete the invoice."
       return
     end
 
@@ -87,7 +87,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         next if item.product_type_id == ProductType.id_for(:service)
         # if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
         if item.previously_delivered < item_q.first.quantity
-          add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
+          add_message :error, 'Items in Receipt Note cannot be reduced as they have already been invoiced'
           break
         end
       end
@@ -166,7 +166,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     end
 
-    add_message :success, 'Successfully updated GRN'
+    add_message :success, 'Successfully updated Receipt Note'
   end
 
   private
