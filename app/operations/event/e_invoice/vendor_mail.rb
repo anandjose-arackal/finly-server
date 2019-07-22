@@ -46,7 +46,7 @@ class Event::EInvoice::VendorMail < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    "Your invoice has been generated"
+    "Your following invoice has been generated : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
   end
 
   class Event::EInvoice::VendorMail::MailerPresenter < Event::SetNotifier::MailerPresenter
