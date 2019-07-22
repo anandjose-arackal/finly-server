@@ -68,6 +68,7 @@ class ReportProcessorGroup < ApplicationRecord
   scope :not_completed, -> { where status_id: ReportProcessorGroupStatus.ids_for([:pending, :scheduled,
                                                                                   :processing, :partially_completed,
                                                                                   :failed]) }
+  scope :not_completed_including_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :filter_user_id, -> (user_id) {
     id = pluck(:id)
