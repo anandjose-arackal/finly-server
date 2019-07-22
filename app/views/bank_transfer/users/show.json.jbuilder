@@ -5,6 +5,7 @@ json.user do
   json.address_1 @result.selected_user.profile&.address_1
   json.address_2 @result.selected_user.profile&.address_2
   json.gender @result.selected_user.profile&.gender
+  json.employee_id @result.selected_user.profile&.employee_id
 end
 
 json.user_delegate do

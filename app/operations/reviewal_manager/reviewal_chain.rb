@@ -56,8 +56,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
           level_id: level.id,
           level_name: level.name,
           timestamp: timestamp,
-          reviewers: mappings
+          reviewers: mappings,
+          reviewer_data: get_mapping_data(mappings)
       }
+
       if selected_reviewer.present?
         level_data[:selected_reviewer] = selected_reviewer.reviewer
         level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
@@ -79,5 +81,46 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     def init
       self.chain = params[:chain]
     end
+  end
+
+
+
+  private
+
+  def get_mapping_data(mappings)
+    mappings = mappings.as_json
+    result = []
+    unique_reviewer_ids = mappings.map {|item| item['reviewer_id']}.uniq
+
+    unique_reviewer_ids.each do |reviewer_id|
+
+      sample = mappings.select {|item| item['reviewer_id'] == reviewer_id }[0]
+      min = mappings.select{|item| item['reviewer_id'] == reviewer_id}.min_by {|item| item['threshold']}['threshold']
+      compare_max = mappings.select{|item| item['reviewer_id'] == reviewer_id}.max_by {|item| item['threshold']}['threshold']
+
+      thresholds = mappings.select {|item| (item['reviewer_id'] != reviewer_id) && (item['threshold'] > compare_max) }&.map {|item| item['threshold']}
+
+      if thresholds.empty?
+        max = 99999999999999
+      else
+        max = thresholds.min
+      end
+
+      reviewer = User.find_by id: reviewer_id
+
+      data = {
+          reviewer_id: reviewer_id,
+          reviewer_name: reviewer&.name,
+          reviewer: reviewer,
+          threshold: sample['threshold'],
+          id: sample['id'],
+          exception: sample['exception'],
+          min: min,
+          max: max
+      }
+
+      result.push(data)
+    end
+    result
   end
 end

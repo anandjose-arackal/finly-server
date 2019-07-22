@@ -7,18 +7,21 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
   class BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount, :source_account_balance,
-                  :wallet_balance, :company_credits_balance
+                  :wallet_balance, :company_credits_balance, :bank_accounts
 
     def init
       self.result = params[:result]
       self.processable_amount = params[:processable_amount]
       self.unprocessable_amount = params[:unprocessable_amount]
       self.scheduled_amount = params[:scheduled_amount]
+
       self.source_account_balance = params[:source_account_balance]
       self.wallet_balance = params[:wallet_balance]
       self.company_credits_balance = params[:company_credits_balance]
     end
 
+    # todo - multibank : See why we use it
+    # Used for enabling and disabling the credit button on frontend
     def processable?
       self.source_account_balance >= (self.processable_amount + self.scheduled_amount)
     end
@@ -152,6 +155,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
             return user.company.yes_bank_company_account
           when "ICICI"
             return user.company.icici_bank_company_account
+          when "KOTAK"
+            return user.company.kotak_bank_company_account
           else
             return user.company.yes_bank_company_account
         end
@@ -170,6 +175,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
           when "ICICI"
             return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+          when "KOTAK"
+            return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
           else
             return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

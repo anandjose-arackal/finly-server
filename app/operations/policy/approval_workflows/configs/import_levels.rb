@@ -52,7 +52,7 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
               if reviewer.policies.pluck(:id).exclude?(policy.id)
                 self.policy.user_mapping.create(user: reviewer)
               end
-              mapping_exist = self.level.level_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer.id, threshold: threshold).first
+              mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer.id, threshold: threshold).first
               self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: threshold) unless mapping_exist.present?
               result_hash[name][i] = 'Reviewer Mapping created'
             else
@@ -156,7 +156,7 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
 
   def create_response_csv
     file = Tempfile.new("bulk_import_lrm_result.xls")
-    workbook  = ::WriteXLSX.new(file_name)
+    workbook  = ::WriteXLSX.new(file)
     sheets.each_with_pagename do |name, sheet|
       worksheet = workbook.add_worksheet(name)
 

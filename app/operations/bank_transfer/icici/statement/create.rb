@@ -16,6 +16,7 @@ class BankTransfer::Icici::Statement::Create < BankTransfer::Icici::Statement::B
   end
 
   def process
+    # need these to be sent in descending order of date
     self.records.each do |record|
       transaction = self.company.icici_statements.build(
           cheque_no: record["CHEQUENO"],

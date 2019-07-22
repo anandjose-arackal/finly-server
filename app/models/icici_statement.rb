@@ -25,8 +25,13 @@ class IciciStatement < ApplicationRecord
 
   validates_uniqueness_of :transaction_id, scope: [:company_id]
 
+  default_scope { order(txn_date: :desc) }
+
   after_create do
+    # since the last set of characters in the remarks will contain the Request ID
     request_id = self.remarks.split("/").last
+    # removing any extra characters after the actual request ID
+    request_id = request_id.split(" ").first
     self.update(request_id: request_id)
   end
 

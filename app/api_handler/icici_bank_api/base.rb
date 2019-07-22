@@ -104,6 +104,7 @@ class IciciBankApi::Base < BaseHandler
                     post_params: post_params_hash,
                     response: response_hash,
                     status: status_code,
+                    company: self.company&.name,
                     icici_bank_action: env_key,
                     request_time: (self.end_time - self.start_time),
                     success: true

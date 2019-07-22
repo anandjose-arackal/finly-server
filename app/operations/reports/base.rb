@@ -83,7 +83,7 @@ class Reports::Base < BaseOperation
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses.includes(:amount,:receipts,:card_expense,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type)
+      self.expenses = report.expenses.includes(:amount,:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,{manual_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{card_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{distance_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{time_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]})
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string

@@ -14,7 +14,6 @@
 #  renewal_alert_period_id :integer
 #  note                    :string(255)
 #  company_id              :integer
-#  rate_contract_number    :string(255)
 #
 
 class RateContract < ApplicationRecord
@@ -82,6 +81,10 @@ class RateContract < ApplicationRecord
     if self.company_id.blank?
       self.company_id = self.creator.company_id
     end
+  end
+
+  def vendor_display_name
+    self&.vendor&.business_name || self&.vendor&.name
   end
 
 

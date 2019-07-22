@@ -19,6 +19,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
 
+    if self.inward_invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
+
 
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
 
@@ -50,10 +55,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def validate
-    if self.inward_invoice.blank?
-      add_message :error, "Invoice not found"
-      return
-    end
 
     if self.inward_invoice_params[:invoice_number].blank?
       add_message :error, "Invoice number is required. You can input alphanumeric characters, dash and forward slash. No spaces allowed."
@@ -74,6 +75,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if invoice_number.present? && duplicate_invoices.present?
       # add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
       add_message :error, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details."
+      return
+    end
+
+    if self.inward_invoice_params[:location_id].blank?
+      add_message :error, "Please specify a Billing Address."
+    end
+
+    if self.inward_invoice_params[:delivery_location_id].blank?
+      add_message :error, "Please specify a Shipping Address."
       return
     end
 

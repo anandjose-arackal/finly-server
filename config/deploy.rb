@@ -66,10 +66,10 @@ when :uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
 when :feature_testing
-  branch = fetch :branch
-  unless ['feature-testing', :'feature-testing'].include?(branch)
-    raise 'This branch cannot be deploy to feature testing. Please select the correct branch'
-  end
+  # branch = fetch :branch
+  # unless ['feature-testing', :'feature-testing'].include?(branch)
+  #   raise 'This branch cannot be deploy to feature testing. Please select the correct branch'
+  # end
   set :deploy_to, '/home/centos/app_3'
   set :rails_env, 'staging'
 end
