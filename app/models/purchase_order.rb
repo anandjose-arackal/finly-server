@@ -513,7 +513,7 @@ class PurchaseOrder < ApplicationRecord
     shipped = true
     self.items.each do |item|
       case item.inventory_line_item.product_type_id
-      when ProductType.id_for(:service)
+      when ProductType.id_for(:goods)
         unless item.quantity == item.delivered
           shipped = false
           break
