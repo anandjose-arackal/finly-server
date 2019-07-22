@@ -95,6 +95,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
         item[:single_item] = single_item
       end
+      item[:preferred_vendors] = single_item.rate_contract_vendors rescue []
+
 
       unless validate_amount unit_price
         self.valid = false
