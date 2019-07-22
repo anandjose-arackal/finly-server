@@ -1,6 +1,7 @@
+# awaiting_approval_columns = Columns in the email template 
 class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Base
 
-  attr_accessor :purchase_orders
+  attr_accessor :purchase_orders, :awaiting_approval_columns
 
   def pre_validate
     unless user.present?
@@ -15,6 +16,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
 
   def init
     self.purchase_orders = params[:purchase_orders]
+    self.awaiting_approval_columns = ["#", "PO #", "Created By", "Sub Department", "Amount"]
   end
 
   def send_mailer(user)
@@ -22,6 +24,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
+    params[:awaiting_approval_columns] = awaiting_approval_columns
     ProcurementMailer.send_awaiting_approval_mail(Event::EPurchaseOrder::RemindAwaitingApproval::MailerPresenter.new(user, params)).deliver_now
   end
 
@@ -58,7 +61,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
 
   class Event::EPurchaseOrder::RemindAwaitingApproval::MailerPresenter < Event::SetNotifier::MailerPresenter
 
-    attr_accessor :user, :body_val, :subject_val, :company, :purchase_orders, :action_name, :action_url, :awaiting_approvals
+    attr_accessor :user, :body_val, :subject_val, :company, :purchase_orders, :action_name, :action_url, :awaiting_approvals, :awaiting_approval_columns
 
     def initialize(user, params)
       self.user = user
@@ -69,6 +72,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
       self.action_name = params[:action_name]
       self.action_url = params[:action_url]
       self.awaiting_approvals = params[:purchase_orders]
+      self.awaiting_approval_columns = params[:awaiting_approval_columns]
     end
 
     def to

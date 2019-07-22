@@ -1,6 +1,6 @@
 <% content_for :body do %>
   <head>
-    <title>@data.title</title>
+    <title>@data.action_name</title>
   </head>
   <body style="background-color: #f3f3f3; height: auto;">
   <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
@@ -13,21 +13,19 @@
       <table style="width: 100%;">
         <thead>
         <tr>
-          <th>#</th>
-          <th>PO #</th>
-          <th>Created By</th>
-          <th>Sub Department</th>
-          <th>Amount</th>
+          <% @data.awaiting_approval_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
         </tr>
         </thead>
         <tbody>
-        <% @data.awaiting_approvals.each_with_index do |po_details, index| %>
+        <% @data.awaiting_approvals.each_with_index do |document, index| %>
           <tr>
             <td><%= index + 1 %></td>
-            <td><%= po_details[:po_number] %></td>
-            <td><%= po_details[:user] %></td>
-            <td><%= po_details[:sub_department] %></td>
-            <td>&#8377;<%= po_details[:amount]&.to_d.round(2) rescue 0 %></td>
+            <td><%= document.po_number %></td>
+            <td><%= document.user&.name %></td>
+            <td><%= document.sub_department&.name %></td>
+            <td>&#8377;<%= document.amount&.to_d.round(2) rescue 0 %></td>
           </tr>
         <% end %>
         </tbody>
