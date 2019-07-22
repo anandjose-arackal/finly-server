@@ -13,8 +13,8 @@ class MinMaxMigration
     migrate_lrm
     migrate_lurm
     result_one
-    #migrate_dlrm
-    #result_two
+    migrate_dlrm
+    result_two
   end
 
   def next_greater(array, i)
