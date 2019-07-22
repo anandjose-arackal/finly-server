@@ -40,7 +40,6 @@ json.levels do
             json.exception lurm.exception
             json.min lurm.min
             json.max lurm.max
-            json.max lurm.max
             json.wo_exception lurm.wo_exception
           end
         end
