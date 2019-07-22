@@ -519,7 +519,7 @@ class PurchaseOrder < ApplicationRecord
           break
         end
       when ProductType.id_for(:service)
-        unless item.previously_billed_amount == item.taxable_amount.value
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
           shipped = false
           break
         end
@@ -534,7 +534,7 @@ class PurchaseOrder < ApplicationRecord
       # next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       case item.inventory_line_item.product_type_id
       when ProductType.id_for(:service)
-        unless item.previously_billed_amount == item.taxable_amount.value
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
           shipped = false
           break
         end

@@ -151,8 +151,13 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.accepted.to_i - it_cal.to_i
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-            real_q = item.quantity - it_cal
-            next if real_q <= 0
+            # here we sum billable amount for all service items in previous invoices
+            # if they are not the same, we create the invoice, else
+            # we skip it.
+            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+            # next if real_q <= 0
+            next if bill_cal.to_f.round(2) == item.previously_billed_amount.to_f.round(2)
+            real_q = item.quantity
           end
         end
       else
@@ -358,7 +363,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       }
     end
     
-    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a GRN first." end
+    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
     
 
     if self.advance.present?
