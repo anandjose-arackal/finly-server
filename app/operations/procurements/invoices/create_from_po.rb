@@ -156,7 +156,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # we skip it.
             bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
             # next if real_q <= 0
-            next if bill_cal.to_f.round(2) == item.previously_billed_amount.to_f.round(2)
+            next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
           end
         end
