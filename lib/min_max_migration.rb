@@ -10,9 +10,9 @@ class MinMaxMigration
   end
 
   def process
-    migrate_lrm
-    migrate_lurm
-    result_one
+    # migrate_lrm
+    # migrate_lurm
+    # result_one
     migrate_dlrm
     result_two
   end
