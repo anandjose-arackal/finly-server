@@ -626,7 +626,8 @@ class Invoice < ApplicationRecord
         editable: self.unpaid? || self.initiated?,
         tax_rate: precision_value(self.tax_rate),
         tds_rate: precision_value(self.tds_rate),
-        discount_rate: precision_value(self.discount_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
         attachments: self.attachments.map(&:as_json),
         # invoice_attachment: {
@@ -666,6 +667,10 @@ class Invoice < ApplicationRecord
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json
     }
+  end
+
+  def invoice_discount_rate
+    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
   end
 
   def include_original_amount

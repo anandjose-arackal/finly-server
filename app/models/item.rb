@@ -33,6 +33,7 @@
 class Item < ApplicationRecord
   include SoftDeletable
   include Sequenced::ActsAsSequenced
+  include MathUtil
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
@@ -119,6 +120,7 @@ class Item < ApplicationRecord
       product_type: product_type_id,
       product_type_label: product_type_label,
       rate_contract_vendors: rate_contract_vendors,
+      preferred_vendors: rate_contract_vendors,
       user: user,
       active: active,
       item_expense_type_id: item_expense_type_id,
@@ -154,7 +156,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value)}}
   end
 
   private
