@@ -36,7 +36,6 @@ json.locations do
   end
 end
 
-
 json.reviewal_chains do
   json.array! @result.reviewal_chains do |chain|
     json.policy_id chain[:policy_id]
