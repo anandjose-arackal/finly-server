@@ -275,6 +275,7 @@ class User < ApplicationRecord
     where id: ids
   }
   scope :with_company_id, ->(company_id) {where company_id: company_id}
+  scope :without_company_id, -> (company_id) { where.not(company_id: company_id) }
   scope :without_id, ->(user_id) {where.not id: user_id}
   scope :filter_name, -> (name) do
     where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
