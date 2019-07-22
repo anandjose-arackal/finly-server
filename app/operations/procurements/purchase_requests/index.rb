@@ -1,7 +1,7 @@
 class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_requests, :policies
+  attr_accessor :purchase_requests, :policies, :filter_ids
   def init
-
+    self.filter_ids = params[:filter_ids]
   end
 
   def validate
@@ -26,11 +26,12 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
 
   def success
     params[:purchase_requests] = self.purchase_requests
+    params[:filter_ids] = self.filter_ids
     Procurements::PurchaseRequests::Index::IndexPresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_requests, :paginated_purchase_requests, :count
+    attr_accessor :purchase_requests, :paginated_purchase_requests, :count, :filter_ids
 
     has_scope :filter_by_status_id
     has_scope :search_by_email
@@ -43,8 +44,11 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
 
     def init
       self.purchase_requests = params[:purchase_requests]
+      self.filter_ids = params[:filter_ids]
       self.purchase_requests = apply_scopes(purchase_requests, params) rescue ::PurchaseRequest.none
       self.paginated_purchase_requests = purchase_requests.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PurchaseRequest.none
+      # If certain PR's are selected in export, override purchase_requests with the filtered requests
+      self.purchase_requests = user.company.purchase_requests.where(id: self.filter_ids) unless self.filter_ids.blank?
       self.count = purchase_requests&.count
     end
 
