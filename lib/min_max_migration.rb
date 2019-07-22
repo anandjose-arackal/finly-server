@@ -170,5 +170,3 @@ class MinMaxMigration
   end
 end
 
-
-MinMaxMigration.new.process
