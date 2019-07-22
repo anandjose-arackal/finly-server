@@ -160,4 +160,9 @@ class ProcurementMailer < ApplicationMailer
       mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_import_invoices'
     end
   end
+
+  def notify_vendor(presenter)
+    @data = presenter
+    mail to: @data.to, subject: @data.subject, template_name: 'template_invoice'
+  end
 end
