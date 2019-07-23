@@ -273,6 +273,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     invoice_items_attributes = []
     self.purchase_order.items.each do |item|
       real_q = 0
+      real_amount = 0
       if self.previous_invoices.present?
         item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         # This query does not hit the DB.
@@ -300,6 +301,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
+            real_amount = item.previously_billed_amount - bill_cal
+            next if real_amount <=0
           end
         end
       else
@@ -330,7 +333,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           sgst: item.sgst,
           igst: item.igst,
           billable_amount_attributes: {
-              value: item.previously_billed_amount,
+              value: real_amount,
               currency_id: 1
           }
       }
@@ -344,6 +347,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     invoice_items_attributes = []
     self.purchase_order.items.each do |item|
       real_q = 0
+      real_amount = 0
       if self.previous_invoices.present?
         item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         # This query does not hit the DB.
@@ -371,6 +375,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
+            real_amount = item.previously_billed_amount - bill_cal
+            next if real_amount <=0
           end
         end
       else
@@ -401,7 +407,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           sgst: item.sgst,
           igst: item.igst,
           billable_amount_attributes: {
-              value: item.previously_billed_amount,
+              value: real_amount,
               currency_id: 1
           }
       }

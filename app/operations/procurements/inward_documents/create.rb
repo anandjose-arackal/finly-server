@@ -30,7 +30,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     end
 
     self.result.messages.keys.each do |key|
-      add_message key, op.messages[key]      
+      add_message key, self.result.messages[key]
     end
 
     if self.result.success?
