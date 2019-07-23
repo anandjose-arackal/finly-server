@@ -18,6 +18,8 @@ json.levels do
           json.email lrm.reviewer&.email
           json.threshold lrm.threshold
           json.exception lrm.exception
+          json.min lrm.min
+          json.max lrm.max
           json.wo_exception lrm.wo_exception
         end
       end
@@ -36,6 +38,8 @@ json.levels do
             json.email lurm.reviewer&.email
             json.threshold lurm.threshold
             json.exception lurm.exception
+            json.min lurm.min
+            json.max lurm.max
             json.wo_exception lurm.wo_exception
           end
         end

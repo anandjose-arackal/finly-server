@@ -2,7 +2,7 @@
 # will have to pass {retry: true} for it to execute correctly
 
 class AccountManager::Payments::CancelPaymentOrder < AccountManager::Base
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :selected_payments, :remaining_payments
 
   def pre_validate
     super
@@ -31,15 +31,35 @@ class AccountManager::Payments::CancelPaymentOrder < AccountManager::Base
     end
   end
 
+  def pre_process
+    self.remaining_payments = false
+    if params[:payment_ids].present?
+      self.selected_payments = self.payment_order.payments.where id: params[:payment_ids]
+      self.remaining_payments = (self.payment_order.payments - self.selected_payments).present? #see if anything is remaining, if so, dont change payment_order status
+    else
+      self.selected_payments = self.payment_order.payments
+    end
+  end
+
   def process
-    if self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:cancelled))
-      self.payment_order.payments.each do |payment|
-        unless payment.in_progress?
-          payment.update(payment_status_id: PaymentStatus.id_for(:cancelled))
-        end
-      end
+    if self.remaining_payments
+      update_payments
+    elsif self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:cancelled))
+      update_payments
     else
       add_message :error, self.payment_order.errors.full_messages
+    end
+  end
+
+  private
+
+  def update_payments
+    # new feature - in a batch, user can choose which items to cancel individually
+    # this will make sure only those payments associated with the mr/report get cancelled if selected or all of them
+    self.selected_payments.each do |payment|
+      unless payment.in_progress?
+        payment.update(payment_status_id: PaymentStatus.id_for(:cancelled))
+      end
     end
   end
 

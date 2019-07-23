@@ -57,8 +57,8 @@ class WorkflowManager::Aasm::BaseProvider
   def document_amount
     amount = 0
     case document.class.name
-      when 'Report'
-        amount = document.total_amount
+    when 'Report'
+      amount = document.total_amount
     end
     amount
   end

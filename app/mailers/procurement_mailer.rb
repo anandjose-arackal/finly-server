@@ -167,4 +167,9 @@ class ProcurementMailer < ApplicationMailer
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
     end
   end
+
+  def notify_vendor(presenter)
+    @data = presenter
+    mail to: @data.to, subject: @data.subject, template_name: 'template_invoice'
+  end
 end

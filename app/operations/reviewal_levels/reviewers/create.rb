@@ -46,10 +46,4 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     add_message :success, 'Successfully Added Reviewer'
   end
 
-  private
-
-  def reviewer_parameters
-    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception, :wo_exception)
-  end
-
 end

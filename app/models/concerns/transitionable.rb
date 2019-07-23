@@ -157,6 +157,8 @@ module Transitionable
             mobile_number: dlrm.reviewer&.mobile_number,
             active: dlrm.active,
             threshold: dlrm.threshold,
+            min: dlrm.min,
+            max: dlrm.max,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
