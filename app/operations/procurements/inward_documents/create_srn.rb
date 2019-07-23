@@ -150,14 +150,15 @@ class Procurements::InwardDocuments::CreateSrn < Procurements::InwardDocuments::
     
     if self.grn_enabled && self.srn_disabled
       po.items.each do |item|
-        unless item.quantity == item.delivered
+        unless item.quantity == item.accepted
           shipped = false
           break
         end
       end
     elsif self.grn_disabled && self.srn_enabled
       po.items.each do |item|
-        unless item.quantity == item.delivered
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
           shipped = false
           break
         end
@@ -166,7 +167,7 @@ class Procurements::InwardDocuments::CreateSrn < Procurements::InwardDocuments::
       po.items.each do |item|
         case item.inventory_line_item.product_type_id
         when ProductType.id_for(:goods)
-          unless item.quantity == item.delivered
+          unless item.quantity == item.accepted
             shipped = false
             break
           end

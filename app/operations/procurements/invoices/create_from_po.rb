@@ -124,7 +124,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       invoice_items_attributes =  create_without_grn_and_srn
     end
 
-    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a GRN first." end
+    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a Receipt Note first." end
     
 
     if self.advance.present?
