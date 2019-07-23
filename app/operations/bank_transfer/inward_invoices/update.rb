@@ -118,7 +118,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
         item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
 
-        unless user.company.feature_subscription.receipt_note_mandatory
+        unless user.company.feature_subscription.grn_enabled
           item_q = po_item.quantity
         end
 

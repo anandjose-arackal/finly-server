@@ -68,7 +68,7 @@ class Procurements::Show < Procurements::Base
           actions[:add_document] = true
         end
       end
-      actions[:receipt_note] = user.company.feature_subscription.receipt_note_mandatory
+      actions[:receipt_note] = user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
       actions
     end
 
@@ -111,7 +111,7 @@ class Procurements::Show < Procurements::Base
         documents << self.purchase_order
       end
 
-      documents += self.inward_documents # if user.company.feature_subscription.receipt_note_mandatory
+      documents += self.inward_documents
       documents += self.invoices
       documents += self.purchase_order&.advance_payments if self.purchase_order.present?
 

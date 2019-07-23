@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments, :po_revision, :inv_items
+                :id_current_attachments, :po_revision, :inv_items, :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -11,7 +11,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.purchase_order = self.procurement&.purchase_order
 
     if self.procurement.po_revisions.present?
-      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
       self.po_revision = self.procurement.po_revisions.last
       if po_revision.present?
         self.purchase_order = self.po_revision
@@ -47,11 +46,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       add_message :error, "Delivery Date cannot be for a future date."
       return
     end
-
-    # unless self.inward_document.id == self.procurement.inward_documents.last.id
-    #   add_message :error, 'You cannot modify the selected GRN'
-    #   return
-    # end
 
     unless self.inward_document.id == self.procurement.inward_documents.last.id
       add_message :error, "Cannot update old Receipt Notes"
@@ -148,14 +142,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def post_process
     # Update Status Tags for Procurement
     #   Find if all items are shipped
-    if self.purchase_order.all_items_shipped?
+    if all_items_shipped?(self.purchase_order)
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
       # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
       params[:purchase_order_id] = self.purchase_order.id
-      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?(inward_document)
+      Procurements::PurchaseOrders::Close.(current_user, params) if all_items_accepted?(self.purchase_order)
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
@@ -284,6 +278,102 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+  end
+
+
+
+
+
+
+
+  def all_items_shipped?(po)
+    configuration = user.company.feature_subscription
+
+    self.grn_enabled = configuration.grn_enabled == true
+    self.grn_disabled = configuration.grn_enabled == false
+
+    self.srn_enabled = configuration.srn_enabled == true
+    self.srn_disabled = configuration.srn_enabled == false
+
+    shipped = true
+    
+    if self.grn_enabled && self.srn_disabled
+      po.items.each do |item|
+        unless item.quantity == item.delivered
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_disabled && self.srn_enabled
+      po.items.each do |item|
+        unless item.quantity == item.delivered
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_enabled && self.srn_enabled
+      po.items.each do |item|
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:goods)
+          unless item.quantity == item.delivered
+            shipped = false
+            break
+          end
+        when ProductType.id_for(:service)
+          unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+            shipped = false
+            break
+          end
+        end
+      end
+    end
+    shipped
+  end
+
+  def all_items_accepted?(po)
+    configuration = user.company.feature_subscription
+
+    self.grn_enabled = configuration.grn_enabled == true
+    self.grn_disabled = configuration.grn_enabled == false
+
+    self.srn_enabled = configuration.srn_enabled == true
+    self.srn_disabled = configuration.srn_enabled == false
+
+    shipped = true
+    
+    if self.grn_enabled && self.srn_disabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        unless item.quantity == (item.accepted + 0)
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_disabled && self.srn_enabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_enabled && self.srn_enabled
+      po.items.each do |item|
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:service)
+          unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+            shipped = false
+            break
+          end
+        when ProductType.id_for(:goods)
+          unless item.quantity == (item.accepted + 0)
+            shipped = false
+            break
+          end
+        end
+      end
+    end
+    shipped
   end
 
 end
