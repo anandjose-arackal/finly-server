@@ -95,7 +95,8 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
   def set_column_values
     column_values = []
     self.purchase_orders.each.with_index(1) do |purchase_order, index|
-      column_values << [index, purchase_order.po_number, purchase_order.user&.name, purchase_order&.sub_department&.name, precision_value(purchase_order.balance_amount&.value || 0)]
+      balance_amount = precision_value(purchase_order.balance_amount&.value || 0)
+      column_values << [index, purchase_order.po_number, purchase_order.user&.name, purchase_order&.sub_department&.name, "Rs " + balance_amount.to_s]
     end
     if column_values.present?
       params[:awaiting_approval_column_values] = column_values
