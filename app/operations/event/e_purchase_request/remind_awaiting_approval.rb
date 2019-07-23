@@ -16,7 +16,7 @@ class Event::EPurchaseRequest::RemindAwaitingApproval < Event::EPurchaseRequest:
 
   def init
     self.purchase_requests = params[:purchase_requests]
-    self.awaiting_approval_columns = ["#", "PR #", "Created By", "Sub Department", "Amount"]
+    self.awaiting_approval_columns = ["#", "PR #", "Created By", "Location", "Amount"]
   end
 
   def send_mailer(user)
@@ -94,9 +94,9 @@ class Event::EPurchaseRequest::RemindAwaitingApproval < Event::EPurchaseRequest:
   private
   def set_column_values
     column_values = []
-    self.purchase_requests.each.with_index(1) do |purchase_order, index|
-      balance_amount = precision_value(purchase_order.balance_amount&.value || 0)
-      column_values << [index, purchase_order.po_number, purchase_order.user&.name, purchase_order&.sub_department&.name, "Rs " + balance_amount.to_s]
+    self.purchase_requests.each.with_index(1) do |purchase_request, index|
+      total_amount = precision_value(purchase_request.total_amount&.value || 0)
+      column_values << [index, purchase_request.order_number, purchase_request.creator&.name, purchase_request&.location&.name, "Rs " + total_amount.to_s]
     end
     if column_values.present?
       params[:awaiting_approval_column_values] = column_values
