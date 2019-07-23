@@ -37,3 +37,5 @@ Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}
 Crono.perform(IciciStatementsFetch).every 30.minutes
 Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
 # Crono.perform(FixSpuriousPayments).every 30.minutes
+Crono.perform(ReminderAwaitingApprovalPurchaseOrders).every 1.day, at: {hour: 10, min: 00}
+Crono.perform(ReminderAwaitingApprovalNonPoInvoices).every 1.day, at: {hour: 10, min: 00}

@@ -17,8 +17,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         self.purchase_order = self.po_revision
       end
     end
-
-    
   end
 
   def validate

@@ -119,6 +119,7 @@ class Item < ApplicationRecord
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
       rate_contract_vendors: rate_contract_vendors,
+      preferred_vendors: rate_contract_vendors,
       user: user,
       active: active,
       item_expense_type_id: item_expense_type_id,
