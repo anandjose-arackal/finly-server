@@ -35,6 +35,8 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
   end 
 
   def process
+    # Email is in form of table. Set column values against column names
+    set_column_values
     send_mailer(user)
   end
 
@@ -61,7 +63,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
 
   class Event::EPurchaseOrder::RemindAwaitingApproval::MailerPresenter < Event::SetNotifier::MailerPresenter
 
-    attr_accessor :user, :body_val, :subject_val, :company, :purchase_orders, :action_name, :action_url, :awaiting_approvals, :awaiting_approval_columns
+    attr_accessor :user, :body_val, :subject_val, :company, :purchase_orders, :action_name, :action_url, :awaiting_approvals, :awaiting_approval_columns, :awaiting_approval_column_values
 
     def initialize(user, params)
       self.user = user
@@ -73,6 +75,7 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
       self.action_url = params[:action_url]
       self.awaiting_approvals = params[:purchase_orders]
       self.awaiting_approval_columns = params[:awaiting_approval_columns]
+      self.awaiting_approval_column_values = params[:awaiting_approval_column_values]
     end
 
     def to
@@ -88,4 +91,14 @@ class Event::EPurchaseOrder::RemindAwaitingApproval < Event::EPurchaseOrder::Bas
     end
   end
 
+  private
+  def set_column_values
+    column_values = []
+    self.purchase_orders.each.with_index(1) do |purchase_order, index|
+      column_values << [index, purchase_order.po_number, purchase_order.user&.name, purchase_order&.sub_department&.name, precision_value(purchase_order.balance_amount&.value || 0)]
+    end
+    if column_values.present?
+      params[:awaiting_approval_column_values] = column_values
+    end
+  end
 end

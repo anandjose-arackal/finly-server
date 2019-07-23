@@ -19,13 +19,11 @@
         </tr>
         </thead>
         <tbody>
-        <% @data.awaiting_approvals.each_with_index do |document, index| %>
+        <% @data.awaiting_approval_column_values.each do |column_values| %>
           <tr>
-            <td><%= index + 1 %></td>
-            <td><%= document.po_number %></td>
-            <td><%= document.user&.name %></td>
-            <td><%= document.sub_department&.name %></td>
-            <td>&#8377;<%= document.amount&.to_d.round(2) rescue 0 %></td>
+            <% column_values.each do |value| %>
+                <td><%= value %></td>
+            <% end %>
           </tr>
         <% end %>
         </tbody>
