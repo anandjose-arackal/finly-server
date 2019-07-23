@@ -56,7 +56,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       end
     end
     
-    unless user.company.feature_subscription.receipt_note_mandatory
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
       document_types[:grn] = false
     end
 
