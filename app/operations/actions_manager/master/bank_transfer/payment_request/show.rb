@@ -968,4 +968,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     bank_payment_request.get_reviewers.include?(user) && user.vendor_payment_admin?
   end
 
+  def user_in_level?
+    bank_payment_request.get_reviewers.include?(user)
+  end
+
 end
