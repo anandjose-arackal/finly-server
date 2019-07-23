@@ -35,8 +35,23 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
     if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
       unless all_accepted?
-        e = inward_document.items.map {|i| i.delivered == 0}
+        if user.company.feature_subscription.grn_enabled
+          e = inward_document.items.map {|i| i.delivered == 0}
+        elsif user.company.feature_subscription.srn_enabled
+          e = inward_document.items.map {|i| i.billable_amount.to_i == 0}
+        elsif user.company.feature_subscription.grn_enabled && user.company.feature_subscription.srn_enabled
+          e = inward_document.items.map {|i| i.delivered == 0}
+          e += inward_document.items.map {|i| i.billable_amount.to_i == 0}
+        end
         unless e.include? true
+          if user.company.feature_subscription.grn_enabled
+            e = inward_document.items.map {|i| i.quantity >= i.accepted}
+          elsif user.company.feature_subscription.srn_enabled
+            e = inward_document.items.map {|i| i.order_amount >= i.previously_billed_amount}
+          elsif user.company.feature_subscription.grn_enabled && user.company.feature_subscription.srn_enabled
+            e = inward_document.items.map {|i| i.quantity >= i.accepted}
+            e += inward_document.items.map {|i| i.order_amount >= i.previously_billed_amount}
+          end
           e = inward_document.items.map {|i| i.quantity >= i.accepted}
           e.include? true
         end
@@ -162,7 +177,14 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def all_accepted?
-    e = inward_document.items.map {|i| i.accepted == i.quantity}
+    if user.company.feature_subscription.grn_enabled
+      e = inward_document.items.map {|i| i.accepted == i.quantity}
+    elsif user.company.feature_subscription.srn_enabled
+      e = inward_document.items.map {|i| i.order_amount.to_f == i.previously_billed_amount}
+    elsif user.company.feature_subscription.grn_enabled && user.company.feature_subscription.srn_enabled
+      e = inward_document.items.map {|i| i.accepted == i.quantity}
+      e += inward_document.items.map {|i| i.order_amount.to_f == i.previously_billed_amount}
+    end
     (e.uniq.size == 1) && e.include?(true)
   end
 
