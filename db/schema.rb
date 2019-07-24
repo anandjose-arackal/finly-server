@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_22_065920) do
+ActiveRecord::Schema.define(version: 2019_07_24_140522) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1003,8 +1003,8 @@ ActiveRecord::Schema.define(version: 2019_07_22_065920) do
     t.string "gstin"
     t.string "pan"
     t.integer "company_id"
-    t.string "address_1"
-    t.string "address_2"
+    t.text "address_1"
+    t.text "address_2"
     t.string "city"
     t.integer "state_id"
     t.string "country"
