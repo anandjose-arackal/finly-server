@@ -534,6 +534,18 @@ class PurchaseOrder < ApplicationRecord
     shipped
   end
 
+  def all_items_billed?
+    billed = true
+    self.items.each do |item|
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+      unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+        billed = false
+        return
+      end
+    end
+    billed
+  end
+
   def procurement_index_details
     {
         id: id,
