@@ -312,6 +312,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           next unless item.previously_billed_amount > 0
           real_q = item.quantity
+          real_amount = item.previously_billed_amount
         end
       end
       invoice_items_attributes << {
@@ -386,6 +387,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           next unless item.previously_billed_amount > 0
           real_q = item.quantity
+          real_amount = item.previously_billed_amount
         end
       end
       invoice_items_attributes << {
