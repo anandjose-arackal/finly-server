@@ -512,7 +512,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_shipped?
     shipped = true
     self.items.each do |item|
-      unless item.quantity == item.delivered
+      unless item.quantity == item.accepted
         shipped = false
         break
       end
