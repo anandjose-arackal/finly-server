@@ -77,8 +77,8 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
         next if item_q.blank? 
+        next if item.product_type_id == ProductType.id_for(:service) # for now skipping this check for service items
         next if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ))
-        next if item.product_type_id == ProductType.id_for(:service)
         # if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
         if item.previously_delivered < item_q.first.quantity
           add_message :error, 'Items in Receipt Note cannot be reduced as they have already been invoiced'
