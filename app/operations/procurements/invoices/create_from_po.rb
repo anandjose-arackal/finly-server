@@ -212,12 +212,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.purchase_order.items.each do |item|
       real_q = 0
       if self.previous_invoices.present?
-        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:purchase_order_item_id).include? item.id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
@@ -260,7 +260,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
-          igst: item.igst
+          igst: item.igst,
+          purchase_order_item_id: item.id
       }
     end
     invoice_items_attributes
@@ -275,12 +276,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
-        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:purchase_order_item_id).include? item.id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
@@ -297,7 +298,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # here we sum billable amount for all service items in previous invoices
             # if they are not the same, we create the invoice, else
             # we skip it.
-            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
@@ -333,6 +334,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
+          purchase_order_item_id: item.id,
           billable_amount_attributes: {
               value: real_amount,
               currency_id: 1
@@ -350,12 +352,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
-        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:purchase_order_item_id).include? item.id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
@@ -372,7 +374,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # here we sum billable amount for all service items in previous invoices
             # if they are not the same, we create the invoice, else
             # we skip it.
-            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+            bill_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.billable_amount&.value if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
@@ -408,6 +410,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
+          purchase_order_item_id: item.id,
           billable_amount_attributes: {
               value: real_amount,
               currency_id: 1
@@ -425,12 +428,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.purchase_order.items.each do |item|
       real_q = 0
       if self.previous_invoices.present?
-        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:purchase_order_item_id).include? item.id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.purchase_order_item_id == item.id } }.flatten.compact.sum
         # if the item was in previous invoice
         # but the quantity was zero, that is, it was not billed
         # and most importantly,
@@ -473,7 +476,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           category_id: item.category_id,
           cgst: item.cgst,
           sgst: item.sgst,
-          igst: item.igst
+          igst: item.igst,
+          purchase_order_item_id: item.id
       }
     end
     invoice_items_attributes

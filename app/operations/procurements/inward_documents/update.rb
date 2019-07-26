@@ -72,7 +72,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       inv_items = self.procurement.invoices.includes(:items)
       self.inward_document.items.each do |item|
 
-        item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        item_q = inv_items.map { |iv| iv.items.where(purchase_order_item_id: item.purchase_order_item_id) }.flatten
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
         next if item_q.blank? 
         next if item.product_type_id == ProductType.id_for(:service) # for now skipping this check for service items
