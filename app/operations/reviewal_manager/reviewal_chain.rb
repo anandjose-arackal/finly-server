@@ -1,3 +1,10 @@
+# params {
+#   reviewal_document: document, # Optional if provider_name is provided
+#   provider_name: provider_name, # Optional if reviewal_document if provided
+#   policy_id: policy_id, # Mandatory
+#   violation_present: true/false # returns result based on violations
+# }
+# Return possible levels w/ reviewers and their thresholds for the passed values
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
   attr_accessor :document, :provider_names,
                 :chain, :policy,
@@ -11,9 +18,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.violations_present = !!params[:violations_present]
     self.chain = []
     self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider)
-
     policy_id = params[:policy_id]
-
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
     self.policy = user.company.policies.with_id(policy_id).first rescue nil
   end
@@ -26,6 +31,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   end
 
   def process
+    # If policy not present, return, as some documents policy is not present during creation
     unless self.policy.present?
       return
     end
@@ -82,8 +88,6 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       self.chain = params[:chain]
     end
   end
-
-
 
   private
 

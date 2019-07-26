@@ -12,6 +12,8 @@
 #  threshold    :decimal(20, 5)   default(0.0)
 #  exception    :boolean          default(TRUE)
 #  wo_exception :boolean          default(TRUE)
+#  min          :decimal(20, 5)   default(0.0)
+#  max          :decimal(20, 5)
 #
 
 class LevelUserReviewerMapping < ActiveRecord::Base
@@ -36,9 +38,22 @@ class LevelUserReviewerMapping < ActiveRecord::Base
 
   # Finds all the MAX amounts which are less than the amount passed
   # Find thes the mappings with max threshold which are lteq amount
-  scope :with_threshold, -> (amount) {
-    where('threshold = ?', where('threshold <= ?', amount).maximum("threshold"))
+  # scope :with_threshold, -> (amount) {
+  #   where('threshold = ?', where('threshold <= ?', amount).maximum("threshold"))
+  # }
+
+  scope :with_threshold, -> (amount){
+    satisfies_min(amount).satisfies_max(amount)
   }
+
+  scope :satisfies_min, -> (amount) {
+    where("min < ?", amount)
+  }
+
+  scope :satisfies_max, -> (amount){
+    where("max IS NULL OR max >= ?", amount)
+  }
+
   scope :with_level_id, -> (ids) {
     where level_id: ids
   }

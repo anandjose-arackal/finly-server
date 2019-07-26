@@ -30,6 +30,8 @@ json.result do
               json.email lurm.reviewer&.email
               json.threshold lurm.threshold
               json.exception lurm.exception
+              json.min lurm.min
+              json.max lurm.max
               json.wo_exception lurm.wo_exception
             end
           else
@@ -37,6 +39,8 @@ json.result do
               json.name lrm.reviewer&.name
               json.email lrm.reviewer&.email
               json.threshold lrm.threshold
+              json.min lrm.min
+              json.max lrm.max
               json.exception lrm.exception
               json.wo_exception lrm.wo_exception
             end
