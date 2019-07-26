@@ -280,6 +280,12 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+    if user_id.present?
+      self.awaiting_action_items(user_id)
+    end
+  }
+
   scope :filter_ids, ->(ids) {
     where id: ids
   }
