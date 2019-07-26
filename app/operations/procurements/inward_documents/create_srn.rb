@@ -150,6 +150,7 @@ class Procurements::InwardDocuments::CreateSrn < Procurements::InwardDocuments::
     
     if self.grn_enabled && self.srn_disabled
       po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
         unless item.quantity == item.accepted
           shipped = false
           break
