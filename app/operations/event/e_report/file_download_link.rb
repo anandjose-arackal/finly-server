@@ -26,6 +26,7 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   end
 
   def set_presenter_params(user)
+    params[:download_url] = self.download_url
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
     params[:action_name] = self.action_name
@@ -43,16 +44,16 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    "Download exported data"
+    "Download report data"
   end
 
   def mailer_body(user)
-    "Download exported data by visiting this link : #{self.download_url}"
+    "Download report data requested on #{Time.now.strftime("%-d/%-m/%y: %H:%M %Z")}"
   end
 
   class Event::EReport::FileDownloadLink::MailerPresenter < Event::SetNotifier::MailerPresenter
 
-    attr_accessor :body_val, :subject_val, :event_id, :action_name, :company
+    attr_accessor :body_val, :subject_val, :event_id, :action_name, :company, :download_url
 
     def initialize(user, params)
       self.body_val = params[:body]
@@ -60,6 +61,7 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
       self.action_name = params[:action_name]
       self.user = user
       self.company = user.company
+      self.download_url = params[:download_url]
     end
 
     def subject
