@@ -63,7 +63,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
     self.file_name = 'export.xls'
     self.download_url = create_temporary_link(exportable_file)
     #send_email
-    # Event::EReport::FileDownloadLink.(user, download_url: download_url)
+    Event::EReport::FileDownloadLink.(user, download_url: download_url)
   end
 
   def success

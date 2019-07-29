@@ -22,7 +22,7 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   def send_mailer(user)
   set_presenter_params(user)
   return unless params[:subject].present? and params[:body].present? and user.email.present?
-  ReportMailer.delay.send_export_mail(Event::EReport::FileDownloadLink::MailerPresenter.new(user, params))
+  ReportMailer.send_export_mail(Event::EReport::FileDownloadLink::MailerPresenter.new(user, params)).deliver_now
   end
 
   def set_presenter_params(user)
