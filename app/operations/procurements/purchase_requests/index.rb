@@ -2,6 +2,9 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
   attr_accessor :purchase_requests, :policies, :filter_ids
   def init
     self.filter_ids = params[:filter_ids]
+    if self.filter_ids.present?
+      self.filter_ids = filter_ids[0].split(",").reject { |id| id.empty? } rescue []
+    end
   end
 
   def validate
@@ -48,7 +51,9 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
       self.purchase_requests = apply_scopes(purchase_requests, params) rescue ::PurchaseRequest.none
       self.paginated_purchase_requests = purchase_requests.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PurchaseRequest.none
       # If certain PR's are selected in export, override purchase_requests with the filtered requests
-      self.purchase_requests = user.company.purchase_requests.where(id: self.filter_ids) unless self.filter_ids.blank?
+      if self.filter_ids.present?
+        self.purchase_requests = user.company.purchase_requests.where(id: self.filter_ids)
+      end 
       self.count = purchase_requests&.count
     end
 

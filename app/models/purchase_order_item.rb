@@ -36,6 +36,7 @@
 #  cgst                     :decimal(20, 10)
 #  sgst                     :decimal(20, )
 #  igst                     :decimal(20, )
+#  taxable_amount_id        :integer
 #
 
 class PurchaseOrderItem < ApplicationRecord

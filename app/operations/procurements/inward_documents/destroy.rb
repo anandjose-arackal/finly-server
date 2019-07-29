@@ -88,12 +88,23 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   def update_purchase_order_item(item)
     purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
 
-    po_item_params = {
-        accepted: purchase_order_item.accepted - item.accepted,
-        rejected: purchase_order_item.rejected - item.rejected,
-        delivered: purchase_order_item.delivered - item.delivered,
-        previously_billed_amount: purchase_order_item.previously_billed_amount - item.billable_amount
-    }
+    # po_item_params = {
+    #     accepted: purchase_order_item.accepted - item.accepted,
+    #     rejected: purchase_order_item.rejected - item.rejected,
+    #     delivered: purchase_order_item.delivered - item.delivered
+    # }
+
+    po_item_params = {}
+
+    if user.company.feature_subscription.grn_enabled
+      po_item_params[:accepted] = purchase_order_item.accepted - item.accepted
+      po_item_params[:rejected] = purchase_order_item.rejected - item.rejected,
+      po_item_params[:delivered] = purchase_order_item.delivered - item.delivered
+    end
+
+    if user.company.feature_subscription.srn_enabled
+      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount
+    end
 
     purchase_order_item.assign_attributes(po_item_params)
     purchase_order_item.save

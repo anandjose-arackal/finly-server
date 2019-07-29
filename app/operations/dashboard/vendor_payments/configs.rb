@@ -73,7 +73,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       end
     end
     
-    unless user.company.feature_subscription.receipt_note_mandatory
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
       request_types[:grns] = false
     end
 

@@ -19,7 +19,7 @@ class InvoiceLineItemsCalculationUtils
     self.invoice_is_a_tax_invoice = (invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice))
     self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = self.tds_applicable_amount = self.taxable_amount_for_service = 0
     invoice.invoice_items.each_with_index do |item, index|
-      self.service_item = ( (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) && self.invoice_is_a_tax_invoice && self.invoice.company.feature_subscription.receipt_note_mandatory) rescue false
+      self.service_item = ( (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) && self.invoice_is_a_tax_invoice && invoice.company.feature_subscription.srn_enabled) rescue false
       self.item_taxable_amount = 0
       self.gross_amount = 0
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively

@@ -250,7 +250,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
             value: self.requested_amount,
             currency_id: 1
         },
-        payment_mode: "NEFT",
+        payment_mode: self.payment_mode,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
