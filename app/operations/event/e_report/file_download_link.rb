@@ -2,7 +2,7 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   attr_accessor :download_url
 
   def action_name
-    "Download File"
+    "Download Report Excel"
   end
 
   def pre_validate
@@ -27,9 +27,9 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
 
   def set_presenter_params(user)
     params[:download_url] = self.download_url
-    params[:subject] = self.mailer_subject(user)
-    params[:body] = self.mailer_body(user)
-    params[:action_name] = self.action_name
+    params[:subject] = mailer_subject(user)
+    params[:body] = mailer_body(user)
+    params[:action_name] = action_name
   end
 
   def event_id
@@ -38,6 +38,15 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
 
   def affected_users
     [user]
+  end
+
+  def process
+    users = mailer_affected_users
+    if users.present?
+      users.each do |user|
+        send_mailer(user)
+      end
+    end
   end
 
   def set_notification(user)

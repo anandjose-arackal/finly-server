@@ -6,8 +6,8 @@ class ExportController < BaseControllers::WebBase
   def report
     case params[:download_type] # Format should be json
     when :xls, 'xls' # Used for 'export all' operations
-      @result = Export::Reports::AsXmlBackground.call_async(current_user, params)
       respond response: :success, message: 'You will receive email shortly'
+      @result = Export::Reports::AsXmlBackground.call_async(current_user, params)
       return
     end
     respond_to do |format|
