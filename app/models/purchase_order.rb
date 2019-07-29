@@ -512,17 +512,9 @@ class PurchaseOrder < ApplicationRecord
   def all_items_shipped?
     shipped = true
     self.items.each do |item|
-      case item.inventory_line_item.product_type_id
-      when ProductType.id_for(:goods)
-        unless item.quantity == item.delivered
-          shipped = false
-          break
-        end
-      when ProductType.id_for(:service)
-        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
-          shipped = false
-          break
-        end
+      unless item.quantity == item.accepted
+        shipped = false
+        break
       end
     end
     shipped
@@ -531,23 +523,27 @@ class PurchaseOrder < ApplicationRecord
   def all_items_accepted?(inward_document = nil)
     shipped = true
     self.items.each do |item|
-      # next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-      case item.inventory_line_item.product_type_id
-      when ProductType.id_for(:service)
-        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
-          shipped = false
-          break
-        end
-      when ProductType.id_for(:goods)
-        # Commenting this fetch for value for now.
-        # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
-        unless item.quantity == (item.accepted + 0)
-          shipped = false
-          break
-        end
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      # Commenting this fetch for value for now.
+      # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
+      unless item.quantity == (item.accepted + 0)
+        shipped = false
+        break
       end
     end
     shipped
+  end
+
+  def all_items_billed?
+    billed = true
+    self.items.each do |item|
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+      unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+        billed = false
+        return
+      end
+    end
+    billed
   end
 
   def procurement_index_details

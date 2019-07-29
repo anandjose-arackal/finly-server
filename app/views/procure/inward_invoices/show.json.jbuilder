@@ -134,7 +134,8 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst
+                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst,
+                    :purchase_order_item_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
@@ -268,24 +269,29 @@ json.reviewal_chains do
         # json.selected_reviewer item[:selected_reviewer]&.as_json
         # json.selected_reviewer_threshold item[:selected_reviewer_threshold]
         json.reviewers do
-          if current_company.present? && (current_company.id == 2 || current_company.id == 156)
-            json.array! item[:reviewer_data] do |data|
-              json.id data[:id]
-              json.exception data[:exception]
-              json.threshold data[:threshold]
-              json.reviewer_details do
-                min = MathUtil.number_with_rupee_delimiter(data[:min])
-                max = (data[:max].to_i == 99999999999999 ? '∞' : MathUtil.number_with_rupee_delimiter(data[:max]))
-                json.name "#{data[:reviewer_name]}(#{min} - #{max})"
-                json.id data[:reviewer_id]
-              end
-            end
-          else
+          # if current_company.present? && (current_company.id == 2 || current_company.id == 156)
+          #   json.array! item[:reviewer_data] do |data|
+          #     json.id data[:id]
+          #     json.exception data[:exception]
+          #     json.threshold data[:threshold]
+          #     json.reviewer_details do
+          #       min = MathUtil.number_with_rupee_delimiter(data[:min])
+          #       max = (data[:max].to_i == 99999999999999 ? '∞' : MathUtil.number_with_rupee_delimiter(data[:max]))
+          #       json.name "#{data[:reviewer_name]}(#{min} - #{max})"
+          #       json.id data[:reviewer_id]
+          #     end
+          #   end
+          # else
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min
+              if reviewer.max.present?
+                json.max reviewer.max
+              else
+                json.max '∞'
+              end
               json.reviewer_details reviewer.reviewer.as_json
             end
-          end
+          # end
         end
       end
     end

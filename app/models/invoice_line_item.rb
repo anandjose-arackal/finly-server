@@ -50,6 +50,7 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

@@ -12,6 +12,8 @@
 #  threshold    :decimal(20, 5)   default(0.0)
 #  exception    :boolean          default(TRUE)
 #  wo_exception :boolean          default(TRUE)
+#  min          :decimal(20, 5)   default(0.0)
+#  max          :decimal(20, 5)
 #
 
 FactoryBot.define do
