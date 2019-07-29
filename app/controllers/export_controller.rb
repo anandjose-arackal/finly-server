@@ -4,12 +4,18 @@ class ExportController < BaseControllers::WebBase
   set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor
 
   def report
+    case params[:download_type] # Format should be json
+    when :xls, 'xls' # Used for 'export all' operations
+      @result = Export::Reports::AsXmlBackground.(current_user, params)
+      respond response: :success, message: 'You will receive email shortly'
+      return
+    end
     respond_to do |format|
       format.csv {
         @report = Export::Reports::AsCsv.(current_user, params)
         send_data @report.data, filename: "#{@report.report_names}.csv"
       }
-      format.xls {
+      format.xls { # User for report/show export
         @report = Export::Reports::AsXml.(current_user, params)
         @header = @report.header
         @data = @report.data
