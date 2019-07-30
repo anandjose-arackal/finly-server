@@ -57,7 +57,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
-	    self.policy = current_company.policies.find_by(id: policy_id)
+	    self.policy = user.company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -120,7 +120,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Create Document Level Reviewer Mapping
 	    # For setting level specific reviewers from reviewal chain for a document
 	    params[:reviewal_document] = self.bank_payment_request.reload
-
 	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
 	    unless document_reviewer_mappings_op.success?
 	      self.bank_payment_request.destroy

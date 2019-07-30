@@ -15,6 +15,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def validate
     unless document.present?
       add_message :error, 'Document not found'
+      return
     end
 
     all_level_ids = ReviewalLevel.with_policy_ids(document.policy_id).pluck(:id)
@@ -87,7 +88,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         amount = get_document_amount
 
         valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id) + level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
-
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
 
