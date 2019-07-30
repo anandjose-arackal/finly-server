@@ -157,6 +157,8 @@ module Transitionable
             mobile_number: dlrm.reviewer&.mobile_number,
             active: dlrm.active,
             threshold: dlrm.threshold,
+            min: dlrm.min,
+            max: dlrm.max,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
@@ -286,7 +288,8 @@ module Transitionable
       return nil if all_level_numbers.blank?
 
       if self.level.present?
-        current_level_number = self.level.level_number
+        # current_level_number = self.level.level_number
+        current_level_number = self.document_level_reviewer_mappings.where(level_id: self.level.id).first&.level_number
         if type == 'next' || type == :next
           level_number = current_level_number + 1
         elsif ['previous', :previous, 'prev', :prev].include?(type)

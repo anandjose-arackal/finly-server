@@ -49,5 +49,4 @@ class Event::EPurchaseOrder::Retract < Event::EPurchaseOrder::Base
       "#{purchase_order.user.name} has retracted the purchase order '#{self.purchase_order.po_number}'."
     end
   end
-
 end
