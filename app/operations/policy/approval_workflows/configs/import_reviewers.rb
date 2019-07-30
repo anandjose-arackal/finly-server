@@ -36,7 +36,7 @@ class Policy::ApprovalWorkflows::Configs::ImportReviewers < Policy::ApprovalWork
         end
         row_length = row.size
         lower_index = 1
-        while(lower_index < row_length)
+        while(lower_index < row_length-1)
           level_name = row[lower_index+1].to_s
           level_number = row[lower_index+2].to_i
           reviewer_id = clean_up_data row[lower_index+3]
