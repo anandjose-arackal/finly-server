@@ -36,10 +36,10 @@ class Policy::ApprovalWorkflows::Configs::ImportReviewers < Policy::ApprovalWork
         end
         row_length = row.size
         lower_index = 1
-        while(lower_index < row_length)
+        while(lower_index < row_length-1)
           level_name = row[lower_index+1].to_s
           level_number = row[lower_index+2].to_i
-          reviewer_id = clean_up_data row[lower_index+3].to_s
+          reviewer_id = clean_up_data row[lower_index+3]
           min = row[lower_index+4].to_i
           max = (row[lower_index+5].present? ? row[lower_index+5].to_i : nil)
           if level_name.present? && level_number.present?
