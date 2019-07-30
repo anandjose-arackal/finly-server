@@ -194,7 +194,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       end
 
       if item.changes[:rejected].present?
-        rejected = (rejected - item.changes[:rejected][0]) + item.changes[:rejected][1]
+        rejected = (rejected.to_f - item.changes[:rejected][0].to_f) + item.changes[:rejected][1].to_f
       end
     end
 
