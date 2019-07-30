@@ -29,7 +29,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def init
-    self.company = self.payment.company
+    self.company = self.payment.payment_order.company
     # self.company = Company.second
     super # so that the variables are initialized from the config file
     self.icici_bank_transaction = self.payment.reference_resource

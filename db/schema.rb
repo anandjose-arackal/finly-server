@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_22_065920) do
+ActiveRecord::Schema.define(version: 2019_07_24_140522) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1003,8 +1003,8 @@ ActiveRecord::Schema.define(version: 2019_07_22_065920) do
     t.string "gstin"
     t.string "pan"
     t.integer "company_id"
-    t.string "address_1"
-    t.string "address_2"
+    t.text "address_1"
+    t.text "address_2"
     t.string "city"
     t.integer "state_id"
     t.string "country"
@@ -3212,6 +3212,7 @@ ActiveRecord::Schema.define(version: 2019_07_22_065920) do
     t.decimal "sgst", precision: 20
     t.decimal "cgst", precision: 20
     t.decimal "igst", precision: 20
+    t.integer "purchase_order_item_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -3222,6 +3223,7 @@ ActiveRecord::Schema.define(version: 2019_07_22_065920) do
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
     t.index ["net_amount_id"], name: "index_invoice_line_items_on_net_amount_id"
     t.index ["parent_id", "parent_type"], name: "index_invoice_line_items_on_parent_id_and_parent_type"
+    t.index ["purchase_order_item_id"], name: "index_invoice_line_items_on_purchase_order_item_id"
     t.index ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_invoice_line_items_on_tax_rate_id"
     t.index ["taxable_amount_id"], name: "index_invoice_line_items_on_taxable_amount_id"
