@@ -101,7 +101,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     invalid_invoices = []
     self.inward_invoices.each do |invoice|
-      invalid_invoices << invoice if invoice.initiated?
+      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
     end
 
     if invalid_invoices.present?
