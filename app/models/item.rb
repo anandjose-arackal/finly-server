@@ -126,7 +126,9 @@ class Item < ApplicationRecord
       active: active,
       item_expense_type_id: item_expense_type_id,
       item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable
+      tds_applicable: tds_applicable,
+      custom_description: get_custom_description
+
     }
   end
 
@@ -166,6 +168,10 @@ class Item < ApplicationRecord
     purchase_order_items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
+  end
+
+  def get_custom_description
+    item_number.present? ? "#{description} (#{item_number})" : description
   end
 
 end
