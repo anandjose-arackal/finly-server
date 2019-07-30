@@ -114,6 +114,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Payment Order Submitted Date",
                "Payment Order Processed Date",
                "Awaiting Action From",
+               "Policy",
+               "PO Number",
                "Invoice Number",
                "Invoice Due Date",
                "Invoice Date",
@@ -134,10 +136,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
+    ActiveRecord::Base.uncached do
     bank_payment_requests.include_for_data_retrieval.find_each(batch_size: 1000) do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
+        purchase_order = (payment.parent_type == 'PurchaseOrder' ? payment.parent : nil)
         payment_details = [
             pr.id,
             pr.name,
@@ -155,6 +159,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
             # payment.payment_order.bank_payment_request.controlling_user&.name,
             reviewer_names,
+            pr.policy&.name,
+            purchase_order.present? ? purchase_order&.po_number: '',
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
             payment.invoice&.date&.strftime("%d-%m-%Y"),
@@ -175,6 +181,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
         ]
         content << payment_details
       end
+    end
     end
     content
   end
