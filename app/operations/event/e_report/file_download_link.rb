@@ -2,7 +2,7 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   attr_accessor :download_url
 
   def action_name
-    "Download Report Excel"
+    "Download Report Excel - "
   end
 
   def pre_validate
@@ -53,11 +53,11 @@ class Event::EReport::FileDownloadLink < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    "Download report data"
+    "Download report data - #{Time.now.in_time_zone("Chennai").strftime('%-d/%-m/%y: %H:%M %Z')}"
   end
 
   def mailer_body(user)
-    "Download report data requested on #{Time.now.strftime("%-d/%-m/%y: %H:%M %Z")}"
+    "Download report data requested on #{Time.now.in_time_zone("Chennai").strftime('%-d/%-m/%y: %H:%M %Z')}"
   end
 
   class Event::EReport::FileDownloadLink::MailerPresenter < Event::SetNotifier::MailerPresenter
