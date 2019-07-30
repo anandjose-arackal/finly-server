@@ -98,7 +98,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
     if user.company.feature_subscription.grn_enabled
       po_item_params[:accepted] = purchase_order_item.accepted - item.accepted
-      po_item_params[:rejected] = purchase_order_item.rejected - item.rejected,
+      po_item_params[:rejected] = purchase_order_item.rejected.to_f - item.rejected.to_f
       po_item_params[:delivered] = purchase_order_item.delivered - item.delivered
     end
 
