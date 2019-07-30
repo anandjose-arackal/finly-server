@@ -161,6 +161,10 @@ class Item < ApplicationRecord
     rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value)}}
   end
 
+  def get_custom_description
+    item_number.present? ? "#{description} (#{item_number})" : description
+  end
+
   private
 
   def budget_trail_entry
@@ -168,10 +172,6 @@ class Item < ApplicationRecord
     purchase_order_items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
-  end
-
-  def get_custom_description
-    item_number.present? ? "#{description} (#{item_number})" : description
   end
 
 end
