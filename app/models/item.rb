@@ -58,7 +58,9 @@ class Item < ApplicationRecord
   accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :with_category_id, -> (id) { where category_id: id }
-  scope :search, -> (term) { where("description like ? OR sku like ? OR note like ? OR hsn_sac like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%") }
+  scope :search, -> (term) {
+    where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%") 
+  }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
 
   # Filter though supply item type
