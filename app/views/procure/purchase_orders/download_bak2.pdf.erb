@@ -357,7 +357,7 @@
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless (@company.id == 137 || @company.id == 156) %>
+      <% unless [137,156,166,179,173].include?(@company.id)%>
         <ul>
           <% approved_users = [] %>
           <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
@@ -383,7 +383,9 @@
           </li>
         </ul>
       <% end %>
-      <!-- <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p> -->
+      <% unless [156].include?(@company.id) %>
+        <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
+      <% end %>
     </div>
   </div>
 </div>
