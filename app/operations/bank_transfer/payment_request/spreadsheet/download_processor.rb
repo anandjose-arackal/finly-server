@@ -103,6 +103,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Payment Order Name",
                "Payment ID",
                "Beneficiary Name",
+               "Beneficiary Code",
                "Beneficiary Account Name",
                "Beneficiary Account Number",
                "Beneficiary IFSC",
@@ -142,12 +143,14 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
       po.payments.each do |payment|
         reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
         purchase_order = (payment.parent_type == 'PurchaseOrder' ? payment.parent : nil)
+        vendor = (payment.receiving_user_type == 'YesBankVendor' ? payment.receiving_user : nil)
         payment_details = [
             pr.id,
             pr.name,
             payment.id,
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
+            vendor.present? ? vendor.vendor_id : '',
             payment.receiving_account&.account_number,
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
@@ -167,11 +170,17 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
+        tds_amount = 0.0
+        if payment.parent_type == 'PurchaseOrder' && purchase_order.present?
+          tds_amount = (purchase_order.advance_tds_amount&.value || 0)
+        else
+          (payment.invoice&.tds_amount&.value || 0)
+        end
         payment_details += [
             (payment.invoice&.amount&.value || 0),
             (payment.invoice&.discount_amount&.value || 0),
             (payment.invoice&.tax_amount&.value || 0),
-            (payment.invoice&.tds_amount&.value || 0),
+            tds_amount,
             (payment.invoice&.advance_amount&.value || 0),
             (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
