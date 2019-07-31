@@ -260,6 +260,7 @@
             (IGST)
           <% end %>
           </th>
+          <th class="text-right">Tax Percentage</th>
           <th class="text-right">Total</th>
         </tr>
         </thead>
@@ -273,6 +274,7 @@
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right"><%= item.tax_rate&.rate.to_f %></td>
             <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
         <% end %>
