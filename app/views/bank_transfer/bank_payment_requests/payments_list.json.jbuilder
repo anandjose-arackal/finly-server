@@ -27,6 +27,7 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.credited_at payment.reference_resource&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.retriable do
       json.retriable payment.retriable?
