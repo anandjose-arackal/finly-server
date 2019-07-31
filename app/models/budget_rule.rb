@@ -123,7 +123,7 @@ class BudgetRule < ApplicationRecord
       when Period.id_for(:quarter)
         period = "quarter"
       when Period.id_for(:year)
-        period = "year"
+        period = "year (Fiscal Year India)"
       else
         period = ""
       end

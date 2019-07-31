@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_12_122508) do
+ActiveRecord::Schema.define(version: 2019_07_29_131306) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1003,8 +1003,8 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.string "gstin"
     t.string "pan"
     t.integer "company_id"
-    t.string "address_1"
-    t.string "address_2"
+    t.text "address_1"
+    t.text "address_2"
     t.string "city"
     t.integer "state_id"
     t.string "country"
@@ -2078,6 +2078,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.integer "dependent_parent_id"
     t.string "dependent_parent_type"
     t.string "field_key"
+    t.text "configured_field_value"
     t.index ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id"
     t.index ["parent_id"], name: "index_custom_fields_on_parent_id"
     t.index ["parent_type"], name: "index_custom_fields_on_parent_type"
@@ -2313,6 +2314,8 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.boolean "forwarded", default: false
     t.integer "forwarded_by_id"
     t.integer "forwarded_to_id"
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["action_id"], name: "index_document_level_reviewer_mappings_on_action_id"
     t.index ["action_taken_by_id"], name: "index_document_level_reviewer_mappings_on_action_taken_by_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
@@ -3209,6 +3212,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.decimal "sgst", precision: 20
     t.decimal "cgst", precision: 20
     t.decimal "igst", precision: 20
+    t.integer "purchase_order_item_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -3219,6 +3223,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
     t.index ["net_amount_id"], name: "index_invoice_line_items_on_net_amount_id"
     t.index ["parent_id", "parent_type"], name: "index_invoice_line_items_on_parent_id_and_parent_type"
+    t.index ["purchase_order_item_id"], name: "index_invoice_line_items_on_purchase_order_item_id"
     t.index ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_invoice_line_items_on_tax_rate_id"
     t.index ["taxable_amount_id"], name: "index_invoice_line_items_on_taxable_amount_id"
@@ -3640,6 +3645,8 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.boolean "wo_exception", default: true
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["level_id"], name: "index_level_reviewer_mappings_on_level_id"
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
@@ -3654,6 +3661,8 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
     t.boolean "exception", default: true
     t.boolean "wo_exception", default: true
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id"
@@ -3803,7 +3812,9 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "note"
+    t.string "bank_reference_number"
     t.index ["amount_id"], name: "index_money_request_processor_mappings_on_amount_id"
+    t.index ["bank_reference_number"], name: "index_money_request_processor_mappings_on_bank_reference_number"
     t.index ["payment_id"], name: "index_money_request_processor_mappings_on_payment_id"
     t.index ["processor_accountable_id", "processor_accountable_type"], name: "index_money_request_processor_mappings_on_processor_accountable"
     t.index ["processor_id"], name: "index_money_request_processor_mappings_on_processor_id"
@@ -5352,7 +5363,9 @@ ActiveRecord::Schema.define(version: 2019_07_12_122508) do
     t.datetime "updated_at", null: false
     t.text "note"
     t.boolean "marked_as_closed"
+    t.string "bank_reference_number"
     t.index ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id"
+    t.index ["bank_reference_number"], name: "index_report_processor_group_mappings_on_bank_reference_number"
     t.index ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id"
     t.index ["processor_accountable_id", "processor_accountable_type"], name: "index_report_processor_group_mappings_on_processor_accountable"
     t.index ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id"

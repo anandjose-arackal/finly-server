@@ -43,7 +43,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
       return
     end
 
-    unless InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :paid, :partially_paid).include?(inward_invoice.invoice_status_id)
+    unless InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid).include?(inward_invoice.invoice_status_id)
       add_message :error, "You cannot credit this invoice as it already has a unprocessed payment associated with it"
       return
     end

@@ -68,6 +68,7 @@ class MoneyRequestProcessor < ApplicationRecord
   scope :not_completed, -> { where status_id: MoneyRequestProcessorStatus.ids_for([:pending, :scheduled,
                                                                                   :processing, :partially_completed,
                                                                                   :failed]) }
+  scope :not_completed_including_cancelled, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :completed, -> { where status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   # From here
   scope :filter_search, -> (search_key) {

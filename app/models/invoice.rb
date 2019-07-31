@@ -291,6 +291,12 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+    if user_id.present?
+      self.awaiting_action_items(user_id)
+    end
+  }
+
   scope :filter_ids, ->(ids) {
     where id: ids
   }
@@ -312,7 +318,13 @@ class Invoice < ApplicationRecord
   scope :filter_creation_date, -> (from, to) {
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
-    where('invoices.created_at >= ? && invoices.created_at <= ?', from, to)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.approved_at >= ? && invoices.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
   scope :filter_invoice_date, -> (from) {
@@ -680,6 +692,10 @@ class Invoice < ApplicationRecord
           discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
       }
     end
+  end
+
+  def invoice_discount_rate
+    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
   end
 
   def include_original_amount

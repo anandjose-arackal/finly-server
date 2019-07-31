@@ -23,6 +23,8 @@
 #  forwarded                       :boolean          default(FALSE)
 #  forwarded_by_id                 :integer
 #  forwarded_to_id                 :integer
+#  min                             :decimal(20, 5)   default(0.0)
+#  max                             :decimal(20, 5)
 #
 
 FactoryBot.define do

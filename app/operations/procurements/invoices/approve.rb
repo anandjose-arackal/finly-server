@@ -44,6 +44,8 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
+    # Email to vendor that invoice is generated when the invoice is approved
+    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
   end
 end

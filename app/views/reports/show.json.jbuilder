@@ -116,15 +116,15 @@ json.expense_sections sorted_expenses do |category|
     json.custom_fields do
       case expense.expense_type_id
       when ExpenseType.id_for(:manual)
-        json.array! expense.manual_expense.custom_fields
+        json.array! expense.manual_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:card)
-        json.array! expense.card_expense.custom_fields
+        json.array! expense.card_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:distance)
-        json.array! expense.distance_expense.custom_fields
+        json.array! expense.distance_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:time)
-        json.array! expense.time_expense.custom_fields
+        json.array! expense.time_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:per_diem)
-        json.array! expense.per_diem_expense.custom_fields
+        json.array! expense.per_diem_expense.custom_fields.as_json({report_show: true})
       end
     end
     json.receipts do
@@ -187,7 +187,7 @@ json.violations do
 end
 
 json.custom_fields do
-  json.array! @result.report.custom_fields
+  json.array! @result.report.custom_fields.as_json
 end
 
 json.budgets do
@@ -238,7 +238,12 @@ json.reviewal_chains do
         end
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold
+            json.extract! reviewer, :id, :exception, :threshold, :min
+              if reviewer.max.present?
+                json.max reviewer.max
+              else
+                json.max '∞'
+              end
             json.reviewer_details reviewer.reviewer.as_json
           end
         end

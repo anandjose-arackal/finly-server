@@ -33,6 +33,7 @@
 class Item < ApplicationRecord
   include SoftDeletable
   include Sequenced::ActsAsSequenced
+  include MathUtil
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
@@ -57,7 +58,9 @@ class Item < ApplicationRecord
   accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :with_category_id, -> (id) { where category_id: id }
-  scope :search, -> (term) { where("description like ? OR sku like ? OR note like ? OR hsn_sac like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%") }
+  scope :search, -> (term) {
+    where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%") 
+  }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
 
   # Filter though supply item type
@@ -122,11 +125,14 @@ class Item < ApplicationRecord
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
       rate_contract_vendors: rate_contract_vendors,
+      preferred_vendors: rate_contract_vendors,
       user: user,
       active: active,
       item_expense_type_id: item_expense_type_id,
       item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable
+      tds_applicable: tds_applicable,
+      custom_description: get_custom_description
+
     }
   end
 
@@ -156,7 +162,11 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value)}}
+  end
+
+  def get_custom_description
+    item_number.present? ? "#{description} (#{item_number})" : description
   end
 
   private

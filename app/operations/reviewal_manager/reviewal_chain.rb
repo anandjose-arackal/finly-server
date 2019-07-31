@@ -1,3 +1,10 @@
+# params {
+#   reviewal_document: document, # Optional if provider_name is provided
+#   provider_name: provider_name, # Optional if reviewal_document if provided
+#   policy_id: policy_id, # Mandatory
+#   violation_present: true/false # returns result based on violations
+# }
+# Return possible levels w/ reviewers and their thresholds for the passed values
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
   attr_accessor :document, :provider_names,
                 :chain, :policy,
@@ -10,10 +17,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.violations_present = !!params[:violations_present]
     self.chain = []
+
     self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider)
 
     policy_id = params[:policy_id]
-
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
     self.policy = user.company.policies.with_id(policy_id).first rescue nil
   end
@@ -26,6 +33,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   end
 
   def process
+    # If policy not present, return, as some documents policy is not present during creation
     unless self.policy.present?
       return
     end
@@ -56,8 +64,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
           level_id: level.id,
           level_name: level.name,
           timestamp: timestamp,
-          reviewers: mappings
+          reviewers: mappings,
+          reviewer_data: get_mapping_data(mappings)
       }
+
       if selected_reviewer.present?
         level_data[:selected_reviewer] = selected_reviewer.reviewer
         level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
@@ -79,5 +89,44 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     def init
       self.chain = params[:chain]
     end
+  end
+
+  private
+
+  def get_mapping_data(mappings)
+    mappings = mappings.as_json
+    result = []
+    unique_reviewer_ids = mappings.map {|item| item['reviewer_id']}.uniq
+
+    unique_reviewer_ids.each do |reviewer_id|
+
+      sample = mappings.select {|item| item['reviewer_id'] == reviewer_id }[0]
+      min = mappings.select{|item| item['reviewer_id'] == reviewer_id}.min_by {|item| item['threshold']}['threshold']
+      compare_max = mappings.select{|item| item['reviewer_id'] == reviewer_id}.max_by {|item| item['threshold']}['threshold']
+
+      thresholds = mappings.select {|item| (item['reviewer_id'] != reviewer_id) && (item['threshold'] > compare_max) }&.map {|item| item['threshold']}
+
+      if thresholds.empty?
+        max = 99999999999999
+      else
+        max = thresholds.min
+      end
+
+      reviewer = User.find_by id: reviewer_id
+
+      data = {
+          reviewer_id: reviewer_id,
+          reviewer_name: reviewer&.name,
+          reviewer: reviewer,
+          threshold: sample['threshold'],
+          id: sample['id'],
+          exception: sample['exception'],
+          min: min,
+          max: max
+      }
+
+      result.push(data)
+    end
+    result
   end
 end

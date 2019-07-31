@@ -665,7 +665,16 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: true
+        editable: true,
+        attachments: self.attachments.map(&:as_json),
+        # since in FE as of now key name expected is invoice_attachment,
+        # this should work out of the box for them
+        invoice_attachment: {
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
+        }
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,

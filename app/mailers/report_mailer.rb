@@ -24,4 +24,10 @@ class ReportMailer < ApplicationMailer
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
     end
   end
+
+  def send_export_mail(presenter)
+    @data = presenter
+    mail(to: presenter.to, subject: presenter.subject, template_name: 'export_notify')
+
+  end
 end

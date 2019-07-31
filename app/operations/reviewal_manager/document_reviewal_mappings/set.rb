@@ -15,6 +15,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def validate
     unless document.present?
       add_message :error, 'Document not found'
+      return
     end
 
     all_level_ids = ReviewalLevel.with_policy_ids(document.policy_id).pluck(:id)
@@ -87,14 +88,14 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         amount = get_document_amount
 
         valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id) + level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
-
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
 
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
-              threshold = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer_id(reviewer.id).first&.threshold || level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first&.threshold
+              # threshold = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer_id(reviewer.id).first&.threshold || level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first&.threshold
+              lurm = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer_id(reviewer.id).first || level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first
               # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {
@@ -103,12 +104,13 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                       reviewer_id: reviewer.id,
                       provider_name: provider_name,
                       level_number: level.level_number,
-                      threshold: threshold
+                      min: lurm&.min,
+                      max: lurm&.max
                   })
               # Create new level
               dlrm.save
             else
-              add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value"
+              add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount doens't fall within set thresholds"
             end
           else
             # Delete exisint dlrms
@@ -127,7 +129,9 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                         provider_name: level.associated_entity_type,
                         reviewer_id: lurm.reviewer_id,
                         policy_id: document.policy_id,
-                        threshold: lurm.threshold
+                        threshold: lurm.threshold,
+                        min: lurm.min,
+                        max: lurm.max
                     })
               end
             else
@@ -142,7 +146,9 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                           provider_name: level.associated_entity_type,
                           reviewer_id: lrm.reviewer_id,
                           level_number: level.level_number,
-                          threshold: lrm.threshold
+                          threshold: lrm.threshold,
+                          min: lrm.min,
+                          max: lrm.max
                       })
                 end
               end

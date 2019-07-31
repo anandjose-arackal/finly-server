@@ -1,5 +1,5 @@
 class Export::Reports::Base < Export::Base
-  attr_accessor :company, :preference
+  attr_accessor :company, :preference, :loose_headers,  :custom_field_data
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
