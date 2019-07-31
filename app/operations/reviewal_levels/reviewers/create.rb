@@ -31,6 +31,12 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     end
   end
 
+  def pre_process
+    if reviewer_params[:min].blank?
+      reviewer_params[:min] = 0
+    end
+  end
+
   def process
     level_reviewer_mapping = reviewal_level.level_reviewer_mappings.new(reviewer_params)
 

@@ -24,6 +24,12 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
     end
   end
 
+  def pre_process
+    if level_user_reviewer_params[:min].blank?
+      level_user_reviewer_params[:min] = 0
+    end
+  end
+
   def process
     lurm = LevelUserReviewerMapping.new level_user_reviewer_params
 
