@@ -16,6 +16,8 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
 
     if reviewer_params[:min].blank?
       reviewer_params[:min] = 0
+    elsif reviewer_params[:min].to_f < 0
+      add_message :error, "Min cannot be less than 0"
     end
   end
 
@@ -35,7 +37,7 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
   end
 
   def process
-    unless self.level_reviewer_mapping.update(reviewer_parameters)
+    unless self.level_reviewer_mapping.update(reviewer_params)
       add_message :error, level_reviewer_mapping.errors.full_messages
     end
   end

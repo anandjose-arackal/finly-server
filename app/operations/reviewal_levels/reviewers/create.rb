@@ -13,6 +13,8 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
 
     if reviewer_params[:min].blank?
       reviewer_params[:min] = 0
+    elsif reviewer_params[:min].to_f < 0
+      add_message :error, "Min cannot be less than 0"
     end
   end
 
@@ -37,10 +39,6 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     if reviewer_params[:max].present? && reviewer_params[:max].to_f <= reviewer_params[:min].to_f
       add_message :error, "Max cannot be less than or equal to min"
     end
-  end
-
-  def pre_process
-
   end
 
   def process

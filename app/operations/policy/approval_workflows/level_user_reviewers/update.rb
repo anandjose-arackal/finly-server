@@ -9,6 +9,8 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Update < Policy::ApprovalWo
 
     if level_user_reviewer_params[:min].blank?
       level_user_reviewer_params[:min] = 0
+    elsif level_user_reviewer_params[:min].to_f < 0
+      add_message :error, "Min cannot be less than 0"
     end
   end
 
