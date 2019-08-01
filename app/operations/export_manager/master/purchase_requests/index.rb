@@ -12,7 +12,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
   def input
     return self.input_data unless self.input_data.nil?
 
-    purchase_request_presenter = Procurements::PurchaseRequests::Index.(user, params)
+    purchase_request_presenter = ::Procurements::PurchaseRequests::Index.(user, params)
 
     unless purchase_request_presenter.success?
       add_message :error, purchase_request_presenter.messages[:error]
@@ -47,7 +47,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
   end
 
   def status(purchase_request)
-    purchase_request.status&.name
+    purchase_request.status&.name&.titleize
   end
 
   def amount(purchase_request)

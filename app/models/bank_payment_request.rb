@@ -187,8 +187,8 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
-  scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
-                                                                             :initiating_user,
+  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
+                                                                             :initiating_user,:parent,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
                                                                              {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
                                                                              :amount]})}
