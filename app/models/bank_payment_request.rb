@@ -520,7 +520,9 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
-
+  def self.human_name
+    'Payment Ticket'
+  end
 
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))

@@ -60,8 +60,12 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           max_thresholds = level_reviewers_data.map{|item| item['max']}
           # min_thresholds = level_reviewers_data.map{|item| item['min']}
 
-          if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max
-            add_message :error, "#{document.class.name}'s amount is greater than maximum threshold set in Level - #{level.level_number} (#{level.name})"
+          # If level doesn't have reviewers
+          if max_thresholds.compact.present?
+            if !max_thresholds.include?(nil) && document_amount > max_thresholds.compact.max
+              document_class_name = document.class.human_name rescue document.model_name.human.titleize
+              add_message :error, "#{document_class_name}'s amount is greater than maximum limit set in Level - #{level.level_number} (#{level.name})"
+            end
           end
 
           # Check if selected reviewer is a valid reviewer
@@ -217,7 +221,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               # Create new level
               dlrm.save
             else
-              add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount doens't fall within set thresholds"
+              add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount doesn't fall within set limits"
             end
           else
             # Delete exisint dlrms
