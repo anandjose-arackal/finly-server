@@ -33,11 +33,11 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
         overrides_present = level.level_user_reviewer_mappings.with_user_id(user.id).present?
 
         level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).
-            with_threshold(document_amount).
+            with_threshold(amount).
             with_exception(violations_present).with_reviewer.as_json
 
         if level_reviewers_data.blank? && !overrides_present
-          level_reviewers_data = level.level_reviewer_mappings.non_deleted.with_threshold(document_amount).with_exception(violations_present).as_json
+          level_reviewers_data = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).as_json
         end
 
         valid_reviewer_ids = level_reviewers_data.map{|item| item['reviewer_id']}
