@@ -153,24 +153,27 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
   def process
     document.document_level_reviewer_mappings.with_provider_name(provider_name).destroy_all
+    if dlrm_mapping_data.present?
+      dlrm_mapping_data.each do |dlrm_level_data|
+        if dlrm_level_data[:level_reviewers_data].present?
 
-    dlrm_mapping_data.each do |dlrm_level_data|
-      if dlrm_level_data[:level_reviewers_data].present?
-
-        dlrm_level_data[:level_reviewers_data].each do |level_reviewer_data|
-          dlrm = document.document_level_reviewer_mappings.new({
-                                                                   level_id: dlrm_level_data[:level].id,
-                                                                   level_number: dlrm_level_data[:level].level_number,
-                                                                   policy_id: document.policy_id,
-                                                                   reviewer_id: level_reviewer_data['reviewer_id'],
-                                                                   provider_name: provider_name,
-                                                                   min: level_reviewer_data['min'],
-                                                                   max: level_reviewer_data['min']
-                                                               })
-          # Create new level
-          dlrm.save
+          dlrm_level_data[:level_reviewers_data].each do |level_reviewer_data|
+            dlrm = document.document_level_reviewer_mappings.new({
+                                                                     level_id: dlrm_level_data[:level].id,
+                                                                     level_number: dlrm_level_data[:level].level_number,
+                                                                     policy_id: document.policy_id,
+                                                                     reviewer_id: level_reviewer_data['reviewer_id'],
+                                                                     provider_name: provider_name,
+                                                                     min: level_reviewer_data['min'],
+                                                                     max: level_reviewer_data['min']
+                                                                 })
+            # Create new level
+            dlrm.save
+          end
         end
       end
+    else
+      add_message :error, "No Reviewal Levels Could be Set"
     end
   end
 
