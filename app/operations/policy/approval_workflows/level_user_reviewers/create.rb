@@ -8,6 +8,10 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
     self.level = ReviewalLevel.with_policy_id(policy_ids).non_deleted.with_id(level_user_reviewer_params[:level_id]).first rescue nil
     self.target_user = user.company.users.find_by id: level_user_reviewer_params[:user_id]
     self.reviewer = user.company.users.find_by id: level_user_reviewer_params[:reviewer_id]
+
+    if level_user_reviewer_params[:min].blank?
+      level_user_reviewer_params[:min] = 0
+    end
   end
 
   def validate
@@ -22,12 +26,14 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWo
     if level_user_reviewer_params[:reviewer_id].present? && self.reviewer.blank?
       add_message :error, "Invalid Reviewer Details"
     end
+
+    if level_user_reviewer_params[:max].present? && level_user_reviewer_params[:max].to_f <= level_user_reviewer_params[:min].to_f
+      add_message :error, "Max cannot be less than or equal to min"
+    end
   end
 
   def pre_process
-    if level_user_reviewer_params[:min].blank?
-      level_user_reviewer_params[:min] = 0
-    end
+
   end
 
   def process
