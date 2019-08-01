@@ -168,7 +168,10 @@ class PurchaseRequest < ApplicationRecord
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
       total_cost: self&.total_amount&.value,
       controlling_user: self.get_reviewers&.first&.name,
-      rejection_note: self.reject_note
+      rejection_note: self.reject_note,
+      department: self.department&.name,
+      cost_center: self.cost_center&.name,
+      cost_allocation_items: cost_allocation_items
     }
   end
 
