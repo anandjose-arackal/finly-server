@@ -31,7 +31,8 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
           # For each level find the reviewer selection data
           mapping_params = get_mapping_data(level)
-          reviewer_id = mapping_params[:reviewer_id]
+
+          reviewer_id = mapping_params[:reviewer_id] if mapping_params.present?
 
           # If no reviewer is selected skip to next level
           # next if mapping_params.blank? || mapping_params[:reviewer_id].blank?
@@ -50,7 +51,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           if reviewer_id.present?
             unless level_reviewers_data.map{|item| item['reviewer_id']}.include?(reviewer_id.to_i)
               reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
-              add_message :error, "Cannot set #{reviewer.present? ? reviewer.name : 'selected reviewer'} for Level - #{level.level_number} (#{level.name})"
+              add_message :error, "Cannot set #{reviewer.present? ? reviewer.name : 'selected reviewer'} for level - #{level.level_number} (#{level.name})"
               next
             end
           end
@@ -74,9 +75,17 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           end
 
           if reviewer_id.present?
-            unless valid_threshold_reviewer_data.map{|item| item['reviewer_id']}.include?(reviewer_id.to_i) && valid_violation_reviewer_data.map{|item| item['reviewer_id']}.include?(reviewer_id.to_i)
+            valid_threshold_reviewer_ids = valid_threshold_reviewer_data.map{|item| item['reviewer_id']}
+            valid_violation_reviewer_ids = valid_violation_reviewer_data.map{|item| item['reviewer_id']}
+
+            if valid_threshold_reviewer_ids.present? && !valid_threshold_reviewer_ids.include?(reviewer_id.to_i)
               reviewer = User.find_by id: mapping_params[:reviewer_id]
-              add_message :error, "Cannot set #{reviewer.present? ? reviewer.name : 'selected reviewer'} for Level - #{level.level_number} (#{level.name})"
+              add_message :error, "Cannot set #{reviewer.present? ? reviewer.name : 'selected reviewer'} for Level - #{level.level_number} (#{level.name}) | Approval Limit Mismatch"
+            end
+
+            if valid_violation_reviewer_ids.present? && !valid_violation_reviewer_ids.include?(reviewer_id.to_i)
+              reviewer = User.find_by id: mapping_params[:reviewer_id]
+              add_message :error, "Cannot set #{reviewer.present? ? reviewer.name : 'selected reviewer'} for Level - #{level.level_number} (#{level.name}) | Violations #{!!violations_present ? "present" : "not present"}"
             end
           end
 
