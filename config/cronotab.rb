@@ -39,3 +39,4 @@ Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
 # Crono.perform(FixSpuriousPayments).every 30.minutes
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 17, min: 00}
+Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}
