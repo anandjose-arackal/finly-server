@@ -41,12 +41,12 @@ json.result do
           json.rejected line_item.rejected
           json.unit_of_measurement line_item.unit_of_measurement
           json.department do
-            json.name line_item.purchase_request&.department&.name
-            json.id line_item.purchase_request&.department_id
+            json.name line_item&.department&.name
+            json.id line_item&.department_id
           end
           json.cost_center do
-            json.name line_item.purchase_request&.cost_center&.name
-            json.id line_item.purchase_request&.cost_center&.id
+            json.name line_item&.cost_center&.name
+            json.id line_item&.cost_center&.id
           end
 
           json.category do

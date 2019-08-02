@@ -46,7 +46,7 @@ class PurchaseRequest < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
-  validates :description, :location, :department, :policy, presence: true
+  validates :description, :location, :policy, presence: true
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
