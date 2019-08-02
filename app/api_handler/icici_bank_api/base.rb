@@ -11,11 +11,15 @@ class IciciBankApi::Base < BaseHandler
 
       # todo - temporary for checking the actual value of this hash for the status checker
       ap values
+      ap type
     else
       path = "#{Rails.root}/config/icici_bank_config.yml"
       values = YAML.load_file(path)
       type = self.company.id
     end
+
+    ap "#{self.company_details}"
+    ap "inside the base class"
     self.company_details = values[type]
 
     super()

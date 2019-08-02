@@ -44,6 +44,8 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
   end
 
   def raw_api_params
+    ap "#{self.company_details}"
+    ap "inside the TransactionStatus class"
     {
         AGGRID: self.company_details["AGGR_ID"],
         CORPID: self.company_details["CORP_ID"],
