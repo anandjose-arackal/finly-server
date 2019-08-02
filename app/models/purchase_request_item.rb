@@ -42,7 +42,11 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
+  include FieldCustomizer::CustomizableValidation
   # include Transitionable
+
+  field_customization_key :purchase_request_item
+  customizable_validate :purpose, presence: true
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
@@ -61,7 +65,7 @@ class PurchaseRequestItem < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
