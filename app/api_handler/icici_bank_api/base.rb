@@ -8,6 +8,9 @@ class IciciBankApi::Base < BaseHandler
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/icici_bank')
       type = self.company.id.to_s
+
+      # todo - temporary for checking the actual value of this hash for the status checker
+      ap values
     else
       path = "#{Rails.root}/config/icici_bank_config.yml"
       values = YAML.load_file(path)
