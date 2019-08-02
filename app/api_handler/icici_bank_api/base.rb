@@ -16,6 +16,9 @@ class IciciBankApi::Base < BaseHandler
       values = YAML.load_file(path)
       type = self.company.id
     end
+
+    ap "#{self.company_details}"
+    ap "inside the base class"
     self.company_details = values[type]
 
     super()
