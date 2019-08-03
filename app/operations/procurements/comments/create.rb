@@ -45,7 +45,7 @@ class Procurements::Comments::Create < Procurements::Comments::Base
       Event::EInvoice::Comment.(user, document: document, invoice: document)
     end
 
-    #
+
   end
 
   private
