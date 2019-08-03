@@ -41,7 +41,7 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
     if self.purchase_request.save
       self.purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
       # Copy department id to purchase request item
-      self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
+      # self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
       # Create document level reviewer mapping
       # For setting level  specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.purchase_request
