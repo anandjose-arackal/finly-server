@@ -1020,6 +1020,8 @@ class PurchaseOrder < ApplicationRecord
   def purchase_request_tasks
     parameters = RequestStore.store[:params]
     if parameters[:associated_resource] == "purchase_request_item"
+      # Initially when PO is created from PR, then cost allocation item is line_item by default
+      update_po_cost_allocation_items
       item_ids = self.filter_purchase_request_item_ids(parameters, user)
       # Status transition of PR
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
@@ -1059,6 +1061,10 @@ class PurchaseOrder < ApplicationRecord
         end unless document_ids.blank?
       end
     end
+  end
+
+  def update_po_cost_allocation_items
+    self.update_column('cost_allocation_items', true)
   end
 
 end
