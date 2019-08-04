@@ -49,7 +49,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_creation_date_to
     has_scope :filter_month
     has_scope :filter_year
-    has_scope :filter_by_policy
+    has_scope :filter_policy_id
 
 
     def init
