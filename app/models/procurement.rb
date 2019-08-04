@@ -407,6 +407,11 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_by_policy, -> (policy_id) {
+    filtered_ids = user.company.purchase_orders.where(id: policy_id).pluck(:procurement_id)
+    where(id: filtered_ids)
+  }
+
 
   def awaiting_action?(user)
     # Ideal method:

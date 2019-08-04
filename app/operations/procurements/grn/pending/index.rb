@@ -64,6 +64,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     has_scope :filter_year
     has_scope :filter_grn_due_today
     has_scope :filter_grn_overdue
+    has_scope :filter_by_policy
 
 
     def init
