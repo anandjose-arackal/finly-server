@@ -11,6 +11,11 @@ end
 json.items do
   json.array! @result.inward_document.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment
+    json.per_unit_price do
+      json.value item&.purchase_order_item&.total_amount&.value&.round(2)
+      json.id item&.purchase_order_item&.total_amount&.id
+      json.currency_id item&.purchase_order_item&.total_amount&.currency&.id
+    end
   end
 end
 
