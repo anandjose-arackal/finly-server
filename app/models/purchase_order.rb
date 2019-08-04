@@ -756,7 +756,6 @@ class PurchaseOrder < ApplicationRecord
     balance_amount = 0
     total_amount = 0
     persisted = false
-
     self.items.each do |item|
       if item.persisted?
         persisted = true
@@ -1026,6 +1025,9 @@ class PurchaseOrder < ApplicationRecord
       # Status transition of PR
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
+      self.reload
+      calculate_line_items(true)
+      self.save
     end
   end
 

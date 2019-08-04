@@ -47,6 +47,7 @@ class PurchaseRequest < ApplicationRecord
 
 
   validates :description, :location, :policy, presence: true
+  validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
@@ -370,6 +371,10 @@ class PurchaseRequest < ApplicationRecord
       end
     end
     return department_id
+  end
+
+  def cost_allocation_items?
+    self.cost_allocation_items
   end
 
 end
