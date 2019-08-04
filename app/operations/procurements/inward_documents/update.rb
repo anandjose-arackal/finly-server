@@ -134,7 +134,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       # Keep track of delivered items in procurement items
       inward_document.items.each do |item|
         po_item = update_purchase_order_item(item)
-        update_item_unit_amount(item)
+        update_accepting_item_amount(item)
         # item.update(previously_delivered: po_item.accepted)
       end
 
@@ -232,13 +232,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   private
 
-  def update_item_unit_amount(item)
+  def update_accepting_item_amount(item)
     amount = item.per_unit_price * item.accepted rescue nil
     if amount.present?
-      if item.per_unit_amount_id.present?
-        item.per_unit_amount.update_column(value: amount)
+      if item.accepting_item_amount_id.present?
+        item.accepting_item_amount.update_column(value: amount)
       else
-        item.create_per_unit_amount(currency_id: 1, value: amount)
+        item.create_accepting_item_amount(currency_id: 1, value: amount)
       end
     end
   end

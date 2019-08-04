@@ -24,7 +24,7 @@ class InwardDocumentItem < ApplicationRecord
   include SoftDeletable
   belongs_to :inward_document, optional: true
   belongs_to :purchase_order_item, optional: true
-  belongs_to :per_unit_amount, optional: true, class_name: "Amount"
+  belongs_to :accepting_item_amount, optional: true, class_name: "Amount"
 
 
   def per_unit_price
