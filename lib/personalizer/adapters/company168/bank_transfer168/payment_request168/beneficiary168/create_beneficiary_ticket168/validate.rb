@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company168::BankTransfer2::PaymentRequest2::Beneficiary2::CreateBeneficiaryTicket2::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company168::BankTransfer168::PaymentRequest168::Beneficiary168::CreateBeneficiaryTicket168::Validate < Personalizer::Adapters::Base
   attr_accessor :payments_attributes, :custom_fields
 
   def init
