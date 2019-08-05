@@ -15,8 +15,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     # :unapprove, :credited, :pending, :creation_in_progress, :auto_approved
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected], to: :processing
+      # transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:open, :retracted, :rejected], to: :processing, guard: :reviewers_present?
     end
 
     event :approve do

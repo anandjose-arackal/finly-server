@@ -36,19 +36,20 @@ class Policy::ApprovalWorkflows::Configs::ImportReviewers < Policy::ApprovalWork
         end
         row_length = row.size
         lower_index = 1
-        while(lower_index < row_length)
+        while(lower_index < row_length-1)
           level_name = row[lower_index+1].to_s
           level_number = row[lower_index+2].to_i
-          reviewer_id = clean_up_data row[lower_index+3].to_s
-          threshold = row[lower_index+4].to_i
-          if level_name.present? && level_number.present? && threshold.present?
+          reviewer_id = clean_up_data row[lower_index+3]
+          min = row[lower_index+4].to_i
+          max = (row[lower_index+5].present? ? row[lower_index+5].to_i : nil)
+          if level_name.present? && level_number.present?
             self.level = get_level(level_name, level_number, provider)
             reviewer = company.users.where(mobile_number: reviewer_id).or(company.users.where(email: reviewer_id)).first
-              mapping_exist = self.level.level_user_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer&.id, threshold: threshold, user_id: entity_user.id).first
-              self.level.level_user_reviewer_mappings.create(reviewer_id: reviewer&.id, policy_id: policy.id,user_id: entity_user.id, threshold: threshold) unless mapping_exist.present?
+              mapping_exist = self.level.level_user_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer&.id, min: min, max: max, user_id: entity_user.id).first
+              self.level.level_user_reviewer_mappings.create(reviewer_id: reviewer&.id, policy_id: policy.id,user_id: entity_user.id, min: min, max: max) unless mapping_exist.present?
               result_hash[name][i] = 'Reviewer Mapping created'
           end
-          lower_index += 4
+          lower_index += 5
         end
       end
     end
