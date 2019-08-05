@@ -39,6 +39,9 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     begin
       ActiveRecord::Base.transaction do
         if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
+          unless self.purchase_request.cost_allocation_items
+            self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
+          end
           pr_attachment_ids = get_attachment_ids(params)
           # line_item_attachment_ids = get_line_item_attachment_ids(params)
 
