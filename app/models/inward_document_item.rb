@@ -28,6 +28,7 @@ class InwardDocumentItem < ApplicationRecord
 
 
   def per_unit_price
-    self.purchase_order_item&.total_amount&.value/self.purchase_order_item.quantity rescue nil
+    price= self.purchase_order_item&.total_amount&.value/self.purchase_order_item.quantity rescue nil
+    price.round(2) if price.present?
   end
 end
