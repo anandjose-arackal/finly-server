@@ -546,6 +546,12 @@ class PurchaseOrder < ApplicationRecord
     billed
   end
 
+  def partial_items_accepted?
+    any_item = self.items.map { |item| item if ( item.accepted > 0 || (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) ) }.compact
+    any_item.present?
+  end
+
+
   def procurement_index_details
     {
         id: id,
