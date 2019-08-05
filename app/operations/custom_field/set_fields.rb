@@ -40,7 +40,6 @@ class CustomField::SetFields < CustomField::Base
     if params.present? and params.has_key?(:reset_fields)
       self.reset = params[:reset_fields]
     end
-
     # If reset is required, we need to fetch all the field_configurations for item's current policy
     # if self.reset
 
@@ -136,6 +135,7 @@ class CustomField::SetFields < CustomField::Base
   # Once all acceptable values are identified in the previous step,
   # this step identifies the custom fields which have to be created / destroyed
   def process_custom_field_changes
+    field_values.merge!(update_field_values)
     all_field_values = merged_custom_field_values
     acceptable_dropdown_values = identify_acceptable_dropdown_values all_field_values
 
@@ -144,7 +144,6 @@ class CustomField::SetFields < CustomField::Base
     configs_to_create = []
     config_ids_to_destroy = []
     required_configs = {}
-
     self.field_configurations.enabled.each do |config|
       required = false
       if config.root_field
@@ -173,13 +172,11 @@ class CustomField::SetFields < CustomField::Base
     end
 
     config_ids_to_destroy = current_ids - required_configs.keys
-
     required_configs.each do |id, config|
       unless current_ids.include?(id)
         configs_to_create << config
       end
     end
-
     [configs_to_create, config_ids_to_destroy]
   end
 
@@ -227,6 +224,23 @@ class CustomField::SetFields < CustomField::Base
       end
     end
     acceptable_dropdown_values
+  end
+
+  def update_field_values
+    all_field_configurations = field_values.keys
+    new_field_values = {}
+    self.field_values.each do |key, value|
+      fc = FieldConfiguration.where(field_type_id: FieldType.id_for(:drop_down), id: key).first
+      if fc.present?
+         ddi = fc.drop_down_items.where(id: value).first
+         if ddi.present?
+           related_field_configuration_ids = ddi.dependent_field_configurations.pluck(:dependent_field_configuration_id)&.map(&:to_s)
+           fields_not_seleted = related_field_configuration_ids - all_field_configurations
+           fields_not_seleted.each { |e| new_field_values[e.to_s] = ""}
+         end
+      end
+    end
+    new_field_values
   end
 
 end

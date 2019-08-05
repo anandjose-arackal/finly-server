@@ -62,7 +62,7 @@ class YesBankTransferRequest < NonPersistentModel
   end
 
   def self.get_transfer_type(transfer_type = "IMPS", ifsc)
-    if ifsc.include?("YESB")
+    if ifsc.include?("YESB") && ifsc != "YESB0CMSNOC"
       return "FT"
     end
     transfer_type

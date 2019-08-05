@@ -16,6 +16,7 @@
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
 #  marked_as_closed           :boolean
+#  bank_reference_number      :string(255)
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord
