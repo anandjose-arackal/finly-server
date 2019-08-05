@@ -5,6 +5,7 @@ json.result do
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
     json.rejection_note @result.purchase_request&.reject_note
+    json.cost_allocation_items @result&.purchase_request&.cost_allocation_items
     # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
       json.name @result.purchase_request.creator&.name
@@ -38,7 +39,15 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
-          json.unit_of_measurement line_item.unit_of_measurement  
+          json.unit_of_measurement line_item.unit_of_measurement
+          json.department do
+            json.name line_item&.department&.name
+            json.id line_item&.department_id
+          end
+          json.cost_center do
+            json.name line_item&.cost_center&.name
+            json.id line_item&.cost_center&.id
+          end
 
           json.category do
             json.name line_item.category&.name

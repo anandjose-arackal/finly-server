@@ -41,6 +41,14 @@ json.results do
         json.id item.delivery_location_id
         json.name item.delivery_location&.name
       end
+      json.department do
+        json.name item&.department&.name
+        json.id item&.department_id
+      end
+      json.cost_center do
+        json.name item&.cost_center&.name
+        json.id item&.cost_center&.id
+      end
     end
   end
   json.count @result.count
