@@ -32,7 +32,7 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
       self.line_items  = purchase_request&.purchase_request_items
       self.reviewal_chain = purchase_request.get_reviewal_chain if !purchase_request.draft? && !purchase_request.retracted? && !purchase_request.rejected?
       po_created = purchase_request&.purchase_request_items&.joins(:purchase_order_item) rescue nil
-      is_any_po_created = !!po_created
+      self.is_any_po_created = !!po_created
 
       # self.policies = Policy::VendorPayments::Index.(user, params).policies
       # self.reviewal_chains = []
