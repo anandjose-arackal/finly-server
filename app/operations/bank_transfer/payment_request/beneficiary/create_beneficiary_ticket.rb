@@ -16,6 +16,14 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
 					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
 
+	def personalizer
+		{
+				validate: {
+						before: Personalizer::Process.new([:bank_transfer, :payment_request, :beneficiary, :create_beneficiary_ticket], :validate, self)
+				}
+		}
+	end
+
 	def pre_validate
 	    if user.blank?
 	      add_message :error, 'User not found'
@@ -57,7 +65,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
-	    self.policy = current_company.policies.find_by(id: policy_id)
+	    self.policy = user.company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -120,7 +128,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Create Document Level Reviewer Mapping
 	    # For setting level specific reviewers from reviewal chain for a document
 	    params[:reviewal_document] = self.bank_payment_request.reload
-
 	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
 	    unless document_reviewer_mappings_op.success?
 	      self.bank_payment_request.destroy

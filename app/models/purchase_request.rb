@@ -56,7 +56,13 @@ class PurchaseRequest < ApplicationRecord
 
 
 
-  scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
+  scope :search_by_email, -> (email) {
+    user = RequestStore.store[:current_user]
+    if user.present?
+      # where creator_id: User.find_by(email: email)&.id
+      where creator_id: user.company.users.find_by_email(email)&.id
+    end
+  }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}

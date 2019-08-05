@@ -47,7 +47,7 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   }
 
   scope :satisfies_min, -> (amount) {
-    where("min < ?", amount)
+    where("min <= ?", amount)
   }
 
   scope :satisfies_max, -> (amount){
