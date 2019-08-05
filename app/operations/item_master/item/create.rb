@@ -31,6 +31,11 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
         end
       end
     end
+
+    if self.inventory_item_parameters[:override_item_number] && self.inventory_item_parameters[:item_number].blank?
+      add_message :error, "Item number cannot be blank."
+      return
+    end
   end
 
   def pre_process
