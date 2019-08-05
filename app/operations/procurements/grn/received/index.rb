@@ -62,11 +62,11 @@ class Procurements::Grn::Received::Index < Procurements::Base
       self.procurements = params[:procurements]
       apply_filter
 
-      self.procurements = self.procurements.order_by_controlling_level(user.id)
+      self.procurements = self.procurements.order_by_controlling_level(user.id) rescue Procurement.none
       page = params[:page] || 1
       per_page = params[:per_page] || 30
-      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details
-      self.count = self.procurements.count
+      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details rescue Procurement.none
+      self.count = self.procurements.count rescue 0
 
     end
 
@@ -74,10 +74,10 @@ class Procurements::Grn::Received::Index < Procurements::Base
       if params[:search_type].present? && params[:search_query].present?
         set_scope
       end
-      self.procurements = apply_scopes(self.procurements, params)
+      self.procurements = apply_scopes(self.procurements, params) rescue Procurement.none
 
       if params[:filter_awaiting_approval].present?
-        self.procurements = self.procurements.filter_awaiting_approval(user)
+        self.procurements = self.procurements.filter_awaiting_approval(user) rescue Procurement.none
       end
 
     end
