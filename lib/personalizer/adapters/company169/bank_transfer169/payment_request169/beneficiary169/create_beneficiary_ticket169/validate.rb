@@ -8,7 +8,7 @@ class Personalizer::Adapters::Company169::BankTransfer169::PaymentRequest169::Be
   def validate
     custom_field_id = current_company.field_configurations.non_deleted.find_by(field_key: 'sub_order_id')&.id
     self.custom_fields = self.payments_attributes[:custom_fields][custom_field_id.to_s] rescue ""
-     if custom_fields.blank? || custom_fields&.match?("^[A-Ba-z0-9]{8,12}$") != true
+     if custom_fields.blank? || custom_fields&.match?(/^.{8,12}$/) != true
        add_message :error, "Suborder ID must have 8-12 Characters"
      end
   end
