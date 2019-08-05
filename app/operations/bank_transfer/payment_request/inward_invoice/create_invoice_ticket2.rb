@@ -99,6 +99,16 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
+    invalid_invoices = []
+    self.inward_invoices.each do |invoice|
+      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+    end
+
+    if invalid_invoices.present?
+      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:id).compact.join(", ")}\", are already linked to a payment ticket"
+      return
+    end
+
     if self.policy.blank?
       add_message :error, "Policy not found."
       return

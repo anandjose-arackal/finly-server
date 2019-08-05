@@ -13,6 +13,7 @@ class IciciBankApi::Base < BaseHandler
       values = YAML.load_file(path)
       type = self.company.id
     end
+
     self.company_details = values[type]
 
     super()

@@ -7,8 +7,8 @@
 #  gstin                 :string(255)
 #  pan                   :string(255)
 #  company_id            :integer
-#  address_1             :string(255)
-#  address_2             :string(255)
+#  address_1             :text(65535)
+#  address_2             :text(65535)
 #  city                  :string(255)
 #  state_id              :integer
 #  country               :string(255)
