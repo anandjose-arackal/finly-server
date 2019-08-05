@@ -40,6 +40,10 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
 
     if self.purchase_request.save
       self.purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
+
+      unless self.purchase_request.cost_allocation_items
+        self.purchase_request.purchase_request_items.update_all(cost_center_id: self.purchase_request&.cost_center_id, department_id: self.purchase_request&.department_id)
+      end
       # Copy department id to purchase request item
       # self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
       # Create document level reviewer mapping
