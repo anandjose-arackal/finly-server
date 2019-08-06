@@ -40,6 +40,11 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  gst_details_id         :integer
+#  gstin_location_id      :integer
+#  state_of_expense_id    :integer
+#  hsn_sac                :string(255)
+#  merchant_bill_no       :string(255)
 #
 
 class Expense < ApplicationRecord
@@ -81,6 +86,7 @@ class Expense < ApplicationRecord
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
   has_one :payment, as: :reference_resource
+  has_one :gstin_location
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -92,6 +98,7 @@ class Expense < ApplicationRecord
   accepts_nested_attributes_for :per_diem_expense
   accepts_nested_attributes_for :receipt_email
   accepts_nested_attributes_for :tds_amount
+  accepts_nested_attributes_for :gstin_location
 
 
   # delegating to associated classes the dependent attribute calls

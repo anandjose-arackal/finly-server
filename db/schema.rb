@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_29_131306) do
+ActiveRecord::Schema.define(version: 2019_08_05_151814) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1457,6 +1457,7 @@ ActiveRecord::Schema.define(version: 2019_07_29_131306) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
+    t.boolean "gst_applicable", default: false
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -2618,6 +2619,11 @@ ActiveRecord::Schema.define(version: 2019_07_29_131306) do
     t.integer "created_by_id"
     t.integer "modified_by_id"
     t.datetime "deleted_at"
+    t.integer "gst_details_id"
+    t.integer "gstin_location_id"
+    t.integer "state_of_expense_id"
+    t.string "hsn_sac"
+    t.string "merchant_bill_no"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["created_at"], name: "index_expenses_on_created_at"
@@ -3414,6 +3420,8 @@ ActiveRecord::Schema.define(version: 2019_07_29_131306) do
     t.decimal "previously_delivered", precision: 20, scale: 5
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.integer "accepting_item_amount_id"
+    t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
     t.index ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id"
@@ -5018,6 +5026,7 @@ ActiveRecord::Schema.define(version: 2019_07_29_131306) do
     t.integer "company_id"
     t.integer "cost_center_id"
     t.integer "total_amount_id"
+    t.boolean "cost_allocation_items", null: false
     t.index ["company_id"], name: "index_purchase_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_purchase_requests_on_controlling_level_id"
     t.index ["cost_center_id"], name: "index_purchase_requests_on_cost_center_id"

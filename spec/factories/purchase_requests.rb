@@ -20,6 +20,7 @@
 #  company_id                 :integer
 #  cost_center_id             :integer
 #  total_amount_id            :integer
+#  cost_allocation_items      :boolean          not null
 #
 
 FactoryBot.define do
