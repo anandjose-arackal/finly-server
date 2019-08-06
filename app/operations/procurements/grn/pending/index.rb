@@ -33,7 +33,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
         end
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
-        self.procurements = Procurement.where(id: proc_ids)
+        self.procurements = Procurement.where(id: proc_ids).joins(:purchase_order).where.not('purchase_orders.purchase_order_status_id = ?', PurchaseOrderStatus.id_for(:closed)) rescue Procurement.none
       end
     end
   end
@@ -98,7 +98,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
 
     def get_status_counts
       # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
-      received_pending_ids = [StatusTag.id_for(:shipment_received)]
+      received_pending_ids = [StatusTag.id_for(:receiving_shipment)]
       st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
       pr_ids = self.procurements.pluck(:id)
       # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
