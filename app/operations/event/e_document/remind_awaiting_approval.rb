@@ -155,7 +155,7 @@ class Event::EDocument::RemindAwaitingApproval < BaseOperation
       self.non_po_awaiting_approval_column_values = params[:non_po_awaiting_approval_column_values]
     end
 
-    def setup_po_invoice_section(para)
+    def setup_po_invoice_section(params)
       self.po_invoice_awaiting_approvals = params[:po_invoices]
       self.po_invoice_awaiting_approval_columns = params[:po_invoice_awaiting_approval_columns]
       self.po_invoice_awaiting_approval_column_values = params[:po_invoice_awaiting_approval_column_values]

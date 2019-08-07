@@ -8,7 +8,7 @@
   </div>
   <div style="width: 100%; height: auto; margin: auto; background-color: white;">
 
-    <% if @data.purchase_request_awaiting_approvals.length > 0 %>
+    <% if @data.purchase_request_awaiting_approvals.present? %>
       <div style="text-align: left;">Purchase request awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
@@ -31,7 +31,7 @@
     <% end %>
     <br>
 
-    <% if @data.non_po_awaiting_approvals.length > 0 %>
+    <% if @data.non_po_awaiting_approvals.present? %>
       <div style="text-align: left;">Non PO awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
@@ -54,7 +54,7 @@
     <% end %>
     <br>
 
-    <% if @data.po_invoice_awaiting_approvals.length > 0 %>
+    <% if @data.po_invoice_awaiting_approvals.present? %>
       <div style="text-align: left;">PO invoice awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
@@ -77,7 +77,7 @@
     <% end %>
     <br>
 
-    <% if @data.bpr_awaiting_approvals.length > 0 %>
+    <% if @data.bpr_awaiting_approvals.present? %>
       <div style="text-align: left;">Payment ticket awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
@@ -100,7 +100,7 @@
     <% end %>
     <br>
 
-    <% if @data.po_awaiting_approvals.length > 0 %>
+    <% if @data.po_awaiting_approvals.present? %>
       <div style="text-align: left;">Purchase order awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
