@@ -236,7 +236,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     amount = item.per_unit_price * item.accepted rescue nil
     if amount.present?
       if item.accepting_item_amount_id.present?
-        item.accepting_item_amount.update_column(value: amount)
+        item.accepting_item_amount.update_column('value', amount)
       else
         item.create_accepting_item_amount(currency_id: 1, value: amount)
       end
