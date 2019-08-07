@@ -1,7 +1,7 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
-                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields
+                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields, :total_adjusted_advance
 
   def personalizer
     {
@@ -60,7 +60,6 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def process
-
     self.invoice = self.procurement.invoices.build(self.invoice_params)
     
     self.invoice.company_id = user.company.id
@@ -77,6 +76,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       # self.invoice.advance_amount_required = false
       self.invoice.save
 
+      if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
+        if self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?
+          calculcate_po_adjusted_advance
+        end
+      end
 
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
       unless procurement.status_tags.include? status_tag
@@ -199,7 +203,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       if self.previous_invoices.present?
          # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
         self.last_invoice = self.previous_invoices.last
-        total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
+        self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
         self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
@@ -273,7 +277,43 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     custom_fields[:save] = save
     CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
-  
+
+  def calculcate_po_adjusted_advance
+    self.total_adjusted_advance = 0
+    if self.last_invoice.present?
+      self.total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_f + self.last_invoice.po_adjusted_advance&.value&.to_f
+    end
+    allowed_current_adjustment = self.po_advance - self.total_adjusted_advance rescue nil
+    bal_due_amount = nil
+    current_adjustment = nil
+    # Current allowed adjustment should be present and should not be previously exhausted
+    if allowed_current_adjustment.present? && !allowed_current_adjustment.zero?
+      case 
+        when self.invoice&.balance_due&.value.present? && self.invoice&.balance_due&.value >= allowed_current_adjustment
+        # Substract PO advance amount from balance due amount
+        bal_due_amount = self.invoice&.balance_due&.value - allowed_current_adjustment
+        current_adjustment = allowed_current_adjustment
+        when self.invoice&.balance_due&.value.present? &&  self.invoice&.balance_due&.value < allowed_current_adjustment
+         current_adjustment = self.invoice&.balance_due&.value
+         bal_due_amount = 0
+      end
+      set_advance_amount_required
+    end
+    unless bal_due_amount.blank?
+      self.invoice.balance_due.update(value: bal_due_amount)
+    end
+
+    if current_adjustment.present?
+      self.invoice.po_adjusted_advance.update(value: current_adjustment)
+      invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+    end
+
+  end
+
+  def set_advance_amount_required
+    self.invoice.update(advance_amount_required: true)
+  end
+ 
 end
 
 

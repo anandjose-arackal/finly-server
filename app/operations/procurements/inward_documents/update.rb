@@ -134,7 +134,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       # Keep track of delivered items in procurement items
       inward_document.items.each do |item|
         po_item = update_purchase_order_item(item)
-
+        update_accepting_item_amount(item)
         # item.update(previously_delivered: po_item.accepted)
       end
 
@@ -154,20 +154,19 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.id_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
     self.id_current_attachments.update_all(procurement_document_id: inward_document.id, procurement_document_type: inward_document.class.name)
-
   end
 
   def post_process
     # Update Status Tags for Procurement
     #   Find if all items are shipped
-    if self.purchase_order.all_items_shipped?
+    if self.purchase_order.all_items_accepted?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
       # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
       params[:purchase_order_id] = self.purchase_order.id
-      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?(inward_document)
+      Procurements::PurchaseOrders::Close.(user, params) if self.purchase_order.all_items_accepted?(inward_document)
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
@@ -231,7 +230,17 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   end
 
-  def set_purchase_order_items
+  private
+
+  def update_accepting_item_amount(item)
+    amount = item.per_unit_price * item.accepted rescue nil
+    if amount.present?
+      if item.accepting_item_amount_id.present?
+        item.accepting_item_amount.update_column('value', amount)
+      else
+        item.create_accepting_item_amount(currency_id: 1, value: amount)
+      end
+    end
   end
 
 end
