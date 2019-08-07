@@ -1,7 +1,7 @@
 # submit_pending_columns = Columns in the email template 
 class Event::EInwardDocument::SubmitPending < BaseOperation
 
-  attr_accessor :inward_documents, :submit_pending_columns
+  attr_accessor :inward_documents, :submit_pending_columns, :procurements
 
   def pre_validate
     unless user.present?
@@ -16,7 +16,7 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
 
   def init
     self.inward_documents = params[:inward_documents]
-    self.submit_pending_columns = ["#", "GRN #", "Procurement ID", "Vendor Name", "Created by", "Creation Date"]
+    self.submit_pending_columns = ["#", "GRN #", "Proc ID", "Proc Name", "Vendor", "Created by", "Creation Date"]
   end
 
   def send_mailer(user)
@@ -25,7 +25,12 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
     params[:submit_pending_columns] = submit_pending_columns
-    ProcurementMailer.delay.send_awaiting_approval_mail(Event::EInwardDocument::SubmitPending::MailerPresenter.new(user, params))
+    ProcurementMailer.send_submit_reminder_mail(Event::EInwardDocument::SubmitPending::MailerPresenter.new(user, params)).deliver_now
+  end
+
+  def set_presenter_params(user)
+    params[:subject] = self.mailer_subject(user)
+    params[:body] = self.mailer_body(user)
   end
 
   def validate
@@ -73,7 +78,7 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
       self.action_name = params[:action_name]
       self.action_url = params[:action_url]
       self.pending_submissions = params[:inward_documents]
-      self.pending_submission_columns = params[:pending_submission_columns]
+      self.pending_submission_columns = params[:submit_pending_columns]
       self.pending_submission_column_values = params[:pending_submission_column_values]
     end
 
@@ -94,10 +99,10 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
   def set_column_values
     column_values = []
     self.inward_documents.each.with_index(1) do |inward_document, index|
-      column_values << [index, inward_document.grn_number, inward_document.procurement_id, inward_document&.vendor&.display_name, inward_document&.user&.name, inward_document.created_at.to_date]
+      column_values << [index, inward_document.grn_number, inward_document.procurement_id,inward_document&.procurement&.name, inward_document&.vendor&.display_name, inward_document&.user&.name, inward_document.created_at.to_date]
     end
     if column_values.present?
-      params[:awaiting_approval_column_values] = column_values
+      params[:pending_submission_column_values] = column_values
     end
   end
 end
