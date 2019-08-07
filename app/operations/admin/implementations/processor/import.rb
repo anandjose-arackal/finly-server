@@ -56,6 +56,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
       end
 
       if failed and self.halt_on_failure?
+        row << "Ignored"
         output << row
         next
       end
