@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_05_151814) do
+ActiveRecord::Schema.define(version: 2019_08_06_142025) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1457,7 +1457,7 @@ ActiveRecord::Schema.define(version: 2019_08_05_151814) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
-    t.boolean "gst_applicable", default: false
+    t.boolean "gst_applicable", default: true
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
