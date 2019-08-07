@@ -1,4 +1,4 @@
-class Admin::Implementations::Master::Categories::Export < Admin::Implementations::Processor::Generic
+class Admin::Implementations::Master::Categories::Export < Admin::Implementations::Processor::Export
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'categories.list'

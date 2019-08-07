@@ -1,0 +1,42 @@
+class Admin::Implementations::Master::Categories::Import < Admin::Implementations::Processor::Import
+
+  bus Admin::Implementations::Master::BaseMaster
+  subscribe 'categories.import'
+  halt_on_failure!
+  headers [
+              :id,
+              :parent_id,
+              :gl_name,
+              :name
+          ]
+
+  def process_row(data)
+    id = data[:id]
+    if id.present?
+      update_category(data)
+    else
+      create_category(data)
+    end
+  end
+
+  def update_category(data)
+    category = self.company.categories.find_by id: data[:id]
+    unless category
+      return result false, "Category not found"
+    end
+
+    unless category.update(data)
+      return result false, category.errors.full_messages
+    end
+    result true
+  end
+
+  def create_category(data)
+    category = self.companies.categories.new data.except(:id)
+    unless category.save
+      return result false, category.errors.full_messages
+    end
+    result true
+  end
+
+end

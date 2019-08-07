@@ -45,6 +45,7 @@ public/system/vendor_attachments/*
 /public/system/outward_invoice_attachments/*
 /public/system/procurement_attachments/*
 /public/system/booking_attachments/*
+/public/system/admin_implementation_requests/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions

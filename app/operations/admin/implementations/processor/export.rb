@@ -1,4 +1,4 @@
-class Admin::Implementations::Processor::Generic < Admin::Implementations::Processor::Base
+class Admin::Implementations::Processor::Export < Admin::Implementations::Processor::Base
 
   def input
     # Implement me

@@ -72,16 +72,13 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
   def export(headers, contents)
     exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
-    file = Paperclip::Tempfile.new(file_name)
-    open(file.path, 'wb') do |f|
-      f.write exporter.generate_xls
-    end
+    file = exporter.generate_xls_file
     self.implementation_request.result_file = file
     self.implementation_request.save
   end
 
   def file_name
-    ['export', '.xls']
+    ['export', '.xlsx']
   end
 
 end
