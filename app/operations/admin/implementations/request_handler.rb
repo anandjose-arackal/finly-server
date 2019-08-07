@@ -28,7 +28,6 @@ class Admin::Implementations::RequestHandler < Admin::Base
   end
 
   def process
-    params[:request_file] = File.open("/Users/vivekag/Projects/Rails/finly-server/public/system/admin_implementation_requests/result_files/000/000/021/original/export20190808-60493-16bwrpd.xlsx", "r")
     self.implementation_request = self.user.admin_implementation_requests.new request_key: params[:request_key],
                                                                               company_id: params[:company_id],
                                                                               request_params: params,
