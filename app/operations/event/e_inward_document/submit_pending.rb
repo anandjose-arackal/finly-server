@@ -16,7 +16,7 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
 
   def init
     self.inward_documents = params[:inward_documents]
-    self.submit_pending_columns = ["#", "GRN #", "Proc ID", "Proc Name", "Vendor", "Created by", "Creation Date"]
+    self.submit_pending_columns = ["#", "GRN #", "PO #", "Proc Name", "Vendor", "Created by", "Creation Date"]
   end
 
   def send_mailer(user)
@@ -99,7 +99,7 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
   def set_column_values
     column_values = []
     self.inward_documents.each.with_index(1) do |inward_document, index|
-      column_values << [index, inward_document.grn_number, inward_document.procurement_id,inward_document&.procurement&.name, inward_document&.vendor&.display_name, inward_document&.user&.name, inward_document.created_at.to_date]
+      column_values << [index, inward_document.grn_number, inward_document&.procurement&.purchase_order&.po_number,inward_document&.procurement&.name, inward_document&.vendor&.display_name, inward_document&.user&.name, inward_document.created_at.to_date]
     end
     if column_values.present?
       params[:pending_submission_column_values] = column_values
