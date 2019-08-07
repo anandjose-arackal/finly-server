@@ -8,18 +8,18 @@
   </div>
   <div style="width: 100%; height: auto; margin: auto; background-color: white;">
 
-    <% if @data.pending_submissions.length > 0 %>
-      <div style="text-align: left;"><%= @data.body_val.html_safe %></div>
+    <% if @data.inward_document_pending_submit.present? %>
+      <div style="text-align: left;margin-top: 20px">GRN pending submission</div>
       <table style="width: 100%;">
         <thead>
         <tr>
-          <% @data.pending_submission_columns.each do |column_name| %>
+          <% @data.inward_document_pending_submit_columns.each do |column_name| %>
             <th><%= column_name %></th>
           <% end %>
         </tr>
         </thead>
         <tbody>
-        <% @data.pending_submission_column_values.each do |column_values| %>
+        <% @data.inward_document_pending_submit_column_values.each do |column_values| %>
           <tr>
             <% column_values.each do |value| %>
               <td><%= value %></td>
@@ -29,6 +29,57 @@
         </tbody>
       </table>
     <% end %>
+    <br>
+
+
+    <% if @data.non_po_pending_submit.present? %>
+      <div style="text-align: left;margin-top: 20px">Non PO Pending submission</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.non_po_pending_submit_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.non_po_pending_submit_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
+    <% if @data.po_invoice_pending_submit.present? %>
+      <div style="text-align: left;margin-top: 20px">PO pending submission</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.po_invoice_pending_submit_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.po_invoice_pending_submit_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
+
+
     <br>
   </div>
   </body>

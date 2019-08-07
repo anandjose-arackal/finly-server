@@ -25,7 +25,7 @@ class Event::EInwardDocument::SubmitPending < BaseOperation
     return unless params[:subject].present? && params[:body].present?
     params[:action_name] = action_name
     params[:submit_pending_columns] = submit_pending_columns
-    ProcurementMailer.send_submit_reminder_mail(Event::EInwardDocument::SubmitPending::MailerPresenter.new(user, params)).deliver_now
+    ProcurementMailer.delay.send_submit_reminder_mail(Event::EInwardDocument::SubmitPending::MailerPresenter.new(user, params))
   end
 
   def set_presenter_params(user)

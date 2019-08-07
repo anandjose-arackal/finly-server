@@ -124,6 +124,7 @@ class Event::EDocument::RemindAwaitingApproval < BaseOperation
 
       setup_purchase_request_section(params)
       setup_non_po_invoice_section(params)
+      setup_po_invoice_section(params)
       setup_bank_payment_request_section(params)
       setup_po_section(params)
     end
@@ -152,6 +153,12 @@ class Event::EDocument::RemindAwaitingApproval < BaseOperation
       self.non_po_awaiting_approvals = params[:non_po_invoices]
       self.non_po_awaiting_approval_columns = params[:non_po_awaiting_approval_columns]
       self.non_po_awaiting_approval_column_values = params[:non_po_awaiting_approval_column_values]
+    end
+
+    def setup_po_invoice_section(para)
+      self.po_invoice_awaiting_approvals = params[:po_invoices]
+      self.po_invoice_awaiting_approval_columns = params[:po_invoice_awaiting_approval_columns]
+      self.po_invoice_awaiting_approval_column_values = params[:po_invoice_awaiting_approval_column_values]
     end
 
     def setup_bank_payment_request_section(params)
