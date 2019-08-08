@@ -8,18 +8,18 @@
   </div>
   <div style="width: 100%; height: auto; margin: auto; background-color: white;">
 
-    <% if @data.awaiting_approvals.length > 0 %>
-      <div style="text-align: left;"><%= @data.body_val.html_safe %></div>
+    <% if @data.purchase_request_awaiting_approvals.present? %>
+      <div style="text-align: left;">Purchase request awaiting approvals</div>
       <table style="width: 100%;">
         <thead>
         <tr>
-          <% @data.awaiting_approval_columns.each do |column_name| %>
+          <% @data.purchase_request_awaiting_approval_columns.each do |column_name| %>
             <th><%= column_name %></th>
           <% end %>
         </tr>
         </thead>
         <tbody>
-        <% @data.awaiting_approval_column_values.each do |column_values| %>
+        <% @data.purchase_request_awaiting_approval_column_values.each do |column_values| %>
           <tr>
             <% column_values.each do |value| %>
               <td><%= value %></td>
@@ -30,6 +30,99 @@
       </table>
     <% end %>
     <br>
+
+    <% if @data.non_po_awaiting_approvals.present? %>
+      <div style="text-align: left;">Non PO awaiting approvals</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.non_po_awaiting_approval_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.non_po_awaiting_approval_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
+    <% if @data.po_invoice_awaiting_approvals.present? %>
+      <div style="text-align: left;">PO invoice awaiting approvals</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.po_invoice_awaiting_approval_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.po_invoice_awaiting_approval_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
+    <% if @data.bpr_awaiting_approvals.present? %>
+      <div style="text-align: left;">Payment ticket awaiting approvals</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.bpr_awaiting_approval_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.bpr_awaiting_approval_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
+    <% if @data.po_awaiting_approvals.present? %>
+      <div style="text-align: left;">Purchase order awaiting approvals</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <% @data.po_awaiting_approval_columns.each do |column_name| %>
+            <th><%= column_name %></th>
+          <% end %>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.po_awaiting_approval_column_values.each do |column_values| %>
+          <tr>
+            <% column_values.each do |value| %>
+              <td><%= value %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+
   </div>
   </body>
 <% end %>
