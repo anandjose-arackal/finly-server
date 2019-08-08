@@ -62,12 +62,16 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
     self.implementation_request.status = status
     self.implementation_request.completed_items = completed_items if completed_items
     self.implementation_request.message = message if message
-    self.implementation_request.save
-
-    if [:error, :failed].include?(status)
+    case status
+    when :in_progress
+      self.implementation_request.started_at = DateTime.now if self.implementation_request.started_at.blank?
+    when :failed, :error
       add_message :error, message || 'Unknown error occurred'
-      return
+      self.implementation_request.completed_at = DateTime.now
+    when :completed
+
     end
+    self.implementation_request.save
   end
 
   def export(headers, contents)
