@@ -53,7 +53,7 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
               title: "Total POs Awaiting Shipments",
               # count: apply_scopes(procurements, {filter_status_tags: [7]})&.count,
               count: apply_scopes(procurements, {filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]})&.count,
-              filters: [{filter_creation_date_from: "2019-06-20"}]
+              filters: [{filter_creation_date_from: params[:filter_creation_date_from]}]
             }
           ]
         }

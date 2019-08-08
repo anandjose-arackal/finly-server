@@ -56,12 +56,14 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :cost_center, optional: true
   belongs_to :category, optional: true
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
+  has_one :purchase_order_item
   has_many :trails, as: :parent
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
@@ -141,6 +143,8 @@ class PurchaseRequestItem < ApplicationRecord
     end
   end
 
-
+  def cost_allocation_items?
+    self.purchase_request.cost_allocation_items
+  end
 
 end

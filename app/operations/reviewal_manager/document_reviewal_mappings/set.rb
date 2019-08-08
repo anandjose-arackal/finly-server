@@ -169,7 +169,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                                                                      reviewer_id: level_reviewer_data['reviewer_id'],
                                                                      provider_name: provider_name,
                                                                      min: level_reviewer_data['min'],
-                                                                     max: level_reviewer_data['min']
+                                                                     max: level_reviewer_data['max']
                                                                  })
             # Create new level
             dlrm.save

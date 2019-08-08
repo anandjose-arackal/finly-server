@@ -11,7 +11,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return
     end
   end
@@ -34,7 +34,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     end
 
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot delete GRN'
+      add_message :error, 'Purchase Order not found for this procurement, cannot delete Receipt Note'
       return
     end
 
@@ -72,7 +72,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   end
 
   def post_process
-    add_message :success, 'Successfully deleted GRN'
+    add_message :success, 'Successfully deleted Receipt Note'
   end
 
   private
@@ -88,11 +88,23 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   def update_purchase_order_item(item)
     purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
 
-    po_item_params = {
-        accepted: purchase_order_item.accepted - item.accepted,
-        rejected: purchase_order_item.rejected - item.rejected,
-        delivered: purchase_order_item.delivered - item.delivered
-    }
+    # po_item_params = {
+    #     accepted: purchase_order_item.accepted - item.accepted,
+    #     rejected: purchase_order_item.rejected - item.rejected,
+    #     delivered: purchase_order_item.delivered - item.delivered
+    # }
+
+    po_item_params = {}
+
+    if user.company.feature_subscription.grn_enabled
+      po_item_params[:accepted] = purchase_order_item.accepted - item.accepted
+      po_item_params[:rejected] = purchase_order_item.rejected.to_f - item.rejected.to_f
+      po_item_params[:delivered] = purchase_order_item.delivered - item.delivered
+    end
+
+    if user.company.feature_subscription.srn_enabled
+      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount
+    end
 
     purchase_order_item.assign_attributes(po_item_params)
     purchase_order_item.save
