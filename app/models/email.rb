@@ -1,5 +1,5 @@
 class Email < ApplicationRecord
-  serialize :recipient
+  serialize :recipient, JSON
 
   belongs_to :entity, polymorphic: true, optional: true
   # belongs_to :user
