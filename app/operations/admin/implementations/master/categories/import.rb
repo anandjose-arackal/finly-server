@@ -10,30 +10,21 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
               :name
           ]
 
-  def process_row(data)
-    id = data[:id]
-    if id.present?
-      update_category(data)
-    else
-      create_category(data)
+  def create_record(data)
+    category = self.companies.categories.new data.except(:id)
+    unless category.save
+      return result false, category.errors.full_messages
     end
+    result true
   end
 
-  def update_category(data)
+  def update_record(data)
     category = self.company.categories.find_by id: data[:id]
     unless category
       return result false, "Category not found"
     end
 
     unless category.update(data)
-      return result false, category.errors.full_messages
-    end
-    result true
-  end
-
-  def create_category(data)
-    category = self.companies.categories.new data.except(:id)
-    unless category.save
       return result false, category.errors.full_messages
     end
     result true

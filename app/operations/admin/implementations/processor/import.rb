@@ -81,6 +81,19 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   end
 
   def process_row(data)
+    id = data[:id]
+    if id.present?
+      update_record(data)
+    else
+      create_record(data)
+    end
+  end
+
+  def update_record(data)
+    result success: false, message: "Error while processing item"
+  end
+
+  def create_record(data)
     result success: false, message: "Error while processing item"
   end
 
