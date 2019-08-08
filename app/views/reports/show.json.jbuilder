@@ -29,6 +29,7 @@ json.user_details do
   json.department @result.report&.user&.department&.name
   json.cost_center @result.report&.user&.cost_center&.name
   json.location @result.report&.user&.location&.name
+  json.operating_unit @result.report&.user&.gl_config[:operation_unit]
 end
 
 policy_id = nil
