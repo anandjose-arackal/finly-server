@@ -2,6 +2,12 @@ class AdminImplementationRequest < ApplicationRecord
   belongs_to :company
   belongs_to :admin_user
 
+  before_save do
+    if self.started_at.present? and self.completed_at.present? and self.runtime.blank?
+      self.runtime = self.completed_at - self.started_at
+    end
+  end
+
   enum status: [:pending, :in_progress, :completed, :failed, :error]
 
   serialize :request_params, JSON
