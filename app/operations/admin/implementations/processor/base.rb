@@ -3,11 +3,6 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
   attr_accessor :master, :implementation_request, :company, :input
 
-  def self.data_source(source = NoObject)
-    @data_source = source unless source == NoObject
-    @data_source
-  end
-
   def self.headers(headers = NoObject)
     @headers = headers unless headers == NoObject
     @headers
@@ -15,10 +10,6 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
   def headers
     self.class.headers
-  end
-
-  def data_source
-    self.class.data_source
   end
 
   def pre_validate

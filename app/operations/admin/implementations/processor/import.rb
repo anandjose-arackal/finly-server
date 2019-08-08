@@ -45,8 +45,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   end
 
   def process
-    sheets = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
-    self.input = sheets
+    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
     output = []
     failed = false
     self.input.each_with_index do |row, index|
