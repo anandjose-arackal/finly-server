@@ -28,7 +28,7 @@ class ApplicationMailer < ActionMailer::Base
 
     email = Email.create(
         entity: params&.dig(:entity),
-        company: company,
+        company: self.company,
         message_id: mail.message_id,
         sender: mail.from,
         recipient: mail.to,
