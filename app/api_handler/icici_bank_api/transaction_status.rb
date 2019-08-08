@@ -44,8 +44,6 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
   end
 
   def raw_api_params
-    ap "#{self.company_details}"
-    ap "inside the TransactionStatus class"
     {
         AGGRID: self.company_details["AGGR_ID"],
         CORPID: self.company_details["CORP_ID"],
@@ -82,7 +80,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
             end
           when "PENDING FOR PROCESSING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
-          when "REJECTED"
+          when "REJECTED", "RECALLED"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
           when "SUSPECT"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))

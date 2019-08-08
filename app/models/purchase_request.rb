@@ -46,7 +46,8 @@ class PurchaseRequest < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
-  validates :description, :location, :department, :policy, presence: true
+  validates :description, :location, :policy, presence: true
+  validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
@@ -168,7 +169,10 @@ class PurchaseRequest < ApplicationRecord
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
       total_cost: self&.total_amount&.value,
       controlling_user: self.get_reviewers&.first&.name,
-      rejection_note: self.reject_note
+      rejection_note: self.reject_note,
+      department: self.department&.name,
+      cost_center: self.cost_center&.name,
+      cost_allocation_items: cost_allocation_items
     }
   end
 
@@ -367,6 +371,10 @@ class PurchaseRequest < ApplicationRecord
       end
     end
     return department_id
+  end
+
+  def cost_allocation_items?
+    self.cost_allocation_items
   end
 
 end

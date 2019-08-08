@@ -16,6 +16,14 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
 					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
 
+	def personalizer
+		{
+				validate: {
+						before: Personalizer::Process.new([:bank_transfer, :payment_request, :beneficiary, :create_beneficiary_ticket], :validate, self)
+				}
+		}
+	end
+
 	def pre_validate
 	    if user.blank?
 	      add_message :error, 'User not found'
