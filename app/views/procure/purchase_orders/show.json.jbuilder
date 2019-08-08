@@ -109,6 +109,15 @@ json.items do
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
     json.purchase_request_item_quantity item&.purchase_request_item&.quantity
     json.amount item.rate * item.quantity
+    product = ""
+    case item.inventory_line_item&.product_type_id
+    when ProductType.id_for(:goods)
+      product = "goods"
+    when ProductType.id_for(:service)
+      product = "service"
+    end
+    json.product_type product
+    json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
