@@ -325,12 +325,12 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     approvers = invoice_line_item.parent.dlrms.map do |dlrm|
       taken_control_by = forwarded_to = reviewer = nil
       taken_control_by = dlrm.taken_control_by
-      forwarded_to = dlrm.forwarded_by
+      forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
-      if taken_control_by.present?
-        taken_control_by.name
-      elsif  forwarded_to.present?
+      if forwarded_to.present?
         forwarded_to.name
+      elsif taken_control_by.present?
+        taken_control_by.name
       elsif reviewer.present?
         reviewer.name
       end
