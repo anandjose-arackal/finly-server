@@ -159,7 +159,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def post_process
     # Update Status Tags for Procurement
     #   Find if all items are shipped
-    if self.purchase_order.all_items_accepted?
+    if self.purchase_order.all_items_shipped?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
