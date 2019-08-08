@@ -13,13 +13,13 @@ class Admin::Implementations::Processor::Export < Admin::Implementations::Proces
     data = input
     return contents if data.nil?
     self.implementation_request.update(requested_items: data.count)
-    data.each do |entry|
+    data.each_with_index do |entry, index|
       row = []
       self.headers.each do |field|
         row << self.send(field, entry)
       end
       contents << row
-      progress_update :in_progress
+      progress_update :in_progress, completed_items: (index + 1)
     end
     contents
   end
