@@ -2,8 +2,13 @@ class ApplicationMailer < ActionMailer::Base
   default from: 'noreply@finly.io',
           "Message-ID" => ->(v) {"<#{Digest::SHA2.hexdigest(Time.now.to_i.to_s)}@finly.io>"}
 
+<<<<<<< HEAD
   before_action :add_headers
   after_action :log_mail
+=======
+  # before_action :add_headers
+  # after_action :log_mail
+>>>>>>> 3d83fc89a916f583b452b1f9965376aa00860155
 
   layout 'mailer'
 

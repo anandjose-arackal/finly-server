@@ -511,7 +511,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_shipped?
     shipped = true
     self.items.each do |item|
-      unless item.quantity == item.delivered
+      unless item.quantity == item.accepted
         shipped = false
         break
       end
@@ -532,6 +532,24 @@ class PurchaseOrder < ApplicationRecord
     end
     shipped
   end
+
+  def all_items_billed?
+    billed = true
+    self.items.each do |item|
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+      unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+        billed = false
+        return
+      end
+    end
+    billed
+  end
+
+  def partial_items_accepted?
+    any_item = self.items.map { |item| item if ( item.accepted > 0 || (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) ) }.compact
+    any_item.present?
+  end
+
 
   def procurement_index_details
     {

@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments, :po_revision, :inv_items
+                :id_current_attachments, :po_revision, :inv_items, :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -11,7 +11,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.purchase_order = self.procurement&.purchase_order
 
     if self.procurement.po_revisions.present?
-      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
       self.po_revision = self.procurement.po_revisions.last
       if po_revision.present?
         self.purchase_order = self.po_revision
@@ -21,16 +20,16 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create Receipt Note'
       return
     end
 
     if self.inward_document_params[:delivery_date].blank?
-      add_message :error, "Please add the delivery date for this GRN."
+      add_message :error, "Please add the delivery date for this Receipt Note."
       return
     end
 
@@ -46,65 +45,41 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
-    # unless self.inward_document.id == self.procurement.inward_documents.last.id
-    #   add_message :error, 'You cannot modify the selected GRN'
-    #   return
-    # end
-
     unless self.inward_document.id == self.procurement.inward_documents.last.id
-      add_message :error, "Cannot update old GRNs"
+      add_message :error, "Cannot update old Receipt Notes"
       return
     end
 
     # if invoice was added after adding a grn, block modification of current grn
     if self.procurement.documents&.first&.class&.name == "Invoice"
-      add_message :error, "You have added an Invoice for this GRN. If you want to modify it, delete the invoice."
+      add_message :error, "You have added an Invoice for this Receipt Note. If you want to modify it, delete the invoice."
       return
     end
 
     inward_document_params[:items_attributes].each do |item|
-      delivered = item[:delivered] || 0
-      accepted = item[:accepted] || 0
-      rejected = item[:rejected] || 0
-
       po_items = self.inward_document.items.find_by(id: item[:id])
-      
-      if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
-        add_message :error, "Negative quantity entered for #{po_items.description}"
-        break
-      end
 
-
-      remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
-      
-      if  remaining < delivered.to_f
-        add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
-        break
-      end 
-
-      if delivered.to_f > po_items.quantity.to_f
-        add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
-        break
-      end
-
-
-      unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
-        break
+      case po_items.inventory_line_item.product_type_id
+      when ProductType.id_for(:goods)
+        validations_for_goods(item, po_items)
+      when ProductType.id_for(:service)
+        validations_for_services(item, po_items)
       end
     end
 
+    # todo take care of this
     if self.procurement.invoices.present?
       inv_items = self.procurement.invoices.includes(:items)
       self.inward_document.items.each do |item|
 
-        item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        item_q = inv_items.map { |iv| iv.items.where(purchase_order_item_id: item.purchase_order_item_id) }.flatten
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
         next if item_q.blank? 
+        next if item.product_type_id == ProductType.id_for(:service) # for now skipping this check for service items
         next if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ))
         # if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
         if item.previously_delivered < item_q.first.quantity
-          add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
+          add_message :error, 'Items in Receipt Note cannot be reduced as they have already been invoiced'
           break
         end
       end
@@ -133,8 +108,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     if inward_document.valid?
       # Keep track of delivered items in procurement items
       inward_document.items.each do |item|
-        po_item = update_purchase_order_item(item)
-        update_accepting_item_amount(item)
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:goods)
+          po_item = update_purchase_order_item(item)
+          update_accepting_item_amount(item)
+        when ProductType.id_for(:service)
+          po_item = update_service_item(item)
+        end
+
         # item.update(previously_delivered: po_item.accepted)
       end
 
@@ -159,14 +140,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def post_process
     # Update Status Tags for Procurement
     #   Find if all items are shipped
-    if self.purchase_order.all_items_accepted?
+    if all_items_shipped?(self.purchase_order)
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
       # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
       params[:purchase_order_id] = self.purchase_order.id
-      Procurements::PurchaseOrders::Close.(user, params) if self.purchase_order.all_items_accepted?(inward_document)
+      Procurements::PurchaseOrders::Close.(current_user, params) if all_items_accepted?(self.purchase_order)
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
@@ -177,14 +158,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     end
 
-    add_message :success, 'Successfully updated GRN'
+    add_message :success, 'Successfully updated Receipt Note'
   end
 
   private
 
   def inward_document_parameters
     params.require(:inward_document).permit(:id, :doc_number, :override_doc_number, :delivery_date,
-                                            items_attributes: [:id, :delivered, :accepted, :rejected, :comment],
+                                            items_attributes: [:id, :delivered, :accepted, :rejected, :comment, :billable_amount],
                                             attachments: []
     )
 
@@ -213,7 +194,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       end
 
       if item.changes[:rejected].present?
-        rejected = (rejected - item.changes[:rejected][0]) + item.changes[:rejected][1]
+        rejected = (rejected.to_f - item.changes[:rejected][0].to_f) + item.changes[:rejected][1].to_f
       end
     end
 
@@ -230,7 +211,20 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
   end
 
-  private
+  def update_service_item(item)
+    purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
+
+    previously_billed_amount = purchase_order_item.previously_billed_amount
+    if item.changes[:billable_amount].present?
+      # previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
+      previously_billed_amount = previously_billed_amount + (item.changes[:billable_amount][1] - item.changes[:billable_amount][0])
+    end
+
+    purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
+    purchase_order_item.save
+
+    purchase_order_item
+  end
 
   def update_accepting_item_amount(item)
     amount = item.per_unit_price * item.accepted rescue nil
@@ -241,6 +235,149 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         item.create_accepting_item_amount(currency_id: 1, value: amount)
       end
     end
+  end
+
+  def validations_for_goods(item, po_items)
+    delivered = item[:delivered] || 0
+    accepted = item[:accepted] || 0
+    rejected = item[:rejected] || 0
+
+    if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
+      add_message :error, "Negative quantity entered for #{po_items.description}"
+      # break
+      return
+    end
+
+
+    remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
+
+    if  remaining < delivered.to_f
+      add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
+      # break
+      return
+    end
+
+    if delivered.to_f > po_items.quantity.to_f
+      add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
+      # break
+      return
+    end
+
+
+    unless delivered.to_f == accepted.to_f + rejected.to_f
+      add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
+      # break
+      return
+    end
+  end
+
+  def validations_for_services(item, po_items)
+    billable_amount = item[:billable_amount] || 0
+
+    if billable_amount.to_f < 0
+      add_message :error, "Negative billable amount entered for #{po_items.description}"
+      return
+    end
+
+    if ( billable_amount.to_f + po_items.previously_billed_amount.to_f ) > po_items.order_amount.to_f
+      add_message :error, "For item - #{po_items.description}, billable amount has exceeded the order amount"
+      return
+    end
+
+  end
+
+
+
+  def all_items_shipped?(po)
+    configuration = user.company.feature_subscription
+
+    self.grn_enabled = configuration.grn_enabled == true
+    self.grn_disabled = configuration.grn_enabled == false
+
+    self.srn_enabled = configuration.srn_enabled == true
+    self.srn_disabled = configuration.srn_enabled == false
+
+    shipped = true
+
+    if self.grn_enabled && self.srn_disabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        unless item.quantity == item.accepted
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_disabled && self.srn_enabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_enabled && self.srn_enabled
+      po.items.each do |item|
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:goods)
+          unless item.quantity == item.accepted
+            shipped = false
+            break
+          end
+        when ProductType.id_for(:service)
+          unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+            shipped = false
+            break
+          end
+        end
+      end
+    end
+    shipped
+  end
+
+  def all_items_accepted?(po)
+    configuration = user.company.feature_subscription
+
+    self.grn_enabled = configuration.grn_enabled == true
+    self.grn_disabled = configuration.grn_enabled == false
+
+    self.srn_enabled = configuration.srn_enabled == true
+    self.srn_disabled = configuration.srn_enabled == false
+
+    shipped = true
+
+    if self.grn_enabled && self.srn_disabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+        unless item.quantity == (item.accepted + 0)
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_disabled && self.srn_enabled
+      po.items.each do |item|
+        next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+          shipped = false
+          break
+        end
+      end
+    elsif self.grn_enabled && self.srn_enabled
+      po.items.each do |item|
+        case item.inventory_line_item.product_type_id
+        when ProductType.id_for(:service)
+          unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+            shipped = false
+            break
+          end
+        when ProductType.id_for(:goods)
+          unless item.quantity == (item.accepted + 0)
+            shipped = false
+            break
+          end
+        end
+      end
+    end
+    shipped
   end
 
 end

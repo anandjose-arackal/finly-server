@@ -72,6 +72,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         end
       end
     end
+    
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      request_types[:grns] = false
+    end
+
   end
 
   def success
