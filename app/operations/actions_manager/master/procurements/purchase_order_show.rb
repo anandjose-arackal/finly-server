@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-    :take_control, :return_control, :forward, :mark_vendor_confirmed
+    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment
   ]
 
   def initialize(user = nil, params = {})
@@ -17,6 +17,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     end
     self.procurement = result.procurement
     self.purchase_order = result.purchase_order
+  end
+
+  def make_payment
+    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && user.is_bank_payment_request_initiator?(purchase_order)
   end
 
   def mark_send_to_vendor
