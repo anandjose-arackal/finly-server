@@ -846,6 +846,9 @@
 #                                                          PATCH  /users/:id(.:format)                                                                                                users#update
 #                                                          PUT    /users/:id(.:format)                                                                                                users#update
 #                                                          DELETE /users/:id(.:format)                                                                                                users#destroy
+#                                     group_entities_login POST   /users/group_entities_login(.:format)                                                                               users#group_entities_login
+#                                           group_entities GET    /users/group_entities(.:format)                                                                                     users#group_entities
+#                                       multi_entity_login POST   /multi_entity_login(.:format)                                                                                       multi_entity_login/token#create
 #                                        user_user_summary GET    /users/:user_id/summary(.:format)                                                                                   users#summary
 #                                             user_details POST   /users/:user_id/user_details(.:format)                                                                              users#user_details
 #                                         user_update_team PATCH  /users/:user_id/update_user_team(.:format)                                                                          users#update_team
@@ -2997,6 +3000,9 @@ Rails.application.routes.draw do
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
   get 'users/all_cards', to: 'users#all_cards', as: :all_cards
+  post 'users/group_entities_login', to: 'users#group_entities_login', as: :group_entities_login
+  get 'group_entities_after_login', to: 'users#group_entities_after_login', as: :group_entities_after_login
+  post 'multi_entity_login', to: 'multi_entity_login/token#create', as: :multi_entity_login
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
@@ -3060,11 +3066,18 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/report#processing_cancel'
         post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
         get 'payment_file', to: 'settlement/report#processing_payment_file'
+        get '/:id/generate_template_file', to: 'settlement/report#generate_template_file'
+        post '/:id/process_template_file', to: 'settlement/report#process_template_file'
+        get '/:id', to: 'settlement/report#processing_show'
+        patch '/:id', to: 'settlement/report#processing_update'
+        get '/:id/items', to: 'settlement/report#processing_show_items'
       end
       get 'completed', to: 'settlement/report#completed_index'
       get 'completed/count', to: 'settlement/report#completed_count'
       get 'completed/batch', to: 'settlement/report#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
+      get 'completed/:id', to: 'settlement/report#completed_show'
+      get 'completed/:id/items', to: 'settlement/report#completed_show_items'
     end
     scope :money_requests do
       get 'pending', to: 'settlement/money_requests#pending_index'
@@ -3077,11 +3090,18 @@ Rails.application.routes.draw do
         post 'cancel', to: 'settlement/money_requests#processing_cancel'
         post 'mark_as_paid', to: 'settlement/money_requests#processing_mark_paid'
         get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
+        get '/:id/generate_template_file', to: 'settlement/money_requests#generate_template_file'
+        post '/:id/process_template_file', to: 'settlement/money_requests#process_template_file'
+      	get '/:id', to: 'settlement/money_requests#processing_show'
+        patch '/:id', to: 'settlement/money_requests#processing_update'
+      	get '/:id/items', to: 'settlement/money_requests#processing_show_items'
       end
       get 'completed', to: 'settlement/money_requests#completed_index'
       get 'completed/count', to: 'settlement/money_requests#completed_count'
       get 'completed/batch', to: 'settlement/money_requests#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/money_requests#completed_batch_count'
+      get 'completed/:id', to: 'settlement/money_requests#completed_show'
+      get 'completed/:id/items', to: 'settlement/money_requests#completed_show_items'
     end
   end
 
@@ -3340,6 +3360,7 @@ Rails.application.routes.draw do
 
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
+    get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests', to: 'bank_payment_requests#create'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
@@ -3572,6 +3593,7 @@ Rails.application.routes.draw do
 
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
+    get 'inward_documents/filter_config', to: "inward_documents#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
       # get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'

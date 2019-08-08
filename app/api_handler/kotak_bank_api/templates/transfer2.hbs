@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:pay="http://www.kotak.com/schemas/CMS_Generic/Payment_Request.xsd">
+   <soap:Header />
+   <soap:Body>
+      <pay:Payment>
+         <pay:RequestHeader>
+            <pay:MessageId>FINLYNEFT61894137571</pay:MessageId> <!-- Unique ID -->
+            <pay:MsgSource>FINLY</pay:MsgSource> <!-- Initials of Entity eg. FINLY -->
+            <pay:ClientCode>TEMPTEST1</pay:ClientCode><!-- TEMPTEST1 -->
+            <pay:BatchRefNmbr>23</pay:BatchRefNmbr>
+            <pay:HeaderChecksum />
+         </pay:RequestHeader>
+         <pay:InstrumentList>
+            <pay:instrument>
+               <pay:InstRefNo>FINLYNEFT61894137571</pay:InstRefNo> <!-- Message ID can be mentioned -->
+               <pay:CompanyId />
+               <pay:CompBatchId />
+               <pay:ConfidentialInd />
+               <pay:MyProdCode>WPAY</pay:MyProdCode><!-- Client master maintainance is done at Banks end for each client. Bank will provide the MYPRODUCT which needs to be passed in Production. In case of UAT, you need to use CMSPAY as the MYPRODUCT -->
+               <pay:CompTransNo />
+               <!--Optional:-->
+               <!--Optional:-->
+               <!-- Basis the IFSC code and amount, pls mention the payment type
+                  - in case Kotak to Kotak transfer- Payment type will be IFT
+                  - In case other bank transfer value is below 2lakhs, NEFT
+                  - In case other bank transfer with value above 2 lakhs- RTGS
+                  - IMPS in case of IMPS enabled IFSC codes. Here the cap for the amount is 2 lakhs -->
+               <pay:PayMode>NEFT</pay:PayMode>
+               <pay:TxnAmnt>10.2</pay:TxnAmnt> <!-- 20,2 -->
+               <!--Optional:-->
+               <pay:AccountNo>09582650000173</pay:AccountNo><!-- Mention your Account number maintained in Kotak which needs to be debited for the amount and credited to the beneficiary. -->
+               <!--Optional:-->
+               <!--Optional:-->
+               <pay:DrDesc>FUND TRANSFER</pay:DrDesc><!-- In case Accounting and Authorisation is maintained at Instrument then only mentioned description will be passed in statement else std narration will be passed -->
+               <!--Optional:-->
+               <pay:PaymentDt>2019-06-21</pay:PaymentDt><!-- Format expected: YYYY-MM-DD -->
+               <!--Optional:-->
+               <pay:RecBrCd>HDFC0001748</pay:RecBrCd><!-- Mention the Beneficiary bank IFSC code. It will be always 11 digit -->
+               <!--Optional:-->
+               <pay:BeneAcctNo>50200014661894</pay:BeneAcctNo><!-- Mention the Beneficiary bank account number -->
+               <!--Optional:-->
+               <pay:BeneName>FinlyHDFC</pay:BeneName><!-- Mention the Beneficiary name. -->
+               <pay:InstDt>2019-06-21</pay:InstDt><!-- Format expected: YYYY-MM-DD -->
+            	<pay:EnrichmentSet>
+                 <pay:Enrichment />
+               </pay:EnrichmentSet>
+            </pay:instrument>
+         </pay:InstrumentList>
+      </pay:Payment>
+   </soap:Body>
+</soap:Envelope>

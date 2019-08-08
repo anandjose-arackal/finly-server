@@ -957,7 +957,7 @@ class Expense < ApplicationRecord
   end
 
   def has_custom_fields?
-    !!self.sub_expense&.custom_fields.present?
+    !!self.sub_expense&.custom_fields.exists?
   end
 
   def sub_expense

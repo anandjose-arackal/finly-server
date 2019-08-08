@@ -1,0 +1,1 @@
+json.bank_accounts @result.bank_accounts

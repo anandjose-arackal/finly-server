@@ -99,6 +99,16 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
+    invalid_invoices = []
+    self.inward_invoices.each do |invoice|
+      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+    end
+
+    if invalid_invoices.present?
+      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:id).compact.join(", ")}\", are already linked to a payment ticket"
+      return
+    end
+
     if self.policy.blank?
       add_message :error, "Policy not found."
       return
@@ -250,7 +260,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
             value: self.requested_amount,
             currency_id: 1
         },
-        payment_mode: "NEFT",
+        payment_mode: self.payment_mode,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -276,12 +286,14 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
   def retrieve_initiating_account(company)
     case company&.feature_subscription&.bank_service_provider
-      when "YES"
-        initiating_account = user.company.yes_bank_company_account
-      when "ICICI"
-        initiating_account = user.company.icici_bank_company_account
-      else
-        initiating_account = user.company.yes_bank_company_account
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
     end
     initiating_account
   end

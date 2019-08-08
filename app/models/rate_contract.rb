@@ -84,5 +84,9 @@ class RateContract < ApplicationRecord
     end
   end
 
+  def vendor_display_name
+    self&.vendor&.business_name || self&.vendor&.name
+  end
+
 
 end

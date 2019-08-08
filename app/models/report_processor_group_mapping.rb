@@ -16,6 +16,7 @@
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
 #  marked_as_closed           :boolean
+#  bank_reference_number      :string(255)
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord
@@ -37,12 +38,17 @@ class ReportProcessorGroupMapping < ApplicationRecord
   accepts_nested_attributes_for :reports
   accepts_nested_attributes_for :system_messages
 
+  delegate :completed?, :pending?, :cancelled?, :scheduled?, :failed?, :scheduled?, :processing?, to: :status
+
   scope :with_id, -> (id) { where id: id }
   scope :with_processor_group_id, -> (group_id) { where processor_group_id: group_id }
   scope :with_user_id, -> (user_id) { where user_id: user_id }
   scope :pending, -> { where status_id: ReportProcessorGroupStatus.id_for(:pending) }
-  scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
-  scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
+  scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.ids_for([:completed, :cancelled]) }
+  scope :not_completed_including_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
+  scope :exclude_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:cancelled) }
+  scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
+  scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable,:reports }
   scope :sum_amounts, -> { joins(:amount).sum(:INR) }
   scope :pluck_group_id, -> { pluck(:processor_group_id) }
 
