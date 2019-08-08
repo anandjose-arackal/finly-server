@@ -20,6 +20,8 @@ class ApplicationMailer < ActionMailer::Base
     mailer_klass = self.class.to_s
     mailer_action = self.action_name
 
+    debugger
+
     if mail.multipart?
       body = mail.html_part.decoded
     else
