@@ -62,6 +62,11 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         end
       end
     end
+
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      document_types[:grn] = false
+    end
+
     self.result = []
   end
 
@@ -247,7 +252,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "GRN",
+        title: "Receipt Note",
         type: 'receive',
         count: procurements.count,
         # filters: [{filter_status_tags: [7]}]

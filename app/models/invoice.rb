@@ -84,14 +84,6 @@
 #  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
-#  payment_agreement_id            :integer
-#  vendor_location_id              :integer
-#  billing_type_id                 :integer
-#  payment_agreement_escalation_id :integer
-#  invoice_frequency_id            :integer
-#  billing_start_date              :datetime
-#  billing_day_of_month            :integer
-#  agreement_based_next_due_date   :date
 #
 
 class Invoice < ApplicationRecord
@@ -529,8 +521,14 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
+      user = RequestStore.store[:current_user]
+      configuration = user.company.feature_subscription.srn_enabled rescue false
+      if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
+        return self.invoice_items.map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
+      end
+
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
+      return self.invoice_items.map {|p| p.amount&.value }.compact.sum
     else
       return 0
     end

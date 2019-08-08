@@ -5,6 +5,7 @@ json.result do
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
     json.rejection_note @result.purchase_request&.reject_note
+    json.cost_allocation_items @result&.purchase_request&.cost_allocation_items
     # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
       json.name @result.purchase_request.creator&.name
@@ -32,6 +33,8 @@ json.result do
     end
     json.total_cost @result.purchase_request.calculate_total_amount
     json.total_items @result.line_items_count
+    # Checks if any line item as an associated PO for it
+    json.is_any_po_created @result.is_any_po_created
     json.line_items do
       if @result.line_items.present?
         json.array!(@result.line_items) do |line_item|
@@ -40,7 +43,14 @@ json.result do
           json.rejected line_item.rejected
           json.unit_of_measurement line_item.unit_of_measurement
           json.reject_note line_item.reject_note  
-
+          json.department do
+            json.name line_item&.department&.name
+            json.id line_item&.department_id
+          end
+          json.cost_center do
+            json.name line_item&.cost_center&.name
+            json.id line_item&.cost_center&.id
+          end
           json.category do
             json.name line_item.category&.name
             json.id line_item.category_id
@@ -73,6 +83,11 @@ json.result do
             json.currency_id line_item&.per_unit_estimated_amount&.currency_id
             json.value line_item&.per_unit_estimated_amount&.value
             json.id line_item&.per_unit_estimated_amount_id
+          end
+
+          json.po_creator do
+            json.id line_item.purchase_order_item.purchase_order.user_id rescue nil
+            json.name line_item.purchase_order_item.purchase_order.user.name rescue nil
           end
           json.attachment_attributes do
             # json.uid line_item.attachment&.id

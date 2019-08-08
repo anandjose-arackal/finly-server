@@ -5,7 +5,7 @@
 #  id            :integer          not null, primary key
 #  name          :string(255)      not null
 #  resource_type :string(255)      not null
-#  user_id       :integer
+#  user_id       :integer          not null
 #  last_used_at  :datetime
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null

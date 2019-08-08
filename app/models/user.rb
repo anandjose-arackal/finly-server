@@ -560,7 +560,7 @@ class User < ApplicationRecord
   }
 
   scope :includes_for_admin_panel, -> {
-    includes(:cards, :company)
+    includes(:cards, :company, :profile)
   }
 
   scope :includes_for_index, -> { includes(:profile) }
