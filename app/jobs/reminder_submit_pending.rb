@@ -40,13 +40,15 @@ class ReminderSubmitPending < ApplicationJob
       params[:filter_procurement_type] = "purchase_order"
       params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
       User.where(company_id: 156).where(id: initiator_ids).each do |user|
-        grn_ids = Procurements::Grn::Pending::Index.(user, params).procurements.where("DATE(procurements.created_at) >= ?", created_at).joins(:inward_documents).where("inward_documents.user_id = ?", user.id).pluck('inward_documents.id')
-        inward_documents = user.company.inward_documents.where(id: grn_ids) rescue nil
-        params[:inward_documents] = inward_documents
-        params[:po_invoices] = user.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open)).where("DATE(created_at) >= ?", created_at).filter_invoice_type('po_invoice') rescue nil
-        params[:non_po_invoices] = user.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open)).where("DATE(created_at) >= ?", created_at).filter_invoice_type('non_po_invoice') rescue nil
+        if user.email.present?
+          grn_ids = Procurements::Grn::Pending::Index.(user, params).procurements.where("DATE(procurements.created_at) >= ?", created_at).joins(:inward_documents).where("inward_documents.user_id = ?", user.id).pluck('inward_documents.id')
+          inward_documents = user.company.inward_documents.where(id: grn_ids) rescue nil
+          params[:inward_documents] = inward_documents
+          params[:po_invoices] = user.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open)).where("DATE(created_at) >= ?", created_at).filter_invoice_type('po_invoice') rescue nil
+          params[:non_po_invoices] = user.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:open)).where("DATE(created_at) >= ?", created_at).filter_invoice_type('non_po_invoice') rescue nil
 
-        Event::EDocument::RemindPendingSubmit.(user, params) if params.values.present?
+          Event::EDocument::RemindPendingSubmit.(user, params) if params.values.present?
+        end
       end
     end
   end

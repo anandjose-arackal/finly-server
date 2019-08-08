@@ -83,7 +83,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
       apply_filter
-      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date
+      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details
