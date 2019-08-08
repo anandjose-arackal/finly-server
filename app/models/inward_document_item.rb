@@ -26,4 +26,11 @@ class InwardDocumentItem < ApplicationRecord
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :product_type, optional: true
   belongs_to :purchase_order_item, optional: true
+  belongs_to :accepting_item_amount, optional: true, class_name: "Amount"
+
+
+  def per_unit_price
+    price= self.purchase_order_item&.total_amount&.value/self.purchase_order_item.quantity rescue nil
+    price.round(2) if price.present?
+  end
 end

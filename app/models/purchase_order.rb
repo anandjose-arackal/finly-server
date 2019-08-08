@@ -773,7 +773,6 @@ class PurchaseOrder < ApplicationRecord
     balance_amount = 0
     total_amount = 0
     persisted = false
-
     self.items.each do |item|
       if item.persisted?
         persisted = true
@@ -1026,7 +1025,7 @@ class PurchaseOrder < ApplicationRecord
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id
     }
   end
 
@@ -1037,10 +1036,15 @@ class PurchaseOrder < ApplicationRecord
   def purchase_request_tasks
     parameters = RequestStore.store[:params]
     if parameters[:associated_resource] == "purchase_request_item"
+      # Initially when PO is created from PR, then cost allocation item is line_item by default
+      update_po_cost_allocation_items
       item_ids = self.filter_purchase_request_item_ids(parameters, user)
       # Status transition of PR
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
+      self.reload
+      calculate_line_items(true)
+      self.save
     end
   end
 
@@ -1076,6 +1080,10 @@ class PurchaseOrder < ApplicationRecord
         end unless document_ids.blank?
       end
     end
+  end
+
+  def update_po_cost_allocation_items
+    self.update_column('cost_allocation_items', true)
   end
 
 end

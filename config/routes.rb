@@ -3588,6 +3588,7 @@ Rails.application.routes.draw do
 
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
+    get 'inward_documents/filter_config', to: "inward_documents#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
       # get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
