@@ -41,6 +41,7 @@ class UserMailer < ApplicationMailer
     @data = user
     @token = token
     @note = note
+    headers['X-SES-CONFIGURATION-SET'] = 'email_tracker_core'
     mail to: user.email, subject: 'Invitation to use Finly!'
   end
 
