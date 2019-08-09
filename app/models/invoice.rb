@@ -109,7 +109,7 @@ class Invoice < ApplicationRecord
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
   belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
-  belongs_to :proforma_advance, opstatustional: true, class_name: "Amount", foreign_key: :proforma_advance
+  belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
 
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
