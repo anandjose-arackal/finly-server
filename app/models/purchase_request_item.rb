@@ -66,7 +66,7 @@ class PurchaseRequestItem < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
   validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true

@@ -2815,6 +2815,10 @@ ActiveRecord::Schema.define(version: 2019_08_08_065841) do
     t.boolean "purchase_requisition_system"
     t.string "bank_service_provider"
     t.boolean "group_entity_structure", default: false
+    t.boolean "grn_enabled", default: true
+    t.boolean "srn_enabled", default: false
+    t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
+    t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -3330,6 +3334,7 @@ ActiveRecord::Schema.define(version: 2019_08_08_065841) do
     t.decimal "cgst", precision: 20
     t.decimal "igst", precision: 20
     t.integer "purchase_order_item_id"
+    t.integer "billable_amount_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -3532,10 +3537,15 @@ ActiveRecord::Schema.define(version: 2019_08_08_065841) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.integer "accepting_item_amount_id"
+    t.decimal "billable_amount", precision: 10
+    t.decimal "order_amount", precision: 10
+    t.decimal "previously_billed_amount", precision: 10
+    t.integer "product_type_id", default: 1
     t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["deleted_at"], name: "index_inward_document_items_on_deleted_at"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
+    t.index ["product_type_id"], name: "index_inward_document_items_on_product_type_id"
     t.index ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id"
   end
 
@@ -4958,6 +4968,7 @@ ActiveRecord::Schema.define(version: 2019_08_08_065841) do
     t.decimal "sgst", precision: 20
     t.decimal "igst", precision: 20
     t.integer "taxable_amount_id"
+    t.decimal "previously_billed_amount", precision: 10, default: "0"
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
