@@ -28,9 +28,6 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
       if self.bank_transaction.completed?
         unless self.bank_transaction.neft?
           self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-          if self.payment&.invoice.present?
-            self.payment&.invoice&.update_invoice_status
-          end
           self.payment_order.update_order_status
           self.payment_order.update_processed_amount
         end
@@ -45,6 +42,12 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
         self.payment_order.update_order_status
         self.payment_order.update_processed_amount
       end
+    end
+  end
+
+  def post_process
+    if self.payment&.invoice.present?
+      self.payment&.invoice&.update_invoice_status
     end
   end
 end
