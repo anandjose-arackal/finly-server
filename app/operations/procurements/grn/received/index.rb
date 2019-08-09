@@ -19,8 +19,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
         # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
         received_pending_ids = [StatusTag.id_for(:shipment_received)]
         # pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
-        case 
-        when user.vendor_payments_admin?
+ 
+        if user.vendor_payments_admin?
           pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
         else
           policy_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ? AND user_id = ?', UserRole.id_for(:goods_receiver), user.id).pluck(:id).uniq rescue []
