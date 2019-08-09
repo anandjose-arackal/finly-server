@@ -134,11 +134,12 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst
+                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst,
+                    :purchase_order_item_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
-      json.tds_applicable item.inventory_line_item&.tds_applicable
+      json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -148,6 +149,15 @@ json.invoice do
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
+      json.billable_amount precision_value item.billable_amount&.value
+      product = ""
+      case item.inventory_line_item&.product_type_id
+      when ProductType.id_for(:goods)
+        product = "goods"
+      when ProductType.id_for(:service)
+        product = "service"
+      end      
+      json.product_type product
     end
   end
 
@@ -273,12 +283,7 @@ json.reviewal_chains do
           #   end
           # else
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold, :min
-              if reviewer.max.present?
-                json.max reviewer.max
-              else
-                json.max '∞'
-              end
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
               json.reviewer_details reviewer.reviewer.as_json
             end
           # end
