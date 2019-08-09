@@ -62,12 +62,14 @@ class ReminderAwaitingApproval < ApplicationJob
       # Double check for company
       params = {}
       User.where(company_id: 156).where(id: reviewer_ids).each do |user|
-        params[:purchase_orders] = PurchaseOrder.awaiting_action_items(user.id)
-        params[:non_po_invoices] = Invoice.awaiting_action_items(user.id).filter_invoice_type('non_po_invoice')
-        params[:po_invoices] = Invoice.awaiting_action_items(user.id).filter_invoice_type('po_invoice')
-        params[:bank_payment_requests] = BankPaymentRequest.awaiting_action_items(user.id)
-        params[:purchase_requests] = PurchaseRequest.awaiting_action_items(user.id)
-        Event::EDocument::RemindAwaitingApproval.(user, params) if params.values.present?
+        if user.email.present?
+          params[:purchase_orders] = PurchaseOrder.awaiting_action_items(user.id)
+          params[:non_po_invoices] = Invoice.awaiting_action_items(user.id).filter_invoice_type('non_po_invoice')
+          params[:po_invoices] = Invoice.awaiting_action_items(user.id).filter_invoice_type('po_invoice')
+          params[:bank_payment_requests] = BankPaymentRequest.awaiting_action_items(user.id)
+          params[:purchase_requests] = PurchaseRequest.awaiting_action_items(user.id)
+          Event::EDocument::RemindAwaitingApproval.(user, params) if params.values.present?
+        end
       end
     end
   end
