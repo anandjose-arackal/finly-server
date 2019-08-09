@@ -24,7 +24,7 @@ class Navbar::Master::Base
   end
 
   def self.cog
-    default_cog + set_data_map[:cog]
+    default_cog + set_data_map[:cog_menu] + set_data_map[:cog_modules]
   end
 
   def self.structure(type)

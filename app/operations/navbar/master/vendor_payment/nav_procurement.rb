@@ -13,12 +13,19 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request]}
       ]
   )
+  
   register_structure(
-      :cog,
+      :cog_menu,
       [
           :attachments, :users,
           :load_company_balance, :statements,
-          :organization_account,
+          :organization_account
+      ]
+  )
+
+  register_structure(
+      :cog_modules,
+      [
           :finly_expense_management, :finly_disburse, :finly_collect, :finly_insights
       ]
   )
