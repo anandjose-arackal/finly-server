@@ -32,28 +32,28 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
             title: "Pending",
             count: self.trips.filter_status('booking_pending')&.count,
             total_amount: self.trips.filter_status('booking_pending').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 'booking_pending'}]
           },
 
           {
             title: "Processing",
             count: self.trips.filter_status('processing')&.count,
             total_amount: self.trips.filter_status('processing').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 'processing'}]
           },
 
           {
             title: "Confirmed",
             count: self.trips.filter_status('booking_confirmed')&.count,
             total_amount: self.trips.filter_status('booking_confirmed').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 'booking_confirmed'}]
           },
 
           {
             title: "Rejected",
             count: self.trips.filter_status('rejected')&.count,
             total_amount: self.trips.filter_status('rejected').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: []
+            filters: [{filter_status: 'rejected'}]
           }
         ]
 
