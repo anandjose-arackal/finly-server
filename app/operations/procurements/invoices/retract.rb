@@ -5,6 +5,9 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
     {
         post_process: {
             after: Personalizer::Process.new([:procurements, :invoices, :retract], :post_process, self)
+        },
+        validate: {
+            after: Personalizer::Process.new([:procurements, :invoices, :retract], :validate, self )
         }
     }
   end
