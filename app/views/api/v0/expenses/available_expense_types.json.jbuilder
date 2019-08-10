@@ -32,3 +32,5 @@ json.categories do
     json.extract! category, :id, :name
   end
 end
+
+json.state_codes @result.gst_state_codes
