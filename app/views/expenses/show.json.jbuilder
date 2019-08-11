@@ -180,3 +180,5 @@ json.tax_details do
   json.hsn_sac @result.expense.hsn_sac
   json.state_of_expense_id @result.expense.state_of_expense_id
 end
+
+json.tax_rates @result.tax_rates
