@@ -1,3 +1,4 @@
+expense = @result.expense
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
                                     :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                                     :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id, :usage_date_type, :usage_date_start, :usage_date_end
@@ -172,13 +173,14 @@ end
 
 # Tax details for this expense
 json.tax_details do
-  json.merchant_gstin @result.expense.gstin_location.gstin
-  json.merchant_state_id @result.expense.gstin_location.state_id
-  json.tax_amount @result.expense.gst_amount&.value
-  json.gst_type_id @result.expense.gst_type_id
-  json.merchant_bill_no @result.expense.merchant_bill_no
-  json.hsn_sac @result.expense.hsn_sac
-  json.state_of_expense_id @result.expense.state_of_expense_id
+  json.merchant_gstin expense.gstin_location&.gstin
+  json.merchant_state_id expense.gstin_location&.state_id
+  json.merchant_registered_name expense.gstin_location&.gstin_master&.legal_name_of_business
+  json.tax_amount expense.gst_amount&.value
+  json.gst_type_id expense.gst_type_id
+  json.merchant_bill_no expense.merchant_bill_no
+  json.hsn_sac expense.hsn_sac
+  json.state_of_expense_id expense.state_of_expense_id
 end
 
 json.tax_rates @result.tax_rates
