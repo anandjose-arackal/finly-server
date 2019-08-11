@@ -86,7 +86,7 @@ class Expense < ApplicationRecord
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
   has_one :payment, as: :reference_resource
-  has_one :gstin_location
+  belongs_to :gstin_location
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
