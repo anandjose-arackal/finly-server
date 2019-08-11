@@ -79,6 +79,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     export headers, output
   end
 
+  def template
+    Exporter::Spreadsheet.new(user, {headers: headers, contents: []})
+  end
+
   def process_row(data)
     id = data[:id]
     if id.present?

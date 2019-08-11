@@ -42,10 +42,6 @@ class Admin::Implementations::RequestHandler < Admin::Base
     self.implementation_request.save
   end
 
-  def post_process
-    self.master.call(nil, admin_user_id: user.id, implementation_request_id: self.implementation_request.id)
-  end
-
   protected
 
   def init_master
