@@ -118,18 +118,21 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def process
+    debugger
     self.expense = user.expenses.build(expense_params)
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
 
     if self.expense.save
+      debugger
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
         self.receipt.save
       end
     else
+      debugger
       add_message :error, self.expense.errors.full_messages
     end
   end

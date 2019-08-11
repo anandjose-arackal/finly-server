@@ -68,6 +68,7 @@ class Expense < ApplicationRecord
   belongs_to :spent_from, optional: true, class_name: 'UserPocket'
   belongs_to :created_by, class_name: "User", optional: true
   belongs_to :modified_by, class_name: "User", optional: true
+  belongs_to :gstin_location, optional: true
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -86,7 +87,6 @@ class Expense < ApplicationRecord
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
   has_one :payment, as: :reference_resource
-  belongs_to :gstin_location
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount

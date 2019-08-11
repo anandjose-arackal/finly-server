@@ -21,7 +21,7 @@ class Expense::Manual::Base < Expense::Base
         amount_attributes: [:value, :currency_id],
         manual_expense_attributes: [:merchant],
         receipts_attributes: [:image, :user_id, :id],
-        gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :_destroy],
+        gstin_location_attributes: [:gstin_id, :gstin, :location, :state_id, :_destroy],
         receipt_email_attributes: [
             :source, :email_id, :sender, :raw_html,
             :subject, :sent_at, :body, :user_id,

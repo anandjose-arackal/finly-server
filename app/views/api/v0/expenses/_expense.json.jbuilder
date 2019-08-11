@@ -32,6 +32,7 @@ json.custom_fields do
   end
 end
 
+# Tax details for this expense
 json.tax_details do
   json.merchant_gstin expense.gstin_location.gstin
   json.merchant_state_id expense.gstin_location.state_id

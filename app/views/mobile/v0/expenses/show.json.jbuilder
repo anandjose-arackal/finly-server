@@ -7,3 +7,5 @@ json.currencies do
     json.id currency.id
   end
 end
+
+json.tax_rates @result.tax_rates

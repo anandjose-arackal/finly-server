@@ -57,3 +57,14 @@ json.custom_fields do
   end
 end
 json.cancelled expense.cancelled?
+
+# Tax details for this expense
+json.tax_details do
+  json.merchant_gstin expense.gstin_location.gstin
+  json.merchant_state_id expense.gstin_location.state_id
+  json.tax_amount expense.gst_amount&.value
+  json.gst_type_id expense.gst_type_id
+  json.merchant_bill_no expense.merchant_bill_no
+  json.hsn_sac expense.hsn_sac
+  json.state_of_expense_id expense.state_of_expense_id
+end
