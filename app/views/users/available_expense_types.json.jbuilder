@@ -78,3 +78,4 @@ json.cash_pockets do
 end
 
 json.state_codes @result.gst_state_codes
+json.tax_rates @result.tax_rates
