@@ -45,6 +45,7 @@
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
 #  merchant_bill_no       :string(255)
+#  tax_rate_id            :integer
 #
 
 class Expense < ApplicationRecord
@@ -69,6 +70,7 @@ class Expense < ApplicationRecord
   belongs_to :created_by, class_name: "User", optional: true
   belongs_to :modified_by, class_name: "User", optional: true
   belongs_to :gstin_location, optional: true
+  belongs_to :tax_rate
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy

@@ -181,6 +181,7 @@ json.tax_details do
   json.merchant_bill_no expense.merchant_bill_no
   json.hsn_sac expense.hsn_sac
   json.state_of_expense_id expense.state_of_expense_id
+  json.tax_rate_id expense.tax_rate_id
 end
 
 json.tax_rates @result.tax_rates

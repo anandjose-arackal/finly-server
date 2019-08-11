@@ -19,6 +19,10 @@
 #  is_deleted               :boolean          default(FALSE), not null
 #  deleted_at               :datetime
 #  accepting_item_amount_id :integer
+#  billable_amount          :decimal(10, )
+#  order_amount             :decimal(10, )
+#  previously_billed_amount :decimal(10, )
+#  product_type_id          :integer          default(1)
 #
 
 class InwardDocumentItem < ApplicationRecord
