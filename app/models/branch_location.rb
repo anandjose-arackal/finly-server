@@ -7,8 +7,8 @@
 #  gstin                 :string(255)
 #  pan                   :string(255)
 #  company_id            :integer
-#  address_1             :string(255)
-#  address_2             :string(255)
+#  address_1             :text(65535)
+#  address_2             :text(65535)
 #  city                  :string(255)
 #  state_id              :integer
 #  country               :string(255)
@@ -24,6 +24,7 @@
 #  nature_of_office      :string(255)
 #  billable_location     :boolean          default(TRUE)
 #  shippable_location    :boolean          default(TRUE)
+#  gl_code               :string(255)
 #
 
 class BranchLocation < ApplicationRecord

@@ -18,6 +18,11 @@ json.summary do
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_user @result.bank_payment_request.owner.name
+  json.initiating_user_details do
+    json.name @result.bank_payment_request.owner.name rescue nil
+    json.email @result.bank_payment_request.owner.email rescue nil
+    json.phone @result.bank_payment_request.owner.mobile_number rescue nil
+  end
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')

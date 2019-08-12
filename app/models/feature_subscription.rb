@@ -32,6 +32,8 @@
 #  purchase_requisition_system :boolean
 #  bank_service_provider       :string(255)
 #  group_entity_structure      :boolean          default(FALSE)
+#  grn_enabled                 :boolean          default(TRUE)
+#  srn_enabled                 :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord

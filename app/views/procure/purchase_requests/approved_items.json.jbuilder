@@ -3,6 +3,7 @@ json.results do
     json.array!(@result.paginated_items) do |item|
       json.id item.id
       json.order_number item.purchase_request.order_number
+      json.purchase_request_id item&.purchase_request&.id
       json.required_by_date item&.required_by_date&.to_date
       json.delivery_location_id item&.delivery_location&.name
       json.vendor_id item&.vendor_id
@@ -40,6 +41,14 @@ json.results do
       json.location_attributes do
         json.id item.delivery_location_id
         json.name item.delivery_location&.name
+      end
+      json.department do
+        json.name item&.department&.name
+        json.id item&.department_id
+      end
+      json.cost_center do
+        json.name item&.cost_center&.name
+        json.id item&.cost_center&.id
       end
     end
   end
