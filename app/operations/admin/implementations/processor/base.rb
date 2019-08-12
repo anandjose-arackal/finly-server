@@ -38,7 +38,7 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
   end
 
   def pre_process
-    progress_update :in_progress, completed_items: 0
+    progress_update :in_progress
   end
 
   def process
@@ -49,7 +49,18 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
     progress_update :completed
   end
 
-  def progress_update(status, completed_items: nil, message: nil)
+  def item_complete(success)
+    self.implementation_request.completed_items = 0 if self.implementation_request.completed_items.nil?
+    self.implementation_request.success_items = 0 if self.implementation_request.success_items.nil?
+    self.implementation_request.failed_items = 0 if self.implementation_request.failed_items.nil?
+
+    self.implementation_request.completed_items += 1
+    self.implementation_request.success_items += 1 if success
+    self.implementation_request.failed_items += 1 unless success
+
+  end
+
+  def progress_update(status, message: nil)
     self.implementation_request.status = status
     self.implementation_request.completed_items = completed_items if completed_items
     self.implementation_request.message = message if message

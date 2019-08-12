@@ -67,14 +67,17 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
       result = process_row(data)
       unless result.is_a?(Admin::Implementations::Processor::Import::Result)
+        item_complete false
         raise "invalid result"
       end
 
       unless result.success?
+        item_complete false
         row << result.message
         failed = true
       end
       output << row
+      item_complete true
     end
     export headers, output
   end

@@ -19,7 +19,7 @@ class Admin::Implementations::Processor::Export < Admin::Implementations::Proces
         row << self.send(field, entry)
       end
       contents << row
-      progress_update :in_progress, completed_items: (index + 1)
+      item_complete true
     end
     contents
   end
