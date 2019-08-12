@@ -46,7 +46,7 @@ class PurchaseRequestItem < ApplicationRecord
   # include Transitionable
 
   field_customization_key :purchase_request_item
-  customizable_validate :purpose, presence: true
+  customizable_validate :purpose, presence: true, scope: [:purchase_request, :company]
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
