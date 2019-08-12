@@ -33,6 +33,7 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
+#  company_id                         :integer
 #
 
 class MoneyRequest < ApplicationRecord
