@@ -237,7 +237,7 @@
   <% end %>
 
   <% flag = true %>
-  <% flag = StringUtils.to_bool(params[:without_receipt]) if params[:without_receipt] %>
+  <% flag = !!StringUtils.to_bool(params[:receipt]) if params[:receipt].present? %>
 
   <% if flag %>
     <% unless receipts.blank? %>
