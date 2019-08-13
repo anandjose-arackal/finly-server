@@ -31,12 +31,12 @@ class Procurements::Grn::Pending::Index < Procurements::Base
         # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
         # Get all policies where user has goods receiver role
         received_pending_ids = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
-        case 
-        when user.vendor_payments_admin?
-          pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        
+        if user.vendor_payments_admin?
+          pr_ids = user.company.procurements.pluck(:id)
         else
           policy_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ? AND user_id = ?', UserRole.id_for(:goods_receiver), user.id).pluck(:id).uniq rescue []
-          pr_ids = user.company.procurements.joins(:inward_documents).joins(:purchase_order).where('purchase_orders.policy_id IN (?)', policy_ids).pluck(:id)
+          pr_ids = user.company.procurements.joins(:purchase_order).where('purchase_orders.policy_id IN (?)', policy_ids).pluck(:id)
         end
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
@@ -83,7 +83,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
       apply_filter
-      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date
+      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details

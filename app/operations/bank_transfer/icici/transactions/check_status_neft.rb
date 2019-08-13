@@ -41,7 +41,9 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
 
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       self.payment.system_messages.destroy_all
-
+      if self.payment&.invoice.present?
+        self.payment&.invoice&.update_invoice_status
+      end
       self.payment_order.update_order_status
       self.payment_order.update_processed_amount
     end
