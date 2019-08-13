@@ -77,7 +77,9 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses, :count
+    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses, :count,
+                  :gst_state_codes, :tax_rates
+
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -122,6 +124,8 @@ class Expense::Index < Expense::Base
         self.paginated_expenses = self.paginated_expenses.include_details
       end
       self.categories = user.company.active_categories
+      self.tax_rates = expense.user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
     end
 
     def exclude_cancelled
