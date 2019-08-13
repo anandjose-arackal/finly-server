@@ -3,6 +3,7 @@ json.categories do
     json.id category.id
     json.name category.name
     json.gl_code category.gl_code
+    json.gst_enabled category.gst_applicable
     if category.children.present?
       json.sub_categories do
         json.array!(category.children) do |sub_category|
