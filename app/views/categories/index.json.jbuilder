@@ -8,6 +8,7 @@ json.categories do
         json.array!(category.children) do |sub_category|
           json.id sub_category.id
           json.name sub_category.name
+          json.gst_enabled category.gst_applicable
           json.expense_management sub_category.expense_management
           json.vendor_payments sub_category.vendor_payments
           json.inward_invoice_line_items sub_category.inward_invoice_line_items
