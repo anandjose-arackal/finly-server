@@ -22,7 +22,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       # payment cannot be processed in this case
       return false
     elsif bank_transaction&.retriable? || bank_transaction&.open?
-      reference_number = bank_transaction.unique_request_number
+      # even if the payment is being retried, the reference number needs to be
+      # a new one
+      reference_number = nil
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
@@ -31,7 +33,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
+    if payment.reference_resource&.retriable?
+      bank_transaction.update(unique_request_number: transfer_request.generate_unique_reference)
+    elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
       bank_transaction = payment.reference_resource
@@ -126,6 +130,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
   end
 
   private
+
 
   def create_bank_transaction(payment, transfer_request)
     if self.account.account_owner.is_a?(Company)
