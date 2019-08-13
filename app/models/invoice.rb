@@ -143,7 +143,8 @@ class Invoice < ApplicationRecord
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
-  belongs_to :payment_agreement_escalation, optional: true
+  # belongs_to :payment_agreement_escalation, optional: true
+  has_many :payment_agreement_escalations, dependent: :destroy
   belongs_to :invoice_frequency, optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -184,7 +185,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :payment_agreement_escalation
+  accepts_nested_attributes_for :payment_agreement_escalations
   accepts_nested_attributes_for :invoice_frequency
 
   delegate :tax_amount_value, to: :tax_amount
