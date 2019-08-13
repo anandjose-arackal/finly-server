@@ -124,7 +124,7 @@ class Expense::Index < Expense::Base
         self.paginated_expenses = self.paginated_expenses.include_details
       end
       self.categories = user.company.active_categories
-      self.tax_rates = expense.user.company.tax_rates
+      self.tax_rates = user.company.tax_rates
       self.gst_state_codes = GstStateCode.all
     end
 
