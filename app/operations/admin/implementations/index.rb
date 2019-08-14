@@ -1,6 +1,6 @@
 class Admin::Implementations::Index < Admin::Base
 
-  attr_accessor :implementation_requests, :company
+  attr_accessor :implementation_requests, :company, :policies
 
   def pre_validate
     if user.blank? || params.blank? || params[:request_key].blank? || params[:company_id].blank?
@@ -13,23 +13,25 @@ class Admin::Implementations::Index < Admin::Base
   end
 
   def process
-    document_type = params[:request_key]&.split('.')&.first
-    self.implementation_requests = company.admin_implementation_requests.where('request_key LIKE ?',"%#{document_type}%")
+    self.implementation_requests = company.admin_implementation_requests.where('request_key LIKE ?',"%#{params[:request_key]}%")
+    self.policies = company.policies
   end
 
   def success
     params[:implementation_requests] = implementation_requests
+    params[:policies] = policies
     Admin::Implementations::Index::ImplementataionPresenter.new(user, params, messages)
   end
 
   class Admin::Implementations::Index::ImplementataionPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :implementation_requests, :paginated_requests
+    attr_accessor :implementation_requests, :paginated_requests,:policies
 
     def init
       per_page = params[:per_page] || 30
       self.implementation_requests = params[:implementation_requests]
       self.paginated_requests = implementation_requests.paginate(page: params[:page], per_page: params[:per_page])
+      self .policies = params[:policies]
     end
   end
 
