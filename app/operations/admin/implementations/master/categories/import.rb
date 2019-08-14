@@ -11,7 +11,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
           ]
 
   def create_record(data)
-    category = self.companies.categories.new data.except(:id)
+    category = self.company.categories.new data.except(:id)
     unless category.save
       return result false, category.errors.full_messages
     end

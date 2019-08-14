@@ -6,7 +6,8 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
               :id,
               :parent_id,
               :gl_name,
-              :name
+              :name,
+              :destroy
           ]
 
   def valid_request
@@ -32,6 +33,11 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
   def name(category)
     category.name
   end
+  def destroy(category)
+    ''
+  end
 
+  def post_process
+  end
 
 end

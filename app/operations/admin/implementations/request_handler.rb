@@ -1,6 +1,6 @@
 class Admin::Implementations::RequestHandler < Admin::Base
 
-  attr_accessor :master, :request_key, :implementation_request
+  attr_accessor :master, :request_key, :implementation_request, :processor
 
   def pre_validate
     user_present? and params_present?
@@ -18,6 +18,8 @@ class Admin::Implementations::RequestHandler < Admin::Base
   def init
     self.request_key = params[:request_key]
     self.master = init_master
+    return if self.master.blank?
+    #self.processor = init_processor
   end
 
   def validate
@@ -39,13 +41,41 @@ class Admin::Implementations::RequestHandler < Admin::Base
       add_message :error, self.implementation_request.errors.full_messages
       return
     end
-    self.implementation_request.save
+    if self.implementation_request.save
+      params[:implementation_request_id] =implementation_request.id
+      data ={admin_user_id: user.id, company_id: params[:company_id], implementation_request_id: implementation_request.id}
+      self.master.call_async(user, data)
+      add_message :error, 'Implementation Request on Processing'
+    end
+  end
+
+  def post_process
+    add_message :error, 'Implementation Request on Processing'
+  end
+
+  def success
+    Admin::Implementations::RequestHandler::RequestHandlerPresenter.new(user, params, messages)
+  end
+
+  class Admin::Implementations::RequestHandler::RequestHandlerPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    def init
+    end
   end
 
   protected
 
   def init_master
     Admin::Implementations::Master::BaseMaster.subscribers(self.request_key)&.first
+  end
+
+  def init_processor
+    return nil if self.master.blank?
+    self.master.new(user,params.to_h)
+  end
+
+  def implementation_params
+    params&.permit(:implementation_request_id, :country)
   end
 
 end

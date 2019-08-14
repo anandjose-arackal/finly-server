@@ -62,7 +62,7 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
   def progress_update(status, message: nil)
     self.implementation_request.status = status
-    self.implementation_request.completed_items = completed_items if completed_items
+    #self.implementation_request.completed_items = completed_items if completed_items
     self.implementation_request.message = message if message
 
     case status
