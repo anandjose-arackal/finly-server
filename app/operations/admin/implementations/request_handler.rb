@@ -45,12 +45,11 @@ class Admin::Implementations::RequestHandler < Admin::Base
       params[:implementation_request_id] =implementation_request.id
       data ={admin_user_id: user.id, company_id: params[:company_id], implementation_request_id: implementation_request.id}
       self.master.call_async(user, data)
-      add_message :error, 'Implementation Request on Processing'
     end
   end
 
   def post_process
-    add_message :error, 'Implementation Request on Processing'
+    add_message :success, 'Implementation Request on Processing'
   end
 
   def success
