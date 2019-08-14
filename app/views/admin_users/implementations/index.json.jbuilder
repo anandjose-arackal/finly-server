@@ -10,8 +10,10 @@ json.trails do
     json.result_file  implementation_request.result_file&.url
   end
 end
-json.policies do
-  json.array!(@result.policies) do |policy|
-    json.extract! policy, :id, :name
+if @result&.policies.present?
+  json.policies do
+    json.array!(@result.policies) do |policy|
+      json.extract! policy, :id, :name
+    end
   end
 end
