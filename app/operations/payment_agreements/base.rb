@@ -35,7 +35,8 @@ class PaymentAgreements::Base < BaseOperation
         balance_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
-        payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
+        # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
+        payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         invoice_frequency_attributes: [:id, :number, :period_id]
       ],
       rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount,
@@ -57,7 +58,8 @@ class PaymentAgreements::Base < BaseOperation
         balance_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
-        payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
+        # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
+        payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         invoice_frequency_attributes: [:id, :number, :period_id]
       ],
       beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
