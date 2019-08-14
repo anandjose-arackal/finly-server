@@ -53,7 +53,6 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
     self.implementation_request.completed_items = 0 if self.implementation_request.completed_items.nil?
     self.implementation_request.success_items = 0 if self.implementation_request.success_items.nil?
     self.implementation_request.failed_items = 0 if self.implementation_request.failed_items.nil?
-
     self.implementation_request.completed_items += 1
     self.implementation_request.success_items += 1 if success
     self.implementation_request.failed_items += 1 unless success
@@ -83,6 +82,7 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
     file = exporter.generate_xls_file
     self.implementation_request.result_file = file
     self.implementation_request.save
+    progress_update(:completed)
   end
 
   def file_name
