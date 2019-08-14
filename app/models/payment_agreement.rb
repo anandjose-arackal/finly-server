@@ -52,6 +52,10 @@ class PaymentAgreement < ApplicationRecord
   #   joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
   # }
 
+  scope :with_ids, -> (ids) {
+    where id: ids
+  } 
+
   scope :filter_policy_id, -> (id){
     where policy_id: id
   }
@@ -148,6 +152,28 @@ class PaymentAgreement < ApplicationRecord
 
   scope :search_title, -> (search_query) {
     where('payment_agreements.title LIKE ?', "%#{search_query}%")
+  }
+
+  scope :filter_agreement_type, -> (agreement_type) {
+    user = RequestStore.store[:current_user]
+    ids = nil
+    case agreement_type 
+    when 'general_invoices'
+      # ids = joins(:general_invoices).pluck(:id)
+      ids = user.company.general_invoices.pluck(:payment_agreement_id)
+    when 'rental_invoices'
+      # ids = joins(:rental_invoices).pluck(:id)
+      ids = user.company.rental_invoices.pluck(:payment_agreement_id)
+    when 'beneficiary_payment'
+      # ids = joins(:beneficiary_payments).pluck(:id)
+      ids = user.company.beneficiary_payments.pluck(:payment_agreement_id)
+    when 'security_deposit'
+      # ids = joins(:security_deposits).pluck(:id)
+      ids = user.company.security_deposits.pluck(:payment_agreement_id)
+    end
+    if ids.present?
+      with_ids(ids)
+    end
   }
 
   def as_json(options={})
