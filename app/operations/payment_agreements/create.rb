@@ -10,11 +10,13 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       add_message :error, 'You do not have permission for this action'
       return
     end
+    # check_agreement_item_presence
   end
 
   def process
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
     # self.payment_agreement = PaymentAgreement.new(payment_agreement_params)
+    return unless check_agreement_item_presence
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     # self.payment_agreement.company_id = user.company_id
@@ -77,6 +79,14 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       params.dig(:payment_agreement, :attachments_attributes).each{ |ele| attachment_ids << ele[:id] }
       return attachment_ids
     end
+  end
+
+  def check_agreement_item_presence
+    if payment_agreement.general_invoices.blank? && payment_agreement.rental_invoices.blank? && payment_agreement.security_deposits.blank? && payment_agreement.beneficiary_payments.blank?
+      add_message :error, 'Please add agreement item'
+      return false
+    end
+    true
   end
 
 end
