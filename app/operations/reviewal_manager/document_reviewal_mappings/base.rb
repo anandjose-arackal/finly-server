@@ -21,7 +21,7 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     when 'PurchaseRequest'
       amount = document&.total_amount&.value
     when 'PaymentAgreement'
-      amount = document&.total_amount&.value rescue 0
+      amount = document&.total_amount&.value
     when 'YesBankVendor'
       amount = 1
     else

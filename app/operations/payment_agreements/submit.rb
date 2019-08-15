@@ -15,7 +15,7 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
     # Rental should not submit without security deposit
     if self.payment_agreement.rental_invoices.present?
       if self.payment_agreement.security_deposits.blank?
-        add_message :error, 'Please add security deposit with rental invoice'
+        add_message :error, 'Please add and update security deposit with rental invoice'
       end
     end
 

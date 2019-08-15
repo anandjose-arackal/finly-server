@@ -242,5 +242,50 @@ class PaymentAgreements::Base < BaseOperation
     return amount_arr.sum
   end
 
+  # Calculate and set total amount on payment agreements
+  def update_total_amount
+    total_amount = agreement_item_total_amount
+    if self.payment_agreement.total_amount.present?
+      self.payment_agreement.total_amount.update(value: total_amount)
+    else
+      # TODO - check why this is not working
+      # self.payment_agreement.create_total_amount(value: total_amount, currency_id: 1)
+      amount = Amount.create(value: total_amount, currency_id: 1)
+      payment_agreement.total_amount_id = amount.id
+      payment_agreement.save
+    end
+  end
+
+  # Agreement items can have multiple combinations, hence consider all of them for approval flow threshold validation
+  def agreement_item_total_amount
+    item_max = []
+
+    if self.payment_agreement.security_deposits.present?
+      ids = self.payment_agreement.security_deposits.pluck(:payable_amount_id)
+      sd_total_amount = Amount.where(id: ids).pluck(:value).max
+      item_max << sd_total_amount if sd_total_amount.present?
+    end
+
+    if self.payment_agreement.general_invoices.present?
+      ids = self.payment_agreement.general_invoices.pluck(:balance_due_id)
+      gi_total_amount = Amount.where(id: ids).pluck(:value).max
+      item_max << gi_total_amount if gi_total_amount.present?
+    end
+
+    if self.payment_agreement.rental_invoices.present?
+      ids = self.payment_agreement.general_invoices.pluck(:balance_due_id)
+      ri_total_amount = Amount.where(id: ids).pluck(:value).max
+      item_max << ri_total_amount if ri_total_amount.present?
+    end
+
+    if self.payment_agreement.beneficiary_payments.present?
+      ids = self.payment_agreement.beneficiary_payments.pluck(:payable_amount_id)
+      bp_total_amount = Amount.where(id: ids).pluck(:value).max
+      item_max << bp_total_amount if bp_total_amount.present?
+    end
+
+    return item_max.max
+  end
+
 
 end

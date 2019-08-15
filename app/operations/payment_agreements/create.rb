@@ -24,6 +24,10 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
       set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
       set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
+
+      # Set total amount on agreement level
+      update_total_amount
+
       # duplicate general/rental invoice department, cost_center in line items
       update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
       abp_attachment_ids = get_attachment_ids(params)
