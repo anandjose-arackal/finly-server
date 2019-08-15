@@ -159,19 +159,20 @@ class PaymentAgreement < ApplicationRecord
     user = RequestStore.store[:current_user]
     ids = nil
     case agreement_type 
-    when 'general_invoices'
-      # ids = joins(:general_invoices).pluck(:id)
-      ids = user.company.general_invoices.pluck(:payment_agreement_id)
-    when 'rental_invoices'
-      # ids = joins(:rental_invoices).pluck(:id)
-      ids = user.company.rental_invoices.pluck(:payment_agreement_id)
+    when 'general_invoice'
+      # joins(:invoices).where('invoices.invoice_type_id = ?', InwardInvoiceType.id_for(:general_invoice))
+      ids = user.company.inward_invoices.where(invoice_type_id: InwardInvoiceType.id_for(:general_invoice)).pluck(:payment_agreement_id).uniq
+    when 'rental_invoice'
+      # joins(:invoices).where('invoices.invoice_type_id = ?', InwardInvoiceType.id_for(:general_invoice))
+      ids = user.company.inward_invoices.where(invoice_type_id: InwardInvoiceType.id_for(:rental_invoice)).pluck(:payment_agreement_id).uniq
     when 'beneficiary_payment'
-      # ids = joins(:beneficiary_payments).pluck(:id)
-      ids = user.company.beneficiary_payments.pluck(:payment_agreement_id)
+      # joins(:beneficiary_payments)
+      ids = user.company.beneficiary_payments.pluck(:payment_agreement_id).uniq
     when 'security_deposit'
-      # ids = joins(:security_deposits).pluck(:id)
-      ids = user.company.security_deposits.pluck(:payment_agreement_id)
+      # joins(:security_deposits)
+      ids = user.company.security_deposits.pluck(:payment_agreement_id).uniq
     end
+
     if ids.present?
       with_ids(ids)
     end
