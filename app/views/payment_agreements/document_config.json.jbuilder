@@ -5,6 +5,13 @@ json.policies do
   end
 end
 
+json.bank_payment_request_policies do |policy|
+  json.array!(@result.bank_payment_request_policies) do |policy|
+    json.id policy.id
+    json.name policy.name
+  end
+end
+
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
     json.merge! tax_rate.as_json
