@@ -66,7 +66,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     if user.vendor_payments_admin?
       admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
       self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
-      self.invoices = self.invoices.not_open.non_beneficiary.created_at_desc
+      self.invoices = self.invoices.non_beneficiary.created_at_desc
       return
     end
 

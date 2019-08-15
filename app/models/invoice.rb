@@ -391,6 +391,7 @@ class Invoice < ApplicationRecord
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
                             InwardInvoiceType.id_for(:non_po_invoice),
+                            InwardInvoiceType.id_for(:recurring_invoice),
                             nil])
   }
 
