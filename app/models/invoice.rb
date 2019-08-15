@@ -143,8 +143,8 @@ class Invoice < ApplicationRecord
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
-  belongs_to :payment_agreement_escalation, optional: true
-  # has_many :payment_agreement_escalations, dependent: :destroy
+  # belongs_to :payment_agreement_escalation, optional: true
+  has_many :payment_agreement_escalations, dependent: :destroy
   belongs_to :invoice_frequency, optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -185,8 +185,8 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  # accepts_nested_attributes_for :payment_agreement_escalations
-  accepts_nested_attributes_for :payment_agreement_escalation
+  accepts_nested_attributes_for :payment_agreement_escalations
+  # accepts_nested_attributes_for :payment_agreement_escalation
   accepts_nested_attributes_for :invoice_frequency
 
   delegate :tax_amount_value, to: :tax_amount
@@ -988,7 +988,8 @@ class Invoice < ApplicationRecord
       note: self.note,
       tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
       invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
-      payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment },
+      # payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment },
+      payment_agreement_escalations_attributes: self.payment_agreement_escalations.as_json,
       billing_start_date: self.billing_start_date&.to_date,
       billing_day_of_month: billing_day_of_month,
       due_date: self.due_date&.to_date
