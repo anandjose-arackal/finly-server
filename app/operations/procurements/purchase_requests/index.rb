@@ -44,6 +44,8 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     has_scope :filter_by_department_id
     has_scope :filter_by_location_id
     has_scope :filter_awaiting_approval
+    has_scope :sort_order_number
+    has_scope :sort_description
 
     def init
       self.purchase_requests = params[:purchase_requests]

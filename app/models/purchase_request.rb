@@ -152,6 +152,25 @@ class PurchaseRequest < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+  # Sorting
+  scope :sort_order_number, -> (type){
+    if type
+      reorder("purchase_requests.order_number #{type}")
+    end
+  }
+
+  scope :sort_description, -> (type){
+    if type
+      reorder("purchase_requests.description #{type}")
+    end
+  }
+
+  # scope :sort_amount, -> (type){
+  #   if type
+  #     reorder("purchase_requests.description #{type}")
+  #   end
+  # }
+
   def add_company
     self.company_id = self.creator.company_id
   end
