@@ -43,3 +43,5 @@ end
 json.gst_types do
   json.merge! @result.gst_types.to_json if @result.gst_types.present?
 end
+
+json.invoice_custom_fields_config @result.custom_fields_config[:invoice]

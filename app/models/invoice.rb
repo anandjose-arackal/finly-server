@@ -997,7 +997,8 @@ class Invoice < ApplicationRecord
       start_date: self.start_date,
       end_date: self.end_date,
       lock_in_period: self.lock_in_period,
-      rent_free_period: self.rent_free_period
+      rent_free_period: self.rent_free_period,
+      custom_fields: self.custom_fields
 
     }
   end
@@ -1043,5 +1044,33 @@ class Invoice < ApplicationRecord
       end
     end
   end
+
+  # # This is used for agreement invoice custom fields
+  # def set_custom_field_operation
+  #   CustomField::SetFields.(self, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
+  # end
+
+  # # This is used for agreement invoice custom fields
+  # def after_update_custom_field_operation
+  #   parameters = RequestStore.store[:params]
+  #   if parameters.present?
+  #     custom_fields = parameters&.dig(:custom_fields) || parameters&.dig(:invoice, :custom_fields)
+  #   end
+  # end
+
+  # def validate_custom_fields_invoice
+  #   set_fields = set_custom_fields_invoice self, custom_fields, false
+  #   unless set_fields.success?
+  #     add_message :error, set_fields.messages[:error]
+  #     return
+  #   end
+  #   valid = CustomField::Validate.(self.invoice)
+  #   unless valid.success?
+  #     add_message :error, valid.messages[:error]
+  #     return
+  #   end
+  # end
+
+
 
 end

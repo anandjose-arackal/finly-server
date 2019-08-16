@@ -1,15 +1,17 @@
 class PaymentAgreements::Update < PaymentAgreements::Base
-  attr_accessor :payment_agreement, :payment_agreement_params, :document_reviewer_mappings_params
+  attr_accessor :payment_agreement, :payment_agreement_params, :document_reviewer_mappings_params, :custom_fields
 
   def init
     super
     self.payment_agreement_params = payment_agreement_parameters
     self.payment_agreement = user.company.payment_agreements.find_by_id(params[:id])
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
 
   def process
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
+    create_or_update_custom_fields
     if payment_agreement.valid?
       # Set validation of DLRMs
       if PaymentAgreement.status_ids(:open, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
@@ -28,12 +30,12 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
 
     if self.payment_agreement.save
-      update_amount_attributes
-      set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
-      set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
-      set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
-      set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
-      update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
+      update_item_attributes
+      # set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
+      # set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
+      # set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
+      # set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
+      # update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
 
       # Set total amount on agreement level
       update_total_amount

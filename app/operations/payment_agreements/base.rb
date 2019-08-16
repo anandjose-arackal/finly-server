@@ -77,34 +77,20 @@ class PaymentAgreements::Base < BaseOperation
 
   private
 
-  def update_amount_attributes
+  def update_item_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
-        general_invoice.update_taxable_and_orig_amount_value
-        general_invoice.items.map(&:update_taxable_amount_value)
-        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
-        # general_invoice.save!
-        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, general_invoice)
-        general_invoice.save
-        if general_invoice.tds_slab_id.present?
-          apply_tds_on_amount(general_invoice)
-        end
-        update_balance_due_amount(general_invoice, general_invoice.net_amount.value)
+        update_amount_attributes(general_invoice)
+        set_due_date_for_general_invoices
+        general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)
       end
     end
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
-        rental_invoice.update_taxable_and_orig_amount_value
-        rental_invoice.items.map(&:update_taxable_amount_value)
-        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        # rental_invoice.save!
-        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, rental_invoice)
-        rental_invoice.save
-        if rental_invoice.tds_slab_id.present?
-          apply_tds_on_amount(rental_invoice)
-        end
-        update_balance_due_amount(rental_invoice, rental_invoice.net_amount.value)
+        update_amount_attributes(rental_invoice)
+        set_due_date_for_rental_invoices
+        rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)
       end
     end
     # if payment_agreement.general_invoices.present?
@@ -121,15 +107,17 @@ class PaymentAgreements::Base < BaseOperation
     #   payment_agreement.rental_invoices.map(&:update_net_amount_value)
     # end
 
-    # if payment_agreement.beneficiary_payments.present?
-    #   payment_agreement.beneficiary_payments.each do |beneficiary_payment|
-    #     update_payable_amount(beneficiary_payment)
-    #   end 
-    # end
+    if payment_agreement.beneficiary_payments.present?
+      payment_agreement.beneficiary_payments.each do |beneficiary_payment|
+      #   update_payable_amount(beneficiary_payment)
+      set_due_date_for_beneficiary_payments
+      end 
+    end
 
     if payment_agreement.security_deposits.present?
       payment_agreement.security_deposits.each do |security_deposit|
         update_payable_amount(security_deposit)
+        set_due_date_for_security_deposits
       end 
     end
   end
@@ -228,8 +216,8 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def update_line_item_attributes
-    self.payment_agreement.general_invoices.map{|general_invoice| general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)} if self.payment_agreement.general_invoices.present?
-    self.payment_agreement.rental_invoices.map{|rental_invoice| rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)} if self.payment_agreement.rental_invoices.present?
+    # self.payment_agreement.general_invoices.map{|general_invoice| general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)} if self.payment_agreement.general_invoices.present?
+    # self.payment_agreement.rental_invoices.map{|rental_invoice| rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)} if self.payment_agreement.rental_invoices.present?
   end
 
   def calculate_tds_value(tds_percentage, invoice)
@@ -286,6 +274,54 @@ class PaymentAgreements::Base < BaseOperation
 
     return item_max.max
   end
+
+  # Invoice can be of type general or rental
+  def update_amount_attributes(invoice)
+    invoice.update_taxable_and_orig_amount_value
+    invoice.items.map(&:update_taxable_amount_value)
+    # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+    # invoice.save!
+    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+    invoice.save
+    if invoice.tds_slab_id.present?
+      apply_tds_on_amount(invoice)
+    end
+    update_balance_due_amount(invoice, invoice.net_amount.value)
+  end
+
+  def create_or_update_custom_fields
+    if self.payment_agreement.invoices.present?
+      self.payment_agreement.invoices.each do |invoice|
+        if invoice.new_record?
+          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
+        else
+          validate_custom_fields_invoice(invoice)
+        end
+      end
+    end
+  end
+
+  def validate_custom_fields_invoice(invoice)
+    set_fields = set_custom_fields_invoice invoice, self.custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(invoice)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
+
 
 
 end

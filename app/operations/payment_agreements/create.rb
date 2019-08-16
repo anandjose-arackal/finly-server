@@ -15,23 +15,25 @@ class PaymentAgreements::Create < PaymentAgreements::Base
 
   def process
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
+    create_or_update_custom_fields
     # self.payment_agreement = PaymentAgreement.new(payment_agreement_params)
     return unless check_agreement_item_presence
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     # self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.save && self.payment_agreement.reload
-      update_amount_attributes
-      set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
-      set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
-      set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
-      set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
+      # set_custom_field
+      update_item_attributes
+      # set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
+      # set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
+      # set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
+      # set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
 
       # Set total amount on agreement level
       update_total_amount
 
       # duplicate general/rental invoice department, cost_center in line items
-      update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
+      # update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
       abp_attachment_ids = get_attachment_ids(params)
       Attachment.update_resource({ids: abp_attachment_ids, resource_id: self.payment_agreement.id, user: user}) if abp_attachment_ids.present?
 
@@ -88,5 +90,13 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     end
     true
   end
+
+  def set_custom_field
+    self.payment_agreement.invoices {|invoice| custom_field_setup(invoice) }
+  end
+
+  # def custom_field_setup(invoice)
+  #   CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
+  # end
 
 end
