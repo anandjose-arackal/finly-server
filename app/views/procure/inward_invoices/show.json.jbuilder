@@ -96,6 +96,7 @@ json.invoice do
   # json.discount_rate precision_value invoice.discount_rate
   json.discount_rate precision_value ((invoice.discount_amount&.value / invoice.item_amounts_total) * 100).round(2) rescue 0
   json.advance_rate precision_value invoice.advance_rate
+  json.variable_periodic_invoice @result.variable_periodic_invoice
   #############################
   json.invoice_attachment do
     json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
