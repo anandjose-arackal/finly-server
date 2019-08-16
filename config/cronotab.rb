@@ -41,3 +41,4 @@ Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 17, min: 00}
 Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
 Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}
+Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
