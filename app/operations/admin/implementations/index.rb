@@ -25,13 +25,14 @@ class Admin::Implementations::Index < Admin::Base
 
   class Admin::Implementations::Index::ImplementataionPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :implementation_requests, :paginated_requests,:policies
+    attr_accessor :implementation_requests, :paginated_requests,:policies,:count
 
     def init
       per_page = params[:per_page] || 30
       self.implementation_requests = params[:implementation_requests]
       self.paginated_requests = implementation_requests.paginate(page: params[:page], per_page: params[:per_page])
-      self .policies = params[:policies]
+      self.policies = params[:policies]
+      self.count = implementation_requests.count
     end
   end
 

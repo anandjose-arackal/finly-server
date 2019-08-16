@@ -17,3 +17,4 @@ if @result&.policies.present?
     end
   end
 end
+json.count @result.count
