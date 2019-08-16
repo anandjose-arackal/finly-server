@@ -5,13 +5,21 @@ class BillingType < ApplicationRecord
 
     def self.values
       [
-        :one_time, :fixed_periodic
+        :one_time, :fixed_periodic, :variable_periodic
 
       ]
     end
 
     def one_time?
       self.id == BillingType.id_for(:one_time)
+    end
+
+    def fixed_periodic?
+      self.id == BillingType.id_for(:fixed_periodic)
+    end
+
+    def variable_periodic?
+      self.id == BillingType.id_for(:variable_periodic)
     end
 
     def as_json
