@@ -993,7 +993,11 @@ class Invoice < ApplicationRecord
       payment_agreement_escalations_attributes: self.payment_agreement_escalations.as_json,
       billing_start_date: self.billing_start_date&.to_date,
       billing_day_of_month: billing_day_of_month,
-      due_date: self.due_date&.to_date
+      due_date: self.due_date&.to_date,
+      start_date: self.start_date,
+      end_date: self.end_date,
+      lock_in_period: self.lock_in_period,
+      rent_free_period: self.rent_free_period
 
     }
   end
