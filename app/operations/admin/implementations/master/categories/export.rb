@@ -15,8 +15,7 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
   end
 
   def input
-    Category.limit(10)
-    binding.pry
+    company.categories
   end
 
   def id(category)
