@@ -37,7 +37,6 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   def validate
     super()
     return if has_errors?
-
     if self.implementation_request.request_file.blank?
       add_message :error, 'File has not been uploaded'
       return
@@ -88,7 +87,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
   def process_row(data)
     id = data[:id]
-    if id.present?
+    destroy_action = data[:destroy]
+    if destroy_action.downcase == 'y'
+      destroy_records(data)
+    elsif id.present?
       update_record(data)
     else
       create_record(data)

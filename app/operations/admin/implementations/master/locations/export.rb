@@ -18,7 +18,7 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
   end
 
   def input
-    BranchLocation.limit(20)
+    company.locations
   end
 
   def id(location)

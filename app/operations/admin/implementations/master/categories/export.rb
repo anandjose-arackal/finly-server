@@ -5,7 +5,7 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
   headers [
               :id,
               :parent_id,
-              :gl_name,
+              :gl_code,
               :name,
               :destroy
           ]
@@ -16,6 +16,7 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
 
   def input
     Category.limit(10)
+    binding.pry
   end
 
   def id(category)
@@ -26,8 +27,8 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
     category.parent_id
   end
 
-  def gl_name(category)
-    category.gl_name
+  def gl_code(category)
+    category.gl_code
   end
 
   def name(category)

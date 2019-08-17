@@ -6,8 +6,9 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
   headers [
               :id,
               :parent_id,
-              :gl_name,
-              :name
+              :gl_code,
+              :name,
+              :delete
           ]
 
   def create_record(data)
