@@ -164,6 +164,7 @@ json.expense_sections sorted_expenses do |category|
       json.hsn_sac expense.hsn_sac
       json.state_of_expense_id expense.state_of_expense_id
       json.tax_rate_id expense.tax_rate_id
+      json.gstin_location_id expense.gstin_location_id
     end
   end
 end
