@@ -998,6 +998,7 @@ class Invoice < ApplicationRecord
       end_date: self.end_date,
       lock_in_period: self.lock_in_period,
       rent_free_period: self.rent_free_period,
+      tenancy_period: self.tenancy_period,
       custom_fields: self.custom_fields
 
     }
