@@ -34,7 +34,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
     if payment.reference_resource&.retriable?
-      bank_transaction.update(unique_request_number: transfer_request.generate_unique_reference)
+      # updating the request number with a new one because the old one will have been used already
+      bank_transaction.update_columns(unique_request_number: transfer_request.generate_unique_reference)
     elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
