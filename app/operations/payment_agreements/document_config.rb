@@ -24,7 +24,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
     end
 
     def custom_field_configurations
-      configurations = user.company.field_configurations.exclude_deleted.order_created_at_desc
+      configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
       self.custom_fields_config = {}
       self.custom_fields_config[:invoice] = configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
