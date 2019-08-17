@@ -18,10 +18,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
     bank_transaction = payment.reference_resource
 
-    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
+    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure? || bank_transaction.pending_for_processing? || bank_transaction.pending_utr?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable? || bank_transaction&.open?
+    elsif bank_transaction&.retriable? || bank_transaction&.open? || bank_transaction.rejected?
       # even if the payment is being retried, the reference number needs to be
       # a new one
       reference_number = nil
