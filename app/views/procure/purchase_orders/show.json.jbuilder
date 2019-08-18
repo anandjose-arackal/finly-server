@@ -108,6 +108,16 @@ json.items do
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
     json.purchase_request_id item&.purchase_request_item&.purchase_request_id
     json.purchase_request_item_quantity item&.purchase_request_item&.quantity
+    json.amount item.rate * item.quantity
+    product = ""
+    case item.inventory_line_item&.product_type_id
+    when ProductType.id_for(:goods)
+      product = "goods"
+    when ProductType.id_for(:service)
+      product = "service"
+    end
+    json.product_type product
+    json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
@@ -216,12 +226,7 @@ json.reviewal_chains do
         end
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold, :min
-            if reviewer.max.present?
-              json.max reviewer.max
-            else
-              json.max '∞'
-            end
+            json.extract! reviewer, :id, :exception, :threshold, :min, :max
             json.reviewer_details reviewer.reviewer.as_json
           end
         end

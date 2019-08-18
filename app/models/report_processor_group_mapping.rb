@@ -16,6 +16,7 @@
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
 #  marked_as_closed           :boolean
+#  bank_reference_number      :string(255)
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord
@@ -47,7 +48,7 @@ class ReportProcessorGroupMapping < ApplicationRecord
   scope :not_completed_including_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :exclude_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:cancelled) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
-  scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
+  scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable,:reports }
   scope :sum_amounts, -> { joins(:amount).sum(:INR) }
   scope :pluck_group_id, -> { pluck(:processor_group_id) }
 

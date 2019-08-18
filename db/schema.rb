@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_24_140522) do
+ActiveRecord::Schema.define(version: 2019_08_11_213745) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -559,6 +559,8 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
     t.integer "bank_account_master_id"
+    t.boolean "yes_bank_verified", default: false
+    t.string "yes_bank_beneficiary_code"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_type", "account_owner_id"], name: "index_bank_accounts_on_account_owner_type_and_account_owner_id"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
@@ -1457,6 +1459,7 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
+    t.boolean "gst_applicable", default: true
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -2479,6 +2482,67 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.index ["user_id"], name: "index_email_authorizations_on_user_id"
   end
 
+  create_table "email_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "email_id", null: false
+    t.string "event", null: false
+    t.string "link"
+    t.datetime "timestamp"
+    t.string "event_id"
+    t.text "payload", limit: 4294967295
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "ip_addr"
+    t.string "user_agent"
+    t.string "link_tags"
+    t.index ["email_id"], name: "index_email_events_on_email_id"
+    t.index ["event"], name: "index_email_events_on_event"
+    t.index ["event_id"], name: "index_email_events_on_event_id"
+    t.index ["link"], name: "index_email_events_on_link"
+    t.index ["timestamp"], name: "index_email_events_on_timestamp"
+  end
+
+  create_table "emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "entity_type"
+    t.bigint "entity_id"
+    t.integer "company_id"
+    t.string "message_id"
+    t.string "sender"
+    t.string "recipient"
+    t.string "bcc"
+    t.string "cc"
+    t.string "subject"
+    t.text "body", limit: 4294967295
+    t.string "mailer_klass"
+    t.string "mailer_action"
+    t.string "configuration_set"
+    t.datetime "sent_at"
+    t.datetime "delivered_at"
+    t.integer "delivery_count"
+    t.datetime "last_opened_at"
+    t.integer "open_count"
+    t.datetime "last_link_clicked_at"
+    t.integer "link_open_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bcc"], name: "index_emails_on_bcc"
+    t.index ["cc"], name: "index_emails_on_cc"
+    t.index ["company_id"], name: "index_emails_on_company_id"
+    t.index ["delivered_at"], name: "index_emails_on_delivered_at"
+    t.index ["delivery_count"], name: "index_emails_on_delivery_count"
+    t.index ["entity_type", "entity_id"], name: "index_emails_on_entity_type_and_entity_id"
+    t.index ["last_link_clicked_at"], name: "index_emails_on_last_link_clicked_at"
+    t.index ["last_opened_at"], name: "index_emails_on_last_opened_at"
+    t.index ["link_open_count"], name: "index_emails_on_link_open_count"
+    t.index ["mailer_action"], name: "index_emails_on_mailer_action"
+    t.index ["mailer_klass"], name: "index_emails_on_mailer_klass"
+    t.index ["message_id"], name: "index_emails_on_message_id"
+    t.index ["open_count"], name: "index_emails_on_open_count"
+    t.index ["recipient"], name: "index_emails_on_recipient"
+    t.index ["sender"], name: "index_emails_on_sender"
+    t.index ["sent_at"], name: "index_emails_on_sent_at"
+    t.index ["subject"], name: "index_emails_on_subject"
+  end
+
   create_table "enforce_budget_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "enforce_purchase_order_budget"
     t.boolean "enforce_payment_budget"
@@ -2618,6 +2682,12 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.integer "created_by_id"
     t.integer "modified_by_id"
     t.datetime "deleted_at"
+    t.integer "gst_details_id"
+    t.integer "gstin_location_id"
+    t.integer "state_of_expense_id"
+    t.string "hsn_sac"
+    t.string "merchant_bill_no"
+    t.integer "tax_rate_id"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["created_at"], name: "index_expenses_on_created_at"
@@ -2705,6 +2775,10 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.string "bank_service_provider"
     t.boolean "request_encryption_enabled", default: false
     t.boolean "group_entity_structure", default: false
+    t.boolean "grn_enabled", default: true
+    t.boolean "srn_enabled", default: false
+    t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
+    t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -3212,6 +3286,8 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.decimal "sgst", precision: 20
     t.decimal "cgst", precision: 20
     t.decimal "igst", precision: 20
+    t.integer "purchase_order_item_id"
+    t.integer "billable_amount_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -3222,6 +3298,7 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
     t.index ["net_amount_id"], name: "index_invoice_line_items_on_net_amount_id"
     t.index ["parent_id", "parent_type"], name: "index_invoice_line_items_on_parent_id_and_parent_type"
+    t.index ["purchase_order_item_id"], name: "index_invoice_line_items_on_purchase_order_item_id"
     t.index ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_invoice_line_items_on_tax_rate_id"
     t.index ["taxable_amount_id"], name: "index_invoice_line_items_on_taxable_amount_id"
@@ -3412,8 +3489,15 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.decimal "previously_delivered", precision: 20, scale: 5
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.integer "accepting_item_amount_id"
+    t.decimal "billable_amount", precision: 10
+    t.decimal "order_amount", precision: 10
+    t.decimal "previously_billed_amount", precision: 10
+    t.integer "product_type_id", default: 1
+    t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
+    t.index ["product_type_id"], name: "index_inward_document_items_on_product_type_id"
     t.index ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id"
   end
 
@@ -4820,6 +4904,7 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.decimal "sgst", precision: 20
     t.decimal "igst", precision: 20
     t.integer "taxable_amount_id"
+    t.decimal "previously_billed_amount", precision: 10, default: "0"
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
@@ -5016,6 +5101,7 @@ ActiveRecord::Schema.define(version: 2019_07_24_140522) do
     t.integer "company_id"
     t.integer "cost_center_id"
     t.integer "total_amount_id"
+    t.boolean "cost_allocation_items", null: false
     t.index ["company_id"], name: "index_purchase_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_purchase_requests_on_controlling_level_id"
     t.index ["cost_center_id"], name: "index_purchase_requests_on_cost_center_id"

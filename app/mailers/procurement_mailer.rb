@@ -170,6 +170,13 @@ class ProcurementMailer < ApplicationMailer
 
   def notify_vendor(presenter)
     @data = presenter
-    mail to: @data.to, subject: @data.subject, template_name: 'template_invoice'
+    mail to: @data.to, subject: @data.subject, template_name: 'vendor_template_invoice'
+  end
+
+  def send_submit_reminder_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
+    end    
   end
 end
