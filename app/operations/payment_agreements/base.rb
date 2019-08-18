@@ -78,6 +78,9 @@ class PaymentAgreements::Base < BaseOperation
         params[:payment_agreement][:rental_invoices_attributes].each_with_index do |rental_invoice, index|
           rental_invoice[:custom_fields].permit!
         end
+        params[:payment_agreement][:general_invoices_attributes].each_with_index do |general_invoice, index|
+          general_invoice[:custom_fields].permit!
+        end
       end
   end
 
@@ -306,6 +309,20 @@ class PaymentAgreements::Base < BaseOperation
       end
     end
 
+    # Setup custom field for general invoices
+    if self.payment_agreement.general_invoices.present?
+      self.payment_agreement.general_invoices.each_with_index do |invoice, index|
+        custom_fields = params[:payment_agreement][:general_invoices_attributes][index][:custom_fields] 
+        if invoice.new_record?
+          custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+        else
+          validate_custom_fields_invoice(invoice, custom_fields)
+        end
+      end
+    end
+
+    # Setup custom field for rental invoices
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each_with_index do |invoice, index|
         custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields] 
