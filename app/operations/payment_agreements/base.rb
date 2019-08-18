@@ -16,6 +16,7 @@ class PaymentAgreements::Base < BaseOperation
       :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, 
 
       general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
+        custom_fields: [],
 
         invoice_items_attributes: [
             :quantity, :unit_of_measurement, :department_id,
@@ -40,6 +41,7 @@ class PaymentAgreements::Base < BaseOperation
         invoice_frequency_attributes: [:id, :number, :period_id]
       ],
       rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
+        custom_fields: [],
 
         invoice_items_attributes: [
             :quantity, :department_id,
@@ -72,7 +74,11 @@ class PaymentAgreements::Base < BaseOperation
         original_amount_attributes: [:id, :currency_id, :value]
       ]
       
-      )
+      ).tap do |whitelisted|
+        params[:payment_agreement][:rental_invoices_attributes].each_with_index do |rental_invoice, index|
+          rental_invoice[:custom_fields].permit!
+        end
+      end
   end
 
   private
@@ -290,8 +296,8 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def create_or_update_custom_fields
-    if self.payment_agreement.invoices.present?
-      self.payment_agreement.invoices.each do |invoice|
+    if self.payment_agreement.general_invoices.present?
+      self.payment_agreement.general_invoices.each do |invoice|
         if invoice.new_record?
           CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
         else
@@ -299,10 +305,23 @@ class PaymentAgreements::Base < BaseOperation
         end
       end
     end
+
+    if self.payment_agreement.rental_invoices.present?
+      self.payment_agreement.rental_invoices.each_with_index do |invoice, index|
+        custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields] 
+        if invoice.new_record?
+          custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+
+        else
+          validate_custom_fields_invoice(invoice, custom_fields)
+        end
+      end
+    end
   end
 
-  def validate_custom_fields_invoice(invoice)
-    set_fields = set_custom_fields_invoice invoice, self.custom_fields, false
+  def validate_custom_fields_invoice(invoice, custom_fields)
+    set_fields = set_custom_fields_invoice invoice, custom_fields, false
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
       return
