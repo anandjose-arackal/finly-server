@@ -75,11 +75,15 @@ class PaymentAgreements::Base < BaseOperation
       ]
       
       ).tap do |whitelisted|
-        params[:payment_agreement][:rental_invoices_attributes].each_with_index do |rental_invoice, index|
-          rental_invoice[:custom_fields].permit!
+        if params.dig(:payment_agreement, :rental_invoices_attributes).present?
+          params[:payment_agreement][:rental_invoices_attributes].each_with_index do |rental_invoice, index|
+            rental_invoice[:custom_fields].permit!
+          end
         end
-        params[:payment_agreement][:general_invoices_attributes].each_with_index do |general_invoice, index|
-          general_invoice[:custom_fields].permit!
+        if params.dig(:payment_agreement, :general_invoices_attributes).present?
+          params[:payment_agreement][:general_invoices_attributes].each_with_index do |general_invoice, index|
+            general_invoice[:custom_fields].permit!
+          end
         end
       end
   end
