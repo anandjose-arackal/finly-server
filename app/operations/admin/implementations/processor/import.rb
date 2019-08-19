@@ -97,6 +97,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     end
   end
 
+  def destroy_records(data)
+      result success: false, message: "Error while processing item"
+  end
+
   def update_record(data)
     result success: false, message: "Error while processing item"
   end
