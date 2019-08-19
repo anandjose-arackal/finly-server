@@ -88,7 +88,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   def process_row(data)
     id = data[:id]
     destroy_action = data[:destroy]
-    if destroy_action.downcase == 'y'
+    if destroy_action&.downcase == 'y'
       destroy_records(data)
     elsif id.present?
       update_record(data)
