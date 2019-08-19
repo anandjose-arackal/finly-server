@@ -73,7 +73,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       # Create trail for general/rental_invoice that recurring invoice has been created
       trail_options = {action: 'invoice_created', parent: resource, parent_type: 'Invoice'}
       create_trail(trail_options)
-      create_next_upcoming_invoice(resource)
+
+      #Temp comment out to support new logic
+      # create_next_upcoming_invoice(resource)
       # Since recurring invoice has been created and next upcoming invoice has been created, previous invoice will not be upcoming_invoice anymore
       set_upcoming_invoice_status(resource, false)
       return true
