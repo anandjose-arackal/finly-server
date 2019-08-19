@@ -261,7 +261,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id
+          purchase_order_item_id: item.id,
+          billable_amount_attributes: {
+              value: item.taxable_amount&.value.to_f,
+              currency_id: 1
+          }
       }
     end
     invoice_items_attributes
@@ -477,7 +481,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id
+          purchase_order_item_id: item.id,
+          billable_amount_attributes: {
+              value: item.taxable_amount&.value.to_f,
+              currency_id: 1
+          }
       }
     end
     invoice_items_attributes
