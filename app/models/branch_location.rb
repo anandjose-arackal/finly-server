@@ -24,7 +24,6 @@
 #  nature_of_office      :string(255)
 #  billable_location     :boolean          default(TRUE)
 #  shippable_location    :boolean          default(TRUE)
-#  gl_code               :string(255)
 #
 
 class BranchLocation < ApplicationRecord
