@@ -42,24 +42,24 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
                 expense.amount.value,
                 '',
                 '',
+                report.user&.profile&.employee_id,
                 '',
-                "Report ID #{report.id}",
                 '',
                 '',
             ]
           end
           self.contents << [
+              '61110004',
+              '9992',
               '',
-              report.user&.profile&.employee_id,
-              report.user.gl_config&.dig(:location_code),
-              report.user.gl_config&.dig(:cost_center),
+              '',
+              '',
+              '',
               '',
               report.reimbursable_expenses_total&.value,
               '',
               '',
               '',
-              '',
-              "Against settlement of Report ID #{report.id}",
               '',
               ''
           ]

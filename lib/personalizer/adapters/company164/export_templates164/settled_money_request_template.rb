@@ -29,40 +29,37 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
        'Ref. Invoice No.'
    ]
    self.contents = []
-   count = 1
+
    money_request_processors .each do |rpg|
          rpg.mappings.each do |rpg_mapping|
            rpg_mapping.money_requests.each do |money_request|
-             money_request.items.map do |item|
-               next if item.amount.value == 0.0
                self.contents << [
-                   item.category&.gl_code,
+                   31352001,
                    '',
                    money_request.user.gl_config&.dig(:location_code),
                    money_request.user.gl_config&.dig(:cost_center),
                    '',
                    '',
-                   item.amount.value,
+                   money_request.total_amount,
                    '',
                    '',
-                   '',
-                   "Money Request ID #{money_request.id}",
+                   money_request.user&.profile&.employee_id,
+                   "Against Money Request No. #{money_request.id}",
                    '',
                    '',
                ]
-             end
              self.contents << [
-                 '',
-                 money_request.user&.profile&.employee_id,
+                 '61110004',
+                 '9992',
                  money_request.user.gl_config&.dig(:location_code),
                  money_request.user.gl_config&.dig(:cost_center),
+                 '',
+                 '',
                  '',
                  money_request.total_amount,
                  '',
                  '',
                  '',
-                 '',
-                 "Against settlement of Money Request ID #{money_request.id}",
                  '',
                  ''
              ]

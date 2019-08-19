@@ -30,7 +30,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
     self.contents = []
     count = 1
     reports.each do |report|
+      total_amount = 0
       report.expenses.each do |expense|
+        total_amount += expense&.amount&.value
         self.contents << [
             expense.category.gl_code,
             '',
@@ -38,7 +40,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
-            expense.amount.value,
+            total_amount&.round(2),
             '',
             '',
             '',
@@ -48,17 +50,17 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
         ]
       end
       self.contents << [
+          31352001,
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          total_amount&.round(2),
           '',
           report.user&.profile&.employee_id,
-          report.user.gl_config&.dig(:location_code),
-          report.user.gl_config&.dig(:cost_center),
           '',
-          report.submitted_amount&.value,
-          '',
-          '',
-          '',
-          '',
-          "Report ID #{report.id}",
           '',
           ''
       ]
