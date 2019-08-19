@@ -10,16 +10,13 @@ class ReportsAwaitingApproval < ApplicationJob
   private
 
   def remind_document_reviewer(company)
-    au = company.admins.first
-    reports = Report.admin_associated_items(au).not_open.exclude_deleted.where(report_status_id: ReportStatus.id_for(:processing))
-    reports = reports.where('submitted_at <= ?', 3.days.ago)
-    if reports.present?
-      ids_with_reviewers = []
-      result = reports.map {|report| next if report.get_reviewers.blank?; ids_with_reviewers << report.id; [report.get_reviewers.first.id, report.id];}.compact.group_by {|user_id, report_id| user_id }.map {|user_id, report_id| [user_id, report_id.map(&:last)] }.to_h
-      reports = reports.where(id: ids_with_reviewers)
-      users = User.where(company_id: company.id, id: result.keys)
-      users.each do |user|
-        Event::EDocument::ReportsAwaitingApproval.(user, reports: reports, report_ids: result[user.id])
+    users = company.managers
+
+    users.each do |user|
+      reports = Report.awaiting_action_items(user.id)
+      reports = reports.where('submitted_at <= ?', 3.days.ago)
+      if reports.present?
+        Event::EDocument::ReportsAwaitingApproval.(user, reports: reports)
       end
     end
   end
