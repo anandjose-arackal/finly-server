@@ -14,7 +14,9 @@ class ReportsAwaitingApproval < ApplicationJob
     reports = Report.admin_associated_items(au).not_open.exclude_deleted.where(report_status_id: ReportStatus.id_for(:processing))
     reports = reports.where('submitted_at <= ?', 3.days.ago)
     if reports.present?
-      result = reports.map {|report| [report.get_reviewers.first.id, report.id]}.compact.group_by {|user_id, report_id| user_id }.map {|user_id, report_id| [user_id, report_id.map(&:last)] }.to_h
+      ids_with_reviewers = []
+      result = reports.map {|report| next if report.get_reviewers.blank?; [report.get_reviewers.first.id, report.id]; ids_with_reviewers << report.id}.compact.group_by {|user_id, report_id| user_id }.map {|user_id, report_id| [user_id, report_id.map(&:last)] }.to_h
+      reports = reports.where(id: ids_with_reviewers)
       users = User.where(company_id: company.id, id: result.keys)
       users.each do |user|
         Event::EDocument::ReportsAwaitingApproval.(user, reports: reports, report_ids: result[user.id])
