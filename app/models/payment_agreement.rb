@@ -268,14 +268,24 @@ class PaymentAgreement < ApplicationRecord
   end
 
   def agreement_date_comparison
+    validate_agreement_date
+    validate_execution_date
+    validate_comparison_with_execution_date
+  end
+
+  def validate_agreement_date
     if self.agreement_date.blank?
       errors.add(:agreement_date, 'cannot be blank')
     end
+  end
 
+  def validate_execution_date
     if self.execution_date.blank?
       errors.add(:execution_date, 'cannot be blank')
     end
+  end
 
+  def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
       if self.agreement_date > self.execution_date
         errors.add(:agreement_date, 'cannot be greater than execution date')

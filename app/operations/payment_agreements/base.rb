@@ -303,16 +303,6 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def create_or_update_custom_fields
-    if self.payment_agreement.general_invoices.present?
-      self.payment_agreement.general_invoices.each do |invoice|
-        if invoice.new_record?
-          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
-        else
-          validate_custom_fields_invoice(invoice)
-        end
-      end
-    end
-
     # Setup custom field for general invoices
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each_with_index do |invoice, index|
