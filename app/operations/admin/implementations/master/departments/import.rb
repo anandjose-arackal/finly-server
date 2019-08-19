@@ -29,4 +29,15 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
     end
     result true
   end
+  
+   def destroy_records(data)
+     departments = self.company.departments.find_by id: data[:id]
+     unless departments
+      return result false, "Department not found"
+     end
+     unless departments.destroy
+       return result false, departments.errors.full_messages
+     end
+     result true
+    end
 end

@@ -30,4 +30,15 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
     end
     result true
   end
+
+  def destroy_records(data)
+   location = self.company.locations.find_by id: data[:id]
+   unless location
+    return result false, "Location not found"
+   end
+   unless location.destroy
+     return result false, location.errors.full_messages
+   end
+   result true
+  end
 end

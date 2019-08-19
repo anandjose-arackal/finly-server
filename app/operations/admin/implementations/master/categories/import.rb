@@ -30,5 +30,16 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
     end
     result true
   end
+  
+    def destroy_records(data)
+     category = self.company.categories.find_by id: data[:id]
+     unless category
+      return result false, "Category not found"
+     end
+     unless category.destroy
+       return result false, category.errors.full_messages
+     end
+     result true
+    end
 
 end
