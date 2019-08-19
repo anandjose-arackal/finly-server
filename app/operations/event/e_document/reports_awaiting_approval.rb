@@ -1,6 +1,6 @@
 class Event::EDocument::ReportsAwaitingApproval < BaseOperation
 
-  attr_accessor :reports, :reports_awaiting_approval_columns
+  attr_accessor :reports, :report_awaiting_approval_columns
 
   def pre_validate
     unless user.present?

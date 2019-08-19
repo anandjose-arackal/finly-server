@@ -15,7 +15,7 @@ class ReportsAwaitingApproval < ApplicationJob
     reports = reports.where('submitted_at <= ?', 3.days.ago)
     if reports.present?
       ids_with_reviewers = []
-      result = reports.map {|report| next if report.get_reviewers.blank?; [report.get_reviewers.first.id, report.id]; ids_with_reviewers << report.id}.compact.group_by {|user_id, report_id| user_id }.map {|user_id, report_id| [user_id, report_id.map(&:last)] }.to_h
+      result = reports.map {|report| next if report.get_reviewers.blank?; ids_with_reviewers << report.id; [report.get_reviewers.first.id, report.id];}.compact.group_by {|user_id, report_id| user_id }.map {|user_id, report_id| [user_id, report_id.map(&:last)] }.to_h
       reports = reports.where(id: ids_with_reviewers)
       users = User.where(company_id: company.id, id: result.keys)
       users.each do |user|
