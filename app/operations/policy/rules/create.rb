@@ -68,7 +68,7 @@ class Policy::Rules::Create < Policy::Rules::Base
 
   def process
     if params[:expense_rule]
-      category_ids = params[:expense_rule][:expense_rule_category_mappings_attributes][:category_id]
+      category_ids = params[:expense_rule][:expense_rule_category_mappings_attributes].pluck :category_id
       category_ids.each do |category_id|   
         rule_params[:category_id] = category_id     
         self.rule = self.policy.expense_rules.create(rule_params)
