@@ -26,8 +26,12 @@ class Event::EDocument::ReportsAwaitingApproval < BaseOperation
 
     params[:reports] = self.reports
     params[:report_awaiting_approval_columns] = report_awaiting_approval_columns
-
-    ReportMailer.delay.send_awaiting_approval_mail(Event::EDocument::ReportsAwaitingApproval::MailerPresenter.new(user, params))
+    presenter = Event::EDocument::ReportsAwaitingApproval::MailerPresenter.new(user, params)
+    unless presenter.success?
+      Rails.logger.fatal "presenter.errors?, \n #{presenter.errors?}, messages -  \n #{presenter.messages}, presenter -  \n #{presenter}"
+    else
+      ReportMailer.delay.send_awaiting_approval_mail(presenter)
+    end
   end
 
   def set_presenter_params(user)
@@ -77,12 +81,13 @@ class Event::EDocument::ReportsAwaitingApproval < BaseOperation
       self.company = user.company
       self.action_name = params[:action_name]
       self.action_url = params[:action_url]
-
-      setup_report_section(params)
+      self.report_awaiting_approvals = params[:reports]
+      self.report_awaiting_approval_columns = params[:report_awaiting_approval_columns]
+      self.report_awaiting_approval_column_values = params[:report_awaiting_approval_column_values]
     end
 
     def to
-      user.email
+      self.user.email
     end
 
     def subject
@@ -91,14 +96,6 @@ class Event::EDocument::ReportsAwaitingApproval < BaseOperation
 
     def body
       self.body_val
-    end
-
-    private
-
-    def setup_report_section(params)
-      self.report_awaiting_approvals = params[:reports]
-      self.report_awaiting_approval_columns = params[:report_awaiting_approval_columns]
-      self.report_awaiting_approval_column_values = params[:report_awaiting_approval_column_values]
     end
   end
 
