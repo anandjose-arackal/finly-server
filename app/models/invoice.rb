@@ -84,14 +84,6 @@
 #  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
-#  payment_agreement_id            :integer
-#  vendor_location_id              :integer
-#  billing_type_id                 :integer
-#  payment_agreement_escalation_id :integer
-#  invoice_frequency_id            :integer
-#  billing_start_date              :datetime
-#  billing_day_of_month            :integer
-#  agreement_based_next_due_date   :date
 #
 
 class Invoice < ApplicationRecord
@@ -277,6 +269,12 @@ class Invoice < ApplicationRecord
     if user_id.present?
       ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_id(ids)
+    end
+  }
+
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+    if user_id.present?
+      self.awaiting_action_items(user_id)
     end
   }
 

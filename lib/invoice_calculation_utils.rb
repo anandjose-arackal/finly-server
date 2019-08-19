@@ -39,17 +39,21 @@ class InvoiceCalculationUtils
     end
 
     # assign gross amount
-    if self.invoice&.gross_amount.present?
-      self.invoice.gross_amount.value = self.gross_amount
-    else
-      self.invoice.gross_amount = Amount.new(value: self.gross_amount, currency_id: 1)
+    unless self.invoice.class.name == 'OutwardInvoice'
+      if self.invoice&.gross_amount.present?
+        self.invoice.gross_amount.value = self.gross_amount
+      else
+        self.invoice&.gross_amount = Amount.new(value: self.gross_amount, currency_id: 1)
+      end
     end
 
-    # assign taxable amount
-    if self.invoice&.taxable_amount.present?
-      self.invoice.taxable_amount.value = taxable_amount
-    else
-      self.invoice.taxable_amount = Amount.new(value: taxable_amount, currency_id: 1)
+    unless self.invoice.class.name == 'OutwardInvoice'
+      # assign taxable amount
+      if self.invoice&.taxable_amount.present?
+        self.invoice.taxable_amount.value = taxable_amount
+      else
+        self.invoice.taxable_amount = Amount.new(value: taxable_amount, currency_id: 1)
+      end
     end
 
     # assign TDS and advance amount

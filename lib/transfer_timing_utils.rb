@@ -98,6 +98,11 @@ class TransferTimingUtils
       date = date.to_date
     end
     return date.to_date if within_timeframe? payment_mode, date
+    if date <= Date.today
+      date = DateUtils.local_date
+    else
+      date.change(hour: 8, min: 1, sec: 0)
+    end
     return date.to_date if payment_mode == "IMPS"
     case payment_mode.upcase
       when "NEFT", "RTGS"
@@ -124,7 +129,22 @@ class TransferTimingUtils
     business_date = date
     loop do
       business_date = business_date + 1.day
-      if bank_holidays.exclude?(business_date.strftime("%d-%m-%Y")) && [1,6].exclude?(business_date.wday)
+      if bank_holidays.exclude?(business_date.strftime("%d-%m-%Y")) && [0,6].exclude?(business_date.wday)
+        date_count += 1
+      end
+      return business_date if date_count == no_of_days
+    end
+  end
+
+  def self.subtract_business_days(date, no_of_days=1)
+    date_count  = 0
+    if date.blank?
+      date = DateTime.now
+    end
+    business_date = date
+    loop do
+      business_date = business_date - 1.day
+      if bank_holidays.exclude?(business_date.strftime("%d-%m-%Y")) && [0,6].exclude?(business_date.wday)
         date_count += 1
       end
       return business_date if date_count == no_of_days

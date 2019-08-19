@@ -64,7 +64,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         validations_for_goods(item, po_items)
       when ProductType.id_for(:service)
         validations_for_services(item, po_items)
-      end      
+      end
     end
 
     # todo take care of this
@@ -112,6 +112,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         case item.inventory_line_item.product_type_id
         when ProductType.id_for(:goods)
           po_item = update_purchase_order_item(item)
+          update_accepting_item_amount(item)
         when ProductType.id_for(:service)
           po_item = update_service_item(item)
         end
@@ -135,7 +136,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.id_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
     self.id_current_attachments.update_all(procurement_document_id: inward_document.id, procurement_document_type: inward_document.class.name)
-
   end
 
   def post_process
@@ -224,10 +224,18 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
     purchase_order_item.save
 
-    purchase_order_item    
+    purchase_order_item
   end
 
-  def set_purchase_order_items
+  def update_accepting_item_amount(item)
+    amount = item.per_unit_price * item.accepted rescue nil
+    if amount.present?
+      if item.accepting_item_amount_id.present?
+        item.accepting_item_amount.update_column('value', amount)
+      else
+        item.create_accepting_item_amount(currency_id: 1, value: amount)
+      end
+    end
   end
 
   def validations_for_goods(item, po_items)
@@ -243,12 +251,12 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
 
     remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
-    
+
     if  remaining < delivered.to_f
       add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
       # break
       return
-    end 
+    end
 
     if delivered.to_f > po_items.quantity.to_f
       add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
@@ -281,10 +289,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
 
 
-
-
-
-
   def all_items_shipped?(po)
     configuration = user.company.feature_subscription
 
@@ -295,7 +299,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.srn_disabled = configuration.srn_enabled == false
 
     shipped = true
-    
+
     if self.grn_enabled && self.srn_disabled
       po.items.each do |item|
         next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
@@ -341,7 +345,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.srn_disabled = configuration.srn_enabled == false
 
     shipped = true
-    
+
     if self.grn_enabled && self.srn_disabled
       po.items.each do |item|
         next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )

@@ -77,11 +77,11 @@ json.cards do
 end
 
 json.subscriptions do
-  json.expense_management @result.user_panel_subscription.expense_management
-  json.disburse @result.user_panel_subscription.disburse
-  json.yes_bank_account_transfer @result.user_panel_subscription.yes_bank_account_transfer
-  json.invoicing_system @result.user_panel_subscription.invoicing_system
-  json.travel_request @result.user_panel_subscription.travel_request
+  json.expense_management @result.user_panel_subscription&.expense_management
+  json.disburse @result.user_panel_subscription&.disburse
+  json.yes_bank_account_transfer @result.user_panel_subscription&.yes_bank_account_transfer
+  json.invoicing_system @result.user_panel_subscription&.invoicing_system
+  json.travel_request @result.user_panel_subscription&.travel_request
 end
 
 json.individual_kyc @result.individual_kyc_data

@@ -32,6 +32,8 @@
 #  sgst                   :decimal(20, )
 #  cgst                   :decimal(20, )
 #  igst                   :decimal(20, )
+#  purchase_order_item_id :integer
+#  billable_amount_id     :integer
 #
 
 class InvoiceLineItem < ApplicationRecord
