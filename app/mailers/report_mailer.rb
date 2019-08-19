@@ -33,6 +33,7 @@ class ReportMailer < ApplicationMailer
 
   def send_awaiting_approval_mail(presenter)
     @data = presenter
+    Rails.logger.fatal "presenter.errors?, \n #{presenter.errors?}, messages -  \n #{presenter.messages}, presenter -  \n #{presenter}"
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
     end
