@@ -160,7 +160,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    if purchase_order.advance_amount.paid?
+    if purchase_order.advance_paid?
       params.delete(:advance_tds_slab_id)
       params.delete(:advance_amount_required)
       params.delete(:advance_amount_attributes)
@@ -203,7 +203,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
 
-    if purchase_order.advance_amount.paid?
+    if purchase_order.advance_paid?
       params.delete(:advance_tds_slab_id)
       params.delete(:advance_amount_required)
       params.delete(:advance_amount_attributes)

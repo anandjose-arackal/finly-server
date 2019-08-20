@@ -63,7 +63,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     end
 
     if purchase_order.advance_amount&.present?
-      if purchase_order.advance_amount.value > 0 and not purchase_order.advance_amount.paid?
+      if purchase_order.advance_amount.value > 0 and not purchase_order.advance_paid?
         purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
         purchase_order.save
       end

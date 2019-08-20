@@ -41,7 +41,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
       if purchase_order.advance_amount&.present?
-        if purchase_order.advance_amount.value > 0 and not purchase_order.advance_amount.paid?
+        if purchase_order.advance_amount.value > 0 and not purchase_order.advance_paid?
           purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
           purchase_order.save
         end
