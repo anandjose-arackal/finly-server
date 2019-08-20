@@ -57,6 +57,7 @@ class Company < ApplicationRecord
   has_one :kotak_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
+  has_one :gst_config
   has_many :web_hooks
   has_many :web_hook_tracks
   has_many :invoice_attachments

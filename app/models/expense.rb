@@ -46,7 +46,6 @@
 #  hsn_sac                :string(255)
 #  merchant_bill_no       :string(255)
 #  tax_rate_id            :integer
-#  company_id             :integer
 #
 
 class Expense < ApplicationRecord
