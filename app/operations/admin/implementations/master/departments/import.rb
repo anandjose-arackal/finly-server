@@ -7,27 +7,43 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
               :id,
               :parent_id,
               :name,
-              :department_code
+              :department_code,
+              :destroy
           ]
   def create_record(data)
-    department = self.company.departments.new data.except(:id)
-    unless department.save
-      return result false, department.errors.full_messages
+    if data[:parent_id].is_a?(String) && data[:parent_id].present?
+      parent_department = company.departments.non_deleted.with_name(data[:parent_id]).first
+      unless parent_department.present?
+        return result false, "Parent Department Not Found"
+      end
     end
-    result true
+    if data[:name].present?
+      sub_department = company.departments.non_deleted.with_name(data[:name]).first
+      return result false, "Department already existed" if sub_department.present?
+    else
+      return result false, "Department Name Missing"
+    end
 
+    sub_department = company.departments.new data.except(:id, :parent_id,:destroy)
+    sub_department.parent_id = parent_department&.id rescue nil
+
+    if sub_department.save
+      return result true, "Department Created Successfully"
+    else
+      return result false, sub_department.errors.full_messages
+    end
   end
 
   def update_record(data)
     department = self.company.departments.find_by id: data[:id]
     unless department
-      return result false, "department not found"
+      return result false, "Department not found"
     end
 
-    unless department.update(data)
+    unless department.update(data.except(:destroy))
       return result false, department.errors.full_messages
     end
-    result true
+    result true, 'Updated Successfully'
   end
   
    def destroy_records(data)
@@ -38,6 +54,6 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
      unless departments.destroy
        return result false, departments.errors.full_messages
      end
-     result true
+     result true, "Destroyed Successfully"
     end
 end

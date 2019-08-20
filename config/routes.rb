@@ -2663,7 +2663,7 @@ Rails.application.routes.draw do
       get 'export_data_configuration', to: 'companies#export_data_configuration'
       resources :implementations do
         collection do
-          post 'process', to: 'implementations#process'
+          get :get_template
         end
       end
     end

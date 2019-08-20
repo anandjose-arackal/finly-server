@@ -16,7 +16,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
     unless category.save
       return result false, category.errors.full_messages
     end
-    result true
+    result true, 'Created Successfully'
   end
 
   def update_record(data)
@@ -28,7 +28,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
     unless category.update(data)
       return result false, category.errors.full_messages
     end
-    result true
+    result true,'Updated Successfully'
   end
   
     def destroy_records(data)
@@ -39,7 +39,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
      unless category.destroy
        return result false, category.errors.full_messages
      end
-     result true
+     result true, "Destroyed Successfully"
     end
 
 end

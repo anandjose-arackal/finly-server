@@ -31,7 +31,7 @@ class Admin::Implementations::Processor::ImportTemplate < Admin::Base
   end
 
   def process
-    export(self.headers, contents)
+    self.file_url = export(self.headers, contents)
   end
 
   def contents
@@ -40,6 +40,9 @@ class Admin::Implementations::Processor::ImportTemplate < Admin::Base
 
   def export(headers, contents)
     exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
+    file = exporter.generate_xls_file
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+    return temp_file.file.url
   end
 
   def file_name
@@ -48,10 +51,10 @@ class Admin::Implementations::Processor::ImportTemplate < Admin::Base
 
   def success
     params[:file_url] = file_url
-    Admin::Implementations::Processor::ImportTemplate .new(user, params, messages)
+    Admin::Implementations::Processor::ImportTemplate::ImportPresenter .new(user, params, messages)
   end
 
-  class Admin::Implementations::Processor::ImportTemplate::Import  < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::Implementations::Processor::ImportTemplate::ImportPresenter  < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :file_url
 

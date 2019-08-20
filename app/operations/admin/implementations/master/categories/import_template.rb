@@ -11,11 +11,9 @@ class Admin::Implementations::Master::Categories::ImportTemplates < Admin::Imple
           ]
 
   def valid_request
-
   end
 
   def input
-    binding.pry
     []
   end
 

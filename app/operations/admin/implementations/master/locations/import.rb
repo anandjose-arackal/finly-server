@@ -2,21 +2,21 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'locations.import'
-  halt_on_failure!
   headers [
               :id,
               :name,
               :address_1,
               :gstin,
               :location_code,
-              :nature_of_office
+              :nature_of_office,
+              :destroy
           ]
   def create_record(data)
-    location = self.company.locations.new data.except(:id)
+    location = self.company.locations.new data.except(:id,:destroy)
     unless location.save
       return result false, location.errors.full_messages
     end
-    result true
+    result true, 'Created Successfully'
   end
 
   def update_record(data)
@@ -25,10 +25,10 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
       return result false, "Location not found"
     end
 
-    unless location.update(data)
+    unless location.update(data.except(:destroy))
       return result false, location.errors.full_messages
     end
-    result true
+    result true, 'Updated Successfully'
   end
 
   def destroy_records(data)
@@ -39,6 +39,6 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
    unless location.destroy
      return result false, location.errors.full_messages
    end
-   result true
+   result true, "Destroyed Successfully"
   end
 end

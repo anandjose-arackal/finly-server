@@ -49,7 +49,6 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     failed = false
     self.input.each_with_index do |row, index|
       if index == 0
-        output << row
         next
       end
 
@@ -74,6 +73,9 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
         item_complete false
         row << result.message
         failed = true
+      end
+      if result.success?
+        row << result.message
       end
       output << row
       item_complete true

@@ -14,6 +14,11 @@ class AdminUsers::ImplementationsController < BaseControllers::AdminBase
     respond
   end
 
+  def get_template
+    @result = Admin::Implementations::ImportTemplate.(current_user, params)
+    respond
+  end
+
   def show
 
   end
