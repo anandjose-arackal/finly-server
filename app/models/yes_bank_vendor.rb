@@ -243,6 +243,10 @@ class YesBankVendor < ApplicationRecord
     }
   end
 
+  def self.human_name
+    'Vendor'
+  end
+
   def self.document_owner_attribute
     'created_by_id'
   end

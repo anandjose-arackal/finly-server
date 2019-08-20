@@ -2,6 +2,13 @@ class Procurements::Grn::Pending::Index < Procurements::Base
 
   attr_accessor :procurements, :filter_procurement_type
 
+  def pre_validate
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      add_message :error, "Receipt note is not enabled for your company. Please contact your admin or Finly Customer Support."
+      return
+    end
+  end
+  
   def init
     self.filter_procurement_type = params[:filter_procurement_type]
   end
@@ -19,15 +26,21 @@ class Procurements::Grn::Pending::Index < Procurements::Base
   end
 
   def process
-    if user.vp_admin_or_auditor? || user.is_goods_receiver?
+    if user.vendor_payments_admin? || user.is_goods_receiver?
       if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
         # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
+        # Get all policies where user has goods receiver role
         received_pending_ids = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
-        # pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
-        pr_ids = user.company.procurements.pluck(:id)
+        
+        if user.vendor_payments_admin?
+          pr_ids = user.company.procurements.pluck(:id)
+        else
+          policy_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ? AND user_id = ?', UserRole.id_for(:goods_receiver), user.id).pluck(:id).uniq rescue []
+          pr_ids = user.company.procurements.joins(:purchase_order).where('purchase_orders.policy_id IN (?)', policy_ids).pluck(:id)
+        end
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
-        self.procurements = Procurement.where(id: proc_ids)
+        self.procurements = Procurement.where(id: proc_ids).joins(:purchase_order).where.not('purchase_orders.purchase_order_status_id = ?', PurchaseOrderStatus.id_for(:closed)) rescue Procurement.none
       end
     end
   end
@@ -64,12 +77,13 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     has_scope :filter_year
     has_scope :filter_grn_due_today
     has_scope :filter_grn_overdue
+    has_scope :filter_policy_id
 
 
     def init
       self.procurements = params[:procurements]
       apply_filter
-      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date
+      self.procurements = procurements.order_by_controlling_level(user.id).order_by_expected_delivery_date(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details
@@ -91,7 +105,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
 
     def get_status_counts
       # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
-      received_pending_ids = [StatusTag.id_for(:shipment_received)]
+      received_pending_ids = [StatusTag.id_for(:receiving_shipment)]
       st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
       pr_ids = self.procurements.pluck(:id)
       # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size

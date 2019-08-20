@@ -45,16 +45,22 @@ module Transitionable
       User.where(id: user_ids)
     end
 
-    def affected_users(type=nil)
+    def affected_users(type=nil, options={})
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
+      # Valid options {}
+      # {ignore_reviewer: true}
       user_ids = []
       case type
       when :approve, 'approve'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.document_owner_id
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
         else
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
           user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
         end
       when :reject, 'reject'
@@ -157,6 +163,8 @@ module Transitionable
             mobile_number: dlrm.reviewer&.mobile_number,
             active: dlrm.active,
             threshold: dlrm.threshold,
+            min: dlrm.min,
+            max: dlrm.max,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
@@ -286,7 +294,8 @@ module Transitionable
       return nil if all_level_numbers.blank?
 
       if self.level.present?
-        current_level_number = self.level.level_number
+        # current_level_number = self.level.level_number
+        current_level_number = self.document_level_reviewer_mappings.where(level_id: self.level.id).first&.level_number
         if type == 'next' || type == :next
           level_number = current_level_number + 1
         elsif ['previous', :previous, 'prev', :prev].include?(type)
