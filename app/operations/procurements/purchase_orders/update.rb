@@ -160,34 +160,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
-      unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
-        add_message :error, "You selected advance to be added for this PO. Please add advance amount."
-        return
-      end
-    end
-
-
-    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present? && self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
-      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > (params[:purchase_order][:balance_amount_attributes][:value].to_i + 1) # adding a buffer to account for roundoff amount
-        add_message :error, "Advance amount can't be more than the Balance Due for the entire PO."
-        return
-      end
-      if self.purchase_order_params[:due_date].blank?
-        add_message :error, 'Scheduled date for the advance amount has not been set.'
-        return
-      end
-      valid_date = Date.parse(self.purchase_order_params[:due_date]) rescue false 
-      unless valid_date
-        add_message :error, 'Invalid date provided'
-        return
-      end
-      unless (Date.parse(self.purchase_order_params[:due_date]) >= Date.today)
-        add_message :error, 'Cannot create back dated scheduled payments for advances.'
-      end
+    if purchase_order.advance_amount.paid?
+      params.delete(:advance_tds_slab_id)
+      params.delete(:advance_amount_required)
+      params.delete(:advance_amount_attributes)
+      params.delete(:requested_advance_amount_attributes)
     else
-      self.purchase_order_params[:due_date] = nil
+      validation_for_advance_amount
     end
+
     # Validate if user has access to PO show page    
     validate_document_access
     # Validate if user has access to PO update
@@ -222,17 +203,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
 
-    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present?
-      purchase_order_params[:requested_advance_amount_attributes][:id] = self.purchase_order&.requested_advance_amount&.id
-      # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
-      self.skip_adv_calculation = false
-      if ( purchase_order_params[:requested_advance_amount_attributes][:value].to_i == self.purchase_order.requested_advance_amount&.value ) && ( purchase_order_params[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id )
-        self.skip_adv_calculation = true
-      end
+    if purchase_order.advance_amount.paid?
+      params.delete(:advance_tds_slab_id)
+      params.delete(:advance_amount_required)
+      params.delete(:advance_amount_attributes)
+      params.delete(:requested_advance_amount_attributes)
     else
-      self.purchase_order_params[:requested_advance_amount_attributes][:value] = self.purchase_order&.requested_advance_amount&.value || 0
-      self.purchase_order_params[:due_date] = self.purchase_order.due_date
-      self.skip_adv_calculation = true
+      pre_process_for_advance_amount
     end
 
   end
@@ -381,6 +358,52 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     return if purchase_order.update_if_admin(user) if !PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id) || purchase_order.user_id.blank?
     return if purchase_order.update_if_reviewer(user) if PurchaseOrderStatus.status_ids_for_reviewer.include?(purchase_order.purchase_order_status_id)
     add_message :error, 'Unable to update'
+  end
+
+  def validation_for_advance_amount
+    if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
+      unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
+        add_message :error, "You selected advance to be added for this PO. Please add advance amount."
+        return
+      end
+    end
+
+
+    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present? && self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
+      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > (params[:purchase_order][:balance_amount_attributes][:value].to_i + 1) # adding a buffer to account for roundoff amount
+        add_message :error, "Advance amount can't be more than the Balance Due for the entire PO."
+        return
+      end
+      if self.purchase_order_params[:due_date].blank?
+        add_message :error, 'Scheduled date for the advance amount has not been set.'
+        return
+      end
+      valid_date = Date.parse(self.purchase_order_params[:due_date]) rescue false 
+      unless valid_date
+        add_message :error, 'Invalid date provided'
+        return
+      end
+      unless (Date.parse(self.purchase_order_params[:due_date]) >= Date.today)
+        add_message :error, 'Cannot create back dated scheduled payments for advances.'
+      end
+    else
+      self.purchase_order_params[:due_date] = nil
+    end
+  end
+
+  def pre_process_for_advance_amount
+    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present?
+      purchase_order_params[:requested_advance_amount_attributes][:id] = self.purchase_order&.requested_advance_amount&.id
+      # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+      self.skip_adv_calculation = false
+      if ( purchase_order_params[:requested_advance_amount_attributes][:value].to_i == self.purchase_order.requested_advance_amount&.value ) && ( purchase_order_params[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id )
+        self.skip_adv_calculation = true
+      end
+    else
+      self.purchase_order_params[:requested_advance_amount_attributes][:value] = self.purchase_order&.requested_advance_amount&.value || 0
+      self.purchase_order_params[:due_date] = self.purchase_order.due_date
+      self.skip_adv_calculation = true
+    end
   end
 
 end
