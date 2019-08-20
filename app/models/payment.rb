@@ -118,6 +118,9 @@ class Payment < ApplicationRecord
       where.not(id: id)
     end
   }
+  scope :with_external_id, -> (external_id) {
+    where external_reference_id: external_id
+  }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
   scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance),
                                                   PaymentPurpose.id_for(:cash_advance),
