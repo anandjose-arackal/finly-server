@@ -25,7 +25,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       return result false, "Category not found"
     end
 
-    unless category.update(data)
+    unless category.update(data.except(:destroy))
       return result false, category.errors.full_messages
     end
     result true,'Updated Successfully'
