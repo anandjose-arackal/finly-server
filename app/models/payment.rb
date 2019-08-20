@@ -446,6 +446,7 @@ class Payment < ApplicationRecord
 
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
+  after_save :add_company_id
 
   after_destroy :budget_trail_destroy
 
@@ -717,6 +718,12 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
+  end
+
+  def add_company_id
+    if self.company_id.blank?
+      self.update_columns(company_id: payment_order&.company_id)
     end
   end
 end
