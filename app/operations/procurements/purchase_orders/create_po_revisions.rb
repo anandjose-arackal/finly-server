@@ -53,7 +53,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.save
 
     if self.purchase_order.advance_payments.present?
-      self.purchase_order.advance_payments.update_all parent_id: self.duplicate_po.id
+      self.purchase_order.advance_payments.update_all(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
     end
 
     self.klass.each_with_index do |k, kid| 
