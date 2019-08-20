@@ -6,12 +6,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     def initialize(success, message = nil)
       self.success = success
       self.message = message
-
       if message and message.is_a?(Array)
         message = message.join(', ')
       end
-
-      unless success and not message
+      unless success and message.present?
         self.message = "Error while processing item"
       end
     end
