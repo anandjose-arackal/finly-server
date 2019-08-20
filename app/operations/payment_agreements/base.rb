@@ -41,7 +41,6 @@ class PaymentAgreements::Base < BaseOperation
         invoice_frequency_attributes: [:id, :number, :period_id]
       ],
       rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
-        custom_fields: [],
 
         invoice_items_attributes: [
             :quantity, :department_id,
@@ -62,7 +61,8 @@ class PaymentAgreements::Base < BaseOperation
         notify_users_attributes: [:id, :_destroy, :user_id],
         payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
-        invoice_frequency_attributes: [:id, :number, :period_id]
+        invoice_frequency_attributes: [:id, :number, :period_id],
+        custom_fields: []
       ],
       beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
         tax_amount_attributes: [:id, :value, :currency_id],
@@ -78,6 +78,7 @@ class PaymentAgreements::Base < BaseOperation
         if params.dig(:payment_agreement, :rental_invoices_attributes).present?
           params[:payment_agreement][:rental_invoices_attributes].each_with_index do |rental_invoice, index|
             rental_invoice[:custom_fields].permit! rescue nil
+            # whitelisted[:rental_invoices_attributes][index][:custom_fields] = rental_invoice[:custom_fields]
           end
         end
         if params.dig(:payment_agreement, :general_invoices_attributes).present?
@@ -253,7 +254,7 @@ class PaymentAgreements::Base < BaseOperation
       # self.payment_agreement.create_total_amount(value: total_amount, currency_id: 1)
       amount = Amount.create(value: total_amount, currency_id: 1)
       payment_agreement.total_amount_id = amount.id
-      payment_agreement.save
+      payment_agreement.save!
     end
   end
 
@@ -305,34 +306,38 @@ class PaymentAgreements::Base < BaseOperation
   def create_or_update_custom_fields
     # Setup custom field for general invoices
     if self.payment_agreement.general_invoices.present?
-      self.payment_agreement.general_invoices.each_with_index do |invoice, index|
-        custom_fields = params[:payment_agreement][:general_invoices_attributes][index][:custom_fields] 
-        if invoice.new_record?
-          custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
-        else
-          validate_custom_fields_invoice(invoice, custom_fields)
+      if params.dig(:payment_agreement, :rental_invoices_attributes).present?
+        self.payment_agreement.general_invoices.each_with_index do |invoice, index|
+          custom_fields = params[:payment_agreement][:general_invoices_attributes][index][:custom_fields]
+          if invoice.new_record?
+            custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+            CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+          else
+            validate_custom_fields_invoice(invoice, custom_fields)
+          end
         end
       end
     end
 
     # Setup custom field for rental invoices
     if self.payment_agreement.rental_invoices.present?
-      self.payment_agreement.rental_invoices.each_with_index do |invoice, index|
-        custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields] 
-        if invoice.new_record?
-          custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-          CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
-
-        else
-          validate_custom_fields_invoice(invoice, custom_fields)
+      if params.dig(:payment_agreement, :rental_invoices_attributes).present?
+        self.payment_agreement.rental_invoices.each_with_index do |invoice, index| 
+          if invoice.new_record?
+            custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+            custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+            CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+          else
+            custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+            validate_custom_fields_invoice(invoice, custom_fields, true)
+          end
         end
       end
     end
   end
 
-  def validate_custom_fields_invoice(invoice, custom_fields)
-    set_fields = set_custom_fields_invoice invoice, custom_fields, false
+  def validate_custom_fields_invoice(invoice, custom_fields, save=false)
+    set_fields = set_custom_fields_invoice invoice, custom_fields, save
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
       return

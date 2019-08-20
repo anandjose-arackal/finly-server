@@ -270,7 +270,7 @@ class PaymentAgreement < ApplicationRecord
   def agreement_date_comparison
     validate_agreement_date
     validate_execution_date
-    validate_comparison_with_execution_date
+    validate_comparison_between_dates
   end
 
   def validate_agreement_date
@@ -285,6 +285,11 @@ class PaymentAgreement < ApplicationRecord
     end
   end
 
+  def validate_comparison_between_dates
+    validate_comparison_with_execution_date
+    validate_renewal_reminder
+  end
+
   def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
       if self.agreement_date > self.execution_date
@@ -296,6 +301,21 @@ class PaymentAgreement < ApplicationRecord
   def expiration_date_if_allowed
     if self.no_expiration.blank? && self.expiration_date.blank?
       errors.add(:expiration_date, ' cannot be blank or agreement should never expire')
+    end
+    if self.no_expiration.blank? && self.expiration_date.present?
+      if self.expiration_date < self.execution_date
+        errors.add(:expiration_date, ' cannot be smaller than execution date')
+      end
+    end
+  end
+
+  def validate_renewal_reminder
+    unless self.no_expiration 
+      if self.execution_date.present? && self.expiration_date.present? && self.renewal_reminder_date.present?
+        if (self.renewal_reminder_date < self.execution_date) || (self.renewal_reminder_date > self.expiration_date)
+          errors.add(:renewal_reminder_date, ' should be between execution and expiry date')
+        end
+      end 
     end
   end
 
