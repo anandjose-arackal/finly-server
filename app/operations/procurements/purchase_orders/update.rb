@@ -161,10 +161,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     if purchase_order.advance_paid?
-      params.delete(:advance_tds_slab_id)
-      params.delete(:advance_amount_required)
-      params.delete(:advance_amount_attributes)
-      params.delete(:requested_advance_amount_attributes)
+      self.purchase_order_params.delete(:advance_tds_slab_id)
+      self.purchase_order_params.delete(:advance_amount_required)
+      self.purchase_order_params.delete(:advance_amount_attributes)
+      self.purchase_order_params.delete(:requested_advance_amount_attributes)
     else
       validation_for_advance_amount
     end
@@ -204,10 +204,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.po_old_attachments = self.purchase_order.attachments
 
     if purchase_order.advance_paid?
-      params.delete(:advance_tds_slab_id)
-      params.delete(:advance_amount_required)
-      params.delete(:advance_amount_attributes)
-      params.delete(:requested_advance_amount_attributes)
+      self.purchase_order_params.delete(:advance_tds_slab_id)
+      self.purchase_order_params.delete(:advance_amount_required)
+      self.purchase_order_params.delete(:advance_amount_attributes)
+      self.purchase_order_params.delete(:requested_advance_amount_attributes)
     else
       pre_process_for_advance_amount
     end
