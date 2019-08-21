@@ -402,6 +402,28 @@ class PurchaseOrder < ApplicationRecord
     includes(:user, :balance_amount, :vendor, :status, procurement: [:status_tags])
   }
 
+  # Sorting
+  scope :sort_po_number, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_orders.po_number #{type}")
+    end
+  }
+
+  scope :sort_po_name, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:procurement).reorder("procurements.name #{type}")
+    end
+  }
+
+  scope :sort_amount, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:balance_amount).reorder("amounts.value #{type}")
+    end
+  }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry

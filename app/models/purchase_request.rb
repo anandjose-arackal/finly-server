@@ -154,22 +154,25 @@ class PurchaseRequest < ApplicationRecord
 
   # Sorting
   scope :sort_order_number, -> (type){
-    if type
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_requests.order_number #{type}")
     end
   }
 
   scope :sort_description, -> (type){
-    if type
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_requests.description #{type}")
     end
   }
 
-  # scope :sort_amount, -> (type){
-  #   if type
-  #     reorder("purchase_requests.description #{type}")
-  #   end
-  # }
+  scope :sort_amount, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:total_amount).reorder("amounts.value #{type}")
+    end
+  }
 
   def add_company
     self.company_id = self.creator.company_id

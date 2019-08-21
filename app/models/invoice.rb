@@ -438,6 +438,43 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+
+  # Sorting
+  scope :sort_invoice_id, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.invoice_id #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.date #{type}")
+    end
+  }
+
+  scope :sort_due_date, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.due_date #{type}")
+    end
+  }
+
+  scope :sort_amount, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:net_amount).reorder("amounts.value #{type}")
+    end
+  }
+
+  scope :sort_balance_due, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:balance_due).reorder("amounts.value #{type}")
+    end
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
