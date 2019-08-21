@@ -16,7 +16,7 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
     applications << 'em' if data[:expense_management]&.upcase == 'Y'
     applications << 'vp' if data[:vendor_payment]&.upcase == 'Y'
     if applications.blank?
-      return false, "Enable EM or VP"
+      return result false, "Enable EM or VP"
     end
     applications.each do |application|
       cost_center = self.company.cost_centers.new data.except(:id,:destroy,:expense_management, :vendor_payment)

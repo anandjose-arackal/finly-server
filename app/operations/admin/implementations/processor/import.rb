@@ -98,15 +98,15 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   end
 
   def destroy_records(data)
-      result success: false, message: "Error while processing item"
+      result success: false, message: "Destroy action cant perform"
   end
 
   def update_record(data)
-    result success: false, message: "Error while processing item"
+    result success: false, message: "Update action cant perform"
   end
 
   def create_record(data)
-    result success: false, message: "Error while processing item"
+    result success: false, message: "Create action cant perform"
   end
 
   def result(success, message = nil)

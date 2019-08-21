@@ -6,7 +6,8 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
   headers [
               :id,
               :name,
-              :tds
+              :tds,
+              :destroy
           ]
 
   def valid_request
