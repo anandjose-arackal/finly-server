@@ -46,9 +46,9 @@ class Event::EReport::Approve < Event::EReport::Base
     #   [self.report.tracks.last.action_user, self.report.controlling_user]
     # end
     if self.report.document_role_users(:finance_manager).present? && (self.report.approved? || self.report.auto_approved?)
-      self.report.affected_users(:approve) + self.report.document_role_users(:finance_manager)
+      self.report.affected_users(:approve, {ignore_reviewer: true}) + self.report.document_role_users(:finance_manager)
     else
-      self.report.affected_users(:approve)
+      self.report.affected_users(:approve, {ignore_reviewer: true})
     end
   end
 
