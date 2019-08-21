@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_19_150735) do
+ActiveRecord::Schema.define(version: 2019_08_21_114951) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1460,6 +1460,7 @@ ActiveRecord::Schema.define(version: 2019_08_19_150735) do
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
     t.boolean "gst_applicable", default: true
+    t.boolean "tds_applicable"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -3006,15 +3007,6 @@ ActiveRecord::Schema.define(version: 2019_08_19_150735) do
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
 
-  create_table "gst_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.boolean "gst"
-    t.boolean "tds"
-    t.integer "company_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_gst_configs_on_company_id"
-  end
-
   create_table "gst_state_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -4387,8 +4379,10 @@ ActiveRecord::Schema.define(version: 2019_08_19_150735) do
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
+    t.index ["created_at"], name: "index_payment_orders_on_created_at"
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
+    t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"
   end
 
   create_table "payment_purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
