@@ -40,7 +40,7 @@ end
 
 json.categories do
   json.array!(@result.categories) do |category|
-    json.extract! category, :id, :name
+    json.extract! category, :id, :name, :tds_applicable, :gst_applicable
   end
 end
 

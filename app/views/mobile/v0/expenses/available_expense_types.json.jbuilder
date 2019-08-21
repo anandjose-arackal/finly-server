@@ -38,7 +38,7 @@ json.cash_on_hand do
 end
 json.categories do
   json.array!(@result.categories) do |category|
-    json.extract! category, :id, :name
+    json.extract! category, :id, :name, :tds_applicable, :gst_applicable
   end
 end
 json.cash_pockets do
