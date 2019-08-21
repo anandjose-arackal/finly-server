@@ -580,9 +580,11 @@ class Payment < ApplicationRecord
     self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
-  def company_id
-    self.payment_order&.company_id
-  end
+  # def company_id
+  #   if super.blank?
+  #     self.payment_order&.company_id
+  #   end
+  # end
 
   def procurement_index_details
     {
@@ -723,7 +725,7 @@ class Payment < ApplicationRecord
 
   def add_company_id
     if self.company_id.blank?
-      self.update_columns(company_id: payment_order&.company_id)
+      self.update_columns(company_id: self.payment_order&.company_id)
     end
   end
 end
