@@ -18,6 +18,7 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
       end
     end
     if data[:name].present?
+      data[:department_code] = nil if data[:department_code].blank?
       sub_department = company.departments.non_deleted.with_name(data[:name]).first
       return result false, "Department already existed" if sub_department.present?
     else

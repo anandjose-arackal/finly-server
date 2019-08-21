@@ -19,6 +19,7 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
       return result false, "Enable EM or VP"
     end
     applications.each do |application|
+      data[:cost_center_code] = nil if data[:cost_center_code].blank?
       cost_center = self.company.cost_centers.new data.except(:id,:destroy,:expense_management, :vendor_payment)
       cost_center.application = application
         unless cost_center.save

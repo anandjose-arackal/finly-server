@@ -8,7 +8,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
               :parent_id,
               :gl_code,
               :name,
-              :delete
+              :destroy
           ]
 
   def create_record(data)
