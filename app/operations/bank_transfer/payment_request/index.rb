@@ -162,6 +162,10 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_month
     has_scope :filter_year
 
+    # Sorting
+    has_scope :sort_order_id
+    has_scope :sort_scheduled_date
+
 
     def init
       self.payment_requests = params[:payment_requests]

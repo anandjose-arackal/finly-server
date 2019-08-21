@@ -303,6 +303,20 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     where(payment_order_id: payment_order_ids)
   }
 
+  scope :sort_order_id, -> (type) {
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("bank_payment_requests.id #{type}")
+    end
+  }
+
+  sort :sort_scheduled_date, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:payment_order).reorder("payment_orders.scheduled_at #{type}")
+    end
+  }
+
   attr_accessor :cache_users
 
   before_save do
