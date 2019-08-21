@@ -114,6 +114,7 @@ class Procurements::Show < Procurements::Base
       documents += self.inward_documents
       documents += self.invoices
       documents += self.purchase_order&.advance_payments if self.purchase_order.present?
+      documents += self.po_revisions&.last&.advance_payments if self.po_revisions.present?
 
       self.invoices.each do |invoice|
         documents += invoice.payments
