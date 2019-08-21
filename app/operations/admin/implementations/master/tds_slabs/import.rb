@@ -5,8 +5,7 @@ class Admin::Implementations::Master::TdsSlabs::Import < Admin::Implementations:
   headers [
               :id,
               :name,
-              :tds,
-              :destroy
+              :tds
           ]
   def create_record(data)
     tds_slab = self.company.tds_slabs.new data.except(:id,:destroy)
@@ -28,14 +27,4 @@ class Admin::Implementations::Master::TdsSlabs::Import < Admin::Implementations:
     return result true, 'Updated Successfully'
   end
 
-  def destroy_records(data)
-   tds_slab = self.company.tds_slabs.find_by id: data[:id]
-   unless tds_slab
-    return result false, "TDS Slab not found"
-   end
-   unless tds_slab.destroy
-     return result false, tds_slab.errors.full_messages
-   end
-   result true, "Destroyed Successfully"
-  end
 end

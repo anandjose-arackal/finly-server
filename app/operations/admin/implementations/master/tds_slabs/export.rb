@@ -6,8 +6,7 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
   headers [
               :id,
               :name,
-              :tds,
-              :destroy
+              :tds
           ]
 
   def valid_request
@@ -30,11 +29,6 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
     tds_slab.name
   end
 
-
-
-  def destroy(tds_slab)
-    ''
-  end
 
   def post_process
   end

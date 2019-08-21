@@ -9,9 +9,9 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
       if message and message.is_a?(Array)
         message = message.join(', ')
       end
-      unless success and message.present?
-        self.message = "Error while processing item"
-      end
+      # unless success and message.present?
+      #   self.message = "Error while processing item"
+      # end
     end
 
     def success?
