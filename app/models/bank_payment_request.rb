@@ -179,7 +179,7 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
                                                               :payment_status,
@@ -301,20 +301,6 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     payments = Payment.where(payment_order_id: payment_order_ids)
     payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
     where(payment_order_id: payment_order_ids)
-  }
-
-  scope :sort_order_id, -> (type) {
-    type = type&.strip&.upcase
-    if type && ['ASC', 'DESC'].include?(type)
-      reorder("bank_payment_requests.id #{type}")
-    end
-  }
-
-  scope :sort_scheduled_date, -> (type){
-    type = type&.strip&.upcase
-    if type && ['ASC', 'DESC'].include?(type)
-      includes(:payment_order).reorder("payment_orders.scheduled_at #{type}")
-    end
   }
 
   attr_accessor :cache_users
