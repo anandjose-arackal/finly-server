@@ -247,6 +247,7 @@ class InvoiceCalculationUtils
     else
       if invoice.is_a?(Invoice)
         tds = 0
+        invoice.tds = 0
       else
         tds = invoice.tds
       end
