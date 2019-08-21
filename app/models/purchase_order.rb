@@ -404,21 +404,21 @@ class PurchaseOrder < ApplicationRecord
 
   # Sorting
   scope :sort_po_number, -> (type){
-    type = type.strip.upcase
+    type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("purchase_orders.po_number #{type}")
     end
   }
 
   scope :sort_po_name, -> (type){
-    type = type.strip.upcase
+    type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       includes(:procurement).reorder("procurements.name #{type}")
     end
   }
 
   scope :sort_amount, -> (type){
-    type = type.strip.upcase
+    type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       includes(:balance_amount).reorder("amounts.value #{type}")
     end

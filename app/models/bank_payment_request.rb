@@ -304,14 +304,14 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   }
 
   scope :sort_order_id, -> (type) {
-    type = type.strip.upcase
+    type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("bank_payment_requests.id #{type}")
     end
   }
 
   scope :sort_scheduled_date, -> (type){
-    type = type.strip.upcase
+    type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       includes(:payment_order).reorder("payment_orders.scheduled_at #{type}")
     end
