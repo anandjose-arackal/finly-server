@@ -97,7 +97,7 @@ class Invoice < ApplicationRecord
   belongs_to :amount, optional: true
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :net_amount, optional: true, class_name: "Amount"
-  belongs_to :net_amount_only_value, optional: true, class_name: "Amount", foreign_key: 'net_amount_id'#, :select => "amounts.id, amounts.value"
+  belongs_to :net_amount_only_value, optional: true, class_name: "Amount", foreign_key: 'net_amount_id', :select => "amounts.id, amounts.value"
   belongs_to :tds_amount, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount"
@@ -105,7 +105,7 @@ class Invoice < ApplicationRecord
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
-  belongs_to :balance_due_only_value, optional: true, class_name: "Amount", foreign_key: 'balance_due_id'#, :select => "amounts.id, amounts.value"
+  belongs_to :balance_due_only_value, optional: true, class_name: "Amount", foreign_key: 'balance_due_id', :select => "amounts.id, amounts.value"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
 
   # Captures PO advance if any and how much is adjusted in the tax invoice
@@ -466,14 +466,16 @@ class Invoice < ApplicationRecord
   scope :sort_amount, -> (type){
     type = type.strip.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      includes(:net_amount_only_value).reorder("amounts.value #{type}")
+      # includes(:net_amount_only_value).reorder("amounts.value #{type}")
+      joins(:net_amount).select("value").reorder("amounts.value #{type}")
     end
   }
 
   scope :sort_balance_due, -> (type){
     type = type.strip.upcase
     if type && ['ASC', 'DESC'].include?(type)
-      includes(:balance_due_only_value).reorder("amounts.value #{type}")
+      # includes(:balance_due_only_value).reorder("amounts.value #{type}")
+      joins(:balance_due).select("value").reorder("amounts.value #{type}")
     end
   }
 
