@@ -160,7 +160,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    if purchase_order.advance_paid?
+    # if procurements already has advance payments, disallow editing advance amount even if po revised.
+    if purchase_order.advance_payments.present?
       self.purchase_order_params.delete(:advance_tds_slab_id)
       self.purchase_order_params.delete(:advance_amount_required)
       self.purchase_order_params.delete(:advance_amount_attributes)
@@ -203,7 +204,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
 
-    if purchase_order.advance_paid?
+    # if procurements already has advance payments, disallow editing advance amount even if po revised.
+    if purchase_order.advance_payments.present?
       self.purchase_order_params.delete(:advance_tds_slab_id)
       self.purchase_order_params.delete(:advance_amount_required)
       self.purchase_order_params.delete(:advance_amount_attributes)
