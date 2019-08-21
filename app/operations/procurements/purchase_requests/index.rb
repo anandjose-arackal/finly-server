@@ -47,6 +47,7 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
 
     has_scope :sort_order_number
     has_scope :sort_description
+    has_scope :sort_date
     has_scope :sort_amount
 
     def init

@@ -404,7 +404,7 @@ class Invoice < ApplicationRecord
 
   scope :include_for_index, -> {
     includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
-             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type,
              :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 

@@ -167,6 +167,13 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :sort_date, -> (type){
+    type = type.strip.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.created_at #{type}")
+    end
+  }
+
   scope :sort_amount, -> (type){
     type = type.strip.upcase
     if type && ['ASC', 'DESC'].include?(type)
