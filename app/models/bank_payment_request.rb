@@ -310,7 +310,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     end
   }
 
-  sort :sort_scheduled_date, -> (type){
+  scope :sort_scheduled_date, -> (type){
     type = type.strip.upcase
     if type && ['ASC', 'DESC'].include?(type)
       includes(:payment_order).reorder("payment_orders.scheduled_at #{type}")
