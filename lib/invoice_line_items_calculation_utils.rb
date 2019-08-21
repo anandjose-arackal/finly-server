@@ -26,7 +26,7 @@ class InvoiceLineItemsCalculationUtils
         calculate_inclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
         # if the item is TDS deductible, add it to the tax applicable amount
-        if item.tds_applicable?
+        if item.tds_applicable? && invoice.tds_slab_id.present?
           self.tds_applicable_amount += self.gross_amount
         end
         # self.invoice_item_amount = self.gross_amount + self.discount_amount
@@ -42,7 +42,7 @@ class InvoiceLineItemsCalculationUtils
       self.total_discount += self.discount_amount
       self.total_tax += self.tax_amount
       self.taxable_amount += self.item_taxable_amount
-      if item.tds_applicable?
+      if item.tds_applicable? && invoice.tds_slab_id.present?
         self.tds_applicable_amount += self.item_taxable_amount
       end
       # assign the respective calculated parameters to the payment params
