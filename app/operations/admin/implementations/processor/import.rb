@@ -45,6 +45,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
     output = []
     failed = false
+    self.implementation_request.update(requested_items: (input&.count-1))
     self.input.each_with_index do |row, index|
       if index == 0
         next
@@ -74,9 +75,9 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
       end
       if result.success?
         row << result.message
+        item_complete true
       end
       output << row
-      item_complete true
     end
     export headers, output
   end

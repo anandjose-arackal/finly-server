@@ -12,6 +12,10 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
           ]
 
   def create_record(data)
+    if data[:name].blank?
+      return result false, "Name cant blank"
+    end
+
     applications = []
     applications << 'em' if data[:expense_management]&.upcase == 'Y'
     applications << 'vp' if data[:vendor_payment]&.upcase == 'Y'

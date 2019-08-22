@@ -66,7 +66,6 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
     case status
     when :in_progress
-      self.implementation_request.started_at = DateTime.now if self.implementation_request.started_at.blank?
     when :failed, :error
       add_message :error, message || 'Unknown error occurred'
       self.implementation_request.completed_at = DateTime.now

@@ -8,8 +8,8 @@ json.trails do
     json.initiated_by implementation_request.admin_user&.name
     json.status implementation_request.status&.humanize
     json.request_key implementation_request.request_key&.split('.')&.last
-    json.started_at implementation_request.started_at&.to_date&.strftime("%d %B %y")
-    json.completed_at implementation_request.completed_at&.to_date&.strftime("%d %B %y")
+    json.started_at implementation_request.started_at&.strftime("%d %B %y %T")
+    json.completed_at implementation_request.completed_at&.strftime("%d %B %y %T")
     json.request_file "/api#{implementation_request.request_file&.url}"
     json.result_file "/api#{implementation_request.result_file&.url}"
   end

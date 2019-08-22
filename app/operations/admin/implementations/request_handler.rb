@@ -36,7 +36,8 @@ class Admin::Implementations::RequestHandler < Admin::Base
                                                                               master: self.master,
                                                                               name: self.master.name,
                                                                               request_file: params[:request_file],
-                                                                              status: :pending
+                                                                              status: :pending,
+                                                                              started_at: Time.now
     unless self.implementation_request.valid?
       add_message :error, self.implementation_request.errors.full_messages
       return

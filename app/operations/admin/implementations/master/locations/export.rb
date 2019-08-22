@@ -7,6 +7,11 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
               :id,
               :name,
               :address_1,
+              :address_2,
+              :city,
+              :state,
+              :pin,
+              :pan,
               :gstin,
               :location_code,
               :nature_of_office,
@@ -31,6 +36,18 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
 
   def address_1(location)
     location.address_1
+  end
+
+  def address_2(location)
+    location.address_2
+  end
+
+  def city(location)
+    location.city
+  end
+
+  def state(location)
+    location.state&.name
   end
 
   def gstin(location)
