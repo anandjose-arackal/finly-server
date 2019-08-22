@@ -62,8 +62,9 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       self.procurement.status_tags << status_tag
     end
 
-    if purchase_order.advance_amount&.present?
-      if purchase_order.advance_amount.value > 0 and not purchase_order.advance_paid?
+    # if procurements already has advance payments, disallow changes in advance amount even if po revised.
+    if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
+      if purchase_order.advance_amount.value > 0
         purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
         purchase_order.save
       end
