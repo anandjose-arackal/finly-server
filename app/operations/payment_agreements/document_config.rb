@@ -19,14 +19,15 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
       self.gst_types = GstType.all
       params[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
       self.bank_payment_request_policies = Policy::VendorPayments::Index.(initiating_user, params).policies
-      params[:field_parent_type_id] = FieldParentType.id_for(:invoice)
+      # params[:field_parent_type_id] = FieldParentType.id_for(:invoice)
       custom_field_configurations
     end
 
     def custom_field_configurations
       configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
       self.custom_fields_config = {}
-      self.custom_fields_config[:invoice] = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+      self.custom_fields_config[:general_invoice] = configurations.with_parent_type(FieldParentType.id_for(:general_invoice))
+      self.custom_fields_config[:rental_invoice] = configurations.with_parent_type(FieldParentType.id_for(:rental_invoice))
     end
   end
 
