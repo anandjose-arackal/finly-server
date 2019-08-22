@@ -62,7 +62,6 @@ class Company < ApplicationRecord
   has_many :invoice_attachments
   has_many :export_configs
   has_many :unique_identifiers
-  has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_many :beneficiary_payments
   has_many :security_deposits
   has_many :icici_statements
@@ -435,8 +434,13 @@ class Company < ApplicationRecord
     Policy.with_id(policy_ids)
   end
 
-  def enforce_policy_enabled?
-    self.enforce_policy.enabled
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+
+    end
   end
 
   private

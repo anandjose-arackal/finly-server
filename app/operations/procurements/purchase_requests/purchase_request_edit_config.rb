@@ -28,7 +28,6 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       self.cost_centers = user.company.cost_centers.where(application: "vp") rescue CostCenter.none
       self.reviewal_chains = []
       self.department_mappings = []
-      self.location_mappings = []
       params[:reviewal_document] = purchase_request
 
       self.policies.each do |policy|
@@ -49,7 +48,6 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
         }
         self.reviewal_chains.push(chain)
         self.department_mappings.push(get_department_mapping(policy))
-        self.location_mappings.push(get_location_mapping(policy))
       end
     end
 
@@ -62,13 +60,6 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       {
         policy_id: policy.id,
         departments: policy.departments.as_json
-      }
-    end
-
-    def get_location_mapping(policy)
-      {
-        policy_id: policy.id,
-        locations: policy.locations.as_json
       }
     end
   end

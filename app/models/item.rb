@@ -83,10 +83,6 @@ class Item < ApplicationRecord
     where active: active
   }
 
-  scope :supply_item_type, -> (item_type){
-    where(supply_item_type: item_type)
-  }
-
   scope :includes_for_export, -> {includes(:category,:item_expense_type,:product_type, :supply_item_type, :tax_rate)}
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type

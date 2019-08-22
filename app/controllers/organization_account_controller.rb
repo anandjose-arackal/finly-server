@@ -59,14 +59,4 @@ class OrganizationAccountController < BaseControllers::WebBase
     end
   end
 
-  def configuration_index
-    @result  = OrganizationAccount::Configuration::Index.(current_user, params)
-    respond
-  end
-
-  def configuration_update
-    @result  = OrganizationAccount::Configuration::Update.(current_user, params)
-    respond
-  end
-
 end

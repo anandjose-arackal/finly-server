@@ -161,9 +161,7 @@ class PoliciesController < BaseControllers::WebBase
     respond
   end
 
-  def cost_center_mapping
-    @result = Policy::Mappings::CostCenterMapping::Index.(current_user, params)
-    respond
-  end 
+  # def update_department_mapping
+  # end
 
 end

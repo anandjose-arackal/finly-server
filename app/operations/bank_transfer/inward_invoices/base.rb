@@ -29,7 +29,6 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
                                     :vendor_id, :advance_amount_required, :bank_account_id,
                                     :po_number, :narration,
-                                    taxable_amount_attributes: [:id, :value, :currency_id],
                                     original_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],

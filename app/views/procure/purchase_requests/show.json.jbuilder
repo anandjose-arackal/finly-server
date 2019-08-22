@@ -42,7 +42,6 @@ json.result do
           json.status line_item&.status&.name
           json.rejected line_item.rejected
           json.unit_of_measurement line_item.unit_of_measurement
-          json.reject_note line_item.reject_note  
           json.department do
             json.name line_item&.department&.name
             json.id line_item&.department_id

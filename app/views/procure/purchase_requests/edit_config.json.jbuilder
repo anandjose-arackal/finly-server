@@ -26,7 +26,6 @@ json.policies do
 end
 
 json.department_mappings @result.department_mappings
-json.location_mappings @result.location_mappings
 
 json.cost_centers @result.cost_centers.as_json
 

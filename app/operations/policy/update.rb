@@ -47,11 +47,6 @@ class Policy::Update < Policy::Base
           add_message :error, 'Unable to update'
         end
         return
-      when 'policy_cost_center_mapping'
-        unless policy.update_policy_cost_center_mapping(params)
-          add_message :error, 'Unable to update'
-        end
-        return
       end
     end
     unless self.policy.update(strong_params)

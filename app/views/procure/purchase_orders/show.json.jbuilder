@@ -4,10 +4,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note, :vendor_poc_name, :vendor_poc_email, :vendor_poc_mobile_number, :discount_type_id
 
 json.vendor @result.purchase_order.vendor.as_json
-json.cost_allocation_items @result.cost_allocation_items
-json.created_from_purchase_request @result.created_from_purchase_request 
 json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
-
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 
