@@ -72,6 +72,9 @@ json.advance_amount do
   json.advance_amount @result.purchase_order.advance_amount&.value
   json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
+
+json.advance_amount_editable @result.purchase_order.advance_payments.blank? # if procurements already has advance payments, disallow editing advance amount even if po revised.
+
 json.tax do
   json.value @result.purchase_order.tax_amount&.value&.round(2)
   json.id @result.purchase_order.tax_amount&.id
