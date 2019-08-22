@@ -200,6 +200,7 @@ class Invoice < ApplicationRecord
            :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
+  attr_accessor :invoice_custom_fields
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
@@ -370,7 +371,10 @@ class Invoice < ApplicationRecord
     when 'po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
     when 'non_po_invoice'
-      where invoice_type_id: [InwardInvoiceType.id_for(:non_po_invoice), InwardInvoiceType.id_for(:recurring_invoice)]
+      where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+    when 'agreement_invoice'
+      where invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice)
+
     else
       return nil
     end
@@ -690,7 +694,8 @@ class Invoice < ApplicationRecord
           po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
           invoice_items: invoice_items.as_json,
           note: self.note,
-          discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
+          discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
+          payment_agreement_id: self.payment_agreement_id
       }
     end
   end

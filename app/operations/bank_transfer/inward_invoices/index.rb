@@ -50,6 +50,10 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       get_count(InwardInvoiceType.id_for(:non_po_invoice))
     end
 
+    def agreement_invoice_status_count
+      get_count(InwardInvoiceType.id_for(:recurring_invoices))
+    end
+
     def get_count(id)
       raw_count = self.invoices.where(invoice_type_id: id).group( :invoice_status_id).count
       h = {}
