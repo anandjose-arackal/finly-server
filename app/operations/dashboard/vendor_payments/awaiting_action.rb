@@ -55,6 +55,11 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         end
       end
     end
+
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      document_types[:grn] = false
+    end
+
     self.result = []
   end
 
@@ -68,7 +73,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         title: "Purchase Requests",
         type: 'purchase_requests',
         count: purchase_requests.count,
-        filters: [{filter_by_status_id: 'awaiting_approval'}]
+        filters: [{filter_awaiting_approval: '1'}]
       }
 
       if params[:filter_date_from].present?
@@ -240,7 +245,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "GRN",
+        title: "Receipt Note",
         type: 'receive',
         count: procurements.count,
         # filters: [{filter_status_tags: [7]}]

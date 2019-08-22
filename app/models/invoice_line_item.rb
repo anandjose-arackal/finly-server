@@ -29,9 +29,11 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
-#  sgst                   :decimal(10, 5)
-#  cgst                   :decimal(10, 5)
-#  igst                   :decimal(10, 5)
+#  sgst                   :decimal(20, )
+#  cgst                   :decimal(20, )
+#  igst                   :decimal(20, )
+#  purchase_order_item_id :integer
+#  billable_amount_id     :integer
 #
 
 class InvoiceLineItem < ApplicationRecord
@@ -44,11 +46,13 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :billable_amount, optional: true, class_name: "Amount"
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -56,6 +60,8 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
+  accepts_nested_attributes_for :billable_amount
 
   validates :description, presence: true
   validates :quantity, presence: true

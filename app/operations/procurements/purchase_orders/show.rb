@@ -223,6 +223,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_auditor(user)
     # Payment ticket credtor has access to inward invoice show, hence giving access to view purchase order too
     return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
+    # Give access to grn initiator once PO is approved
+    return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
     raise_unauthorized_exception
   end
 end

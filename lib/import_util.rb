@@ -45,8 +45,8 @@ class ImportUtil
         unless j >= row_length
           val = row[j]
         end
+        val = cleanup_account_number(key, val)
         val = cleanup_email(val)
-        # val = cleanup_account_number(key, val)
         map[key] = val
       end
       add_line = false
@@ -98,8 +98,11 @@ class ImportUtil
     unless key.to_s.include?("account_number")
       return raw_value
     end
-    raw_value = raw_value.to_i.to_s
-    return raw_value
+    if raw_value.is_a?(Float) || raw_value.is_a?(Integer)
+      raw_value.to_i.to_s
+    else
+      raw_value.strip
+    end
   end
 
 end

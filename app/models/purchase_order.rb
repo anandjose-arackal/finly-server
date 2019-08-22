@@ -31,7 +31,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  user_id                      :integer
-#  procurement_term_text        :text(65535)
+#  procurement_term_text        :text(16777215)
 #  controlling_user_id          :integer
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
@@ -67,7 +67,10 @@
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
-#  taxable_amount_id            :integer
+#  vendor_poc_name              :string(255)
+#  vendor_poc_email             :string(255)
+#  vendor_poc_mobile_number     :string(255)
+#  rejection_note               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -508,7 +511,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_shipped?
     shipped = true
     self.items.each do |item|
-      unless item.quantity == item.delivered
+      unless item.quantity == item.accepted
         shipped = false
         break
       end
@@ -529,6 +532,24 @@ class PurchaseOrder < ApplicationRecord
     end
     shipped
   end
+
+  def all_items_billed?
+    billed = true
+    self.items.each do |item|
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+      unless item.previously_billed_amount.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
+        billed = false
+        return
+      end
+    end
+    billed
+  end
+
+  def partial_items_accepted?
+    any_item = self.items.map { |item| item if ( item.accepted > 0 || (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) ) }.compact
+    any_item.present?
+  end
+
 
   def procurement_index_details
     {
@@ -660,7 +681,16 @@ class PurchaseOrder < ApplicationRecord
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
         purchase_order_total: precision_value(self.balance_amount&.value),
-        editable: true
+        editable: true,
+        attachments: self.attachments.map(&:as_json),
+        # since in FE as of now key name expected is invoice_attachment,
+        # this should work out of the box for them
+        invoice_attachment: {
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
+        }
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -743,7 +773,6 @@ class PurchaseOrder < ApplicationRecord
     balance_amount = 0
     total_amount = 0
     persisted = false
-
     self.items.each do |item|
       if item.persisted?
         persisted = true
@@ -785,6 +814,12 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount.value = item_tax_amount
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+        end
+
+        if item.taxable_amount.present?
+          item.taxable_amount.value = item_taxable_amount
+        else
+          item.taxable_amount = Amount.new(value: item_taxable_amount, currency_id: 1)
         end
 
         # also set the CGST, SGST, and IGST amounts in the PO Line item
@@ -933,7 +968,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles
@@ -990,7 +1025,7 @@ class PurchaseOrder < ApplicationRecord
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id
     }
   end
 
@@ -1001,10 +1036,15 @@ class PurchaseOrder < ApplicationRecord
   def purchase_request_tasks
     parameters = RequestStore.store[:params]
     if parameters[:associated_resource] == "purchase_request_item"
+      # Initially when PO is created from PR, then cost allocation item is line_item by default
+      update_po_cost_allocation_items
       item_ids = self.filter_purchase_request_item_ids(parameters, user)
       # Status transition of PR
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
+      self.reload
+      calculate_line_items(true)
+      self.save
     end
   end
 
@@ -1040,6 +1080,10 @@ class PurchaseOrder < ApplicationRecord
         end unless document_ids.blank?
       end
     end
+  end
+
+  def update_po_cost_allocation_items
+    self.update_column('cost_allocation_items', true)
   end
 
 end

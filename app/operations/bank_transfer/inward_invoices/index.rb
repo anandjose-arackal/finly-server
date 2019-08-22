@@ -9,6 +9,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_payable_invoices
     has_scope :invoice_date, using: [:from, :to], type: :hash
     has_scope :filter_creation_date, using: [:from, :to], type: :hash
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_invoice_date
     has_scope :due_date, using: [:from, :to], type: :hash
     has_scope :filter_due_date
@@ -21,6 +22,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_invoice_type
     has_scope :filter_po_number
     has_scope :filter_awaiting_approval
+    has_scope :filter_reviewer_awaiting_approval
     has_scope :filter_inward_invoice_type
     has_scope :filter_user
     has_scope :filter_year
@@ -64,7 +66,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     if user.vendor_payments_admin?
       admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
       self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
-      self.invoices.not_open.non_beneficiary.created_at_desc
+      self.invoices = self.invoices.not_open.non_beneficiary.created_at_desc
       return
     end
 
@@ -75,6 +77,15 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     if self.invoices.nil?
       self.invoices = ::Invoice.none
+    end
+  end
+
+  def pre_process
+    if params[:filter_reviewer_awaiting_approval].present?
+      reviewing_user = user.company.users.find_by id: params[:filter_reviewer_awaiting_approval]
+      unless reviewing_user.present? && reviewing_user.is_invoice_reviewer?
+        params.delete(:filter_reviewer_awaiting_approval)
+      end
     end
   end
 

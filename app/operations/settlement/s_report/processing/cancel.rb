@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing::Base
-  attr_accessor :report_group_processor
+  attr_accessor :report_group_processor, :pending_mappings
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -44,12 +44,28 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
     end
   end
 
+
+  def pre_process
+    # new feature - in a batch, user can choose which items to cancel individually
+    if params[:request_ids].present?
+      self.pending_mappings = self.report_group_processor.mappings.not_completed.where id: params[:request_ids]
+    else
+      self.pending_mappings = self.report_group_processor.mappings.not_completed
+    end
+
+    if params[:request_ids].present? && self.pending_mappings.blank?
+      add_message :error, "Request details not sent or found."
+      return
+    end
+  end
+
   def process
 
     if self.report_group_processor.process_via_finly?
       payment_order = self.report_group_processor.payment_order
       if payment_order.present? and (payment_order.pending? or payment_order.scheduled? or payment_order.in_progress?)
-        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order)
+        payment_ids = self.pending_mappings.pluck(:payment_ids) rescue []
+        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order, payment_ids: payment_ids)
         unless result.success?
           add_message :error, result.messages[:error]
           return
@@ -57,15 +73,18 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
       end
     end
 
-    pending_mappings = self.report_group_processor.mappings.not_completed
-    pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
+    # new feature - in a batch, user can choose which items to cancel individually
+    # pending_mappings = self.report_group_processor.mappings.not_completed
 
-    pending_mappings_id = pending_mappings.pluck(:id)
+    pending_mappings_id = self.pending_mappings.pluck(:id)
     failed_reports = Report.with_processor_group_mapping(pending_mappings_id)
     failed_reports.update_all(report_processor_group_mapping_id: nil)
+    self.pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
 
     if report_group_processor.partially_completed?
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:completed))
+    elsif self.report_group_processor.mappings.not_completed.present?
+      # dont do anything for now
     else
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
     end

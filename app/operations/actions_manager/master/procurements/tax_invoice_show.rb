@@ -49,7 +49,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     # if (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?)
     #   (user_in_level? && user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)
     # end
-    (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?) && user.is_bank_payment_request_initiator?(invoice)
+    (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid?) && user.is_bank_payment_request_initiator?(invoice)
   end
 
   def approve

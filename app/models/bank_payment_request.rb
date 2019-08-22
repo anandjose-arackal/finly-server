@@ -27,11 +27,13 @@
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
 #  company_id                   :integer
+#  max_payment_amount           :decimal(20, 5)
+#  rejection_note               :text(65535)
 #  bank_account_provider_id     :integer
 #  otp                          :string(255)
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
-#  max_payment_amount           :decimal(20, 5)
+#  otp_count                    :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -185,8 +187,8 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
-  scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
-                                                                             :initiating_user,
+  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
+                                                                             :initiating_user,:parent,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
                                                                              {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
                                                                              :amount]})}
@@ -518,7 +520,9 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
-
+  def self.human_name
+    'Payment Ticket'
+  end
 
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))

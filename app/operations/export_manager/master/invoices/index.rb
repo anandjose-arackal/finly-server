@@ -136,6 +136,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_net_payable_amount: {spreadsheet: true},
+             approvers: {spreadsheet: true},
+             finance_approved_date: {spreadsheet: true}
          ]
 
   def input
@@ -149,7 +152,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -211,11 +214,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   # end
 
   def transaction_period_from(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def transaction_period_to(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def invoice_status(invoice_line_item)
@@ -318,5 +321,29 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
+  def approvers(invoice_line_item)
+    approvers = invoice_line_item.parent.dlrms.map do |dlrm|
+      taken_control_by = forwarded_to = reviewer = nil
+      taken_control_by = dlrm.taken_control_by
+      forwarded_to = dlrm.forwarded_to
+      reviewer = dlrm.reviewer
+      if forwarded_to.present?
+        forwarded_to.name
+      elsif taken_control_by.present?
+        taken_control_by.name
+      elsif reviewer.present?
+        reviewer.name
+      end
+    end
+    approvers.reject { |e| e.to_s.empty? }.join(", ")
+  end
+
+  def invoice_net_payable_amount(invoice_line_item)
+    invoice_line_item.parent&.balance_due&.value || 0
+  end
+
+  def finance_approved_date(invoice_line_item)
+    invoice_line_item.parent&.approved_at&.strftime("%d-%m-%y")
+  end
 
 end

@@ -132,7 +132,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
     unless purchase_request_item_ids.blank?
       purchase_request_items = PurchaseRequestItem.where(id: purchase_request_item_ids) 
       purchase_request_items.each do |purchase_request_item|
-        trail_status = purchase_request_item.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve)]).last&.action.name
+        trail_status = purchase_request_item.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve)]).last&.action&.name
         if trail_status == 'approve'
           status = 'approved'
         elsif trail_status == 'auto_approve'

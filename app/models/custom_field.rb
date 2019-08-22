@@ -13,6 +13,7 @@
 #  dependent_parent_id    :integer
 #  dependent_parent_type  :string(255)
 #  field_key              :string(255)
+#  configured_field_value :text(65535)
 #
 
 class CustomField < ApplicationRecord
@@ -165,46 +166,70 @@ class CustomField < ApplicationRecord
   end
 
   def as_json(options = {})
-    options = []
-    dependent_field_configuration_ids = []
-    has_dependent_cf = false
-    if field_configuration.field_type_id == FieldType.id_for(:drop_down)
-      options = field_configuration.drop_down_items.exclude_deleted
-      options.each do |option|
-        if option.dependent_field_configurations.present?
-          dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
-          has_dependent_cf = true
-        end
+    case
+    when options[:report_show]
+      return report_show
+    else 
+      options = []
+      dependent_field_configuration_ids = []
+      has_dependent_cf = false
+      if field_configuration.field_type_id == FieldType.id_for(:drop_down)
+        options = field_configuration.drop_down_items.exclude_deleted
+        # options.each do |option|
+        #   if option.dependent_field_configurations.present?
+        #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+        #     has_dependent_cf = true
+        #   end
+        # end
+        dependent_field_configuration_ids = options.joins(:dependent_field_configurations).pluck('field_configurations.id')
+        has_dependent_cf = true if dependent_field_configuration_ids.present?
+
+      elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
+        options = field_configuration.multiselect_items
       end
-    elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
-      options = field_configuration.multiselect_items
+      json = {id: field_configuration.id,
+              label: field_configuration.field_name,
+              field_type: {id: field_configuration.field_type.id,
+                           name: field_configuration.field_type.name},
+              mandatory: field_configuration.mandatory,
+              options: options,
+              root_field: self.field_configuration.root_field,
+              dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
+              has_dependent_cf: has_dependent_cf
+              }
+      case self.field_configuration.field_type_id
+        when FieldType.id_for(:multiselect)
+          ids = []
+          names = []
+          self.value&.field_multiselect_selection_items&.each do |item|
+            ids << item.value_id
+            names << item.value&.name
+          end
+          json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
+              ids: ids,
+              names: names
+          }
+        else
+          json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+      end
+      json
     end
-    json = {id: field_configuration.id,
-            label: field_configuration.field_name,
-            field_type: {id: field_configuration.field_type.id,
-                         name: field_configuration.field_type.name},
-            mandatory: field_configuration.mandatory,
-            options: options,
-            root_field: self.field_configuration.root_field,
-            dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
-            has_dependent_cf: has_dependent_cf
-            }
-    case self.field_configuration.field_type_id
-      when FieldType.id_for(:multiselect)
-        ids = []
-        names = []
-        self.value&.field_multiselect_selection_items&.each do |item|
-          ids << item.value_id
-          names << item.value&.name
-        end
-        json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
-            ids: ids,
-            names: names
-        }
-      else
-        json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
-    end
-    json
+  end
+
+  def report_show
+    json = {
+     id: field_configuration.id,
+      label: field_configuration.field_name,
+      field_type: {id: field_configuration.field_type.id,
+      name: field_configuration.field_type.name},
+      mandatory: field_configuration.mandatory,
+      options: {},
+      root_field: self.field_configuration.root_field,
+      dependent_field_configuration_ids: [],
+      has_dependent_cf: false
+    }
+    json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    return json
   end
 
   def set_field_key

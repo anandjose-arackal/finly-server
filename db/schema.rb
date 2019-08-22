@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_173719) do
+ActiveRecord::Schema.define(version: 2019_08_20_140513) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -523,10 +523,18 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "bank_account_provider_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.string "debit_account_number"
+    t.integer "bank_account_provider_type_id"
   end
 
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -551,6 +559,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
     t.integer "bank_account_master_id"
+    t.boolean "yes_bank_verified", default: false
+    t.string "yes_bank_beneficiary_code"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_type", "account_owner_id"], name: "index_bank_accounts_on_account_owner_type_and_account_owner_id"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
@@ -647,6 +657,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "otp_sent_at"
     t.integer "otp_attempts"
     t.integer "otp_count"
+    t.text "rejection_note"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["created_at"], name: "index_bank_payment_requests_on_created_at"
@@ -701,6 +712,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.date "invoice_date"
     t.date "invoice_due_date"
     t.integer "advance_amount_id"
+    t.json "payment_notification_users"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
@@ -993,8 +1005,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "gstin"
     t.string "pan"
     t.integer "company_id"
-    t.string "address_1"
-    t.string "address_2"
+    t.text "address_1"
+    t.text "address_2"
     t.string "city"
     t.integer "state_id"
     t.string "country"
@@ -1447,6 +1459,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
+    t.boolean "gst_applicable", default: true
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -1501,6 +1514,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "base_currency_id", default: 1
     t.integer "status_id", default: 1, null: false
     t.boolean "test_account", default: false
+    t.string "subdomain"
+    t.integer "group_id"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1672,6 +1687,12 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["bank_type_id"], name: "index_company_funds_load_requests_on_bank_type_id"
     t.index ["company_id"], name: "index_company_funds_load_requests_on_company_id"
     t.index ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id"
+  end
+
+  create_table "company_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "company_kyc_document_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2060,6 +2081,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "dependent_parent_id"
     t.string "dependent_parent_type"
     t.string "field_key"
+    t.text "configured_field_value"
     t.index ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id"
     t.index ["parent_id"], name: "index_custom_fields_on_parent_id"
     t.index ["parent_type"], name: "index_custom_fields_on_parent_type"
@@ -2295,6 +2317,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "forwarded", default: false
     t.integer "forwarded_by_id"
     t.integer "forwarded_to_id"
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["action_id"], name: "index_document_level_reviewer_mappings_on_action_id"
     t.index ["action_taken_by_id"], name: "index_document_level_reviewer_mappings_on_action_taken_by_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
@@ -2458,6 +2482,67 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_email_authorizations_on_user_id"
   end
 
+  create_table "email_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "email_id", null: false
+    t.string "event", null: false
+    t.string "link"
+    t.datetime "timestamp"
+    t.string "event_id"
+    t.text "payload", limit: 4294967295
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "ip_addr"
+    t.string "user_agent"
+    t.string "link_tags"
+    t.index ["email_id"], name: "index_email_events_on_email_id"
+    t.index ["event"], name: "index_email_events_on_event"
+    t.index ["event_id"], name: "index_email_events_on_event_id"
+    t.index ["link"], name: "index_email_events_on_link"
+    t.index ["timestamp"], name: "index_email_events_on_timestamp"
+  end
+
+  create_table "emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "entity_type"
+    t.bigint "entity_id"
+    t.integer "company_id"
+    t.string "message_id"
+    t.string "sender"
+    t.string "recipient"
+    t.string "bcc"
+    t.string "cc"
+    t.string "subject"
+    t.text "body", limit: 4294967295
+    t.string "mailer_klass"
+    t.string "mailer_action"
+    t.string "configuration_set"
+    t.datetime "sent_at"
+    t.datetime "delivered_at"
+    t.integer "delivery_count"
+    t.datetime "last_opened_at"
+    t.integer "open_count"
+    t.datetime "last_link_clicked_at"
+    t.integer "link_open_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bcc"], name: "index_emails_on_bcc"
+    t.index ["cc"], name: "index_emails_on_cc"
+    t.index ["company_id"], name: "index_emails_on_company_id"
+    t.index ["delivered_at"], name: "index_emails_on_delivered_at"
+    t.index ["delivery_count"], name: "index_emails_on_delivery_count"
+    t.index ["entity_type", "entity_id"], name: "index_emails_on_entity_type_and_entity_id"
+    t.index ["last_link_clicked_at"], name: "index_emails_on_last_link_clicked_at"
+    t.index ["last_opened_at"], name: "index_emails_on_last_opened_at"
+    t.index ["link_open_count"], name: "index_emails_on_link_open_count"
+    t.index ["mailer_action"], name: "index_emails_on_mailer_action"
+    t.index ["mailer_klass"], name: "index_emails_on_mailer_klass"
+    t.index ["message_id"], name: "index_emails_on_message_id"
+    t.index ["open_count"], name: "index_emails_on_open_count"
+    t.index ["recipient"], name: "index_emails_on_recipient"
+    t.index ["sender"], name: "index_emails_on_sender"
+    t.index ["sent_at"], name: "index_emails_on_sent_at"
+    t.index ["subject"], name: "index_emails_on_subject"
+  end
+
   create_table "enforce_budget_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "enforce_purchase_order_budget"
     t.boolean "enforce_payment_budget"
@@ -2597,6 +2682,12 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "created_by_id"
     t.integer "modified_by_id"
     t.datetime "deleted_at"
+    t.integer "gst_details_id"
+    t.integer "gstin_location_id"
+    t.integer "state_of_expense_id"
+    t.string "hsn_sac"
+    t.string "merchant_bill_no"
+    t.integer "tax_rate_id"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["created_at"], name: "index_expenses_on_created_at"
@@ -2683,6 +2774,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "purchase_requisition_system"
     t.string "bank_service_provider"
     t.boolean "request_encryption_enabled", default: false
+    t.boolean "group_entity_structure", default: false
+    t.boolean "grn_enabled", default: true
+    t.boolean "srn_enabled", default: false
+    t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
+    t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -2910,6 +3006,15 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
 
+  create_table "gst_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.boolean "gst"
+    t.boolean "tds"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_gst_configs_on_company_id"
+  end
+
   create_table "gst_state_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -2966,6 +3071,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
     t.integer "company_id"
     t.integer "balance_id"
+    t.boolean "enabled", default: false
   end
 
   create_table "icici_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2999,6 +3105,22 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "transfer_status_id"
     t.integer "company_id"
     t.string "request_id"
+  end
+
+  create_table "icici_statements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "cheque_no"
+    t.datetime "txn_date"
+    t.decimal "amount", precision: 20, scale: 10
+    t.decimal "balance", precision: 20, scale: 10
+    t.datetime "value_date"
+    t.string "transaction_type"
+    t.string "transaction_id"
+    t.string "request_id"
+    t.integer "bank_transaction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.text "remarks"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -3170,9 +3292,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "cost_center_id"
     t.string "unit_of_measurement"
     t.integer "department_id"
-    t.decimal "sgst", precision: 10, scale: 5
-    t.decimal "cgst", precision: 10, scale: 5
-    t.decimal "igst", precision: 10, scale: 5
+    t.decimal "sgst", precision: 20
+    t.decimal "cgst", precision: 20
+    t.decimal "igst", precision: 20
+    t.integer "purchase_order_item_id"
+    t.integer "billable_amount_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["cost_center_id"], name: "index_invoice_line_items_on_cost_center_id"
@@ -3183,6 +3307,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
     t.index ["net_amount_id"], name: "index_invoice_line_items_on_net_amount_id"
     t.index ["parent_id", "parent_type"], name: "index_invoice_line_items_on_parent_id_and_parent_type"
+    t.index ["purchase_order_item_id"], name: "index_invoice_line_items_on_purchase_order_item_id"
     t.index ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_invoice_line_items_on_tax_rate_id"
     t.index ["taxable_amount_id"], name: "index_invoice_line_items_on_taxable_amount_id"
@@ -3308,6 +3433,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "po_number"
     t.text "narration"
     t.integer "bank_account_id"
+    t.text "rejection_note"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -3372,8 +3498,15 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.decimal "previously_delivered", precision: 20, scale: 5
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.integer "accepting_item_amount_id"
+    t.decimal "billable_amount", precision: 10
+    t.decimal "order_amount", precision: 10
+    t.decimal "previously_billed_amount", precision: 10
+    t.integer "product_type_id", default: 1
+    t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
+    t.index ["product_type_id"], name: "index_inward_document_items_on_product_type_id"
     t.index ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id"
   end
 
@@ -3532,6 +3665,47 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["company_id"], name: "index_itz_cash_properties_on_company_id"
   end
 
+  create_table "kotak_bank_company_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.integer "balance_id"
+    t.boolean "enabled", default: false
+  end
+
+  create_table "kotak_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "kotak_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "amount_id"
+    t.integer "company_id"
+    t.integer "transfer_status_id"
+    t.integer "beneficiary_account_id"
+    t.string "utr"
+    t.string "response_status_code"
+    t.string "unique_reference_number"
+    t.string "transfer_type"
+    t.string "beneficiary_account_number"
+    t.string "beneficiary_account_ifsc"
+    t.string "beneficiary_name"
+    t.string "narration"
+    t.date "payment_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "bank_response"
+    t.string "reversal_status_code"
+    t.text "reversal_response"
+    t.integer "reversal_api_counter", default: 0
+    t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
+    t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
+    t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
+    t.index ["response_status_code"], name: "index_kotak_bank_transactions_on_response_status_code"
+    t.index ["transfer_status_id"], name: "index_kotak_bank_transactions_on_transfer_status_id"
+    t.index ["unique_reference_number"], name: "index_kotak_bank_transactions_on_unique_reference_number"
+  end
+
   create_table "kyc_documents", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "company_kyc_document_type_id"
     t.integer "company_kyc_id"
@@ -3562,6 +3736,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.boolean "wo_exception", default: true
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["level_id"], name: "index_level_reviewer_mappings_on_level_id"
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
@@ -3576,6 +3752,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
     t.boolean "exception", default: true
     t.boolean "wo_exception", default: true
+    t.decimal "min", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max", precision: 20, scale: 5
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id"
@@ -3725,7 +3903,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "note"
+    t.string "bank_reference_number"
     t.index ["amount_id"], name: "index_money_request_processor_mappings_on_amount_id"
+    t.index ["bank_reference_number"], name: "index_money_request_processor_mappings_on_bank_reference_number"
     t.index ["payment_id"], name: "index_money_request_processor_mappings_on_payment_id"
     t.index ["processor_accountable_id", "processor_accountable_type"], name: "index_money_request_processor_mappings_on_processor_accountable"
     t.index ["processor_id"], name: "index_money_request_processor_mappings_on_processor_id"
@@ -4207,8 +4387,10 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
+    t.index ["created_at"], name: "index_payment_orders_on_created_at"
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
+    t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"
   end
 
   create_table "payment_purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4729,9 +4911,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "unit_of_measurement"
     t.integer "purchase_request_item_id"
     t.integer "department_id"
-    t.decimal "cgst", precision: 10, scale: 5
-    t.decimal "sgst", precision: 10, scale: 5
-    t.decimal "igst", precision: 10, scale: 5
+    t.decimal "cgst", precision: 20, scale: 10
+    t.decimal "sgst", precision: 20
+    t.decimal "igst", precision: 20
+    t.integer "taxable_amount_id"
+    t.decimal "previously_billed_amount", precision: 10, default: "0"
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
@@ -4742,6 +4926,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["purchase_request_item_id"], name: "index_purchase_order_items_on_purchase_request_item_id"
     t.index ["tax_amount_id"], name: "index_purchase_order_items_on_tax_amount_id"
     t.index ["tax_rate_id"], name: "index_purchase_order_items_on_tax_rate_id"
+    t.index ["taxable_amount_id"], name: "index_purchase_order_items_on_taxable_amount_id"
     t.index ["tds_amount_id"], name: "index_purchase_order_items_on_tds_amount_id"
     t.index ["total_amount_id"], name: "index_purchase_order_items_on_total_amount_id"
   end
@@ -4781,7 +4966,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id"
-    t.text "procurement_term_text"
+    t.text "procurement_term_text", limit: 16777215
     t.integer "controlling_user_id"
     t.integer "controlling_user_role_id"
     t.integer "controlling_for_user_id"
@@ -4820,6 +5005,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "vendor_poc_name"
     t.string "vendor_poc_email"
     t.string "vendor_poc_mobile_number"
+    t.text "rejection_note"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["advance_tds_amount_id"], name: "index_purchase_orders_on_advance_tds_amount_id"
@@ -4925,6 +5111,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "controlling_level_id"
     t.integer "company_id"
     t.integer "cost_center_id"
+    t.integer "total_amount_id"
+    t.boolean "cost_allocation_items", null: false
     t.index ["company_id"], name: "index_purchase_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_purchase_requests_on_controlling_level_id"
     t.index ["cost_center_id"], name: "index_purchase_requests_on_cost_center_id"
@@ -4934,6 +5122,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["policy_id"], name: "index_purchase_requests_on_policy_id"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
+    t.index ["total_amount_id"], name: "index_purchase_requests_on_total_amount_id"
   end
 
   create_table "purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5269,7 +5458,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
     t.text "note"
     t.boolean "marked_as_closed"
+    t.string "bank_reference_number"
     t.index ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id"
+    t.index ["bank_reference_number"], name: "index_report_processor_group_mappings_on_bank_reference_number"
     t.index ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id"
     t.index ["processor_accountable_id", "processor_accountable_type"], name: "index_report_processor_group_mappings_on_processor_accountable"
     t.index ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id"
@@ -5561,6 +5752,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "state_code"
   end
 
   create_table "status_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -6838,6 +7030,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "balance_id"
+    t.boolean "enabled", default: false
     t.index ["balance_id"], name: "index_yes_bank_company_accounts_on_balance_id"
     t.index ["company_id"], name: "index_yes_bank_company_accounts_on_company_id"
     t.index ["wallet_balance_id"], name: "index_yes_bank_company_accounts_on_wallet_balance_id"
@@ -6909,6 +7102,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "vedor_code"
+    t.string "trade_name"
+    t.string "reject_note"
     t.index ["authorized"], name: "index_yes_bank_vendors_on_authorized"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["controlling_level_id"], name: "index_yes_bank_vendors_on_controlling_level_id"

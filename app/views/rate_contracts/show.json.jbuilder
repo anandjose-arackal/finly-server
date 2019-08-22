@@ -9,6 +9,7 @@ json.result do
           json.item_id line_item&.item_id
           json.item_name line_item&.item&.description
           json.item_code line_item&.item&.item_code
+          json.item_number line_item&.item&.item_number
           json.location_id line_item&.location_id
           json.location_name line_item&.location&.name
           json.location_code line_item&.location&.location_code

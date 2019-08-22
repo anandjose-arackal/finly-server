@@ -8,6 +8,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  balance_id        :integer
+#  enabled           :boolean          default(FALSE)
 #
 
 class YesBankCompanyAccount < ApplicationRecord

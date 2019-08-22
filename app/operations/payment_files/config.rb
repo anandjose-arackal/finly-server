@@ -17,7 +17,8 @@ class PaymentFiles::Config
         {name: 'Kotak Mahindra Bank', key: :kotak_mahindra_bank, operation: PaymentFiles::Formats::KotakMahindraBank::Process, validator: PaymentFiles::Formats::KotakMahindraBank::ValidateConfig},
         {name: 'Citi', key: :citi, operation: PaymentFiles::Formats::Citi::Process, validator: PaymentFiles::Formats::Citi::ValidateConfig},
         {name: 'Toppr', key: :toppr, operation: PaymentFiles::Formats::Toppr::Process, validator: PaymentFiles::Formats::Toppr::ValidateConfig},
-        {name: 'Denave', key: :denave, operation: PaymentFiles::Formats::Denave::Process, validator: PaymentFiles::Formats::Denave::ValidateConfig}
+        {name: 'Denave', key: :denave, operation: PaymentFiles::Formats::Denave::Process, validator: PaymentFiles::Formats::Denave::ValidateConfig},
+        {name: 'Axis Bank', key: :axis_bank, operation: PaymentFiles::Formats::AxisBank::Process, validator: PaymentFiles::Formats::AxisBank::ValidateConfig}
     ]
   end
 

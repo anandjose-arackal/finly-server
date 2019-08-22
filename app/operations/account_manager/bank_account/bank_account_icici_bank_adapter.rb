@@ -18,11 +18,13 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
     bank_transaction = payment.reference_resource
 
-    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
+    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure? || bank_transaction.pending_for_processing? || bank_transaction.pending_utr?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable? || bank_transaction&.open?
-      reference_number = bank_transaction.unique_request_number
+    elsif bank_transaction.present? && (bank_transaction&.retriable? || bank_transaction&.open? || bank_transaction&.rejected?)
+      # even if the payment is being retried, the reference number needs to be
+      # a new one
+      reference_number = nil
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
@@ -31,7 +33,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
+    if payment.reference_resource&.retriable?
+      # updating the request number with a new one because the old one will have been used already
+      bank_transaction.update_columns(unique_request_number: transfer_request.generate_unique_reference)
+    elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
       bank_transaction = payment.reference_resource
@@ -57,9 +62,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
     if op.success?
-      if bank_transaction.completed?
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
+      if bank_transaction.pending_utr?
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_system_message_for_processing(payment)
+        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
@@ -126,6 +132,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
   private
 
+
   def create_bank_transaction(payment, transfer_request)
     if self.account.account_owner.is_a?(Company)
       self.company = self.account.account_owner
@@ -142,8 +149,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.icici_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.icici_bank_transactions.build(unique_request_number: transfer_request.generate_unique_reference,
                                                         txn_type: transfer_request.transfer_type,
+                                                        transfer_type: transfer_request.transfer_type,
                                                         receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
                                                         remarks: payment.note,
@@ -152,6 +160,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                             value: payment.amount_value,
                                                             currency_id: Currency.first.id
                                                         })
+    bank_transaction.save
     payment.with_lock do
       if payment.reference_resource.present?
         return false
