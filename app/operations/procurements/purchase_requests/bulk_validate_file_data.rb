@@ -82,6 +82,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       location_id = item[:location_id] || item["location_id"]
       delivery_location = item[:delivery_location] || item["delivery_location"]
       purpose = item[:purpose] || item["purpose"]
+      hsn_sac = item[:hsn_sac] || item["hsn_sac"]
       quantity = item[:quantity] || item["quantity"]
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
       unit_price = item[:unit_price] || item["unit_price"]
@@ -113,6 +114,12 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           self.error_messages << "Please input the ID of the Preferred Vendor from the Items Sheet"
           self.issue_item[:preferred_vendor] = "Please input the ID of the Preferred Vendor from the Items Sheet."
         end
+      end
+
+      unless validate_hsn_sac hsn_sac
+        self.valid = false
+        self.error_messages << "HSN/SAC is invalid. Please recheck."
+        self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
       end
 
       # Removing it for now
@@ -252,9 +259,10 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
 
   private
 
-  # def validate_hsn_sac(hsn_sac)
-  #   ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
-  # end
+  def validate_hsn_sac(hsn_sac)
+    # ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
+    ( /\A(\d{4,8})\Z/.match(hsn_sac) ) ? true : false
+  end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
@@ -283,6 +291,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
      "Cost Center ID",
      "Delivery Location",
      "Purpose",
+     "HSN/SAC",
      "Quantity",
      "Unit of measurement",
      "Estimated Unit Price",
