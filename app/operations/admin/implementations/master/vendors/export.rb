@@ -19,7 +19,8 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
               :gst_location,
               :vendor_bank_account_name,
               :account_number,
-              :ifsc
+              :ifsc,
+              :destroy
           ]
 
   def valid_request
@@ -94,7 +95,7 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
     vendor.bank_accounts&.first&.name rescue ''
   end
 
-  def destroy(location)
+  def destroy(vendor)
     ''
   end
 

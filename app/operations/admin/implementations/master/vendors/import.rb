@@ -18,7 +18,8 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
               :gst_location,
               :vendor_bank_account_name,
               :account_number,
-              :ifsc
+              :ifsc,
+              :destroy
           ]
 
   attr_accessor :vendor_params
@@ -44,8 +45,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless vendor
       return result false, "Vendor not found"
     end
-
-    unless vendor.update(data.except(:destroy))
+    vendor_params, messages = set_params(data)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+    unless vendor.update(vendor_params["vendor"])
       return result false, vendor.errors.full_messages
     end
     result true, 'Updated Successfully'

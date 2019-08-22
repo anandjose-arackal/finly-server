@@ -1,7 +1,7 @@
 class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementations::Processor::Import
 
   bus Admin::Implementations::Master::BaseMaster
-  subscribe 'bank_account.import'
+  subscribe 'bank_accounts.import'
   headers [
                :account_name,
                :user_id,
@@ -14,42 +14,20 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     unless messages.blank?
       return result false, messages.join(', ')
     end
-
-    bank_account = self.company.bank_accounts.new bank_account_params
+    user = User.find_by params[:user_id]
+    bank_account = user.bank_accounts.new bank_account_params.except(:user_id)
     unless bank_account.save
       return result false, bank_account.errors.full_messages
     end
     result true, 'Created Successfully'
   end
 
-  def update_record(data)
-    bank_account = self.company.bank_accounts.find_by id: data[:id]
-    unless bank_account
-      return result false, "bank_account not found"
-    end
-
-    unless bank_account.update(data.except(:destroy))
-      return result false, bank_account.errors.full_messages
-    end
-    result true, 'Updated Successfully'
-  end
-
-  def destroy_records(data)
-   bank_account = self.company.bank_accounts.find_by id: data[:id]
-   unless bank_account
-    return result false, "bank_account not found"
-   end
-   unless bank_account.destroy
-     return result false, bank_account.errors.full_messages
-   end
-   result true, "Destroyed Successfully"
-  end
 
   def set_params(data)
     messages = []
-    name = data[:name].to_s
+    name = data[:account_name].to_s
     user_id = clean_up_data data[:user_id]
-    user_entity = company.users.where(mobile_number: data[:user_id]).or(company.users.where(email: data[:user_id])).first
+    user_entity = company.users.where(mobile_number: user_id).or(company.users.where(email: user_id)).first
     unless user_entity.present?
        messages << "User Not Found"
     end

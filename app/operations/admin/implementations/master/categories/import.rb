@@ -2,7 +2,6 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'categories.import'
-  halt_on_failure!
   headers [
               :id,
               :parent_id,
@@ -36,9 +35,14 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
      unless category
       return result false, "Category not found"
      end
-     unless category.destroy
-       return result false, category.errors.full_messages
+     begin
+       unless category.destroy
+         return result false, category.errors.full_messages
+       end
+     rescue Exception => e
+       return result false, "#{e.message}"
      end
+
      result true, "Destroyed Successfully"
     end
 

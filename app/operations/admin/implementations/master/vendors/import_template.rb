@@ -18,7 +18,8 @@ class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implemen
               :gst_location,
               :vendor_bank_account_name,
               :account_number,
-              :ifsc
+              :ifsc,
+              :destroy
           ]
 
   def valid_request

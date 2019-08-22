@@ -33,6 +33,7 @@ class AdminImplementationRequest < ApplicationRecord
   belongs_to :admin_user
 
   scope :with_request_key, ->(request_key) { where request_key: request_key }
+  default_scope {order(created_at: :desc)}
   before_save do
     if self.started_at.present? and self.completed_at.present? and self.runtime.blank?
       self.runtime = self.completed_at - self.started_at
