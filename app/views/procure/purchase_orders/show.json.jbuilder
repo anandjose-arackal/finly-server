@@ -105,7 +105,7 @@ json.items do
                   :sgst, :cgst, :igst
     
     json.item_number item.inventory_line_item&.item_number rescue nil
-    json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.gl_code item.category&.gl_code
     json.category_name item.category&.name
     json.category_id item.category_id
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
@@ -184,12 +184,7 @@ json.comments do
   end
 end
 
-json.po_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.po_item_categories current_company.categories.inward_invoice_items_only
 
 json.policies do
   json.array! @result.policies do |policy|
