@@ -45,16 +45,22 @@ module Transitionable
       User.where(id: user_ids)
     end
 
-    def affected_users(type=nil)
+    def affected_users(type=nil, options={})
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
+      # Valid options {}
+      # {ignore_reviewer: true}
       user_ids = []
       case type
       when :approve, 'approve'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.document_owner_id
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
         else
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
           user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
         end
       when :reject, 'reject'

@@ -16,6 +16,7 @@ json.bulk_items do
 		end
 		json.unit_of_measurement item[:unit_of_measurement]
 		json.quantity item[:quantity]
+		json.hsn_sac item[:hsn_sac]
 		json.purpose item[:purpose]
 		json.required_by_date item[:required_by_date]
 

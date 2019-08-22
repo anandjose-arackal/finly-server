@@ -73,6 +73,7 @@ json.result do
             json.id line_item.delivery_location_id
           end
           json.purpose line_item.purpose
+          json.hsn_sac line_item.hsn_sac
           json.quantity line_item.quantity
           json.estimated_cost do
             json.currency_id line_item&.estimated_amount&.currency_id

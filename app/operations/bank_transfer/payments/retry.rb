@@ -28,6 +28,12 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       return
     end
 
+    bt = self.payment.reference_resource
+    unless bt&.retriable?
+      add_message :error, "Only failed payments can be retried"
+      return
+    end
+
     unless payment.payment_order.present?
       add_message :error, "This payment does not belong to a payment order"
       return
