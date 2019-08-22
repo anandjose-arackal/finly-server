@@ -438,8 +438,10 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  scope :show_only_invoices_which_are_forwarded, -> {
-    self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
+  scope :show_only_invoices_which_are_forwarded, -> (show_it = false) {
+    if show_it
+      self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
+    end
   }
 
 
