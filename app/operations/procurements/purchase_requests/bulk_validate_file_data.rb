@@ -116,10 +116,12 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         end
       end
 
-      unless validate_hsn_sac hsn_sac
-        self.valid = false
-        self.error_messages << "HSN/SAC is invalid. Please recheck."
-        self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
+      if hsn_sac.present?
+        unless validate_hsn_sac hsn_sac
+          self.valid = false
+          self.error_messages << "HSN/SAC is invalid. Please recheck."
+          self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
+        end
       end
 
       # Removing it for now
