@@ -257,6 +257,14 @@ class PurchaseOrder < ApplicationRecord
                                         ])
   }
 
+  scope :show_only_po_which_have_advances, -> {
+    where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing]))
+  }
+
+  scope :show_only_po_which_are_forwarded, -> {
+    self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
+  }
+
   scope :filter_by_due_date, -> (due_date) {
     where due_date: due_date
   }
