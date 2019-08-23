@@ -17,7 +17,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :rental_invoices, dependent: :destroy
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 
-  has_many :invoices
+  # has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
   
   has_many :notify_users, as: :document, dependent: :destroy 
@@ -26,8 +26,9 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :attachments, as: :resource, dependent: :destroy
 
-  validates_associated :invoices
+  # validates_associated :invoices
 
+  validates :no_expiration, presence: true
   validate :agreement_date_comparison, :expiration_date_if_allowed
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
@@ -307,6 +308,7 @@ class PaymentAgreement < ApplicationRecord
         errors.add(:expiration_date, ' cannot be smaller than execution date')
       end
     end
+
   end
 
   def validate_renewal_reminder

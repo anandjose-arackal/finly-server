@@ -1,6 +1,6 @@
 class PaymentAgreements::Base < BaseOperation
 
-  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num, :match_invoice_start_date, :match_invoice_end_date
+  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num, :match_invoice_start_date, :match_invoice_end_date, :any_fixed_period_invoice
 
 
   def pre_validate
@@ -443,11 +443,22 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.present?
       self.match_invoice_start_date = false
       self.match_invoice_end_date = false
+      self.any_fixed_period_invoice = false
       self.payment_agreement.general_invoices.each do |general_invoice|
+        unless self.any_fixed_period_invoice
+          self.any_fixed_period_invoice = general_invoice.billing_type.fixed_periodic?
+        end 
         comparison_status = compare_start_end_date(general_invoice)
         next unless comparison_status
-        check_missing_days(general_invoice)
-        return if self.match_invoice_start_date && self.match_invoice_end_date
+        match_start_date, match_end_date = check_missing_days(general_invoice)
+        if general_invoice.billing_type.fixed_periodic?
+          return if match_start_date
+        end
+        return if match_start_date && match_end_date
+      end
+      if self.any_fixed_period_invoice
+        add_message :error, "Any one general invoice start date should match with execution date"
+        return
       end
       add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
       return
@@ -458,11 +469,22 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.present?
       self.match_invoice_start_date = false
       self.match_invoice_end_date = false
+      self.any_fixed_period_invoice = false
       self.payment_agreement.rental_invoices.each do |rental_invoice|
+        unless self.any_fixed_period_invoice
+          self.any_fixed_period_invoice = rental_invoice.billing_type.fixed_periodic?
+        end 
         comparison_status = compare_start_end_date(rental_invoice)
         next unless comparison_status
         match_start_date, match_end_date = check_missing_days(rental_invoice)
+        if rental_invoice.billing_type.fixed_periodic?
+          return if match_start_date
+        end
         return if match_start_date && match_end_date
+      end
+      if self.any_fixed_period_invoice
+        add_message :error, "Any one rental invoice start date should match with execution date"
+        return
       end
       add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
       return
@@ -501,6 +523,11 @@ class PaymentAgreements::Base < BaseOperation
           self.match_invoice_start_date = true
         end
       end
+      # If agreement never expires, do not match expiration date with end date
+      if self.payment_agreement.no_expiration
+        self.match_invoice_end_date = true
+        return match_invoice_start_date, match_invoice_end_date
+      end
       if invoice.end_date&.to_date == self.payment_agreement.expiration_date&.to_date
         unless match_invoice_end_date
           self.match_invoice_end_date = true
@@ -509,12 +536,6 @@ class PaymentAgreements::Base < BaseOperation
     end
     return match_invoice_start_date, match_invoice_end_date
   end
-
-
-
-
-
-
 
 
 end
