@@ -456,8 +456,7 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  # before_create :payment_agreement_updations
-  before_validation :update_company, :payment_agreement_updations
+  before_validation :update_company
   before_save :update_company
   after_create :set_defaults, :set_invoice_type
   after_save :budget_trail_entry
@@ -628,76 +627,70 @@ class Invoice < ApplicationRecord
   # end
 
   def as_json(options={})
-    if options[:payment_agreement]
-      return agreement_based_json
-    elsif options[:payment_history] || options[:upcoming_invoices]
-      return payment_history_json
-    else
-      {
-          id: self.id,
-          invoice_type: self.invoice_type&.name,
-          procurement_id: self.procurement_id,
-          advance: self.advance,
-          advance_amount: self.advance_amount&.value,
-          tax_amount: precision_value(self.tax_amount&.value),
-          tds_amount: precision_value(self.tds_amount&.value),
-          tax: precision_value(self.tax),
-          tds: precision_value(self.tds),
-          gst_type_id: self.gst_type_id,
-          tax_type_id: self.tax_type_id,
-          tds_type_id: self.tds_type_id,
-          discount_amount: precision_value(self.discount_amount&.value),
-          discount: precision_value(self.discount),
-          date: self.date,
-          discount_type_id: self.discount_type_id,
-          due_date: self.due_date,
-          invoice_number: self.invoice_number,
-          inclusive_of_taxes: self.inclusive_of_taxes,
-          freight_amount: self.freight_amount&.value,
-          roundoff_amount: self.roundoff_amount,
-          net_payable_amount: self.balance_due&.value,
-          balance_due: self.balance_due&.value,
-          taxable_amount: precision_value(self.gross_amount&.value),
-          editable: self.unpaid? || self.initiated?,
-          tax_rate: precision_value(self.tax_rate),
-          tds_rate: precision_value(self.tds_rate),
-          discount_rate: precision_value(self.discount_rate),
-          advance_rate: precision_value(self.advance_rate),
-          invoice_attachment: {
-              url: self.invoice_attachments.first&.attached_file&.url,
-              thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-              content_type: self.invoice_attachments.first&.attached_file&.content_type,
-              file_name: self.invoice_attachments.first&.attached_file&.original_filename
-          },
-          net_amount: precision_value(self.net_amount&.value),
-          original_amount: self.include_original_amount,
-          gross_amount: precision_value(self.gross_amount&.value),
-          custom_fields: self.custom_fields,
-          category_id: self.category_id,
-          category_name: self.category&.name,
+    {
+      id: self.id,
+      invoice_type: self.invoice_type&.name,
+      procurement_id: self.procurement_id,
+      advance: self.advance,
+      advance_amount: self.advance_amount&.value,
+      tax_amount: precision_value(self.tax_amount&.value),
+      tds_amount: precision_value(self.tds_amount&.value),
+      tax: precision_value(self.tax),
+      tds: precision_value(self.tds),
+      gst_type_id: self.gst_type_id,
+      tax_type_id: self.tax_type_id,
+      tds_type_id: self.tds_type_id,
+      discount_amount: precision_value(self.discount_amount&.value),
+      discount: precision_value(self.discount),
+      date: self.date,
+      discount_type_id: self.discount_type_id,
+      due_date: self.due_date,
+      invoice_number: self.invoice_number,
+      inclusive_of_taxes: self.inclusive_of_taxes,
+      freight_amount: self.freight_amount&.value,
+      roundoff_amount: self.roundoff_amount,
+      net_payable_amount: self.balance_due&.value,
+      balance_due: self.balance_due&.value,
+      taxable_amount: precision_value(self.gross_amount&.value),
+      editable: self.unpaid? || self.initiated?,
+      tax_rate: precision_value(self.tax_rate),
+      tds_rate: precision_value(self.tds_rate),
+      discount_rate: precision_value(self.discount_rate),
+      advance_rate: precision_value(self.advance_rate),
+      invoice_attachment: {
+          url: self.invoice_attachments.first&.attached_file&.url,
+          thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+          content_type: self.invoice_attachments.first&.attached_file&.content_type,
+          file_name: self.invoice_attachments.first&.attached_file&.original_filename
+      },
+      net_amount: precision_value(self.net_amount&.value),
+      original_amount: self.include_original_amount,
+      gross_amount: precision_value(self.gross_amount&.value),
+      custom_fields: self.custom_fields,
+      category_id: self.category_id,
+      category_name: self.category&.name,
 
-          cost_center_id: self.cost_center_id,
-          cost_center_name: self.cost_center&.name,
+      cost_center_id: self.cost_center_id,
+      cost_center_name: self.cost_center&.name,
 
-          tds_slab_id: self.tds_slab_id,
-          tds_slab_name: self.tds_slab&.name,
-          tds_rate: self.tds,
+      tds_slab_id: self.tds_slab_id,
+      tds_slab_name: self.tds_slab&.name,
+      tds_rate: self.tds,
 
-          # invoice amounts total
-          item_amounts_total: self.item_amounts_total,
+      # invoice amounts total
+      item_amounts_total: self.item_amounts_total,
 
-          # paid amount for this invoice
-          # paid_amount: self.payments.successful.joins(:amount).sum(:value),
-          # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
-          paid_amount: payment_amounts_total,
-          remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-          po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
-          invoice_items: invoice_items.as_json,
-          note: self.note,
-          discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
-          payment_agreement_id: self.payment_agreement_id
-      }
-    end
+      # paid amount for this invoice
+      # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+      # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      paid_amount: payment_amounts_total,
+      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+      po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+      invoice_items: invoice_items.as_json,
+      note: self.note,
+      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
+      payment_agreement_id: self.payment_agreement_id
+    }
   end
 
   def invoice_discount_rate
@@ -809,49 +802,49 @@ class Invoice < ApplicationRecord
     # end
   end
 
-  def update_taxable_and_orig_amount_value
-    taxable_val = []
-    raw_val = []
-    if self.items.present?
-      self.items.each do |item|
-        rate = item.rate
-        quantity = item.quantity
-        discount_percentage = item.discount
-        amount_before_discount = rate*quantity
-        taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
-        raw_val << amount_before_discount
-        taxable_val << taxable_amt
-      end
-    end
+  # def update_taxable_and_orig_amount_value
+  #   taxable_val = []
+  #   raw_val = []
+  #   if self.items.present?
+  #     self.items.each do |item|
+  #       rate = item.rate
+  #       quantity = item.quantity
+  #       discount_percentage = item.discount
+  #       amount_before_discount = rate*quantity
+  #       taxable_amt = amount_before_discount - (amount_before_discount*discount.to_f/100)
+  #       raw_val << amount_before_discount
+  #       taxable_val << taxable_amt
+  #     end
+  #   end
 
-    if self.original_amount.present?
-      self.original_amount.update(value: raw_val.sum)
-    else
-      self.create_original_amount(value: raw_val.sum, currency_id: 1)
-    end
+  #   if self.original_amount.present?
+  #     self.original_amount.update(value: raw_val.sum)
+  #   else
+  #     self.create_original_amount(value: raw_val.sum, currency_id: 1)
+  #   end
     
-    if self.taxable_amount.present?
-      self.taxable_amount.update(value: taxable_val.sum)
-    else
-      self.create_taxable_amount(value: taxable_val.sum, currency_id: 1)
-    end
-  end
+  #   if self.taxable_amount.present?
+  #     self.taxable_amount.update(value: taxable_val.sum)
+  #   else
+  #     self.create_taxable_amount(value: taxable_val.sum, currency_id: 1)
+  #   end
+  # end
 
   private
 
-  def payment_agreement_updations
-    parameters = RequestStore.store[:params]
-    if parameters.present?
-      general_invoices = parameters.dig(:payment_agreement, :general_invoices_attributes).present? rescue false
-      rental_invoices = parameters.dig(:payment_agreement, :rental_invoices_attributes).present? rescue false
-     if (general_invoices || rental_invoices)
-        user = user.present? ? user : RequestStore.store[:current_user]
-        update_creator(user)
-        # update_company(user)
-        # set_initial_status
-      end
-    end
-  end
+  # def payment_agreement_updations
+  #   parameters = RequestStore.store[:params]
+  #   if parameters.present?
+  #     general_invoices = parameters.dig(:payment_agreement, :general_invoices_attributes).present? rescue false
+  #     rental_invoices = parameters.dig(:payment_agreement, :rental_invoices_attributes).present? rescue false
+  #    if (general_invoices || rental_invoices)
+  #       user = user.present? ? user : RequestStore.store[:current_user]
+  #       update_creator(user)
+  #       # update_company(user)
+  #       # set_initial_status
+  #     end
+  #   end
+  # end
 
   def set_initial_status
     self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
@@ -974,59 +967,59 @@ class Invoice < ApplicationRecord
     ]
   end
 
-  def agreement_based_json
-    {
-      id: self.id, 
-      invoice_type: self.invoice_type&.name,
-      department_attributes: { id: self.department_id, name: self.department&.name },
-      location_attributes: { id: self.location_id, name: self.location&.name },
-      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
-      payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
-      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
-      bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
-      vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json,
-      note: self.note,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
-      # payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment },
-      payment_agreement_escalations_attributes: self.payment_agreement_escalations.as_json,
-      billing_start_date: self.billing_start_date&.to_date,
-      billing_day_of_month: billing_day_of_month,
-      due_date: self.due_date&.to_date,
-      start_date: self.start_date,
-      end_date: self.end_date,
-      lock_in_period: self.lock_in_period,
-      rent_free_period: self.rent_free_period,
-      tenancy_period: self.tenancy_period,
-      custom_fields: self.custom_fields
+  # def agreement_based_json
+  #   {
+  #     id: self.id, 
+  #     invoice_type: self.invoice_type&.name,
+  #     department_attributes: { id: self.department_id, name: self.department&.name },
+  #     location_attributes: { id: self.location_id, name: self.location&.name },
+  #     cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+  #     payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
+  #     billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name},
+  #     balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+  #     net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+  #     notify_users: self.notify_users&.as_json,
+  #     vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+  #     bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
+  #     vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+  #     vendor_locations: fetch_vendor_locations.as_json,
+  #     bank_accounts: fetch_vendor_bank_accounts.as_json,
+  #     note: self.note,
+  #     tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+  #     invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
+  #     # payment_agreement_escalation_attributes: {id: self.payment_agreement_escalation_id, period_id: self.payment_agreement_escalation&.period_id, number: self.payment_agreement_escalation&.number, percentage_increment: self.payment_agreement_escalation&.percentage_increment },
+  #     payment_agreement_escalations_attributes: self.payment_agreement_escalations.as_json,
+  #     billing_start_date: self.billing_start_date&.to_date,
+  #     billing_day_of_month: billing_day_of_month,
+  #     due_date: self.due_date&.to_date,
+  #     start_date: self.start_date,
+  #     end_date: self.end_date,
+  #     lock_in_period: self.lock_in_period,
+  #     rent_free_period: self.rent_free_period,
+  #     tenancy_period: self.tenancy_period,
+  #     custom_fields: self.custom_fields
 
-    }
-  end
+  #   }
+  # end
 
-  def payment_history_json
-    {
-      id: self.id,
-      invoice_number: self.invoice_id,
-      vendor_name: self.vendor&.display_name,
-      due_date: self.due_date&.to_date,
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      status: self&.status&.name&.titleize,
-      creation_date: self.created_at.to_date,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      agreement_type: self.invoice_type&.name,
-      payment_agreement_id: self.payment_agreement_id,
-      vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.order_number
+  # def payment_history_json
+  #   {
+  #     id: self.id,
+  #     invoice_number: self.invoice_id,
+  #     vendor_name: self.vendor&.display_name,
+  #     due_date: self.due_date&.to_date,
+  #     net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+  #     balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+  #     status: self&.status&.name&.titleize,
+  #     creation_date: self.created_at.to_date,
+  #     tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+  #     agreement_type: self.invoice_type&.name,
+  #     payment_agreement_id: self.payment_agreement_id,
+  #     vendor_id: self.vendor_id,
+  #     agreement_number: self.payment_agreement&.order_number
 
-    }
-  end
+  #   }
+  # end
 
   def fetch_vendor_locations
     self.vendor&.gstin_locations&.as_json
@@ -1036,20 +1029,20 @@ class Invoice < ApplicationRecord
     self.vendor&.bank_accounts&.non_deleted&.as_json
   end
 
-  def payment_agreement_related_fields
-    if self.payment_agreement.present?
-      errors.add(:vendor, 'cannot be blank') if self.vendor_id.blank?
-      errors.add(:vendor_location, 'cannot be blank') if self.vendor_location_id.blank?
-      errors.add(:bank_account, 'name cannot be blank') if self.bank_account_id.blank?
-      errors.add(:department, 'name cannot be blank') if self.department_id.blank?
-      errors.add(:location, 'name cannot be blank') if self.location_id.blank?
-      errors.add(:cost_center, 'name cannot be blank') if self.cost_center_id.blank?
-      errors.add(:payment_term, 'name cannot be blank') if self.payment_term_id.blank?
-      if self.billing_type_id == BillingType.id_for(:fixed_periodic) && (self.invoice_frequency.number.blank? || self.invoice_frequency.period_id.blank?)
-        errors.add(:invoice_frequency, 'cannot be blank') 
-      end
-    end
-  end
+  # def payment_agreement_related_fields
+  #   if self.payment_agreement.present?
+  #     errors.add(:vendor, 'cannot be blank') if self.vendor_id.blank?
+  #     errors.add(:vendor_location, 'cannot be blank') if self.vendor_location_id.blank?
+  #     errors.add(:bank_account, 'name cannot be blank') if self.bank_account_id.blank?
+  #     errors.add(:department, 'name cannot be blank') if self.department_id.blank?
+  #     errors.add(:location, 'name cannot be blank') if self.location_id.blank?
+  #     errors.add(:cost_center, 'name cannot be blank') if self.cost_center_id.blank?
+  #     errors.add(:payment_term, 'name cannot be blank') if self.payment_term_id.blank?
+  #     if self.billing_type_id == BillingType.id_for(:fixed_periodic) && (self.invoice_frequency.number.blank? || self.invoice_frequency.period_id.blank?)
+  #       errors.add(:invoice_frequency, 'cannot be blank') 
+  #     end
+  #   end
+  # end
 
   # # This is used for agreement invoice custom fields
   # def set_custom_field_operation

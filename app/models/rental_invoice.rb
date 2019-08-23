@@ -1,7 +1,7 @@
 class RentalInvoice < ApplicationRecord
 
   include SoftDeletable, MathUtil
-  include Sequenced::ActsAsSequenced
+  # include Sequenced::ActsAsSequenced
 
   # acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
@@ -31,6 +31,7 @@ class RentalInvoice < ApplicationRecord
   belongs_to :payment_term, optional: true
   belongs_to :payment_agreement, optional: true
   belongs_to :department, optional: true
+  belongs_to :invoice_type, optional: true, class_name: "InwardInvoiceType"
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
@@ -74,5 +75,96 @@ class RentalInvoice < ApplicationRecord
 
 
   attr_accessor :invoice_custom_fields
-  
+
+  validates :vendor, :vendor_location, :bank_account, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  validate :additional_validations
+
+
+  def bank_account
+    if self.receiving_account_type == "BankAccount"
+      return self.receiving_account
+    end
+    nil
+  end
+
+  def invoice_bank_account
+    user = self.created_by
+    return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
+  end
+
+  def additional_validations
+    errors.add(:bank_account, 'name cannot be blank') if self.bank_account_id.blank?
+  end
+
+  def fetch_vendor_locations
+    self.vendor&.gstin_locations&.as_json
+  end
+
+  def fetch_vendor_bank_accounts
+    self.vendor&.bank_accounts&.non_deleted&.as_json
+  end
+
+
+
+  def as_json(options={})
+    if options[:payment_agreement]
+      return agreement_based_json
+    elsif options[:payment_history] || options[:upcoming_invoices]
+      return payment_history_json
+    end
+  end
+
+  def agreement_based_json
+    {
+      id: self.id, 
+      invoice_type: self.invoice_type&.name,
+      department_attributes: { id: self.department_id, name: self.department&.name },
+      location_attributes: { id: self.location_id, name: self.location&.name },
+      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+      payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
+      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name},
+      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+      notify_users: self.notify_users&.as_json,
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+      bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+      vendor_locations: fetch_vendor_locations.as_json,
+      bank_accounts: fetch_vendor_bank_accounts.as_json,
+      note: self.note,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+      invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
+      billing_start_date: self.billing_start_date&.to_date,
+      billing_day_of_month: billing_day_of_month,
+      due_date: self.due_date&.to_date,
+      start_date: self.start_date,
+      end_date: self.end_date,
+      lock_in_period: self.lock_in_period,
+      rent_free_period: self.rent_free_period,
+      tenancy_period: self.tenancy_period,
+      custom_fields: self.custom_fields
+
+    }
+  end
+
+  def payment_history_json
+    {
+      id: self.id,
+      invoice_number: self.invoice_id,
+      vendor_name: self.vendor&.display_name,
+      due_date: self.due_date&.to_date,
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+      status: self&.status&.name&.titleize,
+      creation_date: self.created_at.to_date,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+      agreement_type: self.invoice_type&.name,
+      payment_agreement_id: self.payment_agreement_id,
+      vendor_id: self.vendor_id,
+      agreement_number: self.payment_agreement&.order_number
+
+    }
+  end
+
+
 end

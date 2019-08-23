@@ -20,6 +20,12 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     self.payment_agreement.company_id = user.company_id
+    if self.payment_agreement.general_invoices.present?
+      self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+    end
+    if self.payment_agreement.rental_invoices.present?
+      self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+    end
     if self.payment_agreement.save && self.payment_agreement.reload
       # set_custom_field
       update_item_attributes
