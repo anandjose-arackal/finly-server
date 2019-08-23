@@ -2,20 +2,21 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'locations.import'
-  headers [
-              :id,
-              :name,
-              :address_1,
-              :address_2,
-              :city,
-              :state,
-              :pin,
-              :pan,
-              :gstin,
-              :location_code,
-              :nature_of_office,
-              :destroy
-          ]
+  headers ({
+      :id => "ID",
+      :name => "Name",
+      :address_1 => "Address Line1",
+      :address_2 => "Address Line2",
+      :city => "City",
+      :state => "State",
+      :pin => "PIN",
+      :pan => "PAN",
+      :gstin => "GSTIN",
+      :location_code => "Location Code",
+      :nature_of_office => "Nature of Office",
+      :destroy => "Destroy"
+  })
+
   def create_record(data)
     data, messages = set_params(data)
     unless messages.blank?

@@ -2,13 +2,13 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'categories.export'
-  headers [
-              :id,
-              :parent_id,
-              :gl_code,
-              :name,
-              :destroy
-          ]
+  headers ({
+              :id => "ID",
+              :parent_id => "Parent Name/ID",
+              :gl_code => "GL CODE",
+              :name => "Category Name",
+              :destroy => "Destroy"
+  })
 
   def valid_request
 

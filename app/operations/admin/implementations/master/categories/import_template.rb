@@ -2,13 +2,13 @@ class Admin::Implementations::Master::Categories::ImportTemplates < Admin::Imple
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'categories.import_template'
-  headers [
-              :id,
-              :parent_id,
-              :gl_code,
-              :name,
-              :destroy
-          ]
+  headers ({
+      :id => "ID",
+      :parent_id => "Parent Name/ID",
+      :gl_code => "GL CODE",
+      :name => "Category Name",
+      :destroy => "Destroy"
+  })
 
   def valid_request
   end

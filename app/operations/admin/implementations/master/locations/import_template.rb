@@ -2,20 +2,20 @@ class Admin::Implementations::Master::Locations::ImportTemplates < Admin::Implem
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'locations.import_template'
-  headers [
-              :id,
-              :name,
-              :address_1,
-              :address_2,
-              :city,
-              :state,
-              :pin,
-              :pan,
-              :gstin,
-              :location_code,
-              :nature_of_office,
-              :destroy
-          ]
+  headers ({
+      :id => "ID",
+      :name => "Name",
+      :address_1 => "Address Line1",
+      :address_2 => "Address Line2",
+      :city => "City",
+      :state => "State",
+      :pin => "PIN",
+      :pan => "PAN",
+      :gstin => "GSTIN",
+      :location_code => "Location Code",
+      :nature_of_office => "Nature of Office",
+      :destroy => "Destroy"
+  })
 
   def valid_request
   end

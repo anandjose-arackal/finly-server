@@ -2,13 +2,13 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'categories.import'
-  headers [
-              :id,
-              :parent_id,
-              :gl_code,
-              :name,
-              :destroy
-          ]
+  headers ({
+      :id => "ID",
+      :parent_id => "Parent Name/ID",
+      :gl_code => "GL CODE",
+      :name => "Category Name",
+      :destroy => "Destroy"
+  })
 
   def create_record(data)
     category = self.company.categories.new data.except(:id,:destroy)
