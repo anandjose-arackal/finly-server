@@ -20,7 +20,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def make_payment
-    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && user.is_bank_payment_request_initiator?(purchase_order)
+    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && user.is_bank_payment_request_initiator?(purchase_order) && purchase_order.advance_can_be_paid?
   end
 
   def mark_send_to_vendor
