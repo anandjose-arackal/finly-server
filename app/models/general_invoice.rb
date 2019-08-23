@@ -79,4 +79,29 @@ class GeneralInvoice < ApplicationRecord
 
   attr_accessor :invoice_custom_fields
 
+
+
+  validates :vendor, :vendor_location, :bank_account, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type
+
+  # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
+
+
+  def invoice_frequency_for_fix_periodic
+    if self.billing_type_id == BillingType.id_for(:fixed_periodic) && (self.invoice_frequency.number.blank? || self.invoice_frequency.period_id.blank?)
+      errors.add(:invoice_frequency, 'cannot be blank') 
+    end
+  end
+
+  def start_end_date_for_agreement
+    if self.start_date.present? && self.end_date.present?
+      if self.payment_agreement.execution_date > self.start_date || self.payment_agreement.expiration_date < self.start_date
+        errors.add(:start_date, ' should be between execution and expiration date')
+      end
+      if self.payment_agreement.execution_date > self.end_date || self.payment_agreement.expiration_date < self.end_date
+        errors.add(:end_date, ' should be between execution and expiration date')
+      end
+    end
+  end
+
+
 end
