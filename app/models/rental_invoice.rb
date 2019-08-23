@@ -76,7 +76,8 @@ class RentalInvoice < ApplicationRecord
 
   attr_accessor :invoice_custom_fields
 
-  validates :vendor, :vendor_location, :bank_account, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+
   validate :additional_validations
 
 
