@@ -59,7 +59,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
       data = {}
       row.each_with_index do |value, index|
-        data[headers[index]] = value
+        data[headers.keys[index]] = value
       end
 
       result = process_row(data)
@@ -79,7 +79,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
       end
       output << row
     end
-    export headers, output
+    export headers.values, output
   end
 
   def template

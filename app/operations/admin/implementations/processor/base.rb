@@ -3,8 +3,8 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
 
   attr_accessor :master, :implementation_request, :company, :input
 
-  def self.headers(headers = NoObject)
-    @headers = headers unless headers == NoObject
+  def self.headers(headers = {})
+    @headers = headers unless headers == {}
     @headers
   end
 

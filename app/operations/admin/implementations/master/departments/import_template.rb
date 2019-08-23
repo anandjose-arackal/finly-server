@@ -2,13 +2,13 @@ class Admin::Implementations::Master::Departments::ImportTemplates < Admin::Impl
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.import_template'
-  headers [
-              :id,
-              :parent_id,
-              :name,
-              :department_code,
-              :destroy
-          ]
+  headers ({
+      :id => "ID",
+      :parent_id =>  "Parent Department ID/NAME",
+      :name => "Departmet Name",
+      :department_code => "Department Code",
+      :destroy => "Destroy"
+  })
 
   def valid_request
   end

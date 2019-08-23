@@ -5,7 +5,7 @@ class Admin::Implementations::Processor::Export < Admin::Implementations::Proces
   end
 
   def process
-    export(self.headers, contents)
+    export(self.headers.values, contents)
   end
 
   def contents
@@ -15,7 +15,7 @@ class Admin::Implementations::Processor::Export < Admin::Implementations::Proces
     self.implementation_request.update(requested_items: data.count)
     data.each_with_index do |entry, index|
       row = []
-      self.headers.each do |field|
+      self.headers.keys.each do |field|
         row << self.send(field, entry)
       end
       contents << row

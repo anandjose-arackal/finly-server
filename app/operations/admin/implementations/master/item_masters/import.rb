@@ -3,17 +3,17 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'item_masters.import'
   headers [
-              :id,
-              :description,
-              :category,
-              :hsn_sac,
-              :item_number,
-              :item_expense_type,
-              :po_item,
-              :non_po_item,
-              :discount,
-              :rate,
-              :destroy
+              :id => "ID",
+              :description => "Description (mandatory)",
+              :category => "Category Name",
+              :hsn_sac => "HSN - SAC",
+              :item_number => "Item Code",
+              :item_expense_type => "Expense Type",
+              :po_item =>  "PO Item (Y/N)",
+              :non_po_item => "Non PO Item (Y/N)",
+              :discount => "Discount",
+              :rate => "Rate",
+              :destroy => "Destroy"
           ]
   attr_accessor :item_params
   def create_record(data)

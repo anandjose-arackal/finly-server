@@ -4,19 +4,18 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   subscribe 'item_masters.export'
 
   headers [
-              :id,
-              :description,
-              :category,
-              :hsn_sac,
-              :item_number,
-              :item_expense_type,
-              :po_item,
-              :non_po_item,
-              :discount,
-              :rate,
-              :destroy
+              :id => "ID",
+              :description => "Description (mandatory)",
+              :category => "Category Name",
+              :hsn_sac => "HSN - SAC",
+              :item_number => "Item Code",
+              :item_expense_type => "Expense Type",
+              :po_item =>  "PO Item (Y/N)",
+              :non_po_item => "Non PO Item (Y/N)",
+              :discount => "Discount",
+              :rate => "Rate",
+              :destroy => "Destroy"
           ]
-
   def valid_request
 
   end

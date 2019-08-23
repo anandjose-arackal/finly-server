@@ -3,12 +3,13 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.export'
 
-  headers [
-              :id,
-              :parent_id,
-              :name,
-              :department_code
-          ]
+  headers ({
+      :id => "ID",
+      :parent_id =>  "Parent Department ID/NAME",
+      :name => "Departmet Name",
+      :department_code => "Department Code",
+      :destroy => "Destroy"
+  })
 
   def valid_request
 

@@ -3,13 +3,13 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.import'
   halt_on_failure!
-  headers [
-              :id,
-              :parent_id,
-              :name,
-              :department_code,
-              :destroy
-          ]
+  headers ({
+              :id => "ID",
+              :parent_id =>  "Parent Department ID/NAME",
+              :name => "Departmet Name",
+              :department_code => "Department Code",
+              :destroy => "Destroy"
+  })
   def create_record(data)
     if data[:parent_id].is_a?(String) && data[:parent_id].present?
       parent_department = company.departments.non_deleted.with_name(data[:parent_id]).first

@@ -3,8 +3,8 @@ class Admin::Implementations::Processor::ImportTemplate < Admin::Base
 
   attr_accessor :master, :company, :input, :file_url
 
-  def self.headers(headers = NoObject)
-    @headers = headers unless headers == NoObject
+  def self.headers(headers = {})
+    @headers = headers unless headers == {}
     @headers
   end
 
@@ -39,7 +39,7 @@ class Admin::Implementations::Processor::ImportTemplate < Admin::Base
   end
 
   def export(headers, contents)
-    exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
+    exporter = Exporter::Spreadsheet.new(user, {headers: headers.values, contents: contents})
     file = exporter.generate_xls_file
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
     return temp_file.file.url
