@@ -17,7 +17,8 @@ class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implemen
       :gstin => "GSTIN",
       :gst_location => "GST Location",
       :vendor_bank_account_name => "Bank Account Name",
-      :account_number => "IFSC",
+      :account_number => "Account Number",
+      :ifsc => "IFSC",
       :destroy => "Destroy"
   })
   def valid_request
