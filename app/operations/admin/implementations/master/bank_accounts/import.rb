@@ -2,12 +2,12 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'bank_accounts.import'
-  headers [
-               :account_name,
-               :user_id,
-               :account_number,
-               :ifsc
-           ]
+  headers ({
+      :name => "Bank Name",
+      :user_id => "User Email / Mobile NUmber",
+      :account_number => "Account Number",
+      :ifsc => "IFSC"
+  })
   attr_accessor :bank_account_params
   def create_record(data)
     bank_account_params, messages = set_params(data)

@@ -2,12 +2,12 @@ class Admin::Implementations::Master::TdsSlabs::Import < Admin::Implementations:
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'tds_slabs.import'
-  headers ([
+  headers ({
       :id => "ID",
       :name => "Name",
       :tds => "TDS Rate",
       :destroy => "Destrou"
-  ])
+  })
 
   def create_record(data)
     tds_slab = self.company.tds_slabs.new data.except(:id,:destroy)

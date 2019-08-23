@@ -2,12 +2,12 @@ class Admin::Implementations::Master::TdsSlabs::ImportTemplates < Admin::Impleme
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'tds_slabs.import_template'
-  headers ([
+  headers ({
       :id => "ID",
       :name => "Name",
       :tds => "TDS Rate",
       :destroy => "Destrou"
-  ])
+  })
 
   def valid_request
   end

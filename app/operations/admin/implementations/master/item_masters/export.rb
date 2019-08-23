@@ -3,7 +3,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'item_masters.export'
 
-  headers [
+  headers ({
               :id => "ID",
               :description => "Description (mandatory)",
               :category => "Category Name",
@@ -15,7 +15,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
               :discount => "Discount",
               :rate => "Rate",
               :destroy => "Destroy"
-          ]
+  })
   def valid_request
 
   end

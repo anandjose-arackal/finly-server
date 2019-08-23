@@ -3,12 +3,12 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'bank_accounts.export'
 
-  headers [
-              :name,
-              :user_id,
-              :account_number,
-              :ifsc
-          ]
+  headers ({
+      :name => "Bank Name",
+      :user_id => "User Email / Mobile NUmber",
+      :account_number => "Account Number",
+      :ifsc => "IFSC"
+  })
 
   def valid_request
 

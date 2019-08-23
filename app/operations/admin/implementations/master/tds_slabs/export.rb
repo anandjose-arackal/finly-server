@@ -3,12 +3,12 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'tds_slabs.export'
 
-  headers ([
+  headers ({
               :id => "ID",
               :name => "Name",
               :tds => "TDS Rate",
               :destroy => "Destrou"
-          ])
+          })
 
   def valid_request
 
