@@ -87,29 +87,32 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def approve
-    ############# Reviewer logic start #########################
+    # ############# Reviewer logic start #########################
+    # if purchase_order.is_reviewing_user? || admin_has_taken_control?
+    #   if purchase_order.processing?
+    #     last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
+    #     if (purchase_order.get_reviewers.include?(user))
+    #       if purchase_order.action_users(:approve).include?(user)
+    #         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:approve)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:submit)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:take_control)
+    #           return true
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
+    # ############# Reviewer logic end #########################
     if purchase_order.is_reviewing_user? || admin_has_taken_control?
-      if purchase_order.processing?
-        last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
-        if (purchase_order.get_reviewers.include?(user))
-          if purchase_order.action_users(:approve).include?(user)
-            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:approve)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:submit)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:take_control)
-              return true
-            end
-          end
-        end
-      end
+      purchase_order.processing? && user_in_level?
     end
-    ############# Reviewer logic end #########################
   end
 
   def remind

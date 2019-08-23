@@ -19,4 +19,10 @@ class Procure::InwardDocumentsController < BaseControllers::WebBase
     @result = Procurements::InwardDocuments::Destroy.(current_user, params)
     respond
   end
+
+  def filter_config
+    @result = Procurements::InwardDocuments::FilterConfig.(current_user, params)
+    respond
+  end
+
 end

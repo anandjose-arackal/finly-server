@@ -7,6 +7,7 @@
 #  updated_at :datetime         not null
 #  company_id :integer
 #  balance_id :integer
+#  enabled    :boolean          default(FALSE)
 #
 
 require 'rails_helper'

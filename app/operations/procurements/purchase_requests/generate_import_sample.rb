@@ -74,6 +74,36 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
       name: "Categories"
     }
 
+    department_headers = ["Department ID", "Department Name"]
+    department_contents = []
+    departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
+    if departments.present?
+      departments.each do |department|
+        department_contents << [department.id, department.name]
+      end
+    end
+
+    self.sheets << {
+      item_headers: department_headers,
+      item_contents: department_contents,
+      name: 'Departments'
+    }
+
+    cost_center_headers = ["Cost Center ID", "Cost Center Name"]
+    cost_center_contents = []
+    cost_centers = user.company.cost_centers.where(application: "vp")
+    if cost_centers.present?
+      cost_centers.each do |cost_center|
+        cost_center_contents << [cost_center.id, cost_center.name]
+      end
+    end
+
+    self.sheets << {
+      item_headers: cost_center_headers,
+      item_contents: cost_center_contents,
+      name: 'Cost Center'
+    }
+
   end
 
   def success
@@ -90,8 +120,11 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
       "Category ID",
       "Preferred Vendor ID",
       "Required By Date",
+      "Department ID",
+      "Cost Center ID",
       "Delivery Location ID",
       "Purpose",
+      "HSN/SAC",
       "Quantity",
       "Unit of measurement",
       "Estimated Unit Price",

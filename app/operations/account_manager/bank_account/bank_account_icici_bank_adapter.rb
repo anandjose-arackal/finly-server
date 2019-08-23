@@ -18,11 +18,13 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
     bank_transaction = payment.reference_resource
 
-    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
+    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure? || bank_transaction.pending_for_processing? || bank_transaction.pending_utr?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable? || bank_transaction&.open?
-      reference_number = bank_transaction.unique_request_number
+    elsif bank_transaction.present? && (bank_transaction&.retriable? || bank_transaction&.open? || bank_transaction&.rejected?)
+      # even if the payment is being retried, the reference number needs to be
+      # a new one
+      reference_number = nil
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
@@ -31,7 +33,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
+    if payment.reference_resource&.retriable?
+      # updating the request number with a new one because the old one will have been used already
+      bank_transaction.update_columns(unique_request_number: transfer_request.generate_unique_reference)
+    elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
       bank_transaction = payment.reference_resource
@@ -126,6 +131,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
   end
 
   private
+
 
   def create_bank_transaction(payment, transfer_request)
     if self.account.account_owner.is_a?(Company)

@@ -2,16 +2,30 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
   attr_accessor :procurements, :filter_procurement_type
 
+  def pre_validate
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      add_message :error, "Receipt note is not enabled for your company. Please contact your admin or Finly Customer Support."
+      return
+    end
+  end
+
   def init
     self.filter_procurement_type = params[:filter_procurement_type]
   end
 
   def process
-    if user.vp_admin_or_auditor? || user.is_goods_receiver?
+    if user.vendor_payments_admin? || user.is_goods_receiver?
       if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
         # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
         received_pending_ids = [StatusTag.id_for(:shipment_received)]
-        pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        # pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+ 
+        if user.vendor_payments_admin?
+          pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        else
+          policy_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ? AND user_id = ?', UserRole.id_for(:goods_receiver), user.id).pluck(:id).uniq rescue []
+          pr_ids = user.company.procurements.joins(:inward_documents).joins(:purchase_order).where('purchase_orders.policy_id IN (?)', policy_ids).pluck(:id)
+        end
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
         self.procurements = Procurement.where(id: proc_ids)
@@ -49,17 +63,18 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_creation_date_to
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_policy_id
 
 
     def init
       self.procurements = params[:procurements]
       apply_filter
 
-      self.procurements = self.procurements.order_by_controlling_level(user.id)
+      self.procurements = self.procurements.order_by_controlling_level(user.id) rescue Procurement.none
       page = params[:page] || 1
       per_page = params[:per_page] || 30
-      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details
-      self.count = self.procurements.count
+      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details rescue Procurement.none
+      self.count = self.procurements.count rescue 0
 
     end
 
@@ -67,10 +82,10 @@ class Procurements::Grn::Received::Index < Procurements::Base
       if params[:search_type].present? && params[:search_query].present?
         set_scope
       end
-      self.procurements = apply_scopes(self.procurements, params)
+      self.procurements = apply_scopes(self.procurements, params) rescue Procurement.none
 
       if params[:filter_awaiting_approval].present?
-        self.procurements = self.procurements.filter_awaiting_approval(user)
+        self.procurements = self.procurements.filter_awaiting_approval(user) rescue Procurement.none
       end
 
     end

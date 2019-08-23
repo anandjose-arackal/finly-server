@@ -36,7 +36,7 @@ class Procurements::PurchaseRequests::ApprovedItems < Procurements::PurchaseRequ
       self.approved_purchase_request_items = PurchaseRequestItem.with_ids(approved_item_ids)
       apply_search
       self.approved_purchase_request_items = apply_scopes(self.approved_purchase_request_items, params)
-      self.paginated_items = self.approved_purchase_request_items.paginate(page: params[:page], per_page: 30) rescue nil
+      self.paginated_items = self.approved_purchase_request_items.paginate(page: params[:page], per_page: params[:per_page]) rescue nil
       self.count = self.approved_purchase_request_items.count
     end
 

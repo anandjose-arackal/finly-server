@@ -93,7 +93,8 @@ json.invoice do
   # adding the respective rates
   json.tax_rate precision_value invoice.tax_rate
   json.tds_rate precision_value invoice.tds_rate
-  json.discount_rate precision_value invoice.discount_rate
+  # json.discount_rate precision_value invoice.discount_rate
+  json.discount_rate precision_value ((invoice.discount_amount&.value / invoice.item_amounts_total) * 100).round(2) rescue 0
   json.advance_rate precision_value invoice.advance_rate
   #############################
   json.invoice_attachment do
@@ -133,19 +134,30 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst
+                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id, :sgst, :cgst, :igst,
+                    :purchase_order_item_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
-      json.tds_applicable item.inventory_line_item&.tds_applicable
+      json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
+      json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
       json.amount precision_value item.amount&.value
       json.category_name item.category&.name
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
+      json.billable_amount precision_value item.billable_amount&.value
+      product = ""
+      case item.inventory_line_item&.product_type_id
+      when ProductType.id_for(:goods)
+        product = "goods"
+      when ProductType.id_for(:service)
+        product = "service"
+      end      
+      json.product_type product
     end
   end
 
@@ -176,18 +188,9 @@ json.invoice do
   end
 end
 
-json.invoice_categories do
-  json.array!(current_company.categories.vendor_payments_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
-json.invoice_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.invoice_categories current_company.categories.vendor_payments_only
+json.invoice_item_categories current_company.categories.inward_invoice_items_only
+
 json.cost_centers do
   # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
   json.array! @result.cost_centers do |cost_center|
@@ -257,24 +260,24 @@ json.reviewal_chains do
         # json.selected_reviewer item[:selected_reviewer]&.as_json
         # json.selected_reviewer_threshold item[:selected_reviewer_threshold]
         json.reviewers do
-          if current_company.present? && (current_company.id == 2 || current_company.id == 156)
-            json.array! item[:reviewer_data] do |data|
-              json.id data[:id]
-              json.exception data[:exception]
-              json.threshold data[:threshold]
-              json.reviewer_details do
-                min = MathUtil.number_with_rupee_delimiter(data[:min])
-                max = (data[:max].to_i == 99999999999999 ? '∞' : MathUtil.number_with_rupee_delimiter(data[:max]))
-                json.name "#{data[:reviewer_name]}(#{min} - #{max})"
-                json.id data[:reviewer_id]
-              end
-            end
-          else
+          # if current_company.present? && (current_company.id == 2 || current_company.id == 156)
+          #   json.array! item[:reviewer_data] do |data|
+          #     json.id data[:id]
+          #     json.exception data[:exception]
+          #     json.threshold data[:threshold]
+          #     json.reviewer_details do
+          #       min = MathUtil.number_with_rupee_delimiter(data[:min])
+          #       max = (data[:max].to_i == 99999999999999 ? '∞' : MathUtil.number_with_rupee_delimiter(data[:max]))
+          #       json.name "#{data[:reviewer_name]}(#{min} - #{max})"
+          #       json.id data[:reviewer_id]
+          #     end
+          #   end
+          # else
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
               json.reviewer_details reviewer.reviewer.as_json
             end
-          end
+          # end
         end
       end
     end
