@@ -15,6 +15,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
 
   def process
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
+    validate_invoice_frequency
     create_or_update_custom_fields
     return unless check_agreement_item_presence
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)

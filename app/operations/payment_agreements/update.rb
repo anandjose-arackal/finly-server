@@ -11,6 +11,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
   def process
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
+    validate_invoice_frequency
     create_or_update_custom_fields
     if payment_agreement.valid?
       # Set validation of DLRMs

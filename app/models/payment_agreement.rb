@@ -347,11 +347,6 @@ class PaymentAgreement < ApplicationRecord
     end
   end
 
-  # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
-  def invoice_frequency_consistency
-
-  end
-
   def get_related_vendors(options)
     vendors = []
     if options[:list_vendors]

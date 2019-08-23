@@ -1,6 +1,6 @@
 class PaymentAgreements::Base < BaseOperation
 
-  attr_accessor :company, :workflow_output, :payment_agreement
+  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num
 
 
   def pre_validate
@@ -36,9 +36,9 @@ class PaymentAgreements::Base < BaseOperation
         balance_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
-        payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
+        # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
-        invoice_frequency_attributes: [:id, :number, :period_id]
+        invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
       rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
         invoice_custom_fields: {},
@@ -62,7 +62,7 @@ class PaymentAgreements::Base < BaseOperation
         notify_users_attributes: [:id, :_destroy, :user_id],
         payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
-        invoice_frequency_attributes: [:id, :number, :period_id]
+        invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
       beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
         tax_amount_attributes: [:id, :value, :currency_id],
@@ -392,6 +392,50 @@ class PaymentAgreements::Base < BaseOperation
     custom_fields[:save] = save
     CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
+
+  # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
+  def validate_invoice_frequency
+
+    validate_invoice_frequency_for_gi
+    validate_invoice_frequency_for_ri
+  end
+
+  def validate_invoice_frequency_for_gi
+    if self.payment_agreement.general_invoices.present?
+      self.invoice_freq_num = []
+      self.payment_agreement.general_invoices.each do |general_invoice|
+        validate_frequency_for_document(general_invoice)
+      end
+    end
+  end
+
+  def validate_invoice_frequency_for_ri
+    if self.payment_agreement.rental_invoices.present?
+      self.invoice_freq_num = []
+      self.payment_agreement.rental_invoices.each do |rental_invoice|
+        validate_frequency_for_document(rental_invoice)
+      end
+    end
+  end
+
+  def validate_frequency_for_document(invoice)
+    if invoice.billing_type.fixed_periodic?
+      invoice_freq_num << invoice.invoice_frequency.number
+      if invoice_freq_num.uniq.count.zero?
+        add_message :error,  "#{invoice.class.name.titleize} frequency data is incorrect"
+        return 
+      end
+      if invoice_freq_num.uniq.count > 1
+        add_message :error, "Invoice frequency should be same for all #{invoice.class.name.titleize.pluralize}"
+        return
+      end
+    end
+  end
+
+
+
+
+
 
 
 
