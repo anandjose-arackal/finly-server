@@ -449,12 +449,13 @@ class PaymentAgreements::Base < BaseOperation
           self.any_fixed_period_invoice = general_invoice.billing_type.fixed_periodic?
         end 
         comparison_status = compare_start_end_date(general_invoice)
-        next unless comparison_status
-        match_start_date, match_end_date = check_missing_days(general_invoice)
+        return unless comparison_status
+        # match_start_date, match_end_date = check_missing_days(general_invoice)
+        check_missing_days(general_invoice)
         if general_invoice.billing_type.fixed_periodic?
-          return if match_start_date
+          return if self.match_invoice_start_date
         end
-        return if match_start_date && match_end_date
+        return if self.match_invoice_start_date && self.match_invoice_end_date
       end
       if self.any_fixed_period_invoice
         add_message :error, "Any one general invoice start date should match with execution date"
@@ -475,7 +476,7 @@ class PaymentAgreements::Base < BaseOperation
           self.any_fixed_period_invoice = rental_invoice.billing_type.fixed_periodic?
         end 
         comparison_status = compare_start_end_date(rental_invoice)
-        next unless comparison_status
+        return unless comparison_status
         match_start_date, match_end_date = check_missing_days(rental_invoice)
         if rental_invoice.billing_type.fixed_periodic?
           return if match_start_date
@@ -494,15 +495,29 @@ class PaymentAgreements::Base < BaseOperation
 
   # Start date and end date should be between agreement execution date and expiration date
   def compare_start_end_date(invoice)
-    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && self.payment_agreement.expiration_date.present? 
-      if invoice.start_date&.to_date < self.payment_agreement.execution_date&.to_date || invoice.start_date&.to_date > self.payment_agreement.expiration_date&.to_date
-        add_message :error, "#{invoice.class.name.titleize} start date is not in between excution and expiration date"
+    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && (self.payment_agreement.expiration_date.present? || self.payment_agreement.no_expiration)
+      if (invoice.start_date&.to_date < self.payment_agreement.execution_date&.to_date)
+        add_message :error, "#{invoice.class.name.titleize} start date is not in between execution and expiration date"
         return false
       end
 
-      if invoice.end_date&.to_date < self.payment_agreement.execution_date&.to_date || invoice.end_date&.to_date > self.payment_agreement.expiration_date&.to_date
-        add_message :error, "#{invoice.class.name.titleize} start date is not in between excution and expiration date"
+      unless self.payment_agreement.no_expiration
+        if invoice.start_date&.to_date > self.payment_agreement.expiration_date&.to_date
+          add_message :error, "#{invoice.class.name.titleize} start date is not in between execution and expiration date"
+          return false
+        end
+      end
+
+      if invoice.end_date&.to_date < self.payment_agreement.execution_date&.to_date
+        add_message :error, "#{invoice.class.name.titleize} end date cannot be less than execution date"
         return false
+      end
+
+      unless self.payment_agreement.no_expiration
+        if invoice.end_date&.to_date > self.payment_agreement.expiration_date&.to_date
+          add_message :error, "#{invoice.class.name.titleize} end date cannot be more than expiration date"
+          return false
+        end
       end
 
       if invoice.end_date&.to_date < invoice.start_date&.to_date
@@ -517,7 +532,7 @@ class PaymentAgreements::Base < BaseOperation
   # Start date and end date should cover all days between agreement execution date and expiration date
   # Enforce user to add any one invoice date as start date and any inoice date end date as end date
   def check_missing_days(invoice)
-    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && self.payment_agreement.expiration_date.present?
+    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && (self.payment_agreement.expiration_date.present? || self.payment_agreement.no_expiration)
       if invoice.start_date&.to_date == self.payment_agreement.execution_date&.to_date
         unless match_invoice_start_date 
           self.match_invoice_start_date = true

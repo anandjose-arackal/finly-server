@@ -18,7 +18,15 @@ class ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment
   end
 
   def make_payment
+    unless agreement.no_expiration
+      return agreement.expiration_date.to_date >= Date.today
+    end
     true
+  end
+
+
+  def agreement
+    beneficiary_payment.payment_agreement
   end
 
 end

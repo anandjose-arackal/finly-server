@@ -9,10 +9,14 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
 
-  def process
+  def validate
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
     validate_invoice_frequency
     validate_invoice_start_end_date
+    # Nullify invoice frequency if not fixed periodic
+  end
+
+  def process
     create_or_update_custom_fields
     if payment_agreement.valid?
       # Set validation of DLRMs
