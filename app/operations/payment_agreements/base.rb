@@ -472,7 +472,7 @@ class PaymentAgreements::Base < BaseOperation
 
   # Start date and end date should be between agreement execution date and expiration date
   def compare_start_end_date(invoice)
-    if invoice.start_date.present? && invoice.end_date.present? 
+    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && self.payment_agreement.expiration_date.present? 
       if invoice.start_date&.to_date < self.payment_agreement.execution_date&.to_date || invoice.start_date&.to_date > self.payment_agreement.expiration_date&.to_date
         add_message :error, "#{invoice.class.name.titleize} start date is not in between excution and expiration date"
         return false
@@ -495,7 +495,7 @@ class PaymentAgreements::Base < BaseOperation
   # Start date and end date should cover all days between agreement execution date and expiration date
   # Enforce user to add any one invoice date as start date and any inoice date end date as end date
   def check_missing_days(invoice)
-    if invoice.start_date.present? && invoice.end_date.present?
+    if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && self.payment_agreement.expiration_date.present?
       if invoice.start_date&.to_date == self.payment_agreement.execution_date&.to_date
         unless match_invoice_start_date 
           self.match_invoice_start_date = true
