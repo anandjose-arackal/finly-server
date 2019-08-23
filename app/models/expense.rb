@@ -71,6 +71,7 @@ class Expense < ApplicationRecord
   belongs_to :modified_by, class_name: "User", optional: true
   belongs_to :gstin_location, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :state_of_expense, class_name: "GstStateCode", optional: true
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy

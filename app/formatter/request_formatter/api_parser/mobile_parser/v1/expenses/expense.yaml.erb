@@ -78,5 +78,10 @@ expense:
       <% params[:receipt_email][:attachments].each do |attachment| %>
       - attachment_url: <%= attachment[:url] %>
       <% end %>
-   <% end %>
-<% end %>
+    <% end %>
+  <% end %>
+  gstin_location_attributes:
+    id: <%= params.dig(:gstin_location_attributes, :id)%>
+    gstin_id: <%= params.dig(:gstin_location_attributes, :gstin_id)%>
+    gstin: <%= params.dig(:gstin_location_attributes, :gstin)%>
+    state_id: <%= params.dig(:gstin_location_attributes, :state_id)%>

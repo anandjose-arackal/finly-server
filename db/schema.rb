@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_21_114951) do
+ActiveRecord::Schema.define(version: 2019_08_21_185109) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5065,12 +5065,14 @@ ActiveRecord::Schema.define(version: 2019_08_21_114951) do
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "category_id"
+    t.string "hsn_sac"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
     t.index ["category_id"], name: "index_purchase_request_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
     t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
     t.index ["department_id"], name: "index_purchase_request_items_on_department_id"
     t.index ["estimated_amount_id"], name: "index_purchase_request_items_on_estimated_amount_id"
+    t.index ["hsn_sac"], name: "index_purchase_request_items_on_hsn_sac"
     t.index ["item_id"], name: "index_purchase_request_items_on_item_id"
     t.index ["per_unit_estimated_amount_id"], name: "index_purchase_request_items_on_per_unit_estimated_amount_id"
     t.index ["purchase_order_id"], name: "index_purchase_request_items_on_purchase_order_id"
