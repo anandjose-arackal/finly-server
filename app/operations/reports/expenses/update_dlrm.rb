@@ -43,6 +43,7 @@ class Reports::Expenses::UpdateDlrm < BaseOperation
     set_params = {
       reviewal_document: report,
       violations_present: violation_present,
+      type: 'unaffected'
     }
 
     ReviewalManager::DocumentReviewalMappings::Set.(user, set_params)
