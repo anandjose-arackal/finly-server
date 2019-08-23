@@ -98,6 +98,11 @@ class TransferTimingUtils
       date = date.to_date
     end
     return date.to_date if within_timeframe? payment_mode, date
+    if date <= Date.today
+      date = DateUtils.local_date
+    else
+      date.change(hour: 8, min: 1, sec: 0)
+    end
     return date.to_date if payment_mode == "IMPS"
     case payment_mode.upcase
       when "NEFT", "RTGS"
