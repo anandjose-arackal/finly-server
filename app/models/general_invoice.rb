@@ -7,7 +7,7 @@ class GeneralInvoice < ApplicationRecord
   include SoftDeletable, MathUtil
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
+  # acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -81,7 +81,7 @@ class GeneralInvoice < ApplicationRecord
 
 
 
-  validates :vendor, :vendor_location, :bank_account, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type
+  validates :vendor, :vendor_location, :bank_account, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
 
   # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
 

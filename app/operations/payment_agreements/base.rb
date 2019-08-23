@@ -293,7 +293,7 @@ class PaymentAgreements::Base < BaseOperation
 
   # Invoice can be of type general or rental
   def update_amount_attributes(invoice)
-    invoice.update_taxable_and_orig_amount_value
+    update_taxable_and_orig_amount_value(invoice)
     invoice.items.map(&:update_taxable_amount_value)
     # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
     # invoice.save!
@@ -305,17 +305,48 @@ class PaymentAgreements::Base < BaseOperation
     update_balance_due_amount(invoice, invoice.net_amount.value)
   end
 
+  def update_taxable_and_orig_amount_value(invoice)
+    taxable_val = []
+    raw_val = []
+    if invoice.items.present?
+      invoice.items.each do |item|
+        rate = item.rate
+        quantity = item.quantity
+        discount_percentage = item.discount
+        amount_before_discount = rate*quantity
+        taxable_amt = amount_before_discount - (amount_before_discount*item.discount.to_f/100)
+        raw_val << amount_before_discount
+        taxable_val << taxable_amt
+      end
+    end
+
+    if invoice.original_amount.present?
+      invoice.original_amount.update(value: raw_val.sum)
+    else
+      invoice.create_original_amount(value: raw_val.sum, currency_id: 1)
+    end
+    
+    if invoice.taxable_amount.present?
+      invoice.taxable_amount.update(value: taxable_val.sum)
+    else
+      invoice.create_taxable_amount(value: taxable_val.sum, currency_id: 1)
+    end
+  end
+
+
   def create_or_update_custom_fields
     # Setup custom field for general invoices
     if self.payment_agreement.general_invoices.present?
       if params.dig(:payment_agreement, :rental_invoices_attributes).present?
         self.payment_agreement.general_invoices.each_with_index do |invoice, index|
-          custom_fields = params[:payment_agreement][:general_invoices_attributes][index][:custom_fields]
-          if invoice.new_record?
-            custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-            CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
-          else
-            validate_custom_fields_invoice(invoice, custom_fields)
+          custom_fields = invoice.invoice_custom_fields
+          if custom_fields.present?
+            if invoice.new_record?
+              custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+              CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+            else
+              validate_custom_fields_invoice(invoice, custom_fields)
+            end
           end
         end
       end
@@ -326,13 +357,15 @@ class PaymentAgreements::Base < BaseOperation
       if params.dig(:payment_agreement, :rental_invoices_attributes).present?
         self.payment_agreement.rental_invoices.each_with_index do |invoice, index|
           custom_fields = invoice.invoice_custom_fields
-          if invoice.new_record?
-            # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
-            custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-            CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
-          else
-            # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
-            validate_custom_fields_invoice(invoice, custom_fields, true)
+          if custom_fields.present?
+            if invoice.new_record?
+              # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+              custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+              CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+            else
+              # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+              validate_custom_fields_invoice(invoice, custom_fields, true)
+            end
           end
         end
       end

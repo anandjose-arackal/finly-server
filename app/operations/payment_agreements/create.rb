@@ -16,11 +16,10 @@ class PaymentAgreements::Create < PaymentAgreements::Base
   def process
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
     create_or_update_custom_fields
-    # self.payment_agreement = PaymentAgreement.new(payment_agreement_params)
     return unless check_agreement_item_presence
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
-    # self.payment_agreement.company_id = user.company_id
+    self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.save && self.payment_agreement.reload
       # set_custom_field
       update_item_attributes
