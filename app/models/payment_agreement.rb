@@ -325,28 +325,6 @@ class PaymentAgreement < ApplicationRecord
     end
   end
 
-
-  # Invoice start date and end date should cover all days between agreement execution date and agreement expiration date
-  # First agreement invoice is valid from agreement execution date
-  def consecutive_invoice_start_end_date
-    if self.general_invoices.present?
-      match_start_date = false
-      self.general_invoices.each do |general_invoice|
-        if general_invoice.billing_type.fixed_periodic?
-          if general_invoice.start_date == self.execution_date
-            match_start_date = true
-          end
-        end
-      end
-      unless match_start_date
-        errors.add(:start_date, "should start from execution date")
-      end
-    end
-
-    if self.rental_invoices.present?
-    end
-  end
-
   def get_related_vendors(options)
     vendors = []
     if options[:list_vendors]

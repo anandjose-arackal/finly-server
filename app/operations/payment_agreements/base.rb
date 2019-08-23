@@ -1,6 +1,6 @@
 class PaymentAgreements::Base < BaseOperation
 
-  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num
+  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num, :match_invoice_start_date, :match_invoice_end_date
 
 
   def pre_validate
@@ -430,6 +430,80 @@ class PaymentAgreements::Base < BaseOperation
         return
       end
     end
+  end
+
+  # Invoice start date and end date should cover all days between agreement execution date and agreement expiration date
+  # First agreement invoice is valid from agreement execution date
+  def validate_invoice_start_end_date
+    general_invoice_start_end_date
+    rental_invoice_start_end_date
+  end
+
+  def general_invoice_start_end_date
+    if self.payment_agreement.general_invoices.present?
+      self.match_invoice_start_date = false
+      self.match_invoice_end_date = false
+      self.payment_agreement.general_invoices.each do |general_invoice|
+        comparison_status = compare_start_end_date(general_invoice)
+        next unless comparison_status
+        check_missing_days(general_invoice)
+        return if self.match_invoice_start_date && self.match_invoice_end_date
+      end
+      add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
+      return
+    end
+  end
+
+  def rental_invoice_start_end_date
+    if self.payment_agreement.rental_invoices.present?
+      self.match_invoice_start_date = false
+      self.match_invoice_end_date = false
+      self.payment_agreement.rental_invoices.each do |rental_invoice|
+        comparison_status = compare_start_end_date(rental_invoice)
+        next unless comparison_status
+        match_start_date, match_end_date = check_missing_days(rental_invoice)
+        return if match_start_date && match_end_date
+      end
+      add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
+      return
+    end
+  end
+
+
+  # Start date and end date should be between agreement execution date and expiration date
+  def compare_start_end_date(invoice)
+    if invoice.start_date&.to_date < self.payment_agreement.execution_date&.to_date || invoice.start_date&.to_date > self.payment_agreement.expiration_date&.to_date
+      add_message :error, "#{invoice.class.name.titleize} start date is not in between excution and expiration date"
+      return false
+    end
+
+    if invoice.end_date&.to_date < self.payment_agreement.execution_date&.to_date || invoice.end_date&.to_date > self.payment_agreement.expiration_date&.to_date
+      add_message :error, "#{invoice.class.name.titleize} start date is not in between excution and expiration date"
+      return false
+    end
+
+    if invoice.end_date&.to_date < invoice.start_date&.to_date
+      add_message :error, "#{invoice.class.name.titleize} end date cannot be before start date"
+      return false
+    end
+    true
+  end
+
+
+  # Start date and end date should cover all days between agreement execution date and expiration date
+  # Enforce user to add any one invoice date as start date and any inoice date end date as end date
+  def check_missing_days(invoice)
+    if invoice.start_date&.to_date == self.payment_agreement.execution_date&.to_date
+      unless match_invoice_start_date 
+        self.match_invoice_start_date = true
+      end
+    end
+    if invoice.end_date&.to_date == self.payment_agreement.expiration_date&.to_date
+      unless match_invoice_end_date
+        self.match_invoice_end_date = true
+      end
+    end
+    return match_invoice_start_date, match_invoice_end_date
   end
 
 
