@@ -417,12 +417,12 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :sort_amount, -> (type){
-    type = type&.strip&.upcase
-    if type && ['ASC', 'DESC'].include?(type)
-      includes(:balance_amount).reorder("amounts.value #{type}")
-    end
-  }
+  # scope :sort_amount, -> (type){
+  #   type = type&.strip&.upcase
+  #   if type && ['ASC', 'DESC'].include?(type)
+  #     includes(:balance_amount).reorder("amounts.value #{type}")
+  #   end
+  # }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks

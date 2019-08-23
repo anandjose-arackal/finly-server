@@ -35,8 +35,6 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :sort_invoice_id
     has_scope :sort_date
     has_scope :sort_due_date
-    has_scope :sort_amount
-    has_scope :sort_balance_due
 
     def init
       # Todo temp workaround because of frontend format issue - START

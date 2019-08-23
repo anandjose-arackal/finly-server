@@ -62,7 +62,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     # Sorting
     has_scope :sort_po_number
     has_scope :sort_po_name
-    has_scope :sort_amount
+    # has_scope :sort_amount
 
     def init
       self.purchase_orders = params[:purchase_orders]
