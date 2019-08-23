@@ -104,6 +104,11 @@ class RentalInvoice < ApplicationRecord
     self.vendor&.bank_accounts&.non_deleted&.as_json
   end
 
+  def set_creator_and_company(user)
+    self.created_by_user_id = user.id
+    self.company_id = user.company_id
+  end
+
 
 
   def as_json(options={})
