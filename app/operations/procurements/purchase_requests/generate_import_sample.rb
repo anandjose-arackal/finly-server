@@ -124,6 +124,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
       "Cost Center ID",
       "Delivery Location ID",
       "Purpose",
+      "HSN/SAC",
       "Quantity",
       "Unit of measurement",
       "Estimated Unit Price",

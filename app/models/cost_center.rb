@@ -12,7 +12,6 @@
 #  deleted_at       :datetime
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
-#  gl_code          :string(255)
 #
 
 class CostCenter < ApplicationRecord

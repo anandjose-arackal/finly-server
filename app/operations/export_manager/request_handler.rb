@@ -39,7 +39,7 @@ class ExportManager::RequestHandler < BaseOperation
   end
 
   def validate
-    if self.master.blank? or self.processor.blank?
+    if self.master.blank? or self.processor.blank?Master::BaseSubscriber
       add_message :error, 'Invalid Type. Error while generating export'
       return
     end
