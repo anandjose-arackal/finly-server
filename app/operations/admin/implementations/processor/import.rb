@@ -59,13 +59,17 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
       data = {}
       row.each_with_index do |value, index|
+        next if index >= headers.size
         data[headers.keys[index]] = value
       end
-
-      result = process_row(data)
-      unless result.is_a?(Admin::Implementations::Processor::Import::Result)
-        item_complete false
-        raise "invalid result"
+      begin
+        result = process_row(data)
+        unless result.is_a?(Admin::Implementations::Processor::Import::Result)
+          item_complete false
+          raise "invalid result"
+        end
+      rescue Exception => e
+        return result false, "#{e.message}"
       end
 
       unless result.success?
@@ -89,7 +93,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   def process_row(data)
     id = data[:id]
     destroy_action = data[:destroy]
-    if destroy_action&.downcase == 'y'
+    if destroy_action&.to_s&.downcase == 'y'
       destroy_records(data)
     elsif id.present?
       update_record(data)

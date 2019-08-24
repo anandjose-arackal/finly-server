@@ -25,7 +25,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
 
   def set_params(data)
     messages = []
-    name = data[:account_name].to_s
+    name = data[:name].to_s
     user_id = clean_up_data data[:user_id]
     user_entity = company.users.where(mobile_number: user_id).or(company.users.where(email: user_id)).first
     unless user_entity.present?

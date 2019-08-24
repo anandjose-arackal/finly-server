@@ -3,26 +3,26 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'users.import'
   headers ({
-              :id => "ID",
-              :first_name => "First Name (mandatory)",
-              :last_name => "Last Name (mandatory)",
-              :email => "Email",
-              :mobile_number => "Mobile Number (mandatory)",
-              :employee_id => "Employee ID",
-              :dob => "DOB",
-              :address_1 => "Address Line 1",
-              :address_2 => "Address Line 2", 
-              :pin_code => "PIN CODE",
-              :state_id => "State",
-              :city => "City",
-              :gender => "Gender",
-              :company_id => "Company ID (mandatory)",
-              :department_code => "Department Code",
-              :location_code => "Location Code",
-              :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
-              :expense_management => "Expense",
-              :disburse  => "Disburse",
-              :user_payments => "user Payment"
+      :id => "ID",
+      :first_name => "First Name (mandatory)",
+      :last_name => "Last Name (mandatory)",
+      :email => "Email",
+      :mobile_number => "Mobile Number (mandatory)",
+      :employee_id => "Employee ID",
+      :dob => "DOB",
+      :address_1 => "Address Line 1",
+      :address_2 => "Address Line 2",
+      :pin_code => "PIN CODE",
+      :state_id => "State",
+      :city => "City",
+      :gender => "Gender",
+      :company_id => "Company ID (mandatory)",
+      :department_code => "Department Code",
+      :location_code => "Location Code",
+      :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
+      :expense_management => "Expense Management Y for enable",
+      :disburse  => "Disburse Y for enable",
+      :vendor_payments => "Vendor Payments Y for enable"
   })
 
   attr_accessor :user_params
@@ -36,9 +36,12 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     unless user.validate
       return result false, user.errors.full_messages
     end
-
-    unless user.save
-      return result false, user.errors.full_messages
+    begin
+      unless user.save
+        return result false, user.errors.full_messages
+      end
+    rescue Exception => e
+      return result false, e.message
     end
     result true, 'Created Successfully'
   end
@@ -52,9 +55,15 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    unless user.update(user_params)
-      return result false, user.errors.full_messages
+
+    begin
+      unless user.update(user_params)
+        return result false, user.errors.full_messages
+      end
+    rescue Exception => e
+      return result false, e.message
     end
+
     result true, 'Updated Successfully'
   end
 
@@ -104,6 +113,14 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       messages << "Location with code not found"
     end
 
+    state_id = nil
+    if data[:state_id].present?
+      state_id = State.where('name LIKE ?', "%#{data[:state_id]}%").first&id
+      unless  state_id.present?
+        messages << "Invalid State Name"
+      end
+    end
+
     user_department_mappings_attributes = [{ department_id: department_id}]
     user_branch_location_mappings_attributes = [{branch_location_id: location_id}]
     user_params = { first_name: data[:first_name],
@@ -117,7 +134,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
                                          address_2: data[:address_2],
                                          pin_code: pin_code,
                                          date_of_birth: data[:dob],
-                                         state_id: data[:state_id],
+                                         state_id: state_id,
                                          gender: data[:gender],
                                          city: data[:city],
                                          employee_id: data[:employee_id]

@@ -7,7 +7,7 @@ class Admin::Implementations::Master::TdsSlabs::Export < Admin::Implementations:
               :id => "ID",
               :name => "Name",
               :tds => "TDS Rate",
-              :destroy => "Destrou"
+              :destroy => "Destroy"
           })
 
   def valid_request

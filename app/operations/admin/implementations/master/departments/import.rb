@@ -2,21 +2,23 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.import'
-  halt_on_failure!
+
   headers ({
               :id => "ID",
-              :parent_id =>  "Parent Department ID/NAME",
+              :parent_id =>  "Parent Department NAME",
               :name => "Departmet Name",
               :department_code => "Department Code",
               :destroy => "Destroy"
   })
+
   def create_record(data)
-    if data[:parent_id].is_a?(String) && data[:parent_id].present?
+    if data[:parent_id].present?
       parent_department = company.departments.non_deleted.with_name(data[:parent_id]).first
       unless parent_department.present?
         return result false, "Parent Department Not Found"
       end
     end
+
     if data[:name].present?
       data[:department_code] = nil if data[:department_code].blank?
       sub_department = company.departments.non_deleted.with_name(data[:name]).first
@@ -39,6 +41,14 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
     department = self.company.departments.find_by id: data[:id]
     unless department
       return result false, "Department not found"
+    end
+
+    if data[:parent_id].present?
+      parent_department = company.departments.non_deleted.with_name(data[:parent_id]).first
+      unless parent_department.present?
+        return result false, "Parent Department Not Found"
+      end
+      data[:parent_id] = parent_department&.id rescue nil
     end
 
     unless department.update(data.except(:destroy))

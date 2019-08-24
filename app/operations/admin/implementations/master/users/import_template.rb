@@ -20,9 +20,9 @@ class Admin::Implementations::Master::Users::ImportTemplates < Admin::Implementa
       :department_code => "Department Code",
       :location_code => "Location Code",
       :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
-      :expense_management => "Expense",
-      :disburse  => "Disburse",
-      :user_payments => "user Payment"
+      :expense_management => "Expense Management Y for enable",
+      :disburse  => "Disburse Y for enable",
+      :vendor_payments => "Vendor Payments Y for enable"
   })
 
   def valid_request

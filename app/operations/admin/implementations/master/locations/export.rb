@@ -50,6 +50,14 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
     location.state&.name
   end
 
+  def pin(location)
+    location.pin
+  end
+
+  def pan(location)
+    location.pan
+  end
+
   def gstin(location)
     location.gstin
   end

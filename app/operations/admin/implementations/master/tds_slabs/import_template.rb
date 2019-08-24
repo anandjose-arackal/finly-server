@@ -6,7 +6,7 @@ class Admin::Implementations::Master::TdsSlabs::ImportTemplates < Admin::Impleme
       :id => "ID",
       :name => "Name",
       :tds => "TDS Rate",
-      :destroy => "Destrou"
+      :destroy => "Destroy"
   })
 
   def valid_request

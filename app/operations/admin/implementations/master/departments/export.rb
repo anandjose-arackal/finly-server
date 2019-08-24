@@ -5,7 +5,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
 
   headers ({
       :id => "ID",
-      :parent_id =>  "Parent Department ID/NAME",
+      :parent_id =>  "Parent Department NAME",
       :name => "Departmet Name",
       :department_code => "Department Code",
       :destroy => "Destroy"
@@ -28,7 +28,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   end
 
   def parent_id(department)
-    department.parent&.id || ''
+    department.parent&.name || ''
   end
 
   def department_code(department)
