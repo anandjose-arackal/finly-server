@@ -88,6 +88,9 @@ class GeneralInvoice < ApplicationRecord
   # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
   validate :additional_validations
 
+  # Columns mapped with actual invoice columns
+  TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id gross_amount_id net_amount_id inclusive_of_taxes amount_id tds tds_type_id gst_type_id payment_id discount_amount_id tds_amount_id tax_amount_id tax category_id original_amount_id advance_amount_id advance_type_id advance freight_amount_id roundoff_amount balance_due_id taxable_amount_id tds_slab_id company_id created_by_user_id paid_amount_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id narration payment_agreement_id bank_account_id vendor_location_id vendor_poc_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id }
+
   # before_create :set_company, :set_creator
 
 

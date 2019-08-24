@@ -100,7 +100,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   def apply_general_invoice_template(general_invoice)
     invoice = Invoice.new
-    RentalInvoice::TEMPLATE_COLUMNS.each do |column_name|
+    invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
+    GeneralInvoice::TEMPLATE_COLUMNS.each do |column_name|
       invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym))
     end
     if invoice.save 
@@ -115,6 +116,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   def apply_rental_invoice_template(rental_invoice)
     invoice = Invoice.new
+    invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     RentalInvoice::TEMPLATE_COLUMNS.each do |column_name|
       invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym))
     end
