@@ -176,7 +176,12 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_general_invoices
     execution_date = self.payment_agreement&.execution_date&.to_date
-    self.payment_agreement.general_invoices.map {|general_invoice| general_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+    # self.payment_agreement.general_invoices.map {|general_invoice| general_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+
+    # Any one invoice will have start date equivalent to execution date. This is the first agreement invoice to be processed. Hence, it is first upcoming invoice.
+      self.payment_agreement.general_invoices.where(start_date: execution_date).update_all(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)
+
+
     # self.payment_agreement.general_invoices.map do |general_invoice|
       # number = general_invoice.invoice_frequency&.number
       # period_id = general_invoice.invoice_frequency&.period_id
@@ -198,7 +203,11 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_due_date_for_rental_invoices
     execution_date = self.payment_agreement&.execution_date&.to_date
-    self.payment_agreement.rental_invoices.map {|rental_invoice| rental_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+    # self.payment_agreement.rental_invoices.map {|rental_invoice| rental_invoice.update(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)}
+
+    # Any one invoice will have start date equivalent to execution date. This is the first agreement invoice to be processed. Hence, it is first upcoming invoice.
+      self.payment_agreement.rental_invoices.where(start_date: execution_date).update_all(payment_agreement_upcoming_date: execution_date, is_payment_agreement_upcoming_invoice: true)
+
     # self.payment_agreement.rental_invoices.map do |rental_invoice|
       # number = rental_invoice.invoice_frequency&.number
       # period_id = rental_invoice.invoice_frequency&.period_id
@@ -457,10 +466,35 @@ class PaymentAgreements::Base < BaseOperation
         end
         return if self.match_invoice_start_date && self.match_invoice_end_date
       end
+
+
       if self.any_fixed_period_invoice
         add_message :error, "Any one general invoice start date should match with execution date"
         return
       end
+
+      # if self.invoice.billing_type.one_time?
+      #   if unless self.payment_agreement.no_expiration
+      #     add_message :error, "Any one general invoice start date should match with execution date"
+      #     return
+      #   end
+      #   add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
+      #   return
+      # end
+
+      # if self.invoice.billing_type.variable_periodic?
+      #   if unless self.payment_agreement.no_expiration
+      #     add_message :error, "Any one general invoice start date should match with execution date"
+      #     return
+      #   end
+      #   add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
+      #   return
+      # end
+      if self.payment_agreement.no_expiration
+        add_message :error, "Any one general invoice start date should match with execution date"
+        return
+      end
+
       add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
       return
     end
@@ -477,20 +511,72 @@ class PaymentAgreements::Base < BaseOperation
         end 
         comparison_status = compare_start_end_date(rental_invoice)
         return unless comparison_status
-        match_start_date, match_end_date = check_missing_days(rental_invoice)
+        # match_start_date, match_end_date = check_missing_days(rental_invoice)
+        check_missing_days(rental_invoice)
         if rental_invoice.billing_type.fixed_periodic?
-          return if match_start_date
+          return if self.match_invoice_start_date
         end
-        return if match_start_date && match_end_date
+        return if self.match_invoice_start_date && self.match_invoice_end_date
       end
+
+
       if self.any_fixed_period_invoice
         add_message :error, "Any one rental invoice start date should match with execution date"
         return
       end
+
+      # if self.invoice.billing_type.one_time?
+      #   if unless self.payment_agreement.no_expiration
+      #     add_message :error, "Any one rental invoice start date should match with execution date"
+      #     return
+      #   end
+      #   add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
+      #   return
+      # end
+
+      # if self.invoice.billing_type.variable_periodic?
+      #   if unless self.payment_agreement.no_expiration
+      #     add_message :error, "Any one rental invoice start date should match with execution date"
+      #     return
+      #   end
+      #   add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
+      #   return
+      # end
+      if self.payment_agreement.no_expiration
+        add_message :error, "Any one rental invoice start date should match with execution date"
+        return
+      end
+
       add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
       return
     end
   end
+
+  # def rental_invoice_start_end_date
+  #   if self.payment_agreement.rental_invoices.present?
+  #     self.match_invoice_start_date = false
+  #     self.match_invoice_end_date = false
+  #     self.any_fixed_period_invoice = false
+  #     self.payment_agreement.rental_invoices.each do |rental_invoice|
+  #       unless self.any_fixed_period_invoice
+  #         self.any_fixed_period_invoice = rental_invoice.billing_type.fixed_periodic?
+  #       end 
+  #       comparison_status = compare_start_end_date(rental_invoice)
+  #       return unless comparison_status
+  #       match_start_date, match_end_date = check_missing_days(rental_invoice)
+  #       if rental_invoice.billing_type.fixed_periodic?
+  #         return if match_start_date
+  #       end
+  #       return if match_start_date && match_end_date
+  #     end
+  #     if self.any_fixed_period_invoice
+  #       add_message :error, "Any one rental invoice start date should match with execution date"
+  #       return
+  #     end
+  #     add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
+  #     return
+  #   end
+  # end
 
 
   # Start date and end date should be between agreement execution date and expiration date

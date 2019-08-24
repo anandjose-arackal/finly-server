@@ -23,9 +23,11 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def process
     case payment_agreement_type
     when 'general_invoice'
-      self.general_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
+      # self.general_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
+      self.general_invoice = self.payment_agreement.general_invoices.find_by_id payment_agreement_type_id
     when 'rental_invoice'
-      self.rental_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
+      # self.rental_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
+      self.rental_invoice = self.payment_agreement.rental_invoices.find_by_id payment_agreement_type_id
     end
 
     if general_invoice.present?
@@ -51,36 +53,90 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
 
   def apply_template(resource)
+
+    case resource.class.name
+    when 'GeneralInvoice'
+      new_invoice = apply_general_invoice_template(resource)
+      trail_action = 'general_invoice_created'
+    when 'RentalInvoice'
+      new_invoice = apply_rental_invoice_template(resource)
+      trail_action = 'rental_invoice_created'
+    end
+
+
+
     # Resource can be general_invoice or rental_invoice
-    case
-    when resource.is_a?(Invoice)
-    new_invoice = resource.amoeba_dup
-    new_invoice.invoice_id = nil
-    if new_invoice.save
+    # case
+    # when resource.is_a?(Invoice)
+    # new_invoice = resource.amoeba_dup
+    # new_invoice.invoice_id = nil
+    # if new_invoice.save
 
 
-      # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
-      items = new_invoice.items.group(:description).having('count("description") > 1').count(:description)
-      items.each do |key, value|
-        duplicates = new_invoice.items.where(description: key)[1..value-1]
-        duplicates.each(&:destroy)
-      end
+    #   # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
+    #   items = new_invoice.items.group(:description).having('count("description") > 1').count(:description)
+    #   items.each do |key, value|
+    #     duplicates = new_invoice.items.where(description: key)[1..value-1]
+    #     duplicates.each(&:destroy)
+    #   end
 
-      ######## Temp fix for demo only ########
+    #   ######## Temp fix for demo only ########
 
 
       update_invoice_attributes(resource, new_invoice, {invoice_type: 'recurring_invoice', update_procurement: true})
-      # Create trail for general/rental_invoice that recurring invoice has been created
-      trail_options = {action: 'invoice_created', parent: resource, parent_type: 'Invoice'}
+    #   # Create trail for general/rental_invoice that recurring invoice has been created
+      trail_options = {action: trail_action, parent: resource, parent_type: resource.class.name}
       create_trail(trail_options)
 
-      #Temp comment out to support new logic
-      # create_next_upcoming_invoice(resource)
-      # Since recurring invoice has been created and next upcoming invoice has been created, previous invoice will not be upcoming_invoice anymore
-      set_upcoming_invoice_status(resource, false)
-      return true
+    #   #Temp comment out to support new logic
+    #   # create_next_upcoming_invoice(resource)
+    #   # Since recurring invoice has been created and next upcoming invoice has been created, previous invoice will not be upcoming_invoice anymore
+    #   set_upcoming_invoice_status(resource, false)
+    #   return true
+    # end
+    # end
+  end
+
+
+  def apply_general_invoice_template(general_invoice)
+    invoice = Invoice.new
+    RentalInvoice::TEMPLATE_COLUMNS.each do |column_name|
+      invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym))
     end
+    if invoice.save 
+      unless map_line_items(general_invoice, invoice)
+        invoice.destroy
+        add_message :error, "Unable to create general invoice"
+        return
+      end
     end
+    return invoice
+  end
+
+  def apply_rental_invoice_template(rental_invoice)
+    invoice = Invoice.new
+    RentalInvoice::TEMPLATE_COLUMNS.each do |column_name|
+      invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym))
+    end
+    if invoice.save 
+      unless map_line_items(rental_invoice, invoice)
+        invoice.destroy
+        add_message :error, "Unable to create rental invoice"
+        return
+      end
+    end
+    return invoice
+  end
+
+  def map_line_items(agreement_invoice, new_invoice)
+    agreement_invoice.invoice_items.each do |item|
+      new_line_item = new_invoice.items.new
+      InvoiceLineItem::TEMPLATE_COLUMNS.each do |column_name|
+        new_line_item.send("#{column_name}=", item.send(column_name.to_sym))
+      end
+      new_line_item.parent_type = 'Invoice'
+    end
+    return new_invoice.save
   end
 
 
@@ -109,7 +165,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   # Some attributes are set here, some are nullified in model as per logic used in other places, hence updating explicitly 
   def update_invoice_attributes(original_invoice, new_invoice, options={})
-    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), due_date: original_invoice.due_date, balance_due_id: original_invoice.balance_due_id, date: original_invoice.payment_agreement_upcoming_date, recurring_invoice_id: original_invoice.id)
+    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), date: original_invoice.payment_agreement_upcoming_date)
     new_invoice.update(procurement_id: procurement_id) if options[:update_procurement]
   end
 

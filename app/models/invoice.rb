@@ -128,7 +128,6 @@ class Invoice < ApplicationRecord
   belongs_to :gst_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
   belongs_to :payment_term, optional: true
-  belongs_to :payment_agreement, optional: true
 
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_for_user, optional: true, class_name: 'User'
@@ -143,9 +142,7 @@ class Invoice < ApplicationRecord
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
-  # belongs_to :payment_agreement_escalation, optional: true
-  has_many :payment_agreement_escalations, dependent: :destroy
-  belongs_to :invoice_frequency, optional: true
+  belongs_to :payment_agreement, optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -185,9 +182,6 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :payment_agreement_escalations
-  # accepts_nested_attributes_for :payment_agreement_escalation
-  accepts_nested_attributes_for :invoice_frequency
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tds_amount
@@ -207,8 +201,6 @@ class Invoice < ApplicationRecord
   # validates :amount, presence: true
 
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
-
-  validate :payment_agreement_related_fields
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
@@ -458,7 +450,7 @@ class Invoice < ApplicationRecord
 
   before_validation :update_company
   before_save :update_company
-  after_create :set_defaults, :set_invoice_type
+  after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -496,7 +488,6 @@ class Invoice < ApplicationRecord
     nullify :invoice_number
     nullify :date
     nullify :due_date
-    nullify :payment_agreement_upcoming_date
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
@@ -688,8 +679,7 @@ class Invoice < ApplicationRecord
       po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
       invoice_items: invoice_items.as_json,
       note: self.note,
-      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
-      payment_agreement_id: self.payment_agreement_id
+      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
     }
   end
 
@@ -850,19 +840,19 @@ class Invoice < ApplicationRecord
     self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
   end
 
-  def set_invoice_type
-    # This method is valid if there are multiple invoices of the same type
-    parameters = RequestStore.store[:params]
-    if parameters.present?
-      general_invoices = parameters.dig(:payment_agreement, :general_invoices_attributes).present? rescue false
-      rental_invoices = parameters.dig(:payment_agreement, :rental_invoices_attributes).present? rescue false
-      if general_invoices
-        self.update(invoice_type_id: InwardInvoiceType.id_for(:general_invoice))
-      elsif rental_invoices
-        self.update(invoice_type_id: InwardInvoiceType.id_for(:rental_invoice))
-      end
-    end
-  end
+  # def set_invoice_type
+  #   # This method is valid if there are multiple invoices of the same type
+  #   parameters = RequestStore.store[:params]
+  #   if parameters.present?
+  #     general_invoices = parameters.dig(:payment_agreement, :general_invoices_attributes).present? rescue false
+  #     rental_invoices = parameters.dig(:payment_agreement, :rental_invoices_attributes).present? rescue false
+  #     if general_invoices
+  #       self.update(invoice_type_id: InwardInvoiceType.id_for(:general_invoice))
+  #     elsif rental_invoices
+  #       self.update(invoice_type_id: InwardInvoiceType.id_for(:rental_invoice))
+  #     end
+  #   end
+  # end
 
   def update_creator(user)
     self.created_by_user_id = user.id
@@ -870,8 +860,10 @@ class Invoice < ApplicationRecord
 
   def update_company(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.company_id.blank?
-      self.company_id = user.company_id
+    if user.present?
+      if self.company_id.blank?
+        self.company_id = user.company_id
+      end
     end
   end
 
