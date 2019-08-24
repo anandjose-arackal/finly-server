@@ -41,6 +41,7 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :billing_type, optional: true
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
   belongs_to :invoice_frequency, optional: true
+  belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
