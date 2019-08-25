@@ -638,5 +638,13 @@ class PaymentAgreements::Base < BaseOperation
     return match_invoice_start_date, match_invoice_end_date
   end
 
+  def check_agreement_item_presence
+    if payment_agreement.general_invoices.blank? && payment_agreement.rental_invoices.blank? && payment_agreement.security_deposits.blank? && payment_agreement.beneficiary_payments.blank?
+      add_message :error, 'Please add agreement item'
+      return false
+    end
+    true
+  end
+
 
 end

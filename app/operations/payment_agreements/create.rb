@@ -89,14 +89,6 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     end
   end
 
-  def check_agreement_item_presence
-    if payment_agreement.general_invoices.blank? && payment_agreement.rental_invoices.blank? && payment_agreement.security_deposits.blank? && payment_agreement.beneficiary_payments.blank?
-      add_message :error, 'Please add agreement item'
-      return false
-    end
-    true
-  end
-
   def set_custom_field
     self.payment_agreement.invoices {|invoice| custom_field_setup(invoice) }
   end

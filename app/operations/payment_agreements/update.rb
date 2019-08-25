@@ -13,6 +13,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
     validate_invoice_frequency
     validate_invoice_start_end_date
+    check_agreement_item_presence
     # Nullify invoice frequency if not fixed periodic
   end
 

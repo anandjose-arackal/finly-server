@@ -19,9 +19,13 @@ class ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment
 
   def make_payment
     unless agreement.no_expiration
-      return agreement.expiration_date.to_date >= Date.today
+      if agreement.expiration_date.to_date < Date.today
+        return false
+      end
     end
-    true
+    if self.beneficiary_payment.status.unpaid?
+      return true
+    end
   end
 
 

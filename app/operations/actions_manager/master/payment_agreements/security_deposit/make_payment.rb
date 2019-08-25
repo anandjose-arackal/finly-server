@@ -19,13 +19,18 @@ class ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment < 
 
   def make_payment
     unless agreement.no_expiration
-      return agreement.expiration_date.to_date >= Date.today
+      if agreement.expiration_date.to_date < Date.today
+        return false
+      end
     end
-    true
+
+    if security_deposit.status.unpaid?
+      return true
+    end
   end
 
   def agreement
-    security_deposit.payment_agreement
+    self.security_deposit.payment_agreement
   end
 
 end

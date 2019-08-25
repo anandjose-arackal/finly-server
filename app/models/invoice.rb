@@ -703,7 +703,10 @@ class Invoice < ApplicationRecord
       po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
       invoice_items: invoice_items.as_json,
       note: self.note,
-      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
+      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
+      payment_agreement_id: self.payment_agreement_id,
+      created_from_payment_agreement: self.payment_agreement_id.present?,
+      agreement_number: self.payment_agreement&.order_number
     }
   end
 
