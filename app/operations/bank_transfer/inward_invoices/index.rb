@@ -56,7 +56,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     end
 
     def agreement_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:recurring_invoices))
+      get_count(InwardInvoiceType.id_for(:recurring_invoice))
     end
 
     def get_count(id)
