@@ -92,14 +92,16 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     trail_options = {action: trail_action, parent: resource, parent_type: resource.class.name}
     create_trail(trail_options)
     # Automatically create next upcoming invoice via scheduler too
-    create_next_upcoming_invoice(resource)
+    if resource.billing_type.fixed_periodic?
+      create_next_upcoming_invoice(resource)
+    end
     
     # Invoice with billing type one time has actual invoice only once
     # Invoice with billing type fixed periodic has actual invoice only once per agreement invoice.
     if resource.billing_type.fixed_periodic? || resource.billing_type.one_time?
       set_upcoming_invoice_status(resource, false)
     end
-    #   return true
+    return true
     # end
     # end
   end
@@ -161,8 +163,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def create_next_upcoming_invoice(agreement_invoice)
     setup_params(agreement_invoice)
     op = PaymentAgreements::CreateUpcomingInvoice.(user, params)
-    binding.pry
-    if op.success?
+    unless op.success?
+      add_message :error, "Unable to creatw"
     end
   end
 
