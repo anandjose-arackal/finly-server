@@ -143,6 +143,7 @@ class Invoice < ApplicationRecord
   belongs_to :billing_type, optional: true
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
   belongs_to :payment_agreement, optional: true
+  belongs_to :agreement_item, optional: true, polymorphic: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 

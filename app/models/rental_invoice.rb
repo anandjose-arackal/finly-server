@@ -38,14 +38,28 @@ class RentalInvoice < ApplicationRecord
   belongs_to :vendor_location, class_name: "GstinLocation", optional: true
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
+  belongs_to :template_invoice, optional: true, class_name: 'RentalInvoice'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
+  has_many :invoices, as: :agreement_item
 
+  # Use include_association instead of exclude_association if data tree grows
+  #https://github.com/amoeba-rb/amoeba#installation
+
+  amoeba do
+    clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
+           :original_amount, :taxable_amount,
+           :invoice_items, :custom_fields,
+           :document_level_reviewer_mappings]
+    
+    exclude_association :trails
+    exclude_association :invoices
+  end
+  
 
   alias_attribute :status, :invoice_status
 
@@ -82,7 +96,9 @@ class RentalInvoice < ApplicationRecord
   validate :additional_validations
 
   # Columns mapped with actual invoice columns
-  TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id gross_amount_id net_amount_id inclusive_of_taxes amount_id tds tds_type_id gst_type_id payment_id discount_amount_id tds_amount_id tax_amount_id tax category_id original_amount_id advance_amount_id advance_type_id advance freight_amount_id roundoff_amount balance_due_id taxable_amount_id tds_slab_id company_id created_by_user_id paid_amount_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id narration payment_agreement_id bank_account_id vendor_location_id vendor_poc_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id }
+  TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id narration payment_agreement_id bank_account_id vendor_location_id vendor_poc_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id}
+  # Choose what columns to clone out of these template columns
+  CLONE_RECORDS = %w{ discount_amount gross_amount net_amount amount original_amount balance_due taxable_amount  tds_amount tax_amount}
 
 
   def bank_account

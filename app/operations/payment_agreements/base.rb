@@ -428,7 +428,7 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def validate_frequency_for_document(invoice)
-    if invoice.billing_type.fixed_periodic?
+    if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
       invoice_freq_num << invoice.invoice_frequency.number
       if invoice_freq_num.uniq.count.zero?
         add_message :error,  "#{invoice.class.name.titleize} frequency data is incorrect"
@@ -455,13 +455,13 @@ class PaymentAgreements::Base < BaseOperation
       self.any_fixed_period_invoice = false
       self.payment_agreement.general_invoices.each do |general_invoice|
         unless self.any_fixed_period_invoice
-          self.any_fixed_period_invoice = general_invoice.billing_type.fixed_periodic?
+          self.any_fixed_period_invoice = general_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         end 
         comparison_status = compare_start_end_date(general_invoice)
         return unless comparison_status
         # match_start_date, match_end_date = check_missing_days(general_invoice)
         check_missing_days(general_invoice)
-        if general_invoice.billing_type.fixed_periodic?
+        if general_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
           return if self.match_invoice_start_date
         end
         return if self.match_invoice_start_date && self.match_invoice_end_date
@@ -507,13 +507,13 @@ class PaymentAgreements::Base < BaseOperation
       self.any_fixed_period_invoice = false
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         unless self.any_fixed_period_invoice
-          self.any_fixed_period_invoice = rental_invoice.billing_type.fixed_periodic?
+          self.any_fixed_period_invoice = rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         end 
         comparison_status = compare_start_end_date(rental_invoice)
         return unless comparison_status
         # match_start_date, match_end_date = check_missing_days(rental_invoice)
         check_missing_days(rental_invoice)
-        if rental_invoice.billing_type.fixed_periodic?
+        if rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
           return if self.match_invoice_start_date
         end
         return if self.match_invoice_start_date && self.match_invoice_end_date
@@ -559,12 +559,12 @@ class PaymentAgreements::Base < BaseOperation
   #     self.any_fixed_period_invoice = false
   #     self.payment_agreement.rental_invoices.each do |rental_invoice|
   #       unless self.any_fixed_period_invoice
-  #         self.any_fixed_period_invoice = rental_invoice.billing_type.fixed_periodic?
+  #         self.any_fixed_period_invoice = rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
   #       end 
   #       comparison_status = compare_start_end_date(rental_invoice)
   #       return unless comparison_status
   #       match_start_date, match_end_date = check_missing_days(rental_invoice)
-  #       if rental_invoice.billing_type.fixed_periodic?
+  #       if rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
   #         return if match_start_date
   #       end
   #       return if match_start_date && match_end_date
