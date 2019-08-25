@@ -14,8 +14,9 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     validate_invoice_frequency
     validate_invoice_start_end_date
     check_agreement_item_presence
-    start_end_date_consecutiveness
+    validate_start_end_date_consecutiveness
     billing_type_validations
+    validate_agreement_item_combinations
   end
 
   def process

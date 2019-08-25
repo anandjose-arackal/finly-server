@@ -1,6 +1,6 @@
 class PaymentAgreements::Base < BaseOperation
 
-  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num, :match_invoice_start_date, :match_invoice_end_date, :any_fixed_period_invoice
+  attr_accessor :company, :workflow_output, :payment_agreement, :invoice_freq_num, :match_invoice_start_date, :match_invoice_end_date, :any_fixed_period_general_invoice, :any_fixed_period_rental_invoice
 
 
   def pre_validate
@@ -413,6 +413,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.present?
       self.invoice_freq_num = []
       self.payment_agreement.general_invoices.each do |general_invoice|
+        clear_frequency_for_document(general_invoice)
         validate_frequency_for_document(general_invoice)
       end
     end
@@ -422,8 +423,16 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.present?
       self.invoice_freq_num = []
       self.payment_agreement.rental_invoices.each do |rental_invoice|
+        clear_frequency_for_document(rental_invoice)
         validate_frequency_for_document(rental_invoice)
       end
+    end
+  end
+
+  # Clear invoice frequency if already present if billing type is not fixed_periodic 
+  def clear_frequency_for_document(invoice)
+    unless invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+      invoice.invoice_frequency_id = nil
     end
   end
 
@@ -452,13 +461,13 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.present?
       self.match_invoice_start_date = false
       self.match_invoice_end_date = false
-      self.any_fixed_period_invoice = false
+      self.any_fixed_period_general_invoice = false
       # start_end_date_arr => Keeps all the start_date and end_date as 2d array
       # start_end_date_arr = []
       self.payment_agreement.general_invoices.each do |general_invoice|
         # start_end_date_arr.push([general_invoice.start_date.to_date, general_invoice.end_date.to_date])
-        unless self.any_fixed_period_invoice
-          self.any_fixed_period_invoice = general_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+        unless self.any_fixed_period_general_invoice
+          self.any_fixed_period_general_invoice = general_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         end 
         comparison_status = compare_start_end_date(general_invoice)
         return unless comparison_status
@@ -470,7 +479,7 @@ class PaymentAgreements::Base < BaseOperation
         return if self.match_invoice_start_date && self.match_invoice_end_date
       end
 
-      if self.any_fixed_period_invoice
+      if self.any_fixed_period_general_invoice
         add_message :error, "Any one general invoice start date should match with execution date"
         return
       end
@@ -508,10 +517,10 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.present?
       self.match_invoice_start_date = false
       self.match_invoice_end_date = false
-      self.any_fixed_period_invoice = false
+      self.any_fixed_period_rental_invoice = false
       self.payment_agreement.rental_invoices.each do |rental_invoice|
-        unless self.any_fixed_period_invoice
-          self.any_fixed_period_invoice = rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+        unless self.any_fixed_period_rental_invoice
+          self.any_fixed_period_rental_invoice = rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         end 
         comparison_status = compare_start_end_date(rental_invoice)
         return unless comparison_status
@@ -524,7 +533,7 @@ class PaymentAgreements::Base < BaseOperation
       end
 
 
-      if self.any_fixed_period_invoice
+      if self.any_fixed_period_rental_invoice
         add_message :error, "Any one rental invoice start date should match with execution date"
         return
       end
@@ -651,10 +660,94 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   # Check for consecutiveness for fixed periodic invoice type
-  def start_end_date_consecutiveness
+  # start_date starts from the very end of previous end_date
+  def validate_start_end_date_consecutiveness
+    gi_start_end_date_consecutiveness
+    ri_start_end_date_consecutiveness
+  end
+
+  def gi_start_end_date_consecutiveness
+    dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
+    if dates.present? and dates.count > 1
+      invoice_start_end_date_consecutiveness(dates)
+    end
+  end
+
+  def ri_start_end_date_consecutiveness
+    dates = self.payment_agreement.rental_invoices.pluck(:start_date, :end_date)
+    if dates.present? and dates.count > 1
+      invoice_start_end_date_consecutiveness(dates)
+    end
+  end
+
+  # Compare every date with other start_date and end_date and check for overlapping
+  # Document is invoice if overlapping of dates are there
+  def invoice_start_end_date_consecutiveness(dates)
+    dates.each_with_index do |current_date_arr, current_index|
+      next_start_date_present = false
+      next_end_date_present = false
+      start_date = current_date_arr[0].to_date
+      end_date = current_date_arr[1].to_date
+      date_with_issues = []
+      # compare current_date_arr start_date and end_date with all the dates in the agreement invoice
+      dates.each_with_index do |date_arr, index|
+        # Skip comparison with itself
+        next if index == current_index
+        # check if start date lies in b/w start date and end date of any other document
+        if start_date >= date_arr[0].to_date && start_date <= date_arr[1].to_date
+          date_with_issues << start_date
+          add_message :error, "Start date: #{start_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date}"
+          break
+        end
+
+        if end_date >= date_arr[0].to_date && end_date <= date_arr[1].to_date
+          date_with_issues << end_date
+          add_message :error, "End date: #{end_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
+          break
+        end
+        unless next_start_date_present
+          if end_date + 1.day == date_arr[0].to_date
+            next_start_date_present = true
+          end
+        end
+      end
+      if self.payment_agreement.no_expiration || (self.payment_agreement.expiration_date.to_date >= end_date+1.day) 
+        unless next_start_date_present
+          add_message :error, "Fixed periodic start and end date should be consecutive"
+          add_message :error, "One of the start date should be #{end_date+1.day}"
+          break
+        end
+      end
+      break unless date_with_issues.blank?
+    end
   end
 
   def billing_type_validations
+    general_invoice_billing_type_validation
+    rental_invoice_billing_type_validation
+  end
+
+  # If any general invoice has billing type fixed periodic, then all general invoices should have same billing type with same invoice_frequency
+
+  # If billing type is one_time or variable_periodic, they can co-exist for single agreement
+  def general_invoice_billing_type_validation
+    if self.any_fixed_period_general_invoice
+      billing_type_ids = self.payment_agreement.general_invoices.pluck(:billing_type_id).uniq 
+      if billing_type_ids.count > 1 && billing_type_ids.include?(BillingType.id_for(:fixed_periodic))
+        add_message :error, "All general invoices should have billing type as fixed periodic"
+        return
+      end
+    end
+  end
+
+  def rental_invoice_billing_type_validation
+    if self.any_fixed_period_rental_invoice
+      billing_type_ids = self.payment_agreement.rental_invoices.pluck(:billing_type_id).uniq 
+      if billing_type_ids.count > 1 && billing_type_ids.include?(BillingType.id_for(:fixed_periodic))
+        add_message :error, "All rental invoices should have billing type as fixed periodic"
+        return
+      end
+    end
   end
 
   # If expiration date is present and agreement never expires, clear expiration date
@@ -665,6 +758,14 @@ class PaymentAgreements::Base < BaseOperation
       end
     end
   end
+
+  # General and rental invoice should not co-exist in an agreement
+  # security and beneficiary should not co-exist in an agreement
+  # There combinations can be altered/removed once we find real use-cases
+  def validate_agreement_item_combinations
+    # self.payment_agreement.general_invoices.present?
+  end
+
 
 
 end
