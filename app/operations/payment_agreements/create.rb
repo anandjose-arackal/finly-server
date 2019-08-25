@@ -14,9 +14,12 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     validate_invoice_frequency
     validate_invoice_start_end_date
     check_agreement_item_presence
+    start_end_date_consecutiveness
+    billing_type_validations
   end
 
   def process
+    clear_expiration_date_on_no_expiration
     create_or_update_custom_fields
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id

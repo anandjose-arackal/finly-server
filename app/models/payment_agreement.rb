@@ -28,7 +28,7 @@ class PaymentAgreement < ApplicationRecord
 
   # validates_associated :invoices
 
-  # validates :no_expiration, presence: true
+  validates :title, presence: true
   validate :agreement_date_comparison, :expiration_date_if_allowed
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
