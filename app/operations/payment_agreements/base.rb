@@ -696,7 +696,7 @@ class PaymentAgreements::Base < BaseOperation
         # check if start date lies in b/w start date and end date of any other document
         if start_date >= date_arr[0].to_date && start_date <= date_arr[1].to_date
           date_with_issues << start_date
-          add_message :error, "Start date: #{start_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date}"
+          add_message :error, "Start date: #{start_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
           break
         end
 
@@ -763,7 +763,15 @@ class PaymentAgreements::Base < BaseOperation
   # security and beneficiary should not co-exist in an agreement
   # There combinations can be altered/removed once we find real use-cases
   def validate_agreement_item_combinations
-    # self.payment_agreement.general_invoices.present?
+    if self.payment_agreement.general_invoices.present? and self.payment_agreement.rental_invoices.present?
+      add_message :error, 'Both general and rental cannot be a part of same agreement'
+      return
+    end
+
+    if self.payment_agreement.security_deposits.present? and self.payment_agreement.beneficiary_payments.present?
+      add_message :error, 'Security deposit and beneficiary payment cannot be a part of same agreement'
+      return
+    end
   end
 
 

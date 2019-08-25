@@ -706,7 +706,7 @@ class Invoice < ApplicationRecord
       discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
       payment_agreement_id: self.payment_agreement_id,
       created_from_payment_agreement: self.payment_agreement_id.present?,
-      agreement_number: self.payment_agreement&.order_number
+      agreement_number: self&.payment_agreement&.order_number
     }
   end
 

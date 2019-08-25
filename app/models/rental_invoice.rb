@@ -1,9 +1,9 @@
 class RentalInvoice < ApplicationRecord
 
   include SoftDeletable, MathUtil
-  # include Sequenced::ActsAsSequenced
+  include Sequenced::ActsAsSequenced
 
-  # acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
+  acts_as_sequenced column: :invoice_id, purpose: :rental_invoice, editable: false, prefix: 'RENINV'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true

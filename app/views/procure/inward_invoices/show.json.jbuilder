@@ -59,7 +59,9 @@ json.invoice do
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
   json.po_number invoice.po_number
-
+  json.created_from_payment_agreement invoice.payment_agreement_id.present?
+  json.agreement_number invoice&.payment_agreement&.order_number
+  json.payment_agreement_id invoice.payment_agreement_id
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
