@@ -111,7 +111,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	end
 	    end
 
-	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
+	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes, from_payment_agreement: self.from_payment_agreement})
 
 	    if validate_operation.success?
 	    	# total of all individual payments
