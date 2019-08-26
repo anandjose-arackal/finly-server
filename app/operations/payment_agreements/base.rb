@@ -626,6 +626,7 @@ class PaymentAgreements::Base < BaseOperation
 
       # Difference between start date and end date should be in the multiples for invoice frequency
       # For fixed periodic only
+
       if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         frequency_period_number = invoice&.invoice_frequency&.number
         if frequency_period_number.blank?
@@ -637,13 +638,14 @@ class PaymentAgreements::Base < BaseOperation
           (1..12).to_a.each do |number|
             # Work around because no of days are not defined in a month and currently partial invoice is not in place
             # Pls check invoice value when making any changes here. 
-            # Currently one month is defined as same date next month.
+            # Currently one month is defined as one day before that date next month.
             unless self.payment_agreement.no_expiration
               next if invoice.end_date.to_date == self.payment_agreement.expiration_date.to_date
             end
-            if invoice.end_date.to_date == invoice.start_date.to_date + number.month
-              if invoice.end_date.to_date < invoice.start_date.to_date + frequency_period_number.month
+            if invoice.end_date.to_date == (invoice.start_date.to_date + number.month - 1.day)
+              if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
                 add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
+                add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
                 return
               end
 
@@ -720,7 +722,7 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   # Compare every date with other start_date and end_date and check for overlapping
-  # Document is invoice if overlapping of dates are there
+  # Document is invalid if overlapping of dates are there
   def invoice_start_end_date_consecutiveness(dates)
     dates.each_with_index do |current_date_arr, current_index|
       next_start_date_present = false
