@@ -352,9 +352,10 @@ class PaymentAgreements::Base < BaseOperation
           if custom_fields.present?
             if invoice.new_record?
               custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              CustomField::SetFields.(invoice, FieldParentType.id_for(:general_invoice), custom_fields_data)
+              # CustomField::SetFields.(invoice, FieldParentType.id_for(:general_invoice), custom_fields_data)
+              validate_custom_fields_invoice(invoice, custom_fields, false)
             else
-              validate_custom_fields_invoice(invoice, custom_fields)
+              validate_custom_fields_invoice(invoice, custom_fields, true)
             end
           end
         end
