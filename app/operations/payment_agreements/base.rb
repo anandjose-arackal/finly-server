@@ -637,6 +637,7 @@ class PaymentAgreements::Base < BaseOperation
         end
         # if frequency_period_number.present?
           expected_end_date_present = false
+          more_than_one_invoice = false
           (1..12).to_a.each do |number|
             # Work around because no of days are not defined in a month and currently partial invoice is not in place
             # Pls check invoice value when making any changes here. 
@@ -655,25 +656,33 @@ class PaymentAgreements::Base < BaseOperation
                 expected_end_date_present = true
               end
             end
-          end
 
-          # End date is not in mulltiples of invoice frequency
-          # Considering that  rent is payed  later and not in advance
-          # End date is not considered is no_expiration is true and only one invoice is present
-          if invoice.is_a?(GeneralInvoice)
-            if self.payment_agreement.general_invoices.count > 1
-              more_than_one_invoice = true
+            # End date is not in mulltiples of invoice frequency
+            # Considering that  rent is payed  later and not in advance
+            # End date is not considered is no_expiration is true and only one invoice is present
+            if invoice.is_a?(GeneralInvoice)
+              if self.payment_agreement.general_invoices.count > 1
+                more_than_one_invoice = true
+              end
             end
-          end
-          if invoice.is_a?(RentalInvoice)
-            if self.payment_agreement.rental_invoices.count > 1
-              more_than_one_invoice = true
+            if invoice.is_a?(RentalInvoice)
+              if self.payment_agreement.rental_invoices.count > 1
+                more_than_one_invoice = true
+              end
             end
           end
 
           if more_than_one_invoice
             unless expected_end_date_present
               add_message :error, "Start and End date difference should be in multiples of invoice frequency(#{frequency_period_number} months)"
+              return
+            end
+          end
+
+          # If  one invoice
+          unless more_than_one_invoice
+            if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
+              add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency" 
               return
             end
           end
