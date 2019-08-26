@@ -183,7 +183,7 @@ class GeneralInvoice < ApplicationRecord
       location_attributes: { id: self.location_id, name: self.location&.name },
       cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
       payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
-      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name},
+      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name&.titleize},
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
