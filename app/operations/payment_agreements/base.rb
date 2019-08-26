@@ -623,6 +623,39 @@ class PaymentAgreements::Base < BaseOperation
         add_message :error, "#{invoice.class.name.titleize} end date cannot be before start date"
         return false
       end
+
+      # Difference between start date and end date should be in the multiples for invoice frequency
+      # For fixed periodic only
+      if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+        frequency_period_number = invoice&.invoice_frequency&.number
+        if frequency_period_number.blank?
+          add_message :error, "Invoice frequency cannot be blank"
+          return
+        end
+        # if frequency_period_number.present?
+          expected_end_date_present = false
+          (1..12).to_a.each do |number|
+            if invoice.end_date.to_date == invoice.start_date.to_date + number.month
+              if invoice.end_date.to_date < invoice.start_date.to_date + frequency_period_number.month
+                add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
+                return
+              end
+
+              unless expected_end_date_present
+                expected_end_date_present = true
+              end
+            end
+          end
+
+          # End date is not in mulltiples of invoice frequency
+          # Considering that  rent is payed  after using and not in advance 
+          unless expected_end_date_present
+            add_message :error, "Start and End date difference should be in multiples of invoice frequency(#{frequency_period_number} months)"
+            return
+          end
+        # end
+      end
+
     end
     true
   end
