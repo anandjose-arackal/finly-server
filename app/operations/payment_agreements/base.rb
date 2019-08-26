@@ -656,10 +656,24 @@ class PaymentAgreements::Base < BaseOperation
           end
 
           # End date is not in mulltiples of invoice frequency
-          # Considering that  rent is payed  after using and not in advance 
-          unless expected_end_date_present
-            add_message :error, "Start and End date difference should be in multiples of invoice frequency(#{frequency_period_number} months)"
-            return
+          # Considering that  rent is payed  later and not in advance
+          # End date is not considered is no_expiration is true and only one invoice is present
+          if invoice.is_a?(GeneralInvoice)
+            if self.payment_agreement.general_invoices.count > 1
+              more_than_one_invoice = true
+            end
+          end
+          if invoice.is_a?(RentalInvoice)
+            if self.payment_agreement.rental_invoices.count > 1
+              more_than_one_invoice = true
+            end
+          end
+
+          if more_than_one_invoice
+            unless expected_end_date_present
+              add_message :error, "Start and End date difference should be in multiples of invoice frequency(#{frequency_period_number} months)"
+              return
+            end
           end
         # end
       end
