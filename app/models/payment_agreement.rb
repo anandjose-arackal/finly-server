@@ -350,10 +350,10 @@ class PaymentAgreement < ApplicationRecord
   def get_related_vendors(options)
     vendors = []
     if options[:list_vendors]
-      vendors << self.general_invoices.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
-      vendors << self.rental_invoices.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
-      vendors << self.security_deposits.joins(:vendor).pluck('yes_bank_vendors.name') rescue [] if self.rental_invoices.blank?
-      vendors << self.beneficiary_payments.joins(:vendor).pluck('yes_bank_vendors.name') rescue []
+      vendors << self.general_invoices.joins(:vendor).pluck('yes_bank_vendors.business_name') rescue []
+      vendors << self.rental_invoices.joins(:vendor).pluck('yes_bank_vendors.business_name') rescue []
+      vendors << self.security_deposits.joins(:vendor).pluck('yes_bank_vendors.business_name') rescue [] if self.rental_invoices.blank?
+      vendors << self.beneficiary_payments.joins(:vendor).pluck('yes_bank_vendors.business_name') rescue []
     end
     return vendors.flatten.compact
   end
