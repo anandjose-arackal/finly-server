@@ -2661,6 +2661,11 @@ Rails.application.routes.draw do
       post 'configure_payu', to: 'companies#configure_payu'
       post 'import_data_configuration', to: 'companies#import_data_configuration'
       get 'export_data_configuration', to: 'companies#export_data_configuration'
+      resources :implementations do
+        collection do
+          get :get_template
+        end
+      end
     end
     get 'company_types', to: 'companies#company_types'
     get 'users/count', to: 'users#count'

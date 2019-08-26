@@ -1,0 +1,98 @@
+class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementations::Processor::Import
+
+  bus Admin::Implementations::Master::BaseMaster
+  subscribe 'item_masters.import'
+  headers ({
+      :id => "ID",
+      :description => "Description (mandatory)",
+      :category => "Category Name",
+      :hsn_sac => "HSN - SAC",
+      :item_number => "Item Code",
+      :item_expense_type => "Expense Type",
+      :po_item =>  "PO Item (Y/N)",
+      :non_po_item => "Non PO Item (Y/N)",
+      :discount => "Discount",
+      :rate => "Rate",
+      :destroy => "Destroy"
+  })or :item_params
+  def create_record(data)
+    item_params, messages = set_params(data)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
+    item = self.company.items.new item_params
+    unless item.save
+      return result false, item.errors.full_messages
+    end
+    result true, 'Created Successfully'
+  end
+
+  def update_record(data)
+
+    item = self.company.items.find_by id: data[:id]
+    unless item
+      return result false, "item not found"
+    end
+
+    item_params, messages = set_params(data)
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
+    unless item.update(item_params)
+      return result false, item.errors.full_messages
+    end
+    result true, 'Updated Successfully'
+  end
+
+  def destroy_records(data)
+   item = self.company.items.find_by id: data[:id]
+   unless item
+    return result false, "item not found"
+   end
+   unless item.destroy
+     return result false, item.errors.full_messages
+   end
+   result true, "Destroyed Successfully"
+  end
+  
+  def set_params(data)
+    messages =[]
+    item_expense_types = ItemExpenseType.all
+    supply_item_types = SupplyItemType.all
+    description = data[:description].to_s
+    category_id = company.categories.where(name: data[:category].to_s).first&.id
+    if category_id.nil? && data[:category].present?
+      messages << "Associated Category Not Found"
+    end
+    hsn_sac = data[:hsn_sac].blank? ? nil : data[:hsn_sac].to_i
+    item_code = data[:item_code].to_s
+    discount = data[:discount].to_f&.round(2)
+    rate = data[:rate].to_f&.round(2)
+    item_expense_type_id = item_expense_types.where(name: data[:item_expense_type].to_s&.downcase)&.first&.id
+
+    if item_expense_type_id.nil? && data[:item_expense_type].present?
+      messages << "Associated Expense Type Not Found"
+    end
+    supply_item_type_id = nil
+    if data[:po_item].to_s&.upcase  == "Y" && data[:non_po_item].to_s&.upcase  == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("po_non_po_item").id
+    elsif data[:po_item].to_s&.upcase == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("po_item").id
+    elsif data[:non_po_item].to_s&.upcase == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("non_po_item").id
+    end
+    [{
+        description: description,
+        category_id: category_id,
+        hsn_sac: hsn_sac,
+        item_code: item_code,
+        item_expense_type_id: item_expense_type_id,
+        supply_item_type_id: supply_item_type_id,
+        discount: discount,
+        rate: rate
+    }, messages]
+  end
+
+end

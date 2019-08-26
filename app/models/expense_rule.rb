@@ -59,9 +59,19 @@ class ExpenseRule < ApplicationRecord
 
   def rule_in_words
     rule_in_words = "Expenses"
+
     if self.category_id
-      rule_in_words += " belonging to category " + self.category_name
+      rule_in_words += " belonging to category "
+      if self.category.parent.present?
+        rule_in_words += "#{self.category.parent.name} - "
+      end
+      rule_in_words += "#{self.category.name}"
     end
+
+    # if self.category_id
+    #   rule_in_words += " belonging to category " + self.category_name
+    # end
+
     if self.days_after
       rule_in_words += " submitted after " + self.days_after.to_s + " days"
     end
