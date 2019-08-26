@@ -88,8 +88,21 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_status, -> (name){
+    user = RequestStore.store[:current_user]
     if name.present?
-      where status_id: PaymentAgreementStatus.id_for(name.to_sym)
+      case name
+      when 'processing'
+        if user.present?
+          where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval), creator_id: user.id)
+        end
+      when 'awaiting_approval'
+        if user.present?
+          ids = self.awaiting_action_items(user.id)&.pluck(:id)
+          with_ids(ids)
+        end
+      else
+        where status_id: PaymentAgreementStatus.id_for(name.to_sym)
+      end
     end
   }
 
