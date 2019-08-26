@@ -635,6 +635,12 @@ class PaymentAgreements::Base < BaseOperation
         # if frequency_period_number.present?
           expected_end_date_present = false
           (1..12).to_a.each do |number|
+            # Work around because no of days are not defined in a month and currently partial invoice is not in place
+            # Pls check invoice value when making any changes here. 
+            # Currently one month is defined as same date next month.
+            unless self.payment_agreement.no_expiration
+              next if invoice.end_date.to_date == self.payment_agreement.expiration_date.to_date
+            end
             if invoice.end_date.to_date == invoice.start_date.to_date + number.month
               if invoice.end_date.to_date < invoice.start_date.to_date + frequency_period_number.month
                 add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
