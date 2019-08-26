@@ -3670,6 +3670,7 @@ Rails.application.routes.draw do
         patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
         get 'count', to: "purchase_requests#count", as: :count
       end
+      get 'comments', to: "purchase_requests#comments"
     end
     post 'purchase_request/bulk_upload_items', to: 'purchase_requests#bulk_upload_items'
     get 'purchase_request/template_bulk_import_items', to: 'purchase_requests#template_bulk_import_items'

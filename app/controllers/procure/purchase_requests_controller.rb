@@ -148,4 +148,9 @@ class Procure::PurchaseRequestsController < BaseControllers::WebBase
     end    
   end
 
+  def comments
+    @result  = Procurements::PurchaseRequests::Comments.(current_user, params)
+    respond
+  end
+
 end

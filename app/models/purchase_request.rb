@@ -45,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
-
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
