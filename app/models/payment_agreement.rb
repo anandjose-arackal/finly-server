@@ -69,11 +69,18 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_invoice_due_date, ->(from, to){
+    user = RequestStore.store[:current_user]
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
-    joins(:invoices).where('DATE(due_date) >= ? && DATE(due_date) <= ?', from, to)
+    # ids = joins(:general_invoices).where('DATE(general_invoices.due_date) >= ? && DATE(general_invoices.due_date) <= ?', from, to).pluck(:id)
+    # ids += joins(:rental_invoices).where('DATE(due_date) >= ? && DATE(due_date) <= ?', from, to).pluck(:id)
+    ids = joins(:general_invoices).where('DATE(general_invoices.due_date) >= ? && DATE(general_invoices.due_date) <= ?', from, to).pluck(:id)
+    ids += joins(:rental_invoices).where('DATE(rental_invoices.due_date) >= ? && DATE(rental_invoices.due_date) <= ?', from, to).pluck(:id)
+    if user.present?
+      user.company.payment_agreements.where(id: ids)
+    end
   }
 
   scope :filter_creator_id, -> (id){
