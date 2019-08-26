@@ -346,13 +346,13 @@ class PaymentAgreements::Base < BaseOperation
   def create_or_update_custom_fields
     # Setup custom field for general invoices
     if self.payment_agreement.general_invoices.present?
-      if params.dig(:payment_agreement, :rental_invoices_attributes).present?
+      if params.dig(:payment_agreement, :general_invoices_attributes).present?
         self.payment_agreement.general_invoices.each_with_index do |invoice, index|
           custom_fields = invoice.invoice_custom_fields
           if custom_fields.present?
             if invoice.new_record?
               custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+              CustomField::SetFields.(invoice, FieldParentType.id_for(:general_invoice), custom_fields_data)
             else
               validate_custom_fields_invoice(invoice, custom_fields)
             end
@@ -370,7 +370,7 @@ class PaymentAgreements::Base < BaseOperation
             if invoice.new_record?
               # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
               custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields_data)
+              CustomField::SetFields.(invoice, FieldParentType.id_for(:rental_invoice), custom_fields_data)
             else
               # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
               validate_custom_fields_invoice(invoice, custom_fields, true)
@@ -399,7 +399,7 @@ class PaymentAgreements::Base < BaseOperation
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
+    CustomField::SetFields.(invoice, FieldParentType.id_for(invoice.class.name.underscore.to_sym), custom_fields)
   end
 
   # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
