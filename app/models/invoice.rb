@@ -404,7 +404,7 @@ class Invoice < ApplicationRecord
 
   scope :include_for_index, -> {
     includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
-             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type,
              :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 
@@ -444,6 +444,27 @@ class Invoice < ApplicationRecord
     end
   }
 
+  # Sorting
+  scope :sort_invoice_id, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.invoice_id #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.date #{type}")
+    end
+  }
+
+  scope :sort_due_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.due_date #{type}")
+    end
+  }
 
   after_create :set_defaults
   after_save :budget_trail_entry

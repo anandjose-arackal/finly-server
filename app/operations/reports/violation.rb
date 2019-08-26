@@ -134,7 +134,12 @@ class Reports::Violation < Reports::Base
     end
     if rule.category_id
       if expense.category_id == rule.category_id
-        message += ' and belonging to category ' + expense.category_name
+        message += ' and belonging to category '
+        if expense.category.parent.present?
+          message += "#{expense.category.parent.name} - "
+        end
+        message += "#{expense.category_name}"
+        # message += ' and belonging to category ' + expense.category_name
       else
         return false
       end
