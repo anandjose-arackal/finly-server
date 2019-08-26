@@ -226,5 +226,8 @@ class GeneralInvoice < ApplicationRecord
     }
   end
 
+  def invoice_no_or_id
+  end
+
 
 end
