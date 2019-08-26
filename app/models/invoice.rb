@@ -451,9 +451,6 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  before_validation :update_company
-  # before_save :update_company
-
   # Sorting
   scope :sort_invoice_id, -> (type){
     type = type&.strip&.upcase

@@ -370,7 +370,8 @@ class PaymentAgreements::Base < BaseOperation
             if invoice.new_record?
               # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
               custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              CustomField::SetFields.(invoice, FieldParentType.id_for(:rental_invoice), custom_fields_data)
+              # CustomField::SetFields.(invoice, FieldParentType.id_for(:rental_invoice), custom_fields_data)
+              validate_custom_fields_invoice(invoice, custom_fields, false)
             else
               # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
               validate_custom_fields_invoice(invoice, custom_fields, true)
