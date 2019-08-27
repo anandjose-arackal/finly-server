@@ -40,7 +40,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
-            total_amount&.round(2),
+            expense.amount.value&.round(2),
             '',
             '',
             '',

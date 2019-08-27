@@ -8,7 +8,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
   end
 
   def init
-    self.report_processor_group = user.company.report_processor_groups.where(payment_type: %w(bank_transfer payment_file)).includes(mappings: [reports: [{user: :profile},expenses:[:category,:amount]]])
+    self.report_processor_group = user.company.report_processor_groups.where(payment_type: %w(bank_transfer payment_file)).includes(mappings:[:amount,reports: [{user: :profile}]])
     report_processor_group = apply_scopes(self.report_processor_group, params)
 
     self.headers = [
@@ -29,17 +29,16 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
     self.contents = []
     report_processor_group.each do |rpg|
       rpg.mappings.each do |rpg_mapping|
-        rpg_mapping.reports.each do |report|
-          report.expenses.map do |expense|
-            next unless expense.reimbursable
+            report = rpg_mapping&.reports&.first
+            next if report.blank?
             self.contents << [
-                expense.category.gl_code,
+                '31352001',
                 '',
                 report.user.gl_config&.dig(:location_code),
                 report.user.gl_config&.dig(:cost_center),
                 '',
                 '',
-                expense.amount.value,
+                rpg.amount.value,
                 '',
                 '',
                 report.user&.profile&.employee_id,
@@ -47,7 +46,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
                 '',
                 '',
             ]
-          end
           self.contents << [
               '61110004',
               '9992',
@@ -56,14 +54,13 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
               '',
               '',
               '',
-              report.reimbursable_expenses_total&.value,
+              rpg.amount&.value,
               '',
               '',
               '',
               '',
               ''
           ]
-        end
       end
     end
   end
