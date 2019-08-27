@@ -505,13 +505,15 @@ class PaymentAgreements::Base < BaseOperation
       #   add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
       #   return
       # end
-      if self.payment_agreement.no_expiration
-        add_message :error, "Any one general invoice start date should match with execution date"
-        return
-      end
 
-      add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
-      return
+      # Scope it for fixed periodic only till partial invoice is handled 
+      # if self.payment_agreement.no_expiration
+      #   add_message :error, "Any one general invoice start date should match with execution date"
+      #   return
+      # end
+
+      # add_message :error, "Any one general invoice start and end date should match with execution and expiration date"
+      # return
     end
   end
 
@@ -557,13 +559,13 @@ class PaymentAgreements::Base < BaseOperation
       #   add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
       #   return
       # end
-      if self.payment_agreement.no_expiration
-        add_message :error, "Any one rental invoice start date should match with execution date"
-        return
-      end
+      # if self.payment_agreement.no_expiration
+      #   add_message :error, "Any one rental invoice start date should match with execution date"
+      #   return
+      # end
 
-      add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
-      return
+      # add_message :error, "Any one rental invoice start and end date should match with execution and expiration date"
+      # return
     end
   end
 
