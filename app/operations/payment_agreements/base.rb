@@ -744,6 +744,8 @@ class PaymentAgreements::Base < BaseOperation
   def gi_start_end_date_consecutiveness
     dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
     if dates.present? and dates.count > 1
+      # Check consecutiveness for fixed periodic only
+      return unless [self.payment_agreement.general_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
       invoice_start_end_date_consecutiveness(dates)
     end
   end
@@ -751,6 +753,8 @@ class PaymentAgreements::Base < BaseOperation
   def ri_start_end_date_consecutiveness
     dates = self.payment_agreement.rental_invoices.pluck(:start_date, :end_date)
     if dates.present? and dates.count > 1
+      # Check consecutiveness for fixed periodic only
+      return unless [self.payment_agreement.rental_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
       invoice_start_end_date_consecutiveness(dates)
     end
   end

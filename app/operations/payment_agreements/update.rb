@@ -22,6 +22,12 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def process
     clear_expiration_date_on_no_expiration
     create_or_update_custom_fields
+    if self.payment_agreement.general_invoices.present?
+      self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+    end
+    if self.payment_agreement.rental_invoices.present?
+      self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+    end
     if payment_agreement.valid?
       # Set validation of DLRMs
       if PaymentAgreement.status_ids(:open, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id

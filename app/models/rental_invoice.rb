@@ -126,8 +126,8 @@ class RentalInvoice < ApplicationRecord
   end
 
   def set_creator_and_company(user)
-    self.created_by_user_id = user.id
-    self.company_id = user.company_id
+    self.created_by_user_id = user.id if self.created_by_user_id.blank?
+    self.company_id = user.company_id if self.company_id.blank?
   end
 
 
