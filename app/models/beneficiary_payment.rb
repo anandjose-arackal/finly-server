@@ -305,6 +305,10 @@ class BeneficiaryPayment < ApplicationRecord
   def agreement_based_json(options={})
     {
       id: self.id,
+      tax_amount: precision_value(self.tax_amount&.value),
+      tds_amount: precision_value(self.tds_amount&.value),
+      tax: precision_value(self.tax),
+      tds: precision_value(self.tds_slab&.tds),
       vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
       bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
@@ -325,7 +329,12 @@ class BeneficiaryPayment < ApplicationRecord
       vendor_name: self.vendor&.name,
       vendor_id: self.vendor_id,
       creation_date: self.created_at.to_date,
-      status_attributes: {id: self.reload.status&.id, name: self.status&.name, display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name}
+      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+      status_attributes: {id: self.reload.status&.id, name: self.status&.name, 
+      roundoff_amount: self.roundoff_amount,
+      net_payable_amount: self.balance_due&.value,
+      display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
     }
   end
 

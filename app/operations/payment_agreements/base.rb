@@ -842,15 +842,15 @@ class PaymentAgreements::Base < BaseOperation
   # security and beneficiary should not co-exist in an agreement
   # There combinations can be altered/removed once we find real use-cases
   def validate_agreement_item_combinations
-    if self.payment_agreement.general_invoices.present? and self.payment_agreement.rental_invoices.present?
-      add_message :error, 'Both general and rental cannot be a part of same agreement'
-      return
-    end
+    # if self.payment_agreement.general_invoices.present? and self.payment_agreement.rental_invoices.present?
+    #   add_message :error, 'Both general and rental cannot be a part of same agreement'
+    #   return
+    # end
 
-    if self.payment_agreement.security_deposits.present? and self.payment_agreement.beneficiary_payments.present?
-      add_message :error, 'Security deposit and beneficiary payment cannot be a part of same agreement'
-      return
-    end
+    # if self.payment_agreement.security_deposits.present? and self.payment_agreement.beneficiary_payments.present?
+    #   add_message :error, 'Security deposit and beneficiary payment cannot be a part of same agreement'
+    #   return
+    # end
   end
 
 

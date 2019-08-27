@@ -61,8 +61,13 @@ class SecurityDeposit < ApplicationRecord
       vendor_name: self.vendor&.name,
       creation_date: self.created_at.to_date,
       agreement_type: 'security_deposit',
-      status_attributes: {id: self.status&.id, name: self.status&.name, display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name}
-
+      status_attributes: {id: self.status&.id, name: self.status&.name, display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
+      net_payable_amount: self.original_amount&.value,
+      tax_amount: (self.tax_amount.value rescue 0),
+      tds_amount: (self.tds_amount.value rescue 0),
+      tax: (self.tax rescue 0),
+      tds: (self.tds_slab.tds rescue 0),
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
     }
   end
 

@@ -18,14 +18,15 @@ class ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment < Ac
   end
 
   def make_payment
-    unless agreement.no_expiration
-      if rental_invoice.payment_agreement.expiration_date.to_date < Date.today
-        return false
-      end
-    end
-    if rental_invoice.end_date.to_date >= Date.today
-      return true
-    end
+    return false
+    # unless agreement.no_expiration
+    #   if rental_invoice.payment_agreement.expiration_date.to_date < Date.today
+    #     return false
+    #   end
+    # end
+    # if rental_invoice.end_date.to_date >= Date.today
+    #   return true
+    # end
 
   end
 

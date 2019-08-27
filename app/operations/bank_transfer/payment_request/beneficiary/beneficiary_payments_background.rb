@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits
+                :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit 
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -53,15 +53,24 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
         if document.present? 
           case
           when document.is_a?(BeneficiaryPayment)
-            agreement_beneficiary_payment = document
+            self.agreement_beneficiary_payment = document
           when document.is_a?(SecurityDeposit)
-            agreement_security_deposit = document
+            self.agreement_security_deposit = document
           end
         end
       end
 
-      self.beneficiary_payment = from_payment_agreement ? agreement_beneficiary_payment : retrieve_beneficiary_payment(payment, bank_account)
-      self.security_deposit = agreement_security_deposit
+      # self.beneficiary_payment = from_payment_agreement ? agreement_beneficiary_payment : retrieve_beneficiary_payment(payment, bank_account)
+
+      # Do not call this when agreement type is security deposit
+      # Cannot puts params based conditions as not sure what params and places are affecting this action
+      if agreement_security_deposit.blank?
+        self.beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
+      end
+
+      if agreement_security_deposit.present?
+        self.security_deposit = agreement_security_deposit
+      end
 
       payment[:date] = payment[:invoice_date] || payment[:date]
       payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -215,9 +224,15 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     #   bp.save
     #   return bp
     # end
-    
     bp_params = beneficiary_payment_params(payment, vendor_id, bank_account_id)
-    bp = BeneficiaryPayment.new(bp_params)
+    if from_payment_agreement
+      if agreement_beneficiary_payment.present?
+        agreement_beneficiary_payment.assign_attributes(bp_params)
+        bp = agreement_beneficiary_payment
+      end
+    else
+      bp = BeneficiaryPayment.new(bp_params)
+    end
     bp.calculate_tax_and_amount
     bp.save
     return bp
