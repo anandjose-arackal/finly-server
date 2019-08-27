@@ -41,7 +41,6 @@
 </head>
 <body>
 <div class="container-fluid">
-
   <div class="row">
     <% url = report.user.company&.configuration&.logo&.url %>
     <% if url.present? %>
@@ -237,7 +236,9 @@
   <% end %>
 
   <% flag = true %>
-  <% flag = !!StringUtils.to_bool(params[:receipt]) if params[:receipt].present? %>
+  <% if params.present? %>
+    <% flag = !!StringUtils.to_bool(params[:receipt]) if params[:receipt].present? %>
+  <% end %>
 
   <% if flag %>
     <% unless receipts.blank? %>
