@@ -1035,7 +1035,8 @@ class Expense < ApplicationRecord
   def compute_gst_amount
     return unless has_gst? and self.gst_percentage.present?
 
-    gst_amount_value = self.amount.value * self.gst_percentage / 100
+    gst_amount_value = (self.amount.value * self.gst_percentage) / (1.0 + self.gst_percentage)
+    # gst_amount_value = self.amount.value * self.gst_percentage / 100
     set_gst_amount(gst_amount_value)
   end
 
