@@ -53,10 +53,4 @@ class FeatureSubscription < ApplicationRecord
     false
   end
 
-  after_save do
-    if self.em_tax_tracking.true?
-      self.subscribable.update(gst: true, tds: true)
-    end
-  end
-
 end
