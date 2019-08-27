@@ -19,7 +19,7 @@ class Procurements::PurchaseRequests::Comments < Procurements::PurchaseRequests:
       self.comments = params[:comments]
       self.count = self.comments.count
       page = params[:page] || 1
-      per_page = params[:per_page] || 30
+      per_page = params[:per_page] || 1000  # hardcoded as pagination on frontend is not there
 
       self.paginated_comments = self.comments.paginate(page: page, per_page: per_page)
     end
