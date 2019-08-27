@@ -18,14 +18,16 @@ class ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment < A
   end
 
   def make_payment
-    unless agreement.no_expiration
-      if general_invoice.payment_agreement.expiration_date.to_date < Date.today
-        return false
+    if general_invoice.billing_type.variable_periodic?
+      unless agreement.no_expiration
+        if general_invoice.payment_agreement.expiration_date.to_date < Date.today
+          return false
+        end
       end
+      if general_invoice.end_date.to_date >= Date.today
+        return true
+      end 
     end
-    if general_invoice.end_date.to_date >= Date.today
-      return true
-    end 
 
   end
 
