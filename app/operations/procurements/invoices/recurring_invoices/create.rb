@@ -1,6 +1,6 @@
 class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices::Base
 
-  attr_accessor :payment_agreement_type_id, :payment_agreement, :general_invoice, :rental_invoice, :document, :payment_agreement_type, :procurement_id, :previous_upcoming_invoice
+  attr_accessor :payment_agreement_type_id, :payment_agreement, :general_invoice, :rental_invoice, :document, :payment_agreement_type, :procurement_id, :previous_upcoming_invoice, :vendor
 
   def init
     self.payment_agreement_type_id = params[:payment_agreement_type_id]
@@ -63,7 +63,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       trail_action = 'rental_invoice_created'
     end
 
-
+    # setup_initial_invoice_fields(resource)
 
     # Resource can be general_invoice or rental_invoice
     # case
@@ -108,6 +108,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
 
   def apply_general_invoice_template(general_invoice)
+    validate_vendor(general_invoice)
     invoice = Invoice.new
     invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     invoice.agreement_item_type = "GeneralInvoice"
@@ -129,6 +130,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   end
 
   def apply_rental_invoice_template(rental_invoice)
+    validate_vendor(rental_invoice)
     invoice = Invoice.new
     invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     invoice.agreement_item_type = "RentalInvoice"
@@ -164,7 +166,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     setup_params(agreement_invoice)
     op = PaymentAgreements::CreateUpcomingInvoice.(user, params)
     unless op.success?
-      add_message :error, "Unable to creatw"
+      add_message :error, op.messages[:error]
+      agreement_invoice.destroy
     end
   end
 
@@ -199,7 +202,10 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   # Some attributes are set here, some are nullified in model as per logic used in other places, hence updating explicitly 
   def update_invoice_attributes(original_invoice, new_invoice, options={})
-    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), date: original_invoice.payment_agreement_upcoming_date)
+    receiving_account = self.vendor&.bank_accounts&.first
+    role_id = UserRole.id_for(:initiator)
+
+    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), date: original_invoice.payment_agreement_upcoming_date, receiving_account: receiving_account, controlling_user: user, vendor: vendor, payment_term_id: self.vendor&.payment_term_id, controlling_user_role_id: role_id)
     new_invoice.update(procurement_id: procurement_id) if options[:update_procurement]
   end
 
@@ -259,5 +265,14 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   # def next_upcoming_invoice_required(previous_upcoming_invoice)
   #   previous_upcoming_invoice.billing_type.fixed_periodic? && (self.payment_agreement.no_expiration || invoice_upcoming_date(previous_upcoming_invoice))
   # end
+
+
+  def validate_vendor(invoice)
+    self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(invoice.vendor_id).first
+    if self.vendor.blank?
+      add_message :error, 'Vendor not found'
+      return
+    end
+  end
 
 end

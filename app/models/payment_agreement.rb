@@ -43,9 +43,9 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_vendor_id, -> (vendor_id){
-    ids = joins(:general_invoices).where('invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+    ids = joins(:general_invoices).where('general_invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
 
-    ids+= joins(:rental_invoices).where('invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+    ids+= joins(:rental_invoices).where('rental_invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
     ids+= joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
     where(id: ids)
   }
