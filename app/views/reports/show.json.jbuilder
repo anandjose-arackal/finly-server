@@ -84,6 +84,8 @@ json.expense_sections sorted_expenses do |category|
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+    # adding potential duplicate flag in reports show
+    json.potential_duplicate expense.has_duplicate_expenses?
     if expense.category.parent.present?
       json.category_name expense.category.parent.name
       json.sub_category expense.category.name

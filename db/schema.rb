@@ -65,6 +65,38 @@ ActiveRecord::Schema.define(version: 2019_08_21_185109) do
     t.index ["state_id"], name: "fk_rails_2d87b6c11e"
   end
 
+  create_table "admin_implementation_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "admin_user_id", null: false
+    t.string "request_key", null: false
+    t.text "request_params", limit: 4294967295
+    t.string "master"
+    t.string "name"
+    t.integer "status", null: false
+    t.text "message"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.decimal "runtime", precision: 10
+    t.integer "requested_items"
+    t.integer "completed_items"
+    t.string "request_file_file_name"
+    t.string "request_file_content_type"
+    t.bigint "request_file_file_size"
+    t.datetime "request_file_updated_at"
+    t.string "result_file_file_name"
+    t.string "result_file_content_type"
+    t.bigint "result_file_file_size"
+    t.datetime "result_file_updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "success_items", default: 0
+    t.integer "failed_items", default: 0
+    t.index ["admin_user_id"], name: "index_admin_implementation_requests_on_admin_user_id"
+    t.index ["company_id"], name: "index_admin_implementation_requests_on_company_id"
+    t.index ["request_key"], name: "index_admin_implementation_requests_on_request_key"
+    t.index ["status"], name: "index_admin_implementation_requests_on_status"
+  end
+
   create_table "admin_review_workflow_levels", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "admin_review_workflow_id", null: false
     t.integer "position", null: false
