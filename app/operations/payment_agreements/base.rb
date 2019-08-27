@@ -462,7 +462,7 @@ class PaymentAgreements::Base < BaseOperation
   def general_invoice_start_end_date
     if self.payment_agreement.general_invoices.present?
       self.match_invoice_start_date = false
-      self.match_invoice_end_date = true #false
+      self.match_invoice_end_date = false #false
       self.any_fixed_period_general_invoice = false
       # start_end_date_arr => Keeps all the start_date and end_date as 2d array
       # start_end_date_arr = []
@@ -518,7 +518,7 @@ class PaymentAgreements::Base < BaseOperation
   def rental_invoice_start_end_date
     if self.payment_agreement.rental_invoices.present?
       self.match_invoice_start_date = false
-      self.match_invoice_end_date = true
+      self.match_invoice_end_date = false
       self.any_fixed_period_rental_invoice = false
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         unless self.any_fixed_period_rental_invoice
@@ -698,10 +698,14 @@ class PaymentAgreements::Base < BaseOperation
   # Enforce user to add any one invoice start date as execution date and any invoice end date as expiration date
   def check_missing_days(invoice)
     if invoice.start_date.present? && invoice.end_date.present? && self.payment_agreement.execution_date.present? && (self.payment_agreement.expiration_date.present? || self.payment_agreement.no_expiration)
-      if invoice.start_date&.to_date == self.payment_agreement.execution_date&.to_date
-        unless match_invoice_start_date 
-          self.match_invoice_start_date = true
+      unless [BillingType.id_for(:one_time), BillingType.id_for(:variable_periodic)].include?(invoice.billing_type_id)
+        if invoice.start_date&.to_date == self.payment_agreement.execution_date&.to_date
+          unless match_invoice_start_date 
+            self.match_invoice_start_date = true
+          end
         end
+      else
+        self.match_invoice_start_date = true
       end
       # If agreement never expires, do not match expiration date with end date
       if self.payment_agreement.no_expiration
@@ -709,10 +713,14 @@ class PaymentAgreements::Base < BaseOperation
         return match_invoice_start_date, match_invoice_end_date
       end
       # Not required as we are not comparing end date any more
-      if invoice.end_date&.to_date == self.payment_agreement.expiration_date&.to_date
-        unless match_invoice_end_date
-          self.match_invoice_end_date = true
+      unless [BillingType.id_for(:one_time), BillingType.id_for(:variable_periodic)].include?(invoice.billing_type_id)
+        if invoice.end_date&.to_date == self.payment_agreement.expiration_date&.to_date
+          unless match_invoice_end_date
+            self.match_invoice_end_date = true
+          end
         end
+      else
+        self.match_invoice_end_date = true
       end
     end
     return match_invoice_start_date, match_invoice_end_date
