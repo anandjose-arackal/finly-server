@@ -462,7 +462,7 @@ class PaymentAgreements::Base < BaseOperation
   def general_invoice_start_end_date
     if self.payment_agreement.general_invoices.present?
       self.match_invoice_start_date = false
-      self.match_invoice_end_date = false
+      self.match_invoice_end_date = true #false
       self.any_fixed_period_general_invoice = false
       # start_end_date_arr => Keeps all the start_date and end_date as 2d array
       # start_end_date_arr = []
@@ -518,7 +518,7 @@ class PaymentAgreements::Base < BaseOperation
   def rental_invoice_start_end_date
     if self.payment_agreement.rental_invoices.present?
       self.match_invoice_start_date = false
-      self.match_invoice_end_date = false
+      self.match_invoice_end_date = true
       self.any_fixed_period_rental_invoice = false
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         unless self.any_fixed_period_rental_invoice
@@ -708,6 +708,7 @@ class PaymentAgreements::Base < BaseOperation
         self.match_invoice_end_date = true
         return match_invoice_start_date, match_invoice_end_date
       end
+      # Not required as we are not comparing end date any more
       if invoice.end_date&.to_date == self.payment_agreement.expiration_date&.to_date
         unless match_invoice_end_date
           self.match_invoice_end_date = true
