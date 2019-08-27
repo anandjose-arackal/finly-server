@@ -30,4 +30,11 @@ class ReportMailer < ApplicationMailer
     mail(to: presenter.to, subject: presenter.subject, template_name: 'export_notify')
 
   end
+
+  def send_awaiting_approval_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
+    end
+  end
 end

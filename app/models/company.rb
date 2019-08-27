@@ -113,6 +113,8 @@ class Company < ApplicationRecord
   has_many :bank_payment_requests
   has_many :attachments, dependent: :nullify
 
+  has_many :admin_implementation_requests
+
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
