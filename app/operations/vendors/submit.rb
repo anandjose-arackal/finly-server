@@ -25,6 +25,8 @@ class Vendors::Submit < Vendors::Base
       return
     end
 
+    self.vendor.update(reject_note: nil) # clear reject note incase doc sent for reapproval
+
     self.workflow_output = op.workflow_output
   end
 
