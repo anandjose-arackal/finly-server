@@ -9,6 +9,9 @@ expense:
   reimbursable: <%= params[:reimbursable] %>
   category_id: <%= params[:category_id] %>
   from_cash_on_hand: <%= params[:from_cash_on_hand] %>
+  state_of_expense_id: <%= params[:state_of_expense_id] %>
+  hsn_sac: <%= params[:hsn_sac] %>
+  merchant_bill_no: <%= params[:merchant_bill_no] %>
   <% type = yaml_formatter.value_for_placeholder params[:type] %>
   <% if type == '1' or type == 1 %>
   manual_expense_attributes:
