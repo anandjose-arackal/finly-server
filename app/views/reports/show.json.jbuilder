@@ -160,7 +160,7 @@ json.expense_sections sorted_expenses do |category|
       json.merchant_gstin expense.gstin_location&.gstin
       json.merchant_state_id expense.gstin_location&.state_id
       json.merchant_registered_name expense.gstin_location&.gstin_master&.legal_name_of_business
-      json.tax_amount expense.gst_amount&.value
+      json.tax_amount precision_value expense.gst_amount&.value
       json.gst_type_id expense.gst_type_id
       json.merchant_bill_no expense.merchant_bill_no
       json.hsn_sac expense.hsn_sac
