@@ -39,15 +39,20 @@ class PaymentAgreement < ApplicationRecord
   AGREEMENT_TYPES = [{id: 'general_invoice', name: 'Invoice - General Invoice'}, {id: 'rental_invoice', name: 'Invoice - Rental Invoice'}, {id: 'beneficiary_payment', name: 'Payment - Beneficiary Payment'}, {id: 'security_deposit', name: 'Payment - Security Deposit'}]
 
   scope :filter_title, -> (title) {
-    where('payment_agreements.title LIKE ?', "%#{title}%")
+    if title.present?
+      where('payment_agreements.title LIKE ?', "%#{title}%")
+    end
   }
 
   scope :filter_vendor_id, -> (vendor_id){
-    ids = joins(:general_invoices).where('general_invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
+    if vendor_id.present?
+      ids = joins(:general_invoices).where('general_invoices.vendor_id = ?', vendor_id).pluck('general_invoices.payment_agreement_id')
 
-    ids+= joins(:rental_invoices).where('rental_invoices.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
-    ids+= joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id).pluck(:payment_agreement_id)
-    where(id: ids)
+      ids+= joins(:rental_invoices).where('rental_invoices.vendor_id = ?', vendor_id).pluck('rental_invoices.payment_agreement_id')
+      ids+= joins(:beneficiary_payments).where('beneficiary_payments.vendor_id = ?', vendor_id).pluck('beneficiary_payments.payment_agreement_id')
+      ids += joins(:security_deposits).where('security_deposits.vendor_id = ?', vendor_id).pluck('security_deposits.payment_agreement_id')
+      where(id: ids.uniq)
+    end
   }
 
   # scope :filter_vendor_name, -> (name){
@@ -59,7 +64,9 @@ class PaymentAgreement < ApplicationRecord
   } 
 
   scope :filter_policy_id, -> (id){
-    where policy_id: id
+    if id.present?
+      where policy_id: id
+    end
   }
 
   scope :filter_creation_date, -> (date){
@@ -84,7 +91,9 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_creator_id, -> (id){
-    where creator_id: id
+    if id.present?
+      where creator_id: id
+    end
   }
 
   scope :filter_status, -> (name){
@@ -107,11 +116,13 @@ class PaymentAgreement < ApplicationRecord
   }
 
   scope :filter_by_date_range, -> (from, to) {
-    from = Date.parse('01-01-1990') if from.blank?
-    to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
-    where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+    if from.present? || to.present?
+      from = Date.parse('01-01-1990') if from.blank?
+      to = Date.today if to.blank?
+      from = Date.parse(from) unless from.is_a?(Date)
+      to = Date.parse(to) unless to.is_a?(Date)
+      where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+    end
   }
 
   scope :with_status_ids, -> (status_ids) {where status_id: status_ids}
@@ -182,10 +193,10 @@ class PaymentAgreement < ApplicationRecord
     case agreement_type 
     when 'general_invoice'
       # joins(:invoices).where('invoices.invoice_type_id = ?', InwardInvoiceType.id_for(:general_invoice))
-      ids = user.company.inward_invoices.where(invoice_type_id: InwardInvoiceType.id_for(:general_invoice)).pluck(:payment_agreement_id).uniq
+      ids = user.company.general_invoices.pluck(:payment_agreement_id).uniq
     when 'rental_invoice'
       # joins(:invoices).where('invoices.invoice_type_id = ?', InwardInvoiceType.id_for(:general_invoice))
-      ids = user.company.inward_invoices.where(invoice_type_id: InwardInvoiceType.id_for(:rental_invoice)).pluck(:payment_agreement_id).uniq
+      ids = user.company.rental_invoices.pluck(:payment_agreement_id).uniq
     when 'beneficiary_payment'
       # joins(:beneficiary_payments)
       ids = user.company.beneficiary_payments.pluck(:payment_agreement_id).uniq
