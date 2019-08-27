@@ -1,12 +1,13 @@
-class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseMaster
+class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseSubscriber
 
   attr_accessor :entities
 
-  register_handle :budget_entities
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  bus ExportManager::Master::BaseMaster
+  subscribe :budget_entities
+  generators ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  fields [
                       entity_name: {spreadsheet: true, pdf: false},
                       entity_type: {spreadsheet: true, pdf: false},
                       po_number: {spreadsheet: true, pdf: false},
@@ -27,7 +28,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   def input
     op = ::Budgets::Show.(user, params)
     unless op.success?
-      add_message :error, result.messages[:error]
+      add_message :error, op.messages[:error]
       return
     end
     budget = op.budget
@@ -114,11 +115,20 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
 
   def category(item)
     if item.is_a?(PurchaseOrderItem)
-      return item.inventory_line_item&.category&.name
+      return item.category&.name || item.inventory_line_item&.category&.name
     elsif item.is_a?(InvoiceLineItem)
-      return item.inventory_line_item&.category&.name
+      return item.category&.name || item.inventory_line_item&.category&.name
     elsif item.is_a?(Payment)
-      return item.invoice.category&.name
+      case item.parent_type
+        when "Invoice"
+          return item.parent&.category&.name
+        when "BeneficiaryPayment"
+          return item.parent&.category&.name
+        when "PurchaseOrder"
+          return ""
+        else
+          return ""
+      end
     end
     ""
   end

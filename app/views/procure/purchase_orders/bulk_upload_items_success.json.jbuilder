@@ -9,7 +9,7 @@ json.bulk_items do
 		end
 
 		json.rate item[:rate]
-		json.tax item[:tax]
+		json.tax_rate_id item[:tax_rate_id]
 		json.discount item[:discount]
 
 		json.quantity item[:quantity]
@@ -20,5 +20,16 @@ json.bulk_items do
 
 		json.cost_center_id item[:cost_center_id]
 		json.cost_center_name item[:cost_center_name]
+
+		json.item_amount item[:item_amount]
+        json.item_discount_amount item[:item_discount_amount]
+        json.item_taxable_amount item[:item_taxable_amount]
+        json.item_tax_amount item[:item_tax_amount]
+        json.item_total_amount item[:item_total_amount]
+        json.item_tax_split_igst item[:item_tax_split_igst]
+        json.item_tax_split_cgst item[:item_tax_split_cgst]
+        json.item_tax_split_sgst item[:item_tax_split_sgst]
 	end
 end
+
+json.summary @result.summary

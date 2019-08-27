@@ -77,8 +77,12 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       category_id = item[:category_id] || item["category_id"]
       preferred_vendor = item[:preferred_vendor] || item["preferred_vendor"]
       required_by_date = item[:required_by_date] || item["required_by_date"]
+      department_id = item[:department_id] || item["department_id"]
+      cost_center_id = item[:cost_center_id] || item["cost_center_id"]
+      location_id = item[:location_id] || item["location_id"]
       delivery_location = item[:delivery_location] || item["delivery_location"]
       purpose = item[:purpose] || item["purpose"]
+      hsn_sac = item[:hsn_sac] || item["hsn_sac"]
       quantity = item[:quantity] || item["quantity"]
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
       unit_price = item[:unit_price] || item["unit_price"]
@@ -95,6 +99,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
         item[:single_item] = single_item
       end
+      item[:preferred_vendors] = single_item.rate_contract_vendors rescue []
+
 
       unless validate_amount unit_price
         self.valid = false
@@ -107,6 +113,14 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           self.valid = false
           self.error_messages << "Please input the ID of the Preferred Vendor from the Items Sheet"
           self.issue_item[:preferred_vendor] = "Please input the ID of the Preferred Vendor from the Items Sheet."
+        end
+      end
+
+      if hsn_sac.present?
+        unless validate_hsn_sac hsn_sac
+          self.valid = false
+          self.error_messages << "HSN/SAC is invalid. Please recheck."
+          self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
         end
       end
 
@@ -181,6 +195,17 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           item[:delivery_location_id] = location.id
 
         end
+
+        if department_id.present?
+          department = user.company.departments.find_by_id(department_id)
+          item[:department_name] = department.name if department.present?
+          item[:department_id] = department.id if department.present?
+        end 
+        if cost_center_id.present?
+          cost_center = user.company.cost_centers.find_by_id(cost_center_id)
+          item[:cost_center_name] = cost_center.name if cost_center.present?
+          item[:cost_center_id] = cost_center.id if cost_center.present?
+        end
         
         if preferred_vendor.present?
           if preferred_vendor.to_i.to_s == preferred_vendor
@@ -197,7 +222,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           end
         end
 
-        item[:estimated_value] = quantity.to_i * unit_price.to_i
+        item[:estimated_value] = quantity.to_f * unit_price.to_f
 
         item[:category_name] = self.category.find_by(id: category_id)&.name
         item[:category_id] = self.category.find_by(id: category_id)&.id
@@ -236,9 +261,10 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
 
   private
 
-  # def validate_hsn_sac(hsn_sac)
-  #   ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
-  # end
+  def validate_hsn_sac(hsn_sac)
+    # ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
+    ( /\A(\d{4,8})\Z/.match(hsn_sac) ) ? true : false
+  end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
@@ -263,8 +289,11 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
      "Category ID",
      "Preferred Vendor",
      "Required By Date",
+     "Department ID",
+     "Cost Center ID",
      "Delivery Location",
      "Purpose",
+     "HSN/SAC",
      "Quantity",
      "Unit of measurement",
      "Estimated Unit Price",

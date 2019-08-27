@@ -1,7 +1,6 @@
-class Mobile::V2::ExpensesController < ApplicationController
+class Mobile::V2::ExpensesController < BaseControllers::MobileBase
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile }
 
   def available_expense_types
     @result = User::AvailableExpenseTypes::Show.(current_user, params)
@@ -28,6 +27,7 @@ class Mobile::V2::ExpensesController < ApplicationController
         @result = Expense::ExPerDiem::Create.(current_user, param)
       else
         respond response: :failure, message: 'Invalid input'
+        return
     end
 
     # @result = Expense::Manual::Create.(current_user, param)
@@ -37,7 +37,8 @@ class Mobile::V2::ExpensesController < ApplicationController
         @result = Reports::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'mobile/v2/reports/show'
       else
-        respond render: 'mobile/v0/shared/success'
+        @result = Expense::Show.(@result.user, expense_id: @result.expense.id, view: params[:view])
+        respond render: 'mobile/v2/expenses/show'
       end
     else
       respond

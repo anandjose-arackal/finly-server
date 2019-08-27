@@ -7,17 +7,20 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '172.32.152.12', user: 'centos', roles: %w{web app db}
-server '172.32.62.170', user: 'centos', roles: %w{web app}
-server '172.33.23.223', user: 'centos', roles: %w{web app}
-server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
-server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
+server 'm1.finly.io', user: 'centos', roles: %w{web app db}
+server 'm2.finly.io', user: 'centos', roles: %w{web app}
+server 'm3.finly.io', user: 'centos', roles: %w{web app}
+server 'm4.finly.io', user: 'centos', roles: %w{web app}
+server 'm5.finly.io', user: 'centos', roles: %w{web app}
+server 'm6.finly.io', user: 'centos', roles: %w{web app}
+server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
 
 set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :sidekiq_roles, :sidekiq_app
@@ -25,6 +28,7 @@ set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
+set :email_tracker_role, :email_tracker_role
 # role-based syntax
 # ==================
 

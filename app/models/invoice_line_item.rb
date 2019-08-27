@@ -5,7 +5,7 @@
 #  id                     :integer          not null, primary key
 #  invoice_id             :integer
 #  description            :string(255)
-#  quantity               :integer
+#  quantity               :decimal(20, 5)
 #  rate                   :decimal(20, 10)
 #  tax                    :decimal(20, 10)
 #  discount               :decimal(20, 10)
@@ -27,9 +27,17 @@
 #  account                :string(255)
 #  tax_rate_id            :integer
 #  cost_center_id         :integer
+#  unit_of_measurement    :string(255)
+#  department_id          :integer
+#  sgst                   :decimal(20, )
+#  cgst                   :decimal(20, )
+#  igst                   :decimal(20, )
+#  purchase_order_item_id :integer
+#  billable_amount_id     :integer
 #
 
 class InvoiceLineItem < ApplicationRecord
+  include MathUtil
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
   belongs_to :amount, optional: true
@@ -38,11 +46,13 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :billable_amount, optional: true, class_name: "Amount"
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
+  belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -50,6 +60,8 @@ class InvoiceLineItem < ApplicationRecord
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :taxable_amount
+  accepts_nested_attributes_for :billable_amount
 
   validates :description, presence: true
   validates :quantity, presence: true
@@ -57,7 +69,7 @@ class InvoiceLineItem < ApplicationRecord
 
   # removing for now
   # validates_presence_of :unit_of_measurement
-  validates_presence_of :department , if: :check_outward_invoice?
+  validates_presence_of :department, if: :check_outward_invoice?
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -93,8 +105,33 @@ class InvoiceLineItem < ApplicationRecord
     # end
   }
 
+  scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
+
   def check_outward_invoice?
     return true if self.parent_type != 'OutwardInvoice'
+  end
+
+  def tds_applicable?
+    self.inventory_line_item&.tds_applicable?
+  end
+
+  def as_json
+    {
+      rate: rate,
+      quantity: quantity,
+      tax: tax,
+      discount: discount,
+      category_id: category_id,
+      category_name: category&.name,
+      tax_amount: precision_value(tax_amount&.value),
+      discount_amount: precision_value(discount_amount&.value),
+      amount: precision_value(amount&.value),
+      id: id,
+      description: description,
+      total_amount: precision_value(net_amount&.value),
+      hsn_sac: hsn_sac,
+      taxable_amount: precision_value(taxable_amount&.value)
+    }
   end
 
   private

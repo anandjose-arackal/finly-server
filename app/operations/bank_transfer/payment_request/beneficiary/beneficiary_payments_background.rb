@@ -1,7 +1,7 @@
 # called when user adds excel sheet or manually adds new payments
 # This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
 
-class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOperation
+class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground < BackgroundOperation
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
@@ -38,8 +38,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     self.payment_mode = self.bank_payment_request.payment_mode
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
+    initiating_account = retrieve_initiating_account(user.company)
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
+      payment[:advance_amount] = (payment[:advance_amount].blank?) ? 0 : payment[:advance_amount]
       beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
       payment[:date] = payment[:invoice_date] || payment[:date]
       payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -50,8 +52,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
           receiving_user_id: bank_account.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: YesBankCompanyAccount.name,
-          initiating_account_id: user.company.yes_bank_company_account.id,
+          initiating_account_type: initiating_account&.class&.name,
+          initiating_account_id: initiating_account&.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -62,6 +64,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
               currency_id: Currency.first.id
           },
           note: payment[:note],
+          # payment_notification_users: payment[:payment_notification_users],
           date: DateUtils.local_date,
           external_reference_id: payment[:external_reference_id],
           department_id: payment[:department_id],
@@ -91,6 +94,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
               original_amount_attributes: {
                   value: payment[:original_amount],
                   currency_id: 1
+              },
+              advance_amount_attributes: {
+                  value: payment[:advance_amount],
+                  currency_id: 1
               }
           },
           custom_fields: payment[:custom_fields]
@@ -109,8 +116,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       custom_fields = payment_param[:custom_fields]
       payment_param.delete(:custom_fields)
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      payment = ::Payment.new(payment_param)
+      # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
@@ -146,7 +153,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       return ba
     else
       ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id, name: order_details[:name]&.strip,
+                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
       business_name = order_details[:business_name] || order_details[:name]
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)
@@ -183,6 +190,20 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     return bp
   end
 
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
+  end
+
   def beneficiary_payment_params(payment, vendor_id, bank_account_id)
     payment[:date] = payment[:invoice_date] || payment[:date]
     payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -197,11 +218,16 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       company_id: self.company_id,
       gst_type_id: payment[:gst_type_id],
       tds_slab_id: payment[:tds_slab_id],
+      payment_notification_users: payment[:payment_notification_users],
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
       original_amount_attributes: {
               value: payment[:original_amount],
+              currency_id: Currency.first.id
+      },
+      advance_amount_attributes: {
+              value: payment[:advance_amount],
               currency_id: Currency.first.id
       },
       invoice_number: payment[:invoice_number],

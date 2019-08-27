@@ -90,12 +90,13 @@ class Settlement::SMoneyRequests::Processing::Init < Settlement::SMoneyRequests:
         pocket = UserPocket.find_by(id: pocket_id)
         request_ids = self.money_requests.with_user(user_id).with_destination_pocket_id(pocket_id).pluck(:id)
         amount = MoneyRequestItem.with_money_request(request_ids).sum_amount(pocket&.base_currency&.country_code)
+        next if amount.to_f <= 0 # sometimes unknown mr are added to batch with value less than zero. Skip it.
         self.user_count += 1
-        self.request_total[pocket.base_currency&.country_code] = Amount.new(value: 0, currency_id: pocket.base_currency_id) if self.request_total[pocket.base_currency&.country_code].blank?
-        self.request_total[pocket.base_currency&.country_code].value += amount
+        self.request_total[pocket&.base_currency&.country_code] = Amount.new(value: 0, currency_id: pocket&.base_currency_id) if self.request_total[pocket&.base_currency&.country_code].blank?
+        self.request_total[pocket&.base_currency&.country_code].value += amount
         user_money_requests << {
             user: users_map[user_id],
-            request_total: Amount.new(value: amount, currency_id: pocket.base_currency_id),
+            request_total: Amount.new(value: amount, currency_id: pocket&.base_currency_id),
             money_requests: self.money_requests.with_destination_pocket_id(pocket_id).with_user(user_id),
             has_errors: false
         }

@@ -1,6 +1,5 @@
-class Invoicing::RemindersController < ApplicationController
+class Invoicing::RemindersController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def create
     @result = Invoicing::Company::Reminders::Create.(current_user, params)

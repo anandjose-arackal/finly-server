@@ -99,20 +99,20 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: 'staging.finly.io' }
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address:              'smtp.sendgrid.net',
-      port:                 587,
-      domain:               'staging.finly.io',
-      user_name:            'vivekagb',
-      password:             'idAr5APhk61X',
-      # ssl:                  true,
-      # tls:                  true,
-      authentication:       :plain,
-      enable_starttls_auto: true,
-      :openssl_verify_mode  => 'none'
-  }
+  # config.action_mailer.default_url_options = { host: 'staging.finly.io' }
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #     address:              'smtp.sendgrid.net',
+  #     port:                 587,
+  #     domain:               'staging.finly.io',
+  #     user_name:            'vivekagb',
+  #     password:             'idAr5APhk61X',
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  #     authentication:       :plain,
+  #     enable_starttls_auto: true,
+  #     :openssl_verify_mode  => 'none'
+  # }
 
   #####################################################################
 
@@ -135,17 +135,22 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
-  config.paperclip_defaults = {
-      storage: :s3,
-      s3_region: ENV["aws_region_name"],
-      s3_credentials: {
-          s3_host_name: ENV["s3_host_name"],
-          bucket: ENV["s3_attachment_bucket_name"],
-          s3_region: ENV["aws_region_name"],
-          access_key_id: ENV["aws_access_key_id"],
-          secret_access_key: ENV["aws_secret_access_key"]
-      }
-  }
+  # aws_config = Rails.application.config_for(:aws_config)
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: aws_config["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: aws_config["s3_host_name"],
+  #         bucket: aws_config["s3_attachment_bucket_name"],
+  #         s3_region: aws_config["aws_region_name"],
+  #         access_key_id: aws_config["aws_access_key_id"],
+  #         secret_access_key: aws_config["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
+  #     }
+  # }
   #########################################################################################
 
 end

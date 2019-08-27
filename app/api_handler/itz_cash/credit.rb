@@ -36,7 +36,7 @@ class ItzCash::Credit < ItzCash::Base
     serial_id = card.serial_id
     {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
      merchanttypekey: merchant_type_key,
-     reftransid: Generator.new_transaction_id, productcode: card.product_code, amount: amount,
+     reftransid: Generator.new_transaction_id(self.card), productcode: card.product_code, amount: amount,
      transactiontype: transaction_type}
   end
 

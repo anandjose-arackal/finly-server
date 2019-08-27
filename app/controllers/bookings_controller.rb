@@ -1,6 +1,5 @@
-class BookingsController < ApplicationController
+class BookingsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = TravelRequests::Bookings::Create.(current_user, params)

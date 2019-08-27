@@ -9,8 +9,6 @@ class WorkflowManager::Base < BaseOperation
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
 
-
-
     # todo - The below switch case can be reduced to one line since provider name is already present
     self.document_class_name = self.document&.class&.name
 

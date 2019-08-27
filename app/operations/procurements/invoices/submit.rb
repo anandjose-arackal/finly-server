@@ -73,12 +73,15 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       end
     end
 
+    self.invoice.update(rejection_note: "")
     self.workflow_output = op.workflow_output
   end
 
   def post_process
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
+    # Email to vendor that invoice is generated when the invoice is approved/auto_approved
+    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
   end
 end

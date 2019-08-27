@@ -1,6 +1,5 @@
-class Procure::InwardInvoicesController < ApplicationController
+class Procure::InwardInvoicesController < BaseControllers::WebBase
 
-  before_action -> {finly_authorize! :web}
 
   # this action is to create one from a purchase order
   def create_from_po
@@ -16,6 +15,12 @@ class Procure::InwardInvoicesController < ApplicationController
   # this action is to create one from scratch
   def create
 
+  end
+
+
+  def filter_config
+    @result = Procurements::Invoices::FilterConfig.(current_user, params)
+    respond
   end
 
   def index
@@ -110,7 +115,9 @@ class Procure::InwardInvoicesController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::Invoices::Templates::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def bulk_upload_items

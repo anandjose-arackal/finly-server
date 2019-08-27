@@ -1,6 +1,5 @@
-class AgreementsController < ApplicationController
+class AgreementsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web} , only: [:validate, :agree, :company_data]
 
   def company_data
     @result = Agreements::Company::Show.(current_user, params)

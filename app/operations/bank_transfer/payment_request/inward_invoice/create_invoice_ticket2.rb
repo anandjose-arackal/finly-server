@@ -99,6 +99,16 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
+    invalid_invoices = []
+    self.inward_invoices.each do |invoice|
+      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+    end
+
+    if invalid_invoices.present?
+      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:id).compact.join(", ")}\", are already linked to a payment ticket"
+      return
+    end
+
     if self.policy.blank?
       add_message :error, "Policy not found."
       return
@@ -119,6 +129,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, "This invoice, with id #{invoice.id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
         return
       end
+      if invoice.bank_account.blank?
+        add_message :error, "This invoice, with id #{invoice.id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
+        return
+      end
+
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
       end
@@ -174,13 +189,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   def initialize_payment_objects
     payment_params = []
     self.inward_invoices.each do |invoice|
-
+      initiating_account = retrieve_initiating_account(user.company)
       bank_account = invoice.vendor&.bank_accounts&.where(default_account: true).first
       payment_params << {
           name: invoice.vendor&.name,
-          bank_account_number: bank_account&.account_number,
-          ifsc: bank_account&.ifsc,
-          account_id: bank_account&.id,
+          bank_account_number: (invoice.bank_account&.account_number || bank_account&.account_number),
+          ifsc: (invoice.bank_account&.ifsc || bank_account&.ifsc),
+          account_id: ( invoice.bank_account&.id || bank_account&.id),
           requested_amount: self.payable_amounts[invoice.id],
           payment_type_id: PaymentType.id_for(:credit),
           application: RequestStore.store[:current_app],
@@ -188,8 +203,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           receiving_user_id: invoice.bank_account&.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: user.company.yes_bank_company_account&.class&.name,
-          initiating_account_id: user.company.yes_bank_company_account&.id,
+          initiating_account_type: initiating_account&.class&.name,
+          initiating_account_id: initiating_account&.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: invoice.bank_account&.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -236,6 +251,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     #     date: DateUtils.local_date,
     #     invoice_id: self.inward_invoice.id
     # }]
+    initiating_account = retrieve_initiating_account(user.company)
     payment_order_params = {
         initiating_user: user,
         payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
@@ -244,8 +260,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
             value: self.requested_amount,
             currency_id: 1
         },
-        payment_mode: "NEFT",
-        initiating_account_type: user.company.yes_bank_company_account&.class&.name,
+        payment_mode: self.payment_mode,
+        initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: RequestStore.store[:current_app],
@@ -266,6 +282,20 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         payment_order_attributes: payment_order_params
     }
     return bank_payment_request_params
+  end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
   end
 
 end

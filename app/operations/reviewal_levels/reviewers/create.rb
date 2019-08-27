@@ -10,6 +10,12 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
 
     # self.reviewer = User.find_by id: reviewer_params[:reviewer_id]
     self.reviewer = user.company.users.find_by id: reviewer_params[:reviewer_id]
+
+    if reviewer_params[:min].blank?
+      reviewer_params[:min] = 0
+    elsif reviewer_params[:min].to_f < 0
+      add_message :error, "Min cannot be less than 0"
+    end
   end
 
   def validate
@@ -29,6 +35,10 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     unless reviewer.present?
       add_message :error, 'Unknown Reviewer'
     end
+
+    if reviewer_params[:max].present? && reviewer_params[:max].to_f <= reviewer_params[:min].to_f
+      add_message :error, "Max cannot be less than or equal to min"
+    end
   end
 
   def process
@@ -44,12 +54,6 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
 
   def post_process
     add_message :success, 'Successfully Added Reviewer'
-  end
-
-  private
-
-  def reviewer_parameters
-    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception, :wo_exception)
   end
 
 end

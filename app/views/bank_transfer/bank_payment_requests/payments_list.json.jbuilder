@@ -1,6 +1,10 @@
 json.payments do
   json.array!(@result.paginated_payments.include_for_index) do |payment|
-    json.owner_name payment.receiving_account&.account_owner&.name
+    if payment.receiving_account&.account_owner&.is_a?(YesBankVendor)
+      json.owner_name payment.receiving_account&.account_owner&.display_name
+    else
+      json.owner_name payment.receiving_account&.account_owner&.name
+    end
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account&.account_number
     json.ifsc payment.receiving_account&.ifsc
@@ -23,6 +27,8 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.credited_at payment.reference_resource&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+    json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.retriable do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
@@ -73,6 +79,7 @@ json.payments do
         json.tds_rate precision_value invoice.tds_rate
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
+        json.invoice_id invoice.id
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
@@ -139,7 +146,7 @@ json.payments do
     json.parent_details do
       json.merge! payment.parent_details
       # json.payable_amount payment.get_payable_amount
-      json.payable_amount payment.amount_value
+      json.payable_amount precision_value payment.amount.value
     end
   end
 end
@@ -155,18 +162,18 @@ json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account.account_number
-    json.ifsc payment.receiving_account.ifsc
+    json.account_number payment.receiving_account&.account_number
+    json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
-    json.account_id payment.receiving_account.id
-    json.beneficiary_id payment.receiving_account.account_owner&.id
-    json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
-    if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+    json.account_id payment.receiving_account&.id
+    json.beneficiary_id payment.receiving_account&.account_owner&.id
+    json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+    if payment.receiving_user&.is_a?(User) || payment.receiving_user&.authorized
       json.beneficiary_type "authorized"
     else
       json.beneficiary_type "unauthorized"

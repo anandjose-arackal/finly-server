@@ -1,8 +1,7 @@
-class MenusController < ApplicationController
+class MenusController < BaseControllers::WebBase
 
   # todo - temporary, will be changed once new token auth is implemented
 
-  before_action -> { finly_authorize! :web}
 
   def user_menus
 

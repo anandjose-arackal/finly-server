@@ -9,6 +9,9 @@
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
 #  status_id        :integer          default(1), not null
+#  test_account     :boolean          default(FALSE)
+#  subdomain        :string(255)
+#  group_id         :integer
 #
 
 class Company < ApplicationRecord
@@ -16,6 +19,7 @@ class Company < ApplicationRecord
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
+  belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
   has_many :users
   has_many :cards
@@ -37,7 +41,9 @@ class Company < ApplicationRecord
   has_many :company_balance_histories
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
-  has_many :bank_transactions
+  has_many :yes_bank_transactions
+  has_many :icici_bank_transactions
+  has_many :kotak_bank_transactions
   has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
@@ -47,17 +53,23 @@ class Company < ApplicationRecord
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one :icici_bank_company_account
+  has_one :kotak_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
   has_many :web_hook_tracks
   has_many :invoice_attachments
   has_many :export_configs
+  has_many :unique_identifiers
+  has_many :beneficiary_payments
+  has_many :icici_statements
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
   has_one :enforce_budget_configuration
   has_one :custom_export_configuration, as: :configurable
+  has_one :icici_bank_config
 
   has_many :payment_orders
   has_many :user_groups
@@ -100,6 +112,8 @@ class Company < ApplicationRecord
   has_many :bank_payment_requests
   has_many :attachments, dependent: :nullify
 
+  has_many :admin_implementation_requests
+
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -113,7 +127,7 @@ class Company < ApplicationRecord
 
   validates :name, presence: true
 
-  scope :with_id, -> (id) { where id: id }
+  scope :with_id, -> (id) {where id: id}
   scope :filter_ocr, -> (flag) {
     if flag == '1'
       joins(:feature_subscription).select('companies.*').where('ocr_enabled IS true')
@@ -129,9 +143,9 @@ class Company < ApplicationRecord
       joins(:itz_cash_property).select('companies.*').where("itz_cash_properties.d_code = '' OR itz_cash_properties.d_code IS NULL")
     end
   }
-  scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
+  scope :ocr_enabled, -> {joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true')}
 
-  scope :filter_status_id, -> (status_id) { where status_id: status_id }
+  scope :filter_status_id, -> (status_id) {where status_id: status_id}
 
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
@@ -179,6 +193,8 @@ class Company < ApplicationRecord
   scope :auto_sync_reports_enabled, -> {
     joins(:auto_sync_configs).select('companies.*').where(reports_sync: true)
   }
+
+  scope :with_subdomain, ->(subdomain) {find_by subdomain: subdomain}
 
   def vendor_payment_policies
     ids = self.policies.with_application("vp").pluck(:id)
@@ -346,6 +362,14 @@ class Company < ApplicationRecord
     self.configuration.auto_retry_payment
   end
 
+  def group_entity_structure_enabled?
+    self.feature_subscription.group_entity_structure
+  end
+
+  def bank_service_provider
+    self.feature_subscription.bank_service_provider
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
@@ -449,6 +473,7 @@ class Company < ApplicationRecord
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save
@@ -466,7 +491,7 @@ class Company < ApplicationRecord
 
     # creating budget configurations
     self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,
-                                               enforce_expense_budget: false, enforce_invoice_budget: false).save
+                                            enforce_expense_budget: false, enforce_invoice_budget: false).save
 
     # creating custom export configurations for a company
     self.build_custom_export_configuration(custom_report: false, custom_invoice: false, custom_purchase_order: false).save

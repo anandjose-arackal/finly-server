@@ -2,32 +2,42 @@
 #
 # Table name: yes_bank_vendors
 #
-#  id                :integer          not null, primary key
-#  name              :string(255)
-#  company_id        :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  email             :string(255)
-#  mobile_number     :string(255)
-#  authorized        :boolean
-#  description       :text(65535)
-#  is_deleted        :boolean          default(FALSE)
-#  pan               :string(255)
-#  tin               :string(255)
-#  gst               :string(255)
-#  gst_registered    :boolean
-#  state             :string(255)
-#  state_code_id     :integer
-#  created_by_id     :integer
-#  vendor_type_id    :integer
-#  address           :string(255)
-#  business_name     :string(255)
-#  payment_term_id   :integer
-#  currency_id       :integer
-#  tds_rates_list_id :integer
-#  vendor_id         :string(255)
-#  disabled          :boolean          default(FALSE)
-#  deleted_at        :datetime
+#  id                       :integer          not null, primary key
+#  name                     :string(255)
+#  company_id               :integer
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  email                    :string(255)
+#  mobile_number            :string(255)
+#  authorized               :boolean
+#  description              :text(65535)
+#  is_deleted               :boolean          default(FALSE)
+#  pan                      :string(255)
+#  tin                      :string(255)
+#  gst                      :string(255)
+#  gst_registered           :boolean
+#  state                    :string(255)
+#  state_code_id            :integer
+#  created_by_id            :integer
+#  vendor_type_id           :integer
+#  address                  :string(255)
+#  business_name            :string(255)
+#  payment_term_id          :integer
+#  currency_id              :integer
+#  tds_rates_list_id        :integer
+#  vendor_id                :string(255)
+#  disabled                 :boolean          default(FALSE)
+#  deleted_at               :datetime
+#  msme_registered          :boolean          default(FALSE)
+#  msme_registration_number :string(255)
+#  status_id                :integer
+#  policy_id                :integer
+#  controlling_level_id     :integer
+#  submitted_at             :datetime
+#  approved_at              :datetime
+#  vedor_code               :string(255)
+#  trade_name               :string(255)
+#  reject_note              :string(255)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -97,7 +107,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -106,8 +116,10 @@ class YesBankVendor < ApplicationRecord
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR
-                                      yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?",
-                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+                                      yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?",
+                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   }
 
@@ -141,6 +153,12 @@ class YesBankVendor < ApplicationRecord
   }
   scope :filter_approved, -> {
     approved
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('yes_bank_vendors.created_at >= ? && yes_bank_vendors.created_at <= ?', from, to)
   }
 
   scope :includes_bank_accounts, -> {
@@ -192,6 +210,15 @@ class YesBankVendor < ApplicationRecord
     self.business_name.blank? ? self.name : self.business_name
   end
 
+  def generate_sequential_id?
+    # if the vendor is authorized or if the vendor already has a vendor ID from the frontend,
+    # do NOT generate a custom sequential ID for them
+    if !self.authorized || self.vendor_id.present?
+      return false
+    end
+    true
+  end
+
   def as_json(options={})
     display_name = self.business_name || self.name
     {
@@ -213,8 +240,13 @@ class YesBankVendor < ApplicationRecord
         state_code_id: state_code_id,
         tds_id: tds_rates_list_id,
         bank_accounts: bank_accounts,
-        state_code: state_code&.state_code
+        state_code: state_code&.state_code,
+        address: address
     }
+  end
+
+  def self.human_name
+    'Vendor'
   end
 
   def self.document_owner_attribute

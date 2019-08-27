@@ -1,11 +1,12 @@
 class Vendors::Support::PennyTest < Vendors::Base
-  attr_accessor :bank_account_params, :account_name
+  attr_accessor :bank_account_params, :bank_account_master
 
   class Vendors::Support::PennyTest::TestPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :account_name
+    attr_accessor :account_name, :card_id, :bank_account_master
 
     def init
-      params[:account_name] = params[:account_name]
+      self.bank_account_master = params[:bank_account_master]
+      self.card_id = params[:card_id]
     end
   end
 
@@ -26,14 +27,21 @@ class Vendors::Support::PennyTest < Vendors::Base
   def process
     op = BankTransfer::BankAccounts::CheckValidity.(user, bank_account_params)
     if op.success?
-      self.account_name = op.full_name
+      self.bank_account_master = op.bank_account_master
     else
       add_message :error, op.messages[:error]
     end
+
+    # Junk code - todo
+    # self.account_name = "Validated Account"
+  end
+
+  def post_process
+    add_message :success, "Account Validation Successful"
   end
 
   def success
-    params[:account_name] = self.account_name
+    params[:bank_account_master] = self.bank_account_master
     Vendors::Support::PennyTest::TestPresenter.new(user, params, messages)
   end
 

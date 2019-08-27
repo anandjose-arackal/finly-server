@@ -7,12 +7,8 @@ class Categories::Import < Categories::Base
     end
   end
 
-  def user_model
-   [User, AdminUser]
-  end
-
   def init
-    self.company = Company.find_by_id params[:company_id].to_i
+    self.company = user.company
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -84,6 +80,7 @@ class Categories::Import < Categories::Base
     category_name = row[import_fields[:category_name]].to_s
     sub_category_name = row[import_fields[:sub_category_name]].to_s
     gl_code = row[import_fields[:gl_code]].to_s
+    category_code = row[import_fields[:category_code]].to_s
     expense_management = row[import_fields[:expense_management]].to_s.upcase == 'Y' ? true : false
     vendor_payment = row[import_fields[:vendor_payment]].to_s.upcase == 'Y' ? true : false
     inward_invoice_line_items = row[import_fields[:inward_invoice_line_items]].to_s.upcase == 'Y' ? true : false
@@ -92,6 +89,7 @@ class Categories::Import < Categories::Base
         parent_category:{
             name: category_name,
             gl_code: (sub_category_name.blank? ? '': gl_code),
+            category_code: category_code,
             expense_management: expense_management,
             vendor_payments: vendor_payment,
             inward_invoice_line_items: inward_invoice_line_items
@@ -99,6 +97,7 @@ class Categories::Import < Categories::Base
         sub_category:{
             name: sub_category_name,
             gl_code: gl_code,
+            category_code: category_code,
             expense_management: expense_management,
             vendor_payments: vendor_payment,
             inward_invoice_line_items: inward_invoice_line_items
@@ -112,9 +111,10 @@ class Categories::Import < Categories::Base
         :category_name=> 0,
         :sub_category_name => 1,
         :gl_code => 2,
-        :expense_management => 3,
-        :vendor_payment => 4,
-        :inward_invoice_line_items => 5
+        :category_code => 3,
+        :expense_management => 4,
+        :vendor_payment => 5,
+        :inward_invoice_line_items => 6
     }
   end
 
@@ -127,17 +127,18 @@ class Categories::Import < Categories::Base
   end
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    CSV.open(file_name, 'wb') do |csv|
-      self.header << 'Result'
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row = row.map(&:to_s)
-        row << result_hash[i]
-        csv << row
-      end
-    end
-    return file_name.gsub('public', '')
+    file = Tempfile.new("bulk_import_categories_result.csv")
+        CSV.open(file.path, 'wb') do |csv|
+          self.header << 'Result'
+          csv << header
+          (2..sheet.last_row).each do |i|
+            row = sheet.row(i)
+            row = row.map(&:to_s)
+            row << result_hash[i]
+            csv << row
+          end
+        end
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+    return temp_file.file.url
   end
 end

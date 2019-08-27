@@ -21,6 +21,7 @@ class Vendors::Index < Vendors::Base
     has_scope :authorized, type: :boolean
     has_scope :filter_gstin
     has_scope :filter_pan
+    has_scope :filter_creation_date, using: [:from, :to], type: :hash
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
@@ -36,6 +37,38 @@ class Vendors::Index < Vendors::Base
       self.paginated_vendors = self.vendors.paginate(page: page, per_page: per_page).include_details
       self.count = self.vendors.count
     end
+
+    def get_counts
+      result = {
+        all: 0,
+        open: 0,
+        approved: 0,
+        deactivated: 0,
+        processing: 0,
+        awaiting_approval: 0
+      }
+
+      vendor_status_ids = YesBankVendor.status_ids(:draft, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated)
+      vendor_status_counts = self.vendors.where(status_id: vendor_status_ids)&.group(:status_id)&.count
+
+      result[:all] = self.vendors.count
+
+      VendorStatus.all.map do |status|
+        case status.id
+        when VendorStatus.id_for(:draft), VendorStatus.id_for(:retracted), VendorStatus.id_for(:rejected)
+          result[:open] += (vendor_status_counts[status.id] || 0)
+        when VendorStatus.id_for(:awaiting_approval)
+          result[:processing] += (vendor_status_counts[status.id] || 0)
+        when VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved) 
+          result[:approved] += (vendor_status_counts[status.id] || 0)
+        when VendorStatus.id_for(:deactivated)
+          result[:deactivated] += (vendor_status_counts[status.id] || 0)
+        end
+      end
+
+      result[:awaiting_approval] += self.vendors.awaiting_action_items(user).count
+      result
+    end
   end
 
   def init
@@ -50,11 +83,11 @@ class Vendors::Index < Vendors::Base
       return
     end
 
-    if user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.vendors = user.company.yes_bank_vendors.approved.or(user.vendors)
-    else
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       role_based_data = ::YesBankVendor.associated_items(user, ::YesBankVendor.roles) || ::YesBankVendor.none
       self.vendors = user.company.yes_bank_vendors.approved.or(role_based_data)
+    else
+      self.vendors = user.company.yes_bank_vendors.approved
     end
 
   end

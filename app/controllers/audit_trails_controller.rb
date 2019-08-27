@@ -1,5 +1,4 @@
-class AuditTrailsController < ApplicationController
-  before_action -> { finly_authorize! :web}
+class AuditTrailsController < BaseControllers::WebBase
 
   def index
     @result = AuditTrails::Index.(current_user, params)

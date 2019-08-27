@@ -15,6 +15,7 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
+#  bank_reference_number      :string(255)
 #
 
 class MoneyRequestProcessorMapping < ApplicationRecord
@@ -36,12 +37,16 @@ class MoneyRequestProcessorMapping < ApplicationRecord
   accepts_nested_attributes_for :money_requests
   accepts_nested_attributes_for :system_messages
 
+  delegate :completed?, :pending?, :cancelled?, :scheduled?, :failed?, :scheduled?, :processing?, to: :status
+
   scope :with_id, -> (id) { where id: id }
   scope :with_user_id, -> (user_id) { where user_id: user_id }
   scope :with_processor_id, -> (group_id) { where processor_id: group_id }
-  scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
+  scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.ids_for([:completed, :cancelled]) }
+  scope :not_completed_including_cancelled, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
+  scope :exclude_cancelled, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:cancelled) }
+  scope :completed, -> { where status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :pending, -> { where status_id: MoneyRequestProcessorStatus.id_for(:pending) }
-  scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
   scope :pluck_processor_id, -> { pluck :processor_id }
 

@@ -14,7 +14,15 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
+
+	def personalizer
+		{
+				validate: {
+						before: Personalizer::Process.new([:bank_transfer, :payment_request, :beneficiary, :create_beneficiary_ticket], :validate, self)
+				}
+		}
+	end
 
 	def pre_validate
 	    if user.blank?
@@ -57,7 +65,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
-	    self.policy = current_company.policies.find_by(id: policy_id)
+	    self.policy = user.company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -89,7 +97,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    end
 
 	    unless self.policy.present?
-	        add_message :error, 'Policy not found'
+				add_message :error, 'Policy not found'
+				return
 	    end
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
@@ -119,7 +128,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Create Document Level Reviewer Mapping
 	    # For setting level specific reviewers from reviewal chain for a document
 	    params[:reviewal_document] = self.bank_payment_request.reload
-
 	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
 	    unless document_reviewer_mappings_op.success?
 	      self.bank_payment_request.destroy
@@ -128,56 +136,59 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    end
 
 	    # Delegate payment creation to the background operation
-			::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+      # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
 	end
 
 	def success
-	    params[:bank_payment_request_id] = self.bank_payment_request.id
-			params[:bank_payment_request] = self.bank_payment_request
-	    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter.new(user, params, messages)
+    params[:bank_payment_request_id] = self.bank_payment_request.id
+    params[:bank_payment_request] = self.bank_payment_request
+    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter.new(user, params, messages)
 	end
 
 	def failure
-	    params[:issues] = self.issues
-	    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter.new(user, params, messages)
+    params[:issues] = self.issues
+    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter.new(user, params, messages)
 	end
 
 	class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-	    attr_accessor :bank_payment_request_id, :bank_payment_request
+    attr_accessor :bank_payment_request_id, :bank_payment_request
 
-	    def init
-	      self.bank_payment_request_id = params[:bank_payment_request_id]
-				self.bank_payment_request = params[:bank_payment_request]
-	    end
+    def init
+      self.bank_payment_request_id = params[:bank_payment_request_id]
+      self.bank_payment_request = params[:bank_payment_request]
+    end
 	end
 
 	class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-	    attr_accessor :issues
+    attr_accessor :issues
 
-	    def init
-	      self.issues = params[:issues]
-	    end
+    def init
+      self.issues = params[:issues]
+    end
 	end
 
 
 	private
 
 	def parse_payment_order_data
+		initiating_account = retrieve_initiating_account(user.company)
 		policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
 		payment_order_attributes = {
 		    initiating_user_id: user.id,
 		    payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
-		        value: self.total_amount,
+		        # value: self.total_amount,
+		        value: 0,
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
 		    # payment_mode: params[:payment_mode],
-		    initiating_account_type: YesBankCompanyAccount.name,
+		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
@@ -190,7 +201,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
-		        value: self.total_amount,
+		        # value: self.total_amount,
+		        value: 0,
 		        currency_id: 1
 		    },
 		    beneficiary_type_id: 2,
@@ -201,5 +213,19 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    api_initiated: false
 		}
 		bpr_attributes
+	end
+
+	def retrieve_initiating_account(company)
+		case company&.feature_subscription&.bank_service_provider
+		when "YES"
+			initiating_account = user.company.yes_bank_company_account
+		when "ICICI"
+			initiating_account = user.company.icici_bank_company_account
+		when "KOTAK"
+			initiating_account = user.company.kotak_bank_company_account
+		else
+			initiating_account = user.company.yes_bank_company_account
+		end
+		initiating_account
 	end
 end

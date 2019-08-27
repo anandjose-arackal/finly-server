@@ -9,7 +9,7 @@ class ItemMaster::Item::Show < ItemMaster::Item::Base
 
   def validate
     return if record_not_found
-    validate_association
+    # validate_association
   end
 
   def success
@@ -29,13 +29,13 @@ class ItemMaster::Item::Show < ItemMaster::Item::Base
     !validate_presence
   end
 
-  def validate_association
-    return if inventory_line_item.validate_if_admin?(user)
-    # Creator ID not present on Item table
-    # return if item.validate_if_owner?(user)
-    return if inventory_line_item.validate_if_manager?(user)
-    return if current_app == :fc
-    raise_unauthorized_exception
-  end
+  # def validate_association
+  #   return if inventory_line_item.validate_if_admin?(user)
+  #   # Creator ID not present on Item table
+  #   # return if item.validate_if_owner?(user)
+  #   return if inventory_line_item.validate_if_manager?(user)
+  #   return if current_app == :fc
+  #   raise_unauthorized_exception
+  # end
 
 end

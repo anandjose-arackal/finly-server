@@ -2,73 +2,88 @@
 #
 # Table name: invoices
 #
-#  id                           :integer          not null, primary key
-#  address_id                   :integer
-#  date                         :date
-#  due_date                     :date
-#  invoice_number               :text(65535)
-#  tax_type_id                  :integer
-#  discount                     :decimal(64, 12)
-#  discount_type_id             :integer
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  gross_amount_id              :integer
-#  net_amount_id                :integer
-#  inclusive_of_taxes           :boolean
-#  amount_id                    :integer
-#  tds                          :decimal(64, 12)
-#  tds_type_id                  :integer
-#  gst_type_id                  :integer
-#  payment_id                   :integer
-#  discount_amount_id           :integer
-#  tds_amount_id                :integer
-#  tax_amount_id                :integer
-#  tax                          :decimal(64, 12)
-#  category_id                  :integer
-#  original_amount_id           :integer
-#  advance_amount_id            :integer
-#  advance_type_id              :integer
-#  advance                      :decimal(20, 10)
-#  freight_amount_id            :integer
-#  freight_type_id              :integer
-#  freight                      :decimal(20, 10)
-#  roundoff_amount              :decimal(20, 10)
-#  balance_due_id               :integer
-#  taxable_amount_id            :integer
-#  cost_center_id               :integer
-#  tds_slab_id                  :integer
-#  invoice_status_id            :integer
-#  company_id                   :integer
-#  created_by_user_id           :integer
-#  paid_amount_id               :integer
-#  vendor_id                    :integer
-#  receiving_account_id         :integer
-#  receiving_account_type       :string(255)
-#  note                         :text(65535)
-#  procurement_id               :integer
-#  remaining_amount_id          :integer
-#  invoice_type_id              :integer
-#  location_id                  :integer
-#  delivery_location_id         :integer
-#  payment_term_id              :integer
-#  department_id                :integer
-#  sub_department_id            :integer
-#  policy_id                    :integer
-#  controlling_level_id         :integer
-#  controlling_user_id          :integer
-#  controlling_user_role_id     :integer
-#  controlling_for_user_id      :integer
-#  controlling_for_user_role_id :integer
-#  billing_address              :text(65535)
-#  shipping_address             :text(65535)
-#  is_template                  :boolean          default(FALSE)
-#  template_name                :string(255)
-#  is_deleted                   :boolean          default(FALSE)
-#  resource_template_id         :integer
-#  invoice_id                   :string(255)
-#  deleted_at                   :datetime
-#  submitted_at                 :datetime
-#  approved_at                  :datetime
+#  id                              :integer          not null, primary key
+#  address_id                      :integer
+#  date                            :date
+#  due_date                        :date
+#  invoice_number                  :text(65535)
+#  tax_type_id                     :integer
+#  discount                        :decimal(64, 12)
+#  discount_type_id                :integer
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  gross_amount_id                 :integer
+#  net_amount_id                   :integer
+#  inclusive_of_taxes              :boolean
+#  amount_id                       :integer
+#  tds                             :decimal(64, 12)
+#  tds_type_id                     :integer
+#  gst_type_id                     :integer
+#  payment_id                      :integer
+#  discount_amount_id              :integer
+#  tds_amount_id                   :integer
+#  tax_amount_id                   :integer
+#  tax                             :decimal(64, 12)
+#  category_id                     :integer
+#  original_amount_id              :integer
+#  advance_amount_id               :integer
+#  advance_type_id                 :integer
+#  advance                         :decimal(20, 10)
+#  freight_amount_id               :integer
+#  freight_type_id                 :integer
+#  freight                         :decimal(20, 10)
+#  roundoff_amount                 :decimal(20, 10)
+#  balance_due_id                  :integer
+#  taxable_amount_id               :integer
+#  cost_center_id                  :integer
+#  tds_slab_id                     :integer
+#  invoice_status_id               :integer
+#  company_id                      :integer
+#  created_by_user_id              :integer
+#  paid_amount_id                  :integer
+#  vendor_id                       :integer
+#  receiving_account_id            :integer
+#  receiving_account_type          :string(255)
+#  note                            :text(65535)
+#  procurement_id                  :integer
+#  remaining_amount_id             :integer
+#  invoice_type_id                 :integer
+#  location_id                     :integer
+#  delivery_location_id            :integer
+#  payment_term_id                 :integer
+#  department_id                   :integer
+#  sub_department_id               :integer
+#  policy_id                       :integer
+#  controlling_level_id            :integer
+#  controlling_user_id             :integer
+#  controlling_user_role_id        :integer
+#  controlling_for_user_id         :integer
+#  controlling_for_user_role_id    :integer
+#  billing_address                 :text(65535)
+#  shipping_address                :text(65535)
+#  is_template                     :boolean          default(FALSE)
+#  template_name                   :string(255)
+#  is_deleted                      :boolean          default(FALSE)
+#  resource_template_id            :integer
+#  invoice_id                      :string(255)
+#  deleted_at                      :datetime
+#  submitted_at                    :datetime
+#  approved_at                     :datetime
+#  po_adjusted_advance             :integer
+#  po_advance                      :integer
+#  po_prev_adjusted_advance        :integer
+#  advance_amount_required         :boolean          default(FALSE)
+#  gstin_location_id               :bigint
+#  transaction_service_period_from :date
+#  transaction_service_period_to   :date
+#  proforma_invoice_id             :integer
+#  proforma_advance                :integer
+#  total_proforma_advance          :decimal(20, 2)
+#  cost_allocation_items           :boolean          default(FALSE)
+#  po_number                       :string(255)
+#  narration                       :text(65535)
+#  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
 #
 
 class Invoice < ApplicationRecord
@@ -76,7 +91,7 @@ class Invoice < ApplicationRecord
 
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV/'
+  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -122,7 +137,7 @@ class Invoice < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  # belongs_to :policy, optional: true
+  belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 
@@ -164,7 +179,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :proforma_advance
 
   delegate :tax_amount_value, to: :tax_amount
-  delegate :tds_amount_value, to: :tax_amount
+  delegate :tds_amount_value, to: :tds_amount
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
@@ -179,7 +194,7 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
@@ -257,6 +272,12 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+    if user_id.present?
+      self.awaiting_action_items(user_id)
+    end
+  }
+
   scope :filter_ids, ->(ids) {
     where id: ids
   }
@@ -270,11 +291,21 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse('01-01-1990') if from.blank?
-    to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.approved_at >= ? && invoices.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
   scope :filter_invoice_date, -> (from) {
@@ -285,8 +316,8 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) unless from.is_a?(Date)
-    to = Date.parse(to) unless to.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
@@ -373,7 +404,7 @@ class Invoice < ApplicationRecord
 
   scope :include_for_index, -> {
     includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
-             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type,
              :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 
@@ -405,6 +436,29 @@ class Invoice < ApplicationRecord
       month = Date.today.month
     end
     where('extract(month from created_at) = ?', month)
+  }
+
+
+  # Sorting
+  scope :sort_invoice_id, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.invoice_id #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.date #{type}")
+    end
+  }
+
+  scope :sort_due_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.due_date #{type}")
+    end
   }
 
   after_create :set_defaults
@@ -475,8 +529,14 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
+      user = RequestStore.store[:current_user]
+      configuration = user.company.feature_subscription.srn_enabled rescue false
+      if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
+        return self.invoice_items.map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
+      end
+
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
+      return self.invoice_items.map {|p| p.amount&.value }.compact.sum
     else
       return 0
     end
@@ -597,15 +657,24 @@ class Invoice < ApplicationRecord
         editable: self.unpaid? || self.initiated?,
         tax_rate: precision_value(self.tax_rate),
         tds_rate: precision_value(self.tds_rate),
-        discount_rate: precision_value(self.discount_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
+        attachments: self.attachments.map(&:as_json),
+        # invoice_attachment: {
+        #     url: self.invoice_attachments.first&.attached_file&.url,
+        #     thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+        #     content_type: self.invoice_attachments.first&.attached_file&.content_type,
+        #     file_name: self.invoice_attachments.first&.attached_file&.original_filename
+        # },
         invoice_attachment: {
-            url: self.invoice_attachments.first&.attached_file&.url,
-            thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-            content_type: self.invoice_attachments.first&.attached_file&.content_type,
-            file_name: self.invoice_attachments.first&.attached_file&.original_filename
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
         },
         net_amount: precision_value(self.net_amount&.value),
+        original_amount: self.include_original_amount,
         gross_amount: precision_value(self.gross_amount&.value),
         custom_fields: self.custom_fields,
         category_id: self.category_id,
@@ -626,8 +695,21 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        invoice_items: invoice_items.as_json
     }
+  end
+
+  def invoice_discount_rate
+    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
+  end
+
+  def include_original_amount
+    if self.invoice_items.present?
+        precision_value(self.amount&.value)
+    else
+        precision_value(self.original_amount&.value)
+    end
   end
 
   # For user role as invoice initiator
@@ -639,7 +721,7 @@ class Invoice < ApplicationRecord
   # For user role as invoice reviewer
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self) || user.vendor_payment_admin?
   end
 
   def is_crediting_user?(user = nil)
@@ -692,7 +774,28 @@ class Invoice < ApplicationRecord
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def self.role_based_initiator_associated_items(user, role_id, options={})
+    if role_id == UserRole.id_for(:invoice_initiator)
+      document_table_name = options[:document_table_name]
+      if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
+        document_table_name = 'inward_invoices'
+      end
+      document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+    elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    end
+  end
+
   private
+
+
 
   def set_defaults
     if self.invoice_status.blank?

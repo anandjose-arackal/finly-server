@@ -27,6 +27,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id,
                                     :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
+                                    :bank_account_id,
                                     :vendor_id, :advance_amount_required, :po_number, :narration,
                                     original_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
@@ -39,7 +40,8 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                         :quantity, :unit_of_measurement, :department_id,
                                         :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
                                         :category_id, :description, :id, :remove_line_item,
-                                        :hsn_sac, :comment, :_destroy, :inventory_line_item_id
+                                        :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :purchase_order_item_id,
+                                        :billable_amount
                                     ], custom_fields: [])
   end
 

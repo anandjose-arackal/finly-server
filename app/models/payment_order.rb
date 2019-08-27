@@ -26,6 +26,7 @@
 #  post_operation            :text(65535)
 #  post_operation_payload    :text(65535)
 #  api_initiated             :boolean          default(FALSE)
+#  bank_account_provider_id  :integer
 #
 
 class PaymentOrder < ApplicationRecord
@@ -62,6 +63,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :amount_processed, optional: true, class_name: 'Amount'
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
+  belongs_to :bank_account_provider, optional: true
 
   serialize :post_operation_payload, Hash
 
@@ -242,14 +244,18 @@ class PaymentOrder < ApplicationRecord
   def update_order_status
     status_ids = self.payments.pluck(:payment_status_id)
     if status_ids.include?(PaymentStatus.id_for(:failed))
-      # now further check if there are successes as well
-      if status_ids.include?(PaymentStatus.id_for(:completed))
+      # now further check if there are successes / initiated as well
+      if status_ids.include?(PaymentStatus.id_for(:completed)) || status_ids.include?(PaymentStatus.id_for(:initiated))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else # i.e. if there are only failures in this payment order
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       end
     else
-      self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      if status_ids.include?(PaymentStatus.id_for(:initiated))
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      else
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      end
     end
   end
 

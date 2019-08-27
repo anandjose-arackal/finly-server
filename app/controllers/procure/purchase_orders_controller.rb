@@ -1,6 +1,6 @@
-class Procure::PurchaseOrdersController < ApplicationController
-  before_action :set_tokens_in_header, only: [:download]
-  before_action -> { finly_authorize! :web }
+class Procure::PurchaseOrdersController < BaseControllers::WebBase
+
+  set_tokens_in_header :download
 
   def index
     @result = Procurements::PurchaseOrders::Index.(current_user, params)
@@ -115,7 +115,9 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def reject
@@ -143,6 +145,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     @respond
   end
 
+  def mark_vendor_confirmed
+    @result = Procurements::PurchaseOrders::MarkVendorConfirmed.(current_user, params)
+    @respond
+  end
+
   def export_items
     @result = Procurements::PurchaseOrders::ExportItems.(current_user, params)
     respond
@@ -164,10 +171,12 @@ class Procure::PurchaseOrdersController < ApplicationController
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf/paginated_bootstrap.html.erb",
+                 template: "export/purchase_order",
                  print_media_type: true,
                  margin: { :bottom => 12 },
                  dpi: 650,
                  # header: { left: '[page] of [topage]' },
+                 header: { center: @result.purchase_order&.po_number },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
                  # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
@@ -251,6 +260,11 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def actions_configuration
     @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
+  def counts
+    @result = Procurements::PurchaseOrders::Counts.(current_user, params)
     respond
   end
 

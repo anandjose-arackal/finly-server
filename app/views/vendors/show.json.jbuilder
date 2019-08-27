@@ -6,6 +6,7 @@ json.vendor do
     json.payment_term @result.vendor.payment_term
     json.currency @result.vendor.currency
     json.business_name @result.vendor.business_name
+    json.trade_name @result.vendor.trade_name
     json.address @result.vendor.address
     json.authorized @result.vendor.authorized
     json.description @result.vendor.description
@@ -17,6 +18,7 @@ json.vendor do
     json.state_code_name @result.vendor.state_code&.full_name
     json.created_by @result.vendor.created_by&.name
     json.vendor_id @result.vendor.vendor_id
+    json.rejection_note @result.vendor&.reject_note
     json.tds_rates do
       json.array! @result.vendor.vendor_tds_rates do |vtr|
         json.id vtr.id
@@ -40,14 +42,16 @@ json.bank_accounts do
     json.confirm_account_number bank_account.account_number
     json.ifsc bank_account.ifsc
     json.id bank_account.id
+    json.card_id bank_account.id
     json.name bank_account.name
-    json.default bank_account.default_account
+    json.default_account bank_account.default_account
   end
 end
 
 json.gstin_locations do 
   json.array!(@result.vendor.gstin_locations) do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
+    json.card_id gstin_location.id
     if gstin_location.gstin_master.present?
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
@@ -151,7 +155,7 @@ json.edit_config do
           end
           json.reviewers do
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
               json.reviewer_details reviewer.reviewer.as_json
             end
           end

@@ -27,8 +27,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       # self.locations = user.company.locations
       params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
-      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
-      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+      self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
 
       if invoice.created_by&.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
@@ -171,16 +171,15 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
 
     def user_in_level?
-      current_level = invoice.level
-      amount = invoice&.net_amount&.value || 0
+      # current_level = invoice.level
+      # amount = invoice&.net_amount&.value || 0
 
-      if current_level.present?
-        if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
-          return true
-        end
-      end
-
-      false
+      # if current_level.present?
+        # if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
+        #   return true
+        # end
+      # end
+      invoice.get_reviewers.include?(user)
     end
   end
 
@@ -203,9 +202,11 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
     return if invoice.validate_if_reviewer(user)
+    return if invoice.validate_if_invoice_auditor(user)
     # Need to check dlrms as above conditions are breaking
     #Quick fix
     return if user.is_invoice_reviewer?
+    return if user.is_invoice_auditor?
     return if user.is_bank_payment_request_initiator?
     return if user.is_bank_payment_request_reviewer?
     return if user.is_bank_payment_request_creditor?

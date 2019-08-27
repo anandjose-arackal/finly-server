@@ -1,7 +1,6 @@
-class ExportPreferencesController < ApplicationController
+class ExportPreferencesController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def create
     create_op = Company::ExportPreferences::Create.new(current_user, params)

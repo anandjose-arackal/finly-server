@@ -2,7 +2,7 @@
 #
 # Table name: artifacts
 #
-#  id                      :bigint(8)        not null, primary key
+#  id                      :bigint           not null, primary key
 #  resource_id             :integer
 #  resource_type           :string(255)
 #  attachment_file_name    :string(255)
@@ -16,8 +16,3 @@
 #  creator_id              :integer
 #
 
-require 'rails_helper'
-
-RSpec.describe Artifact, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
-end

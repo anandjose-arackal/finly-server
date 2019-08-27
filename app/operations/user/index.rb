@@ -25,6 +25,7 @@ class User::Index < User::Base
         self.count = self.team.count
         per_page = params[:per_page] || 30
         self.paginated_team = self.team.paginate(page: params[:page], per_page: per_page)
+        self.paginated_team = self.paginated_team.includes_for_index
       end
     end
   end

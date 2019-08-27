@@ -1,5 +1,4 @@
-class Procure::InwardDocumentsController < ApplicationController
-  before_action -> {finly_authorize! :web}
+class Procure::InwardDocumentsController < BaseControllers::WebBase
 
   def show
     @result = Procurements::InwardDocuments::Show.(current_user, params)
@@ -20,4 +19,10 @@ class Procure::InwardDocumentsController < ApplicationController
     @result = Procurements::InwardDocuments::Destroy.(current_user, params)
     respond
   end
+
+  def filter_config
+    @result = Procurements::InwardDocuments::FilterConfig.(current_user, params)
+    respond
+  end
+
 end

@@ -1,6 +1,7 @@
-class UsersController < ApplicationController
+class UsersController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web } , except: [:lookup, :send_verification_otp, :verify_user_otp]
+  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login
+  before_action :load_global_variables, only: :lookup
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -189,6 +190,18 @@ class UsersController < ApplicationController
 
   def all_users
     @result = User::AllUsers.(current_user, params)
+    respond
+  end
+
+  # this will be at the time of login, to return the list of companies that this user is a part of
+  def group_entities_login
+    @result = User::GroupEntitiesLogin.(current_user, params)
+    respond
+  end
+
+  # this will be in the cog menu, the list of companies will be part of the cog menu
+  def group_entities_after_login
+    @result = User::GroupEntities.(current_user, params)
     respond
   end
 

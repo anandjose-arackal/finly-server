@@ -4,7 +4,18 @@
 
 class Export::Reports::AsXml < Export::Reports::Base
 
-  attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names
+  attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names,
+                :column_names, :data
+
+  # this will override the default behaviour of this class for Consul and stanza living
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:export, :reports], :as_xml, self)
+        }
+    }
+  end
+
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin, :auditor]
@@ -31,11 +42,11 @@ class Export::Reports::AsXml < Export::Reports::Base
   def process
     cf_data = generate_custom_field_data reports
     cf_headers = cf_data[:headers]
-    @column_names = default_column_names + cf_headers
-    @data = []
+    self.column_names = default_column_names + cf_headers
+    self.data = []
     reports.each do |r|
       r.expenses.each do |e|
-        @data << retrieve_data(preferences, r, e, cf_data)
+        self.data << retrieve_data(preferences, r, e, cf_data)
       end
     end
   end
@@ -50,7 +61,7 @@ class Export::Reports::AsXml < Export::Reports::Base
   end
 
   def success
-    Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data, report_names: report_names}, messages)
+    Export::Base::ExportPresenter.new(user, {header: self.column_names, data: self.data, report_names: report_names}, messages)
   end
 
 end

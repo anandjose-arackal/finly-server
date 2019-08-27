@@ -1,4 +1,4 @@
-class StaticPagesController < ApplicationController
+class StaticPagesController < BaseControllers::PublicBase
   layout 'static'
 
   def home
