@@ -41,7 +41,6 @@
 </head>
 <body>
 <div class="container-fluid">
-
   <div class="row">
     <% url = report.user.company&.configuration&.logo&.url %>
     <% if url.present? %>
@@ -236,20 +235,27 @@
 
   <% end %>
 
-  <% unless receipts.blank? %>
-  <div class="row page-break" style="width: 100%;">
-      <div class="col-sm-12">
-        <h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipts</label></h1>
-        <% receipts.each do |receipt| %>
-          <% next if receipt[:path].nil? %>
-          <div class="img-responsive" style="text-align: center;">
-            <!--<img src="file:///<%= receipt[:path]  %>"/>-->
-            <%= wicked_pdf_image_tag(receipt[:path], :style=>"max-width:100%; height:auto;")%>
-            <p class="text-center">Merchant: <%= receipt[:merchant] %> | Amount: <%= receipt[:amount] %></p>
-          </div>
-        <% end %>
+  <% flag = true %>
+  <% if params.present? %>
+    <% flag = !!StringUtils.to_bool(params[:receipt]) if params[:receipt].present? %>
+  <% end %>
+
+  <% if flag %>
+    <% unless receipts.blank? %>
+      <div class="row page-break" style="width: 100%;">
+        <div class="col-sm-12">
+          <h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipts</label></h1>
+          <% receipts.each do |receipt| %>
+            <% next if receipt[:path].nil? %>
+            <div class="img-responsive" style="text-align: center;">
+              <!--<img src="file:///<%= receipt[:path]  %>"/>-->
+              <%= wicked_pdf_image_tag(receipt[:path], :style=>"max-width:100%; height:auto;")%>
+              <p class="text-center">Merchant: <%= receipt[:merchant] %> | Amount: <%= receipt[:amount] %></p>
+            </div>
+          <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
 
   <br>

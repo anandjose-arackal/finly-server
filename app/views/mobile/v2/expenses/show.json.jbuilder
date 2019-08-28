@@ -7,3 +7,7 @@ json.currencies do
     json.id currency.id
   end
 end
+
+json.tax_rates @result.tax_rates
+json.state_codes @result.gst_state_codes
+json.gst_enabled @result.gst_enabled

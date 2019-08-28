@@ -11,7 +11,7 @@
 #
 
 class BankAccountProvider < ApplicationRecord
-  include Seedable
+  # include Seedable
 
   def self.values
     [
