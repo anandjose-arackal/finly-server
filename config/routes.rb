@@ -3539,6 +3539,7 @@ Rails.application.routes.draw do
     resources :inventory_line_items do 
       put 'upload_attachments', to: 'inventory_line_items#upload_attachments'
       put 'destroy_attachments', to: 'inventory_line_items#destroy_attachments'
+      get 'procurements', to: 'inventory_line_items#procurements'
     end
     resources :payment_terms
     resources :reminders

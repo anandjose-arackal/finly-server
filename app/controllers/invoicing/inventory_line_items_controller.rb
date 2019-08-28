@@ -58,4 +58,9 @@ class Invoicing::InventoryLineItemsController < BaseControllers::WebBase
     respond
   end
 
+  def procurements
+    @result = ItemMaster::Item::Procurements.(current_user, params)
+    respond
+  end
+
 end
