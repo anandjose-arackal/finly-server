@@ -179,10 +179,10 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
-                                                              {receiving_account: :account_owner}, :payment_status, :reference_resource,
+                                                              :payment_status,
                                                               :invoice,
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},

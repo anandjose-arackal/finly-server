@@ -98,6 +98,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       item[:delivered] = (item[:delivered].blank?) ? 0 : item[:delivered]
       item[:accepted] = (item[:accepted].blank?) ? 0 : item[:accepted]
       item[:rejected] = (item[:rejected].blank?) ? 0 : item[:rejected]
+      item[:billable_amount] = (item[:billable_amount].blank?) ? 0 : item[:billable_amount]
     end
   end
 

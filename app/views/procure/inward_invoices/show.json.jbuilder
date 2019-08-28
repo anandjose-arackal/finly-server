@@ -188,18 +188,9 @@ json.invoice do
   end
 end
 
-json.invoice_categories do
-  json.array!(current_company.categories.vendor_payments_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
-json.invoice_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.invoice_categories current_company.categories.vendor_payments_only
+json.invoice_item_categories current_company.categories.inward_invoice_items_only
+
 json.cost_centers do
   # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
   json.array! @result.cost_centers do |cost_center|
