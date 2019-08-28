@@ -14,7 +14,8 @@ class PaymentAgreements::Count < PaymentAgreements::Base
     if result.success?
       self.statuses = result.payment_agreements.joins(:status).group('payment_agreement_statuses.name').count
       self.statuses['all'] = statuses.values.sum rescue nil
-      self.statuses['processing'] = self.statuses['awaiting_approval']
+      # Processing are those which are created by user and are in the approval flow
+      self.statuses['processing'] = user.payment_agreements.where(status: 'awaiting_approval')
     end
   end
 

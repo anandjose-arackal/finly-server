@@ -105,6 +105,8 @@ class Company < ApplicationRecord
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
   has_many :payment_agreements
+  has_many :general_invoices
+  has_many :rental_invoices
 
   has_many :departments
   has_many :company_pocket_templates
