@@ -19,4 +19,12 @@ class GstStateCode < ApplicationRecord
     "#{self.name} - #{self.state_code}"
   end
 
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        state_code: state_code
+    }
+  end
+
 end

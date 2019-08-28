@@ -42,7 +42,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   end
 
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
+    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file&.url)
     output = []
     failed = false
     self.implementation_request.update(requested_items: (input&.count-1))
@@ -69,7 +69,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
           raise "invalid result"
         end
       rescue Exception => e
-        return result false, "#{e.message}"
+        result false, "#{e.message}"
       end
 
       unless result.success?

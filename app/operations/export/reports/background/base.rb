@@ -94,7 +94,7 @@ class Export::Reports::Background::Base < BackgroundOperation
         when ExportField.id_for(:expense_reimbursement)
           data_arr << expense.reimbursable ? 'YES' : 'NO'
         when ExportField.id_for(:spent_from_account)
-          data_arr << expense.spent_from.present? ? expense.spent_from.name : "NONE"
+          data_arr << (expense.spent_from.present? ? expense.spent_from&.name : "NONE")
         when ExportField.id_for(:policy)
           data_arr << expense&.report&.policy&.name
         when ExportField.id_for(:report_submission_date)
