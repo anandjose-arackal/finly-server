@@ -81,6 +81,11 @@ class User < ApplicationRecord
   belongs_to :otp_request_type, optional: true
   belongs_to :user_delegate, optional: true, class_name: "User"
 
+  ######## Expense user specific Cost Center, Location, Department ##########
+  belongs_to :cost_center, optional: true
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :department, optional: true
+
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
   has_one :bank_wallet, class_name: 'VendorPaymentWallet', foreign_key: :user_id, dependent: :destroy
