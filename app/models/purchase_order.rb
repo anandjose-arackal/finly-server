@@ -402,6 +402,28 @@ class PurchaseOrder < ApplicationRecord
     includes(:user, :balance_amount, :vendor, :status, procurement: [:status_tags])
   }
 
+  # Sorting
+  scope :sort_po_number, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_orders.po_number #{type}")
+    end
+  }
+
+  scope :sort_po_name, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      includes(:procurement).reorder("procurements.name #{type}")
+    end
+  }
+
+  # scope :sort_amount, -> (type){
+  #   type = type&.strip&.upcase
+  #   if type && ['ASC', 'DESC'].include?(type)
+  #     includes(:balance_amount).reorder("amounts.value #{type}")
+  #   end
+  # }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
@@ -1022,10 +1044,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def build_params_from_pr_item(pr_item)
+    item_hsn_sac = pr_item.hsn_sac.present? ? pr_item.hsn_sac : pr_item.item&.hsn_sac
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: item_hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.cost_center_id, category_id: pr_item.category_id, comment: pr_item.purpose
     }
   end
 
