@@ -1,40 +1,23 @@
-class ExportTemplates::BaseGenerator
-  include Supporters::ErrorTracker
+class ExportTemplates::BaseGenerator < Transaction
 
-  attr_accessor :user, :template, :configuration
+  step :verify_params
+  step :process_request
 
-  def initialize(user, template)
-    self.user = user
-    self.template = template
-    self.configuration = template&.configuration
-  end
-
-  def process(data)
-    raise 'Cannot process export template as it is in base class'
-  end
-
-  def save_to_file_manager(file)
-    self.user.file_managers.create export_template: self.export_template, file: file
-  end
-
-  def save_to_temp_file(filename, data)
-    file_path = "#{temp_file_path}/#{filename}"
-    File.open(file_path, "w+") do |f|
-      f.write data
+  def verify_params(options, params: {}, **)
+    unless params['template'].present?
+      return error(options, 'template', 'not found')
     end
+    unless params['data'].present?
+      return error(options, 'data', 'not found')
+    end
+    options['template'] = params['template']
+    options['data'] = params['data']
+    options['configuration'] = params['template'].configuration
+    true
   end
 
-  def temp_file_path
-    path = "#{Rails.root}/tmp/files/#{self.user.id}/#{object_id}"
-    FileUtils.mkdir_p(path) unless File.directory?(path)
-    path
-  end
-
-  class ExportTemplates::BaseGenerator::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :output
-
-
-
+  def process_request(options, data:, configuration:, template:, **)
+    raise 'Cannot process export template as it is in base class'
   end
 
 end
