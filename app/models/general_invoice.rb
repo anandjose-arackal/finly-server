@@ -57,8 +57,8 @@ class GeneralInvoice < ApplicationRecord
   amoeba do
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
            :original_amount, :taxable_amount,
-           :invoice_items, :custom_fields,
-           :document_level_reviewer_mappings]
+           :invoice_items, :custom_fields]#,
+           #:document_level_reviewer_mappings]
     
     exclude_association :trails
     exclude_association :invoices

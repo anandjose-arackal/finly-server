@@ -633,6 +633,7 @@ class PaymentAgreements::Base < BaseOperation
 
       if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
         frequency_period_number = invoice&.invoice_frequency&.number
+        match_end_date_with_frequency_multiple = false
         if frequency_period_number.blank?
           add_message :error, "Invoice frequency cannot be blank"
           return
@@ -640,6 +641,22 @@ class PaymentAgreements::Base < BaseOperation
         # if frequency_period_number.present?
           expected_end_date_present = false
           more_than_one_invoice = false
+
+          # End date is not in mulltiples of invoice frequency
+          # Considering that  rent is payed  later and not in advance
+          # End date is not considered is no_expiration is true and only one invoice is present
+          if invoice.is_a?(GeneralInvoice)
+            if self.payment_agreement.general_invoices.count > 1
+              more_than_one_invoice = true
+            end
+          end
+          if invoice.is_a?(RentalInvoice)
+            if self.payment_agreement.rental_invoices.count > 1
+              more_than_one_invoice = true
+            end
+          end
+
+
           (1..12).to_a.each do |number|
             # Work around because no of days are not defined in a month and currently partial invoice is not in place
             # Pls check invoice value when making any changes here. 
@@ -647,7 +664,13 @@ class PaymentAgreements::Base < BaseOperation
             unless self.payment_agreement.no_expiration
               next if invoice.end_date.to_date == self.payment_agreement.expiration_date.to_date
             end
+
+            ############## Obselete Logic Start #####################
             if invoice.end_date.to_date == (invoice.start_date.to_date + number.month - 1.day)
+              # If not already true
+              unless match_end_date_with_frequency_multiple
+                match_end_date_with_frequency_multiple = true
+              end
               if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
                 add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
                 add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
@@ -658,22 +681,8 @@ class PaymentAgreements::Base < BaseOperation
                 expected_end_date_present = true
               end
             end
-
-            # End date is not in mulltiples of invoice frequency
-            # Considering that  rent is payed  later and not in advance
-            # End date is not considered is no_expiration is true and only one invoice is present
-            if invoice.is_a?(GeneralInvoice)
-              if self.payment_agreement.general_invoices.count > 1
-                more_than_one_invoice = true
-              end
-            end
-            if invoice.is_a?(RentalInvoice)
-              if self.payment_agreement.rental_invoices.count > 1
-                more_than_one_invoice = true
-              end
-            end
+            ############# Obselete Logic End ##########################
           end
-
           if more_than_one_invoice
             unless expected_end_date_present
               add_message :error, "Start and End date difference should be in multiples of invoice frequency(#{frequency_period_number} months)"
@@ -684,7 +693,11 @@ class PaymentAgreements::Base < BaseOperation
           # If  one invoice
           unless more_than_one_invoice
             if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
-              add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency" 
+              add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
+              return
+            end
+            unless expected_end_date_present
+              add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
               return
             end
           end
@@ -744,19 +757,23 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def gi_start_end_date_consecutiveness
-    dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
+    # dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
+    dates = self.payment_agreement.general_invoices.collect{ |invoice| [invoice.start_date, invoice.end_date] }
     if dates.present? and dates.count > 1
       # Check consecutiveness for fixed periodic only
-      return unless [self.payment_agreement.general_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
+      # return unless [self.payment_agreement.general_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
+      return unless self.payment_agreement.general_invoices.collect{ |invoice| invoice.billing_type_id}.include?(BillingType.id_for(:fixed_periodic))
       invoice_start_end_date_consecutiveness(dates)
     end
   end
 
   def ri_start_end_date_consecutiveness
-    dates = self.payment_agreement.rental_invoices.pluck(:start_date, :end_date)
+    # dates = self.payment_agreement.rental_invoices.pluck(:start_date, :end_date)
+    dates = self.payment_agreement.rental_invoices.collect{ |invoice| [invoice.start_date, invoice.end_date] }
     if dates.present? and dates.count > 1
       # Check consecutiveness for fixed periodic only
-      return unless [self.payment_agreement.rental_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
+      # return unless [self.payment_agreement.rental_invoices.pluck(:billing_type_id)].include?(BillingType.id_for(:fixed_periodic))
+      return unless self.payment_agreement.rental_invoices.collect{ |invoice| invoice.billing_type_id}.include?(BillingType.id_for(:fixed_periodic))
       invoice_start_end_date_consecutiveness(dates)
     end
   end
@@ -771,6 +788,7 @@ class PaymentAgreements::Base < BaseOperation
       end_date = current_date_arr[1].to_date
       date_with_issues = []
       # compare current_date_arr start_date and end_date with all the dates in the agreement invoice
+      # binding.pry
       dates.each_with_index do |date_arr, index|
         # Skip comparison with itself
         next if index == current_index
@@ -791,8 +809,14 @@ class PaymentAgreements::Base < BaseOperation
             next_start_date_present = true
           end
         end
+
+        # unless next_end_date_present
+        #   if start_date + 1.day == date_arr[0].to_date
+        #     next_start_date_present = true
+        #   end
+        # end
       end
-      if self.payment_agreement.no_expiration || (self.payment_agreement.expiration_date.to_date >= end_date+1.day) 
+      if self.payment_agreement.no_expiration || (self.payment_agreement.expiration_date.to_date >= end_date) 
         unless next_start_date_present
           add_message :error, "Fixed periodic start and end date should be consecutive"
           add_message :error, "One of the start date should be #{end_date+1.day}"
