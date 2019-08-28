@@ -29,6 +29,13 @@ gem 'devise_zxcvbn', '4.4.1'
 gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
+gem 'dry-validation'
+gem 'trailblazer'
+gem 'trailblazer-rails'
+gem 'reform'
+gem 'reform-rails'
+gem 'pundit'
+
 gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server

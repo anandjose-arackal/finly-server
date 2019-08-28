@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_12_134126) do
+ActiveRecord::Schema.define(version: 2019_08_27_111157) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2787,6 +2787,27 @@ ActiveRecord::Schema.define(version: 2019_08_12_134126) do
     t.index ["export_field_id"], name: "index_export_preferences_on_export_field_id"
   end
 
+  create_table "export_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "template_type", null: false
+    t.text "configuration", limit: 4294967295
+    t.string "model_klass", null: false
+    t.boolean "active", default: true
+    t.boolean "personal"
+    t.integer "created_by_user_id", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_export_templates_on_active"
+    t.index ["company_id"], name: "index_export_templates_on_company_id"
+    t.index ["created_by_user_id"], name: "index_export_templates_on_created_by_user_id"
+    t.index ["model_klass"], name: "index_export_templates_on_model_klass"
+    t.index ["name"], name: "index_export_templates_on_name"
+    t.index ["personal"], name: "index_export_templates_on_personal"
+    t.index ["template_type"], name: "index_export_templates_on_template_type"
+  end
+
   create_table "feature_subscriptions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "subscribable_id", null: false
     t.string "subscribable_type", null: false
@@ -4438,6 +4459,7 @@ ActiveRecord::Schema.define(version: 2019_08_12_134126) do
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
+    t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"
   end
 
   create_table "payment_purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5128,12 +5150,14 @@ ActiveRecord::Schema.define(version: 2019_08_12_134126) do
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "category_id"
+    t.string "hsn_sac"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
     t.index ["category_id"], name: "index_purchase_request_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
     t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
     t.index ["department_id"], name: "index_purchase_request_items_on_department_id"
     t.index ["estimated_amount_id"], name: "index_purchase_request_items_on_estimated_amount_id"
+    t.index ["hsn_sac"], name: "index_purchase_request_items_on_hsn_sac"
     t.index ["item_id"], name: "index_purchase_request_items_on_item_id"
     t.index ["per_unit_estimated_amount_id"], name: "index_purchase_request_items_on_per_unit_estimated_amount_id"
     t.index ["purchase_order_id"], name: "index_purchase_request_items_on_purchase_order_id"

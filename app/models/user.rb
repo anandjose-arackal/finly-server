@@ -137,6 +137,7 @@ class User < ApplicationRecord
   has_many :money_requests, inverse_of: :user
 
   has_many :booking_attachments
+  has_many :file_managers
 
 
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
