@@ -187,6 +187,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # Sending email to original document initiators about payments against it
     payments = self.bank_payment_request.payments
     payments.each do |payment|
+      # notify vendor that they got the money they deserved
+      Event::EBankPaymentRequest::NotifyVendor.(user, payment: payment)
+
       case payment.parent_type
       when 'Invoice'        
         document_owner = payment.invoice.created_by
