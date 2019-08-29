@@ -102,7 +102,8 @@ class PaymentAgreement < ApplicationRecord
       case name
       when 'processing'
         if user.present?
-          where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval), creator_id: user.id)
+          # where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval), creator_id: user.id)
+          user.payment_agreements.where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval))
         end
       when 'awaiting_approval'
         if user.present?
