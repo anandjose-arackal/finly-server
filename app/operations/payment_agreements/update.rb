@@ -55,8 +55,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
       # Set total amount on agreement level
       update_total_amount
-      
-      params[:reviewal_document] = self.payment_agreement
+      params[:reviewal_document] = self.payment_agreement.reload
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
