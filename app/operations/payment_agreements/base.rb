@@ -662,6 +662,7 @@ class PaymentAgreements::Base < BaseOperation
       # For fixed periodic only
 
       if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+
         frequency_period_number = invoice&.invoice_frequency&.number
         match_end_date_with_frequency_multiple = false
         if frequency_period_number.blank?
@@ -697,19 +698,22 @@ class PaymentAgreements::Base < BaseOperation
             end
 
             ############## Obselete Logic Start #####################
-            if invoice.end_date.to_date == (invoice.start_date.to_date + number.month - 1.day)
-              # If not already true
-              unless match_end_date_with_frequency_multiple
-                match_end_date_with_frequency_multiple = true
-              end
-              if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
-                add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
-                add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
-                return
-              end
+            if number%frequency_period_number == 0
+              if invoice.end_date.to_date == (invoice.start_date.to_date + number.month - 1.day)
+                # If not already true
+                unless match_end_date_with_frequency_multiple
+                  match_end_date_with_frequency_multiple = true
+                end
+                if invoice.end_date.to_date < (invoice.start_date.to_date + frequency_period_number.month - 1.day)
+                  add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
+                  add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
+                  return
+                end
 
-              unless expected_end_date_present
-                expected_end_date_present = true
+
+                unless expected_end_date_present
+                  expected_end_date_present = true
+                end
               end
             end
             ############# Obselete Logic End ##########################
@@ -829,13 +833,13 @@ class PaymentAgreements::Base < BaseOperation
         # check if start date lies in b/w start date and end date of any other document
         if start_date >= date_arr[0].to_date && start_date <= date_arr[1].to_date
           date_with_issues << start_date
-          add_message :error, "Start date: #{start_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
+          add_message :error, "Start date: #{start_date} is coming between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
           return
         end
 
         if end_date >= date_arr[0].to_date && end_date <= date_arr[1].to_date
           date_with_issues << end_date
-          add_message :error, "End date: #{end_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
+          add_message :error, "End date: #{end_date} is coming between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
           return
         end
         unless next_start_date_present
