@@ -13,7 +13,8 @@ class PaymentAgreements::Base < BaseOperation
   def payment_agreement_parameters
     params.require(:payment_agreement).permit(
 
-      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number, 
+      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
+        selected_invoice_frequency_attributes: {}, 
 
       general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
         invoice_custom_fields: {},
@@ -434,12 +435,18 @@ class PaymentAgreements::Base < BaseOperation
   # Clear invoice frequency if already present if billing type is not fixed_periodic 
   def clear_frequency_for_document(invoice)
     unless invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
-      invoice.invoice_frequency_id = nil
+      invoice.invoice_frequency = nil
     end
   end
 
   def validate_frequency_for_document(invoice)
     if invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
+      # Jugaad as frontend is failing, push this selected attribute to all agreement invoices
+      updated_invoice_with_frequency = set_selected_invoice_frequency_attributes(invoice)
+      if updated_invoice_with_frequency.present?
+        invoice = updated_invoice_with_frequency
+      end 
+
       invoice_freq_num << invoice.invoice_frequency.number
       if invoice_freq_num.uniq.count.zero?
         add_message :error,  "#{invoice.class.name.titleize} frequency data is incorrect"
@@ -881,6 +888,21 @@ class PaymentAgreements::Base < BaseOperation
     #   add_message :error, 'Security deposit and beneficiary payment cannot be a part of same agreement'
     #   return
     # end
+  end
+
+
+  # Handle this since frontend is failing and need for demo
+  def set_selected_invoice_frequency_attributes(invoice)
+    frequency = self.payment_agreement.selected_invoice_frequency_attributes
+    if frequency.present?
+      invoice_frequency_value = frequency[:invoice_frequency_value]
+      period_id = Period.id_for(:month)
+      if invoice_frequency_value.present? && period_id.present?
+        invoice.build_invoice_frequency(number:invoice_frequency_value, period_id: period_id)
+        return invoice
+      end
+    end
+    nil
   end
 
 

@@ -27,6 +27,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :attachments, as: :resource, dependent: :destroy
 
   # validates_associated :invoices
+  attr_accessor :selected_invoice_frequency_attributes
 
   validates :title, presence: true
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
