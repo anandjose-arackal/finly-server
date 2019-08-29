@@ -5,9 +5,9 @@ class Personalizer::Adapters::Company2::Expense2::Manual2::Create2::Validate < P
   def init
     self.expense_params = op_instance.expense_params
     self.category = current_company.categories.find_by_id expense_params[:category_id]
-    self.validate_keys = %w(expense_tax_type_id
+    self.validate_keys = %w(
+                       tax_rate_id
                        gst_type_id
-                       gst_percentage
                        state_of_expense_id
                        hsn_sac
                        merchant_bill_no
@@ -26,7 +26,7 @@ class Personalizer::Adapters::Company2::Expense2::Manual2::Create2::Validate < P
           end&.public_send(:[], field_keys.last)
           if user_value.blank?
             field_name = field_keys.last&.gsub("id","")&.humanize rescue "Expense Field"
-            add_message :error, "#{field_name} can't blank"
+            add_message :error, "#{field_name} can't be blank"
           end
       end
 
