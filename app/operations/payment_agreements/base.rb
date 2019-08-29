@@ -13,7 +13,7 @@ class PaymentAgreements::Base < BaseOperation
   def payment_agreement_parameters
     params.require(:payment_agreement).permit(
 
-      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, 
+      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number, 
 
       general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period,
         invoice_custom_fields: {},

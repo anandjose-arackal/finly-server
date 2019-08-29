@@ -214,7 +214,7 @@ class PaymentAgreement < ApplicationRecord
   def as_json(options={})
     {
       id: self.id,
-      agreement_number: self.order_number,
+      agreement_number: get_agreement_number,
       title: self.title,
       policy_id: self.policy_id,
       policy: self.policy&.name,
@@ -374,6 +374,10 @@ class PaymentAgreement < ApplicationRecord
     if self.general_invoices.present? && self.rental_invoices.present?
       errors.add(:general_invoices, ' and rental invoices cannot be present at the same time')
     end
+  end
+
+  def get_agreement_number
+    self.override_order_number.present? ? self.override_order_number : self.order_number
   end
 
 end

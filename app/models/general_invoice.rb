@@ -224,7 +224,7 @@ class GeneralInvoice < ApplicationRecord
       agreement_type: self.class.name.underscore,
       payment_agreement_id: self.payment_agreement_id,
       vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.order_number
+      agreement_number: self.payment_agreement&.get_agreement_number
 
     }
   end
