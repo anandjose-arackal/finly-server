@@ -191,6 +191,12 @@ json.policies do
   end
 end
 
+json.payment_ticket_policies do
+  json.array! @result.payment_ticket_policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+
 json.departments do
   json.array! @result.departments do |department|
     json.merge! department.as_json(tree: true)

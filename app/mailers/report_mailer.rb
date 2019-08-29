@@ -18,8 +18,9 @@ class ReportMailer < ApplicationMailer
           current_user: @curr_user
       }
       ########################################################
+
       attachments["report-#{@data.report.name}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "report-#{@data.report.name}", template: "export/report", layout: "pdf.html.erb", locals: local_variables, print_media_type: true)
+         render_to_string(pdf: "report-#{@data.report.name}", template: "export/report.pdf.erb", layout: "pdf.html.erb", locals: local_variables, print_media_type: true)
       )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
     end
@@ -29,5 +30,12 @@ class ReportMailer < ApplicationMailer
     @data = presenter
     mail(to: presenter.to, subject: presenter.subject, template_name: 'export_notify')
 
+  end
+
+  def send_awaiting_approval_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
+    end
   end
 end

@@ -73,7 +73,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
 
   def create_temporary_link(file)
     return nil if file.nil?
-    temp_file = File.open(self.file_name, 'w')
+    temp_file = File.open(self.file_name, 'wb')
     temp_file.write file
     temp_file.rewind
     # temp_file
