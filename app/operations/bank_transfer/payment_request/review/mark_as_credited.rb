@@ -131,8 +131,8 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
     #   end
     # end
     if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
-      unless payment.parent.status_id == BeneficiaryPaymentStatus.id_for(:closed)
-        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:closed))
+      unless payment.parent.status_id == BeneficiaryPaymentStatus.id_for(:paid)
+        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:paid))
       end
     end
   end
