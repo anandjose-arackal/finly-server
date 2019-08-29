@@ -7,6 +7,7 @@ class Procurements::PurchaseRequests::FilterConfig < Procurements::PurchaseReque
 
   def success
     params[:policies] = self.policies
+    Procurements::PurchaseRequests::FilterConfig::ConfigPresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
