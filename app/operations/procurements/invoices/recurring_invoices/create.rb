@@ -202,10 +202,10 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   # Some attributes are set here, some are nullified in model as per logic used in other places, hence updating explicitly 
   def update_invoice_attributes(original_invoice, new_invoice, options={})
-    receiving_account = self.vendor&.bank_accounts&.first
+    # receiving_account = self.vendor&.bank_accounts&.first
     role_id = UserRole.id_for(:initiator)
 
-    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), date: original_invoice.payment_agreement_upcoming_date, receiving_account: receiving_account, controlling_user: user, vendor: vendor, payment_term_id: self.vendor&.payment_term_id, controlling_user_role_id: role_id)
+    new_invoice.update(created_by: user, invoice_type_id: InwardInvoiceType.id_for(options[:invoice_type].to_sym), date: original_invoice.payment_agreement_upcoming_date, receiving_account_id: original_invoice.bank_account_id, receiving_account_type: 'BankAccount', controlling_user: user, vendor: vendor, payment_term_id: self.vendor&.payment_term_id, controlling_user_role_id: role_id)
     new_invoice.update(procurement_id: procurement_id) if options[:update_procurement]
   end
 
