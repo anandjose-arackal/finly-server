@@ -20,7 +20,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       return
     end
     if params[:id].blank? and not params[:filtered]
-      add_message :error, 'Report not found'
+      add_message :error, 'Invoice not found'
       return
     end
   end
@@ -53,23 +53,54 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         add_item_gst_ledgers voucher, invoice, item, configuration
       end
 
-      return on_error(options, :base, voucher.errors.full_messages) unless voucher.valid?
+      unless voucher.valid?
+        add_message :error, voucher.errors.full_messages
+        return
+      end
+
+      file_data = generator.as_xml
+      file = Paperclip::Tempfile.new(['export', '.xml'])
+      open(file.path, 'wb') { |f| f.write file_data }
+      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
+      debugger
     end
 
-    set_file_data options, generator.as_xml
+
   end
 
   def success
     Integrations::Tally::Vouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
   end
 
-  # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
-  #
-  #   def render(controller)
-  #     controller.send_data 'this, is, a, test, csv', file_name: 'hello.csv'
-  #   end
-  #
-  # end
+  def add_voucher(generator, invoice, configuration)
+    voucher_data = LiquidHelper.interpolate(configuration.slice('date', 'state', 'voucher_type', 'narration', 'reference'), "invoice" => invoice)
+    vendor_data = LiquidHelper.interpolate(configuration['vendor'].slice('gl_name', 'gstin'), "invoice" => invoice)
+    generator.add_voucher(voucher_data.merge(vendor_data))
+  end
+
+  def add_vendor_ledgers(voucher, invoice, configuration)
+    ledger_data = LiquidHelper.interpolate(configuration['vendor'], "invoice" => invoice)
+    voucher.add ledger_data['gl_name'], invoice.net_amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
+  end
+
+  def add_item_ledgers(voucher, invoice, item, configuration)
+    ledger_data = LiquidHelper.interpolate(configuration['item'].slice(:gl_name, :category_allocations), "item" => item, "invoice" => invoice)
+    voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
+  end
+
+  def add_item_gst_ledgers(voucher, invoice, item, configuration)
+    ledger_data = LiquidHelper.interpolate(configuration['item']['gst_gl'], "item" => item, "invoice" => invoice)
+    if item.cgst_amount.present?
+      voucher.add ledger_data['cgst'], (-item.cgst_amount)
+    end
+    if item.sgst_amount.present?
+      voucher.add ledger_data['sgst'], (-item.sgst_amount)
+    end
+    if item.igst_amount.present?
+      voucher.add ledger_data['igst'], (-item.igst_amount)
+    end
+  end
+
 
 end
 
