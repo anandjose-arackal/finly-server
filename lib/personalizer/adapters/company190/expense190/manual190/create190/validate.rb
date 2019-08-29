@@ -4,7 +4,7 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Create190::Vali
 
   def init
     self.expense_params = op_instance.expense_params
-    self.category = current_company.categories.find_by expense_params[:category_id]
+    self.category = current_company.categories.find_by_id expense_params[:category_id]
     self.validate_keys = %w(expense_tax_type_id
                        gst_type_id
                        gst_percentage
