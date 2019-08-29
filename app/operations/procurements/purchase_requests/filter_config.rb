@@ -5,6 +5,9 @@ class Procurements::PurchaseRequests::FilterConfig < Procurements::PurchaseReque
     self.policies = Policy::VendorPayments::Index.(user, params).policies
   end
 
+  def validate
+  end
+
   def success
     params[:policies] = self.policies
     Procurements::PurchaseRequests::FilterConfig::ConfigPresenter.new(user, params, messages)
@@ -16,7 +19,7 @@ class Procurements::PurchaseRequests::FilterConfig < Procurements::PurchaseReque
     def init
       self.policies = params[:policies]
 
-      config_op = Configs::LocDept.(user, params)
+      config_op = ::Configs::LocDept.(user, params)
 
       self.locations = config_op.locations
       self.departments = config_op.departments
