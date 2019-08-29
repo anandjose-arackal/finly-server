@@ -139,8 +139,8 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
 
   def update_agreement_security_deposit(payment)
     if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
-      unless payment.parent.status_id == SecurityDepositStatus.id_for(:closed)
-        payment.parent.update(status_id: SecurityDepositStatus.id_for(:closed))
+      unless payment.parent.status_id == SecurityDepositStatus.id_for(:paid)
+        payment.parent.update(status_id: SecurityDepositStatus.id_for(:paid))
       end
     end
   end
