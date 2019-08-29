@@ -117,6 +117,7 @@ class RentalInvoice < ApplicationRecord
 
   def additional_validations
     errors.add(:bank_account, 'name cannot be blank') if self.bank_account_id.blank?
+    errors.add(:invoice_items, ' cannot be blank') if self.invoice_items.blank?
   end
 
   def fetch_vendor_locations
