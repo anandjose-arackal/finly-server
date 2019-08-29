@@ -162,7 +162,7 @@ class RentalInvoice < ApplicationRecord
       bank_accounts: fetch_vendor_bank_accounts.as_json,
       note: self.note,
       tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      invoice_frequency_attributes: {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id },
+      invoice_frequency_attributes: get_invoice_frequency_attributes,
       billing_start_date: self.billing_start_date&.to_date,
       billing_day_of_month: billing_day_of_month,
       due_date: self.due_date&.to_date,
@@ -193,6 +193,15 @@ class RentalInvoice < ApplicationRecord
       agreement_number: self.payment_agreement&.get_agreement_number
 
     }
+  end
+
+  # Quickfix as frontend was failing
+  def get_invoice_frequency_attributes
+    if self.billing_type.fixed_periodic?
+      {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id }
+    else
+      {id: nil, number: nil, period_id: nil }
+    end
   end
 
 
