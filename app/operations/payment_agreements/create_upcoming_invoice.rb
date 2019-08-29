@@ -77,14 +77,14 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     true
   end
 
-  # Return next upcoming date w.r.t the previous invoice and that will be previous invoice upcoming date + invoice frequency
+  # Return next upcoming date w.r.t the previous invoice and that will be previous invoice upcoming date + invoice frequency - 1 day
   # 1 month is complete when same date arrives in the next month
   def invoice_upcoming_date(previous_upcoming_invoice)
     number = previous_upcoming_invoice.invoice_frequency.number
     period_id = previous_upcoming_invoice.invoice_frequency.period_id
     case period_id
     when Period.id_for(:month)
-      self.next_invoice_due_date = previous_upcoming_invoice.payment_agreement_upcoming_date.to_date + number.to_i.month
+      self.next_invoice_due_date = previous_upcoming_invoice.payment_agreement_upcoming_date.to_date + number.to_i.month - 1.day
       return
     end
     return nil
@@ -107,7 +107,16 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   def create_upcoming_rental_invoice
-    
+    get_valid_amount_rental_invoice
+    if self.valid_amount_invoice.present?
+      upcoming_rental_invoice = self.valid_amount_invoice.amoeba_dup
+      upcoming_rental_invoice.template_invoice_id = self.valid_amount_invoice.id
+      unless upcoming_rental_invoice.save
+        add_message :error, "Unable to create upcoming general invoice"
+        return
+      end
+      self.new_upcoming_invoice = upcoming_rental_invoice
+    end
   end
 
   def get_valid_amount_general_invoice
@@ -120,6 +129,20 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     # No agreement invoice is found with next_invoice_due_date in between start date and end date  
     if self.valid_amount_invoice.blank?
       add_message :error, "Valid amount general invoice is not found to creating upcoming invoice"
+      return
+    end
+  end
+
+  def get_valid_amount_rental_invoice
+    self.payment_agreement.rental_invoices.each do |rental_invoice|
+      if self.next_invoice_due_date >= rental_invoice.start_date.to_date && self.next_invoice_due_date.to_date <= rental_invoice.end_date.to_date
+        self.valid_amount_invoice = rental_invoice
+        return
+      end
+    end
+    # No agreement invoice is found with next_invoice_due_date in between start date and end date  
+    if self.valid_amount_invoice.blank?
+      add_message :error, "Valid amount rental invoice is not found to creating upcoming invoice"
       return
     end
   end

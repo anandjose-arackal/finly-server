@@ -787,8 +787,11 @@ class PaymentAgreements::Base < BaseOperation
       start_date = current_date_arr[0].to_date
       end_date = current_date_arr[1].to_date
       date_with_issues = []
+
+      # Do not put check for last end date for consecutiveness 
+      next if dates.index(dates.last) == current_index
+
       # compare current_date_arr start_date and end_date with all the dates in the agreement invoice
-      # binding.pry
       dates.each_with_index do |date_arr, index|
         # Skip comparison with itself
         next if index == current_index
@@ -796,17 +799,18 @@ class PaymentAgreements::Base < BaseOperation
         if start_date >= date_arr[0].to_date && start_date <= date_arr[1].to_date
           date_with_issues << start_date
           add_message :error, "Start date: #{start_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
-          break
+          return
         end
 
         if end_date >= date_arr[0].to_date && end_date <= date_arr[1].to_date
           date_with_issues << end_date
           add_message :error, "End date: #{end_date} overlaps between #{date_arr[0].to_date} and #{date_arr[1].to_date} in an invoice"
-          break
+          return
         end
         unless next_start_date_present
           if end_date + 1.day == date_arr[0].to_date
             next_start_date_present = true
+            break
           end
         end
 
@@ -819,8 +823,8 @@ class PaymentAgreements::Base < BaseOperation
       if self.payment_agreement.no_expiration || (self.payment_agreement.expiration_date.to_date >= end_date) 
         unless next_start_date_present
           add_message :error, "Fixed periodic start and end date should be consecutive"
-          add_message :error, "One of the start date should be #{end_date+1.day}"
-          break
+          # add_message :error, "One of the start date should be #{end_date+1.day}"
+          return
         end
       end
       break unless date_with_issues.blank?

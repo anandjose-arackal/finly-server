@@ -17,8 +17,8 @@ class PaymentAgreements::Show < PaymentAgreements::Base
   end
 
   def process
-    self.general_invoices = self.payment_agreement.general_invoices
-    self.rental_invoices = self.payment_agreement.rental_invoices
+    self.general_invoices = self.payment_agreement.general_invoices.template_invoices
+    self.rental_invoices = self.payment_agreement.rental_invoices.template_invoices
     self.security_deposits = self.payment_agreement.security_deposits
     self.beneficiary_payments = self.payment_agreement.beneficiary_payments
   end

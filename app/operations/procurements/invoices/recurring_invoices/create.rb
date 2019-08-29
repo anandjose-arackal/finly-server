@@ -167,7 +167,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     op = PaymentAgreements::CreateUpcomingInvoice.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
-      # op.new_upcoming_invoice.destroy
+      op.new_upcoming_invoice.destroy
     end
   end
 
