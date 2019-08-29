@@ -24,10 +24,10 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       return
     end
 
-    unless user.company.id == 137
-      add_message :error, 'Tally is not configured for your company'
-      return
-    end
+    # unless user.company.id == 137
+    #   add_message :error, 'Tally is not configured for your company'
+    #   return
+    # end
   end
 
   def process
@@ -89,6 +89,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
     generator = ::Tally::Generator.new(company_name: company_name)
     invoices.each do |invoice_obj|
       invoice = invoice_obj.to_liquid
+
+      debugger
 
       voucher = add_voucher generator, invoice, configuration
       add_vendor_ledgers voucher, invoice, configuration
