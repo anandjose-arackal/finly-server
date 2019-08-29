@@ -816,12 +816,28 @@ class PaymentAgreements::Base < BaseOperation
   # Compare every date with other start_date and end_date and check for overlapping
   # Document is invalid if overlapping of dates are there
   def invoice_start_end_date_consecutiveness(dates)
+    execution_date = self.payment_agreement.execution_date.to_date rescue nil
+    expiration_date = self.payment_agreement.expiration_date.to_date rescue nil
     dates.each_with_index do |current_date_arr, current_index|
       next_start_date_present = false
       next_end_date_present = false
       start_date = current_date_arr[0].to_date
       end_date = current_date_arr[1].to_date
       date_with_issues = []
+
+      if execution_date.present?
+        if start_date < execution_date
+          add_message :error, "Start date cannot be less than execution date"
+          return
+        end
+      end
+
+      if expiration_date.present?
+        if end_date > expiration_date
+          add_message :error, "End date cannot be more than expiration date"
+          return 
+        end
+      end
 
       # Do not put check for last end date for consecutiveness 
       next if dates.index(dates.last) == current_index
@@ -876,7 +892,7 @@ class PaymentAgreements::Base < BaseOperation
   # If billing type is one_time or variable_periodic, they can co-exist for single agreement
   def general_invoice_billing_type_validation
     if self.any_fixed_period_general_invoice
-      billing_type_ids = self.payment_agreement.general_invoices.pluck(:billing_type_id).uniq 
+      billing_type_ids = self.payment_agreement.general_invoices.collect{|invoice| invoice.billing_type_id}.uniq rescue [] 
       if billing_type_ids.count > 1 && billing_type_ids.include?(BillingType.id_for(:fixed_periodic))
         add_message :error, "All general invoices should have billing type as fixed periodic"
         return
@@ -886,7 +902,7 @@ class PaymentAgreements::Base < BaseOperation
 
   def rental_invoice_billing_type_validation
     if self.any_fixed_period_rental_invoice
-      billing_type_ids = self.payment_agreement.rental_invoices.pluck(:billing_type_id).uniq 
+      billing_type_ids = self.payment_agreement.rental_invoices.collect{|invoice| invoice.billing_type_id}.uniq
       if billing_type_ids.count > 1 && billing_type_ids.include?(BillingType.id_for(:fixed_periodic))
         add_message :error, "All rental invoices should have billing type as fixed periodic"
         return
