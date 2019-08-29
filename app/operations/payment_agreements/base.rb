@@ -473,6 +473,17 @@ class PaymentAgreements::Base < BaseOperation
       self.any_fixed_period_general_invoice = false
       # start_end_date_arr => Keeps all the start_date and end_date as 2d array
       # start_end_date_arr = []
+      
+      # Order of validation is creating confusion, hence - till we have partial invoice in place
+      if self.payment_agreement.general_invoices.present?
+        if (self.payment_agreement.general_invoices.first.billing_type_id == BillingType.id_for(:fixed_periodic)) && self.payment_agreement.general_invoices.first.start_date.present? && self.payment_agreement.execution_date.present?
+          unless self.payment_agreement.general_invoices.first.start_date.to_date == self.payment_agreement.execution_date.to_date
+            add_message :error, "First general invoice start date should be equal to execution date"
+              return
+          end
+        end
+      end
+      
       self.payment_agreement.general_invoices.each do |general_invoice|
         # start_end_date_arr.push([general_invoice.start_date.to_date, general_invoice.end_date.to_date])
         unless self.any_fixed_period_general_invoice
@@ -529,6 +540,18 @@ class PaymentAgreements::Base < BaseOperation
       self.match_invoice_start_date = false
       self.match_invoice_end_date = false
       self.any_fixed_period_rental_invoice = false
+
+      # Order of validation is creating confusion, hence - till we have partial invoice in place
+      if self.payment_agreement.rental_invoices.present?
+        if (self.payment_agreement.rental_invoices.first.billing_type_id == BillingType.id_for(:fixed_periodic)) && self.payment_agreement.rental_invoices.first.start_date.present? && self.payment_agreement.execution_date.present?
+          unless self.payment_agreement.rental_invoices.first.start_date.to_date == self.payment_agreement.execution_date.to_date
+            add_message :error, "First rental invoice start date should be equal to execution date"
+              return
+          end
+        end
+      end
+
+
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         unless self.any_fixed_period_rental_invoice
           self.any_fixed_period_rental_invoice = rental_invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
@@ -645,7 +668,8 @@ class PaymentAgreements::Base < BaseOperation
           add_message :error, "Invoice frequency cannot be blank"
           return
         end
-        # if frequency_period_number.present?
+
+          # if frequency_period_number.present?
           expected_end_date_present = false
           more_than_one_invoice = false
 
@@ -893,6 +917,7 @@ class PaymentAgreements::Base < BaseOperation
 
   # Handle this since frontend is failing and need for demo
   def set_selected_invoice_frequency_attributes(invoice)
+    return unless invoice.billing_type_id == BillingType.id_for(:fixed_periodic)
     frequency = self.payment_agreement.selected_invoice_frequency_attributes
     if frequency.present?
       invoice_frequency_value = frequency[:invoice_frequency_value]
