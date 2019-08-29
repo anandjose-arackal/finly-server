@@ -335,6 +335,9 @@ class PaymentAgreement < ApplicationRecord
     if self.no_expiration.blank? && self.expiration_date.blank?
       errors.add(:expiration_date, ' cannot be blank or agreement should never expire')
     end
+    if self.no_expiration.present? && self.expiration_date.present?
+      errors.add(:expiration_date, ' and never expire cannot exist at the same time')
+    end
     if self.no_expiration.blank? && self.expiration_date.present?
       if self.expiration_date < self.execution_date
         errors.add(:expiration_date, ' cannot be smaller than execution date')
