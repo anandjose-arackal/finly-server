@@ -243,6 +243,8 @@ class User < ApplicationRecord
 
   has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
 
+  has_many :payment_agreements, foreign_key: :creator_id
+
   has_many :document_message_receipts
   has_many :document_messages
 
@@ -297,7 +299,7 @@ class User < ApplicationRecord
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
-    where('policy_user_roles.policy_id = ?', policy_id)
+    joins(:policy_user_roles).where('policy_user_roles.policy_id = ?', policy_id)
   }
 
   scope :reviewer_type, -> (type) {
@@ -312,6 +314,8 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:vendor_reviewer)).distinct
     when 'PurchaseRequestProvider', :PurchaseRequestProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:purchase_request_reviewer)).distinct
+    when 'PaymentAgreementProvider', :PaymentAgreementProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:payment_agreement_reviewer)).distinct
     end
   }
 
@@ -1411,6 +1415,20 @@ class User < ApplicationRecord
 
   def is_inventory_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
+
+  # Agreement Based Payments Role
+  def is_payment_agreement_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
+  end
+
+  def is_payment_agreement_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), document)
+  end
+
+  def is_payment_agreement_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
 
   def access_locked?

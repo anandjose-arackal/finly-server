@@ -63,6 +63,7 @@ class Company < ApplicationRecord
   has_many :export_configs
   has_many :unique_identifiers
   has_many :beneficiary_payments
+  has_many :security_deposits
   has_many :icici_statements
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
@@ -103,6 +104,9 @@ class Company < ApplicationRecord
   has_many :purchase_requests
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
+  has_many :payment_agreements
+  has_many :general_invoices
+  has_many :rental_invoices
 
   has_many :departments
   has_many :company_pocket_templates
@@ -360,6 +364,10 @@ class Company < ApplicationRecord
 
   def auto_retry_payment_enabled?
     self.configuration.auto_retry_payment
+  end
+
+  def agreement_based_payment_system_enabled?
+    self.feature_subscription.agreement_based_payment_system
   end
 
   def group_entity_structure_enabled?
