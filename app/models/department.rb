@@ -13,6 +13,7 @@
 #  deleted_at      :datetime
 #  department_code :string(255)
 #  code            :string(255)
+#  gl_code         :string(255)
 #
 
 class Department < ApplicationRecord

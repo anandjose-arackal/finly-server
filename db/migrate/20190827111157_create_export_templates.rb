@@ -5,7 +5,7 @@ class CreateExportTemplates < ActiveRecord::Migration[5.2]
       t.text :description
       t.string :template_type, index: true, null: false
       t.text :configuration, limit: 4294967295
-      t.string :model_klass, index: true, null: false
+      t.string :model_class, index: true, null: false
       t.boolean :active, index: true, default: true
       t.boolean :personal, index: true
       t.integer :created_by_user_id, index: true, null: false, references: 'users'

@@ -9,5 +9,9 @@ module TrailblazerErrorTracker
     general_errors = self['result.operation.errors'] || {}
     model_errors.merge(contract_errors).merge(general_errors).merge(policy_errors)
   end
+
+  def messages(type)
+    self["result.operation.#{type}"]
+  end
 end
 Trailblazer::Operation::Result.include TrailblazerErrorTracker

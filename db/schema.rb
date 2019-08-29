@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_27_111157) do
+ActiveRecord::Schema.define(version: 2019_08_29_055805) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1498,6 +1498,8 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
+    t.boolean "gst_applicable", default: true
+    t.boolean "tds_applicable"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
@@ -2609,6 +2611,32 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
     t.index ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id"
   end
 
+  create_table "event_file_manager_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "export_template_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["export_template_id"], name: "index_event_file_manager_actions_on_export_template_id"
+  end
+
+  create_table "event_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "model_class", null: false
+    t.string "trigger_type", null: false
+    t.string "request_key"
+    t.boolean "personal", default: true
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_event_workflows_on_company_id"
+    t.index ["created_at"], name: "index_event_workflows_on_created_at"
+    t.index ["model_class"], name: "index_event_workflows_on_model_class"
+    t.index ["personal"], name: "index_event_workflows_on_personal"
+    t.index ["request_key"], name: "index_event_workflows_on_request_key"
+    t.index ["trigger_type"], name: "index_event_workflows_on_trigger_type"
+    t.index ["updated_at"], name: "index_event_workflows_on_updated_at"
+    t.index ["user_id"], name: "index_event_workflows_on_user_id"
+  end
+
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -2730,6 +2758,11 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "company_id"
+    t.integer "gstin_location_id"
+    t.integer "state_of_expense_id"
+    t.string "hsn_sac"
+    t.string "merchant_bill_no"
+    t.integer "tax_rate_id"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["created_at"], name: "index_expenses_on_created_at"
@@ -2785,6 +2818,29 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_export_preferences_on_company_id"
     t.index ["export_field_id"], name: "index_export_preferences_on_export_field_id"
+  end
+
+  create_table "export_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "model_class"
+    t.string "export_name"
+    t.integer "export_template_id", null: false
+    t.string "file_file_name"
+    t.string "file_content_type"
+    t.bigint "file_file_size"
+    t.datetime "file_updated_at"
+    t.datetime "scheduled_on"
+    t.datetime "expires_on"
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_export_requests_on_company_id"
+    t.index ["expires_on"], name: "index_export_requests_on_expires_on"
+    t.index ["export_name"], name: "index_export_requests_on_export_name"
+    t.index ["export_template_id"], name: "index_export_requests_on_export_template_id"
+    t.index ["model_class"], name: "index_export_requests_on_model_class"
+    t.index ["scheduled_on"], name: "index_export_requests_on_scheduled_on"
+    t.index ["user_id"], name: "index_export_requests_on_user_id"
   end
 
   create_table "export_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -6845,6 +6901,9 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
     t.datetime "password_changed_at"
     t.datetime "last_activity_at"
     t.datetime "expired_at"
+    t.integer "cost_center_id"
+    t.integer "department_id"
+    t.integer "location_id"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -7350,6 +7409,7 @@ ActiveRecord::Schema.define(version: 2019_08_27_111157) do
   add_foreign_key "e_way_bills", "procurements"
   add_foreign_key "e_way_bills", "users"
   add_foreign_key "email_authorizations", "users"
+  add_foreign_key "event_file_manager_actions", "export_templates"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
   add_foreign_key "expense_rules", "categories"

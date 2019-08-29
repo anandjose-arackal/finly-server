@@ -1,19 +1,8 @@
 class ExportTemplates::Contract < Reform::Form
 
-  PROCESSORS = {
-      spreadsheet: {
-          contract: ExportTemplates::Spreadsheet::Contract,
-          generator: ExportTemplates::Spreadsheet::Generator
-      },
-      tally_invoice_voucher: {
-          contract: ExportTemplates::TallyInvoiceVoucher::Contract,
-          generator: ExportTemplates::TallyInvoiceVoucher::Generator
-      }
-  }.with_indifferent_access
-
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}
-  property :template_type, validates: {presence: true, inclusion: {in: PROCESSORS.keys}}
+  property :template_type, validates: {presence: true, inclusion: {in: ExportTemplates::Helpers::Config.types}}
   property :configuration, validates: {presence: true}
   property :model_klass, validates: {presence: true}
   property :active, default: true
@@ -24,7 +13,7 @@ class ExportTemplates::Contract < Reform::Form
   validate :validate_configuration
 
   def validate_configuration
-    schema_contract = PROCESSORS&.dig(self.template_type, :contract)&.new
+    schema_contract = ExportTemplates::Helpers::Config.contract_for(self.template_type)
     if schema_contract.nil?
       errors.add :base, 'Schema contract not found'
       return

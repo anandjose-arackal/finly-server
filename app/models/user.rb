@@ -54,6 +54,9 @@
 #  password_changed_at       :datetime
 #  last_activity_at          :datetime
 #  expired_at                :datetime
+#  cost_center_id            :integer
+#  department_id             :integer
+#  location_id               :integer
 #
 
 class User < ApplicationRecord

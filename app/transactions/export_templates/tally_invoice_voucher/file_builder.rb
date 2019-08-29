@@ -1,6 +1,6 @@
-class ExportTemplates::TallyInvoiceVoucher::Generator < ExportTemplates::BaseGenerator
+class ExportTemplates::TallyInvoiceVoucher::FileBuilder < ExportTemplates::Helpers::BaseFileBuilder
 
-  def process_request(options, data:, template:, configuration:, user:, **)
+  def build_file(options, data:, template:, configuration:, user:, **)
     invoices = data #options['data']
     # template = options['template']
     # configuration = options['configuration']
@@ -17,10 +17,10 @@ class ExportTemplates::TallyInvoiceVoucher::Generator < ExportTemplates::BaseGen
         add_item_gst_ledgers voucher, invoice, item, configuration
       end
 
-      return error(options, :base, voucher.errors.full_messages) unless voucher.valid?
+      return on_error(options, :base, voucher.errors.full_messages) unless voucher.valid?
     end
 
-    options['result.data'] = generator.as_xml
+    set_file_data options, generator.as_xml
     true
   end
 

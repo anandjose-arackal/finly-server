@@ -1,14 +1,14 @@
-class ExportTemplates::BaseGenerator < Transaction
+class ExportTemplates::Helpers::BaseFileBuilder < Transaction
 
   step :verify_params
-  step :process_request
+  step :build_file
 
   def verify_params(options, params: {}, **)
     unless params['template'].present?
-      return error(options, 'template', 'not found')
+      return on_error(options, 'template', 'not found')
     end
     unless params['data'].present?
-      return error(options, 'data', 'not found')
+      return on_error(options, 'data', 'not found')
     end
     options['template'] = params['template']
     options['data'] = params['data']
@@ -16,8 +16,12 @@ class ExportTemplates::BaseGenerator < Transaction
     true
   end
 
-  def process_request(options, data:, configuration:, template:, **)
+  def build_file(options, data:, configuration:, template:, **)
     raise 'Cannot process export template as it is in base class'
+  end
+
+  def set_file_data(options, data)
+    options['result.file_data'] = data
   end
 
 end
