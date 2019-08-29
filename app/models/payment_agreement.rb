@@ -29,7 +29,7 @@ class PaymentAgreement < ApplicationRecord
   # validates_associated :invoices
 
   validates :title, presence: true
-  validate :agreement_date_comparison, :expiration_date_if_allowed
+  validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
 
@@ -368,6 +368,12 @@ class PaymentAgreement < ApplicationRecord
       vendors << self.beneficiary_payments.joins(:vendor).pluck('yes_bank_vendors.business_name') rescue []
     end
     return vendors.flatten.compact
+  end
+
+  def agreement_item_combinations
+    if self.general_invoices.present? && self.rental_invoices.present?
+      errors.add(:general_invoices, ' and rental invoices cannot be present at the same time')
+    end
   end
 
 end
