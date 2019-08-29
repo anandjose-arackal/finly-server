@@ -1,7 +1,7 @@
-class Integrations::Tally::Vouchers < Integrations::Tally::Base
+class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   attr_accessor :expenses, :invoices, :file_url
 
-  class Integrations::Tally::Vouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Integrations::Tally::InvoiceVouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :file_url
 
     def init
@@ -15,7 +15,8 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
-    unless current_company.tally_configuration.present? and current_company.tally_configuration.active
+    debugger
+    unless user.company.tally_configuration.present? and user.company.tally_configuration.active
       add_message :error, 'Tally integration has not been configured for your company'
       return
     end
@@ -23,10 +24,55 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'Invoice not found'
       return
     end
+
+    unless user.company.id == 137
+      add_message :error, 'Tally is not configured for your company'
+      return
+    end
   end
 
   def process
-    invoices_presenter = BankTransfer::InwardInvoices::Index.(current_user, params)
+    configuration = {
+        "company_name": "Metropolitan Stock Exchange of India Ltd. 17-18",
+        "date": "{{invoice.date}}",
+        "state": "{{invoice.billing_location.state.name}}",
+        "voucher_type": "Purchase - {{invoice.billing_location.state.name}}",
+        "reference": "{{invoice.invoice_number}}",
+        "narration": "{{invoice.narration}}",
+        "vendor": {
+            "gstin": "{{invoice.vendor_location.gstin}}",
+            "gl_name": "{{invoice.vendor_location.gl_code}}",
+            "bill_allocations": [
+                {
+                    "name": "{{invoice.invoice_number}}",
+                    "type": "New Ref",
+                    "amount": "{{invoice.net_amount}}"
+                }
+            ]
+        },
+        "item": {
+            "gl_name": "{{item.gl_code}}",
+            "category_allocations": [
+                {
+                    "name": "Primary Cost Center",
+                    "cost_center": "{{invoice.cost_center.gl_code}}",
+                    "amount": "{{item.taxable_amount}}"
+                },
+                {
+                    "name": "State Cost Center",
+                    "cost_center": "{{invoice.billing_location.state.name}}",
+                    "amount": "{{item.taxable_amount}}"
+                }
+            ],
+            "gst_gl": {
+                "sgst": "Input SGST Mumbai",
+                "cgst": "Input CGST Mumbai",
+                "igst": "Input IGST Mumbai"
+            }
+        }
+    }.with_indifferent_access
+
+    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
     unless invoices_presenter&.success?
       add_message :error, invoices_presenter.messages[:error]
       return
@@ -57,19 +103,16 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         add_message :error, voucher.errors.full_messages
         return
       end
-
-      file_data = generator.as_xml
-      file = Paperclip::Tempfile.new(['export', '.xml'])
-      open(file.path, 'wb') { |f| f.write file_data }
-      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-      debugger
     end
-
-
+    file_data = generator.as_xml
+    file = Paperclip::Tempfile.new(['export', '.xml'])
+    open(file.path, 'wb') { |f| f.write file_data }
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
+    debugger
   end
 
   def success
-    Integrations::Tally::Vouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
+    Integrations::Tally::InvoiceVouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
   end
 
   def add_voucher(generator, invoice, configuration)
