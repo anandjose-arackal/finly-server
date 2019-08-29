@@ -377,6 +377,9 @@ class PaymentAgreement < ApplicationRecord
     if self.general_invoices.present? && self.rental_invoices.present?
       errors.add(:general_invoices, ' and rental invoices cannot be present at the same time')
     end
+    if self.general_invoices.present? && self.beneficiary_payments.present?
+      errors.add(:general_invoices, ' and beneficiary payment cannot be present at the same time')
+    end
   end
 
   def get_agreement_number
