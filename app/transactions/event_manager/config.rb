@@ -15,4 +15,8 @@ class EventManager::Config
     TRIGGERS&.dig(trigger&.to_s&.to_sym, :contract)&.new(model)
   end
 
+  def self.valid_trigger?(type)
+    TRIGGERS&.dig(type&.to_s&.to_sym).present?
+  end
+
 end
