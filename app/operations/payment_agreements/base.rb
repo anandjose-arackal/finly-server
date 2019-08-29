@@ -677,12 +677,12 @@ class PaymentAgreements::Base < BaseOperation
           # Considering that  rent is payed  later and not in advance
           # End date is not considered is no_expiration is true and only one invoice is present
           if invoice.is_a?(GeneralInvoice)
-            if self.payment_agreement.general_invoices.count > 1
+            if self.payment_agreement.general_invoices.size > 1
               more_than_one_invoice = true
             end
           end
           if invoice.is_a?(RentalInvoice)
-            if self.payment_agreement.rental_invoices.count > 1
+            if self.payment_agreement.rental_invoices.size > 1
               more_than_one_invoice = true
             end
           end
