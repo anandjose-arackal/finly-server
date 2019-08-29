@@ -1,0 +1,4 @@
+class YesBankVendorDrop < Drop
+
+
+end

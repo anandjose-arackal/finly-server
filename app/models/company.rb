@@ -16,6 +16,7 @@
 
 class Company < ApplicationRecord
   include Constants
+  include LiquidDroppable
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'

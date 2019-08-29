@@ -88,7 +88,7 @@
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
-
+  include LiquidDroppable
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
