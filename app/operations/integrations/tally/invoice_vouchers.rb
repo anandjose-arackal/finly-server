@@ -15,7 +15,6 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
-    debugger
     unless user.company.tally_configuration.present? and user.company.tally_configuration.active
       add_message :error, 'Tally integration has not been configured for your company'
       return
