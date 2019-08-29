@@ -38,7 +38,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
                 report.user.gl_config&.dig(:cost_center),
                 '',
                 '',
-                rpg.amount.value,
+                rpg_mapping.amount&.value,
                 '',
                 '',
                 report.user&.profile&.employee_id,
