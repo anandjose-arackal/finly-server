@@ -88,6 +88,8 @@ class YesBankApi::Base < BaseHandler
       unless Rails.env.production?
         puts "Posting Path: #{p}"
         puts "Post Params: #{self.template}"
+        ap "Posting Path: #{p}"
+        ap "Post Params: #{self.template}"
       end
 
 
@@ -98,6 +100,8 @@ class YesBankApi::Base < BaseHandler
         req.headers['X-IBM-Client-Secret'] = client_secret
         req.body = template
       end
+
+      ap response.body
 
       self.end_time = DateUtils.local_date_time
 
@@ -182,9 +186,7 @@ class YesBankApi::Base < BaseHandler
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
-      unless Rails.env.production?
-        faraday.response :logger, logger # log requests to STDOUT
-      end
+      faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
