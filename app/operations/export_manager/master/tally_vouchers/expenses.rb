@@ -4,7 +4,7 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
   subscribe :tally_expense_voucher_xls
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
                       report_name: {spreadsheet: true},
                       reference_number: {spreadsheet: true},

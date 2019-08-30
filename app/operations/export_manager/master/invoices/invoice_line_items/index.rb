@@ -6,7 +6,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
     procurement_name: {spreadsheet: true, pdf: true},
     invoice_id: {spreadsheet: true, pdf: true},

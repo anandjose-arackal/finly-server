@@ -6,7 +6,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   subscribe :budget_entities
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
                       entity_name: {spreadsheet: true, pdf: false},
                       entity_type: {spreadsheet: true, pdf: false},

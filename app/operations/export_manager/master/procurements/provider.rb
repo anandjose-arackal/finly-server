@@ -6,7 +6,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
              procurement_name: {spreadsheet: true, pdf: true},
              vendor_name: {spreadsheet: true, pdf: true},

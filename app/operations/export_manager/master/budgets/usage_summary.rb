@@ -6,7 +6,7 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::Base
   subscribe :budget_summary
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
                   budget_name: {spreadsheet: true, pdf: false},
                   budget_start_date: {spreadsheet: true, pdf: false},

@@ -6,7 +6,7 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
 
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
                       vendor_business_name: {spreadsheet: true, pdf: false},
                       vendor_id: {spreadsheet: true, pdf: false},

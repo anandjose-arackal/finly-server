@@ -98,7 +98,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   subscribe :invoices
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
              finly_ref_no: {spreadsheet: true},
              po_number: {spreadsheet: true},

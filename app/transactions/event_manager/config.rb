@@ -1,6 +1,11 @@
 class EventManager::Config
 
-  MODELS = %w(Invoice)
+  MODELS = {
+      Invoice: {
+          provider: ""
+      }
+  }
+
   TRIGGERS = {
       event: {
           contract: EventManager::Triggers::Event::Contract
@@ -8,7 +13,7 @@ class EventManager::Config
   }
 
   def models
-    MODELS
+    MODELS.keys
   end
 
   def self.contract_for(trigger, model)

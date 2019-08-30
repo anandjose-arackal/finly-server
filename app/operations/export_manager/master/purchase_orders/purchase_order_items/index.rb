@@ -4,7 +4,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   subscribe :purchase_order_items
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
-  validate :input
+  validate :data_provider
   fields [
     procurement_name: {spreadsheet: true, pdf: true},
     po_number: {spreadsheet: true, pdf: true},
