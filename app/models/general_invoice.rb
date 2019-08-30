@@ -106,7 +106,7 @@ class GeneralInvoice < ApplicationRecord
   scope :template_invoices, -> { where(template_invoice_id: nil) }
 
   # Columns mapped with actual invoice columns
-  TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_poc_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id}
+  TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
   # Choose what columns to clone out of these template columns
   CLONE_RECORDS = %w{ discount_amount gross_amount net_amount amount original_amount balance_due taxable_amount  tds_amount tax_amount}
 
@@ -206,7 +206,8 @@ class GeneralInvoice < ApplicationRecord
       lock_in_period: self.lock_in_period,
       rent_free_period: self.rent_free_period,
       tenancy_period: self.tenancy_period,
-      custom_fields: self.custom_fields
+      custom_fields: self.custom_fields,
+      already_exists: true
     }
   end
 
