@@ -466,6 +466,7 @@ class Company < ApplicationRecord
     # will not matter for the same
     other_category = self.categories.find_by(name: "Other")
     self.configuration.update(default_card_expense_category_id: other_category&.id)
+    self.configuration.update(legal_entity_name: self.name)
 
     self.build_account.save if self.account.blank?
 
