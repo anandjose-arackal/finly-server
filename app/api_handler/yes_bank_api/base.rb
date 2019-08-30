@@ -101,7 +101,7 @@ class YesBankApi::Base < BaseHandler
         req.body = template
       end
 
-      ap response.body
+      ap response&.body
 
       self.end_time = DateUtils.local_date_time
 
