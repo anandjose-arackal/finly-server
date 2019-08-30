@@ -35,7 +35,8 @@ class IciciBankTransferRequest < NonPersistentModel
     end
     ref = nil
     loop do
-      ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      # this has a limit of 13 characters because it gets truncated in the statements from ICICI
+      ref = "FI#{(transfer_type.to_s)[0..1]&.upcase}#{rand.to_s[2..12]}"
       if IciciBankTransaction.find_by(unique_request_number: ref).blank?
         self.unique_reference_number = ref
         break
