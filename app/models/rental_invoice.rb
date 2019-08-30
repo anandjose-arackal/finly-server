@@ -171,7 +171,8 @@ class RentalInvoice < ApplicationRecord
       lock_in_period: self.lock_in_period,
       rent_free_period: self.rent_free_period,
       tenancy_period: self.tenancy_period,
-      custom_fields: self.custom_fields
+      custom_fields: self.custom_fields,
+      already_exists: true
 
     }
   end

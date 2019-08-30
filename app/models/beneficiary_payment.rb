@@ -161,7 +161,8 @@ class BeneficiaryPayment < ApplicationRecord
         department_attributes: { id: self.department_id, name: self.department&.name },
         location_attributes: { id: self.location_id, name: self.location&.name },
         cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
-        note: self.note
+        note: self.note,
+        already_exists: true
 
     	}
     end

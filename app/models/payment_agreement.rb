@@ -32,6 +32,7 @@ class PaymentAgreement < ApplicationRecord
   validates :title, presence: true
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
+
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
@@ -104,7 +105,8 @@ class PaymentAgreement < ApplicationRecord
       when 'processing'
         if user.present?
           # where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval), creator_id: user.id)
-          user.payment_agreements.where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval))
+          ids = user.payment_agreements.where(status_id: PaymentAgreementStatus.id_for(:awaiting_approval)).pluck(:id) rescue []
+          with_ids(ids)
         end
       when 'awaiting_approval'
         if user.present?
