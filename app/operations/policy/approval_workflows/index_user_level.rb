@@ -80,6 +80,9 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
       when 'PurchaseRequestProvider', :PurchaseRequestProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_request_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)
+      when 'PaymentAgreementProvider', :PaymentAgreementProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:payment_agreement_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)
       when 'YesBankVendorProvider', :YesBankVendorProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:vendor_creator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)

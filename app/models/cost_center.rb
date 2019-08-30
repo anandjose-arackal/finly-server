@@ -28,6 +28,7 @@ class CostCenter < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :departments
+  has_many :users
 
   has_many :budget_trails
 

@@ -1,17 +1,17 @@
 class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Processor::Export
 
   bus Admin::Implementations::Master::BaseMaster
-  subscribe 'lrms.export'
+  subscribe 'lrms.export-blocked'
   has_scope :with_id
 
-  headers [
-              :id,
-              :policy,
-              :level_name,
-              :level_number,
-              :reviewer_email_mobile,
-              :destroy
-          ]
+  headers ({
+              :id => 'ID',
+              :policy => 'Policy ID',
+              :level_name => 'Level Name',
+              :level_number => 'Level Number',
+              :reviewer_email_mobile => 'Reviewer Email / Mobile',
+              :destroy => 'Destroy'
+  })
 
   def valid_request
 
@@ -19,7 +19,7 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
 
   def input
     policy_ids = apply_scopes(company.policies).pluck(:id)
-    level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids).pluck(:id)
+    level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity: params[:associated_entity]).pluck(:id)
     LevelUserReviewerMapping.where(level_id: level_ids)
   end
 
