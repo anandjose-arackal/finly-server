@@ -67,7 +67,8 @@ class SecurityDeposit < ApplicationRecord
       tds_amount: (self.tds_amount.value rescue 0),
       tax: (self.tax rescue 0),
       tds: (self.tds_slab.tds rescue 0),
-      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil),
+      already_exists: true
     }
   end
 
