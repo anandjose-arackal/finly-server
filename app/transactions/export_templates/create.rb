@@ -1,4 +1,4 @@
-class ExportTemplates::Create < Transaction
+class ExportTemplates::Create < Transactions::API
 
   step Model(ExportTemplate, :new)
   step Transaction::AssignModelUser(key: :created_by_user)

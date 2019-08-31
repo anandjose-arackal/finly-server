@@ -1,4 +1,4 @@
-class Forms::Fields::Create < Transaction
+class Forms::Fields::Create < Transactions::API
 
   step Model(FormField, :new)
   step Contract::Build(constant: Forms::Fields::Contract::Create)

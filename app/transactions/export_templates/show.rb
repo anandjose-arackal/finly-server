@@ -1,4 +1,4 @@
-class ExportTemplates::Show < Transaction
+class ExportTemplates::Show < Transactions::API
 
   
 

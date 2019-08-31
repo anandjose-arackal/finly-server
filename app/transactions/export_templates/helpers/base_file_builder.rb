@@ -1,4 +1,4 @@
-class ExportTemplates::Helpers::BaseFileBuilder < Transaction
+class ExportTemplates::Helpers::BaseFileBuilder < Transactions::API
 
   step :verify_params
   step :build_file

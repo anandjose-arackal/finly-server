@@ -1,4 +1,4 @@
-module TransactionMessages
+module Transactions::Messages
 
   def self.included(base)
     base.extend(ClassMethods)

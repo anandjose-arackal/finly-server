@@ -1,5 +1,5 @@
-class Transaction < Trailblazer::Operation
-  include Contract::DSL, Model, TransactionMessages
+class Transactions::API < Trailblazer::Operation
+  include Contract::DSL, Model, Transactions::Messages
 
   def self.SuccessMessage(message)
     -> (options) {Transaction.on_success(options, :base, message)}

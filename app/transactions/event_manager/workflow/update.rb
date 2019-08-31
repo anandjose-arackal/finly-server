@@ -1,4 +1,4 @@
-class EventManager::Workflow::Update < Transaction
+class EventManager::Workflow::Update < Transactions::API
 
   
 

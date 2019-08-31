@@ -1,4 +1,4 @@
-class EventManager::Workflow::Create < Transaction
+class EventManager::Workflow::Create < Transactions::API
 
   step Model(EventWorkflow, :new)
   step Transaction::AssignModelUser(key: :user)

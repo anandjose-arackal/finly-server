@@ -1,4 +1,4 @@
-class EventManager::Workflow::Index < Transaction
+class EventManager::Workflow::Index < Transactions::API
 
   
 
