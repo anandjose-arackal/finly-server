@@ -1,7 +1,7 @@
 require "#{Rails.root}/app/policies/application_policy"
-class EventManager::Workflow::Policy < ApplicationPolicy
+class EventManager::Workflows::Policy < ApplicationPolicy
 
-  class EventManager::Workflow::Policy::Scope < ApplicationPolicy::Scope
+  class EventManager::Workflows::Policy::Scope < ApplicationPolicy::Scope
 
     def personal
       scope.where(user: @user)

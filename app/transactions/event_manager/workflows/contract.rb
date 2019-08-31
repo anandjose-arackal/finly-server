@@ -1,9 +1,9 @@
-class EventManager::Workflow::Contract < Reform::Form
+class EventManager::Workflows::Contract < Reform::Form
   include EventManager::Actions::FileManager::Validations
 
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}
-  property :model_class, validates: {presence: true, inclusion: {in: ['Invoice']}}
+  property :model_class, validates: {presence: true, inclusion: {in: Documents::Master.list}}
   property :personal, default: false
   property :user_id, validates: {presence: true}
   property :company_id, validates: {presence: true}

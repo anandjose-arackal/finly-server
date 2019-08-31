@@ -1,20 +1,13 @@
-class EventManager::Config
-
-  MODELS = {
-      Invoice: {
-          provider: ""
-      }
-  }
+class EventManager::Master
 
   TRIGGERS = {
       event: {
           contract: EventManager::Triggers::Event::Contract
+      },
+      schedule: {
+          contract: EventManager::Triggers::Schedule::Contract
       }
   }
-
-  def models
-    MODELS.keys
-  end
 
   def self.contract_for(trigger, model)
     TRIGGERS&.dig(trigger&.to_s&.to_sym, :contract)&.new(model)

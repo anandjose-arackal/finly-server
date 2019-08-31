@@ -87,9 +87,11 @@
 #
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil
+  include SoftDeletable, Templatable, Transitionable, MathUtil, Documentable
 
   include Sequenced::ActsAsSequenced
+
+  master Documents::Invoices::Master
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 

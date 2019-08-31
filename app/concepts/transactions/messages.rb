@@ -1,5 +1,9 @@
 module Transactions::Messages
 
+  def self.SuccessMessage(message)
+    -> (options) {Transactions::API.on_success(options, :base, message)}
+  end
+
   def self.included(base)
     base.extend(ClassMethods)
   end
