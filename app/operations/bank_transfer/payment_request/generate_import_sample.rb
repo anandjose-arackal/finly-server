@@ -7,7 +7,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
 
   def init
     self.company = user.company
-    self.payment_order_custom_fields = self.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    self.payment_order_custom_fields = self.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice))
     self.sample_type = params[:sample_type]
   end
 

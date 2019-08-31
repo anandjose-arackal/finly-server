@@ -1,7 +1,8 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields,
+                :mandatory_fields, :drop_down_fields, :drop_down_field_ids
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -37,7 +38,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
-    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice)).to_a
     self.payment_order_custom_fields.each do |custom_field_config|
       case custom_field_config.field_type_id
         when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
@@ -46,6 +47,12 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           self.headers << "#{custom_field_config.field_name}"
       end
     end
+
+    self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact
+
+    self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact
+
+    self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}}
 
     self.issues = []
 
@@ -83,40 +90,67 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # generating custom field data
       custom_fields = {}
-      field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
-      field_configurations.each do |field|
+      drop_down_custom_fields = {}
+      empty_fields = []
+      # field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      # field_configurations.each do |field|
+      self.payment_order_custom_fields.each do |field|
         field_name = field.field_name.gsub(" ", "_").underscore
         if item[field_name.to_sym].present?
           if field.field_type_id == FieldType.id_for(:multiselect)
             custom_fields[field.id] = [item[field_name.to_sym]].flatten
           elsif field.field_type_id == FieldType.id_for(:drop_down)
             custom_fields[field.id] = item[field_name.to_sym]
+            drop_down_custom_fields[field.id] = item[field_name.to_sym]
           elsif field.field_type_id == FieldType.id_for(:text)
             custom_fields[field.id] = item[field_name.to_sym]
+          end
+        else
+          empty_fields << field.id
+        end
+      end
+
+      self.error_messages = []
+      self.issue_item = {}
+      self.issue_item[:custom_fields] = []
+
+      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
+
+      # find fields which are required but left empty by user
+      required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
+
+      if required_fields.present?
+        self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+        self.valid = false
+        self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+      end
+
+      if drop_down_custom_fields.present?
+        drop_down_custom_fields.each do |key, value|
+          wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key}
+          unless wanted_hash[key].include? value.to_i
+            correct_field = drop_down_fields.find {|field| field if field.id == key}
+            self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
+            self.valid = false
+            self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
           end
         end
       end
 
-      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
-
-
-      self.error_messages = []
-      self.issue_item = {}
-
       # adding the custom fields for the particular invoice, using a ghost invoice
-      self.ghost_invoice = Invoice.new
-      custom_fields = {custom_fields: item[:custom_fields]} || {}
-      custom_fields[:user] = user
-      custom_fields[:reset_fields] = true
-      custom_fields[:save] = false
-      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+      # self.ghost_invoice = Invoice.new
+      # custom_fields = {custom_fields: item[:custom_fields]} || {}
+      # custom_fields[:user] = user
+      # custom_fields[:reset_fields] = true
+      # custom_fields[:save] = false
+      # CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
 
-      op = CustomField::Validate.(self.ghost_invoice)
-      unless op.success?
-        self.error_messages << op.messages[:error]
-        self.valid = false
-        self.issue_item[:custom_fields] = op.messages[:error]
-      end
+      # op = CustomField::Validate.(self.ghost_invoice)
+      # unless op.success?
+      #   self.error_messages << op.messages[:error]
+      #   self.valid = false
+      #   self.issue_item[:custom_fields] = op.messages[:error]
+      # end
 
       # new requirement
       # SET key as array to hold mupltiple errors
@@ -248,6 +282,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
         # self.requested_amount += amount.to_f
         self.requested_amount += payable_amount.to_f
+      else
+        item.delete(:custom_fields)
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
