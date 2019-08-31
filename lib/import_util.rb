@@ -1,5 +1,6 @@
 require 'roo'
 require 'creek'
+require 'saxlsx'
 
 class ImportUtil
 
@@ -75,29 +76,50 @@ class ImportUtil
 
     case file_name
     when '.xlsx' then
-      creek = Creek::Book.new file.path
+      # creek = Creek::Book.new file.path
     else
       raise "Please upload a '.xlsx' file. Unknown file type: #{file.original_filename}"
     end
 
-    sheet = creek.sheets[0]
+    # sheet = creek.sheets[0]
+    # list = []
+    # header_length = header.length
+    # puts "from load_spreadsheet_quickly"
+    # i = 0
+    # sheet.simple_rows.each do |row|
+    #   print "#{i}. "
+    #   next if i == 0
+    #   # map = {}
+    #   new_hash = header.zip(row.values).to_h
+    #   new_hash.update(new_hash) { |key, value| cleanup_account_number_quickly(key, value)}
+    #   # row_length = row.length
+    #   # (0..(header_length - 1)).each do |j|
+    #   #   key = header[j].to_sym
+    #   #   val = nil
+    #   #   unless j >= row_length
+    #   #     val = row.values[j]
+    #   #   end
+    #   #   val = cleanup_account_number(key, val)
+    #   #   val = cleanup_email(val)
+    #   #   map[key] = val
+    #   # end
+    #   # list << new_hash
+    #   i += 1
+    # end
+
     list = []
-    header_length = header.length
-    sheet.simple_rows.each_with_index do |row, index|
-      next if index == 0
-      map = {}
-      row_length = row.length
-      (0..(header_length - 1)).each do |j|
-        key = header[j].to_sym
-        val = nil
-        unless j >= row_length
-          val = row.values[j]
-        end
-        val = cleanup_account_number(key, val)
-        val = cleanup_email(val)
-        map[key] = val
+    Saxlsx::Workbook.open file.path do |excel|
+      sheet = excel.sheets.first
+      Rails.logger.warn "inside saxlsx"
+      i = 0
+      sheet.rows.each do |row|
+        Rails.logger.warn "#{i}. "
+        if i == 0 then i += 1; next end
+        new_hash = header.zip(row).to_h
+        new_hash.update(new_hash) { |key, value| cleanup_account_number_quickly(key, value); cleanup_email(value)}
+        list << new_hash
+        i += 1
       end
-      list << map
     end
     list
   end
@@ -141,6 +163,19 @@ class ImportUtil
       raw_value.to_i.to_s
     else
       raw_value.strip
+    end
+  end
+
+  def self.cleanup_account_number_quickly(key, raw_value)
+    unless key.to_s.include?("account_number")
+      return raw_value
+    else
+      add_leading_zero = raw_value.to_s[0] == '0'
+      raw_value = raw_value.to_i.to_s.strip
+      if add_leading_zero
+        raw_value = "0" + raw_value
+      end
+      raw_value
     end
   end
 

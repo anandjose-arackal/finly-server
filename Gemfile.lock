@@ -356,6 +356,7 @@ GEM
     omniauth-quickbooks (0.0.2)
       omniauth-oauth (~> 1.0)
     orm_adapter (0.5.0)
+    ox (2.11.0)
     paperclip (6.1.0)
       activemodel (>= 4.2.0)
       activesupport (>= 4.2.0)
@@ -474,6 +475,9 @@ GEM
     sassc (2.0.1)
       ffi (~> 1.9)
       rake
+    saxlsx (1.9.0)
+      ox (~> 2.1)
+      rubyzip (~> 1.0)
     scout_apm (2.5.1)
     sendgrid-ruby (6.0.0)
       ruby_http_client (~> 3.3.0)
@@ -661,6 +665,7 @@ DEPENDENCIES
   ruby-prof (~> 0.17.0)
   rubyzip (~> 1.2.2)
   sass-rails (~> 5.0.7)
+  saxlsx
   scout_apm (~> 2.4)
   sendgrid-ruby
   sidekiq (~> 5.2.3)
