@@ -731,10 +731,10 @@ class PaymentAgreements::Base < BaseOperation
               add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
               return
             end
-            unless expected_end_date_present
-              add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
-              return
-            end
+            # unless expected_end_date_present
+            #   add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
+            #   return
+            # end
           end
         # end
       end
