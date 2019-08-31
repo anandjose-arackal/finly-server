@@ -56,7 +56,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
     self.issues = []
 
-    Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
+    # Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
     
   end
 
@@ -65,7 +65,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def process
-    self.order_details.each do |item|
+    self.order_details.each_with_index do |item, index|
+      print "#{index}. "
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]

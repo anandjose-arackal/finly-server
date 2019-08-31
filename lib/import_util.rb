@@ -1,4 +1,5 @@
 require 'roo'
+require 'creek'
 
 class ImportUtil
 
@@ -59,6 +60,44 @@ class ImportUtil
         end
       end
       list << map if add_line
+    end
+    list
+  end
+
+  def self.load_spreadsheet_quickly(file, header = [], options)
+    return unless header.nil? or header.is_a?(Array)
+
+    if file.is_a?(File)
+      file_name = File.extname(file)
+    else
+      file_name = File.extname(file.original_filename)
+    end
+
+    case file_name
+    when '.xlsx' then
+      creek = Creek::Book.new file.path
+    else
+      raise "Please upload a '.xlsx' file. Unknown file type: #{file.original_filename}"
+    end
+
+    sheet = creek.sheets[0]
+    list = []
+    header_length = header.length
+    sheet.simple_rows.each_with_index do |row, index|
+      next if index == 0
+      map = {}
+      row_length = row.length
+      (0..(header_length - 1)).each do |j|
+        key = header[j].to_sym
+        val = nil
+        unless j >= row_length
+          val = row.values[j]
+        end
+        val = cleanup_account_number(key, val)
+        val = cleanup_email(val)
+        map[key] = val
+      end
+      list << map
     end
     list
   end
