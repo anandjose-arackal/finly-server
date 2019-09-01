@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.11.1'
+lock '3.11.0'
 
 if ['aws_production','foreground_production', 'background_production', 'yes_bank_balance_poller'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
