@@ -92,6 +92,7 @@ json.result do
           end
           json.purchase_order_id line_item.purchase_order_id
           json.purchase_order_number line_item&.purchase_order&.purchase_order_number
+          json.purchase_order_procurement_id line_item&.purchase_order&.procurement_id
           json.attachment_attributes do
             # json.uid line_item.attachment&.id
             # json.name line_item.attachment&.file_file_name
