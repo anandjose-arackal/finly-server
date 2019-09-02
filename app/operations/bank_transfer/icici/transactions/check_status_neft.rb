@@ -34,14 +34,16 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
       # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
       # 021341686931 - is the UTR
       # FINLYRGS94365231618 is the request ID
-      utr = statement_entry.remarks.split("/").last(2).first rescue ""
+      utr = statement_entry.remarks.split("/").first(3).last rescue ""
       # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
       utr += "1DC"
       self.bank_transaction.update(utr: utr)
 
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       self.payment.system_messages.destroy_all
-
+      if self.payment&.invoice.present?
+        self.payment&.invoice&.update_invoice_status
+      end
       self.payment_order.update_order_status
       self.payment_order.update_processed_amount
     end

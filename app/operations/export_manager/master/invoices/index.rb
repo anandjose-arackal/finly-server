@@ -136,6 +136,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             advance_amount: {spreadsheet: true},
              invoice_net_payable_amount: {spreadsheet: true},
              approvers: {spreadsheet: true},
              finance_approved_date: {spreadsheet: true}
@@ -152,7 +153,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -319,6 +320,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def tds_amount(invoice_line_item)
     invoice_line_item.parent.tds_amount&.value || 0
+  end
+
+  def advance_amount(invoice_line_item)
+    value = invoice_line_item.parent&.advance_amount || 0
+    precision_value(value)
   end
 
   def approvers(invoice_line_item)

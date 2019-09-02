@@ -77,7 +77,8 @@ class Reports::Base < BaseOperation
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
                   :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers,
-                  :reviewal_chains, :reviewal_chain, :finance_managers, :awaiting_settlement
+                  :reviewal_chains, :reviewal_chain, :finance_managers, :awaiting_settlement,
+                  :tax_rates, :gst_state_codes
 
     def init
       self.report = params[:report]
@@ -93,6 +94,8 @@ class Reports::Base < BaseOperation
       self.violations = Reports::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
       self.finance_managers = report.document_role_users(:finance_managers)
+      self.tax_rates = user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
 
       if Report.status_ids(:approved, :auto_approved).include?(report.status_id)
         self.awaiting_settlement = true

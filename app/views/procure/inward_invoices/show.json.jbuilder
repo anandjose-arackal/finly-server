@@ -60,7 +60,9 @@ json.invoice do
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
   json.po_number invoice.po_number
-
+  json.created_from_payment_agreement invoice.payment_agreement_id.present?
+  json.agreement_number invoice&.payment_agreement&.get_agreement_number
+  json.payment_agreement_id invoice.payment_agreement_id
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
@@ -97,6 +99,7 @@ json.invoice do
   # json.discount_rate precision_value invoice.discount_rate
   json.discount_rate precision_value ((invoice.discount_amount&.value / invoice.item_amounts_total) * 100).round(2) rescue 0
   json.advance_rate precision_value invoice.advance_rate
+  json.variable_periodic_invoice @result.variable_periodic_invoice
   #############################
   json.invoice_attachment do
     json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
@@ -189,18 +192,9 @@ json.invoice do
   end
 end
 
-json.invoice_categories do
-  json.array!(current_company.categories.vendor_payments_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
-json.invoice_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.invoice_categories current_company.categories.vendor_payments_only
+json.invoice_item_categories current_company.categories.inward_invoice_items_only
+
 json.cost_centers do
   # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
   json.array! @result.cost_centers do |cost_center|

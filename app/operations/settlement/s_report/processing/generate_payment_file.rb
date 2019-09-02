@@ -54,6 +54,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
           email: mapping.user.email,
           receiving_mobile_number: mapping.user.mobile_number,
           note: mapping.note,
+          report_ids: mapping&.reports&.collect(&:id)&.join(', ')
       }
     end
     self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
