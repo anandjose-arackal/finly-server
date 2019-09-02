@@ -45,7 +45,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     end
 
 
-    if self.payment_agreement.save
+    if self.payment_agreement.save && self.payment_agreement.reload
       update_item_attributes
       # set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
       # set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
@@ -55,7 +55,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
       # Set total amount on agreement level
       update_total_amount
-      params[:reviewal_document] = self.payment_agreement.reload
+      params[:reviewal_document] = self.payment_agreement
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
