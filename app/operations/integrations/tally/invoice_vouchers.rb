@@ -109,7 +109,6 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
     file = Paperclip::Tempfile.new(['export', '.xml'])
     open(file.path, 'wb') { |f| f.write file_data }
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-    debugger
     self.file_url = temp_file.file.url
   end
 
