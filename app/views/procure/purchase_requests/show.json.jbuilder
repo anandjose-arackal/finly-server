@@ -89,6 +89,8 @@ json.result do
             json.id line_item.purchase_order_item.purchase_order.user_id rescue nil
             json.name line_item.purchase_order_item.purchase_order.user.name rescue nil
           end
+          json.purchase_order_id line_item.purchase_order_id
+          json.purchase_order_number line_item.purchase_order.purchase_order_number
           json.attachment_attributes do
             # json.uid line_item.attachment&.id
             # json.name line_item.attachment&.file_file_name
