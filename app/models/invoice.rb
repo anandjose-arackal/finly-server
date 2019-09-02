@@ -93,6 +93,8 @@ class Invoice < ApplicationRecord
 
   master Documents::Invoices::Master
 
+  enum cost_allocation_type: [:header, :line_items]
+
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
   belongs_to :address, optional: true

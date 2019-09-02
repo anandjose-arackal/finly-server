@@ -78,6 +78,14 @@ class Forms::Definitions::Section
     properties << Forms::Definitions::Types::FormulaType.new(section, parents_association, key, options, &block)
   end
 
+  def field_dependency(controlling_field, dependent_field, populate:)
+
+  end
+
+  def sequence(key, options ={}, &block)
+    properties << Forms::Definitions::Types::SequenceType.new(section, parents_association, key, options, &block)
+  end
+
   def validate(*args, &block)
     validations[:validate] << Forms::Definitions::Validation.new(*args, &block)
   end
