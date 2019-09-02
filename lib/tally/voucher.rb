@@ -20,11 +20,11 @@ class Tally::Voucher < NonPersistentModel
       ledgers << ledger
     end
     ledger.add amount
-    bill_allocations.each do |allocation|
+    bill_allocations&.each do |allocation|
       allocation_amount = allocation[:amount]&.to_i || 0
       ledger.add_bill_allocation allocation[:name], allocation[:type], -allocation_amount
     end
-    category_allocations.each do |allocation|
+    category_allocations&.each do |allocation|
       allocation_amount = allocation[:amount]&.to_i || 0
       ledger.add_category_allocation allocation[:name], allocation[:cost_center], -allocation_amount
     end

@@ -15,7 +15,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
-    unless user.company.tally_configuration.present? and user.company.tally_configuration.active
+    unless user.company.tally_configuration.present? and user.company.tally_configuration.invoice_voucher_enabled and
+        user.company.tally_configuration.invoice_voucher_configuration
       add_message :error, 'Tally integration has not been configured for your company'
       return
     end
@@ -31,7 +32,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   end
 
   def process
-    configuration = {
+    {
         "company_name": "Metropolitan Stock Exchange of India Ltd. 17-18",
         "date": "{{invoice.date}}",
         "state": "{{invoice.billing_location.state.name}}",
@@ -40,7 +41,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
         "narration": "{{invoice.narration}}",
         "vendor": {
             "gstin": "{{invoice.vendor_location.gstin}}",
-            "gl_name": "{{invoice.vendor_location.gl_code}}",
+            "gl_name": "{{invoice.vendor.gl_name}}",
             "bill_allocations": [
                 {
                     "name": "{{invoice.invoice_number}}",
@@ -69,7 +70,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
                 "igst": "Input IGST Mumbai"
             }
         }
-    }.with_indifferent_access
+    }
+    configuration = user.company.tally_configuration.invoice_voucher_configuration&.with_indifferent_access
 
     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
     unless invoices_presenter&.success?
@@ -90,8 +92,6 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
     invoices.each do |invoice_obj|
       invoice = invoice_obj.to_liquid
 
-      debugger
-
       voucher = add_voucher generator, invoice, configuration
       add_vendor_ledgers voucher, invoice, configuration
       invoice.line_items.each do |item_obj|
@@ -110,6 +110,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
     open(file.path, 'wb') { |f| f.write file_data }
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
     debugger
+    self.file_url = temp_file.file.url
   end
 
   def success
@@ -128,7 +129,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   end
 
   def add_item_ledgers(voucher, invoice, item, configuration)
-    ledger_data = LiquidHelper.interpolate(configuration['item'].slice(:gl_name, :category_allocations), "item" => item, "invoice" => invoice)
+    ledger_data = LiquidHelper.interpolate(configuration['item'].slice('gl_name', 'category_allocations'), "item" => item, "invoice" => invoice)
     voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
   end
 

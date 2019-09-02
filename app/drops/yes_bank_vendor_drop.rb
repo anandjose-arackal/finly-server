@@ -1,11 +1,11 @@
 class YesBankVendorDrop < Drop
 
-  def name
-    @record.name
+  def business_name
+    @object&.business_name
   end
 
   def gl_name
-    @record.name
+    business_name
   end
 
 end
