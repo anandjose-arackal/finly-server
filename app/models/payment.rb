@@ -118,6 +118,9 @@ class Payment < ApplicationRecord
       where.not(id: id)
     end
   }
+  scope :with_external_id, -> (external_id) {
+    where external_reference_id: external_id
+  }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
   scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance),
                                                   PaymentPurpose.id_for(:cash_advance),
@@ -443,6 +446,7 @@ class Payment < ApplicationRecord
 
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
+  after_save :add_company_id
 
   after_destroy :budget_trail_destroy
 
@@ -564,7 +568,11 @@ class Payment < ApplicationRecord
   end
 
   def retriable?
-    self.failed?
+    if self.initiating_account.present? && self.initiating_account.is_a?(KotakBankCompanyAccount)
+      false
+    else
+      self.failed?
+    end
   end
 
   def invoice_amount
@@ -572,9 +580,11 @@ class Payment < ApplicationRecord
     self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
-  def company_id
-    self.payment_order&.company_id
-  end
+  # def company_id
+  #   if super.blank?
+  #     self.payment_order&.company_id
+  #   end
+  # end
 
   def procurement_index_details
     {
@@ -710,6 +720,12 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
+  end
+
+  def add_company_id
+    if self.company_id.blank?
+      self.update_columns(company_id: self.payment_order&.company_id)
     end
   end
 end

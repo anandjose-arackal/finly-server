@@ -64,7 +64,7 @@ class YesBankVendor < ApplicationRecord
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
-  has_many :tds_rates, through: :vendor_tds_rates#, foreign_key: :tds_rates_list_id
+  has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
 
@@ -107,7 +107,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -116,8 +116,10 @@ class YesBankVendor < ApplicationRecord
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR
-                                      yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?",
-                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+                                      yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?",
+                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   }
 
@@ -241,6 +243,10 @@ class YesBankVendor < ApplicationRecord
         state_code: state_code&.state_code,
         address: address
     }
+  end
+
+  def self.human_name
+    'Vendor'
   end
 
   def self.document_owner_attribute

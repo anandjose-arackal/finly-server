@@ -4,6 +4,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note, :vendor_poc_name, :vendor_poc_email, :vendor_poc_mobile_number, :discount_type_id
 
 json.vendor @result.purchase_order.vendor.as_json
+json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
 
 json.vendor do
   json.extract! @result.purchase_order&.vendor
@@ -30,6 +31,7 @@ json.vendor do
 end
 
 json.actions @result.actions
+json.user @result.purchase_order.user.as_json rescue nil
 
 if @result.purchase_order.advance_payments&.present?
   json.show_advance_payments true
@@ -39,9 +41,16 @@ end
 json.status do
   json.extract! @result.purchase_order&.status, :id, :name
 end
-json.total_before_tax do
+# because po only saves the taxable value
+json.taxable_value do
   json.id @result.purchase_order.total_before_tax&.id
   json.value @result.purchase_order.total_before_tax&.value&.round(2)
+  json.currency_id @result.purchase_order.total_before_tax&.currency&.id
+end
+# because po does not save the raw value
+json.total_before_tax do
+  json.id @result.purchase_order.total_before_tax&.id
+  json.value (@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2) rescue 0 # in po we are not saving raw amount as of now. before tax amount needs to be inclusive of discount 
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
 json.advance_amount do
@@ -63,6 +72,9 @@ json.advance_amount do
   json.advance_amount @result.purchase_order.advance_amount&.value
   json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
+
+json.advance_amount_editable @result.purchase_order.advance_payments.blank? # if procurements already has advance payments, disallow editing advance amount even if po revised.
+
 json.tax do
   json.value @result.purchase_order.tax_amount&.value&.round(2)
   json.id @result.purchase_order.tax_amount&.id
@@ -89,13 +101,32 @@ json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
+                  :sgst, :cgst, :igst
     
     json.item_number item.inventory_line_item&.item_number rescue nil
-    json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.gl_code item.category&.gl_code
     json.category_name item.category&.name
     json.category_id item.category_id
+    json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
+    json.purchase_request_id item&.purchase_request_item&.purchase_request_id
+    json.purchase_request_item_quantity item&.purchase_request_item&.quantity
+    json.amount item.rate * item.quantity
+    product = ""
+    case item.inventory_line_item&.product_type_id
+    when ProductType.id_for(:goods)
+      product = "goods"
+    when ProductType.id_for(:service)
+      product = "service"
+    end
+    json.product_type product
+    json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
+    json.taxable_amount do
+      json.value item.taxable_amount&.value&.round(2)
+      json.id item.taxable_amount&.id
+      json.currency_id item.taxable_amount&.currency&.id
+    end
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id
@@ -106,6 +137,7 @@ json.items do
       json.id item.discount_amount&.id
       json.currency_id item.discount_amount&.currency&.id
     end
+    json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
     json.total_amount do
       json.value item.total_amount&.value&.round(2)
       json.id item.total_amount&.id
@@ -152,15 +184,16 @@ json.comments do
   end
 end
 
-json.po_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.po_item_categories current_company.categories.inward_invoice_items_only
 
 json.policies do
   json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+
+json.payment_ticket_policies do
+  json.array! @result.payment_ticket_policies do |policy|
     json.extract! policy, :id, :name
   end
 end
@@ -202,7 +235,7 @@ json.reviewal_chains do
         end
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold
+            json.extract! reviewer, :id, :exception, :threshold, :min, :max
             json.reviewer_details reviewer.reviewer.as_json
           end
         end

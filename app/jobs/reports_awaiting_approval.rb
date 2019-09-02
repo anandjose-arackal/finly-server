@@ -1,0 +1,24 @@
+class ReportsAwaitingApproval < ApplicationJob
+
+  def perform
+    company_list = Company.where(id: [2, 164]) # l&C, satin #temp add l&c for qa testing
+    company_list.each do |company|
+      remind_document_reviewer(company)      
+    end
+  end
+
+  private
+
+  def remind_document_reviewer(company)
+    users = company.managers
+
+    users.each do |user|
+      reports = Report.awaiting_action_items(user.id)
+      reports = reports.where('submitted_at <= ?', 3.days.ago)
+      if reports.present?
+        Event::EDocument::ReportsAwaitingApproval.(user, reports: reports)
+      end
+    end
+  end
+
+end

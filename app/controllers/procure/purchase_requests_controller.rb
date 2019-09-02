@@ -1,5 +1,9 @@
 class Procure::PurchaseRequestsController < BaseControllers::WebBase
 
+  def filter_config
+    @result = Procurements::PurchaseRequests::FilterConfig.(current_user, params)
+    respond
+  end
   def index
     @result = Procurements::PurchaseRequests::Index.(current_user, params)
     respond

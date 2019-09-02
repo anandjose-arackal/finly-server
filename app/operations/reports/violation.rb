@@ -69,8 +69,8 @@ class Reports::Violation < Reports::Base
 
   def process
 
-    expense_rules = policy.expense_rules.non_deleted
-    budget_rules = policy.budget_rules.non_deleted
+    expense_rules = policy.expense_rules.non_deleted.includes(:greater_than_amount,:category)
+    budget_rules = policy.budget_rules.non_deleted.includes(:amount,:without_receipt_amount, :period, :budget_rule_category_mappings)
 
     selected_drop_down_items = nil
 
@@ -134,7 +134,12 @@ class Reports::Violation < Reports::Base
     end
     if rule.category_id
       if expense.category_id == rule.category_id
-        message += ' and belonging to category ' + expense.category_name
+        message += ' and belonging to category '
+        if expense.category.parent.present?
+          message += "#{expense.category.parent.name} - "
+        end
+        message += "#{expense.category_name}"
+        # message += ' and belonging to category ' + expense.category_name
       else
         return false
       end
@@ -310,7 +315,7 @@ class Reports::Violation < Reports::Base
             start_date = date.beginning_of_week
             end_date = date.end_of_week
           elsif rule.period_id == Period.id_for(:year)
-            start_date = date.beginning_of_year
+            start_date = date.beginning_of_year + 3.month #to get fiscal year start
             end_date = date.end_of_year
           elsif rule.period_id == Period.id_for(:quarter)
             start_date = date.beginning_of_quarter

@@ -9,8 +9,21 @@
 #
 
 class PaymentStatus < ApplicationRecord
-
-  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9, pending_credit: 10, pending_retry: 11}
+  # Documentation at end of the file
+  VALUES = {
+      completed: 1,
+      failed: 2,
+      pending: 3,
+      in_progress: 4,
+      scheduled: 5,
+      cancelled: 6,
+      processing: 7,
+      pending_approval: 8,
+      possible_failure: 9,
+      pending_credit: 10,
+      pending_retry: 11,
+      initiated: 12
+  }
 
   scope :with_name, ->(name) { where name: name }
 
@@ -63,4 +76,30 @@ class PaymentStatus < ApplicationRecord
     self.id == PaymentStatus.id_for(:pending_retry)
   end
 
+  def initiated?
+    self.id == PaymentStatus.id_for(:initiated)
+  end
+
 end
+
+
+# #####################
+# Order of Payment Statuses
+# #####################
+#
+# Pending Approval(8) -> [Pending(3)/Scheduled(5)] -> In Progress(4) -> [Initiated(12)/Completed(1)/Failed(2)/Processing(7)]
+#
+# Scheduled -> In Progress(4) -> [Initiated(12)/Completed(1)/Failed(2)/Processing(7)]
+#
+# Processing(7) -> [Completed(1)/Failed(2)]
+#
+#
+#
+# #####################
+# Meaning of Statuses
+# #####################
+# Pending(3)/In Progress(4) : Intermediate Status; Used during creation/processing of payments
+# Completed(1) : Payment successfully processed
+# Failed(2) : Payment Failed
+# Processing(7) : Payment processing at Bank's end after successful initiation
+#

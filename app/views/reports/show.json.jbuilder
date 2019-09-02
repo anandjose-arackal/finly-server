@@ -84,6 +84,8 @@ json.expense_sections sorted_expenses do |category|
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+    # adding potential duplicate flag in reports show
+    json.potential_duplicate expense.has_duplicate_expenses?
     if expense.category.parent.present?
       json.category_name expense.category.parent.name
       json.sub_category expense.category.name
@@ -116,15 +118,15 @@ json.expense_sections sorted_expenses do |category|
     json.custom_fields do
       case expense.expense_type_id
       when ExpenseType.id_for(:manual)
-        json.array! expense.manual_expense.custom_fields
+        json.array! expense.manual_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:card)
-        json.array! expense.card_expense.custom_fields
+        json.array! expense.card_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:distance)
-        json.array! expense.distance_expense.custom_fields
+        json.array! expense.distance_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:time)
-        json.array! expense.time_expense.custom_fields
+        json.array! expense.time_expense.custom_fields.as_json({report_show: true})
       when ExpenseType.id_for(:per_diem)
-        json.array! expense.per_diem_expense.custom_fields
+        json.array! expense.per_diem_expense.custom_fields.as_json({report_show: true})
       end
     end
     json.receipts do
@@ -151,6 +153,20 @@ json.expense_sections sorted_expenses do |category|
         json.pocket_id expense.spent_from&.id
         json.pocket_balance expense.spent_from&.name
       end
+    end
+
+    # Tax details for this expense
+    json.tax_details do
+      json.merchant_gstin expense.gstin_location&.gstin
+      json.merchant_state_id expense.gstin_location&.state_id
+      json.merchant_registered_name expense.gstin_location&.gstin_master&.legal_name_of_business
+      json.tax_amount precision_value expense.gst_amount&.value
+      json.gst_type_id expense.gst_type_id
+      json.merchant_bill_no expense.merchant_bill_no
+      json.hsn_sac expense.hsn_sac
+      json.state_of_expense_id expense.state_of_expense_id
+      json.tax_rate_id expense.tax_rate_id
+      json.gstin_location_id expense.gstin_location_id
     end
   end
 end
@@ -187,7 +203,7 @@ json.violations do
 end
 
 json.custom_fields do
-  json.array! @result.report.custom_fields
+  json.array! @result.report.custom_fields.as_json
 end
 
 json.budgets do
@@ -238,7 +254,7 @@ json.reviewal_chains do
         end
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold
+            json.extract! reviewer, :id, :exception, :threshold, :min, :max
             json.reviewer_details reviewer.reviewer.as_json
           end
         end
@@ -248,3 +264,5 @@ json.reviewal_chains do
 end
 
 json.reviewal_chain @result.report.get_reviewal_chain
+json.tax_rates @result.tax_rates
+json.state_codes @result.gst_state_codes

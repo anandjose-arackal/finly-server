@@ -18,6 +18,8 @@
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
+#  gst_applicable             :boolean          default(TRUE)
+#  tds_applicable             :boolean
 #
 
 class Category < ApplicationRecord

@@ -16,8 +16,19 @@ json.bulk_items do
 		end
 		json.unit_of_measurement item[:unit_of_measurement]
 		json.quantity item[:quantity]
+		json.hsn_sac item[:hsn_sac]
 		json.purpose item[:purpose]
 		json.required_by_date item[:required_by_date]
+
+		json.department do
+			json.name item[:department_name]
+			json.id item[:department_id]
+		end
+
+		json.cost_center do
+			json.name item[:cost_center_name]
+			json.id item[:cost_center_id]
+		end
 
 		json.delivery_location do
 			json.name item[:delivery_location_name]
@@ -27,8 +38,7 @@ json.bulk_items do
 			json.vendor_name item[:preferred_vendor_name]
 			json.vendor_id item[:preferred_vendor_id]
 		end
-
-		json.preferred_vendors []
+		json.preferred_vendors item[:preferred_vendors]
 		json.rejected nil
 		json.status nil
 

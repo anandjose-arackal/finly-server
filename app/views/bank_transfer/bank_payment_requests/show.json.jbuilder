@@ -18,6 +18,11 @@ json.summary do
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_user @result.bank_payment_request.owner.name
+  json.initiating_user_details do
+    json.name @result.bank_payment_request.owner.name rescue nil
+    json.email @result.bank_payment_request.owner.email rescue nil
+    json.phone @result.bank_payment_request.owner.mobile_number rescue nil
+  end
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')
@@ -27,7 +32,7 @@ json.summary do
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   # json.approvers @result.approvers
   json.name @result.bank_payment_request.name
-  json.show_payment_file_download (current_company.payment_file_configuration.present? && (current_user.company_admin? || current_user.vendor_payments_creditor?))
+  json.show_payment_file_download(current_company.payment_file_configuration.present? && (current_user.company_admin? || current_user.vendor_payments_creditor?))
 
   json.verified_payments_count @result.payments_verified
   json.unverified_payments_count @result.payments_unverified

@@ -191,7 +191,4 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def execute_callbacks(success)
     self.payment.trigger_callbacks(success)
   end
-
-
-
 end
