@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_30_035324) do
+ActiveRecord::Schema.define(version: 2019_09_02_135927) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2718,8 +2718,8 @@ ActiveRecord::Schema.define(version: 2019_08_30_035324) do
     t.boolean "from_cash_on_hand", default: false
     t.boolean "cash_on_hand_blocked"
     t.integer "expense_tax_type_id"
-    t.decimal "gst_percentage", precision: 10
-    t.decimal "tds_percentage", precision: 10
+    t.decimal "gst_percentage", precision: 10, scale: 5
+    t.decimal "tds_percentage", precision: 10, scale: 5
     t.integer "tds_amount_id"
     t.integer "gst_type_id"
     t.integer "tds_slab_id"
