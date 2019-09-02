@@ -45,7 +45,6 @@ class Expense::Manual::Split < Expense::Manual::Base
     self.expenses_params = split_expense_params
     self.expenses = []
     self.expenses_params&.each do |expense_params|
-      debugger
       expense = user.expenses.build(expense_params[:expense_params])
       unless expense.valid?
         expense.errors.full_messages&.each do |error|
@@ -135,7 +134,6 @@ class Expense::Manual::Split < Expense::Manual::Base
     if base_params[:receipt_email_attributes].present?
       base_params[:receipt_email_attributes][:user_id] = user.id
     end
-    debugger
     splits = params&.to_unsafe_h&.dig(:splits)
     splits&.each do |index, split|
       expense_item_params = base_params.deep_dup
@@ -145,6 +143,7 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense_item_params[:merchant_bill_no] = split[:merchant_bill_no]
       expense_item_params[:tax_rate_id] = split[:tax_rate_id]
       expense_item_params[:gst_type_id] = split[:gst_type_id]
+      expense_item_params[:hsn_sac] = split[:hsn_sac]
       expense_item_params[:expense_tax_type_id] = split[:expense_tax_type_id]
       expense_item_params[:gstin_location_attributes] = split[:gstin_location_attributes] if split[:gstin_location_attributes].present?
       expense_item_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
