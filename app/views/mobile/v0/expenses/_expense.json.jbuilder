@@ -84,6 +84,7 @@ json.type expense.expense_type_id
 json.category do
   json.id expense.category.id
   json.name expense.category.name
+  json.gst_applicable expense.category.gst_applicable
 end
 json.receipts expense.receipts.each do |receipt|
   json.original receipt.image(:original)

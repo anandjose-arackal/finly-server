@@ -14,7 +14,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    user = User.find_by params[:user_id]
+    user = User.find_by_id params[:user_id]
     bank_account = user.bank_accounts.new bank_account_params.except(:user_id)
     unless bank_account.save
       return result false, bank_account.errors.full_messages

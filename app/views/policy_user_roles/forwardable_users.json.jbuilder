@@ -14,3 +14,5 @@ json.users do
     json.merge! pur.user.as_json
   end
 end
+
+json.count @result.policy_user_roles.count

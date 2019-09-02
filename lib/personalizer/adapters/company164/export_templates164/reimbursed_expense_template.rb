@@ -54,7 +54,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
               '',
               '',
               '',
-              rpg.amount&.value,
+              rpg_mapping.amount&.value,
               '',
               '',
               '',
