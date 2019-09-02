@@ -1,5 +1,8 @@
 class Transactions::API < Trailblazer::Operation
-  include Contract::DSL, Model, Transactions::Messages
+  include Contract::DSL
+  include Model
+  include Transactions::Messages
+  include Transactions::Schema::DSL
 
   def self.AssignModelUser(key: :user)
     -> (options) do

@@ -58,6 +58,11 @@ class Documents::Master
     @form
   end
 
+  def self.state_machine(state_machine = NoObject)
+    @state_machine = state_machine unless state_machine == NoObject
+    @state_machine
+  end
+
   def self.create(create = NoObject)
     @create = create unless create == NoObject
     @create

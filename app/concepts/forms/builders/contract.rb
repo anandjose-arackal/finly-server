@@ -19,7 +19,7 @@ module Forms::Builders::Contract
 
   module Build
     def self.with(properties, validations, functions: nil, model: nil)
-      klass = Class.new(Reform::Form)
+      klass = Class.new(Transactions::Contract)
       klass.send :model, model if model.present?
       add_functions klass, functions if functions.present?
       add_properties klass, properties

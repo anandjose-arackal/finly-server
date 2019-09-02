@@ -1,4 +1,4 @@
-class ExportTemplates::Spreadsheet::Contract < Dry::Validation::Contract
+class ExportTemplates::Spreadsheet::Contract < Transactions::Schema
 
   params do
 

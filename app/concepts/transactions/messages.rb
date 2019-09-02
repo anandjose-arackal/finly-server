@@ -23,8 +23,12 @@ module Transactions::Messages
     false
   end
 
+  def on_schema_error(options, errors_list)
+
+  end
+
   def add_message(options, type, key, message)
-    Transaction.add_message options, type, key, message
+    Transactions::API.add_message options, type, key, message
   end
 
   module ClassMethods
@@ -40,6 +44,19 @@ module Transactions::Messages
 
     def on_error(options, key, message)
       add_message options, :error, key, message
+      false
+    end
+
+    def on_schema_error(options, errors_list)
+      errors_list.to_h.each do |attr, err_list|
+        if err_list.is_a?(Hash)
+          on_schema_error(options, err_list)
+        else
+          err_list.each do |e|
+            on_error options, attr, e
+          end
+        end
+      end
       false
     end
 

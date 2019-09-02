@@ -1,4 +1,4 @@
-class ExportTemplates::Contract < Reform::Form
+class ExportTemplates::Contract < Transactions::Contract
 
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}
@@ -20,18 +20,6 @@ class ExportTemplates::Contract < Reform::Form
     end
 
     result = schema_contract.call self.configuration
-    add_dry_validation_errors(result.errors) unless result.success?
-  end
-
-  def add_dry_validation_errors(errors_list)
-    errors_list.to_h.each do |attr, err_list|
-      if err_list.is_a?(Hash)
-        add_dry_validation_errors(err_list)
-      else
-        err_list.each do |e|
-          errors.add attr, e
-        end
-      end
-    end
+    add_schema_errors(result.errors) unless result.success?
   end
 end

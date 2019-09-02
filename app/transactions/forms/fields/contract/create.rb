@@ -1,4 +1,4 @@
-class Forms::Fields::Contract::Create < Reform::Form
+class Forms::Fields::Contract::Create < Transactions::Contract
   include ::ActiveModel::Validations::Callbacks
 
   # property :uuid

@@ -1,4 +1,4 @@
-class ExportTemplates::TallyInvoiceVoucher::Contract < Dry::Validation::Contract
+class ExportTemplates::TallyInvoiceVoucher::Contract < Transactions::Schema
 
   params do
     required(:company_name).filled(:string)

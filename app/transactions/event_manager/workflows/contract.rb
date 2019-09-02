@@ -1,4 +1,4 @@
-class EventManager::Workflows::Contract < Reform::Form
+class EventManager::Workflows::Contract < Transactions::Contract
   include EventManager::Actions::FileManager::Validations
 
   property :name, validates: {presence: true}
