@@ -161,7 +161,7 @@ class Expense < ApplicationRecord
     end
 
     # setting gst_percentage, if it isn't set at the time of saving
-    if self.gst_percentage.blank?
+    if self.gst_percentage.blank? || self.gst_percentage == 0
       self.gst_percentage = self.tax_rate&.rate
     end
     compute_gst_amount
