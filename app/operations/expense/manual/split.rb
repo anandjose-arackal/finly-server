@@ -77,6 +77,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     self.expenses.each do |expense|
       expense.split_link = self.split_link
       if expense.save and self.receipt.present?
+
         expense.receipts << expense.receipts.create(image: self.receipt.image, user: expense.user)
 
         # calculate the equivalent amount in all currencies in the amounts table
@@ -86,6 +87,9 @@ class Expense::Manual::Split < Expense::Manual::Base
           expense.update_other_currencies
         end
       end
+      ####### WEIRDEST JUGAAD EVER - SAVING IT TWICE MAKES IT CALCULATE GST_AMOUNT WTF ############
+      expense.save
+      ###################################### THANKS RUBY -_- ######################################
     end
     if self.receipt.present?
       self.receipt.destroy
