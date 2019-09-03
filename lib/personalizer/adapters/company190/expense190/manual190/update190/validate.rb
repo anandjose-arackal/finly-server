@@ -6,6 +6,7 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Update190::Vali
     self.expense_params = op_instance.params
     self.category = current_company.categories.find_by_id expense_params[:category_id]
     self.validate_keys = %w(
+                       expense_tax_type_id
                        tax_rate_id
                        gst_type_id
                        state_of_expense_id
@@ -21,8 +22,8 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Update190::Vali
     if category.gst_applicable?
       validate_keys.each do |field_key|
         field_keys = field_key.split('.')
-        user_value = field_keys[0...-1].inject(expense_params) do |hash, expence_param|
-          hash&.public_send(:[], expence_param.to_sym)
+        user_value = field_keys[0...-1].inject(expense_params) do |hash, expense_param|
+          hash&.public_send(:[], expense_param.to_sym)
         end&.public_send(:[], field_keys.last)
         if user_value.blank?
           field_name = field_keys.last&.gsub("id","")&.humanize rescue "Expense Field"
