@@ -56,12 +56,12 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
                 {
                     "name": "Primary Cost Center",
                     "cost_center": "{{invoice.cost_center.gl_code}}",
-                    "amount": "{{item.taxable_amount}}"
+                    "amount": "{{item.net_amount}}"
                 },
                 {
                     "name": "State Cost Center",
                     "cost_center": "{{invoice.billing_location.state.name}}",
-                    "amount": "{{item.taxable_amount}}"
+                    "amount": "{{item.net_amount}}"
                 }
             ],
             "gst_gl": {
@@ -129,7 +129,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_item_ledgers(voucher, invoice, item, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['item'].slice('gl_name', 'category_allocations'), "item" => item, "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
+    voucher.add ledger_data['gl_name'], (-item.net_amount), category_allocations: ledger_data['category_allocations']
   end
 
   def add_item_gst_ledgers(voucher, invoice, item, configuration)
