@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Update190::Vali
   attr_accessor :expense_params, :category,:validate_keys
 
   def init
-    self.expense_params = op_instance.expense_params
+    self.expense_params = op_instance.params
     self.category = current_company.categories.find_by_id expense_params[:category_id]
     self.validate_keys = %w(
                        tax_rate_id
