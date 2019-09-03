@@ -180,6 +180,7 @@ class Expense::Manual::Update < Expense::Manual::Base
           end
         end
       end
+      expense.save # extra just to do the gst amount updation part
     else
       add_message :error, self.expense.errors.full_messages
     end
