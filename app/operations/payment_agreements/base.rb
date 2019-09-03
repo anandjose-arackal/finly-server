@@ -356,7 +356,7 @@ class PaymentAgreements::Base < BaseOperation
               # CustomField::SetFields.(invoice, FieldParentType.id_for(:general_invoice), custom_fields_data)
               validate_custom_fields_invoice(invoice, custom_fields, false)
             else
-              validate_custom_fields_invoice(invoice, custom_fields, true)
+              validate_custom_fields_invoice(invoice, custom_fields, false)
             end
           end
         end
@@ -376,7 +376,7 @@ class PaymentAgreements::Base < BaseOperation
               validate_custom_fields_invoice(invoice, custom_fields, false)
             else
               # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
-              validate_custom_fields_invoice(invoice, custom_fields, true)
+              validate_custom_fields_invoice(invoice, custom_fields, false)
             end
           end
         end
@@ -731,10 +731,10 @@ class PaymentAgreements::Base < BaseOperation
               add_message :error, "Duration between start and end date cannot be less than #{frequency_period_number} months as per frequency"
               return
             end
-            unless expected_end_date_present
-              add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
-              return
-            end
+            # unless expected_end_date_present
+            #   add_message :error, "Next end date for start date: #{invoice.start_date.to_date} is #{invoice.start_date.to_date + frequency_period_number.month - 1.day} or its muliples"
+            #   return
+            # end
           end
         # end
       end
