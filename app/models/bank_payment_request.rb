@@ -64,6 +64,8 @@ class BankPaymentRequest < ApplicationRecord
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
+  before_destroy :rollback_related_documents
+
   default_scope {order(created_at: :desc)}
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status, allow_nil: true
@@ -572,4 +574,34 @@ class BankPaymentRequest < ApplicationRecord
     bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
   end
   ####################### Overridden Methods ends ###################
+
+
+  def rollback_related_documents
+    rollback_security_deposit
+    rollback_beneficiary_payment
+  end
+
+  def rollback_security_deposit
+    type_security_deposit = self.payment_order.payments.pluck(:parent_type).include?("SecurityDeposit") rescue false
+    if type_security_deposit
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: SecurityDepositStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
+
+  def rollback_beneficiary_payment
+    type_beneficiary_payment = self.payment_order.payments.pluck(:parent_type).include?("BeneficiaryPayment") rescue false
+    if type_beneficiary_payment
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
 end

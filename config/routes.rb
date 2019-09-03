@@ -3549,6 +3549,25 @@ Rails.application.routes.draw do
     resources :analytics, only: [:index]
   end
 
+  resources :payment_agreements do
+    patch 'approve', to: 'payment_agreements#approve'
+    patch 'submit', to: "payment_agreements#submit", as: :submit
+    patch 'retract', to: "payment_agreements#retract", as: :retract
+    patch 'reject', to: "payment_agreements#reject", as: :reject
+    patch 'unapprove', to: "payment_agreements#unapprove", as: :unapprove
+    patch 'take_control', to: "payment_agreements#take_control", as: :take_control
+    patch 'return_control', to: "payment_agreements#return_control", as: :return_control
+    get 'upcoming_invoices', to: "payment_agreements#upcoming_invoices", as: :upcoming_invoices
+    get 'invoice_history', to: "payment_agreements#invoice_history", as: :invoice_history
+    get 'attachments', to: "payment_agreements#attachments", as: :attachments
+    collection do
+      get 'document_config', to: 'payment_agreements#document_config', as: :document_config
+      get 'count', to: 'payment_agreements#count'
+      get 'policy_config', to: 'payment_agreements#policy_config'
+      get 'filter_config', to: 'payment_agreements#filter_config'
+      get 'payment_agreement_action_config', to: 'payment_agreements#actions_configuration'
+    end
+  end
 
   scope :admin do
     namespace :admin_users do
@@ -3657,6 +3676,7 @@ Rails.application.routes.draw do
     put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
     put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
     delete 'purchase_requests/bulk_destroy', to: 'purchase_requests#bulk_destroy'
+    get 'purchase_requests/filter_config', to: 'purchase_requests#filter_config'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
       post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
@@ -3675,6 +3695,7 @@ Rails.application.routes.draw do
         patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
         get 'count', to: "purchase_requests#count", as: :count
       end
+      get 'comments', to: "purchase_requests#comments"
     end
     post 'purchase_request/bulk_upload_items', to: 'purchase_requests#bulk_upload_items'
     get 'purchase_request/template_bulk_import_items', to: 'purchase_requests#template_bulk_import_items'
@@ -3763,6 +3784,7 @@ Rails.application.routes.draw do
     get 'vp/po_advances', to: 'vendor_payments#po_advances'
     get 'vp/grns', to: 'vendor_payments#grns'
     get 'vp/vendors', to: 'vendor_payments#vendors'
+    get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end

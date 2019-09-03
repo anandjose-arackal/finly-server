@@ -9,8 +9,22 @@ class Forms::Definitions::Types::SequenceType < Forms::Definitions::Property
     does_not_match_any
   )
 
+  def initialize(section, parent, key, options = {}, &block)
+    options[:populate_if_empty] = -> (fragment:) {
+      if fragment.blank?
+
+      end
+      fragment
+    }
+    super(section, parent, key, options, &new_block)
+  end
+
   def field_type
     :sequence
+  end
+
+  def placeholder
+    'Auto-generated'
   end
 
 end
