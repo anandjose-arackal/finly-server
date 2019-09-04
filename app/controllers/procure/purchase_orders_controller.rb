@@ -161,7 +161,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company
 
-    if params[:origin] == 'download_action'
+    if params[:origin] == 'download_action' && request.subdomains.exclude? 'admin'
       @purchase_order.trails.create action_user: current_user,
                                      action_id: TrailAction.id_for(:downloaded),
                                      action_level: @purchase_order.trails.last.action_level
