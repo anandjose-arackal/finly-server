@@ -5,6 +5,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   headers ({
             :id => 'ID',
             :policy => 'Policy ID',
+            :policy_creation_flag => 'For New Policy Y / or Blank',
             :user_id => 'User Email / Mobile',
             :level_name => 'Level Name',
             :level_number => 'Level Number',
@@ -94,18 +95,33 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   def create_record(data)
     lurm_params = set_params(data)
+    # Find or Create a policy for MAP
     if lurm_params[:policy_name].present?
       self.policy = get_policy(lurm_params[:policy_name], application)
+
+      #IF policy with name not found and policy creation flag is seted system will create new policy
+      if self.policy.blank? && lurm_params[:policy_creation_flag]
+        self.policy = create_policy(lurm_params[:policy_name],application)
+      elsif self.policy.blank? && !lurm_params[:policy_creation_flag]
+        return result false, "Policy not found"
+      end
+
     else
       self.policy = company.policies.default.first
     end
+
+    # Find the user to map
     if lurm_params[:user_email].present?
       entity_user_id = clean_up_data lurm_params[:user_email]
-      entity_user = company.users.where(mobile_number: entity_user_id).or(company.users.where(email: entity_user_id)).first
+      entity_user = get_user_entity(entity_user_id)
     end
+
     unless entity_user.present?
       return result false,'User not found'
     end
+
+    #Check and add user to the policy if expense management
+    check_part_of_policy(entity_user) if self.application == 'em'
     row_length = data.size
     lower_index = 2
     while(lower_index < row_length-1)
@@ -116,10 +132,17 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       max = (data[lower_index+5].present? ? data[lower_index+5].to_i : nil)
       if level_name.present? && level_number.present?
         self.level = get_level(level_name, level_number, provider)
-        reviewer = company.users.where(mobile_number: reviewer_id).or(company.users.where(email: reviewer_id)).first
+        if reviewer_id.present?
+          reviewer = get_reviewer(reviewer_id, application)
+          unless  reviewer.present?
+            return result false, "Reviewer Not Found"
+          end
+        else
+          reviewer = nil
+        end
         mapping_exist = self.level.level_user_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer&.id, min: min, max: max, user_id: entity_user.id).first
         self.level.level_user_reviewer_mappings.create(reviewer_id: reviewer&.id, policy_id: policy.id,user_id: entity_user.id, min: min, max: max) unless mapping_exist.present?
-        return result true, 'Reviewer Mapping created'
+        return result true, 'Reviewer Mapping Created'
       end
       lower_index += 5
     end
@@ -133,10 +156,12 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     id = row[import_fields[:id]]
     policy_name = row[import_fields[:policy_name]].to_s
     user_email = row[import_fields[:user_email]]
+    policy_creation_flag = row[import_fields[:policy_creation_flag ]]
 
     params = {
         id: id,
         policy_name: policy_name,
+        policy_creation_flag: (policy_creation_flag.to_s.upcase == Y ? true : false),
         user_email: user_email
     }
   end
@@ -145,15 +170,33 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     {
         :id =>0,
         :policy_name => 1,
-        :user_email => 2
+        :policy_creation_flag => 2,
+        :user_email => 3
     }
   end
 
 
   def get_policy(policy_name,application)
     policy = self.company.policies.find_by(name: policy_name, application: application)
-    return policy if policy.present?
+  end
+
+  def create_policy(policy_name, application)
     policy = self.company.policies.create(name: policy_name, application: application)
+  end
+
+  def check_part_of_policy(entity_user)
+    mapping = self.policy.user_mapping.find_by(user_id: entity_user.id)
+    unless mapping.present?
+      self.policy.user_mapping.create(user_id: entity_user.id)
+    end
+  end
+
+  def get_reviewer(reviewer_id, application)
+    user = get_user_entity(reviewer_id)
+    if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?("Manager")
+      user.role_mapping.create(purpose_id: 1, user_role_id: UserRole.id_for(:manager))
+    end
+    user
   end
 
   def get_level(level_name, level_number,provider)
@@ -164,6 +207,16 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   def get_application(name)
     %w(ReportProvider MoneyRequestProvider TravelRequestProvider).include?(name) ? 'em' : 'vp'
+  end
+
+  def get_user_entity(identifier)
+    user = nil
+    if Constants::VALID_EMAIL_FORMAT.match?(identifier)
+      user = company.users.find_by_email identifier
+    elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
+      user = company.users.find_by_mobile_number identifier
+    end
+    user
   end
 
   def clean_up_data(text)
