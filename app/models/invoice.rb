@@ -240,7 +240,8 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0})
+      ids = self.joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0}).pluck(:id)
+      where id: ids
     end
   }
 
