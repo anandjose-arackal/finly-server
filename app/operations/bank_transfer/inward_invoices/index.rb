@@ -30,6 +30,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_ids, type: :array
     has_scope :filter_policy_id
     has_scope :filter_invoice_id
+    has_scope :show_only_invoices_which_are_forwarded
 
     # Sorting
     has_scope :sort_invoice_id
@@ -53,6 +54,10 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def non_po_invoice_status_count
       get_count(InwardInvoiceType.id_for(:non_po_invoice))
+    end
+
+    def agreement_invoice_status_count
+      get_count(InwardInvoiceType.id_for(:recurring_invoice))
     end
 
     def get_count(id)

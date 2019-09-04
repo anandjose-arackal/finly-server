@@ -42,4 +42,8 @@ module Templatable
     resource_template_id.present?
   end
 
+  def document_owner_id
+    self.send(self.class.document_owner_attribute)
+  end
+
 end

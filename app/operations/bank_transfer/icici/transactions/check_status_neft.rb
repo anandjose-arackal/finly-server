@@ -34,7 +34,7 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
       # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
       # 021341686931 - is the UTR
       # FINLYRGS94365231618 is the request ID
-      utr = statement_entry.remarks.split("/").last(2).first rescue ""
+      utr = statement_entry.remarks.split("/").first(3).last rescue ""
       # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
       utr += "1DC"
       self.bank_transaction.update(utr: utr)
