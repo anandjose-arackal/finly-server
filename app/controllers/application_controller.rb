@@ -242,7 +242,7 @@ class ApplicationController < ActionController::Base
     end
     if @result.present?
       if @result.success?
-        if [Exporter, Exporter::Spreadsheet, Exporter::Pdf, Exporter::AsZip].include? @result.class
+        if [Exporter, Exporter::Xlsx, Exporter::Pdf, Exporter::AsZip].include? @result.class
           @result.render(self)
         else
           respond_to do |format|
