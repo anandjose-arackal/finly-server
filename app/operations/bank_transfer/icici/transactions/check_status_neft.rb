@@ -30,7 +30,7 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
 
   def process
     statement_entry = self.company.icici_statements.find_by(request_id: self.bank_transaction.unique_request_number)
-    if statement_entry.present?
+    if statement_entry.present? && self.bank_transaction.utr.blank?
       # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
       # 021341686931 - is the UTR
       # FINLYRGS94365231618 is the request ID
