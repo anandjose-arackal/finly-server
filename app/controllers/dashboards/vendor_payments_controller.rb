@@ -58,4 +58,9 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
     @result = Dashboard::VendorPayments::Grns.(current_user, params)
     respond
   end
+
+  def payment_agreements
+    @result = Dashboard::VendorPayments::PaymentAgreements.(current_user, params)
+    respond
+  end
 end

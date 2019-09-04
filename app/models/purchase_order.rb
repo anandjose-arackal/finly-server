@@ -776,6 +776,10 @@ class PurchaseOrder < ApplicationRecord
     purchase_order_status_id != PurchaseOrderStatus.id_for(:open)
   end
 
+  def purchase_order_number
+    self.override_po_number.present? ? self.override_po_number : self.po_number
+  end
+
 
   private
 

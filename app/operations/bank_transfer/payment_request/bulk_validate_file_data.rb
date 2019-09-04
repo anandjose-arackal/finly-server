@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -37,13 +37,18 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
-    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
-    self.payment_order_custom_fields.each do |custom_field_config|
-      case custom_field_config.field_type_id
-        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
-          self.headers << "#{custom_field_config.field_name} ID"
-        else
-          self.headers << "#{custom_field_config.field_name}"
+    self.from_payment_agreement = params[:from_payment_agreement]
+
+    # Payment agreement custom fields has no effect here
+    unless from_payment_agreement
+      self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      self.payment_order_custom_fields.each do |custom_field_config|
+        case custom_field_config.field_type_id
+          when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+            self.headers << "#{custom_field_config.field_name} ID"
+          else
+            self.headers << "#{custom_field_config.field_name}"
+        end
       end
     end
 
@@ -83,16 +88,18 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # generating custom field data
       custom_fields = {}
-      field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
-      field_configurations.each do |field|
-        field_name = field.field_name.gsub(" ", "_").underscore
-        if item[field_name.to_sym].present?
-          if field.field_type_id == FieldType.id_for(:multiselect)
-            custom_fields[field.id] = [item[field_name.to_sym]].flatten
-          elsif field.field_type_id == FieldType.id_for(:drop_down)
-            custom_fields[field.id] = item[field_name.to_sym]
-          elsif field.field_type_id == FieldType.id_for(:text)
-            custom_fields[field.id] = item[field_name.to_sym]
+      unless from_payment_agreement
+        field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+        field_configurations.each do |field|
+          field_name = field.field_name.gsub(" ", "_").underscore
+          if item[field_name.to_sym].present?
+            if field.field_type_id == FieldType.id_for(:multiselect)
+              custom_fields[field.id] = [item[field_name.to_sym]].flatten
+            elsif field.field_type_id == FieldType.id_for(:drop_down)
+              custom_fields[field.id] = item[field_name.to_sym]
+            elsif field.field_type_id == FieldType.id_for(:text)
+              custom_fields[field.id] = item[field_name.to_sym]
+            end
           end
         end
       end
@@ -104,18 +111,20 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       self.issue_item = {}
 
       # adding the custom fields for the particular invoice, using a ghost invoice
-      self.ghost_invoice = Invoice.new
-      custom_fields = {custom_fields: item[:custom_fields]} || {}
-      custom_fields[:user] = user
-      custom_fields[:reset_fields] = true
-      custom_fields[:save] = false
-      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+      unless from_payment_agreement
+        self.ghost_invoice = Invoice.new
+        custom_fields = {custom_fields: item[:custom_fields]} || {}
+        custom_fields[:user] = user
+        custom_fields[:reset_fields] = true
+        custom_fields[:save] = false
+        CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
 
-      op = CustomField::Validate.(self.ghost_invoice)
-      unless op.success?
-        self.error_messages << op.messages[:error]
-        self.valid = false
-        self.issue_item[:custom_fields] = op.messages[:error]
+        op = CustomField::Validate.(self.ghost_invoice)
+        unless op.success?
+          self.error_messages << op.messages[:error]
+          self.valid = false
+          self.issue_item[:custom_fields] = op.messages[:error]
+        end
       end
 
       # new requirement

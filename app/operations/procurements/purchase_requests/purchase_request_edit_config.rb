@@ -6,7 +6,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
 
   class Procurements::PurchaseRequests::PurchaseRequestEditConfig::EditConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers, :department_mappings, :custom_fields_config
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers, :department_mappings, :location_mappings, :custom_fields_config
 
     def init
       self.purchase_request = params[:purchase_request]
