@@ -270,10 +270,10 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><%= item.comment %></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
-            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.total_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
         <% end %>
         </tbody>
@@ -292,11 +292,11 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.total_before_tax&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.total_before_tax&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
@@ -316,17 +316,17 @@
               <% end %>
               </td>
             <% end %>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <% if @result.purchase_order.advance_amount_required %>
             <tr>
               <td class="font-light-gray text-left">Advance Amount</td>
-              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.advance_amount&.value&.to_d.round(2) rescue 0 %></td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
             </tr>
           <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.balance_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           </tbody>
         </table>
