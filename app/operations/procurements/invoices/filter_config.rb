@@ -19,13 +19,14 @@ class Procurements::Invoices::FilterConfig < Procurements::Invoices::Base
   end
 
   class Procurements::Invoices::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :locations, :departments, :cost_centers, :policies
+    attr_accessor :locations, :departments, :cost_centers, :policies, :agreement_invoice_enabled
 
     def init
       self.locations = params[:locations]
       self.departments = params[:departments]
       self.cost_centers = params[:cost_centers]
       self.policies = params[:policies]
+      self.agreement_invoice_enabled = user.company.agreement_based_payment_system_enabled?
     end
   end
 end
