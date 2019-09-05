@@ -1,0 +1,1 @@
+json.custom_fields_config @result.field_configurations
