@@ -34,17 +34,27 @@ class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager
   end
 
   def pre_process
-    unaffected_reviewal_level_ids = document.dlrms.where(level_number > current_dlrm.level_number).pluck(:level_id)
+    unaffected_dlrms = document.dlrms.where("level_number > ?", current_dlrm.level_number).as_json
+
+    unaffected_reviewal_level_ids = unaffected_dlrms.map {|item| item["level_id"]}
     # Create dlrm_mappings_data
     self.reviewal_levels = self.reviewal_levels.where(id: unaffected_reviewal_level_ids)
     self.reviewal_levels.each do |level|
-      mapping_params = get_mapping_data(level)
+      # Get preferences of what was previously stored in dlrms
+      user_preferences = unaffected_dlrms.filter {|item| item["level_id"] == level.id}
+
+      user_preferred_reviewers = user_preferences.map {|item| item["reviewer_id"]}
+
+
+      # mapping_params = get_mapping_data(level)
 
       dlrm_level_data = {level: level}
 
-      if mapping_params.blank? || mapping_params[:reviewer_id].blank?
-
+      if user_preferred_reviewers.blank?
+        #todo handle LURM
         overrides_present = level.level_user_reviewer_mappings.with_user_id(user.id).present?
+
+
 
         level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).
             with_threshold(document_amount).
@@ -212,6 +222,8 @@ class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager
     else
       nil
     end
+
+
   end
 
   def mappings_parameters
