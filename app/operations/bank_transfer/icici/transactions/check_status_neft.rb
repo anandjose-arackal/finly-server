@@ -31,19 +31,27 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
       add_message :error, "This is not a NEFT payment"
       return
     end
+
+    if self.bank_transaction.utr.present?
+      add_message :error, "This transaction already has a UTR"
+      return
+    end
   end
 
   def process
     statement_entry = self.company.icici_statements.find_by(request_id: self.bank_transaction.unique_request_number)
-    if statement_entry.present? && self.bank_transaction&.utr&.blank?
-      # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
-      # 021341686931 - is the UTR
-      # FINLYRGS94365231618 is the request ID
-      utr = statement_entry.remarks.split("/").first(3).last rescue ""
-      # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
-      utr += "1DC"
-      self.bank_transaction.update(utr: utr)
+    if statement_entry.present?
+      if self.bank_transaction.utr.blank?
+        # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
+        # 021341686931 - is the UTR
+        # FINLYRGS94365231618 is the request ID
+        utr = statement_entry.remarks.split("/").first(3).last rescue ""
+        # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
+        utr += "1DC"
+        self.bank_transaction.update(utr: utr)
+      end
 
+      # updating statuses of the payment and the payment order
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       self.payment.system_messages.destroy_all
       if self.payment&.invoice.present?
