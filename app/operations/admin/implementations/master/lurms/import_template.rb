@@ -5,7 +5,7 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
 
   headers ({
       :id => 'ID',
-      :policy => 'Policy ID',
+      :policy => 'Policy Name',
       :policy_creation_flag => 'For New Policy Y / or Blank',
       :user_id => 'User Email / Mobile',
       :level_name => 'Level Name',
@@ -37,6 +37,7 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
              PurchaseOrderProvider
              InvoiceProvider
              BankPaymentRequestProvider
+             YesBankVendorProvider
              PaymentAgreementProvider
              )
     file = Tempfile.new(['lurm_import_template', '.xlsx'])
