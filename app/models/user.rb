@@ -1506,7 +1506,7 @@ class User < ApplicationRecord
     return if previously_added_user.blank?
     # setting OTP verified for all users if the current user is verified
     if previously_added_user&.otp_verified?
-      users.map(&:otp_confirm)
+      users.update_all(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     end
     # setting verified as true for all users if they already exist
     if previously_added_user&.verified
