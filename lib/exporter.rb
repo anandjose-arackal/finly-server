@@ -219,9 +219,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           worksheet.write(0, index, item)
         end
 
-        puts "from exporter"
         sheet[:item_contents].each_with_index do |items, index|
-          print "#{index}. "
           items.each_with_index do |item, inner_index|
             if item.present? && (item.to_s.index("---error---") || item.to_s.index("---warning---"))
               format = workbook.add_format
@@ -236,16 +234,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           end
         end
       end
-      puts
-      puts Time.now
 
       # close xlsx file
       workbook.close
-      workbook = nil
-      GC.enable
-      GC.start
 
-      puts Time.now
       # ActiveSupport::Duration should be sent for file expiry duration
       if params[:expire_file_duration] && params[:expire_file_duration].instance_of?(ActiveSupport::Duration)
         expire_file_duration = params[:expire_file_duration]
