@@ -6,6 +6,7 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
   headers ({
       :id => 'ID',
       :policy => 'Policy ID',
+      :policy_creation_flag => 'For New Policy Y / or Blank',
       :user_id => 'User Email / Mobile',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
@@ -15,16 +16,6 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
       :destroy => 'Destroy'
   })
 
-  PROVIDERS =%w(
-             ReportProvider
-             MoneyRequestProvider
-             TravelRequestProvider
-             TravelRequestBookingProvider
-             PurchaseRequestProvider
-             PurchaseOrderProvider
-             InvoiceProvider
-             BankPaymentRequestProvider
-             )
 
   def valid_request
   end
@@ -37,9 +28,20 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
   end
 
   def export(headers, contents)
+    providers =%w(
+             ReportProvider
+             MoneyRequestProvider
+             TravelRequestProvider
+             TravelRequestBookingProvider
+             PurchaseRequestProvider
+             PurchaseOrderProvider
+             InvoiceProvider
+             BankPaymentRequestProvider
+             PaymentAgreementProvider
+             )
     file = Tempfile.new(['lurm_import_template', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)
-    PROVIDERS.each  do |name, sheet|
+    providers.each  do |name|
       worksheet = workbook.add_worksheet(name)
 
       headers.values.each_with_index do |item, index|
