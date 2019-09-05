@@ -101,7 +101,7 @@ class ImportUtil
     if raw_value.is_a?(Float) || raw_value.is_a?(Integer)
       raw_value.to_i.to_s
     else
-      raw_value.strip
+      raw_value.to_s.strip
     end
   end
 
