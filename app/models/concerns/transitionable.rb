@@ -672,7 +672,13 @@ module Transitionable
         when :bank_payment_request_auditor, 'bank_payment_request_auditor'
           # data = []
         when :budget_manager, 'budget_manager'
-          # data = []
+          data = []
+        when :payment_agreement_initiator, 'payment_agreement_initiator'
+          data = role_based_initiator_associated_items(user, role_id)
+        when :payment_agreement_reviewer, 'payment_agreement_reviewer'
+          data = role_based_reviewer_associated_items(user, role_id)
+        when :payment_agreement_auditor, 'payment_agreement_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         else
           # data = []
         end

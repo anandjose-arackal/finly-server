@@ -10,6 +10,7 @@ json.results do
       json.vendor_name item&.vendor&.name
       json.per_unit_estimated_amount item&.per_unit_estimated_amount&.value
       json.rate_contract item.vendor_id.present? 
+      json.purpose item.purpose
       # json.per_unit_estimated_amount_attributes do
       #   json.currency_id line_item&.per_unit_estimated_amount&.currency_id
       #   json.value line_item&.per_unit_estimated_amount&.value

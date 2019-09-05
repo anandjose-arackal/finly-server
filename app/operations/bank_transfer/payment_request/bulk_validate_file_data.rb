@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields,
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement,
                 :mandatory_fields, :drop_down_fields, :drop_down_field_ids,
                 :tds_slab_ids, :all_departments_ids, :category_ids, :cost_center_ids
 
@@ -39,21 +39,26 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
-    self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice)).to_a
-    self.payment_order_custom_fields.each do |custom_field_config|
-      case custom_field_config.field_type_id
+    self.from_payment_agreement = !!StringUtils.to_bool(params[:from_payment_agreement])
+
+    # Payment agreement custom fields has no effect here
+    unless from_payment_agreement
+      self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice)).to_a
+      self.payment_order_custom_fields.each do |custom_field_config|
+        case custom_field_config.field_type_id
         when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
           self.headers << "#{custom_field_config.field_name} ID"
         else
           self.headers << "#{custom_field_config.field_name}"
+        end
       end
+
+      self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact # pluck fields which are mandatory
+
+      self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact # pluck fields which are of type drop down
+
+      self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}} # [{drop_down_field_configuration_id => [array of possible drop down fields]}]
     end
-
-    self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact # pluck fields which are mandatory
-
-    self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact # pluck fields which are of type drop down
-
-    self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}} # [{drop_down_field_configuration_id => [array of possible drop down fields]}]
 
     self.issues = []
 
@@ -63,7 +68,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = all_departments&.policy_department_filter_mapping&.pluck(:id)
 
-    all_categories = current_company.categories.inward_invoice_items_only
+    all_categories = current_company.categories.inward_invoices_only
     self.category_ids = all_categories.pluck(:id) rescue []
 
     all_cost_centers = current_company.cost_centers.vendor_payments_only
@@ -105,21 +110,24 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       custom_fields = {}
       drop_down_custom_fields = {}
       empty_fields = []
+
+      unless from_payment_agreement
       # field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
       # field_configurations.each do |field|
-      self.payment_order_custom_fields.each do |field|
-        field_name = field.field_name.gsub(" ", "_").underscore
-        if item[field_name.to_sym].present?
-          if field.field_type_id == FieldType.id_for(:multiselect)
-            custom_fields[field.id] = [item[field_name.to_sym]].flatten
-          elsif field.field_type_id == FieldType.id_for(:drop_down)
-            custom_fields[field.id] = item[field_name.to_sym]
-            drop_down_custom_fields[field.id] = item[field_name.to_sym]
-          elsif field.field_type_id == FieldType.id_for(:text)
-            custom_fields[field.id] = item[field_name.to_sym]
+        self.payment_order_custom_fields.each do |field|
+          field_name = field.field_name.gsub(" ", "_").underscore
+          if item[field_name.to_sym].present?
+            if field.field_type_id == FieldType.id_for(:multiselect)
+              custom_fields[field.id] = [item[field_name.to_sym]].flatten
+            elsif field.field_type_id == FieldType.id_for(:drop_down)
+              custom_fields[field.id] = item[field_name.to_sym]
+              drop_down_custom_fields[field.id] = item[field_name.to_sym]
+            elsif field.field_type_id == FieldType.id_for(:text)
+              custom_fields[field.id] = item[field_name.to_sym]
+            end
+          else
+            empty_fields << field.id
           end
-        else
-          empty_fields << field.id
         end
       end
 
@@ -129,24 +137,26 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
 
-      # find all fields which are required but left empty by user
-      required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
+      unless from_payment_agreement
+        # find all fields which are required but left empty by user
+        required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
 
-      if required_fields.present?
-        self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
-        self.valid = false
-        self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
-      end
+        if required_fields.present?
+          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.valid = false
+          self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+        end
 
-      # validate if dropdown fields entered matches the data setup in the organization account
-      if drop_down_custom_fields.present?
-        drop_down_custom_fields.each do |key, value|
-          wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key} # find relevant drop down field configuration
-          unless wanted_hash[key].include? value.to_i # check if value entered matches stored possible value
-            correct_field = drop_down_fields.find {|field| field if field.id == key}
-            self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
-            self.valid = false
-            self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+        # validate if dropdown fields entered matches the data setup in the organization account
+        if drop_down_custom_fields.present?
+          drop_down_custom_fields.each do |key, value|
+            wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key} # find relevant drop down field configuration
+            unless wanted_hash[key].include? value.to_i # check if value entered matches stored possible value
+              correct_field = drop_down_fields.find {|field| field if field.id == key}
+              self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
+              self.valid = false
+              self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+            end
           end
         end
       end
