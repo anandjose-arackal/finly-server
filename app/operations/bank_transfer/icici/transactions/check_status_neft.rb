@@ -31,6 +31,11 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
       add_message :error, "This is not a NEFT payment"
       return
     end
+
+    if self.bank_transaction.utr.present?
+      add_message :error, "This transaction already has a UTR"
+      return
+    end
   end
 
   def process
