@@ -6,7 +6,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                 :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
-    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -38,7 +37,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   def init
-    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
 
     unless self.file.respond_to? 'original_filename'
@@ -65,7 +63,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
-    # Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
     self.policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: self.policy_id)
   end
@@ -87,7 +84,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-    # Rails.logger.fatal "FROM BulkCreateFromFile validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else
@@ -128,18 +124,18 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   # this method should create the temporary file that can be linked in the front end
+  # generate the new xlsx format
   def failure
-    if self.headers.present? and self.contents.present?
-      exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
-      file = Tempfile.new("bulk_payment_import_errors.xls")
-      open(file.path, 'wb') do |f|
-        f.write exporter.generate_xls
+    params[:show_file] = false
+    if self.contents.present?
+      result = BankTransfer::PaymentRequest::GenerateImportSample.(user, {content: self.contents})
+
+      if result.success?
+        params[:result_file_path] = result.xlsx_exporter.export_file_path
+        params[:show_file] = true
+      else
+        add_message :error, "Some Internal Error Occurred"
       end
-      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-      params[:result_file_path] = temp_file.file.url
-      params[:show_file] = true
-    else
-      params[:show_file] = false
     end
     BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter.new(user, params, messages)
   end

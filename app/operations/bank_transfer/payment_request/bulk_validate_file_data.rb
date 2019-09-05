@@ -49,11 +49,11 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
     end
 
-    self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact
+    self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact # pluck fields which are mandatory
 
-    self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact
+    self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact # pluck fields which are of type drop down
 
-    self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}}
+    self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}} # [{drop_down_field_configuration_id => [array of possible drop down fields]}]
 
     self.issues = []
 
@@ -120,22 +120,21 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
 
-      # find fields which are required but left empty by user
+      # find all fields which are required but left empty by user
       required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
 
       if required_fields.present?
-        item[:custom_fields] = "---error---"
         self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
         self.valid = false
         self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
       end
 
+      # validate if dropdown fields entered matches the data setup in the organization account
       if drop_down_custom_fields.present?
         drop_down_custom_fields.each do |key, value|
-          wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key}
-          unless wanted_hash[key].include? value.to_i
+          wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key} # find relevant drop down field configuration
+          unless wanted_hash[key].include? value.to_i # check if value entered matches stored possible value
             correct_field = drop_down_fields.find {|field| field if field.id == key}
-            item[:custom_fields] += "---error---"
             self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
             self.valid = false
             self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
@@ -168,7 +167,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # Check if bank account number is present
       if bank_account_no.blank?
-        item[:bank_account_number].to_s += "---error---"
         self.valid = false
         self.error_messages << 'Bank account not found'
         self.issue_item[:bank_account_number] = 'No bank account entered'
@@ -199,7 +197,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # check for format of the Bank account number
       pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
       unless bank_account_no =~ pattern
-        item[:bank_account_number].to_s += "---error---"
         self.valid = false
         self.error_messages << "Invalid Bank Account Number entered"
         self.issue_item[:bank_account_number] = 'Invalid Bank Account Number entered'
@@ -207,7 +204,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # Check if the amount is present
       unless validate_amount(amount.to_s)
-        item[:original_amount].to_s += "---error---"
         self.valid = false
         self.error_messages << 'Invalid amount'
         self.issue_item[:original_amount] = 'Invalid amount'
@@ -215,7 +211,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # Check if the advance amount is present and valid
       unless advance_amount.blank? || validate_amount(advance_amount.to_s)
-        item[:advance_amount] += "---error---"
         self.valid = false
         self.error_messages << 'Invalid advance amount'
         self.issue_item[:advance_amount] = 'Invalid advance amount'
@@ -223,7 +218,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       if advance_amount.present? && validate_amount(advance_amount.to_s)
         if advance_amount.to_f > amount.to_f
-          item[:advance_amount] += "---error---"
           self.valid = false
           self.error_messages << 'Advance amount is more than the original amount'
           self.issue_item[:advance_amount] = 'Advance amount is more than the original amount'
@@ -232,7 +226,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # check if the ifsc is present
       if ifsc.blank?
-        item[:ifsc] = "---error---"
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
         self.issue_item[:ifsc] =  'IFSC cannot be blank'
@@ -241,7 +234,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # check for format of the IFSC
       pattern = Regexp.new(Constants::VALID_IFSC)
       unless ifsc =~ pattern
-        item[:ifsc].to_s += "---error---"
         self.valid = false
         self.error_messages << "Invalid IFSC"
         self.issue_item[:ifsc] = 'Invalid IFSC'
@@ -249,7 +241,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       if external_reference_id.present?
         if ::Payment.with_company_id(user.company_id).find_by(external_reference_id: external_reference_id)
-          item[:external_reference_id] += "---error---"
           self.valid = false
           self.error_messages << "This external reference ID is already taken"
           self.issue_item[:external_reference_id] = "This external reference ID is already taken"
@@ -261,14 +252,12 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
       # 
       unless invoice_date.blank? || validate_date(invoice_date)
-        item[:invoice_date] += "---error---"
         self.valid = false
         self.error_messages << "Invalid invoice date"
         self.issue_item[:invoice_date] = 'Invalid invoice date'
       end
 
       unless invoice_due_date.blank? || validate_date(invoice_due_date)
-        item[:invoice_due_date] += "---error---"
         self.valid = false
         self.error_messages << "Invalid due date"
         self.issue_item[:invoice_due_date] = 'Invalid due date'
@@ -277,21 +266,18 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       
 
       unless invoice_number.blank? || validate_invoice_number(invoice_number)
-        item[:invoice_number] += "---error---"
         self.valid = false
         self.error_messages << "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
         self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
       end
 
       unless validate_rate tax, 1, amount
-        item[:tax] += "---error---"
         self.valid = false
         self.error_messages << "Invalid tax entered"
         self.issue_item[:tax] = 'Invalid tax entered'
       end
 
       unless validate_rate discount, 1, amount
-        item[:discount] += "---error---"
         self.valid = false
         self.error_messages << "Invalid discount entered"
         self.issue_item[:discount] = 'Invalid discount entered'
@@ -299,7 +285,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       if tds_slab_id.present?
         unless self.tds_slab_ids.include? tds_slab_id.to_i
-          item[:tds_slab_id] += "---error---"
           self.valid = false
           self.error_messages << "Invalid TDS Slab ID"
           self.issue_item[:tds_slab_id] = "Invalid TDS Slab ID"
