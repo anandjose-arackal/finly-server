@@ -86,7 +86,7 @@ class ImportUtil
       sheet.rows.each_with_index do |row, index|
         next if index == 0
         new_hash = header.zip(row).to_h
-        new_hash.update(new_hash) { |key, value| cleanup_account_number_quickly(key, value); cleanup_email(value)}
+        new_hash.update(new_hash) { |key, value| val = cleanup_account_number_quickly(key, value); cleanup_email(val)}
         list << new_hash
       end
     end
@@ -131,7 +131,7 @@ class ImportUtil
     if raw_value.is_a?(Float) || raw_value.is_a?(Integer)
       raw_value.to_i.to_s
     else
-      raw_value.strip
+      raw_value.to_s.strip
     end
   end
 
