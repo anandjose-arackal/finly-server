@@ -229,11 +229,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.accepted.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.accepted.to_i - it_cal.to_i
+          real_q = item.accepted.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             real_q = item.quantity - it_cal
@@ -242,7 +242,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.accepted.to_i
+        real_q = item.accepted.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           real_q = item.quantity
@@ -297,11 +297,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.quantity.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.quantity.to_i - it_cal.to_i
+          real_q = item.quantity.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             # here we sum billable amount for all service items in previous invoices
@@ -317,7 +317,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.quantity.to_i
+        real_q = item.quantity.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           next unless item.previously_billed_amount > 0
@@ -373,11 +373,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.accepted.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.accepted.to_i - it_cal.to_i
+          real_q = item.accepted.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             # here we sum billable amount for all service items in previous invoices
@@ -393,7 +393,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.accepted.to_i
+        real_q = item.accepted.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           next unless item.previously_billed_amount > 0
@@ -449,11 +449,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.quantity.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.quantity.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.quantity.to_i - it_cal.to_i
+          real_q = item.quantity.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             real_q = item.quantity - it_cal
@@ -462,7 +462,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.quantity.to_i
+        real_q = item.quantity.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           real_q = item.quantity
