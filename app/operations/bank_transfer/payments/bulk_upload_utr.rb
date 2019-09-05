@@ -31,7 +31,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       self.result_array << payment_data.values
       id = payment_data[:payment_id]
       utr = payment_data[:utr]
-      payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.id_for(:vendor_payment)).pluck(:id)
+      payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order)).pluck(:id)
       payment = Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
       if payment.blank?
         self.result_array[index] << "This payment already has an associated UTR"
@@ -45,11 +45,11 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource&.is_a?(BankTransaction)
+      if payment.reference_resource.present? && payment.reference_resource&.is_a?(YesBankTransaction)
         payment.reference_resource.update(bank_reference_number: utr)
       else
         # create a bank transaction for this particular payment
-        bank_transaction = BankTransaction.create(transfer_type: payment.payment_mode,
+        bank_transaction = YesBankTransaction.create(transfer_type: payment.payment_mode,
                                                   bank_reference_number: utr,
                                                   company_id: user.company_id,
                                                   transfer_status_id: BankTransferStatus.id_for(:completed),

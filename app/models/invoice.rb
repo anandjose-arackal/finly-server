@@ -80,9 +80,10 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
 #
 
 class Invoice < ApplicationRecord
@@ -272,6 +273,12 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
+    if user_id.present?
+      self.awaiting_action_items(user_id)
+    end
+  }
+
   scope :filter_ids, ->(ids) {
     where id: ids
   }
@@ -288,6 +295,18 @@ class Invoice < ApplicationRecord
     from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
+  }
+
+  scope :filter_creation_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.approved_at >= ? && invoices.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
   scope :filter_invoice_date, -> (from) {
@@ -386,7 +405,7 @@ class Invoice < ApplicationRecord
 
   scope :include_for_index, -> {
     includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
-             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type,
              :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 
@@ -418,6 +437,29 @@ class Invoice < ApplicationRecord
       month = Date.today.month
     end
     where('extract(month from created_at) = ?', month)
+  }
+
+
+  # Sorting
+  scope :sort_invoice_id, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.invoice_id #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.date #{type}")
+    end
+  }
+
+  scope :sort_due_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("invoices.due_date #{type}")
+    end
   }
 
   after_create :set_defaults
@@ -488,8 +530,14 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
+      user = RequestStore.store[:current_user]
+      configuration = user.company.feature_subscription.srn_enabled rescue false
+      if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
+        return self.invoice_items.map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
+      end
+
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
+      return self.invoice_items.map {|p| p.amount&.value }.compact.sum
     else
       return 0
     end
@@ -610,7 +658,8 @@ class Invoice < ApplicationRecord
         editable: self.unpaid? || self.initiated?,
         tax_rate: precision_value(self.tax_rate),
         tds_rate: precision_value(self.tds_rate),
-        discount_rate: precision_value(self.discount_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
         attachments: self.attachments.map(&:as_json),
         # invoice_attachment: {
@@ -650,6 +699,10 @@ class Invoice < ApplicationRecord
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json
     }
+  end
+
+  def invoice_discount_rate
+    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
   end
 
   def include_original_amount

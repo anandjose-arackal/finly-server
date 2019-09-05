@@ -45,16 +45,22 @@ module Transitionable
       User.where(id: user_ids)
     end
 
-    def affected_users(type=nil)
+    def affected_users(type=nil, options={})
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
+      # Valid options {}
+      # {ignore_reviewer: true}
       user_ids = []
       case type
       when :approve, 'approve'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.document_owner_id
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
         else
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          unless options[:ignore_reviewer]
+            user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
+          end
           user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
         end
       when :reject, 'reject'
@@ -157,6 +163,8 @@ module Transitionable
             mobile_number: dlrm.reviewer&.mobile_number,
             active: dlrm.active,
             threshold: dlrm.threshold,
+            min: dlrm.min,
+            max: dlrm.max,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
@@ -286,7 +294,8 @@ module Transitionable
       return nil if all_level_numbers.blank?
 
       if self.level.present?
-        current_level_number = self.level.level_number
+        # current_level_number = self.level.level_number
+        current_level_number = self.document_level_reviewer_mappings.where(level_id: self.level.id).first&.level_number
         if type == 'next' || type == :next
           level_number = current_level_number + 1
         elsif ['previous', :previous, 'prev', :prev].include?(type)
@@ -615,57 +624,57 @@ module Transitionable
       if user.has_policy_role?(role_id)
         # role_id = UserRole.id_for(role_name.to_sym)
         role_name = UserRole.find_by_id(role_id).name
-        data = nil
+        data = self.none
         case role_name
         when :purchase_request_initiator, 'purchase_request_initiator'
-          data = role_based_initiator_associated_items(user, role_id)
+          data = data.or(role_based_initiator_associated_items(user, role_id))
         when :purchase_request_reviewer, 'purchase_request_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :purchase_request_auditor, 'purchase_request_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = PurchaseOrder.initiator_associated_items(user, role_id)
+          data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           # Get data for purchase order reviewer
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :purchase_order_auditor, 'purchase_order_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :goods_receiver, 'goods_receiver'
-          data = []
+          # nothing
         when :invoice_initiator, 'invoice_initiator'
-          data = user.company.inward_invoices.where(created_by_user_id: user.id)
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id))
         when :invoice_reviewer, 'invoice_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :invoice_auditor, 'invoice_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
-          data = role_based_initiator_associated_items(user, role_id)
+          data = data.or(role_based_initiator_associated_items(user, role_id))
         when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :bank_payment_request_creditor, 'bank_payment_request_creditor'
-          data = role_based_creditor_associated_items(user, role_id)
+          data = data.or(role_based_creditor_associated_items(user, role_id))
         when :bank_payment_request_auditor, 'bank_payment_request_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :item_master_manager, 'item_master_manager'
-          data = role_based_manager_associated_items(user, role_id)
+          data = data.or(role_based_manager_associated_items(user, role_id))
         when :inventory_manager, 'inventory_manager'
-          data = []
+          #nothing
         when :vendor_creator, 'vendor_creator'
-          data = role_based_initiator_associated_items(user, role_id)
+          data = data.or(role_based_initiator_associated_items(user, role_id))
         when :vendor_reviewer, 'vendor_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :vendor_auditor, 'vendor_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
-          data = []
+          # data = []
         when :policy_admin, 'policy_admin'
-          data = []
+          # data = []
         when :bank_payment_request_auditor, 'bank_payment_request_auditor'
-          data = []
+          # data = []
         when :budget_manager, 'budget_manager'
-          data = []
+          # data = []
         else
-          data = []
+          # data = []
         end
         data
       end
@@ -777,21 +786,24 @@ module Transitionable
     end
 
     def associated_items(user, document_roles)
-      data = nil
+      data = self.none
       # role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
       # policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         role_name = UserRole.find_by_id(role_id).name
         valid_role = document_roles.include?(role_name.to_sym)
-        if valid_role && self.role_based_associated_items(user, role_id).present? 
-          if data.blank?
-            data = self.role_based_associated_items(user, role_id)
-          else
-            data = data.or(self.role_based_associated_items(user, role_id))
-          end
+        # if valid_role && self.role_based_associated_items(user, role_id).present?
+        #   if data.blank?
+        #     data = self.role_based_associated_items(user, role_id)
+        #   else
+        #     data = data.or(self.role_based_associated_items(user, role_id))
+        #   end
+        # end
+        if valid_role
+          data = data.or(self.role_based_associated_items(user, role_id))
         end
       end
-      return data
+      data
     end
   end
 end

@@ -80,7 +80,8 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     if illegible
       add_message :success, "Receipt marked as illegible"
     else
-      expense.update(transcribed: true)
+      # marking this expense as blocked against cash on hand, because it's a manual expense
+      expense.update(transcribed: true,cash_on_hand_blocked: true)
       add_message :success, "Receipt transcribed"
     end
   end

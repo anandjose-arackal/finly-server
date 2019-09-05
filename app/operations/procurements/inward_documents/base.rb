@@ -1,5 +1,12 @@
 class Procurements::InwardDocuments::Base < Procurements::Base
 
+  def pre_validate
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      add_message :error, "Receipt Note not enabled for your company. Please contact your admin or Finly Customer Support."
+      return
+    end
+  end
+
   def inward_documents_parameters
     # todo change the particulars
     params.permit(:inward_document).require(

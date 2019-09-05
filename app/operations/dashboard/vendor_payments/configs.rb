@@ -18,6 +18,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       vendors: false
     }
 
+
     reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer)
 
     if user.vendor_payments_admin?
@@ -71,6 +72,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         end
       end
     end
+    
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      request_types[:grns] = false
+    end
+
   end
 
   def success

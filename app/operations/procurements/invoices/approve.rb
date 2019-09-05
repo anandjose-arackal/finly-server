@@ -1,6 +1,14 @@
 class Procurements::Invoices::Approve < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params
 
+  def personalizer
+    {
+        post_process: {
+            after: Personalizer::Process.new([:procurements, :invoices, :approve], :post_process, self)
+        }
+    }
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
@@ -36,6 +44,8 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
+    # Email to vendor that invoice is generated when the invoice is approved
+    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
   end
 end

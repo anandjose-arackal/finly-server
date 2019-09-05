@@ -6,8 +6,8 @@ class ProcurementMailer < ApplicationMailer
     @purchase_order = presenter.document
     @user = presenter.user
     @company = @user.company
-
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
+
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
          render_to_string(
              pdf: "purchase-order-#{@document.po_number}",
@@ -38,29 +38,31 @@ class ProcurementMailer < ApplicationMailer
     return unless presenter.validate
     @data = presenter
     @company = @data.user.company
+    @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
+    if @include_attachments
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id })
-    if @result.success?
-      @purchase_order = @data.purchase_order
-      @curr_user = @data.user
-      ########################################################
-      attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(
-             pdf: "purchase-order-#{@data.purchase_order.po_number}",
-             # dpi: '650',
-             encoding: 'UTF-8',
-             template: "export/purchase_order",
-             layout: "pdf/paginated_bootstrap.html.erb",
-             margin: { :bottom => 12 },
-             # layout: "pdf.html.erb",
-             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             # print_media_type: true
-         ),
-         dpi: '650'
-      )
+      if @result.success?
+        @purchase_order = @data.purchase_order
+        @curr_user = @data.user
+        attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
+           render_to_string(
+               pdf: "purchase-order-#{@data.purchase_order.po_number}",
+               # dpi: '650',
+               encoding: 'UTF-8',
+               template: "export/purchase_order",
+               layout: "pdf/paginated_bootstrap.html.erb",
+               margin: { :bottom => 12 },
+               # layout: "pdf.html.erb",
+               footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+               # print_media_type: true
+           ),
+           dpi: '650'
+        )
+      end
+    end
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
-    end
   end
 
 
@@ -98,35 +100,35 @@ class ProcurementMailer < ApplicationMailer
   def purchase_order_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_approval'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_approval'
     end
   end
 
   def purchase_order_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_po'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_po'
     end
   end
 
   def purchase_order_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_take_control'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_take_control'
     end
   end
 
   def purchase_order_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_reject'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_reject'
     end
   end
 
   def invoice_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_invoices'
     end
   end
 
@@ -134,28 +136,47 @@ class ProcurementMailer < ApplicationMailer
   def invoice_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_invoices'
     end
   end
 
   def invoice_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_take_control_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_invoices'
     end
   end
 
   def invoice_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_reject_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_invoices'
     end
   end
 
   def invoices_bulk_import(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_import_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_import_invoices'
     end
+  end
+
+  def send_awaiting_approval_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
+    end
+  end
+
+  def notify_vendor(presenter)
+    @data = presenter
+    mail to: @data.to, subject: @data.subject, template_name: 'vendor_template_invoice'
+  end
+
+  def send_submit_reminder_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
+    end    
   end
 end

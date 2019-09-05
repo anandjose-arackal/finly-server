@@ -243,12 +243,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
       if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card?
-        company_credits = retrieve_balance(:company_credits, user) rescue nil
-        finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
+        return true
+        # company_credits = retrieve_balance(:company_credits, user) rescue nil
+        # finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
         # Allow credit even if the balance retreival fails
-        if (company_credits > 0) || (finly_money > 0) || company_credits.blank? || finly_money.blank?
-          return true
-        end
+        # if (company_credits > 0) || (finly_money > 0) || company_credits.blank? || finly_money.blank?
+        #   return true
+        # end
       end
     end
     ############# Admin logic end #######################
@@ -303,12 +304,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       #     return bank_payment_request.payment_order.partially_completed?
       #   end
       # end
-      finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
+      # finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
       if allow_credit && bank_payment_request.document_role_users(:creditor).include?(user)
         # Allow credit even if the balance retrieval fails
-        if (finly_money > 0) || finly_money.blank?
-          return true
-        end
+        # if (finly_money > 0) || finly_money.blank?
+        return true
+        # end
       end
     end
     ############# Creditor logic end ###########################
@@ -558,45 +559,45 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def approve
     ############# Admin logic start ####################
-    if user.vendor_payments_admin?
-      last_trail = bank_payment_request.trails.last rescue nil
-      if bank_payment_request.processing? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && bank_payment_request.action_users(:approve).include?(user)
-        if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
-          return true
-        end
-        if last_trail.action_id == TrailAction.id_for(:approve)
-          return true
-        end
-        if last_trail.action_id == TrailAction.id_for(:take_control)
-          return true
-        end
-      end
-    end 
+    # if user.vendor_payments_admin?
+    #   last_trail = bank_payment_request.trails.last rescue nil
+    #   if bank_payment_request.processing? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && bank_payment_request.action_users(:approve).include?(user)
+    #     if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+    #       return true
+    #     end
+    #     if last_trail.action_id == TrailAction.id_for(:approve)
+    #       return true
+    #     end
+    #     if last_trail.action_id == TrailAction.id_for(:take_control)
+    #       return true
+    #     end
+    #   end
+    # end 
     ############# Admin logic end ####################
 
 
     ############# Reviewer logic start #########################
-    if bank_payment_request.is_reviewing_user?
-      if bank_payment_request.processing?
-        last_trail = bank_payment_request.trails.last rescue nil
-        if (bank_payment_request.get_reviewers.include?(user))
-          if bank_payment_request.action_users(:approve).include?(user)
-            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:approve)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:return_control)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:submit)
-              return true
-            end
-          end
-        end
-      end
-    end
+    # if bank_payment_request.is_reviewing_user?
+    #   if bank_payment_request.processing?
+    #     last_trail = bank_payment_request.trails.last rescue nil
+    #     if (bank_payment_request.get_reviewers.include?(user))
+    #       if bank_payment_request.action_users(:approve).include?(user)
+    #         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:approve)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:return_control)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:submit)
+    #           return true
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
@@ -606,6 +607,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #   end
     # end
     ############# Creditor logic end #########################
+
+    if bank_payment_request.is_reviewing_user? || admin_has_taken_control?
+      bank_payment_request.processing? && user_in_level?
+    end
 
   end
 
@@ -935,17 +940,36 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       return 0
     end
     case account
-      when :vendor_payment_wallet
-        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-        return adapter.balance
-      when :company_credits
+    when :vendor_payment_wallet
+      adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+      return adapter.balance
+    when :company_credits
+      case user.company&.feature_subscription&.bank_service_provider
+      when "YES"
         adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-        return adapter.balance
+      when "ICICI"
+        adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+      when "KOTAK"
+        adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+      else
+        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      end
+      return adapter.balance
     end
   end
 
   def associated_users
-      BankTransfer::PaymentRequest::Review::AssociatedUsers.(user, bank_payment_request: bank_payment_request, user_before: bank_payment_request.controlling_user) rescue []
+    BankTransfer::PaymentRequest::Review::AssociatedUsers.(user, bank_payment_request: bank_payment_request, user_before: bank_payment_request.controlling_user) rescue []
+  end
+
+  def admin_has_taken_control?
+    # If the user is an admin and the admin has explicitly taken control of the document, 
+    # only then they can approve or reject
+    bank_payment_request.get_reviewers.include?(user) && user.vendor_payment_admin?
+  end
+
+  def user_in_level?
+    bank_payment_request.get_reviewers.include?(user)
   end
 
 end

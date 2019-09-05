@@ -216,6 +216,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def get_company_bank_accounts
+    @result = BankTransfer::PaymentRequest::GetCompanyBankAccounts.(current_user, params)
+    @respond
+  end
+
   def bulk_credit
     @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
     respond
@@ -227,7 +232,6 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   end
 
   def payments_list
-    puts "ROUTES PARAMS FROM BankTransfer PAUYMENT LIST", params.inspect, current_user.inspect
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
     respond
   end
@@ -291,6 +295,10 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond_success_failure
+  end
 
 
   private

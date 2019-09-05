@@ -16,6 +16,14 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
 					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
 
+	def personalizer
+		{
+				validate: {
+						before: Personalizer::Process.new([:bank_transfer, :payment_request, :beneficiary, :create_beneficiary_ticket], :validate, self)
+				}
+		}
+	end
+
 	def pre_validate
 	    if user.blank?
 	      add_message :error, 'User not found'
@@ -57,7 +65,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
-	    self.policy = current_company.policies.find_by(id: policy_id)
+	    self.policy = user.company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -120,7 +128,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Create Document Level Reviewer Mapping
 	    # For setting level specific reviewers from reviewal chain for a document
 	    params[:reviewal_document] = self.bank_payment_request.reload
-
 	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
 	    unless document_reviewer_mappings_op.success?
 	      self.bank_payment_request.destroy
@@ -168,6 +175,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	private
 
 	def parse_payment_order_data
+		initiating_account = retrieve_initiating_account(user.company)
 		policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
 		payment_order_attributes = {
 		    initiating_user_id: user.id,
@@ -180,7 +188,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    },
 		    payment_mode: self.payment_mode,
 		    # payment_mode: params[:payment_mode],
-		    initiating_account_type: YesBankCompanyAccount.name,
+		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
@@ -205,5 +213,19 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    api_initiated: false
 		}
 		bpr_attributes
+	end
+
+	def retrieve_initiating_account(company)
+		case company&.feature_subscription&.bank_service_provider
+		when "YES"
+			initiating_account = user.company.yes_bank_company_account
+		when "ICICI"
+			initiating_account = user.company.icici_bank_company_account
+		when "KOTAK"
+			initiating_account = user.company.kotak_bank_company_account
+		else
+			initiating_account = user.company.yes_bank_company_account
+		end
+		initiating_account
 	end
 end

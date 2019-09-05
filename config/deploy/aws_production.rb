@@ -14,7 +14,7 @@ server 'm4.finly.io', user: 'centos', roles: %w{web app}
 server 'm5.finly.io', user: 'centos', roles: %w{web app}
 server 'm6.finly.io', user: 'centos', roles: %w{web app}
 server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
-server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app}
+server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app email_tracker_role}
 
 set :stage, 'production'
 # set :stage, 'staging'
@@ -28,6 +28,7 @@ set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
 set :usage_tracker_role, :poller_role
+set :email_tracker_role, :email_tracker_role
 # role-based syntax
 # ==================
 

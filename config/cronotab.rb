@@ -22,7 +22,8 @@ Crono.perform(BankTransferProcess).every 1.day, at: {hour: 9, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
 Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
-Crono.perform(BankTransferStatusChecker).every 15.minutes
+Crono.perform(YesBankStatusChecker).every 15.minutes
+Crono.perform(IciciStatusChecker).every 15.minutes
 # Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
 # Summary mailer checks performed every 30minutes
 24.times do |num|
@@ -33,4 +34,11 @@ Crono.perform(ReminderOutwardInvoices).every 1.day, at: {hour: 9, min: 30}
 Crono.perform(CompanyAccountScheduledTransfer).every 1.day, at: {hour: 9, min: 30}
 Crono.perform(BankTransferProcessRetry).every 30.minutes
 Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}
+Crono.perform(IciciStatementsFetch).every 30.minutes
+Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
 # Crono.perform(FixSpuriousPayments).every 30.minutes
+Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
+# Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
+# Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 17, min: 00}
+# Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
+# Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}

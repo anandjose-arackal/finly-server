@@ -155,7 +155,7 @@ json.edit_config do
           end
           json.reviewers do
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
               json.reviewer_details reviewer.reviewer.as_json
             end
           end

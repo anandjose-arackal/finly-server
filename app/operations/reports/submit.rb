@@ -194,6 +194,8 @@ class Reports::Submit < Reports::Base
 
     if report.auto_approved?
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:verified))
+      op = Settlement::SReport::Approved.(user, report: report)
+      report.reload
     else
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:submitted))
     end

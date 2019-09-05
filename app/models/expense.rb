@@ -40,6 +40,12 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  gst_details_id         :integer
+#  gstin_location_id      :integer
+#  state_of_expense_id    :integer
+#  hsn_sac                :string(255)
+#  merchant_bill_no       :string(255)
+#  tax_rate_id            :integer
 #
 
 class Expense < ApplicationRecord
@@ -955,7 +961,7 @@ class Expense < ApplicationRecord
   end
 
   def has_custom_fields?
-    !!self.sub_expense&.custom_fields.present?
+    !!self.sub_expense&.custom_fields.exists?
   end
 
   def sub_expense

@@ -22,8 +22,10 @@ class BackgroundOperation < BaseOperation
     super(user_id, params, request_store_hash)
   end
 
-  def initialize
+  def initialize(user = nil, params = nil)
     clear_messages
+    self.user = user if user.present?
+    self.params = params if params.present?
   end
 
   def perform(user_id, params, request_store_hash = nil)

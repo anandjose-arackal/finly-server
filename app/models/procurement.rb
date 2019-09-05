@@ -71,14 +71,30 @@ class Procurement < ApplicationRecord
     end
   }
 
-  scope :order_by_expected_delivery_date, -> {
+  scope :order_by_expected_delivery_date, -> (user_id) {
+    user = User.find_by_id(user_id)
     ids = self.pluck(:id).uniq
-    filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    # filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    filtered_ids = user.company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
     find_ordered(filtered_ids)
   }
 
   scope :filter_procurement_name, -> (name) {
     where "procurements.name LIKE ?", "%#{name}%"
+  }
+
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
   }
 
   scope :filter_policy_id, -> (policy_id) {
@@ -392,7 +408,6 @@ class Procurement < ApplicationRecord
       where(id: filtered_ids)
     end
   }
-
 
   def awaiting_action?(user)
     # Ideal method:

@@ -17,11 +17,12 @@ config/data_store.yml
 config/sentry.yml
 config/aws_config.yml
 config/yes_bank_config.yml
+config/icici_bank_config.yml
 config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
 .rubocop.yml
-
+.vscode/
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -44,6 +45,7 @@ public/system/vendor_attachments/*
 /public/system/outward_invoice_attachments/*
 /public/system/procurement_attachments/*
 /public/system/booking_attachments/*
+/public/system/admin_implementation_requests/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
@@ -51,6 +53,7 @@ public/system/vendor_attachments/*
 config/data/bypass_authorized_users.yml
 config/gstin_verification_config.yml
 public/system/temporary_files/
+public/system/admin_implementation_requests/*
 
 /yes_bank_api_call_logs
 .vagrant/

@@ -244,8 +244,8 @@
   <% end %>
   <div class="col col-xs-12 line-items-container mg-top-5" style="padding-top: 25px">
     <div class="col col-xs-12 no-padding">
-      <table class="table table-responsive table-document-items">
-        <thead>
+      <table class="table table-responsive table-document-items po-container">
+        <thead class="po-header">
         <tr>
           <th style="width: 25px;">#</th>
           <th style="min-width: 140px;">Name/Description</th>
@@ -260,15 +260,16 @@
             (IGST)
           <% end %>
           </th>
+          <th class="text-right">Tax Percentage</th>
           <th class="text-right">Total</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="po-body">
         <% @result.purchase_order.items.each_with_index do |item, index| %>
           <tr>
             <td class="font-light-gray"><%= index + 1 %></td>
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
-            <td class="font-light-gray"><%= item.comment %></td>
+            <td class="font-light-gray"><div><%= item.comment %></div></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
@@ -281,6 +282,9 @@
     </div>
     <div class="col col-xs-12 no-padding">
       <div class="col col-xs-8 no-padding">
+        <div class="amount_in_words">
+          <b>Net Total Amount in Words:</b> <%= AmountUtils.to_words(@result.purchase_order.balance_amount&.value&.to_d.round(2)).titleize %>
+        </div>
         <% if @result.taxes_applicable_flag %>
           <div class="taxes_as_applicable" style="vertical-align: bottom;">
             *Taxes as Applicable
@@ -357,7 +361,7 @@
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless (@company.id == 137 || @company.id == 156) %>
+      <% unless [137,156,166,179,173].include?(@company.id) %>
         <ul>
           <% approved_users = [] %>
           <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
@@ -383,7 +387,6 @@
           </li>
         </ul>
       <% end %>
-      <!-- <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p> -->
     </div>
   </div>
 </div>
@@ -549,6 +552,23 @@
     }
     i{
       font-size: 11px !important;
+    }
+    .amount_in_words {
+      padding-top: 7px;
+      padding-bottom: 15px;
+    }
+
+    table.po-container {
+        page-break-after:always;
+    }
+    thead.po-header {
+        display:table-row-group;
+    }
+    thead.po-body {
+        display:table-row-group;
+    }
+    tfoot.po-footer {
+        display:table-footer-group;
     }
   }
   @media print{
@@ -718,6 +738,23 @@
     }
     i{
       font-size: 11px !important;
+    }
+    .amount_in_words {
+      padding-top: 7px;
+      padding-bottom: 15px;
+    }
+
+    table.po-container {
+        page-break-after:always;
+    }
+    thead.po-header {
+        display:table-row-group;
+    }
+    thead.po-body {
+        display:table-row-group;
+    }
+    tfoot.po-footer {
+        display:table-footer-group;
     }
   }
 </style>
