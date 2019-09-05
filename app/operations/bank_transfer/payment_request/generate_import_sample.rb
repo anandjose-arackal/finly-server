@@ -66,8 +66,12 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     # adding departments to the excel sheet
     department_headers = ["ID", "Department Name"]
     department_contents = []
-    current_company.departments.each do |department|
-      department_contents << [department.id, department.name]
+    departments = Company::Departments::Index.(user, params)
+    # current_company.departments.each do |department|
+    if departments.policy_department_filter_mapping.present?
+      departments.policy_department_filter_mapping.each do |department|
+        department_contents << [department.id, department.name]
+      end
     end
     self.sheets << {
         item_headers: department_headers,

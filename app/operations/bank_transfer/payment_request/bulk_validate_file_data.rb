@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
                 :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields,
                 :mandatory_fields, :drop_down_fields, :drop_down_field_ids,
-                :tds_slab_ids
+                :tds_slab_ids, :all_departments_ids, :category_ids, :cost_center_ids
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -59,6 +59,16 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
     result = TdsSlabs::Index.(user, params)
     self.tds_slab_ids = result.tds_slabs.pluck(:id)
+
+    all_departments = Company::Departments::Index.(user, params)
+    self.all_departments_ids = all_departments&.policy_department_filter_mapping&.pluck(:id)
+
+    all_categories = current_company.categories.inward_invoice_items_only
+    self.category_ids = all_categories.pluck(:id) rescue []
+
+    all_cost_centers = current_company.cost_centers.vendor_payments_only
+    self.cost_center_ids = all_cost_centers.pluck(:id) rescue []
+
     # Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
     
   end
@@ -288,6 +298,30 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           self.valid = false
           self.error_messages << "Invalid TDS Slab ID"
           self.issue_item[:tds_slab_id] = "Invalid TDS Slab ID"
+        end
+      end
+
+      if department_id.present? && self.all_departments_ids.present?
+        unless (self.all_departments_ids.include?(department_id.to_i) )
+          self.valid = false
+          self.error_messages << "Department does not exist for this policy or you are not authorized to make payments for this department."
+          self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make payments for this department."
+        end
+      end
+
+      if category_id.present?
+        unless self.category_ids.include? category_id.to_i
+          self.valid = false
+          self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+          self.issue_item[:category_id] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
+      end
+
+      if cost_center_id.present?
+        unless self.cost_center_ids.include? cost_center_id.to_i
+          self.valid = false
+          self.error_messages << "Entered cost center ID not found for this company. Please recheck the Cost Center sheet for the list of IDs."
+          self.issue_item[:cost_center_id] = "Entered cost center ID not found for this company. Please recheck the Cost Center sheet for the list of IDs."
         end
       end
 
