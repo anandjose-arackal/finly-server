@@ -177,7 +177,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   end
 
   def get_application(name)
-    %w(ReportProvider MoneyRequestProvider TravelRequestProvider).include?(name) ? 'em' : 'vp'
+    %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider).include?(name) ? 'em' : 'vp'
   end
 
   def create_policy_dept_mapping(policy,department)

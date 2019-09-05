@@ -17,7 +17,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   attr_accessor :lurm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
+    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
     output = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
@@ -31,7 +31,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             item_complete false
             raise "invalid result"
           end
-         rescue Exception => e
+        rescue Exception => e
            result false, "#{e.message}"
          end
 
@@ -161,7 +161,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     params = {
         id: id,
         policy_name: policy_name,
-        policy_creation_flag: (policy_creation_flag.to_s.upcase == Y ? true : false),
+        policy_creation_flag: (policy_creation_flag.to_s.upcase == 'Y' ? true : false),
         user_email: user_email
     }
   end
@@ -206,7 +206,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   end
 
   def get_application(name)
-    %w(ReportProvider MoneyRequestProvider TravelRequestProvider).include?(name) ? 'em' : 'vp'
+    %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvide).include?(name) ? 'em' : 'vp'
   end
 
   def get_user_entity(identifier)
