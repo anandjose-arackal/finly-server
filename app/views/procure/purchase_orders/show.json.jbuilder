@@ -5,7 +5,6 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
 
 json.vendor @result.purchase_order.vendor.as_json
 json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
-
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 

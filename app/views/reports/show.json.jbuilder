@@ -23,10 +23,14 @@ json.currency_country_code @result.report.base_currency_code
 json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
-
-
-
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
+
+json.user_details do
+  json.department @result.report&.user&.department&.name
+  json.cost_center @result.report&.user&.cost_center&.name
+  json.location @result.report&.user&.location&.name
+  json.operating_unit @result.report&.user&.gl_config[:operation_unit] rescue nil
+end
 
 policy_id = nil
 policy_name = nil

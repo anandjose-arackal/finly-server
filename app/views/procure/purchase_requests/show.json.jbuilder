@@ -50,7 +50,6 @@ json.result do
             json.name line_item&.cost_center&.name
             json.id line_item&.cost_center&.id
           end
-
           json.category do
             json.name line_item.category&.name
             json.id line_item.category_id

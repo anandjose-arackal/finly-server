@@ -22,7 +22,7 @@ class ProcurementMailer < ApplicationMailer
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
-        url = attachment.file.path
+        url = attachment.file.url
         attachments[attachment.file_file_name] = {
             content: open(url).read
         }

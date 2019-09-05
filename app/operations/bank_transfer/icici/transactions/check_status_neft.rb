@@ -17,6 +17,11 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
   end
 
   def validate
+    if self.bank_transaction.blank?
+      add_message :error, "No bank transaction passed"
+      return
+    end
+
     unless self.bank_transaction.completed?
       add_message :error, "This transaction is not in completed state"
       return
@@ -30,11 +35,11 @@ class BankTransfer::Icici::Transactions::CheckStatusNeft < BaseOperation
 
   def process
     statement_entry = self.company.icici_statements.find_by(request_id: self.bank_transaction.unique_request_number)
-    if statement_entry.present?
+    if statement_entry.present? && self.bank_transaction&.utr&.blank?
       # eg. if the remarks are: "INF/021341686931/FINLYRGS94365231618"
       # 021341686931 - is the UTR
       # FINLYRGS94365231618 is the request ID
-      utr = statement_entry.remarks.split("/").last(2).first rescue ""
+      utr = statement_entry.remarks.split("/").first(3).last rescue ""
       # per ICICI's instruction "1DC" needs to get added to this number for the full UTR
       utr += "1DC"
       self.bank_transaction.update(utr: utr)
