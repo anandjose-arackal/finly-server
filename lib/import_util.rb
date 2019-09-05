@@ -136,15 +136,11 @@ class ImportUtil
   end
 
   def self.cleanup_account_number_quickly(key, raw_value)
+    # bank account validation should happen in respective operations
     unless key.to_s.include?("account_number")
       return raw_value
     else
-      add_leading_zero = raw_value.to_s[0] == '0'
-      raw_value = raw_value.to_i.to_s.strip
-      if add_leading_zero
-        raw_value = "0" + raw_value
-      end
-      raw_value
+      raw_value = raw_value.to_s.strip
     end
   end
 

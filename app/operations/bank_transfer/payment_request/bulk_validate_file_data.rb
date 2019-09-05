@@ -167,8 +167,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # Check if bank account number is present
       if bank_account_no.blank?
         self.valid = false
-        self.error_messages << 'Bank account not found'
-        self.issue_item[:bank_account_number] = 'No bank account entered'
+        self.error_messages << 'No Bank Account entered'
+        self.issue_item[:bank_account_number] = 'No Bank Account entered'
       end
 
       unless authorized
@@ -194,8 +194,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # end
 
       # check for format of the Bank account number
-      pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
-      unless bank_account_no =~ pattern
+      # pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
+      # unless bank_account_no =~ pattern
+      unless validate_bank_account_number bank_account_no
         self.valid = false
         self.error_messages << "Invalid Bank Account Number entered"
         self.issue_item[:bank_account_number] = 'Invalid Bank Account Number entered'
@@ -398,6 +399,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       net_amount = original_amount.to_f + tax_amount - tds_amount - advance_amount.to_f
     end
+  end
+
+  def validate_bank_account_number account_number
+    if !/\A\d+\z/.match(account_number)
+      return false
+    end
+    true
   end
 
   def validate_amount(amount)
