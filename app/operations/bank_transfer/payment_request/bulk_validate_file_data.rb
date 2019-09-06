@@ -116,14 +116,34 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # field_configurations.each do |field|
         self.payment_order_custom_fields.each do |field|
           field_name = field.field_name.gsub(" ", "_").underscore
-          if item[field_name.to_sym].present?
+
+          if item[field_name.to_sym].present? or (custom_fields_key.present? and custom_fields_key[field.id.to_s].present?)
             if field.field_type_id == FieldType.id_for(:multiselect)
-              custom_fields[field.id] = [item[field_name.to_sym]].flatten
+
+              if custom_fields_key[field.id].present?
+                custom_fields[field.id] = [custom_fields_key[field.id.to_s]].flatten if custom_fields_key[field.id.to_s].present?
+              else
+                custom_fields[field.id] = [item[field_name.to_sym]].flatten
+              end
+
             elsif field.field_type_id == FieldType.id_for(:drop_down)
-              custom_fields[field.id] = item[field_name.to_sym]
-              drop_down_custom_fields[field.id] = item[field_name.to_sym]
+
+              if custom_fields_key.present?
+                custom_fields[field.id] = custom_fields_key[field.id.to_s] if custom_fields_key[field.id.to_s].present?
+                drop_down_custom_fields[field.id] = custom_fields_key[field.id.to_s] if custom_fields_key[field.id.to_s].present?
+              else
+                custom_fields[field.id] = item[field_name.to_sym]
+                drop_down_custom_fields[field.id] = item[field_name.to_sym]
+              end
+
             elsif field.field_type_id == FieldType.id_for(:text)
-              custom_fields[field.id] = item[field_name.to_sym]
+
+              if custom_fields_key.present?
+                custom_fields[field.id] = custom_fields_key[field.id.to_s] if custom_fields_key[field.id.to_s].present?
+              else
+                custom_fields[field.id] = item[field_name.to_sym]
+              end
+
             end
           else
             empty_fields << field.id
@@ -151,7 +171,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         if drop_down_custom_fields.present?
           drop_down_custom_fields.each do |key, value|
             wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key} # find relevant drop down field configuration
-            unless wanted_hash[key].include? value.to_i # check if value entered matches stored possible value
+            unless wanted_hash[key].include?(value.to_i) # check if value entered matches stored possible value
               correct_field = drop_down_fields.find {|field| field if field.id == key}
               self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
               self.valid = false
