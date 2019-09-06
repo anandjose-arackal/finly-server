@@ -4,7 +4,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   subscribe 'lurms.import'
   headers ({
             :id => 'ID',
-            :policy => 'Policy ID',
+            :policy => 'Policy Name',
             :policy_creation_flag => 'For New Policy Y / or Blank',
             :user_id => 'User Email / Mobile',
             :level_name => 'Level Name',
@@ -123,14 +123,14 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     #Check and add user to the policy if expense management
     check_part_of_policy(entity_user) if self.application == 'em'
     row_length = data.size
-    lower_index = 2
+    lower_index = 3
     while(lower_index < row_length-1)
       level_name = data[lower_index+1].to_s
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3]
       min = data[lower_index+4].to_i
       max = (data[lower_index+5].present? ? data[lower_index+5].to_i : nil)
-      if level_name.present? && level_number.present?
+      if level_name.present? && level_number.present? && level_number != 0
         self.level = get_level(level_name, level_number, provider)
         if reviewer_id.present?
           reviewer = get_reviewer(reviewer_id, application)
@@ -146,7 +146,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       end
       lower_index += 5
     end
-    result true, 'Updated Successfully'
+    result true, 'Reviewer Mapping Created'
   end
 
 
@@ -156,7 +156,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     id = row[import_fields[:id]]
     policy_name = row[import_fields[:policy_name]].to_s
     user_email = row[import_fields[:user_email]]
-    policy_creation_flag = row[import_fields[:policy_creation_flag ]]
+    policy_creation_flag = row[import_fields[:policy_creation_flag]]
 
     params = {
         id: id,
@@ -192,9 +192,23 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   end
 
   def get_reviewer(reviewer_id, application)
+    role_provider_mapping = {
+        "ReportProvider" => "manager",
+        "MoneyRequestProvider" => "manager",
+        "TravelRequestProvider" => "manager",
+        "TravelRequestBookingProvider" => "manager",
+        "PurchaseRequestProvider" =>"purchase_request_reviewer",
+        "PurchaseOrderProvider" =>"purchase_order_reviewer",
+        "InvoiceProvider" =>"invoice_reviewer",
+        "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
+        "YesBankVendorProvider" =>"vendor_reviewer",
+        "PaymentAgreementProvider" => "payment_agreement_reviewer"}
+
     user = get_user_entity(reviewer_id)
-    if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?("Manager")
+    if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
       user.role_mapping.create(purpose_id: 1, user_role_id: UserRole.id_for(:manager))
+    elsif application == 'vp' && user.present? && user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).blank?
+      user.policy_user_roles.create(policy_id: self.policy.id, user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym))
     end
     user
   end
@@ -223,7 +237,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     if text.is_a?(Float) || text.is_a?(Integer)
       text&.to_i&.to_s
     else
-      text&.strip
+      text&.to_s&.strip
     end
   end
 
