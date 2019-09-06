@@ -88,7 +88,7 @@ class FieldConfiguration < ApplicationRecord
 
   scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
 
-  delegate :drop_down?, to: :field_type
+  delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}

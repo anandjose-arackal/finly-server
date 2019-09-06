@@ -7,6 +7,11 @@ json.data do
       json.array! field_configuration.drop_down_items.exclude_deleted
     end
   end
+  if field_configuration.multiselect?
+    json.multiselect_items do
+      json.array! field_configuration.multiselect_items.exclude_deleted
+    end
+  end
   json.configurable do
     json.type field_configuration.configurable_type
     if field_configuration.configurable&.class&.name == 'Policy'

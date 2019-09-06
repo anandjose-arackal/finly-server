@@ -5,7 +5,7 @@ class Api::V1::Configuration::CustomFieldsController < BaseControllers::ApiBase
 
   def create
     @result = CustomField::Configuration::Create.(current_user, params)
-    respond response: @result&.success? ? :success : :failure
+    respond
   end
 
   def index

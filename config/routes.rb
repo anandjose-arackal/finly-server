@@ -28,14 +28,16 @@
 #                                                          PUT    /admin_users/password(.:format)                                                                                     devise/passwords#update
 #                                                          POST   /admin_users/password(.:format)                                                                                     devise/passwords#create
 #                      api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                                                                      api/v1/configuration/category#index
-#                                     api_v1_custom_fields GET    /api/v1/custom_fields(.:format)                                                                                     api/v1/custom_fields#index
-#                                                          POST   /api/v1/custom_fields(.:format)                                                                                     api/v1/custom_fields#create
-#                                  new_api_v1_custom_field GET    /api/v1/custom_fields/new(.:format)                                                                                 api/v1/custom_fields#new
-#                                 edit_api_v1_custom_field GET    /api/v1/custom_fields/:id/edit(.:format)                                                                            api/v1/custom_fields#edit
-#                                      api_v1_custom_field GET    /api/v1/custom_fields/:id(.:format)                                                                                 api/v1/custom_fields#show
-#                                                          PATCH  /api/v1/custom_fields/:id(.:format)                                                                                 api/v1/custom_fields#update
-#                                                          PUT    /api/v1/custom_fields/:id(.:format)                                                                                 api/v1/custom_fields#update
-#                                                          DELETE /api/v1/custom_fields/:id(.:format)                                                                                 api/v1/custom_fields#destroy
+#        api_v1_configuration_custom_field_drop_down_items POST   /api/v1/configuration/custom_fields/:custom_field_id/drop_down_items(.:format)                                      api/v1/configuration/custom_fields#dropdownitem_create
+#                                                          DELETE /api/v1/configuration/custom_fields/:custom_field_id/drop_down_items/:id(.:format)                                  api/v1/configuration/custom_fields#dropdownitem_destroy
+#                       api_v1_configuration_custom_fields GET    /api/v1/configuration/custom_fields(.:format)                                                                       api/v1/configuration/custom_fields#index
+#                                                          POST   /api/v1/configuration/custom_fields(.:format)                                                                       api/v1/configuration/custom_fields#create
+#                    new_api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/new(.:format)                                                                   api/v1/configuration/custom_fields#new
+#                   edit_api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/:id/edit(.:format)                                                              api/v1/configuration/custom_fields#edit
+#                        api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#show
+#                                                          PATCH  /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#update
+#                                                          PUT    /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#update
+#                                                          DELETE /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#destroy
 #                            api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                                                                            api/v1/configuration#category
 #                                          email_processor POST   /email/incoming(.:format)                                                                                           griddler/emails#create
 #                                         new_user_session GET    /users/sign_in(.:format)                                                                                            sessions#new
@@ -2468,11 +2470,13 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :configuration do
         get 'category/index'
+
+        resources :custom_fields do
+          post 'drop_down_items', to: 'custom_fields#dropdownitem_create'
+          delete 'drop_down_items/:id', to: 'custom_fields#dropdownitem_destroy'
+        end
       end
 
-      resources :custom_fields do
-        
-      end
     end
   end
 
