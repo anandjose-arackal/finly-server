@@ -1,7 +1,9 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement
+                :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement,
+                :mandatory_fields, :drop_down_fields, :drop_down_field_ids,
+                :tds_slab_ids, :all_departments_ids, :category_ids, :cost_center_ids
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -37,24 +39,42 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
-    self.from_payment_agreement = params[:from_payment_agreement]
+    self.from_payment_agreement = !!StringUtils.to_bool(params[:from_payment_agreement])
 
     # Payment agreement custom fields has no effect here
     unless from_payment_agreement
-      self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      self.payment_order_custom_fields = self.user.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice)).to_a
       self.payment_order_custom_fields.each do |custom_field_config|
         case custom_field_config.field_type_id
-          when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
-            self.headers << "#{custom_field_config.field_name} ID"
-          else
-            self.headers << "#{custom_field_config.field_name}"
+        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+          self.headers << "#{custom_field_config.field_name} ID"
+        else
+          self.headers << "#{custom_field_config.field_name}"
         end
       end
+
+      self.mandatory_fields = self.payment_order_custom_fields.map {|field| field if field.mandatory}.compact # pluck fields which are mandatory
+
+      self.drop_down_fields = self.payment_order_custom_fields.map {|field| field if field.field_type_id == FieldType.id_for(:drop_down)}.compact # pluck fields which are of type drop down
+
+      self.drop_down_field_ids = self.drop_down_fields.map {|df| {df.id => df.drop_down_items.pluck(:id)}} # [{drop_down_field_configuration_id => [array of possible drop down fields]}]
     end
 
     self.issues = []
 
-    Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
+    result = TdsSlabs::Index.(user, params)
+    self.tds_slab_ids = result.tds_slabs.pluck(:id)
+
+    all_departments = Company::Departments::Index.(user, params)
+    self.all_departments_ids = all_departments&.policy_department_filter_mapping&.pluck(:id)
+
+    all_categories = current_company.categories.inward_invoices_only
+    self.category_ids = all_categories.pluck(:id) rescue []
+
+    all_cost_centers = current_company.cost_centers.vendor_payments_only
+    self.cost_center_ids = all_cost_centers.pluck(:id) rescue []
+
+    # Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
     
   end
 
@@ -88,44 +108,73 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # generating custom field data
       custom_fields = {}
+      drop_down_custom_fields = {}
+      empty_fields = []
+
       unless from_payment_agreement
-        field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
-        field_configurations.each do |field|
+      # field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      # field_configurations.each do |field|
+        self.payment_order_custom_fields.each do |field|
           field_name = field.field_name.gsub(" ", "_").underscore
           if item[field_name.to_sym].present?
             if field.field_type_id == FieldType.id_for(:multiselect)
               custom_fields[field.id] = [item[field_name.to_sym]].flatten
             elsif field.field_type_id == FieldType.id_for(:drop_down)
               custom_fields[field.id] = item[field_name.to_sym]
+              drop_down_custom_fields[field.id] = item[field_name.to_sym]
             elsif field.field_type_id == FieldType.id_for(:text)
               custom_fields[field.id] = item[field_name.to_sym]
+            end
+          else
+            empty_fields << field.id
+          end
+        end
+      end
+
+      self.error_messages = []
+      self.issue_item = {}
+      self.issue_item[:custom_fields] = []
+
+      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
+
+      unless from_payment_agreement
+        # find all fields which are required but left empty by user
+        required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
+
+        if required_fields.present?
+          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.valid = false
+          self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+        end
+
+        # validate if dropdown fields entered matches the data setup in the organization account
+        if drop_down_custom_fields.present?
+          drop_down_custom_fields.each do |key, value|
+            wanted_hash = self.drop_down_field_ids.find {|ddfi| ddfi if ddfi.keys.include? key} # find relevant drop down field configuration
+            unless wanted_hash[key].include? value.to_i # check if value entered matches stored possible value
+              correct_field = drop_down_fields.find {|field| field if field.id == key}
+              self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
+              self.valid = false
+              self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
             end
           end
         end
       end
 
-      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
-
-
-      self.error_messages = []
-      self.issue_item = {}
-
       # adding the custom fields for the particular invoice, using a ghost invoice
-      unless from_payment_agreement
-        self.ghost_invoice = Invoice.new
-        custom_fields = {custom_fields: item[:custom_fields]} || {}
-        custom_fields[:user] = user
-        custom_fields[:reset_fields] = true
-        custom_fields[:save] = false
-        CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+      # self.ghost_invoice = Invoice.new
+      # custom_fields = {custom_fields: item[:custom_fields]} || {}
+      # custom_fields[:user] = user
+      # custom_fields[:reset_fields] = true
+      # custom_fields[:save] = false
+      # CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
 
-        op = CustomField::Validate.(self.ghost_invoice)
-        unless op.success?
-          self.error_messages << op.messages[:error]
-          self.valid = false
-          self.issue_item[:custom_fields] = op.messages[:error]
-        end
-      end
+      # op = CustomField::Validate.(self.ghost_invoice)
+      # unless op.success?
+      #   self.error_messages << op.messages[:error]
+      #   self.valid = false
+      #   self.issue_item[:custom_fields] = op.messages[:error]
+      # end
 
       # new requirement
       # SET key as array to hold mupltiple errors
@@ -138,8 +187,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # Check if bank account number is present
       if bank_account_no.blank?
         self.valid = false
-        self.error_messages << 'Bank account not found'
-        self.issue_item[:bank_account_number] = 'No bank account entered'
+        self.error_messages << 'No Bank Account entered'
+        self.issue_item[:bank_account_number] = 'No Bank Account entered'
       end
 
       unless authorized
@@ -165,8 +214,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # end
 
       # check for format of the Bank account number
-      pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
-      unless bank_account_no =~ pattern
+      # pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
+      # unless bank_account_no =~ pattern
+      unless validate_bank_account_number bank_account_no
         self.valid = false
         self.error_messages << "Invalid Bank Account Number entered"
         self.issue_item[:bank_account_number] = 'Invalid Bank Account Number entered'
@@ -253,10 +303,44 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:discount] = 'Invalid discount entered'
       end
 
+      if tds_slab_id.present?
+        unless self.tds_slab_ids.include? tds_slab_id.to_i
+          self.valid = false
+          self.error_messages << "Invalid TDS Slab ID"
+          self.issue_item[:tds_slab_id] = "Invalid TDS Slab ID"
+        end
+      end
+
+      if department_id.present? && self.all_departments_ids.present?
+        unless (self.all_departments_ids.include?(department_id.to_i) )
+          self.valid = false
+          self.error_messages << "Department does not exist for this policy or you are not authorized to make payments for this department."
+          self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make payments for this department."
+        end
+      end
+
+      if category_id.present?
+        unless self.category_ids.include? category_id.to_i
+          self.valid = false
+          self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+          self.issue_item[:category_id] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
+      end
+
+      if cost_center_id.present?
+        unless self.cost_center_ids.include? cost_center_id.to_i
+          self.valid = false
+          self.error_messages << "Entered cost center ID not found for this company. Please recheck the Cost Center sheet for the list of IDs."
+          self.issue_item[:cost_center_id] = "Entered cost center ID not found for this company. Please recheck the Cost Center sheet for the list of IDs."
+        end
+      end
+
       if self.valid
         payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
         # self.requested_amount += amount.to_f
         self.requested_amount += payable_amount.to_f
+      else
+        item.delete(:custom_fields)
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
@@ -359,6 +443,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       net_amount = original_amount.to_f + tax_amount - tds_amount - advance_amount.to_f
     end
+  end
+
+  def validate_bank_account_number account_number
+    if !/\A\d+\z/.match(account_number)
+      return false
+    end
+    true
   end
 
   def validate_amount(amount)

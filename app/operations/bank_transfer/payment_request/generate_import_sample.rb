@@ -7,13 +7,13 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
 
   def init
     self.company = user.company
-    self.payment_order_custom_fields = self.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    self.payment_order_custom_fields = self.company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice))
     self.sample_type = params[:sample_type]
+    self.content = params[:content] || []
   end
 
   def process
     self.headers = default_headers
-    self.content = []
     self.payment_order_custom_fields.each do |custom_field_config|
       case custom_field_config.field_type_id
         when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: self.content
         }
     ]
     # adding TDS slabs to the excel sheet
@@ -66,8 +66,12 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     # adding departments to the excel sheet
     department_headers = ["ID", "Department Name"]
     department_contents = []
-    current_company.departments.each do |department|
-      department_contents << [department.id, department.name]
+    departments = Company::Departments::Index.(user, params)
+    # current_company.departments.each do |department|
+    if departments.policy_department_filter_mapping.present?
+      departments.policy_department_filter_mapping.each do |department|
+        department_contents << [department.id, department.name]
+      end
     end
     self.sheets << {
         item_headers: department_headers,
@@ -87,8 +91,8 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
           selection_items = []
       end
       custom_field_contents = []
-      selection_items.each do |content|
-        custom_field_contents << [content.id, content.name]
+      selection_items.each do |item|
+        custom_field_contents << [item.id, item.name]
       end
       self.sheets << {
           item_headers: custom_field_headers,
@@ -99,7 +103,8 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    # self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}, expire_file_duration: 7.day}, messages)
   end
 
   private

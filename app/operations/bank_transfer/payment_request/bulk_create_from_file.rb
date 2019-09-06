@@ -6,7 +6,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                 :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
-    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -38,23 +37,32 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   def init
-    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
-    headers = [:name, :business_name, :bank_account_number, :ifsc, :original_amount,
+
+    unless self.file.respond_to? 'original_filename'
+      add_message :error, "Please upload a properly formatted Excel Sheet."
+      return
+    end
+
+    self.headers = [:name, :business_name, :bank_account_number, :ifsc, :original_amount,
                :inclusive_of_taxes, :gst_type_id, :tax, :advance_amount, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
-    payment_order_custom_fields = current_company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+    payment_order_custom_fields = current_company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice))
     payment_order_custom_fields.each do |field|
-      headers << field.field_name.gsub(" ", "_").underscore
+      headers << field.field_name.gsub(" ", "_").underscore.to_sym
     end
     begin
-      self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
-    rescue Ole::Storage::FormatError => e
-      add_message :error, "File Format error. Please re-save your Excel sheet in Microsoft 2007 format or greater."
+      self.parsed_data = ImportUtil.load_spreadsheet_quickly(file, headers, {skip_empty_lines: true})
+    rescue Ole::Storage::FormatError, RuntimeError => e
+      case e.class.name
+      when 'RuntimeError'
+        add_message :error, e.message
+      else
+        add_message :error, "File Format error. Please re-save your Excel sheet in Microsoft 2007 format or greater."
+      end
     end
 
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
-    Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
     self.policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: self.policy_id)
   end
@@ -76,7 +84,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-    Rails.logger.fatal "FROM BulkCreateFromFile validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else
@@ -109,7 +116,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     op = BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     # op = ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-
   end
 
   def success
@@ -118,14 +124,19 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   # this method should create the temporary file that can be linked in the front end
+  # generate the new xlsx format
   def failure
-    exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
-    file = Tempfile.new("bulk_payment_import_errors.xls")
-    open(file.path, 'wb') do |f|
-      f.write exporter.generate_xls
+    params[:show_file] = false
+    if self.contents.present?
+      result = BankTransfer::PaymentRequest::GenerateImportSample.(user, {content: self.contents})
+
+      if result.success?
+        params[:result_file_path] = result.xlsx_exporter.export_file_path
+        params[:show_file] = true
+      else
+        add_message :error, "Some Internal Error Occurred"
+      end
     end
-    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-    params[:result_file_path] = temp_file.file.url
     BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter.new(user, params, messages)
   end
 
@@ -140,10 +151,11 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
   class BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :result_file_path
+    attr_accessor :result_file_path, :show_file
 
     def init
       self.result_file_path = params[:result_file_path]
+      self.show_file = params[:show_file]
     end
   end
 
