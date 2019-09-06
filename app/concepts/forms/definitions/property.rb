@@ -35,14 +35,14 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     @hint
   end
 
-  def initialize(section, parents, key, params={}, &block)
+  def initialize(section, parents, key, params = {}, &block)
     self.section = section
     self.parents = parents
     self.parent = self.parents.last
     self.key = key
-    attributes = params&.except(:options) || {}
-    options = params&.dig(:options) || {}
-    attributes[:label] = label_for(key, options)
+    self.attributes = params&.except(:options) || {}
+    self.options = params&.dig(:options) || {}
+    attributes[:label] = label
     super(key, default_attributes.merge(attributes), default_options.merge(options), &block)
   end
 
@@ -113,9 +113,12 @@ class Forms::Definitions::Property < Forms::Definitions::Section
   end
 
   def data_url
-    if options[:model].present?
+    model = options&.dig(:data_url, :model)
+    filters = options&.dig(:data_url, :filters)
+    return nil unless model.present?
 
-    end
+    # Todo generate url for model
+    nil
   end
 
   def filter_key
@@ -139,7 +142,7 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     {
         field_key: filter_key,
         field_type: field_type,
-        label: self.options[:label],
+        label: self.label,
         regex: options[:regex],
         choices: filter_choices,
         data_url: data_url
@@ -148,12 +151,12 @@ class Forms::Definitions::Property < Forms::Definitions::Section
 
   protected
 
-  def label_for(key, options)
-    return options[:label]&.to_s if options[:label].present?
+  def label#(key, options)
+    return attributes[:label]&.to_s if attributes[:label].present?
 
     prefix = ''
     if parents.present?
-      parents.map {|p| prefix += p.attributes[:label]}
+      parents.map {|p| prefix += p.label}
       prefix += ' '
     end
     "#{prefix}#{key.to_s.humanize}"
