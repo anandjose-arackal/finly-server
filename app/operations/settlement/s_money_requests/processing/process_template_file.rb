@@ -43,7 +43,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
   def init
 
     self.file = params[:file]
-    headers = [:item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :mark_as_paid]
+    headers = [:item_id, :document_ids, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :mark_as_paid]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e

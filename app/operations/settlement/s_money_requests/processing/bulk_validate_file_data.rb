@@ -129,7 +129,8 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
 
   def retrieve_header_names
     [
-      "Advance ID(unmodifiable)", 
+      "Batch Item ID(unmodifiable)", 
+      "Advance IDs(unmodifiable)", 
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",

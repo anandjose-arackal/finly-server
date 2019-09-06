@@ -57,8 +57,10 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
 
   def processor_details(processor, item)
     marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
+    document_ids = item.money_requests.pluck(:id).join(", ") rescue ""
     [
       item.id,
+      document_ids,
       processor.created_by_user&.name,
       item.processor_accountable&.name,
       item.processor_accountable&.account_number,
@@ -72,7 +74,8 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
 
   def default_headers
     [
-      "Advance ID(unmodifiable)", 
+      "Batch Item ID(unmodifiable)",
+      "Advance IDs(unmodifiable)",
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
