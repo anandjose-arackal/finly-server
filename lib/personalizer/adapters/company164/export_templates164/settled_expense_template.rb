@@ -36,7 +36,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
         self.contents << [
             expense.category.gl_code,
             '',
-            report.user.gl_config&.dig(:location_code),
+            "'#{report.user.gl_config&.dig(:location_code)}",
             report.user.gl_config&.dig(:cost_center),
             '',
             '',

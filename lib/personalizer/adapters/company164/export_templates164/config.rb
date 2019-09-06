@@ -16,6 +16,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::Config
             name: 'JV Expense on Processed',
             description: 'J V exportable format. Exports expenses on settlement',
             formats: [
+                {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
         },
@@ -24,6 +25,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::Config
             name: 'J V Settled Money Request',
             description: 'J V exportable format. Exports money requests settled through bank payment',
             formats: [
+                {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
         },
