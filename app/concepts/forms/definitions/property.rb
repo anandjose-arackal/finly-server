@@ -112,6 +112,12 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     nil
   end
 
+  def data_url
+    if options[:model].present?
+
+    end
+  end
+
   def filter_key
     prefix = ''
     if parents.present?
@@ -131,11 +137,12 @@ class Forms::Definitions::Property < Forms::Definitions::Section
 
   def filter_form
     {
-        attribute: filter_key,
-        label: self.options[:label],
+        field_key: filter_key,
         field_type: field_type,
+        label: self.options[:label],
         regex: options[:regex],
-        choices: filter_choices
+        choices: filter_choices,
+        data_url: data_url
     }.reject {|_, v| v.nil?}
   end
 

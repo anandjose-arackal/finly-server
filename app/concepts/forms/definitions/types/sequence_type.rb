@@ -4,20 +4,13 @@ class Forms::Definitions::Types::SequenceType < Forms::Definitions::Property
   hint 'Auto-generated'
   attributes(
       {
-          override: true,
-          key: nil
+          override: true
       }
   )
-
-  def initialize(section, parent, key, options = {}, &block)
-    options[:populate_if_empty] = -> (fragment:) {
-      if fragment.blank?
-
-      end
-      fragment
-    }
-    super(section, parent, key, options, &new_block)
-  end
-
+  options(
+      {
+          sequence_key: nil
+      }
+  )
 
 end

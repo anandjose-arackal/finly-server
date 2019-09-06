@@ -5,7 +5,10 @@ class Forms::Definitions::Types::DropdownType < Forms::Definitions::Property
   attributes(
       {
           choices: [],
-          data_url: nil
+          data_url: {
+              model: nil,
+              filter: nil
+          },
       }
   )
 
