@@ -3,13 +3,13 @@ class Documents::Invoices::Form < Forms::API
   model Invoice
   section :header do
     # reference :purchase_order
-    # sequence :invoice_id, key: :non_po_invoice_initiator # todo handle sequence type @low_priority
+    sequence :invoice_id, key: :non_po_invoice_initiator
     string :invoice_number, required: true
-    date :date, required: true, options: {can_required_be_changed: false} # todo handle can_required_be_changed
+    date :date, required: true
     date :due_date, required: true
     lookup :policy_id, model: Policy, filters: {role_ids_in: [UserRole.id_for(:non_po_invoice_initiator)]} # todo handle policies specific to a user
-    lookup :cost_center, model: CostCenter, required: true # todo lookup reference
-    lookup :department, model: Department, required: true # todo lookup reference
+    lookup :cost_center_id, model: CostCenter, required: true # todo lookup reference
+    lookup :department_id, model: Department, required: true # todo lookup reference
     date :transaction_period_start, required: true
     date :transaction_period_end, required: true
     dropdown :cost_allocation_type, choices: []#Invoice.cost_allocation_types # todo: handle enum for dropdown
@@ -53,6 +53,10 @@ class Documents::Invoices::Form < Forms::API
     amount :tax_amount
     amount :taxable_amount
     amount :amount
+  end
+
+  functions do
+
   end
 
 end

@@ -55,6 +55,7 @@ class Forms::Definitions::Property < Forms::Definitions::Section
             hidden: false,
             required: false,
             unique: false,
+            system_field: true
         }
     )
   end
@@ -69,6 +70,7 @@ class Forms::Definitions::Property < Forms::Definitions::Section
             can_not_be_hidden: false,
             can_be_filtered: true,
             show_in_bulk_import: false,
+
         }
     )
   end
@@ -110,32 +112,32 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     nil
   end
 
-  # def filter_key
-  #   prefix = ''
-  #   if parents.present?
-  #     parents.map {|p| prefix += p.key.to_s}
-  #     prefix += '_'
-  #   end
-  #   "#{prefix}#{key}"
-  # end
-  #
-  # def filter_choices
-  #   options[:choices]
-  # end
-  #
-  # def filter_multiple
-  #   false
-  # end
-  #
-  # def filter_form
-  #   {
-  #       attribute: filter_key,
-  #       label: self.options[:label],
-  #       field_type: field_type,
-  #       regex: options[:regex],
-  #       choices: filter_choices
-  #   }.reject {|_, v| v.nil?}
-  # end
+  def filter_key
+    prefix = ''
+    if parents.present?
+      parents.map {|p| prefix += p.key.to_s}
+      prefix += '_'
+    end
+    "#{prefix}#{key}"
+  end
+
+  def filter_choices
+    options[:choices]
+  end
+
+  def filter_multiple
+    false
+  end
+
+  def filter_form
+    {
+        attribute: filter_key,
+        label: self.options[:label],
+        field_type: field_type,
+        regex: options[:regex],
+        choices: filter_choices
+    }.reject {|_, v| v.nil?}
+  end
 
   protected
 

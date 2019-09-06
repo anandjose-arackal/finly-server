@@ -4,7 +4,8 @@ class Forms::Definitions::Types::SequenceType < Forms::Definitions::Property
   hint 'Auto-generated'
   attributes(
       {
-          override: true
+          override: true,
+          key: nil
       }
   )
 
