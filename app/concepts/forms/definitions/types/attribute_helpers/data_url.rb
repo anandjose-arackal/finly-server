@@ -22,7 +22,12 @@ module Forms::Definitions::Types::AttributeHelpers::DataUrl
   end
 
   def data_url
+    model = attributes[:model]
+    return nil if model.blank?
+
+    filters = attributes[:filters]
     # todo convert model and filters to a URL
+    "/query/#{model.to_s.underscore}?filters=none"
   end
 
 end

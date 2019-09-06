@@ -124,15 +124,6 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     nil
   end
 
-  def data_url
-    model = options&.dig(:data_url, :model)
-    filters = options&.dig(:data_url, :filters)
-    return nil unless model.present?
-
-    # Todo generate url for model
-    nil
-  end
-
   def filter_key
     prefix = ''
     if parents.present?

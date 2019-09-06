@@ -23,7 +23,12 @@ module Forms::Builders::Filters
 
       properties.each do |property|
         if property.association?
-          response << Build.with(property.properties, company, user)
+          result = Build.with(property.properties, company, user)
+          if result.respond_to?(:each)
+            response += result
+          else
+            response << result
+          end
         else
           response << property.filter_form
         end
