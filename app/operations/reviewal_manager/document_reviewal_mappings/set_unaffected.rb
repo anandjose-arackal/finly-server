@@ -41,55 +41,90 @@ class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager
     self.reviewal_levels = self.reviewal_levels.where(id: unaffected_reviewal_level_ids)
     self.reviewal_levels.each do |level|
       # Get preferences of what was previously stored in dlrms
-      user_preferences = unaffected_dlrms.filter {|item| item["level_id"] == level.id}
+      user_preference_dlrms = unaffected_dlrms.filter {|item| item["level_id"] == level.id}
 
-      user_preferred_reviewers = user_preferences.map {|item| item["reviewer_id"]}
-
-
-      # mapping_params = get_mapping_data(level)
+      user_preferred_reviewer_ids = user_preferences.map {|item| item["reviewer_id"]}
 
       dlrm_level_data = {level: level}
 
-      if user_preferred_reviewers.blank?
-        #todo handle LURM
-        overrides_present = level.level_user_reviewer_mappings.with_user_id(user.id).present?
+      # get reviewer from dlrm
+      # get reviewers with new amount & validations
+      # if reviewers match
+      #   don't do shit
+      # else
+      #   create dlrm with new reviewer
+      # end
+      #
+      #
 
-
-
-        level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).
-            with_threshold(document_amount).
-            with_exception(violations_present).with_reviewer.as_json
-
-        if level_reviewers_data.blank? && !overrides_present
-          level_reviewers_data = level.level_reviewer_mappings.non_deleted.with_threshold(document_amount).with_exception(violations_present).as_json
-        end
-
-        dlrm_level_data[:reviewer_selected] = false
-        dlrm_level_data[:level_reviewers_data] = level_reviewers_data
-
-        self.dlrm_mapping_data.push(dlrm_level_data)
-        next
-      end
-
-      # When Reviewers are selected on the frontend
+      # todo handle LURM
       overrides_present = level.level_user_reviewer_mappings.with_user_id(user.id).present?
-      level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(document_amount).with_exception(violations_present).with_reviewer.as_json
+
+      level_reviewers_data = level.level_user_reviewer_mappings.with_user_id(user.id).
+          with_threshold(document_amount).
+          with_exception(violations_present).with_reviewer.as_json
 
       if level_reviewers_data.blank? && !overrides_present
         level_reviewers_data = level.level_reviewer_mappings.non_deleted.with_threshold(document_amount).with_exception(violations_present).as_json
       end
 
-      if level_reviewers_data.map{|item| item['reviewer_id']}.include?(mapping_params[:reviewer_id].to_i)
-        level_reviewer_data = level_reviewers_data.filter{|item| item['reviewer_id'] == mapping_params[:reviewer_id].to_i}
-        dlrm_level_data[:reviewer_selected] = true
-        dlrm_level_data[:level_reviewers_data] = level_reviewer_data
+      configuration_reviewer_id = level_reviewers_data.map {|item| item["reviewer_id"]}
+
+
+      level_reviewers_data = level_reviewers_data.filter {|item| user_preferred_reviewer_ids.include? item["reviewer_id"] || item["reviewer_id"].blank?}
+
+
+      if level_reviewers_data.blank?
+        dlrm_level_data[:destroy] = true
+        next
       end
 
-      dlrm_mapping_data.push(dlrm_level_data)
+      dlrm_level_data[:reviewer_selected] = false
+      dlrm_level_data[:level_reviewers_data] = level_reviewers_data
+
+      self.dlrm_mapping_data.push(dlrm_level_data)
     end
   end
 
   def process
+    if dlrm_mapping_data.present?
+      dlrm_mapping_data.each do |dlrm_level_data|
+        if dlrm_level_data[:level_reviewers_data].present?
+
+          if dlrm_level_data[:destroy]
+            document.document_level_reviewer_mappings.where(level_id: dlrm_level_data[:level]&.id).destroy_all
+            next
+          end
+
+          dlrm_level_data[:level_reviewers_data].each do |level_reviewer_data|
+            dlrm = document.document_level_reviewer_mappings.new({
+                                                                     level_id: dlrm_level_data[:level].id,
+                                                                     level_number: dlrm_level_data[:level].level_number,
+                                                                     policy_id: document.policy_id,
+                                                                     reviewer_id: level_reviewer_data['reviewer_id'],
+                                                                     provider_name: provider_name,
+                                                                     min: level_reviewer_data['min'],
+                                                                     max: level_reviewer_data['max']
+                                                                 })
+            # Create new level
+            dlrm.save
+          end
+        end
+      end
+    end
+
+
+
+
+
+
+
+
+
+
+
+
+
     document.document_level_reviewer_mappings.with_provider_name(provider_name).destroy_all
     if dlrm_mapping_data.present?
       dlrm_mapping_data.each do |dlrm_level_data|
