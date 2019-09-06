@@ -1,9 +1,10 @@
 class Forms::Definitions::Section
-  attr_accessor :key, :options, :block, :section, :parents, :parent
+  attr_accessor :key, :attributes, :options, :block, :section, :parents, :parent
 
-  def initialize(key, options = {}, &block)
+  def initialize(key, attributes = {}, options = {}, &block)
     self.section = self
     self.key = key
+    self.attributes = attributes
     self.options = options
     self.block = block
     self.parents = [] if self.parents.nil?
@@ -21,7 +22,7 @@ class Forms::Definitions::Section
   def validations
     @validations ||= {validate: [], validates: [], validates_with: []}
   end
-  
+
   def property(key, options = {}, &block)
     properties << Forms::Definitions::Property.new(section, parents_association, key, options, &block)
   end
@@ -78,11 +79,11 @@ class Forms::Definitions::Section
     properties << Forms::Definitions::Types::FormulaType.new(section, parents_association, key, options, &block)
   end
 
-  def field_dependency(controlling_field, dependent_field, populate:)
-
+  def boolean(key, options = {}, &block)
+    properties << Forms::Definitions::Types::BooleanType.new(section, parents_association, key, options, &block)
   end
 
-  def sequence(key, options ={}, &block)
+  def sequence(key, options = {}, &block)
     properties << Forms::Definitions::Types::SequenceType.new(section, parents_association, key, options, &block)
   end
 

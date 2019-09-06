@@ -5,6 +5,11 @@ module Forms::Definitions::DSL
   end
 
   module ClassMethods
+    def model(klass = NoObject)
+      @model = klass unless klass == NoObject
+      @model
+    end
+
     def field_class(klass = NoObject)
       @field_klass = klass unless klass == NoObject
       @field_klass

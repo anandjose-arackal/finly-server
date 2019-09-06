@@ -1,20 +1,6 @@
 class Forms::Definitions::Types::LookupType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    matches
-    does_not_match
-    matches_any
-    does_not_match_any
-  )
-
-  def field_type
-    :lookup
-  end
-
-  def placeholder
-    'Enter value'
-  end
+  field_type :lookup
+  hint 'Enter value'
 
 end

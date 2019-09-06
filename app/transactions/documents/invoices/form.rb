@@ -8,28 +8,21 @@ class Documents::Invoices::Form < Forms::API
     date :date, required: true, options: {can_required_be_changed: false} # todo handle can_required_be_changed
     date :due_date, required: true
     lookup :policy_id, model: Policy, filters: {role_ids_in: [UserRole.id_for(:non_po_invoice_initiator)]} # todo handle policies specific to a user
-    field_dependency :policy_id, :cost_center, set: {choices: :cost_centers, editable: true} # todo handle field_dependency setter
-    lookup :cost_center, model: CostCenter, required: true, filters: {policy_mappings_policy_id_eq: {reference_field: :policy_id, required: true}} # todo lookup reference
-    lookup :department, model: Department, required: true, filters: {policy_mappings_policy_id_eq: {reference_field: :policy_id, required: true}} # todo lookup reference
+    lookup :cost_center, model: CostCenter, required: true # todo lookup reference
+    lookup :department, model: Department, required: true # todo lookup reference
     date :transaction_period_start, required: true
     date :transaction_period_end, required: true
-    dropdown :cost_allocation_type, enum: Invoice.cost_allocation_types # todo: handle enum for dropdown
+    dropdown :cost_allocation_type, choices: []#Invoice.cost_allocation_types # todo: handle enum for dropdown
     text :narration # todo allow type to be modified in database to formula if required
   end
 
   section :vendor_details do
     lookup :vendor_id, model: YesBankVendor # todo model reference
-    field_dependency :vendor_id, :vendor_account_id, on_selection: {set: {choices: :accounts, editable: true}} # todo handle field_dependency
-    field_dependency :vendor_account_id, :vendor_location, on_selection: {set: {choices: :locations, editable: true}}
     dropdown :vendor_account_id, choices: [], editable: false
-    field_dependency :vendor_account_id, :vendor_account_number, on_selection: {set: {value: :account_number}}
-    field_dependency :vendor_account_id, :vendor_account_ifsc, on_selection: {set: {value: :account_ifsc}}
-    field_dependency :vendor_account_id, :beneficiary_type, on_selection: {set: {value: :beneficiary_type}}
     string :vendor_account_number, editable: false, options: {can_editable_be_changed: false} # todo handle editable false to not be send in requests to backend
     string :vendor_account_ifsc, editable: false, options: {can_editable_be_changed: false}
     string :beneficiary_type, editable: false, options: {can_editable_be_changed: false}
     dropdown :vendor_location, choices: []
-    field_dependency :vendor_location, {field: :vendor_gstin, on_selection: {set: {value: :vendor_gstin}}}
     string :vendor_gstin, editable: false
     string :email, regex: {value: Constants::VALID_EMAIL_FORMAT, message: "Invalid Email ID"}
     string :mobile_number, regex: {value: Constants::VALID_MOBILE_NUMBER, message: "Invalid Mobile Number"} # todo handle regex

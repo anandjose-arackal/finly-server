@@ -1,22 +1,23 @@
 class Forms::Definitions::Types::DateType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    lt
+  field_type :date
+  hint 'Select Date'
+
+  filters %i(
     lteq
-    gt
     gteq
-    present
-    blank
+    btwn
+    eq_days
+    lteq_days
+    gteq_days
   )
 
-  def field_type
-    :date
-  end
+  attributes(
+      {
+          min_date: nil,
+          max_date: nil
+      }
+  )
 
-  def placeholder
-    'Select Date'
-  end
 
 end

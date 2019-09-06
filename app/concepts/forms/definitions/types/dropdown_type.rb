@@ -1,20 +1,12 @@
 class Forms::Definitions::Types::DropdownType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    matches
-    does_not_match
-    matches_any
-    does_not_match_any
+  field_type :dropdown
+  hint 'Select item'
+  attributes(
+      {
+          choices: [],
+          data_url: nil
+      }
   )
-
-  def field_type
-    :dropdown
-  end
-
-  def placeholder
-    'Select item'
-  end
 
 end

@@ -1,14 +1,17 @@
 class Forms::Definitions::Types::AmountType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    lt
+  field_type :amount
+  hint 'Enter amount'
+  filters %i(
     lteq
-    gt
     gteq
-    present
-    blank
+  )
+  attributes(
+      {
+          min_amount: 0,
+          max_amount: 200000000,
+          multi_currency: false
+      }
   )
 
   def initialize(section, parent, key, options = {}, &block)
@@ -18,14 +21,6 @@ class Forms::Definitions::Types::AmountType < Forms::Definitions::Property
       string :currency, required: true, editable: true, validates: {presence: true}
     }
     super(section, parent, key, options, &new_block)
-  end
-
-  def field_type
-    :amount
-  end
-
-  def placeholder
-    'Enter amount'
   end
 
 end

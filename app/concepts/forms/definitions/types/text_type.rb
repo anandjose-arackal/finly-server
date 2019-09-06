@@ -1,20 +1,12 @@
 class Forms::Definitions::Types::TextType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    matches
-    does_not_match
-    matches_any
-    does_not_match_any
+  field_type :text
+  hint 'Enter value'
+  attributes(
+      {
+          regex: nil,
+          char_limit: 1000
+      }
   )
-
-  def field_type
-    :text
-  end
-
-  def placeholder
-    "Enter value"
-  end
 
 end

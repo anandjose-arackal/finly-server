@@ -1,23 +1,16 @@
 class Forms::Definitions::Types::DecimalType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    matches
-    lt
+  field_type :decimal
+  hint 'Enter value'
+  filters %i(
     lteq
-    gt
     gteq
-    present
-    blank
   )
-
-  def field_type
-    :decimal
-  end
-
-  def placeholder
-    'Enter value'
-  end
+  attributes(
+      {
+          min_value: nil,
+          max_value: nil
+      }
+  )
 
 end

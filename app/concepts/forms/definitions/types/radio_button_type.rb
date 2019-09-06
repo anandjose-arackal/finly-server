@@ -1,16 +1,16 @@
 class Forms::Definitions::Types::RadioButtonType < Forms::Definitions::Property
 
-  allowed_filters %i(
-    eq
-    not_eq
-    matches
-    does_not_match
-    matches_any
-    does_not_match_any
+  field_type :radio_button
+  attributes(
+      {
+          choices: []
+      }
   )
-
-  def field_type
-    :radio_button
-  end
+  options(
+      {
+          min_items: 1,
+          max_items: 5
+      }
+  )
 
 end
