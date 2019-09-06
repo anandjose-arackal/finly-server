@@ -1,37 +1,39 @@
 class Forms::Definitions::Property < Forms::Definitions::Section
 
+  include Forms::Definitions::Types::AttributeHelpers::Choices
+  include Forms::Definitions::Types::AttributeHelpers::DataUrl
+  include Forms::Definitions::Types::AttributeHelpers::Regex
+
+  def attribute_helpers
+    [
+        Forms::Definitions::Types::AttributeHelpers::Choices,
+        Forms::Definitions::Types::AttributeHelpers::DataUrl,
+        Forms::Definitions::Types::AttributeHelpers::Regex,
+    ]
+  end
+
   def self.filters(list = NoObject)
-    unless list == NoObject
-      @allowed_filters = list
-    end
+    @allowed_filters = list unless list == NoObject
     @allowed_filters ||= []
   end
 
   def self.attributes(hash = NoObject)
-    unless hash == NoObject
-      @default_attributes = hash
-    end
+    @default_attributes = hash unless hash == NoObject
     @default_attributes ||= {}
   end
 
   def self.options(hash = NoObject)
-    unless hash == NoObject
-      @default_options = hash
-    end
+    @default_options = hash unless hash == NoObject
     @default_options ||= {}
   end
 
   def self.field_type(value = NoObject)
-    unless value == NoObject
-      @field_type = value
-    end
+    @field_type = value unless value == NoObject
     @field_type
   end
 
   def self.hint(value = NoObject)
-    unless value == NoObject
-      @hint = value
-    end
+    @hint = value unless value == NoObject
     @hint
   end
 
@@ -40,24 +42,34 @@ class Forms::Definitions::Property < Forms::Definitions::Section
     self.parents = parents
     self.parent = self.parents.last
     self.key = key
-    self.attributes = params&.except(:options) || {}
-    self.options = params&.dig(:options) || {}
-    attributes[:label] = label
-    super(key, default_attributes.merge(attributes), default_options.merge(options), &block)
+    load_params(params)
+    super(key, attributes, options, &block)
+  end
+
+  def load_params(params)
+    self.options = default_attributes.merge(params&.dig(:options) || {})
+    load_attributes params
+  end
+
+  def load_attributes(params)
+    self.attributes = default_attributes.merge(params&.except(:options) || {})
+    self.attributes[:label] = label
+    self.attribute_helpers.each do |attribute_helper|
+      attribute_helper.load_attributes self
+    end
   end
 
   def default_attributes
-    self.class.attributes.merge(
-        {
-            label: nil,
-            default_value: nil,
-            editable: true,
-            hidden: false,
-            required: false,
-            unique: false,
-            system_field: true
-        }
-    )
+    attr = {
+        label: nil,
+        default_value: nil,
+        editable: true,
+        hidden: false,
+        required: false,
+        unique: false,
+        system_field: true
+    }
+    attr.merge(self.class.attributes)
   end
 
   def default_options
@@ -131,7 +143,18 @@ class Forms::Definitions::Property < Forms::Definitions::Section
   end
 
   def filter_choices
-    options[:choices]
+    return attributes[:choices] if attributes[:choices].present?
+    if attributes[:enum].present?
+      model_s = attributes[:enum]&.first
+      model = Object.const_get(model_s)
+      return nil if model.blank?
+
+      method = attributes[:enum]&.second
+      values = model.send(method)
+      values.each do |name, value|
+
+      end
+    end
   end
 
   def filter_multiple
@@ -151,7 +174,7 @@ class Forms::Definitions::Property < Forms::Definitions::Section
 
   protected
 
-  def label#(key, options)
+  def label#(key, attributes)
     return attributes[:label]&.to_s if attributes[:label].present?
 
     prefix = ''

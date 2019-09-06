@@ -2,12 +2,9 @@ class Forms::Definitions::Types::MultiSelectLookupType < Forms::Definitions::Pro
 
   field_type :lookup
   hint 'Enter value'
+  consumes_data_url!
   attributes(
       {
-          data_url: {
-              model: nil,
-              filter: nil
-          },
           min_items: 1,
           max_items: 25,
           mode: 1

@@ -12,7 +12,7 @@ class Documents::Invoices::Form < Forms::API
     lookup :department_id, model: Department, required: true # todo lookup reference
     date :transaction_period_start, required: true
     date :transaction_period_end, required: true
-    dropdown :cost_allocation_type, choices: []#Invoice.cost_allocation_types # todo: handle enum for dropdown
+    dropdown :cost_allocation_type, enum: ['Invoice', :cost_allocation_types] # todo: handle enum for dropdown
     text :narration # todo allow type to be modified in database to formula if required
   end
 

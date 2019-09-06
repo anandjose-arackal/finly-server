@@ -1,11 +1,7 @@
 class Forms::Definitions::Types::CheckboxType < Forms::Definitions::Property
 
   field_type :checkbox
-  attributes(
-      {
-          choices: []
-      }
-  )
+  consumes_choices!
   options(
       {
         min_items: 1,
