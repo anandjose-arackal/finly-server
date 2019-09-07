@@ -64,6 +64,8 @@ class BankPaymentRequest < ApplicationRecord
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
+  before_destroy :rollback_related_documents
+
   default_scope {order(created_at: :desc)}
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status, allow_nil: true
@@ -179,16 +181,16 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
-                                                              {receiving_account: :account_owner}, :payment_status, :reference_resource,
+                                                              :payment_status,
                                                               :invoice,
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
-                                                                             :initiating_user,:parent,
+                                                                             :initiating_user,:parent,:payment_status,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
                                                                              {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
                                                                              :amount]})}
@@ -572,4 +574,34 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
   end
   ####################### Overridden Methods ends ###################
+
+
+  def rollback_related_documents
+    rollback_security_deposit
+    rollback_beneficiary_payment
+  end
+
+  def rollback_security_deposit
+    type_security_deposit = self.payment_order.payments.pluck(:parent_type).include?("SecurityDeposit") rescue false
+    if type_security_deposit
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: SecurityDepositStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
+
+  def rollback_beneficiary_payment
+    type_beneficiary_payment = self.payment_order.payments.pluck(:parent_type).include?("BeneficiaryPayment") rescue false
+    if type_beneficiary_payment
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
 end

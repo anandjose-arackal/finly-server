@@ -71,9 +71,11 @@ class Procurement < ApplicationRecord
     end
   }
 
-  scope :order_by_expected_delivery_date, -> {
+  scope :order_by_expected_delivery_date, -> (user_id) {
+    user = User.find_by_id(user_id)
     ids = self.pluck(:id).uniq
-    filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    # filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    filtered_ids = user.company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
     find_ordered(filtered_ids)
   }
 

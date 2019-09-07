@@ -1,5 +1,6 @@
 json.departments do
-  json.array!(@result.departments.departments.roots) do |department|
+  # json.array!(@result.departments.departments.roots) do |department|
+  json.array!(@result.departments.policy_department_filter_mapping) do |department|
     json.id department.id
     json.name department.name
     if department.children.present?

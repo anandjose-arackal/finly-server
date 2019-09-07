@@ -22,7 +22,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       # payment cannot be processed in this case
       return false
     elsif bank_transaction&.retriable? || bank_transaction&.open?
-      reference_number = bank_transaction.unique_request_number
+      reference_number = bank_transaction.unique_reference_number
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil

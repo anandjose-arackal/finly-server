@@ -18,7 +18,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations, :budgets, :gstin_locations
+                  :tax_rates, :locations, :budgets, :gstin_locations, :variable_periodic_invoice, :bank_payment_request_policies
 
     def init
       self.invoice = params[:invoice]
@@ -38,11 +38,15 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
       self.gstin_locations = self.invoice.vendor&.gstin_locations
+      self.variable_periodic_invoice = (self.invoice.open? || self.invoice.rejected? || self.invoice.retracted?) && (self.invoice.billing_type_id == BillingType.id_for(:variable_periodic))
 
       # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
-      self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
+      self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Policy.none
+
+      params[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+      self.bank_payment_request_policies = Policy::VendorPayments::Index.(user, params).policies rescue Policy.none
 
 
       self.actions = get_actions

@@ -15,11 +15,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       budgets: false,
       po_advances: false,
       grns: false,
-      vendors: false
+      vendors: false,
+      payment_agreements: false
     }
 
-
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
@@ -37,6 +37,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
       unless user.company.purchase_requisition_enabled?
         request_types[:purchase_requests] = false
+      end
+
+      unless user.company.agreement_based_payment_system_enabled?
+        request_types[:payment_agreements] = false
       end
     else
       user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
@@ -69,6 +73,8 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         #   if user.company.vendor_empanelment_workflow_enabled?
         #     request_types[:vendors] = true
         #   end
+        when UserRole.id_for(:payment_agreement_initiator)
+          request_types[:payment_agreements] = true 
         end
       end
     end

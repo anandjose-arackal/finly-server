@@ -30,6 +30,12 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_ids, type: :array
     has_scope :filter_policy_id
     has_scope :filter_invoice_id
+    has_scope :show_only_invoices_which_are_forwarded
+
+    # Sorting
+    has_scope :sort_invoice_id
+    has_scope :sort_date
+    has_scope :sort_due_date
 
     def init
       # Todo temp workaround because of frontend format issue - START
@@ -50,6 +56,10 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       get_count(InwardInvoiceType.id_for(:non_po_invoice))
     end
 
+    def agreement_invoice_status_count
+      get_count(InwardInvoiceType.id_for(:recurring_invoice))
+    end
+
     def get_count(id)
       raw_count = self.invoices.where(invoice_type_id: id).group( :invoice_status_id).count
       h = {}
@@ -66,7 +76,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     if user.vendor_payments_admin?
       admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
       self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
-      self.invoices = self.invoices.not_open.non_beneficiary.created_at_desc
+      self.invoices = self.invoices.non_beneficiary.created_at_desc
       return
     end
 

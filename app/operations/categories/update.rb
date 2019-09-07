@@ -11,12 +11,12 @@ class Categories::Update < Categories::Base
   def init
     super
     id = params[:id] || params[:category_id]
-    self.category = user.company.categories.active.find_by(id: id)
+    self.category = user.company.categories.find_by(id: id)
     self.category_parameters = category_params
   end
 
   def validate
-    parent = user.company.categories.active.find_by(id: category_parameters[:parent_id])
+    parent = user.company.categories.find_by(id: category_parameters[:parent_id])
     if parent.present?
       if parent.id == self.category.id
         add_message :error, "#{self.category.name} cannot be a sub-category of itself"
@@ -32,7 +32,7 @@ class Categories::Update < Categories::Base
   end
 
   def pre_process
-    [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items].each do |app|
+    [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items,:gst_applicable,:tds_applicable].each do |app|
       if self.category_parameters&.dig(app).blank?
         self.category_parameters[app] = false
       end
@@ -44,9 +44,19 @@ class Categories::Update < Categories::Base
       # i.e. if there is a parent and the child's subscriptions have been updated
       # the parent's subscription should also be updated accordingly
       if self.category.parent.present?
-        [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items].each do |app|
+        [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items,:gst_applicable,:tds_applicable].each do |app|
           unless self.category.parent.send(app)
             self.category.parent.update(app => self.category.send(app))
+          end
+        end
+      end
+
+      if self.category.children.present?
+        [:gst_applicable,:tds_applicable].each do |app|
+          unless self.category.send(app)
+            self.category.children.each do |child_category|
+             child_category.update(app => self.category.send(app))
+            end
           end
         end
       end
@@ -63,7 +73,8 @@ class Categories::Update < Categories::Base
   private
 
   def category_params
-    params.require(:category).permit(:name,:gl_code,  :expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items, :parent_id)
+    params.require(:category).permit(:name, :gl_code, :gst_applicable, :tds_applicable,
+                                     :expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items, :parent_id)
   end
 
 end

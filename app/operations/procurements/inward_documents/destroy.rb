@@ -103,7 +103,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     end
 
     if user.company.feature_subscription.srn_enabled
-      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount
+      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount.to_f
     end
 
     purchase_order_item.assign_attributes(po_item_params)

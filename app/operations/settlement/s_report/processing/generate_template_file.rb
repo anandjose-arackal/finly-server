@@ -57,8 +57,10 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
 
   def processor_details(processor, item)
     marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
+    document_ids = item.reports.pluck(:id).join(", ") rescue ""
     [
       item.id,
+      document_ids,
       processor.created_by_user&.name,
       item.processor_accountable&.name,
       item.processor_accountable&.account_number,
@@ -72,7 +74,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
 
   def default_headers
     [
-      "Report ID(unmodifiable)", 
+      "Batch Item ID(unmodifiable)",
+      "Report IDs(unmodifiable)",
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",

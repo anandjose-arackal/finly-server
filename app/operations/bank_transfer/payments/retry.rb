@@ -3,7 +3,7 @@
 
 class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
-  attr_accessor :payment, :payment_order
+  attr_accessor :payment, :payment_order, :payment_mode
 
   def pre_validate
     if user.blank? || params.blank?
@@ -15,6 +15,7 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
     id = params[:id] || params[:payment_id]
     op = BankTransfer::Payments::Index.(user, params)
     self.payment = op.payments.find_by(id: id)
+    self.payment_mode = params[:payment_mode] || self.payment&.payment_mode
   end
 
   def validate
@@ -28,6 +29,12 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       return
     end
 
+    bt = self.payment.reference_resource
+    unless bt&.retriable?
+      add_message :error, "Only failed payments can be retried"
+      return
+    end
+
     unless payment.payment_order.present?
       add_message :error, "This payment does not belong to a payment order"
       return
@@ -36,7 +43,9 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
   def pre_process
     # update the payment mode for this payment alone
-    self.payment.update(payment_mode: params[:payment_mode])
+    if self.payment_mode.present?
+      self.payment.update(payment_mode: self.payment_mode)
+    end
   end
 
   def process

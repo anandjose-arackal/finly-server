@@ -17,7 +17,6 @@ config/data_store.yml
 config/sentry.yml
 config/aws_config.yml
 config/yes_bank_config.yml
-config/icici_bank_config.yml
 config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
@@ -45,6 +44,7 @@ public/system/vendor_attachments/*
 /public/system/outward_invoice_attachments/*
 /public/system/procurement_attachments/*
 /public/system/booking_attachments/*
+/public/system/admin_implementation_requests/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
