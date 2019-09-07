@@ -110,6 +110,14 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
+
+    # checking to ensure that payments that are against invoices or PO advances don't exceed the total
+    op = PaymentProcessorRules::Event.(:checking_multiple_payments_against_document, {payment: self.payment, options: self.options})
+    unless op.success?
+      add_message :error, op.message
+      return
+    end
+
   end
 
   def pre_process
