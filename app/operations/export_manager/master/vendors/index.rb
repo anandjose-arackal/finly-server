@@ -28,8 +28,20 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
 
   def input
     params[:beneficiary_type] = 2
-    op = BankTransfer::AccountOwners::Index.(user, params)
-    op.account_owners
+    result = BankTransfer::AccountOwners::Index.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+
+    ids = params[:ids] || params[:vendor_ids] || params[:filter_ids]
+    unless ids.is_a?(Array) or ids.blank?
+      ids = ids.split(',')
+    end
+
+    vendors = result.account_owners
+    vendors = vendors.where(id: ids) if ids.present?
+    vendors
   end
 
   def vendor_business_name(vendor)
