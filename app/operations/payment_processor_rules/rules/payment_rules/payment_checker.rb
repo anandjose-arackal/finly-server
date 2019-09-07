@@ -25,8 +25,8 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
           successful_payments = purchase_order.advance_payments.successful
           processed_amount = successful_payments.joins(:amount).sum(:value).to_f
           if (processed_amount + payment.amount_value) > purchase_order.advance_amount&.value.to_f
-            add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
-            message "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the invoice amount"
+            add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the PO Advance amount"
+            message "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the PO Advance amount"
             fail
           end
         end
