@@ -11,7 +11,14 @@ class Procurements::PurchaseRequests::Base < BaseOperation
 
   def init
     self.company = user.company
-    self.purchase_request = Procurements::PurchaseRequests::Show.(current_user, params).purchase_request
+    result = Procurements::PurchaseRequests::Show.(current_user, params)
+
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+
+    self.purchase_request = result.purchase_request
   end
 
   def validate

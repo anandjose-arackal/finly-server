@@ -53,7 +53,7 @@ class PaymentAgreements::Show < PaymentAgreements::Base
     return if payment_agreement.validate_if_admin(user) && (!payment_agreement.draft? || (payment_agreement.creator_id == user.id) || payment_agreement.creator_id.blank?)
 
     return if payment_agreement.validate_if_reviewer(user)
-    return if purchase_order.validate_if_auditor(user)
+    return if payment_agreement.validate_if_auditor(user)
     raise_unauthorized_exception
   end
 end

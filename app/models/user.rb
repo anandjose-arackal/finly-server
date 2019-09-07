@@ -740,6 +740,7 @@ class User < ApplicationRecord
   before_save :strip_whitespace
 
   around_update :set_passwords_for_linked_users
+  after_save :sync_users_for_group_entity
 
   after_create do
     default_policy_id = self.company.default_policy.id
@@ -1497,6 +1498,20 @@ class User < ApplicationRecord
           user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
         end
       end
+    end
+  end
+
+  def sync_users_for_group_entity
+    users = User.with_email_or_mobile_number(self.email, self.mobile_number)
+    previously_added_user = users.without_id(self.id).reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
+    return if previously_added_user.blank?
+    # setting OTP verified for all users if the current user is verified
+    if previously_added_user&.otp_verified?
+      users.update_all(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    end
+    # setting verified as true for all users if they already exist
+    if previously_added_user&.verified
+      users.update_all(verified: true)
     end
   end
 
