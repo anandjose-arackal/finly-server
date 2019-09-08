@@ -30,7 +30,7 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
     end
 
     bt = self.payment.reference_resource
-    unless bt&.retriable?
+    if bt.present? && !(bt&.retriable?)
       add_message :error, "Only failed payments can be retried"
       return
     end
