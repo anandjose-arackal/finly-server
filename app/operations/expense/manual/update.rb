@@ -193,8 +193,6 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
-    # Update DLRM
-    Reports::Expenses::UpdateDlrm.(self.user, {updated_expense: self.expense})
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id

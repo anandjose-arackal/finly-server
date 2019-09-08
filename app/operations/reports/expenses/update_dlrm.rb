@@ -1,5 +1,5 @@
 class Reports::Expenses::UpdateDlrm < BaseOperation
-  attr_accessor :report, :updated_expense
+  attr_accessor :report, :updated_expense, :violations
 
   def pre_validate
     if params.blank?
@@ -39,13 +39,31 @@ class Reports::Expenses::UpdateDlrm < BaseOperation
     end
   end
 
+  def pre_process
+    self.violations = Reports::Violation.(user, report: self.report)
+  end
+
   def process
+
+    violations_present = has_warning?
     set_params = {
       reviewal_document: report,
-      violations_present: violation_present,
+      violations_present: violations_present,
       type: 'unaffected'
     }
 
     ReviewalManager::DocumentReviewalMappings::Set.(user, set_params)
+  end
+
+
+  def has_warning?
+    return false unless self.violations.present?
+    self.violations.each do |key, violation|
+      if violation[:expense_warning].present? or violation[:budget_warning].present? or
+          violation['expense_warning'].present? or violation['budget_warning'].present?
+        return true
+      end
+    end
+    false
   end
 end
