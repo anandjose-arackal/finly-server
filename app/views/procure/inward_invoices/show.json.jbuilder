@@ -312,6 +312,12 @@ json.policies do
   end
 end
 
+json.bank_payment_request_policies do
+  json.array! @result.bank_payment_request_policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
     json.merge! tax_rate.as_json

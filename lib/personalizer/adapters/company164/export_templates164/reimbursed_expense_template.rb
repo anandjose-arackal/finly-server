@@ -34,7 +34,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
             self.contents << [
                 '31352001',
                 '',
-                report.user.gl_config&.dig(:location_code),
+                "'#{report.user.gl_config&.dig(:location_code)}",
                 report.user.gl_config&.dig(:cost_center),
                 '',
                 '',

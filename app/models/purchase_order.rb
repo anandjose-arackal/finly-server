@@ -257,6 +257,18 @@ class PurchaseOrder < ApplicationRecord
                                         ])
   }
 
+  scope :show_only_po_which_have_advances, -> (show_it = false) {
+    if StringUtils.to_bool(show_it)
+      where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing]))
+    end
+  }
+
+  scope :show_only_po_which_are_forwarded, -> (show_it = false) {
+    if StringUtils.to_bool(show_it)
+      self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
+    end
+  }
+
   scope :filter_by_due_date, -> (due_date) {
     where due_date: due_date
   }
@@ -774,6 +786,10 @@ class PurchaseOrder < ApplicationRecord
 
   def generate_sequential_id?
     purchase_order_status_id != PurchaseOrderStatus.id_for(:open)
+  end
+
+  def purchase_order_number
+    self.override_po_number.present? ? self.override_po_number : self.po_number
   end
 
 

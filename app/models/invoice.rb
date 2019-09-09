@@ -451,6 +451,12 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+  scope :show_only_invoices_which_are_forwarded, -> (show_it = false) {
+    if StringUtils.to_bool(show_it)
+      self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
+    end
+  }
+
   # Sorting
   scope :sort_invoice_id, -> (type){
     type = type&.strip&.upcase

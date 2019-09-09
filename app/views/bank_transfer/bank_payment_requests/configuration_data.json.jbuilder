@@ -1,5 +1,6 @@
 json.departments do
-  json.array!(@result.departments.departments.roots) do |department|
+  # json.array!(@result.departments.departments.roots) do |department|
+  json.array!(@result.departments.policy_department_filter_mapping) do |department|
     json.id department.id
     json.name department.name
     if department.children.present?
@@ -20,7 +21,7 @@ json.categories do
     json.gl_code category.gl_code
     if category.children.present?
       json.sub_categories do
-        json.array!(category.children) do |sub_category|
+        json.array!(category.children.active) do |sub_category|
           json.id sub_category.id
           json.name sub_category.name
           json.gl_code sub_category.gl_code

@@ -377,10 +377,10 @@ class PaymentAgreement < ApplicationRecord
   end
 
   def agreement_item_combinations
-    if self.general_invoices.present? && self.rental_invoices.present?
+    if self.general_invoices.reject(&:marked_for_destruction?).present? && self.rental_invoices.reject(&:marked_for_destruction?).present?
       errors.add(:general_invoices, ' and rental invoices cannot be present at the same time')
     end
-    if self.general_invoices.present? && self.beneficiary_payments.present?
+    if self.general_invoices.reject(&:marked_for_destruction?).present? && self.beneficiary_payments.reject(&:marked_for_destruction?).present?
       errors.add(:general_invoices, ' and beneficiary payment cannot be present at the same time')
     end
   end

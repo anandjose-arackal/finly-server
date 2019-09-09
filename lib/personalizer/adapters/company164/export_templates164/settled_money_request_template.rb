@@ -36,7 +36,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
                self.contents << [
                    31352001,
                    '',
-                   money_request.user.gl_config&.dig(:location_code),
+                   "'#{money_request.user.gl_config&.dig(:location_code)}",
                    money_request.user.gl_config&.dig(:cost_center),
                    '',
                    '',
@@ -51,7 +51,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
              self.contents << [
                  '61110004',
                  '9992',
-                 money_request.user.gl_config&.dig(:location_code),
+                 "'#{money_request.user.gl_config&.dig(:location_code)}",
                  money_request.user.gl_config&.dig(:cost_center),
                  '',
                  '',

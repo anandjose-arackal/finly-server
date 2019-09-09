@@ -276,12 +276,20 @@ class User::Balances::Show < User::Base
     # adding pocket balances
     self.balances[:user_pockets] = [] if self.balances[:user_pockets].blank?
     self.selected_user.user_pockets.cash_and_credit_cards.each do |pocket|
-      self.balances[:user_pockets] << {
+      balance_data = {
           name: pocket.name,
           type: pocket.user_pocket_type&.name&.humanize,
           balance: self.user_pockets_info[pocket.id],
           base_currency: pocket.base_currency
       }
+
+      # Below steps are done for getting effective balance for cash on hand pockets
+      # Will be removed once a better structure is put to place
+      if pocket&.class&.to_s == 'UserPocket' && pocket&.user_pocket_type_id == UserPocketType.id_for(:cash)
+        adapter = retrieve_adapter(pocket)
+        balance_data[:effective_balance] = adapter.balance
+      end
+      self.balances[:user_pockets] << balance_data
     end
   end
 
