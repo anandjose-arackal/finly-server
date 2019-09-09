@@ -22,7 +22,8 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
              TravelRequestBookingProvider
              PurchaseRequestProvider
              PurchaseOrderProvider
-             InvoiceProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
              BankPaymentRequestProvider
              )
 

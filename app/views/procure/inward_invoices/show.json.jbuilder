@@ -287,7 +287,11 @@ json.reviewal_chains do
   end
 end
 
-json.reviewal_chain @result.invoice.get_reviewal_chain
+if @result.invoice.procurement.purchase_order.present?
+  json.reviewal_chain @result.invoice.get_reviewal_chain('PoInvoiceProvider')
+else
+  json.reviewal_chain @result.invoice.get_reviewal_chain('NonPoInvoiceProvider')
+end
 
 json.comments do
   json.array! invoice.comments do |comment|

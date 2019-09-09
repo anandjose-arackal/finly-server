@@ -33,6 +33,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   end
 
   def validate
+    return unless user_role_based_validation
     if self.procurement.blank?
       add_message :success, "Procurement not found"
       return
@@ -533,6 +534,17 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   def set_advance_amount_required
     self.invoice.update(advance_amount_required: true)
+  end
+
+  def user_role_based_validation
+    # Invoice created from PO will have same policy, hence check if that user has po_invoice_initiator role for that policy
+    is_po_invoice_initiator = self.purchase_order.policy.policy_user_roles.with_user_id(user.id).with_role_id(UserRole.id_for(:po_invoice_initiator)).present? rescue false
+    
+    unless is_po_invoice_initiator
+      add_message :error, "You are not allowed to take this action."
+      return
+    end
+    true
   end
 
 end
