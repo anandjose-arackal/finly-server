@@ -1,8 +1,12 @@
-task :po_non_po_role_migration => :environment do
-  copy_roles_to_po_and_non_po_invoice
-  copy_wm_to_po_and_non_po_invoice
-  migrate_dlrm_provider_name
-end
+class PoNonPoRoleMigration
+
+  def role_migration
+    copy_roles_to_po_and_non_po_invoice 
+    copy_to_po_invoice
+    copy_to_non_po_invoice
+    migrate_dlrm_provider_name  
+  end
+
 
   def copy_roles_to_po_and_non_po_invoice
     # Migrate invoice reviewers and roles  to po_invoice_roles
@@ -49,10 +53,6 @@ end
     end
   end
 
-  def copy_wm_to_po_and_non_po_invoice
-    copy_to_po_invoice
-    copy_to_non_po_invoice
-  end
 
 
   def copy_to_po_invoice
@@ -78,6 +78,8 @@ end
       end
     end
   end
+
+
 
   def copy_to_non_po_invoice
     reviewal_levels = ReviewalLevel.unscoped.where(associated_entity_type: 'InvoiceProvider')
@@ -113,3 +115,5 @@ end
       end
     end
   end
+
+end
