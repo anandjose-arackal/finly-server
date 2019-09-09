@@ -75,6 +75,11 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
          ]
 
   def input
+    if params[:filter_po_status].present?
+      unless params[:filter_po_status].is_a?(Integer)
+        params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
+      end
+    end
     result = ::Procurements::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
