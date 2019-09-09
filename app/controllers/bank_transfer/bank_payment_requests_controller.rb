@@ -228,7 +228,9 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
   def sample_import_file
     @result = BankTransfer::PaymentRequest::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def payments_list

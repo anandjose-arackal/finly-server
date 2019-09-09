@@ -10,8 +10,14 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
     has_scope :filter_category_id
     has_scope :filter_item_type, type: :array #todo undo this after implementation
     has_scope :filter_active
+    has_scope :filter_ids, type: :array
 
     def init
+      # Todo temp workaround because of frontend format issue - START
+      if params[:filter_ids]
+        params[:filter_ids] = params[:filter_ids].first.split(",")
+      end
+
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
       per_page = params[:per_page] || 30
       self.paginated_line_items = self.inventory_line_items&.order(created_at: :desc)&.paginate(page: params[:page], per_page: per_page)

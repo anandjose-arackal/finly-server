@@ -130,13 +130,14 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
 
   def retrieve_header_names
     [
-      "Advance ID(unmodifiable)", 
-      "Batch Created By(unmodifiable)", 
+      "Batch Item ID(unmodifiable)",
+      "Report IDs(unmodifiable)",
+      "Batch Created By(unmodifiable)",
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
-      "Advance Requested By User(unmodifiable)", 
-      "Purpose of Advance(unmodifiable)", 
-      "Total Advance Amount(unmodifiable)", 
+      "Report Requested By User(unmodifiable)",
+      "Purpose of Report(unmodifiable)",
+      "Total Report Amount(unmodifiable)",
       "UTR",
       "Mark As Paid(Y or N; leave blank to skip)"
     ]

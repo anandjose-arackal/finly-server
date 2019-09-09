@@ -20,20 +20,20 @@ class Personalizer::Adapters::Company190::Expense190::Manual190::Update190::Vali
   def process
     return if self.category.blank?
     if category.gst_applicable?
-      validate_keys.each do |field_key|
-        field_keys = field_key.split('.')
-        user_value = field_keys[0...-1].inject(expense_params) do |hash, expense_param|
-          hash&.public_send(:[], expense_param.to_sym)
-        end&.public_send(:[], field_keys.last)
-        if user_value.blank?
-          field_name = field_keys.last&.gsub("id","")&.humanize rescue "Expense Field"
-          add_message :error, "#{field_name} can't be blank"
-        end
-      end
+      # validate_keys.each do |field_key|
+      #   field_keys = field_key.split('.')
+      #   user_value = field_keys[0...-1].inject(expense_params) do |hash, expense_param|
+      #     hash&.public_send(:[], expense_param.to_sym)
+      #   end&.public_send(:[], field_keys.last)
+      #   if user_value.blank?
+      #     field_name = field_keys.last&.gsub("id","")&.humanize rescue "Expense Field"
+      #     add_message :error, "#{field_name} can't be blank"
+      #   end
+      # end
 
-      unless validate_gstin(expense_params.dig(:gstin_location_attributes,:gstin))
-        add_message :error, "GSTIN Invalid"
-      end
+      # unless validate_gstin(expense_params.dig(:gstin_location_attributes,:gstin))
+      #   add_message :error, "GSTIN Invalid"
+      # end
     end
   end
 
