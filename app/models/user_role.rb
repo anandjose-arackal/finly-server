@@ -142,7 +142,13 @@ class UserRole < ApplicationRecord
     vendor_manager: 25,
     bank_payment_request_auditor: 26,
     budget_manager: 27,
-    non_po_initiator: 28
+    non_po_initiator: 28,
+    po_invoice_initiator: 36,
+    po_invoice_reviewer: 37,
+    po_invoice_auditor: 38, 
+    non_po_invoice_initiator: 39,
+    non_po_invoice_reviewer: 40,
+    non_po_invoice_auditor: 41
   }
 
   def self.seed_data

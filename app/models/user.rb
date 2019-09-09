@@ -649,10 +649,42 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_unassigned_non_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
   scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_non_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).pluck(:user_id)
       without_id(user_ids)
     end
   }

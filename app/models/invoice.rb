@@ -844,7 +844,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options={})
-    if role_id == UserRole.id_for(:invoice_initiator)
+    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
@@ -1018,7 +1018,7 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]

@@ -67,6 +67,10 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     has_scope :filter_unassigned_goods_receiver_for_policy
     has_scope :filter_unassigned_invoice_initiator_for_policy
     has_scope :filter_unassigned_invoice_reviewer_for_policy
+    has_scope :filter_unassigned_po_invoice_initiator_for_policy
+    has_scope :filter_unassigned_non_po_invoice_initiator_for_policy
+    has_scope :filter_unassigned_po_invoice_reviewer_for_policy
+    has_scope :filter_unassigned_non_po_invoice_reviewer_for_policy
     has_scope :filter_unassigned_bank_payment_request_initiator_for_policy
     has_scope :filter_unassigned_bank_payment_request_reviewer_for_policy
     has_scope :filter_unassigned_bank_payment_request_creditor_for_policy
