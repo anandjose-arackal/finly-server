@@ -82,12 +82,13 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   # end
 
   def take_control
+    provider_name = invoice.get_invoice_provider_name
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if (invoice.processing? && invoice.get_reviewers.exclude?(user))
+      if (invoice.processing? && invoice.get_reviewers(nil, provider_name).exclude?(user))
         return true
       end
-      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && !invoice.action_users(:approve).include?(user)
+      if invoice.processing? && !invoice.action_users(:return_control, provider_name).include?(user) && !invoice.action_users(:approve, provider_name).include?(user)
         return true
       end
     end
@@ -95,10 +96,11 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def return_control
+    provider_name = invoice.get_invoice_provider_name
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if invoice.processing?
-        return true if invoice.action_users(:return_control).include?(user)
+        return true if invoice.action_users(:return_control, provider_name).include?(user)
       end
     end
     ############# Admin logic end ####################
@@ -163,12 +165,14 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def last_level?
     if invoice.processing?
-      invoice.get_reviewal_chain&.last[:level_number] == invoice.level&.level_number
+      provider_name = invoice.get_invoice_provider_name
+      invoice.get_reviewal_chain(provider_name)&.last[:level_number] == invoice.level&.level_number
     end
   end
 
   def previous_reviewer
-    invoice.get_reviewers('previous').pluck(:id)
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers('previous', provider_name).pluck(:id)
   end
 
   def user_can_take_control?
@@ -187,7 +191,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     # level = invoice.level
     # amount = invoice.net_amount.value rescue 0
     # allowed = level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
-    invoice.get_reviewers.include?(user)
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers(nil, provider_name).include?(user)
   end
 
   def document_owner?
@@ -195,12 +200,14 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def forward
-    invoice.processing? && invoice.get_reviewers.include?(user)
+    provider_name = invoice.get_invoice_provider_name
+    invoice.processing? && invoice.get_reviewers(nil, provider_name).include?(user)
   end
 
   def admin_has_taken_control?
     # If the user is an admin and the admin has explicitly taken control of the document, 
     # only then they can approve or reject
-    invoice.get_reviewers.include?(user) && user.vendor_payment_admin?
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers(nil, provider_name).include?(user) && user.vendor_payment_admin?
   end
 end
