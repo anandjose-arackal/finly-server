@@ -862,7 +862,7 @@ class Invoice < ApplicationRecord
   end
 
   def get_invoice_provider_name
-    self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+    self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
   end
 
   def update_net_amount_value
