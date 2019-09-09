@@ -1501,7 +1501,7 @@ class User < ApplicationRecord
   end
 
   def sync_users_for_group_entity
-    users = User.with_email_or_mobile_number(self.email, self.mobile_number)
+    users = User.without_id(self.id).with_email_or_mobile_number(self.email, self.mobile_number)
     previously_added_user = users.without_id(self.id).reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
     return if previously_added_user.blank?
     # setting OTP verified for all users if the current user is verified
