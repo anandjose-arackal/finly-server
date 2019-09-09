@@ -3449,6 +3449,7 @@ Rails.application.routes.draw do
     get 'users/managers', to: 'users#get_managers'
     get 'users/categories', to: 'users#categories'
     get 'users/invite_config', to: 'users#invite_config'
+    get 'users/export', to: 'users#export'
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
       get 'policies', to: 'users#policies'
@@ -3536,6 +3537,7 @@ Rails.application.routes.draw do
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
     put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
     get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
+    get 'inventory_line_items/export', to: 'inventory_line_items#export'
     resources :inventory_line_items do 
       put 'upload_attachments', to: 'inventory_line_items#upload_attachments'
       put 'destroy_attachments', to: 'inventory_line_items#destroy_attachments'
@@ -3807,6 +3809,7 @@ Rails.application.routes.draw do
   put 'vendors/bulk_reject', to: 'vendors#bulk_reject'
   put 'vendors/bulk_take_control', to: 'vendors#bulk_take_control'
   get 'vendors/counts', to: 'vendors#counts'
+  get 'vendors/export', to: 'vendors#export'
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
