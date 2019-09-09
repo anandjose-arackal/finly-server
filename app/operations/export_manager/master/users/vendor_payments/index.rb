@@ -15,17 +15,12 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Maste
 
 
   def input
-    ids = params[:ids] || params[:user_ids] || params[:filter_ids]
-    unless ids.is_a?(Array) or ids.blank?
-      ids = ids.split(',')
-    end
     result = BankTransfer::Users::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
     users = result.users.includes(:profile)
-    users = users.where(id: ids) if ids.present?
     users
   end
 

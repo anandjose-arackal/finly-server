@@ -192,6 +192,10 @@ class YesBankVendor < ApplicationRecord
     where pan: pan
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
   # Scopes for ordering ends
 
   before_validation do

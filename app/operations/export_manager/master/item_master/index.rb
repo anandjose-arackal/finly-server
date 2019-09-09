@@ -27,12 +27,12 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
 
 
   def input
-    ids = params[:ids] || params[:item_ids] || params[:filter_ids]
-    unless ids.is_a?(Array) or ids.blank?
-      ids = ids.split(',')
+    result = ItemMaster::Item::Index.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
     end
-    items = user.company.items.includes_for_export
-    items = items.where(id: ids) if ids.present?
+    items = result.items.includes_for_export
     items
   end
 
