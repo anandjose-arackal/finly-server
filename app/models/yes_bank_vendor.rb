@@ -64,7 +64,7 @@ class YesBankVendor < ApplicationRecord
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
-  has_many :tds_rates, through: :vendor_tds_rates#, foreign_key: :tds_rates_list_id
+  has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
 
@@ -190,6 +190,10 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_pan, -> (pan) {
     where pan: pan
+  }
+
+  scope :filter_ids, ->(ids) {
+    where id: ids
   }
 
   # Scopes for ordering ends

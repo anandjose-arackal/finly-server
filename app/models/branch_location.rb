@@ -46,6 +46,8 @@ class BranchLocation < ApplicationRecord
   has_many :budget_rule_branch_location_mappings
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
+  has_many :users
+
   scope :with_ids, -> (ids) { where id: ids }
   scope :include_state, -> { includes :state }
 
