@@ -735,6 +735,10 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
 
   before_save :strip_whitespace
 

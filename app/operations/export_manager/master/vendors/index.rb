@@ -35,12 +35,14 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
                       ]
 
   def input
-    ids = params[:ids] || params[:vendor_ids] || params[:filter_ids]
-    unless ids.is_a?(Array) or ids.blank?
-      ids = ids.split(',')
+    result = ::Vendors::Index.(user, params)
+
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
     end
 
-    vendors = user.company.yes_bank_vendors.
+    vendors = result.vendors.
                             sort_for_index.
                             non_deleted.
                             authorized.
@@ -55,7 +57,6 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
                               gstin_locations.poc_email
                             ')
 
-    vendors = vendors.where(id: ids) if ids.present?
     vendors
   end
 
