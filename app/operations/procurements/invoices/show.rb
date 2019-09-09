@@ -154,6 +154,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
 
     def get_reviewal_chain
+      params[:provider_name] = invoice.get_invoice_provider_name
       op = ::ReviewalManager::ReviewalChain.(user, params)
       op.chain
     end
@@ -183,7 +184,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         #   return true
         # end
       # end
-      invoice.get_reviewers.include?(user)
+      provider_name = invoice.get_invoice_provider_name
+      invoice.get_reviewers(nil, provider_name).include?(user)
     end
   
     def get_invoice_provider_name
