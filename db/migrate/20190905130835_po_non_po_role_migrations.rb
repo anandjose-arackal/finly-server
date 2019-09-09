@@ -1,7 +1,7 @@
 class PoNonPoRoleMigrations < ActiveRecord::Migration[5.2]
   def change
-    copy_roles_to_po_and_non_po_invoice
-    copy_wm_to_po_and_non_po_invoice
+    # copy_roles_to_po_and_non_po_invoice
+    # copy_wm_to_po_and_non_po_invoice
     #migrate_dlrm_provider_name
   end
 
@@ -105,17 +105,5 @@ class PoNonPoRoleMigrations < ActiveRecord::Migration[5.2]
     end
   end
 
-  def migrate_dlrm_provider_name
-    # In batches
-    Invoice.all.find_each do |invoice|
-      # Po Invoice
-      if invoice.procurement.purchase_order.present?
-        invoice.docuement_level_reviewer_mappings.update_all(provider_name: 'PoInvoiceProvider')
-      else
-      # Non Po Invoice
-        invoice.docuement_level_reviewer_mappings.update_all(provider_name: 'NonPoInvoiceProvider')
-      end 
-    end
 
-  end
 end
