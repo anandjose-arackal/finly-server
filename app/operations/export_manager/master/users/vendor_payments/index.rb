@@ -1,0 +1,54 @@
+class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Master::BaseSubscriber
+
+  bus ExportManager::Master::BaseMaster
+  subscribe :vp_users
+  generators ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Synchronous
+  validate :input
+  fields [
+          employee_id: {spreadsheet: true},
+          name: {spreadsheet: true},
+          email: {spreadsheet: true},
+          mobile_number: {spreadsheet: true},
+          status: {spreadsheet: true}
+        ]
+
+
+  def input
+    ids = params[:ids] || params[:user_ids] || params[:filter_ids]
+    unless ids.is_a?(Array) or ids.blank?
+      ids = ids.split(',')
+    end
+    result = BankTransfer::Users::Index.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    users = result.users.includes(:profile)
+    users = users.where(id: ids) if ids.present?
+    users
+  end
+
+
+  def employee_id(user)
+    user.profile&.employee_id.to_s
+  end
+
+  def name(user)
+    user.name
+  end
+
+  def email(user)
+    user.email
+  end
+
+  def mobile_number(user)
+    user.mobile_number
+  end
+
+  def status(user)
+    user.active
+  end
+
+
+end
