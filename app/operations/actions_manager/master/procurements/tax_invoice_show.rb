@@ -96,6 +96,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def return_control
+    provider_name = invoice.get_invoice_provider_name
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if invoice.processing?
