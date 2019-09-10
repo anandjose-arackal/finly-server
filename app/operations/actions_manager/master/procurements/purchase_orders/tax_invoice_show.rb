@@ -21,10 +21,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
   
   def send_mail
-    if invoice.is_non_po_initiating_user?
-      (invoice.approved? || invoice.auto_approved?) &&
-      (user_in_level?) || (document_owner?)
-    end
+    false
   end
   
   def export_items
@@ -148,13 +145,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def download
-    invoice.approved?
+    false
   end
 
   def send_btn
     # (invoice.approved? || invoice.auto_approved?) &&
     # (user_in_level?) || (document_owner?)
-    true
+    false
   end
 
   def export_invoice_items
