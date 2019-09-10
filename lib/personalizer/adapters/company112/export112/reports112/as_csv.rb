@@ -16,7 +16,7 @@ class Personalizer::Adapters::Company112::Export112::Reports112::AsCsv < Persona
         r.expenses.each do |expense|
           data = [
               index,
-              expense.repor_id,
+              expense.report_id,
               expense.user.employee_id,
               sap_id(expense.user),
               expense.user.name,
