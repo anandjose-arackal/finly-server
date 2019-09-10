@@ -1,0 +1,2 @@
+class EventWorkflowsController < ApplicationController
+end
