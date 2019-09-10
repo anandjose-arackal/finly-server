@@ -1045,9 +1045,12 @@ class Invoice < ApplicationRecord
   def self.roles
     # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
     [
-        :invoice_initiator,
-        :invoice_reviewer,
-        :invoice_auditor,
+        :po_invoice_initiator,
+        :po_invoice_reviewer,
+        :po_invoice_auditor,
+        :non_po_invoice_initiator,
+        :non_po_invoice_reviewer,
+        :non_po_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
