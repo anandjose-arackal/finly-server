@@ -212,15 +212,17 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     # Validate of current user is owner of PO
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
-    return if invoice.validate_if_reviewer(user)
+    return if invoice.validate_if_reviewer(user) # For DLRMS reviewers
 
     # Validate  Po invoice auditor role
-    if invoice.purchase_order.present?
+    if invoice.procurement.present? && invoice.procurement.purchase_order.present?
       return if  invoice.validate_if_po_invoice_auditor(user)
+      return if  invoice.validate_if_po_invoice_reviewer(user)
     end
 
-    if invoice.purchase_order.blank?
-      return if validate_if_non_po_invoice_auditor(user)
+    if invoice.procurement.blank? || invoice.procurement.purchase_order.blank?
+      return if invoice.validate_if_non_po_invoice_auditor(user)
+      return if invoice.validate_if_non_po_invoice_reviewer(user)
     end
 
     # Validate Non po invoice auditor role
