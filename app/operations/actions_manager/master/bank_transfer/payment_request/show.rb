@@ -897,7 +897,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def company_credits
-    user.vendor_payments_admin?
+    user.vendor_payments_admin? || bank_payment_request.document_role_users(:creditor).include?(user)
   end
 
   # def credit_threshold_notice
