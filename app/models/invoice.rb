@@ -1166,5 +1166,12 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def get_default_provider
+    if self.procurement.present? && self.procurement.purchase_order.present?
+      "PoInvoiceProvider"
+    else
+      "NonPoInvoiceProvider"
+    end
+  end
 
 end
