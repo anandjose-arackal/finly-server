@@ -211,7 +211,8 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         "TravelRequestBookingProvider" => "manager",
         "PurchaseRequestProvider" =>"purchase_request_reviewer",
         "PurchaseOrderProvider" =>"purchase_order_reviewer",
-        "InvoiceProvider" =>"invoice_reviewer",
+        "NonPoInvoiceProvider" =>"non_po_invoice_reviewer",
+        "PoInvoiceProvider" =>"po_invoice_reviewer",
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
         "PaymentAgreementProvider" => "payment_agreement_reviewer"}

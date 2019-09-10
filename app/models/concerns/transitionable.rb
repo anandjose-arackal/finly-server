@@ -645,11 +645,17 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :goods_receiver, 'goods_receiver'
           # nothing
-        when :invoice_initiator, 'invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id))
-        when :invoice_reviewer, 'invoice_reviewer'
+        when :non_po_invoice_initiator, 'non_po_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id:InwardInvoiceType.id_for(:non_po_invoice)))
+        when :non_po_invoice_reviewer, 'non_po_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
-        when :invoice_auditor, 'invoice_auditor'
+        when :non_po_invoice_auditor, 'non_po_invoice_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
+        when :po_invoice_initiator, 'po_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+        when :po_invoice_reviewer, 'po_invoice_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :po_invoice_auditor, 'po_invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
