@@ -94,7 +94,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def remind_approver
-    if invoice.is_initiating_user?
+    if invoice.is_po_initiating_user?
       invoice.processing? &&
       document_owner?
     end
