@@ -59,9 +59,14 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:purchase_orders] = true
         when UserRole.id_for(:goods_receiver)
           request_types[:grns] = true
-        when UserRole.id_for(:invoice_initiator)
+        # when UserRole.id_for(:invoice_initiator)
+          # request_types[:po_invoices] = true
+          # request_types[:non_po_invoices] = true
+        when UserRole.id_for(:po_invoice_initiator)
           request_types[:po_invoices] = true
+        when UserRole.id_for(:non_po_invoice_initiator)
           request_types[:non_po_invoices] = true
+
         when UserRole.id_for(:bank_payment_request_initiator)
           request_types[:payment_tickets] = true
         when UserRole.id_for(:bank_payment_request_creditor)

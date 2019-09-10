@@ -250,7 +250,8 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved]))
+      ids = self.joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0}).pluck(:id)
+      where id: ids
     end
   }
 
@@ -748,6 +749,38 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
   end
 
+  ##### For Po Invoice and Non PO invoice Initiator roles #####
+  def is_po_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_initiator), self)
+  end
+
+  def is_po_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_reviewer), self)
+  end
+
+  def is_po_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_auditor), self)
+  end
+
+  def is_non_po_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_initiator), self)
+  end
+
+  def is_non_po_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_reviewer), self)
+  end
+
+  def is_non_po_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
+  end
+  ############ End ############
+
   # def can_take_control?
   #   processing?
   # end
@@ -799,8 +832,20 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def validate_if_po_invoice_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:po_invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_non_po_invoice_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:non_po_invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
   def self.role_based_initiator_associated_items(user, role_id, options={})
-    if role_id == UserRole.id_for(:invoice_initiator)
+    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
@@ -815,6 +860,10 @@ class Invoice < ApplicationRecord
   def invoice_bank_account
     user = self.created_by
     return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
+  end
+
+  def get_invoice_provider_name
+    self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
   end
 
   def update_net_amount_value
@@ -970,7 +1019,7 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]

@@ -324,7 +324,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
         params[:reviewal_document] = self.inward_invoice
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
+        params[:provider_name] = self.inward_invoice.get_invoice_provider_name
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]

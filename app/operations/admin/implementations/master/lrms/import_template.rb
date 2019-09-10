@@ -16,6 +16,18 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
       :destroy => 'Destroy'
   })
 
+  PROVIDERS =%w(
+             ReportProvider
+             MoneyRequestProvider
+             TravelRequestProvider
+             TravelRequestBookingProvider
+             PurchaseRequestProvider
+             PurchaseOrderProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
+             BankPaymentRequestProvider
+             )
+
   def valid_request
   end
 
