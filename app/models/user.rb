@@ -306,8 +306,8 @@ class User < ApplicationRecord
     case type
     when 'PurchaseOrderProvider', :PurchaseOrderProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
-    when 'InvoiceProvider', :InvoiceProvider
-      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+    # when 'InvoiceProvider', :InvoiceProvider
+    #   joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
     when 'YesBankVendorProvider', :YesBankVendorProvider
@@ -316,6 +316,10 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:purchase_request_reviewer)).distinct
     when 'PaymentAgreementProvider', :PaymentAgreementProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:payment_agreement_reviewer)).distinct
+    when 'PoInvoiceProvider', :PoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
+    when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
     end
   }
 
@@ -645,10 +649,42 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_unassigned_non_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
   scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_non_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).pluck(:user_id)
       without_id(user_ids)
     end
   }
@@ -1434,6 +1470,30 @@ class User < ApplicationRecord
 
   def is_payment_agreement_auditor?(document=nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
+  end
+
+  def is_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)
+  end
+
+  def is_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_reviewer), document)
+  end
+
+  def is_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_auditor), document)
+  end
+
+  def is_non_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_initiator), document)
+  end
+
+  def is_non_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_reviewer), document)
+  end
+
+  def is_non_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
   end
 
   def access_locked?
