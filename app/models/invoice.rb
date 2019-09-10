@@ -883,6 +883,14 @@ class Invoice < ApplicationRecord
     self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
   end
 
+  def get_default_provider
+    if self.procurement.present? && self.procurement.purchase_order.present?
+      "PoInvoiceProvider"
+    else
+      "NonPoInvoiceProvider"
+    end
+  end
+
   def update_net_amount_value
     # taxable_amt = self.items
     # tds_percentage = self.tds_slab&.tds
@@ -1170,6 +1178,5 @@ class Invoice < ApplicationRecord
       self.agreement_item.update(is_payment_agreement_upcoming_invoice: true)
     end
   end
-
 
 end
