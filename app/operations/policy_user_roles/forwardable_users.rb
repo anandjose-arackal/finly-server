@@ -33,10 +33,19 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
 
     # Validate if all documents are awaiting action from current user
     self.documents.each do |doc|
-      unless doc.get_reviewers.include?(user)
-        add_message :error, "You can only forward documents awaiting approval from you"
-        break
+      if doc.is_a?(Invoice)
+        provider_name = doc.get_invoice_provider_name
+        unless doc.get_reviewers(nil, provider_name).include?(user)
+          add_message :error, "You can only forward documents awaiting approval from you"
+          break
+        end
+      elsif doc.is_a?(PurchaseOrder)
+        unless doc.get_reviewers.include?(user)
+          add_message :error, "You can only forward documents awaiting approval from you"
+          break
+        end
       end
+        
     end
   end
 
@@ -51,7 +60,6 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
     when 'non_po_invoice_provider'
       role_id = UserRole.id_for(:non_po_invoice_reviewer)
     end
-
     self.policy_user_roles = self.policy.policy_user_roles.with_role_id(role_id)
   end
 
