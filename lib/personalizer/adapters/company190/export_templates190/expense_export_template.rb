@@ -40,7 +40,6 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
                     "Cgst amount",
                     "Sgst amount",
                     "Net total amount",
-                    "Gst details",
                     "Gstin location",
                     "Merchant state",
                     "State of expense",
@@ -75,12 +74,12 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << expense.spent_from&.name
         data_arr << expense.expense_tax_type&.name&.humanize
         data_arr << expense.gst_percentage
-        data_arr << expense.gst_type&.name&.humanize
-        data_arr << expense.gst_amount&.value
+        data_arr << expense.gst_type&.name&.humanize&.upcase
+        data_arr << expense.gst_amount&.value&.round(2)
         data_arr << (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '')
         data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
         data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
-        data_arr << expense.amount&.value
+        data_arr << (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2)
         data_arr << expense.gstin_location&.location
         data_arr << expense.gstin_location&.state&.name
         data_arr << expense.state_of_expense&.name
