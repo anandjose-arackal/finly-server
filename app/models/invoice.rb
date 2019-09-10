@@ -837,6 +837,18 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def validate_if_po_invoice_reviewer(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:po_invoice_reviewer), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_non_po_invoice_reviewer(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:non_po_invoice_reviewer), user_id: user.id).present? rescue false
+    end
+  end
+
   def validate_if_non_po_invoice_auditor(user)
     if self.policy.present? && self.policy.policy_user_roles.present?
       self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:non_po_invoice_auditor), user_id: user.id).present? rescue false
