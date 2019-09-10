@@ -1,5 +1,5 @@
 class ApplicationRecord < ActiveRecord::Base
-  include LiquidDroppable
+  include LiquidDroppable, ActiveRecordMaster
 
   self.abstract_class = true
 

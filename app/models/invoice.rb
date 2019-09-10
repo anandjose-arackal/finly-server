@@ -87,13 +87,19 @@
 #
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil, Documentable
-
+  include SoftDeletable, Templatable, Transitionable, MathUtil
   include Sequenced::ActsAsSequenced
-
-  master Documents::Invoices::Master
-
   enum cost_allocation_type: {header: 1, line_items: 2}
+
+  form Documents::Invoices::Form
+  policy Documents::Invoices::Policy
+  state_machine Documents::Invoices::StateMachine
+  resolver :admin, Documents::Invoices::Policy::Scope
+  resolver Documents::Invoices::Policy::Scope
+  system_events :submit, :approve
+  request_events :index, :show
+  event_workflow Documents::Invoices::EventHandlers::Email
+  event_workflow Documents::Invoices::EventHandlers::Export
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
