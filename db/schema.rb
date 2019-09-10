@@ -4923,7 +4923,7 @@ ActiveRecord::Schema.define(version: 2019_09_02_135927) do
   create_table "policy_user_roles", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "user_id"
-    t.integer "user_role_id"
+      t.integer "user_role_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "min_amount", precision: 20, scale: 5, default: "0.0"
