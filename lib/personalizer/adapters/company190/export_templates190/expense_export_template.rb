@@ -18,7 +18,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
       add_message :error, 'You are not authorized to do this'
     end
 
-    case self.user.role_id
+    case self.role_id
       when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
         self.reports = Report.admin_associated_items(user).not_open
