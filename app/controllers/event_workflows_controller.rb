@@ -15,11 +15,19 @@ class EventWorkflowsController < BaseControllers::WebBase
     #end
   end
 
-  def configuration
-    endpoint EventManager::DocumentConfiguration,
+  def documents
+    endpoint EventManager::Documents::Index,
              # representer: {name: 'render', data_key: 'filters'},
              args: [params.permit!.to_h, {"current_user" => current_user}] do |m|
-      m.success {|result| render json: result['filters'], status: 200}
+      m.success {|result| render json: result['documents'], status: 200}
+    end
+  end
+
+  def configuration
+    endpoint EventManager::Documents::Configuration,
+             # representer: {name: 'render', data_key: 'filters'},
+             args: [params.permit!.to_h, {"current_user" => current_user}] do |m|
+      m.success {|result| render json: result['config'], status: 200}
     end
   end
 

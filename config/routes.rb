@@ -3184,6 +3184,7 @@ Rails.application.routes.draw do
   post 'feedback' => 'feedback#create'
 
   scope :event_workflows do
+    get 'documents' => 'event_workflows#documents'
     get 'config' => 'event_workflows#configuration'
   end
   resources :event_workflows
