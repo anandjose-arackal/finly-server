@@ -38,6 +38,10 @@ class Transactions::Authorization
       def user_model(model=User)
         @model ||= model
       end
+
+      def authorized_roles(*list)
+        step Transactions::Authorization::Roles(*list)
+      end
     end
 
     def unauthorized!(options)
@@ -45,8 +49,13 @@ class Transactions::Authorization
       false
     end
 
+    def user_model
+      self.class.user_model
+    end
+
     def authorize_user_presence!(options)
-      return unauthorized! if options['current_user'].nil? or options['current_user'].class.name != user_model
+      return true if user_model.nil?
+      return unauthorized!(options) if options['current_user'].nil? or options['current_user'].class.name != user_model.name
 
       true
     end

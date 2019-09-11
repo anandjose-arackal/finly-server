@@ -18,6 +18,8 @@
 #
 
 class EventWorkflow < ApplicationRecord
+  include UUIDHelper
+
   has_many :file_manager_actions, class_name: 'EventFileManagerAction'
 
   serialize :conditions, JSON
@@ -26,7 +28,7 @@ class EventWorkflow < ApplicationRecord
   belongs_to :company
   belongs_to :event_schedule
 
-  attribute :uuid, MySQLBinUUID::Type.new
-
   enum trigger_type: {schedule: 1, event: 2}
+
+  resolver EventManager::Workflows::Policy::Scope
 end

@@ -1,7 +1,7 @@
 class CreateEventWorkflows < ActiveRecord::Migration[5.2]
   def change
     create_table :event_workflows do |t|
-      t.binary :uuid, index: true, limit: 16
+      t.string :uuid, index: true, limit: 36, null: false
       t.string :name, null: false
       t.text :description, null: false
       t.integer :trigger_type, index: true, null: false

@@ -383,8 +383,6 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     mustermann (1.0.3)
-    mysql-binuuid-rails (1.2.1)
-      activerecord (>= 5)
     mysql2 (0.5.2)
     net-scp (2.0.0)
       net-ssh (>= 2.6.5, < 6.0.0)
@@ -613,6 +611,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.6)
     uniform_notifier (1.12.1)
+    uuidtools (2.1.5)
     vegas (0.1.11)
       rack (>= 1.0.0)
     warden (1.2.8)
@@ -714,7 +713,6 @@ DEPENDENCIES
   maxminddb (~> 0.1.22)
   memory_profiler (~> 0.9.12)
   mocha (~> 1.8.0)
-  mysql-binuuid-rails
   mysql2 (~> 0.5.2)
   nokogiri (~> 1.10.0)
   oj (~> 3.7.6)
@@ -765,6 +763,7 @@ DEPENDENCIES
   trailblazer
   trailblazer-rails
   uglifier (~> 4.1.20)
+  uuidtools
   web-console (~> 3.7.0)
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)

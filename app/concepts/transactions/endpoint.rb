@@ -46,7 +46,7 @@ module Transactions
     class Handlers
       def initialize(controller, options = {}, &block)
         @controller = controller
-        @representer = options[:representer] || {class: nil, name: nil, data: 'model'}
+        @representer = options[:representer] || {class: nil, name: nil, data_key: 'model'}
         @path = options[:path] # || controller&.path
         @block = block
       end
@@ -79,7 +79,10 @@ module Transactions
 
       def created(result)
         unless respond_with_representer(result)
-          controller.render json: {success: true, id: result["model"].id}, status: 200
+          response = {
+              id: (result["model"].respond_to?(:uuid) ? result["model"].uuid : result["model"].id)
+          }
+          controller.render json: response, status: 200
         end
       end
 
@@ -105,6 +108,7 @@ module Transactions
         data = result[data_key]
         return false if representer.blank?
         return false if data.blank?
+        data = data.to_a if data.is_a?(ActiveRecord::Relation)
 
         controller.render json: representer.represent(data).to_json, status: 200
         true

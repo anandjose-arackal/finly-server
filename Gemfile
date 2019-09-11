@@ -35,7 +35,7 @@ gem 'trailblazer-rails'
 gem 'reform'
 gem 'reform-rails'
 gem 'pundit'
-gem 'mysql-binuuid-rails'
+gem 'uuidtools'
 gem 'dry-matcher'
 
 gem 'health-monitor-rails', '~> 8.4.0'

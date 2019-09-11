@@ -17,6 +17,12 @@ class EventWorkflowsController < BaseControllers::WebBase
     # end
   end
 
+  def index
+    endpoint EventManager::Workflows::Index,
+             representer: {class: EventManager::Workflows::Representers::Index, data_key: 'model.index'},
+             args: [params.to_unsafe_h, {"current_user" => current_user}]
+  end
+
   def documents
     endpoint EventManager::Documents::Index,
              # representer: {name: 'render', data_key: 'filters'},

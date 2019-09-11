@@ -4,6 +4,7 @@ class EventManager::Workflows::Representers::Show < Representable::Decorator
   property :uuid
   property :name
   property :description
+  property :model_class
   property :trigger_type
   property :event_schedule do
     property :every
