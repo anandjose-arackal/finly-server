@@ -9,7 +9,7 @@ class EventWorkflowsController < BaseControllers::WebBase
 
   def show
     endpoint EventManager::Workflows::Show,
-             representer: {class: EventManager::Workflows::Representers::Show, data: 'model'},
+             representer: {class: EventManager::Workflows::Representers::Show, data_key: 'model'},
              args: [params.permit!.to_h, {"current_user" => current_user}] #do |m|
     # m.success {|result| render json: EventManager::Workflows::Representers::Show.new(result['model']).as_json, status: 200}
     #end
@@ -25,7 +25,6 @@ class EventWorkflowsController < BaseControllers::WebBase
 
   def configuration
     endpoint EventManager::Documents::Configuration,
-             # representer: {name: 'render', data_key: 'filters'},
              args: [params.permit!.to_h, {"current_user" => current_user}] do |m|
       m.success {|result| render json: result['config'], status: 200}
     end
