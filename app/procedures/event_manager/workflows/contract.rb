@@ -16,6 +16,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
     # lteq_days gteq_days eq_days is_in_days eq_days gteq lteq is_in_the_range)
     params do
       required(:logic_type).filled(inclusion?: %w(condition))
+      required(:field_key).filled
       required(:operator).filled
       required(:values).filled
     end
@@ -97,7 +98,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
       when 'condition'
         e = check_condition_schema(rule)
       else
-        e = {rule: 'is invalid'}
+        e = {rule: ['is invalid']}
       end
       if e.present?
         errors[:rules][index] = e
