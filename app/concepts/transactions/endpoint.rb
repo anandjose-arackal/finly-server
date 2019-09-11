@@ -13,14 +13,14 @@ module Transactions
             match: ->(result) {result.failure? && result["result.model"] && result["result.model"]&.failure?},
             resolve: ->(result) {result}),
         # TODO: we could add unauthorized here.
-        # unauthorized: Dry::Matcher::Case.new(
-        #     match: ->(result) {result.failure? && result["result.policy.default"].failure?}, # FIXME: we might need a &. here ;)
-        #     resolve: ->(result) {result}),
-        unauthenticated: Dry::Matcher::Case.new(
-            match: ->(result) {result.failure? && result["result.policy.default"]&.failure?}, # FIXME: we might need a &. here ;)
+        unauthorized: Dry::Matcher::Case.new(
+            match: ->(result) {result.failure? && (result["result.policy.default"]&.failure? || result['unauthorized'])}, # FIXME: we might need a &. here ;)
             resolve: ->(result) {result}),
+        # unauthenticated: Dry::Matcher::Case.new(
+        #     match: ->(result) {result.failure? && result["result.policy.default"]&.failure?}, # FIXME: we might need a &. here ;)
+        #     resolve: ->(result) {result}),
         invalid: Dry::Matcher::Case.new(
-            match: ->(result) {result.failure?},# && result["result.contract.default"] && result["result.contract.default"].failure?},
+            match: ->(result) {result.failure?}, # && result["result.contract.default"] && result["result.contract.default"].failure?},
             resolve: ->(result) {result})
     )
 
@@ -57,7 +57,8 @@ module Transactions
         ->(m) do
           block.call(m) if block.present?
           m.not_found {|result| not_found(result)}
-          m.unauthenticated {|result| unauthenticated(result)}
+          m.unauthorized {|result| unauthorized(result)}
+          # m.unauthenticated {|result| unauthenticated(result)}
           m.created {|result| created(result)}
           m.success {|result| success(result)}
           m.invalid {|result| invalid(result)}
@@ -66,6 +67,10 @@ module Transactions
 
       def not_found(result)
         controller.head 404
+      end
+
+      def unauthorized(result)
+        controller.head 401
       end
 
       def unauthenticated(result)

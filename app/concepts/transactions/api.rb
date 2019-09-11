@@ -3,6 +3,9 @@ class Transactions::API < Trailblazer::Operation
   include Model
   include Transactions::Messages
   include Transactions::Schema::DSL
+  include Transactions::Authorization::DSL
+
+  # Step options: :before, :after, :replace, :delete, :override
 
   def self.AssignModelUser(key: :user)
     -> (options) do
