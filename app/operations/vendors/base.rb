@@ -80,6 +80,7 @@ class Vendors::Base < BaseOperation
 
   def validate_gstin(vendor_params)
     business_name = vendor_params[:business_name]
+    return if vendor_params[:gstin_locations_attributes].blank?
     vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
       gstin = gstin_location[:gstin]
 
