@@ -30,13 +30,13 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def submit
-    if invoice.is_initiating_user?
+    if invoice.is_po_initiating_user?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def reject
-    if invoice.is_reviewing_user? || admin_has_taken_control?
+    if invoice.is_po_reviewing_user? || admin_has_taken_control?
       invoice.processing? && user_in_level?
     end
   end
@@ -53,7 +53,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def approve
-    if invoice.is_reviewing_user? || admin_has_taken_control?
+    if invoice.is_po_reviewing_user? || admin_has_taken_control?
       invoice.processing? && user_in_level?
     end
   end
@@ -109,11 +109,11 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
 
   def remind
-    invoice.is_initiating_user? and invoice.processing? and document_owner?
+    invoice.is_po_initiating_user? and invoice.processing? and document_owner?
   end
 
   def retract
-    invoice.is_initiating_user? and invoice.processing? and document_owner?
+    invoice.is_po_initiating_user? and invoice.processing? and document_owner?
   end
 
   def remind_approver
