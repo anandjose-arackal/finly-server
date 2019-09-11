@@ -5,8 +5,8 @@ module Forms::Builders::Filters
   end
 
   module ClassMethods
-    def filters(company, user)
-      Forms::Builders::Filters::Build(self, company: company, user: user)
+    def filters(user)
+      Forms::Builders::Filters::Build(self, company: user.company, user: user)
     end
   end
 

@@ -3183,6 +3183,9 @@ Rails.application.routes.draw do
 
   post 'feedback' => 'feedback#create'
 
+  scope :event_workflows do
+    get 'config' => 'event_workflows#configuration'
+  end
   resources :event_workflows
 
   # Cards Module APIS
