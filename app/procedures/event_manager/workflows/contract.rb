@@ -29,6 +29,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
     @condition_schema ||= EventManager::Workflows::Contract::ConditionSchema.new
   end
 
+  property :uuid
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}
   property :model_class, validates: {presence: true, inclusion: {in: Documents::Master.list}}
