@@ -36,12 +36,45 @@ class EventManager::Workflows::Contract < Transactions::Contract
   property :user_id, validates: {presence: true}
   property :company_id, validates: {presence: true}
   property :conditions
+  property :trigger_type, validates: {presence: true, inclusion: {in: EventWorkflow.trigger_types.values}}
+  property :event_schedule, populate_if_empty: EventSchedule do
+    property :every, validates: {presence: true, inclusion: {in: EventSchedule.everies.values}}
+    property :hour, validates: {presence: true, inclusion: {in: (1..24).to_a}}
+    property :minute, validates: {presence: true, inclusion: {in: [0, 30]}}
+    property :day_of_the_week, validates: {inclusion: {in: ([nil, 0] + EventSchedule.day_of_the_weeks.values)}}
+    property :day_of_the_month, validates: {inclusion: {in: ([nil, 0] + (1..30).to_a)}}
+  end
   collection :file_manager_actions, populate_if_empty: EventFileManagerAction do
     property :export_template_id, validates: {presence: true}
   end
 
-  validate :atleast_one_action
+  # validate :atleast_one_action
   validate :conditions_schema_validation
+  validate :event_schedule_presence_validation
+  validate :event_schedule_validation
+
+  def event_schedule_presence_validation
+    return unless trigger_type == EventWorkflow.trigger_types['schedule']
+
+    errors.add :event_schedule, 'is not set' if event_schedule.blank?
+  end
+
+  def event_schedule_validation
+    return unless trigger_type == EventWorkflow.trigger_types['schedule']
+    return if event_schedule.nil?
+    case event_schedule.every
+    when EventSchedule.everies['day']
+
+    when EventSchedule.everies['week']
+      if event_schedule.day_of_the_week.blank?
+        errors.add :event_schedule, {day_of_the_week: 'cannot be blank'}
+      end
+    when EventSchedule.everies['month']
+      if event_schedule.day_of_the_month.blank?
+        errors.add :event_schedule, {day_of_the_month: 'cannot be blank'}
+      end
+    end
+  end
 
   def conditions_schema_validation
     errors = check_group_schema(self.conditions)
@@ -56,7 +89,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
     has_errors = false
     errors = {rules: {}}
     result[:rules].each_with_index do |rule, index|
-      type = rule[:logic_type]
+      type = rule['logic_type'] || rule[:logic_type]
       case type
       when 'group'
         e = check_group_schema(rule)
@@ -80,10 +113,10 @@ class EventManager::Workflows::Contract < Transactions::Contract
     nil
   end
 
-  def atleast_one_action
-    if file_manager_actions.blank?
-      errors.add :action, 'is not defined'
-      return
-    end
-  end
+  # def atleast_one_action
+  #   if file_manager_actions.blank?
+  #     errors.add :base, 'Action is not defined'
+  #     return
+  #   end
+  # end
 end

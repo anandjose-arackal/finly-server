@@ -25,8 +25,8 @@
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
 #  expense_tax_type_id    :integer
-#  gst_percentage         :decimal(10, )
-#  tds_percentage         :decimal(10, )
+#  gst_percentage         :decimal(10, 5)
+#  tds_percentage         :decimal(10, 5)
 #  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer

@@ -21,6 +21,7 @@
 #  address                          :text(65535)
 #  cash_money_requests_enabled      :boolean          default(TRUE)
 #  auto_retry_payment               :boolean          default(FALSE)
+#  legal_entity_name                :string(255)
 #
 
 class CompanyConfiguration < ApplicationRecord
