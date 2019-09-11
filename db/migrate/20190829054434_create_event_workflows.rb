@@ -3,6 +3,7 @@ class CreateEventWorkflows < ActiveRecord::Migration[5.2]
     create_table :event_workflows do |t|
       t.string :name, null: false
       t.text :description, null: false
+      t.text :conditions
       t.string :model_class, index: true, null: false
       t.string :trigger_type, index: true, null: false
       t.string :event_key, index: true

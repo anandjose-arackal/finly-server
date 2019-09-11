@@ -18,6 +18,8 @@
 class EventWorkflow < ApplicationRecord
   has_many :file_manager_actions, class_name: 'EventFileManagerAction'
 
+  serialize :conditions, JSON
+
   belongs_to :user
   belongs_to :company
 end

@@ -14,6 +14,10 @@ class EventManager::Workflows::Policy < ApplicationPolicy
     # @user.permissions.expenses.create?
   end
 
+  def show?
+    true
+  end
+
   def update?
     @record.user == @user
   end
