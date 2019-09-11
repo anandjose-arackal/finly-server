@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_09_145823) do
+ActiveRecord::Schema.define(version: 2019_09_11_154724) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5721,6 +5721,8 @@ ActiveRecord::Schema.define(version: 2019_09_09_145823) do
     t.integer "proforma_advance"
     t.integer "total_proforma_advance"
     t.integer "template_invoice_id"
+    t.integer "notice_period"
+    t.decimal "square_feel", precision: 10, scale: 5
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"

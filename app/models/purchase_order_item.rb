@@ -21,9 +21,9 @@
 #  comment                  :text(65535)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
-#  delivered                :integer          default(0)
-#  accepted                 :integer          default(0)
-#  rejected                 :integer          default(0)
+#  delivered                :decimal(20, 5)   default(0.0)
+#  accepted                 :decimal(20, 5)   default(0.0)
+#  rejected                 :decimal(20, 5)   default(0.0)
 #  category_id              :integer
 #  cost_center_id           :integer
 #  is_deleted               :boolean          default(FALSE), not null
