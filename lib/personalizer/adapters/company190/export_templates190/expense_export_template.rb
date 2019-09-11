@@ -8,8 +8,31 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
   end
 
   def init
-    users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
+
+    if params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
+    end
+
+    if self.role_id.blank?
+      add_message :error, 'You are not authorized to do this'
+    end
+
+    case self.user.role_id
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+      if self.user.company_admin? || self.user.auditor?
+        self.reports = Report.admin_associated_items(user).not_open
+      elsif user.policy_admin?
+        # todo Take care of policy admins
+        self.reports = Report.admin_associated_items(user).not_open
+      end
+      when UserRole.id_for(:manager)
+      self.reports = Report.reviewer_associated_items(user).not_open
+      when UserRole.id_for(:finance_manager)
+      self.reports = Report.finance_associated_items(user).not_open
+    end
+
+    self.reports = reports.processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = ["Expense ID",
