@@ -142,9 +142,9 @@ class Forms::Definitions::Property < Forms::Definitions::Section
 
       method = attributes[:enum]&.second
       values = model.send(method)
-      values.each do |name, value|
-
-      end
+      choices = []
+      values.each { |name, value| choices << {name: name.humanize, value: value} }
+      choices
     end
   end
 
