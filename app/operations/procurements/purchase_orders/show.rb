@@ -26,7 +26,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations,
+                  :payment_ticket_policies
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -53,6 +54,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       # params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.policies = Policy::VendorPayments::Index.(purchase_order.user, params).policies rescue Policy.none
+
+      # show applicable payment ticket policies for the user to pay advance 
+      params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
+      result = Policy::VendorPayments::Index.(user, params)
+      self.payment_ticket_policies = result.policies rescue Policy.none
+
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
 

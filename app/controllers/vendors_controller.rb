@@ -129,4 +129,9 @@ class VendorsController < BaseControllers::WebBase
     @result = Vendors::Counts.(current_user, params)
     respond
   end
+
+  def export
+    @result = Vendors::Exports::Generate.(current_user, params)
+    respond
+  end
 end

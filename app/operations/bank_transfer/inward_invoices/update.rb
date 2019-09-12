@@ -101,11 +101,14 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     else
       if self.inward_invoice_params[:advance_amount_required].present?
         self.inward_invoice_params[:advance_amount_required] = false
-        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = 0
       end
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
+      if params[:invoice][:balance_amount_attributes][:value].to_i < 0
+        add_message :error, "Balance due amount cannot be less than zero"
+      end
       if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
@@ -114,9 +117,13 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       # the below line is in the case of one PO having multiple line items of the same inventory item
       processed_item_ids = []
       self.inward_invoice_params[:invoice_items_attributes].each do |item|
-        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(inventory_line_item_id: item[:inventory_line_item_id])
-
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: item[:purchase_order_item_id])
+        next if po_item.blank? # temp workaround
         item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
+
+        unless user.company.feature_subscription.grn_enabled
+          item_q = po_item.quantity
+        end
 
         if item_q < item[:quantity].to_i
           add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
@@ -317,7 +324,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
         params[:reviewal_document] = self.inward_invoice
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
+        params[:provider_name] = self.inward_invoice.get_invoice_provider_name
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]

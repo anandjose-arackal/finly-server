@@ -70,18 +70,6 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
       end
     end
 
-    premise :check_for_invalid_payment_statuses do
-      rule 'Payment cannot be in completed state' do
-
-      end
-
-      rule 'Payment cannot be in '
-    end
-
-  end
-
-  section 'Inside Bank account adapter' do
-
   end
 
 end

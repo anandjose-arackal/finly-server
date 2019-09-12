@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-    :take_control, :return_control, :forward, :mark_vendor_confirmed
+    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment
   ]
 
   def initialize(user = nil, params = {})
@@ -17,6 +17,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     end
     self.procurement = result.procurement
     self.purchase_order = result.purchase_order
+  end
+
+  def make_payment
+    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?) && user.is_bank_payment_request_initiator?(purchase_order) && purchase_order.advance_can_be_paid?
   end
 
   def mark_send_to_vendor
@@ -83,29 +87,32 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def approve
-    ############# Reviewer logic start #########################
+    # ############# Reviewer logic start #########################
+    # if purchase_order.is_reviewing_user? || admin_has_taken_control?
+    #   if purchase_order.processing?
+    #     last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
+    #     if (purchase_order.get_reviewers.include?(user))
+    #       if purchase_order.action_users(:approve).include?(user)
+    #         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:approve)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:submit)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:take_control)
+    #           return true
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
+    # ############# Reviewer logic end #########################
     if purchase_order.is_reviewing_user? || admin_has_taken_control?
-      if purchase_order.processing?
-        last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
-        if (purchase_order.get_reviewers.include?(user))
-          if purchase_order.action_users(:approve).include?(user)
-            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:approve)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:submit)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:take_control)
-              return true
-            end
-          end
-        end
-      end
+      purchase_order.processing? && user_in_level?
     end
-    ############# Reviewer logic end #########################
   end
 
   def remind
@@ -199,7 +206,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def download
-    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
+    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.closed?)
   end
 
   def send_btn

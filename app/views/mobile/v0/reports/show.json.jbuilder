@@ -43,3 +43,6 @@ json.violations @result.violations
 json.custom_fields do
   json.array! @result.report.custom_fields
 end
+
+json.tax_rates @result.tax_rates
+json.state_codes @result.gst_state_codes

@@ -105,6 +105,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              invoice_type: {spreadsheet: true},
              invoice_no: {spreadsheet: true},
              invoice_date: {spreadsheet: true},
+             created_by: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
@@ -136,9 +137,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
-             third_level_approver: {spreadsheet: true},
-             fourth_level_approver: {spreadsheet: true},
-             invoice_net_payable_amount: {spreadsheet: true}
+             advance_amount: {spreadsheet: true},
+             invoice_net_payable_amount: {spreadsheet: true},
+             approvers: {spreadsheet: true},
+             finance_approved_date: {spreadsheet: true}
          ]
 
   def input
@@ -152,7 +154,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab, {dlrms: [:reviewer,:taken_control_by, :forwarded_by]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:created_by, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -214,11 +216,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   # end
 
   def transaction_period_from(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def transaction_period_to(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def invoice_status(invoice_line_item)
@@ -321,35 +323,21 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
-  def third_level_approver(invoice_line_item)
-    approvers = invoice_line_item.parent.dlrms.map do |dlrm|
-      next if dlrm.level_number != 3
-      taken_control_by = forwarded_by = reviewer = nil
-      taken_control_by = dlrm.taken_control_by
-      forwarded_by = dlrm.forwarded_by
-      reviewer = dlrm.reviewer
-      if taken_control_by.present?
-        taken_control_by.name
-      elsif  forwarded_by.present?
-        forwarded_by.name
-      elsif reviewer.present?
-        reviewer.name
-      end
-    end
-    approvers.reject { |e| e.to_s.empty? }.join(", ")
+  def advance_amount(invoice_line_item)
+    value = invoice_line_item.parent&.advance_amount || 0
+    precision_value(value)
   end
 
-  def fourth_level_approver(invoice_line_item)
+  def approvers(invoice_line_item)
     approvers = invoice_line_item.parent.dlrms.map do |dlrm|
-      next if dlrm.level_number != 4
-      taken_control_by = forwarded_by = reviewer = nil
+      taken_control_by = forwarded_to = reviewer = nil
       taken_control_by = dlrm.taken_control_by
-      forwarded_by = dlrm.forwarded_by
+      forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
-      if taken_control_by.present?
+      if forwarded_to.present?
+        forwarded_to.name
+      elsif taken_control_by.present?
         taken_control_by.name
-      elsif  forwarded_by.present?
-        forwarded_by.name
       elsif reviewer.present?
         reviewer.name
       end
@@ -359,6 +347,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def invoice_net_payable_amount(invoice_line_item)
     invoice_line_item.parent&.balance_due&.value || 0
+  end
+
+  def finance_approved_date(invoice_line_item)
+    invoice_line_item.parent&.approved_at&.strftime("%d-%m-%y")
+  end
+
+  def created_by(invoice_line_item)
+    invoice_line_item.parent&.created_by&.name
   end
 
 end

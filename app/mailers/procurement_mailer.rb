@@ -22,7 +22,7 @@ class ProcurementMailer < ApplicationMailer
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
-        url = attachment.file.path
+        url = attachment.file.url
         attachments[attachment.file_file_name] = {
             content: open(url).read
         }
@@ -100,35 +100,35 @@ class ProcurementMailer < ApplicationMailer
   def purchase_order_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_approval'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_approval'
     end
   end
 
   def purchase_order_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_po'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_po'
     end
   end
 
   def purchase_order_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_take_control'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_take_control'
     end
   end
 
   def purchase_order_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_reject'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_reject'
     end
   end
 
   def invoice_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_invoices'
     end
   end
 
@@ -136,28 +136,47 @@ class ProcurementMailer < ApplicationMailer
   def invoice_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_invoices'
     end
   end
 
   def invoice_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_take_control_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_invoices'
     end
   end
 
   def invoice_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_reject_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_invoices'
     end
   end
 
   def invoices_bulk_import(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_import_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_import_invoices'
     end
+  end
+
+  def send_awaiting_approval_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_approval'
+    end
+  end
+
+  def notify_vendor(presenter)
+    @data = presenter
+    mail to: @data.to, subject: @data.subject, template_name: 'vendor_template_invoice'
+  end
+
+  def send_submit_reminder_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
+    end    
   end
 end

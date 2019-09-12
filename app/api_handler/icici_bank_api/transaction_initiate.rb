@@ -29,7 +29,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def init
-    self.company = self.payment.company
+    self.company = self.payment.payment_order.company
     # self.company = Company.second
     super # so that the variables are initialized from the config file
     self.icici_bank_transaction = self.payment.reference_resource
@@ -42,8 +42,10 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def raw_api_params
-    remarks = self.payment.note.blank? ? "Test note" : self.payment.note
+    remarks = self.payment.note.blank? ? "Null" : self.payment.note
+    remarks = remarks.gsub(/[^0-9A-Za-z]/, '') # this is to remove all special characters from the remarks attribute
     payee_name = self.receiving_account.account_owner.business_name
+
     {
         AGGRID: self.company_details["AGGR_ID"],
         AGGRNAME: self.company_details["AGGR_NAME"],
@@ -54,7 +56,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
         CREDITACC: self.receiving_account.account_number,
         # CREDITACC: "000405002777",
-        IFSC: self.receiving_account.ifsc,
+        IFSC: retrieve_ifsc,
         # IFSC: "DLXB0000092",
         # IFSC: "ICIC0000011",
         AMOUNT: self.icici_bank_transaction.amount.value.to_f.to_s,
@@ -62,7 +64,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         CURRENCY: self.icici_bank_transaction.amount.currency.country_code,
         # CURRENCY: "INR",
         # TXNTYPE: "OWN",
-        TXNTYPE: self.icici_bank_transaction.transfer_type,
+        TXNTYPE: retrieve_transaction_type,
         # TXNTYPE: "OWN", # "RTG", "RGS"
         PAYEENAME: payee_name,
         # PAYEENAME: "Sreeram",
@@ -161,6 +163,22 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
     end
+  end
+
+  private
+
+  def retrieve_ifsc
+    if self.icici_bank_transaction.receiving_account&.ifsc.to_s.include?("ICIC")
+      return "ICIC0000011"
+    end
+    return self.icici_bank_transaction.receiving_account&.ifsc
+  end
+
+  def retrieve_transaction_type
+    if self.icici_bank_transaction.receiving_account&.ifsc.to_s.include?("ICIC")
+      return "TPA"
+    end
+    return self.icici_bank_transaction.transfer_type
   end
 
 end

@@ -57,7 +57,17 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35,
+      po_invoice_initiator: 36,
+      po_invoice_reviewer: 37,
+      po_invoice_auditor: 38, 
+      non_po_invoice_initiator: 39,
+      non_po_invoice_reviewer: 40,
+      non_po_invoice_auditor: 41
+
   }
   ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 
@@ -104,12 +114,15 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35
   }
 
 
   # This is used for segregating VP specific policies
-  # Do not put user specific roles like :initiator, :creaditor, :admin, :reviewer here
+  # Do not put user specific roles like :initiator, :creditor, :admin, :reviewer here
   VP_ROLES = {
     purchase_request_initiator: 10,
     purchase_request_reviewer: 11,
@@ -129,7 +142,13 @@ class UserRole < ApplicationRecord
     vendor_manager: 25,
     bank_payment_request_auditor: 26,
     budget_manager: 27,
-    non_po_initiator: 28
+    non_po_initiator: 28,
+    po_invoice_initiator: 36,
+    po_invoice_reviewer: 37,
+    po_invoice_auditor: 38, 
+    non_po_invoice_initiator: 39,
+    non_po_invoice_reviewer: 40,
+    non_po_invoice_auditor: 41
   }
 
   def self.seed_data

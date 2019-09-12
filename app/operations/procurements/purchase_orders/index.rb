@@ -56,8 +56,16 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_cost_center_id
     has_scope :filter_location_id
     has_scope :filter_department_id
+    has_scope :filter_pr_number
 
     has_scope :filter_awaiting_approval
+    has_scope :show_only_po_which_have_advances
+    has_scope :show_only_po_which_are_forwarded
+
+    # Sorting
+    has_scope :sort_po_number
+    has_scope :sort_po_name
+    # has_scope :sort_amount
 
     def init
       self.purchase_orders = params[:purchase_orders]

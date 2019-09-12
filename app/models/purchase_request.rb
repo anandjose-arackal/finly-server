@@ -12,14 +12,15 @@
 #  submitted_at               :datetime
 #  approved_at                :datetime
 #  order_number               :string(255)
-#  reject_note                :text(65535)
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
+#  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
+#  cost_allocation_items      :boolean          not null
 #
 
 class PurchaseRequest < ApplicationRecord
@@ -44,9 +45,10 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
-
-  validates :description, :location, :department, :policy, presence: true
+  validates :description, :location, :policy, presence: true
+  validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
@@ -56,7 +58,13 @@ class PurchaseRequest < ApplicationRecord
 
 
 
-  scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
+  scope :search_by_email, -> (email) {
+    user = RequestStore.store[:current_user]
+    if user.present?
+      # where creator_id: User.find_by(email: email)&.id
+      where creator_id: user.company.users.find_by_email(email)&.id
+    end
+  }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}
@@ -144,6 +152,35 @@ class PurchaseRequest < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+  # Sorting
+  scope :sort_order_number, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.order_number #{type}")
+    end
+  }
+
+  scope :sort_description, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.description #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.created_at #{type}")
+    end
+  }
+
+  # scope :sort_amount, -> (type){
+  #   type = type&.strip&.upcase
+  #   if type && ['ASC', 'DESC'].include?(type)
+  #     includes(:total_amount).reorder("amounts.value #{type}")
+  #   end
+  # }
+
   def add_company
     self.company_id = self.creator.company_id
   end
@@ -162,7 +199,10 @@ class PurchaseRequest < ApplicationRecord
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
       total_cost: self&.total_amount&.value,
       controlling_user: self.get_reviewers&.first&.name,
-      rejection_note: self.reject_note
+      rejection_note: self.reject_note,
+      department: self.department&.name,
+      cost_center: self.cost_center&.name,
+      cost_allocation_items: cost_allocation_items
     }
   end
 
@@ -361,6 +401,10 @@ class PurchaseRequest < ApplicationRecord
       end
     end
     return department_id
+  end
+
+  def cost_allocation_items?
+    self.cost_allocation_items
   end
 
 end

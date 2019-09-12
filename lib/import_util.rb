@@ -1,4 +1,5 @@
 require 'roo'
+require 'saxlsx'
 
 class ImportUtil
 
@@ -45,8 +46,8 @@ class ImportUtil
         unless j >= row_length
           val = row[j]
         end
+        val = cleanup_account_number(key, val)
         val = cleanup_email(val)
-        # val = cleanup_account_number(key, val)
         map[key] = val
       end
       add_line = false
@@ -59,6 +60,35 @@ class ImportUtil
         end
       end
       list << map if add_line
+    end
+    list
+  end
+
+  def self.load_spreadsheet_quickly(file, header = [], options)
+    return unless header.nil? or header.is_a?(Array)
+
+    if file.is_a?(File)
+      file_name = File.extname(file)
+    else
+      file_name = File.extname(file.original_filename)
+    end
+
+    case file_name
+    when '.xlsx' then
+      # do nothing for now
+    else
+      raise "Please upload a '.xlsx' file. Unknown file type: #{file.original_filename}"
+    end
+
+    list = []
+    Saxlsx::Workbook.open file.path do |excel|
+      sheet = excel.sheets.first
+      sheet.rows.each_with_index do |row, index|
+        next if index == 0
+        new_hash = header.zip(row).to_h
+        new_hash.update(new_hash) { |key, value| val = cleanup_account_number_quickly(key, value); cleanup_email(val)}
+        list << new_hash
+      end
     end
     list
   end
@@ -98,8 +128,20 @@ class ImportUtil
     unless key.to_s.include?("account_number")
       return raw_value
     end
-    raw_value = raw_value.to_i.to_s
-    return raw_value
+    if raw_value.is_a?(Float) || raw_value.is_a?(Integer)
+      raw_value.to_i.to_s
+    else
+      raw_value.to_s.strip
+    end
+  end
+
+  def self.cleanup_account_number_quickly(key, raw_value)
+    # bank account validation should happen in respective operations
+    unless key.to_s.include?("account_number")
+      return raw_value
+    else
+      raw_value = raw_value.to_s.strip
+    end
   end
 
 end

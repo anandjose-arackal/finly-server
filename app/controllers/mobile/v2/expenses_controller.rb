@@ -37,7 +37,8 @@ class Mobile::V2::ExpensesController < BaseControllers::MobileBase
         @result = Reports::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'mobile/v2/reports/show'
       else
-        respond render: 'mobile/v0/shared/success'
+        @result = Expense::Show.(@result.user, expense_id: @result.expense.id, view: params[:view])
+        respond render: 'mobile/v2/expenses/show'
       end
     else
       respond

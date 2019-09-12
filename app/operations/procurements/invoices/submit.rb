@@ -43,7 +43,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-        reviewal_document: self.invoice
+        reviewal_document: self.invoice,
+        provider_name: self.invoice.get_invoice_provider_name
     })
 
     unless dlrm_validation_op.success?
@@ -55,6 +56,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
@@ -80,6 +82,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   def post_process
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
+    # Email to vendor that invoice is generated when the invoice is approved/auto_approved
+    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
   end
 end

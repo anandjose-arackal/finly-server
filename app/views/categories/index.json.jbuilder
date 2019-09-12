@@ -3,11 +3,14 @@ json.categories do
     json.id category.id
     json.name category.name
     json.gl_code category.gl_code
+    json.gst_enabled category.gst_applicable
+    json.tds_enabled category.tds_applicable
     if category.children.present?
       json.sub_categories do
         json.array!(category.children) do |sub_category|
           json.id sub_category.id
           json.name sub_category.name
+          json.gst_enabled category.gst_applicable
           json.expense_management sub_category.expense_management
           json.vendor_payments sub_category.vendor_payments
           json.inward_invoice_line_items sub_category.inward_invoice_line_items

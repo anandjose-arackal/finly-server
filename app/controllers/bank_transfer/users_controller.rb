@@ -45,4 +45,9 @@ class BankTransfer::UsersController < BaseControllers::WebBase
     respond
   end
 
+  def export
+    @result = BankTransfer::Users::Exports::Generate.(current_user, params)
+    respond
+  end
+
 end

@@ -26,6 +26,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
@@ -44,6 +45,8 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
 
   def post_process
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
+    # Email to vendor that invoice is generated when the invoice is approved
+    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
   end
 end

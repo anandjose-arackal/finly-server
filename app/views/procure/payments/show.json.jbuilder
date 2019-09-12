@@ -1,4 +1,5 @@
 payment = @result.payment
+parent = payment.parent rescue nil
 json.owner_name payment.receiving_account&.account_owner&.name
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
@@ -121,10 +122,26 @@ if payment.invoice.present?
 else
   json.raw_amount precision_value payment.amount_value
   json.original_amount precision_value payment.amount_value
+  if parent.present?
+    case parent.class.name
+    when 'PurchaseOrder'
+      json.original_amount precision_value parent.total_adv_amount
+    end
+  end
   json.invoice do
     json.net_amount precision_value payment.amount&.value
     json.roundoff_amount 0
     json.balance_due payment.amount&.value
+    if parent.present?
+      case parent.class.name
+      when 'PurchaseOrder'
+        json.item_amounts_total (parent.total_before_tax&.value + parent.discount_amount&.value).round(2) rescue 0
+        json.tds_amount parent.advance_tds_amount&.value rescue 0
+        json.net_payable_amount parent.balance_amount&.value
+        json.paid_amount parent.advance_payments.successful.joins(:amount).sum(:value)
+        json.remaining_amount (parent.balance_amount&.value.to_f - parent.advance_payments.successful.joins(:amount).sum(:value))
+      end
+    end
   end
 end
 

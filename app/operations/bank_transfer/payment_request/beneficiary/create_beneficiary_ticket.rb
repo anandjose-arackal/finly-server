@@ -14,7 +14,15 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type
+
+	def personalizer
+		{
+				validate: {
+						before: Personalizer::Process.new([:bank_transfer, :payment_request, :beneficiary, :create_beneficiary_ticket], :validate, self)
+				}
+		}
+	end
 
 	def pre_validate
 	    if user.blank?
@@ -38,7 +46,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	add_message :error, 'Please specify a scheduled date for your payment ticket.'
 	    	return
 	    end
-
 	    valid_date = Date.parse(params[:scheduled_at]) rescue false 
 	    unless valid_date
 	        add_message :error, 'Invalid date provided'
@@ -57,7 +64,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
-	    self.policy = current_company.policies.find_by(id: policy_id)
+	    self.policy = user.company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -71,6 +78,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
+		self.from_payment_agreement = params[:created_from_payment_agreement]
+		self.agreement_type = params[:agreement_type]
+		self.security_deposit = user.company.security_deposits.find_by_id(params[:document_id]) if self.agreement_type == 'security_deposit'
+		self.beneficiary_payment = user.company.beneficiary_payments.find_by_id(params[:document_id]) if self.agreement_type == 'beneficiary'
 		end
 
 
@@ -93,7 +104,15 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				return
 	    end
 
-	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
+	    if from_payment_agreement
+	    	if self.beneficiary_payment.blank? && self.security_deposit.blank?
+	    		add_message :error, 'Document not found, unable to process'
+	    		return
+	    	end
+	    end
+
+	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes, from_payment_agreement: self.from_payment_agreement})
+
 
 	    if validate_operation.success?
 	    	# total of all individual payments
@@ -120,7 +139,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Create Document Level Reviewer Mapping
 	    # For setting level specific reviewers from reviewal chain for a document
 	    params[:reviewal_document] = self.bank_payment_request.reload
-
 	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
 	    unless document_reviewer_mappings_op.success?
 	      self.bank_payment_request.destroy
@@ -130,8 +148,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-
+      update_status if self.from_payment_agreement # Setting up this status for payment agreement
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
 	end
 
 	def success
@@ -221,4 +239,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		end
 		initiating_account
 	end
+
+  def update_status
+    self.security_deposit.update(status_id: SecurityDepositStatus.id_for(:processing)) if self.agreement_type == 'security_deposit'
+    self.beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:processing)) if self.agreement_type == 'beneficiary'
+  end
 end

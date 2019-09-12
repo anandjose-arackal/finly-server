@@ -44,22 +44,23 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
           level_name = row[lower_index+1].to_s
           level_number = row[lower_index+2].to_i
           reviewer_id = clean_up_data row[lower_index+3].to_s
-          threshold = row[lower_index+4].to_i
-          if level_name.present? && level_number.present? && reviewer_id.present? && threshold.present?
+          min = row[lower_index+4].to_i
+          max = (row[lower_index+5].present? ? row[lower_index+5].to_i : nil)
+          if level_name.present? && level_number.present? && reviewer_id.present?
             self.level = get_level(level_name, level_number, provider)
             reviewer = company.users.where(mobile_number: reviewer_id).or(company.users.where(email: reviewer_id)).first
             if reviewer
               if reviewer.policies.pluck(:id).exclude?(policy.id)
                 self.policy.user_mapping.create(user: reviewer)
               end
-              mapping_exist = self.level.level_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer.id, threshold: threshold).first
-              self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: threshold) unless mapping_exist.present?
+              mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer.id, min: min, max: max).first
+              self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, min: min, max: max) unless mapping_exist.present?
               result_hash[name][i] = 'Reviewer Mapping created'
             else
               result_hash[name][i] = 'Reviewer not found'
             end
           end
-          lower_index += 4
+          lower_index += 5
         end
       end
     end
@@ -156,7 +157,7 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
 
   def create_response_csv
     file = Tempfile.new("bulk_import_lrm_result.xls")
-    workbook  = ::WriteXLSX.new(file_name)
+    workbook  = ::WriteXLSX.new(file)
     sheets.each_with_pagename do |name, sheet|
       worksheet = workbook.add_worksheet(name)
 

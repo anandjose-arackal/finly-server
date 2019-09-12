@@ -1,5 +1,9 @@
 class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :purchase_order
+
+  def pre_validate
+  end
+
   def init
     inward_document_id = params[:id] || params[:inward_document_id]
     self.inward_document = InwardDocument.find_by id: inward_document_id
@@ -35,7 +39,7 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
 
   def validate_presence
     if self.inward_document.blank? || (inward_document.company_id != user.company_id)
-      add_message :error, 'GRN not found'
+      add_message :error, 'Receipt Note not found'
       return false
     end
     true
