@@ -10,6 +10,10 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   end
 
+  def authorized_user_types
+    []
+  end
+
   def pre_validate
     unless user.present?
       add_message :error, 'User not found'
@@ -26,10 +30,10 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       return
     end
 
-    # unless user.company.id == 137
-    #   add_message :error, 'Tally is not configured for your company'
-    #   return
-    # end
+    unless user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin))
+      add_message :error, 'You are not authorized to perform this action'
+      return
+    end
   end
 
   def process
