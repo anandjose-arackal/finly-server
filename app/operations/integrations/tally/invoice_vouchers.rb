@@ -103,10 +103,10 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
         add_item_gst_ledgers voucher, invoice, item, configuration
       end
 
-      # unless voucher.valid?
-      #   add_message :error, voucher.errors.full_messages
-      #   return
-      # end
+      unless voucher.valid?
+        add_message :error, voucher.errors.full_messages
+        return
+      end
     end
     file_data = generator.as_xml
     file = Paperclip::Tempfile.new(['export', '.xml'])
