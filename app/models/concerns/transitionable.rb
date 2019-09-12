@@ -645,6 +645,18 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :goods_receiver, 'goods_receiver'
           # nothing
+        when :non_po_invoice_initiator, 'non_po_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id:InwardInvoiceType.id_for(:non_po_invoice)))
+        when :non_po_invoice_reviewer, 'non_po_invoice_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :non_po_invoice_auditor, 'non_po_invoice_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
+        when :po_invoice_initiator, 'po_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+        when :po_invoice_reviewer, 'po_invoice_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :po_invoice_auditor, 'po_invoice_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :invoice_initiator, 'invoice_initiator'
           data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id))
         when :invoice_reviewer, 'invoice_reviewer'
@@ -800,8 +812,8 @@ module Transitionable
       # role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
       # policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        role_name = UserRole.find_by_id(role_id).name
-        valid_role = document_roles.include?(role_name.to_sym)
+        role_name = UserRole.find_by_id(role_id)&.name
+        valid_role = document_roles.include?(role_name&.to_sym)
         # if valid_role && self.role_based_associated_items(user, role_id).present?
         #   if data.blank?
         #     data = self.role_based_associated_items(user, role_id)

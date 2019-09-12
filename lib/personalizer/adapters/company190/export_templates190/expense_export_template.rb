@@ -1,5 +1,5 @@
 class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports
+  attr_accessor :headers, :contents, :reports, :role_id
 
   has_scope :filter_date, using: [:from, :to], type: :hash
 
@@ -8,8 +8,31 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
   end
 
   def init
-    users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
+
+    if params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
+    end
+
+    if self.role_id.blank?
+      add_message :error, 'You are not authorized to do this'
+    end
+
+    case self.role_id
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+      if self.user.company_admin? || self.user.auditor?
+        self.reports = Report.admin_associated_items(user).not_open
+      elsif user.policy_admin?
+        # todo Take care of policy admins
+        self.reports = Report.admin_associated_items(user).not_open
+      end
+      when UserRole.id_for(:manager)
+      self.reports = Report.reviewer_associated_items(user).not_open
+      when UserRole.id_for(:finance_manager)
+      self.reports = Report.finance_associated_items(user).not_open
+    end
+
+    self.reports = reports.processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = ["Expense ID",
@@ -40,7 +63,6 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
                     "Cgst amount",
                     "Sgst amount",
                     "Net total amount",
-                    "Gst details",
                     "Gstin location",
                     "Merchant state",
                     "State of expense",
@@ -75,12 +97,12 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << expense.spent_from&.name
         data_arr << expense.expense_tax_type&.name&.humanize
         data_arr << expense.gst_percentage
-        data_arr << expense.gst_type&.name&.humanize
-        data_arr << expense.gst_amount&.value
+        data_arr << expense.gst_type&.name&.humanize&.upcase
+        data_arr << expense.gst_amount&.value&.round(2)
         data_arr << (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '')
         data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
         data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
-        data_arr << expense.amount&.value
+        data_arr << (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2)
         data_arr << expense.gstin_location&.location
         data_arr << expense.gstin_location&.state&.name
         data_arr << expense.state_of_expense&.name

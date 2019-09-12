@@ -43,6 +43,7 @@
 class YesBankVendor < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   validates :business_name, presence: true
 

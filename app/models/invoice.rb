@@ -84,11 +84,16 @@
 #  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
+#  payment_agreement_id            :integer
+#  vendor_location_id              :integer
+#  billing_type_id                 :integer
+#  agreement_item_type             :string(255)
+#  agreement_item_id               :integer
 #
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
-
+  include LiquidDroppable
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
@@ -883,6 +888,14 @@ class Invoice < ApplicationRecord
     self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
   end
 
+  def get_default_provider
+    if self.procurement.present? && self.procurement.purchase_order.present?
+      "PoInvoiceProvider"
+    else
+      "NonPoInvoiceProvider"
+    end
+  end
+
   def update_net_amount_value
     # taxable_amt = self.items
     # tds_percentage = self.tds_slab&.tds
@@ -1036,9 +1049,9 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
-        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif UserRole.id_for(:admin) == role_id.to_i
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
@@ -1054,6 +1067,12 @@ class Invoice < ApplicationRecord
         :invoice_initiator,
         :invoice_reviewer,
         :invoice_auditor,
+        :po_invoice_initiator,
+        :po_invoice_reviewer,
+        :po_invoice_auditor,
+        :non_po_invoice_initiator,
+        :non_po_invoice_reviewer,
+        :non_po_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
@@ -1170,6 +1189,5 @@ class Invoice < ApplicationRecord
       self.agreement_item.update(is_payment_agreement_upcoming_invoice: true)
     end
   end
-
 
 end
