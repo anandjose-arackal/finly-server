@@ -15,7 +15,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
-    unless user.company.tally_configuration.present? and user.company.tally_configuration.invoice_voucher_enabled and
+    unless user.company.tally_configuration.present? and
+        user.company.tally_configuration.invoice_voucher_enabled and
         user.company.tally_configuration.invoice_voucher_configuration
       add_message :error, 'Tally integration has not been configured for your company'
       return
@@ -109,7 +110,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
     end
     file_data = generator.as_xml
     file = Paperclip::Tempfile.new(['export', '.xml'])
-    open(file.path, 'wb') { |f| f.write file_data }
+    open(file.path, 'wb') {|f| f.write file_data}
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
     self.file_url = temp_file.file.url
   end
@@ -141,15 +142,10 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_item_gst_ledgers(voucher, invoice, item, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['item']['gst_gl'], "item" => item, "invoice" => invoice)
-    if item.cgst_amount.present?
-      voucher.add ledger_data['cgst'], (-item.cgst_amount)
-    end
-    if item.sgst_amount.present?
-      voucher.add ledger_data['sgst'], (-item.sgst_amount)
-    end
-    if item.igst_amount.present?
-      voucher.add ledger_data['igst'], (-item.igst_amount)
-    end
+
+    voucher.add ledger_data['cgst'], (-item.cgst_amount) if item.cgst_amount.present?
+    voucher.add ledger_data['sgst'], (-item.sgst_amount) if item.sgst_amount.present?
+    voucher.add ledger_data['igst'], (-item.igst_amount) if item.igst_amount.present?
   end
 
 

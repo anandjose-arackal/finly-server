@@ -25,6 +25,7 @@ class Integration::TallyController < BaseControllers::WebBase
 
   def check
     @result = Integrations::Tally::ValidateConfiguration.(current_user, params)
+    @result.messages = {}
     respond
   end
 
