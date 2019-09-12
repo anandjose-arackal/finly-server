@@ -58,6 +58,8 @@
 
 class User < ApplicationRecord
   include OperationCallbacks
+  include LiquidDroppable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
