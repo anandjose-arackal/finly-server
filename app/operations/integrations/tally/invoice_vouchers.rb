@@ -141,6 +141,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_tds_ledgers(voucher, invoice, configuration)
     ledger_name = LiquidHelper.interpolate(configuration['tds_gl_name'], "invoice" => invoice)
+    return if ledger_name.blank?
+
     voucher.add ledger_name, invoice.tds_amount, is_party_ledger: false
   end
 
