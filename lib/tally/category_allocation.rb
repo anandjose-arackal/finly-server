@@ -14,7 +14,7 @@ class Tally::CategoryAllocation < NonPersistentModel
       cost_center = {name: cc, value: 0}
       self.cost_centers << cost_center
     end
-    cost_center[:value] += value&.to_f
+    cost_center[:value] += value
   end
 
   def as_json(options = {})

@@ -23,7 +23,7 @@ class Tally::Ledger < NonPersistentModel
   end
 
   def add(value)
-    self.amount += value&.to_f
+    self.amount += value
   end
 
   def find_bill_allocation(name)
