@@ -3568,6 +3568,7 @@ Rails.application.routes.draw do
       get 'policy_config', to: 'payment_agreements#policy_config'
       get 'filter_config', to: 'payment_agreements#filter_config'
       get 'payment_agreement_action_config', to: 'payment_agreements#actions_configuration'
+      get 'all_upcoming_invoices', to: 'payment_agreements#all_upcoming_invoices'
     end
   end
 
