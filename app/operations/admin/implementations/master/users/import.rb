@@ -115,7 +115,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
 
     state_id = nil
     if data[:state_id].present?
-      state_id = State.where('name LIKE ?', "%#{data[:state_id]}%").first&id
+      state_id = State.where('name LIKE ?', "%#{data[:state_id]}%")&.first&.id
       unless  state_id.present?
         messages << "Invalid State Name"
       end

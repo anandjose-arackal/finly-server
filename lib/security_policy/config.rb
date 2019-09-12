@@ -107,6 +107,12 @@ class SecurityPolicy::Config
       bank_payment_request_initiator: LOW,
       vendor_creator: LOW,
       non_po_initiator: LOW,
+      po_invoice_initiator: LOW,
+      po_invoice_reviewer: LOW,
+      po_invoice_auditor: LOW, 
+      non_po_invoice_initiator: LOW,
+      non_po_invoice_reviewer: LOW,
+      non_po_invoice_auditor: LOW
   }.with_indifferent_access
 
   def self.config_for(roles, *keys)

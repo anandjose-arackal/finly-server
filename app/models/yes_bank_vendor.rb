@@ -246,7 +246,8 @@ class YesBankVendor < ApplicationRecord
         tds_id: tds_rates_list_id,
         bank_accounts: bank_accounts,
         state_code: state_code&.state_code,
-        address: address
+        address: address,
+        trade_name: trade_name
     }
   end
 
