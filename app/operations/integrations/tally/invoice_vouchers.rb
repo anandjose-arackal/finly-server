@@ -127,7 +127,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_vendor_ledgers(voucher, invoice, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['vendor'], "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], invoice.gross_amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
+    voucher.add ledger_data['gl_name'], invoice.net_amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
   end
 
   def add_item_ledgers(voucher, invoice, item, configuration)
@@ -136,8 +136,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   end
 
   def add_tds_ledgers(voucher, invoice, configuration)
-    ledger_data = LiquidHelper.interpolate(configuration['tds'], "invoice" => invoice)
-    voucher.add ledger_data['tds_gl_name'], invoice.tds_amount, is_party_ledger: false
+    ledger_name = LiquidHelper.interpolate(configuration['tds_gl_name'], "invoice" => invoice)
+    voucher.add ledger_name, invoice.tds_amount, is_party_ledger: false
   end
 
   def add_item_gst_ledgers(voucher, invoice, item, configuration)
