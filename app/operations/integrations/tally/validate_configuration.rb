@@ -1,6 +1,10 @@
 class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
   attr_accessor :is_configured
 
+  def authorized_user_types
+    []
+  end
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
