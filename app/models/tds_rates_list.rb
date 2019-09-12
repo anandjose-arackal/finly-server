@@ -11,7 +11,7 @@
 #
 
 class TdsRatesList < ApplicationRecord
-  include LiquidDroppable
+  include LiquidDroppable, SoftDeletable
 
   def self.seed_data(company_id)
     DEFAULTS.each do |rate|
