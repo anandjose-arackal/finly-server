@@ -69,7 +69,8 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
                 "cgst": "Input CGST Mumbai",
                 "igst": "Input IGST Mumbai"
             }
-        }
+        },
+        "tds_gl_name": "{{invoice.tds_slab.gl_code}}",
     }
     configuration = user.company.tally_configuration.invoice_voucher_configuration&.with_indifferent_access
 
@@ -94,6 +95,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
       voucher = add_voucher generator, invoice, configuration
       add_vendor_ledgers voucher, invoice, configuration
+      add_tds_ledgers voucher, invoice, configuration
       invoice.line_items.each do |item_obj|
         item = item_obj.to_liquid
         add_item_ledgers voucher, invoice, item, configuration
@@ -124,12 +126,17 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_vendor_ledgers(voucher, invoice, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['vendor'], "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], invoice.net_amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
+    voucher.add ledger_data['gl_name'], invoice.gross_amount, is_party_ledger: true, bill_allocations: ledger_data['bill_allocations']
   end
 
   def add_item_ledgers(voucher, invoice, item, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['item'].slice('gl_name', 'category_allocations'), "item" => item, "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], (-item.net_amount), category_allocations: ledger_data['category_allocations']
+    voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
+  end
+
+  def add_tds_ledgers(voucher, invoice, configuration)
+    ledger_data = LiquidHelper.interpolate(configuration['tds'], "invoice" => invoice)
+    voucher.add ledger_data['tds_gl_name'], invoice.tds_amount, is_party_ledger: false
   end
 
   def add_item_gst_ledgers(voucher, invoice, item, configuration)
