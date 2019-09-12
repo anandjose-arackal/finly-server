@@ -6,6 +6,10 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
+    unless user.has_role?(:finance_manager) or user.has_role?(:admin)
+      add_message :error, 'You cannot export tally'
+      return
+    end
   end
 
   def init
