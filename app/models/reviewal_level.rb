@@ -84,6 +84,14 @@ class ReviewalLevel < ApplicationRecord
       if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:bank_payment_request_reviewer)).blank?
         reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:bank_payment_request_reviewer), policy_id: self.policy_id)
       end
+    when 'PoInvoiceProvider', :PoInvoiceProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:po_invoice_reviewer), policy_id: self.policy_id)
+      end
+    when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:non_po_invoice_reviewer), policy_id: self.policy_id)
+      end
     # when 'PaymentAgreementProvider', :PaymentAgreementProvider
     #   if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:payment_agreement_reviewer)).blank?
     #     reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:payment_agreement_reviewer), policy_id: self.policy_id)
