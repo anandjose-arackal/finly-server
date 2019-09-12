@@ -141,6 +141,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(card) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_effective_balance cash_on_hand_adapter.balance
   json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance

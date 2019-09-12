@@ -56,6 +56,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_cost_center_id
     has_scope :filter_location_id
     has_scope :filter_department_id
+    has_scope :filter_pr_number
 
     has_scope :filter_awaiting_approval
     has_scope :show_only_po_which_have_advances

@@ -37,6 +37,7 @@
 #
 
 class InvoiceLineItem < ApplicationRecord
+  include LiquidDroppable
   include MathUtil
 
   belongs_to :invoice, optional: true

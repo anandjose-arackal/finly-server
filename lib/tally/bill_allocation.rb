@@ -9,7 +9,7 @@ class Tally::BillAllocation < NonPersistentModel
   end
 
   def add(value)
-    self.amount += value&.to_i
+    self.amount += value
   end
 
   def as_json(options = {})

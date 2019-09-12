@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_11_162246) do
+ActiveRecord::Schema.define(version: 2019_09_12_063029) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1691,6 +1691,7 @@ ActiveRecord::Schema.define(version: 2019_09_11_162246) do
     t.boolean "cash_money_requests_enabled", default: true
     t.boolean "auto_retry_payment", default: false
     t.string "legal_entity_name"
+    t.boolean "show_custom_fields_in_pdf", default: true
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
     t.index ["default_card_expense_category_id"], name: "index_company_configurations_on_default_card_expense_category_id"
@@ -5273,9 +5274,9 @@ ActiveRecord::Schema.define(version: 2019_09_11_162246) do
     t.text "comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "delivered", default: 0
-    t.integer "accepted", default: 0
-    t.integer "rejected", default: 0
+    t.decimal "delivered", precision: 20, scale: 5, default: "0.0"
+    t.decimal "accepted", precision: 20, scale: 5, default: "0.0"
+    t.decimal "rejected", precision: 20, scale: 5, default: "0.0"
     t.integer "category_id"
     t.integer "cost_center_id"
     t.boolean "is_deleted", default: false, null: false
@@ -5889,6 +5890,8 @@ ActiveRecord::Schema.define(version: 2019_09_11_162246) do
     t.integer "proforma_advance"
     t.integer "total_proforma_advance"
     t.integer "template_invoice_id"
+    t.integer "notice_period"
+    t.decimal "square_feet", precision: 10, scale: 5
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
@@ -6386,6 +6389,8 @@ ActiveRecord::Schema.define(version: 2019_09_11_162246) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "company_id"
+    t.string "gl_code"
+    t.datetime "deleted_at"
   end
 
   create_table "temporary_files", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

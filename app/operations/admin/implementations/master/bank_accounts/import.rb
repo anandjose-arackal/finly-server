@@ -14,8 +14,8 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    user = User.find_by_id params[:user_id]
-    bank_account = user.bank_accounts.new bank_account_params.except(:user_id)
+    user = bank_account_params[:user]
+    bank_account = user.bank_accounts.new bank_account_params.except(:user)
     unless bank_account.save
       return result false, bank_account.errors.full_messages
     end
@@ -27,7 +27,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     messages = []
     name = data[:name].to_s
     user_id = clean_up_data data[:user_id]
-    user_entity = company.users.where(mobile_number: user_id).or(company.users.where(email: user_id)).first
+    user_entity = get_user_entity user_id
     unless user_entity.present?
        messages << "User Not Found"
     end
@@ -35,8 +35,8 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     ifsc = data[:ifsc]
     params = {
         name: name,
-        user_id: user_entity&.id,
-        account_number: account_number,
+        user: user_entity,
+        account_number: clean_up_data(account_number),
         ifsc: ifsc
     }
     [params, messages]
@@ -46,8 +46,18 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     if text.is_a?(Float) || text.is_a?(Integer)
       text.to_i.to_s
     else
-      text.strip
+      text.to_s.strip
     end
+  end
+
+  def get_user_entity(identifier)
+    user = nil
+    if Constants::VALID_EMAIL_FORMAT.match?(identifier)
+      user = company.users.find_by_email identifier
+    elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
+      user = company.users.find_by_mobile_number identifier
+    end
+    user
   end
 
 end

@@ -43,6 +43,7 @@
 class YesBankVendor < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   validates :business_name, presence: true
 
@@ -192,6 +193,10 @@ class YesBankVendor < ApplicationRecord
     where pan: pan
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
   # Scopes for ordering ends
 
   before_validation do
@@ -241,7 +246,8 @@ class YesBankVendor < ApplicationRecord
         tds_id: tds_rates_list_id,
         bank_accounts: bank_accounts,
         state_code: state_code&.state_code,
-        address: address
+        address: address,
+        trade_name: trade_name
     }
   end
 

@@ -22,6 +22,7 @@
 #  cash_money_requests_enabled      :boolean          default(TRUE)
 #  auto_retry_payment               :boolean          default(FALSE)
 #  legal_entity_name                :string(255)
+#  show_custom_fields_in_pdf        :boolean          default(TRUE)
 #
 
 class CompanyConfiguration < ApplicationRecord

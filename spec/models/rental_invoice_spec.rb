@@ -94,6 +94,8 @@
 #  proforma_advance                      :integer
 #  total_proforma_advance                :integer
 #  template_invoice_id                   :integer
+#  notice_period                         :integer
+#  square_feel                           :decimal(10, 5)
 #
 
 require 'rails_helper'

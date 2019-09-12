@@ -20,6 +20,13 @@ class Personalizer::Adapters::Company156::Procurements156::Invoices156::Update15
 
       self.inward_invoice.update(narration: narration)
     end
+    inward_invoice.custom_fields.each do |cf|
+      next if cf.field_key != 'estimated_payment_date'
+      if cf.value&.value.nil?
+        estimated_payment_date =  FieldText.create(value: inward_invoice.due_date&.strftime("%d-%b-%Y"))
+        cf.update_columns(value_id: estimated_payment_date.id,value_type:'FieldText')
+      end
+    end
   end
 
 end

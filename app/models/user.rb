@@ -61,6 +61,8 @@
 
 class User < ApplicationRecord
   include OperationCallbacks
+  include LiquidDroppable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
@@ -310,8 +312,8 @@ class User < ApplicationRecord
     case type
     when 'PurchaseOrderProvider', :PurchaseOrderProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
-    when 'InvoiceProvider', :InvoiceProvider
-      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+    # when 'InvoiceProvider', :InvoiceProvider
+    #   joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
     when 'YesBankVendorProvider', :YesBankVendorProvider
@@ -320,6 +322,10 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:purchase_request_reviewer)).distinct
     when 'PaymentAgreementProvider', :PaymentAgreementProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:payment_agreement_reviewer)).distinct
+    when 'PoInvoiceProvider', :PoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
+    when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
     end
   }
 
@@ -649,10 +655,42 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_unassigned_non_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
   scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_non_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).pluck(:user_id)
       without_id(user_ids)
     end
   }
@@ -739,10 +777,15 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
 
   before_save :strip_whitespace
 
   around_update :set_passwords_for_linked_users
+  after_save :sync_users_for_group_entity
 
   after_create do
     default_policy_id = self.company.default_policy.id
@@ -989,7 +1032,7 @@ class User < ApplicationRecord
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
-    self.role_mapping.vendor_payments.creditor.present?
+    self.role_mapping.vendor_payments.creditor.present? || self.policy_user_roles.with_role_id(UserRole.id_for(:bank_payment_request_creditor)).present?
   end
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
@@ -1435,6 +1478,30 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
 
+  def is_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)
+  end
+
+  def is_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_reviewer), document)
+  end
+
+  def is_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_auditor), document)
+  end
+
+  def is_non_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_initiator), document)
+  end
+
+  def is_non_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_reviewer), document)
+  end
+
+  def is_non_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
+  end
+
   def access_locked?
     locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
@@ -1500,6 +1567,20 @@ class User < ApplicationRecord
           user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
         end
       end
+    end
+  end
+
+  def sync_users_for_group_entity
+    users = User.without_id(self.id).with_email_or_mobile_number(self.email, self.mobile_number)
+    previously_added_user = users.without_id(self.id).reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
+    return if previously_added_user.blank?
+    # setting OTP verified for all users if the current user is verified
+    if previously_added_user&.otp_verified?
+      users.update_all(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    end
+    # setting verified as true for all users if they already exist
+    if previously_added_user&.verified
+      users.update_all(verified: true)
     end
   end
 

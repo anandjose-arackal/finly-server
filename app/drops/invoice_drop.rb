@@ -44,6 +44,18 @@ class InvoiceDrop < Drop
     @object.net_amount&.value || 0
   end
 
+  def gross_amount
+    @object.gross_amount&.value || 0
+  end
+
+  def tds_amount
+    @object.tds_amount.value || 0
+  end
+
+  def tds_slab
+    @object.tds_slab.to_liquid
+  end
+
   def line_items
     @object.invoice_items.to_a.map(&:to_liquid)
   end

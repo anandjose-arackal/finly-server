@@ -94,6 +94,8 @@
 #  proforma_advance                      :integer
 #  total_proforma_advance                :integer
 #  template_invoice_id                   :integer
+#  notice_period                         :integer
+#  square_feel                           :decimal(10, 5)
 #
 
 class RentalInvoice < ApplicationRecord
@@ -270,6 +272,8 @@ class RentalInvoice < ApplicationRecord
       rent_free_period: self.rent_free_period,
       tenancy_period: self.tenancy_period,
       custom_fields: self.custom_fields,
+      notice_period: self.notice_period,
+      square_feet: self.square_feet,
       already_exists: true
 
     }
