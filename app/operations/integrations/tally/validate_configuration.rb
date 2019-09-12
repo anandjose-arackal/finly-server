@@ -1,13 +1,13 @@
 class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
   attr_accessor :is_configured
 
-  def authorized_user_types
-    []
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
+      return
+    end
+    unless user.has_role?(:finance_manager) or user.has_role?(:admin)
+      add_message :error, 'You cannot export tally'
       return
     end
   end
