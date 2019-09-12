@@ -2,7 +2,7 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
   attr_accessor :is_configured
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin, :auditor]
+    []
   end
 
   def pre_validate
@@ -28,7 +28,5 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
     def init
       self.is_configured = params[:is_configured]
     end
-
   end
-
 end
