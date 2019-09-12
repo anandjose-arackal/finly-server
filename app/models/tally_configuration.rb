@@ -18,6 +18,8 @@ class TallyConfiguration < ApplicationRecord
 
   validates :voucher_expense_date, inclusion: {in: [nil, 'approval', 'expense']}
 
+  serialize :invoice_voucher_configuration, JSON
+
   def date_for(expense)
     case voucher_expense_date
       when 'approval'
