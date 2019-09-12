@@ -564,9 +564,11 @@ class BankPaymentRequest < ApplicationRecord
     bank_payment_requests = BankPaymentRequest.none
 
     purs.each do |pur|
+      max_amount ||= 999999999999999999
+      min_amount ||= 0
       pur_bank_payment_requests = BankPaymentRequest.all.
         where(policy_id: pur.policy_id).
-        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+        where("(max_payment_amount IS NULL OR max_payment_amount > ?) AND (max_payment_amount IS NULL OR max_payment_amount <= ?)", min_amount, max_amount)
 
       bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
     end
