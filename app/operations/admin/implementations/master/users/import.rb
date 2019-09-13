@@ -100,7 +100,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: data[:company_id])
-    department_id = company&.departments&.find_by code: data[:department_code]
+    department_id = company&.departments&.find_by department_code: data[:department_code]
     location_id = company&.locations&.find_by location_code: data[:location_code]
     if company.nil?
       messages << "Company with this ID not found"
