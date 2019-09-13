@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_12_192341) do
+ActiveRecord::Schema.define(version: 2019_09_13_062627) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2628,24 +2628,6 @@ ActiveRecord::Schema.define(version: 2019_09_12_192341) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id"
-  end
-
-  create_table "event_file_manager_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.bigint "export_template_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "event_workflow_id", null: false
-    t.index ["export_template_id"], name: "index_event_file_manager_actions_on_export_template_id"
-  end
-
-  create_table "event_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "every"
-    t.integer "hour"
-    t.integer "minute"
-    t.integer "day_of_the_week"
-    t.integer "day_of_the_month"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6323,6 +6305,24 @@ ActiveRecord::Schema.define(version: 2019_09_12_192341) do
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
+  create_table "task_file_manager_actions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "export_template_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "event_workflow_id", null: false
+    t.index ["export_template_id"], name: "index_task_file_manager_actions_on_export_template_id"
+  end
+
+  create_table "task_schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "every"
+    t.integer "hour"
+    t.integer "minute"
+    t.integer "day_of_the_week"
+    t.integer "day_of_the_month"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "task_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "model_class", null: false
     t.string "trigger_type", null: false
@@ -7843,7 +7843,6 @@ ActiveRecord::Schema.define(version: 2019_09_12_192341) do
   add_foreign_key "e_way_bills", "procurements"
   add_foreign_key "e_way_bills", "users"
   add_foreign_key "email_authorizations", "users"
-  add_foreign_key "event_file_manager_actions", "export_templates"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
   add_foreign_key "expense_rules", "categories"
@@ -8022,6 +8021,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_192341) do
   add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "sso_keys", "companies"
   add_foreign_key "tally_configurations", "companies"
+  add_foreign_key "task_file_manager_actions", "export_templates"
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"

@@ -39,41 +39,41 @@ class TaskManager::Workflows::Contract < Transactions::Contract
   property :company_id, validates: {presence: true}
   property :conditions
   property :trigger_type, validates: {presence: true, inclusion: {in: TaskWorkflow.trigger_types.values}}
-  property :event_schedule, populate_if_empty: EventSchedule do
-    property :every, validates: {presence: true, inclusion: {in: EventSchedule.everies.values}}
+  property :task_schedule, populate_if_empty: TaskSchedule do
+    property :every, validates: {presence: true, inclusion: {in: TaskSchedule::EVERY.values}}
     property :hour, validates: {presence: true, inclusion: {in: (1..24).to_a}}
     property :minute, validates: {presence: true, inclusion: {in: [0, 30]}}
-    property :day_of_the_week, validates: {inclusion: {in: ([nil, 0] + EventSchedule.day_of_the_weeks.values)}}
+    property :day_of_the_week, validates: {inclusion: {in: ([nil, 0] + TaskSchedule::DAY_OF_THE_WEEK.values)}}
     property :day_of_the_month, validates: {inclusion: {in: ([nil, 0] + (1..30).to_a)}}
   end
-  collection :file_manager_actions, populate_if_empty: EventFileManagerAction do
+  collection :file_manager_actions, populate_if_empty: TaskFileManagerAction do
     property :export_template_id, validates: {presence: true}
   end
 
   # validate :atleast_one_action
   validate :conditions_schema_validation
-  validate :event_schedule_presence_validation
-  validate :event_schedule_validation
+  validate :task_schedule_presence_validation
+  validate :task_schedule_validation
 
-  def event_schedule_presence_validation
+  def task_schedule_presence_validation
     return unless trigger_type == TaskWorkflow.trigger_types['schedule']
 
-    errors.add :event_schedule, 'is not set' if event_schedule.blank?
+    errors.add :task_schedule, 'is not set' if task_schedule.blank?
   end
 
-  def event_schedule_validation
+  def task_schedule_validation
     return unless trigger_type == TaskWorkflow.trigger_types['schedule']
-    return if event_schedule.nil?
-    case event_schedule.every
-    when EventSchedule.everies['day']
+    return if task_schedule.nil?
+    case task_schedule.every
+    when TaskSchedule::EVERY['day']
 
-    when EventSchedule.everies['week']
-      if event_schedule.day_of_the_week.blank?
-        errors.add :event_schedule, {day_of_the_week: 'cannot be blank'}
+    when TaskSchedule::EVERY['week']
+      if task_schedule.day_of_the_week.blank?
+        errors.add :task_schedule, {day_of_the_week: 'cannot be blank'}
       end
-    when EventSchedule.everies['month']
-      if event_schedule.day_of_the_month.blank?
-        errors.add :event_schedule, {day_of_the_month: 'cannot be blank'}
+    when TaskSchedule::EVERY['month']
+      if task_schedule.day_of_the_month.blank?
+        errors.add :task_schedule, {day_of_the_month: 'cannot be blank'}
       end
     end
   end

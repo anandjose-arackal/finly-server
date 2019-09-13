@@ -9,7 +9,7 @@
 #  event_workflow_id  :integer          not null
 #
 
-class EventFileManagerAction < ApplicationRecord
+class TaskFileManagerAction < ApplicationRecord
   belongs_to :event_workflow
   belongs_to :export_template
 end

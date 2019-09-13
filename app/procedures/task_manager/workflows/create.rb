@@ -6,6 +6,6 @@ class TaskManager::Workflows::Create < Transactions::API
   step Contract::Build(constant: TaskManager::Workflows::Contract)
   step Contract::Validate()
   step Contract::Persist()
-  step Transactions::Messages::SuccessMessage('Event created successfully')
+  step Transactions::Messages::SuccessMessage('Task created successfully')
 
 end

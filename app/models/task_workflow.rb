@@ -20,13 +20,13 @@
 class TaskWorkflow < ApplicationRecord
   include UUIDHelper
 
-  has_many :file_manager_actions, class_name: 'EventFileManagerAction'
+  has_many :file_manager_actions, class_name: 'TaskFileManagerAction'
 
   serialize :conditions, JSON
 
   belongs_to :user
   belongs_to :company
-  belongs_to :event_schedule
+  belongs_to :task_schedule
 
   enum trigger_type: {schedule: 1, event: 2}
 

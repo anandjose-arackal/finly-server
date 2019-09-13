@@ -6,7 +6,7 @@ class TaskManager::Workflows::Representers::Show < Representable::Decorator
   property :description
   property :model_class
   property :trigger_type
-  property :event_schedule do
+  property :task_schedule do
     property :every
     property :hour
     property :minute
