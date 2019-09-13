@@ -138,9 +138,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
-             sgst: {spreadsheet: true},
-             cgst: {spreadsheet: true},
-             igst: {spreadsheet: true},
+             line_item_sgst: {spreadsheet: true},
+             line_item_cgst: {spreadsheet: true},
+             line_item_igst: {spreadsheet: true},
              advance_amount: {spreadsheet: true},
              invoice_net_payable_amount: {spreadsheet: true},
              approvers: {spreadsheet: true},
@@ -331,16 +331,16 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_slab&.tds || 0
   end
 
-  def sgst(invoice_line_item)
-    invoice_line_item.parent.invoice_items.map {|item| item.sgst.to_i}.compact.sum rescue 0
+  def line_item_sgst(invoice_line_item)
+    invoice_line_item.sgst || 0
   end
 
-  def cgst(invoice_line_item)
-    invoice_line_item.parent.invoice_items.map {|item| item.cgst.to_i}.compact.sum rescue 0
+  def line_item_cgst(invoice_line_item)
+    invoice_line_item.cgst || 0
   end
 
-  def igst(invoice_line_item)
-    invoice_line_item.parent.invoice_items.map {|item| item.igst.to_i}.compact.sum rescue 0
+  def line_item_igst(invoice_line_item)
+    invoice_line_item.igst || 0
   end
 
   def advance_amount(invoice_line_item)
