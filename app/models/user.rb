@@ -1174,7 +1174,7 @@ class User < ApplicationRecord
       # if the default_company_id is present then replace the user object returned with the one from the default company
       if default_company_id.present?
         user = find_by(company_id: default_company_id, mobile_number: username) || find_by(company_id: default_company_id, email: username)
-      else
+      end
     end
 
     return user if user.present?
