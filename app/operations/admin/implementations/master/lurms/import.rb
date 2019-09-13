@@ -199,7 +199,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "TravelRequestBookingProvider" => "manager",
         "PurchaseRequestProvider" =>"purchase_request_reviewer",
         "PurchaseOrderProvider" =>"purchase_order_reviewer",
-        "InvoiceProvider" =>"invoice_reviewer",
+        "NonPoInvoiceProvider" =>"non_po_invoice_reviewer",
+        "PoInvoiceProvider" => "po_invoice_reviewer",
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
         "PaymentAgreementProvider" => "payment_agreement_reviewer"}
@@ -215,8 +216,15 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   def get_level(level_name, level_number,provider)
     level =  self.policy.levels.non_deleted.where(level_number: level_number, associated_entity_type: provider).first
+    update_level_name(level_name, level)
     return level if level.present?
     level = self.policy.levels.create(name: level_name, level_number: level_number, associated_entity_type: provider)
+  end
+
+  def update_level_name(level_name=nil, level=nil)
+    if level.present? && level_name.present? && (level.name != level_name)
+      level.update(name: level_name)
+    end
   end
 
   def get_application(name)

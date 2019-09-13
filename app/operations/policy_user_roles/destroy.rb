@@ -34,8 +34,14 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
       when 'purchase_order_reviewer'
         provider = 'PurchaseOrderProvider'
         reviewer_ids =  associated_entity_type_reviewers(provider)
-      when 'invoice_reviewer'
-        provider = 'InvoiceProvider'
+      # when 'invoice_reviewer'
+      #   provider = 'InvoiceProvider'
+      #   reviewer_ids = associated_entity_type_reviewers(provider)
+      when 'po_invoice_reviewer'
+        provider = 'PoInvoiceProvider'
+        reviewer_ids = associated_entity_type_reviewers(provider)
+      when 'non_po_invoice_reviewer'
+        provider = 'NonPoInvoiceProvider'
         reviewer_ids = associated_entity_type_reviewers(provider)
       when 'bank_payment_request_reviewer'
         provider = 'BankPaymentRequestProvider'

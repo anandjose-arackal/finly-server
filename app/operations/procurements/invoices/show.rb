@@ -26,7 +26,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # self.departments = user.company.departments
 
       # self.locations = user.company.locations
-      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      params[:filter_role_id] =  invoice.get_invoice_provider_name == 'PoInvoiceProvider' ? [UserRole.id_for(:po_invoice_initiator)] : [UserRole.id_for(:non_po_invoice_initiator)]
+      # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
 
@@ -61,7 +62,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
         self.reviewal_chains = []
         params[:reviewal_document] = invoice
-
+        params[:provider_name] = get_invoice_provider_name
         policies.each do |policy|
           params[:policy_id] = policy.id
           chain = {
@@ -154,6 +155,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
 
     def get_reviewal_chain
+      params[:provider_name] = invoice.get_invoice_provider_name
       op = ::ReviewalManager::ReviewalChain.(user, params)
       op.chain
     end
@@ -183,7 +185,12 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         #   return true
         # end
       # end
-      invoice.get_reviewers.include?(user)
+      provider_name = invoice.get_invoice_provider_name
+      invoice.get_reviewers(nil, provider_name).include?(user)
+    end
+  
+    def get_invoice_provider_name
+      self.invoice.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
     end
   end
 
@@ -205,12 +212,36 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     # Validate of current user is owner of PO
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
-    return if invoice.validate_if_reviewer(user)
-    return if invoice.validate_if_invoice_auditor(user)
+    return if invoice.validate_if_reviewer(user) # For DLRMS reviewers
+
+    # Validate  Po invoice auditor role
+    if invoice.procurement.present? && invoice.procurement.purchase_order.present?
+      return if  invoice.validate_if_po_invoice_auditor(user)
+      return if  invoice.validate_if_po_invoice_reviewer(user)
+    end
+
+    if invoice.procurement.blank? || invoice.procurement.purchase_order.blank?
+      return if invoice.validate_if_non_po_invoice_auditor(user)
+      return if invoice.validate_if_non_po_invoice_reviewer(user)
+    end
+
+    # Validate Non po invoice auditor role
+
+
+    # Validation for Po invoice
+    # return unless po_invoice_reviewer
+    # return unless po_invoice_auditor
+
+    # Validation for non po invoice
+    # return unless non_po_invoice_reviewer
+    # return unless non_po_invoice_auditor
+
     # Need to check dlrms as above conditions are breaking
     #Quick fix
-    return if user.is_invoice_reviewer?
-    return if user.is_invoice_auditor?
+    # Removing this as we now have non and non po invoice role
+    # return if user.is_invoice_reviewer?
+    # return if user.is_invoice_auditor?
+    
     return if user.is_bank_payment_request_initiator?
     return if user.is_bank_payment_request_reviewer?
     return if user.is_bank_payment_request_creditor?
@@ -224,4 +255,18 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     po_params["id"] = invoice.procurement.purchase_order.id rescue nil
     Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
+
+
+  def po_invoice_reviewer
+  end
+
+  def po_invoice_auditor
+  end
+
+  def non_po_invoice_reviewer
+  end
+
+  def non_po_invoice_auditor
+  end
+
 end

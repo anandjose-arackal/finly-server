@@ -19,7 +19,7 @@ class Procurements::Invoices::BulkRejectProcessor < BackgroundOperation
     invoice_ids.each do |id|
       data_success = {}
       data_error = {}
-      op = Procurements::Invoices::Reject.(user, {invoice_id: id}) # Disable mailer
+      op = Procurements::Invoices::Reject.(user, {invoice_id: id,note: "Bulk Rejected Note"}) # Disable mailer
       invoice = Invoice.find_by id: id
       unless op.success?
         data_error[:messages] = op.messages[:error]
