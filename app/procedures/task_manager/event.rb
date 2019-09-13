@@ -1,0 +1,5 @@
+class TaskManager::Event
+
+
+
+end

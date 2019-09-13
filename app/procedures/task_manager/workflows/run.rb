@@ -1,4 +1,4 @@
-class EventManager::Workflows::Run < Transactions::API
+class TaskManager::Workflows::Run < Transactions::API
 
   schema do
     params do

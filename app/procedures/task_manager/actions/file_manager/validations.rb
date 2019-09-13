@@ -1,4 +1,4 @@
-module EventManager::Actions::FileManager::Validations
+module TaskManager::Actions::FileManager::Validations
 
   def self.included(base)
     base.validate :file_manager_validation

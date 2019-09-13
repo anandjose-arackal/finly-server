@@ -1,7 +1,7 @@
-class EventManager::Workflows::Contract < Transactions::Contract
-  include EventManager::Actions::FileManager::Validations
+class TaskManager::Workflows::Contract < Transactions::Contract
+  include TaskManager::Actions::FileManager::Validations
 
-  class EventManager::Workflows::Contract::GroupSchema < Transactions::Schema
+  class TaskManager::Workflows::Contract::GroupSchema < Transactions::Schema
 
     params do
       required(:logic_type).filled(inclusion?: %w(group))
@@ -11,7 +11,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
 
   end
 
-  class EventManager::Workflows::Contract::ConditionSchema < Transactions::Schema
+  class TaskManager::Workflows::Contract::ConditionSchema < Transactions::Schema
     # %w(cont_any not_cont_any in not_in blank present lteq gteq is_in_the_range
     # lteq_days gteq_days eq_days is_in_days eq_days gteq lteq is_in_the_range)
     params do
@@ -23,11 +23,11 @@ class EventManager::Workflows::Contract < Transactions::Contract
   end
 
   def self.group_schema
-    @group_schema ||= EventManager::Workflows::Contract::GroupSchema.new
+    @group_schema ||= TaskManager::Workflows::Contract::GroupSchema.new
   end
 
   def self.condition_schema
-    @condition_schema ||= EventManager::Workflows::Contract::ConditionSchema.new
+    @condition_schema ||= TaskManager::Workflows::Contract::ConditionSchema.new
   end
 
   property :uuid
@@ -38,7 +38,7 @@ class EventManager::Workflows::Contract < Transactions::Contract
   property :user_id, validates: {presence: true}
   property :company_id, validates: {presence: true}
   property :conditions
-  property :trigger_type, validates: {presence: true, inclusion: {in: EventWorkflow.trigger_types.values}}
+  property :trigger_type, validates: {presence: true, inclusion: {in: TaskWorkflow.trigger_types.values}}
   property :event_schedule, populate_if_empty: EventSchedule do
     property :every, validates: {presence: true, inclusion: {in: EventSchedule.everies.values}}
     property :hour, validates: {presence: true, inclusion: {in: (1..24).to_a}}
@@ -56,13 +56,13 @@ class EventManager::Workflows::Contract < Transactions::Contract
   validate :event_schedule_validation
 
   def event_schedule_presence_validation
-    return unless trigger_type == EventWorkflow.trigger_types['schedule']
+    return unless trigger_type == TaskWorkflow.trigger_types['schedule']
 
     errors.add :event_schedule, 'is not set' if event_schedule.blank?
   end
 
   def event_schedule_validation
-    return unless trigger_type == EventWorkflow.trigger_types['schedule']
+    return unless trigger_type == TaskWorkflow.trigger_types['schedule']
     return if event_schedule.nil?
     case event_schedule.every
     when EventSchedule.everies['day']

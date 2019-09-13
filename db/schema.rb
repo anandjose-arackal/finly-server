@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_12_063029) do
+ActiveRecord::Schema.define(version: 2019_09_12_192341) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2646,30 +2646,6 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "day_of_the_month"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "event_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "model_class", null: false
-    t.string "trigger_type", null: false
-    t.string "event_key"
-    t.boolean "personal", default: true
-    t.integer "user_id", null: false
-    t.integer "company_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "name", null: false
-    t.text "description", null: false
-    t.text "conditions"
-    t.integer "event_schedule_id"
-    t.string "uuid", limit: 36, null: false
-    t.index ["company_id"], name: "index_event_workflows_on_company_id"
-    t.index ["created_at"], name: "index_event_workflows_on_created_at"
-    t.index ["event_key"], name: "index_event_workflows_on_event_key"
-    t.index ["model_class"], name: "index_event_workflows_on_model_class"
-    t.index ["personal"], name: "index_event_workflows_on_personal"
-    t.index ["trigger_type"], name: "index_event_workflows_on_trigger_type"
-    t.index ["updated_at"], name: "index_event_workflows_on_updated_at"
-    t.index ["user_id"], name: "index_event_workflows_on_user_id"
   end
 
   create_table "expense_data_extract_sources", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6345,6 +6321,30 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.boolean "invoice_voucher_enabled"
     t.text "invoice_voucher_configuration", limit: 4294967295
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
+  end
+
+  create_table "task_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "model_class", null: false
+    t.string "trigger_type", null: false
+    t.string "event_key"
+    t.boolean "personal", default: true
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name", null: false
+    t.text "description", null: false
+    t.text "conditions"
+    t.integer "event_schedule_id"
+    t.string "uuid", limit: 36, null: false
+    t.index ["company_id"], name: "index_task_workflows_on_company_id"
+    t.index ["created_at"], name: "index_task_workflows_on_created_at"
+    t.index ["event_key"], name: "index_task_workflows_on_event_key"
+    t.index ["model_class"], name: "index_task_workflows_on_model_class"
+    t.index ["personal"], name: "index_task_workflows_on_personal"
+    t.index ["trigger_type"], name: "index_task_workflows_on_trigger_type"
+    t.index ["updated_at"], name: "index_task_workflows_on_updated_at"
+    t.index ["user_id"], name: "index_task_workflows_on_user_id"
   end
 
   create_table "tax_per_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

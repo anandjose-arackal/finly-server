@@ -32,12 +32,12 @@ module ActiveRecordMaster
       @system_events + @request_events
     end
 
-    def event_workflow(workflow_klass)
-      event_workflows << workflow_klass
+    def task_workflow(workflow_klass)
+      task_workflows << workflow_klass
     end
 
-    def event_workflows
-      @event_workflows ||= []
+    def task_workflows
+      @task_workflows ||= []
     end
 
     def form(form = NoObject)

@@ -1,4 +1,4 @@
-class EventManager::Documents::Configuration < Transactions::API
+class TaskManager::Documents::Configuration < Transactions::API
   extend Representer::DSL
 
   schema do

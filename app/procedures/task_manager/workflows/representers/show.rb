@@ -1,4 +1,4 @@
-class EventManager::Workflows::Representers::Show < Representable::Decorator
+class TaskManager::Workflows::Representers::Show < Representable::Decorator
   include Representable::JSON
 
   property :uuid

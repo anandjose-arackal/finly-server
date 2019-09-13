@@ -1,11 +1,11 @@
-class EventManager::Master
+class TaskManager::Master
 
   TRIGGERS = {
       event: {
-          contract: EventManager::Triggers::Event::Contract
+          contract: TaskManager::Triggers::Event::Contract
       },
       schedule: {
-          contract: EventManager::Triggers::Schedule::Contract
+          contract: TaskManager::Triggers::Schedule::Contract
       }
   }
 

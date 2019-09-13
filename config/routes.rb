@@ -2982,6 +2982,12 @@ Rails.application.routes.draw do
   # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'
   # get 'expenses/all_expense_types' => 'expenses#all_expense_types'
 
+
+  scope :task_workflows do
+
+  end
+  resources :task_workflows
+
   get 'receipts/export', to: 'receipts#export'
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note

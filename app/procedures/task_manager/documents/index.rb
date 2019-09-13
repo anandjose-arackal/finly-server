@@ -1,4 +1,4 @@
-class EventManager::Documents::Index < Transactions::API
+class TaskManager::Documents::Index < Transactions::API
   extend Representer::DSL
 
   step :load_documents

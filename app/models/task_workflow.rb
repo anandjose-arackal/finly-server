@@ -17,7 +17,7 @@
 #  event_schedule_id :integer
 #
 
-class EventWorkflow < ApplicationRecord
+class TaskWorkflow < ApplicationRecord
   include UUIDHelper
 
   has_many :file_manager_actions, class_name: 'EventFileManagerAction'
@@ -30,5 +30,5 @@ class EventWorkflow < ApplicationRecord
 
   enum trigger_type: {schedule: 1, event: 2}
 
-  resolver EventManager::Workflows::Policy::Scope
+  resolver TaskManager::Workflows::Policy::Scope
 end

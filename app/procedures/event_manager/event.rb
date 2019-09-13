@@ -1,5 +1,0 @@
-class EventManager::Event
-
-
-
-end
