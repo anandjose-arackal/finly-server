@@ -41,7 +41,9 @@ class Personalizer::Adapters::Company190::Report190::Violation190::PostProcess <
         if expense.gstin_location&.state_id.blank?
           errors += ["Merchant state"]
         end
-        self.warning_messages[expense.id]["expense_blocking"] << {type: "GST", message: "The following expense fields: #{errors.to_sentence} cannot be blank"}
+        if errors.present?
+          self.warning_messages[expense.id]["expense_blocking"] << {type: "GST", message: "The following expense fields: #{errors.to_sentence} cannot be blank"}
+        end
       end
     end
   end
