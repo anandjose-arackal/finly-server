@@ -1,20 +1,20 @@
 class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
   attr_accessor :is_configured
 
+  def authorized_user_types
+    []
+  end
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
-      return
-    end
-    unless user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin))
-      add_message :error, 'You cannot export tally'
       return
     end
   end
 
   def init
     tally_configuration = user.company.tally_configuration
-    self.is_configured = tally_configuration&.company_name.present?
+    self.is_configured = tally_configuration&.company_name.present? && (user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin)))
   end
 
   def success
