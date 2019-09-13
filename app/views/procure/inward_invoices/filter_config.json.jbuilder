@@ -21,3 +21,5 @@ json.policies do |policy|
     json.extract! policy, :id, :name
   end
 end
+
+json.invoice_custom_fields_config @result.custom_fields_config[:invoice]

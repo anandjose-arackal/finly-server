@@ -1,5 +1,5 @@
 class Procurements::FilterConfig < Procurements::Base
-  attr_accessor :config, :status_tags, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :policies
+  attr_accessor :config, :status_tags, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :policies, :custom_fields_config
 
   def init
     self.status_tags = StatusTag.all
@@ -26,6 +26,8 @@ class Procurements::FilterConfig < Procurements::Base
     department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
     department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
     self.departments = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
+    load_custom_fields_config
+    params[:custom_fields_config] = self.custom_fields_config
   end
 
   def success
@@ -41,7 +43,7 @@ class Procurements::FilterConfig < Procurements::Base
   end
 
   class Procurements::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :config, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :sub_departments, :policies
+    attr_accessor :config, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :sub_departments, :policies, :custom_fields_config
 
     def init
       self.config = params[:config]
@@ -52,6 +54,13 @@ class Procurements::FilterConfig < Procurements::Base
       self.sub_departments = params[:sub_departments]
       self.cost_centers = params[:cost_centers]
       self.policies = params[:policies]
+      self.custom_fields_config = params[:custom_fields_config]
     end
+  end
+
+  def load_custom_fields_config
+    configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
+    self.custom_fields_config = {}
+    self.custom_fields_config[:purchase_order] = configurations.with_parent_type(FieldParentType.id_for(:purchase_order))
   end
 end
