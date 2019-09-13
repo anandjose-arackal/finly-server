@@ -109,6 +109,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         },
         note: self.inward_invoice.note,
         category_id: self.inward_invoice.category_id,
+        department_id: self.inward_invoice.department_id,
         date: DateUtils.local_date,
         invoice_id: self.inward_invoice.id,
         parent_type: self.inward_invoice.class.name,
