@@ -44,7 +44,11 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def raw_api_params
     remarks = self.payment.note.blank? ? "Null" : self.payment.note
     remarks = remarks.gsub(/[^0-9A-Za-z]/, '') # this is to remove all special characters from the remarks attribute
-    payee_name = self.receiving_account.account_owner.business_name
+    if self.receiving_account&.account_owner.is_a?(YesBankVendor)
+      payee_name = self.receiving_account.account_owner.business_name
+    else
+      payee_name = self.receiving_account.account_owner.name
+    end
 
     {
         AGGRID: self.company_details["AGGR_ID"],
