@@ -16,6 +16,7 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
       :destroy => 'Destroy'
   })
 
+
   def valid_request
   end
 
@@ -34,7 +35,8 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
              TravelRequestBookingProvider
              PurchaseRequestProvider
              PurchaseOrderProvider
-             InvoiceProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider

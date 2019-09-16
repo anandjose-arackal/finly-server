@@ -23,6 +23,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'Report not found'
       return
     end
+    unless user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin))
+      add_message :error, 'You are not authorized to perform this action'
+      return
+    end
   end
 
   def process

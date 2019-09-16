@@ -86,8 +86,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.order_details.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
-      name = item[:name] || item["name"]
-      business_name = item[:business_name] || item["business_name"]
+      name = item[:name].present? ? item[:name] : item[:bank_account_name]
+      business_name = item[:business_name].present? ? item[:business_name] : item[:name]
       authorized = item[:authorized] || item["authorized"]
       amount = item[:original_amount]
       advance_amount = item[:advance_amount]
@@ -467,7 +467,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_bank_account_number account_number
-    if !/\A\d+\z/.match(account_number)
+    unless Constants::VALID_BANK_ACCOUNT.match(account_number)
+    # if !/\A\d+\z/.match(account_number)
       return false
     end
     true

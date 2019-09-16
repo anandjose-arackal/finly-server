@@ -27,6 +27,7 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'retract'
     params[:violation_present] = false #todo Check violations
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]

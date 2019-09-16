@@ -10,7 +10,7 @@
 #
 
 class GstStateCode < ApplicationRecord
-
+  include LiquidDroppable
 
   scope :with_state_code, -> (state_code) {
     where(state_code: state_code)

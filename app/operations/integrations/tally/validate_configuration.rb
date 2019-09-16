@@ -2,7 +2,7 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
   attr_accessor :is_configured
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin, :auditor]
+    []
   end
 
   def pre_validate
@@ -14,7 +14,7 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
 
   def init
     tally_configuration = user.company.tally_configuration
-    self.is_configured = tally_configuration&.company_name.present?
+    self.is_configured = tally_configuration&.company_name.present? && (user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin)))
   end
 
   def success
@@ -28,7 +28,5 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
     def init
       self.is_configured = params[:is_configured]
     end
-
   end
-
 end
