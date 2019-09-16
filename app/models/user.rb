@@ -1165,6 +1165,7 @@ class User < ApplicationRecord
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
     company_id = conditions[:company_id]
+    # company_id = nil
     if company_id.present?
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
