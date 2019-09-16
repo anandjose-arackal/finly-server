@@ -3,6 +3,8 @@ json.expenses do
     json.partial! 'expense', expense: expense
   end
 end
+json.tax_rates @result.tax_rates
+json.state_codes @result.gst_state_codes
 json.filter do
   json.categories do
     json.array! @result.categories do |category|

@@ -29,6 +29,7 @@
 class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry
@@ -45,6 +46,8 @@ class BranchLocation < ApplicationRecord
 
   has_many :budget_rule_branch_location_mappings
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
+
+  has_many :users
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :include_state, -> { includes :state }

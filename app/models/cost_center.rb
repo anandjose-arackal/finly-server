@@ -17,6 +17,7 @@
 class CostCenter < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
@@ -28,6 +29,7 @@ class CostCenter < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :departments
+  has_many :users
 
   has_many :budget_trails
 

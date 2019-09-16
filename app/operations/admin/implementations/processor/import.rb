@@ -69,7 +69,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
           raise "invalid result"
         end
       rescue Exception => e
-        return result false, "#{e.message}"
+        result false, "#{e.message}"
       end
 
       unless result.success?

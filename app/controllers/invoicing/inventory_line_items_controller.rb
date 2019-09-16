@@ -63,4 +63,9 @@ class Invoicing::InventoryLineItemsController < BaseControllers::WebBase
     respond
   end
 
+  def export
+    @result = ItemMaster::Item::Exports::Generate.(current_user, params)
+    respond
+  end
+
 end

@@ -59,7 +59,9 @@ json.invoice do
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
   json.po_number invoice.po_number
-
+  json.created_from_payment_agreement invoice.payment_agreement_id.present?
+  json.agreement_number invoice&.payment_agreement&.get_agreement_number
+  json.payment_agreement_id invoice.payment_agreement_id
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
@@ -96,6 +98,7 @@ json.invoice do
   # json.discount_rate precision_value invoice.discount_rate
   json.discount_rate precision_value ((invoice.discount_amount&.value / invoice.item_amounts_total) * 100).round(2) rescue 0
   json.advance_rate precision_value invoice.advance_rate
+  json.variable_periodic_invoice @result.variable_periodic_invoice
   #############################
   json.invoice_attachment do
     json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
@@ -138,7 +141,7 @@ json.invoice do
                     :purchase_order_item_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
-      json.gl_code item.inventory_line_item&.item_code rescue nil
+      json.gl_code item.inventory_line_item&.category.gl_code rescue nil
       json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
       json.tax_amount precision_value item.tax_amount&.value
@@ -284,7 +287,11 @@ json.reviewal_chains do
   end
 end
 
-json.reviewal_chain @result.invoice.get_reviewal_chain
+if @result.invoice.procurement.purchase_order.present?
+  json.reviewal_chain @result.invoice.get_reviewal_chain('PoInvoiceProvider')
+else
+  json.reviewal_chain @result.invoice.get_reviewal_chain('NonPoInvoiceProvider')
+end
 
 json.comments do
   json.array! invoice.comments do |comment|
@@ -301,6 +308,12 @@ end
 
 json.policies do
   json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+
+json.bank_payment_request_policies do
+  json.array! @result.bank_payment_request_policies do |policy|
     json.extract! policy, :id, :name
   end
 end

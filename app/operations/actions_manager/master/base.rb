@@ -2,7 +2,7 @@ class ActionsManager::Master::Base
 
   cattr_accessor :data_map
 
-  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request
+  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request, :payment_agreement, :security_deposit, :beneficiary_payment, :general_invoice, :rental_invoice
 
   MASTERS ||= {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
@@ -34,7 +34,13 @@ class ActionsManager::Master::Base
     purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
     purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
     vendor_show: '::ActionsManager::Master::Vendors::Show',
-    vendors_index: '::ActionsManager::Master::Vendors::Index'
+    vendors_index: '::ActionsManager::Master::Vendors::Index',
+    payment_agreement_index: '::ActionsManager::Master::PaymentAgreements::Index',
+    payment_agreement_show: '::ActionsManager::Master::PaymentAgreements::Show',
+    security_deposit_make_payment: '::ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment',
+    beneficiary_payment_make_payment: '::ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment',
+    rental_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment',
+    general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment'
 
   }.with_indifferent_access
 

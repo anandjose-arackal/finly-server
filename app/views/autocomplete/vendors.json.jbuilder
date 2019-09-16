@@ -2,6 +2,7 @@ json.array!(@result.paginated_vendors) do |vendor|
   # name = vendor.business_name || vendor.name
   json.vendor_name vendor.name || ""
   json.business_name  vendor.business_name || ""
+  json.trade_name vendor.trade_name || ""
   json.value vendor.id
 
   if vendor.name.present?
