@@ -29,7 +29,7 @@ class ItemMaster::Item::Procurements < ItemMaster::Item::Base
       return
     end
 
-    if ["purchase_order", "po_invoice", "non_po_invoice"].exclude? params[:document_type]
+    if ["purchase_order", "po_invoice", "non_po_invoice", "purchase_request"].exclude? params[:document_type]
       add_message :error, "Improper request sent to gather document details. Please contact Finly Customer Support."
       return
     end
@@ -46,6 +46,9 @@ class ItemMaster::Item::Procurements < ItemMaster::Item::Base
     when 'non_po_invoice'
       document_ids = InvoiceLineItem.where(inventory_line_item_id: self.item.id).map(&:parent_id).uniq
       self.documents = user.company.inward_invoices.with_type_non_po_invoice.where(id: document_ids)
+    when "purchase_request"
+      document_ids = PurchaseRequestItem.where(item_id: self.item.id).map(&:purchase_request_id).uniq
+      self.documents = user.company.purchase_requests.where(id: document_ids)
     end
   end
 
