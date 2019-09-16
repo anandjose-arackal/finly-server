@@ -87,12 +87,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     self.report_processor_group.save
     if self.report_processor_group.process_via_finly?
       op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
     elsif self.report_processor_group.mark_as_closed?
       op = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
-    end
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
     end
   end
 
