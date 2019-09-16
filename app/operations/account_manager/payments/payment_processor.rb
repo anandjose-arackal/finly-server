@@ -132,7 +132,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def process
     # now the actual execution of the payment orderapp/operations/payment_processor_rules/rules/status_checks/status_checker.rb:41, based on whether it's
     # synchronous or a background operation
-    
     if self.crediting_payments.present?
       if self.background
         scheduled_at = self.crediting_payments.pluck(:scheduled_at).uniq&.compact.first
