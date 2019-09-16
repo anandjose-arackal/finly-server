@@ -1,0 +1,12 @@
+json.id @result.money_request_processor.id
+json.created_by_user @result.money_request_processor.created_by_user
+json.status @result.money_request_processor.status
+json.created_at DateUtils.date_formatted @result.money_request_processor.created_at
+json.scheduled_on DateUtils.date_formatted @result.money_request_processor.scheduled_at
+json.completed_on DateUtils.date_formatted @result.money_request_processor.completed_at
+json.total_amount @result.money_request_processor.total_amount
+json.processed_amount @result.money_request_processor.processed_amount
+json.source_account_type @result.money_request_processor.source_account_type
+json.payment_type @result.money_request_processor.payment_type
+json.payment_mode @result.money_request_processor.payment_mode
+json.actions @result.actions_for(@result.money_request_processor)

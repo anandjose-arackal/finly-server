@@ -89,6 +89,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
     # elsif user.id == report.controlling_user_id
     #   return report.controlling_user_role_id
     # end
-    invoice.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers(nil, provider_name).include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end

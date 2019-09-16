@@ -1,6 +1,7 @@
 json.result do
   json.array!(@result.paginated_team) do |user|
     json.extract! user, :id, :email, :company_id, :mobile_number, :active, :first_name, :last_name, :verified, :name
+    json.employee_id user.profile&.employee_id
 
     # Wallet
     json.finly_money do

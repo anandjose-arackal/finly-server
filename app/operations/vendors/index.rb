@@ -21,12 +21,19 @@ class Vendors::Index < Vendors::Base
     has_scope :authorized, type: :boolean
     has_scope :filter_gstin
     has_scope :filter_pan
+    has_scope :filter_creation_date, using: [:from, :to], type: :hash
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
     has_scope :sort_business_name
-
+    has_scope :filter_ids, type: :array
+    
     def init
+      # Todo temp workaround because of frontend format issue - START
+      if params[:filter_ids]
+        params[:filter_ids] = params[:filter_ids].first.split(",")
+      end
+
       self.vendors = params[:vendors]
       self.vendors = apply_scopes(self.vendors, params)
       self.vendors = self.vendors.sort_for_index

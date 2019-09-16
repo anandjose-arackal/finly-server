@@ -9,8 +9,6 @@ class WorkflowManager::Base < BaseOperation
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
 
-
-
     # todo - The below switch case can be reduced to one line since provider name is already present
     self.document_class_name = self.document&.class&.name
 
@@ -25,7 +23,11 @@ class WorkflowManager::Base < BaseOperation
     when 'PurchaseOrder'
       self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new user, workflow_input
     when 'Invoice'
-      self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new user, workflow_input
+      if provider_name == 'PoInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::PoInvoiceProvider.new user, workflow_input
+      elsif provider_name == 'NonPoInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::NonPoInvoiceProvider.new user, workflow_input
+      end 
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input
     when 'MoneyRequest'
@@ -49,6 +51,8 @@ class WorkflowManager::Base < BaseOperation
       self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestItemProvider.new user, workflow_input
     when 'YesBankVendor'
       self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
+    when 'PaymentAgreement'
+      self.aasm_document = ::WorkflowManager::Aasm::PaymentAgreementProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

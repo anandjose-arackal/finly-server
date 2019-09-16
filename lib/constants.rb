@@ -12,9 +12,9 @@ module Constants
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
 
-  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
   EM_PROVIDER = %w( ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider )
-  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
+  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
@@ -86,6 +86,7 @@ module Constants
   else
     PAYU_RELOAD_URL = "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
   end
+
 
   #########################
 

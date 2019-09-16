@@ -161,7 +161,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company
 
-    if params[:origin] == 'download_action'
+    if (params[:origin] == 'download_action') && request.subdomains.exclude?('admin')
       @purchase_order.trails.create action_user: current_user,
                                      action_id: TrailAction.id_for(:downloaded),
                                      action_level: @purchase_order.trails.last.action_level
@@ -176,6 +176,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
                  margin: { :bottom => 12 },
                  dpi: 650,
                  # header: { left: '[page] of [topage]' },
+                 header: { center: @result.purchase_order&.po_number },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
                  # header: { html: { template: 'export/header_pagination.html.erb' }}
       }

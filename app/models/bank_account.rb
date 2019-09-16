@@ -2,28 +2,30 @@
 #
 # Table name: bank_accounts
 #
-#  id                     :integer          not null, primary key
-#  yes_bank_vendor_id     :integer
-#  account_number         :string(255)
-#  ifsc                   :string(255)
-#  name                   :string(255)
-#  address_1              :string(255)
-#  address_2              :string(255)
-#  address_3              :string(255)
-#  pin_code               :string(255)
-#  country                :string(255)
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  account_owner_id       :integer
-#  account_owner_type     :string(255)
-#  company_id             :integer
-#  reimbursable           :boolean
-#  default_account        :boolean          default(FALSE)
-#  is_deleted             :boolean          default(FALSE)
-#  disabled               :boolean          default(FALSE)
-#  deleted_at             :datetime
-#  on_hold                :boolean          default(FALSE)
-#  bank_account_master_id :integer
+#  id                        :integer          not null, primary key
+#  yes_bank_vendor_id        :integer
+#  account_number            :string(255)
+#  ifsc                      :string(255)
+#  name                      :string(255)
+#  address_1                 :string(255)
+#  address_2                 :string(255)
+#  address_3                 :string(255)
+#  pin_code                  :string(255)
+#  country                   :string(255)
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  account_owner_id          :integer
+#  account_owner_type        :string(255)
+#  company_id                :integer
+#  reimbursable              :boolean
+#  default_account           :boolean          default(FALSE)
+#  is_deleted                :boolean          default(FALSE)
+#  disabled                  :boolean          default(FALSE)
+#  deleted_at                :datetime
+#  on_hold                   :boolean          default(FALSE)
+#  bank_account_master_id    :integer
+#  yes_bank_verified         :boolean          default(FALSE)
+#  yes_bank_beneficiary_code :string(255)
 #
 
 class BankAccount < ApplicationRecord
@@ -37,10 +39,12 @@ class BankAccount < ApplicationRecord
 
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
+  # belongs_to :company_id
 
   validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
+  # validates :company_id, presence: true
   validate :valid_bank_account
 
   accepts_nested_attributes_for :account_owner

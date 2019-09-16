@@ -169,6 +169,8 @@ class NotifierType < ApplicationRecord
               configurable_push_notification: false, configurable_mailer: false},
              {key: :user_otp, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
+             {key: :bulk_export, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
             # Vendors
              {key: :vendor_submit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},

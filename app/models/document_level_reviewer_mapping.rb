@@ -23,6 +23,8 @@
 #  forwarded                       :boolean          default(FALSE)
 #  forwarded_by_id                 :integer
 #  forwarded_to_id                 :integer
+#  min                             :decimal(20, 5)   default(0.0)
+#  max                             :decimal(20, 5)
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord
@@ -40,6 +42,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   belongs_to :forwarded_to, class_name: 'User', optional: true
   belongs_to :forwarded_by, class_name: 'User', optional: true
 
+  # Scopes
   scope :with_level_ids, -> (ids) {where level_id: ids}
   scope :with_level_id, -> (ids) {where level_id: ids}
   scope :with_reviewer_ids, -> (ids) {where reviewer_id: ids}
@@ -56,7 +59,6 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   scope :with_provider_name, -> (name) {where provider_name: name}
   scope :with_action_id, -> (action_id) {where action_id: action_id}
   scope :with_viewable, -> {where viewable: true}
-
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
   scope :with_level_number_gt, -> (number) {
     if number.present?
@@ -69,6 +71,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
     end
   }
 
+  # Validations
   validates :policy_id, presence: true
   validates :level_id, presence: true
   validates :document_reviewer_mappable_id, presence: true

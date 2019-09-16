@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :beneficiary_payments
+                :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit 
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -18,6 +18,12 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
     self.payments_attributes = options[:payments_attributes]
+    self.from_payment_agreement = options[:created_from_payment_agreement]
+    # Payment agreement type
+    self.agreement_type = options[:agreement_type]
+    # For payment agreement type id
+    self.agreement_related_document_id = options[:document_id]
+    self.ticket_type = options[:ticket_type]
     self.options = options
     self.run
   end
@@ -38,10 +44,34 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.payment_mode = self.bank_payment_request.payment_mode
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
+    initiating_account = retrieve_initiating_account(user.company)
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
       payment[:advance_amount] = (payment[:advance_amount].blank?) ? 0 : payment[:advance_amount]
-      beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
+      if from_payment_agreement
+        document = find_agreement_related_document
+        if document.present? 
+          case
+          when document.is_a?(BeneficiaryPayment)
+            self.agreement_beneficiary_payment = document
+          when document.is_a?(SecurityDeposit)
+            self.agreement_security_deposit = document
+          end
+        end
+      end
+
+      # self.beneficiary_payment = from_payment_agreement ? agreement_beneficiary_payment : retrieve_beneficiary_payment(payment, bank_account)
+
+      # Do not call this when agreement type is security deposit
+      # Cannot puts params based conditions as not sure what params and places are affecting this action
+      if agreement_security_deposit.blank?
+        self.beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
+      end
+
+      if agreement_security_deposit.present?
+        self.security_deposit = agreement_security_deposit
+      end
+
       payment[:date] = payment[:invoice_date] || payment[:date]
       payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
       self.payment_params << {
@@ -51,8 +81,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           receiving_user_id: bank_account.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: YesBankCompanyAccount.name,
-          initiating_account_id: user.company.yes_bank_company_account.id,
+          initiating_account_type: initiating_account&.class&.name,
+          initiating_account_id: initiating_account&.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -63,6 +93,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
               currency_id: Currency.first.id
           },
           note: payment[:note],
+          # payment_notification_users: payment[:payment_notification_users],
           date: DateUtils.local_date,
           external_reference_id: payment[:external_reference_id],
           department_id: payment[:department_id],
@@ -70,9 +101,9 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           cost_center_id: payment[:cost_center_id],
           company_id: user.company_id,
           api_initiated: false,
-          beneficiary_payment_id: beneficiary_payment.id,
-          parent_type: beneficiary_payment.class.name,
-          parent_id: beneficiary_payment.id,
+          beneficiary_payment_id: beneficiary_payment&.id,
+          parent_type: set_payment_parent_type,
+          parent_id: set_payment_parent_id,
           invoice_attributes: {
               category_id: payment[:category_id],
               cost_center_id: payment[:cost_center_id],
@@ -101,12 +132,20 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           custom_fields: payment[:custom_fields]
       }
     end
-
-    self.beneficiary_payments = BeneficiaryPayment.where(id: self.payment_params.pluck(:beneficiary_payment_id))
+    if agreement_type == 'security_deposit'
+      self.security_deposits = SecurityDeposit.where(id: self.payment_params.pluck(:parent_id))
+    else
+      self.beneficiary_payments = BeneficiaryPayment.where(id: self.payment_params.pluck(:parent_id))
+    end
   end
 
   def validate
-
+    if agreement_type == 'security_deposit'
+      if self.security_deposit.blank?
+        add_message :error, 'Unable to find security deposit'
+        return
+      end
+    end
   end
 
   def process
@@ -117,9 +156,14 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       payment = ::Payment.new(payment_param)
       # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
+
+        # Trail will help w.r.t. invoice history
+        if from_payment_agreement && ['security_deposit', 'beneficiary'].include?(agreement_type)
+          create_trail
+        end
         # perform the required calculations
-        beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
-        beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+        beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id]) if self.beneficiary_payments.present?
+        beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid)) if beneficiary_payments.present? && !from_payment_agreement
 
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
@@ -180,12 +224,43 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     #   bp.save
     #   return bp
     # end
-    
     bp_params = beneficiary_payment_params(payment, vendor_id, bank_account_id)
-    bp = BeneficiaryPayment.new(bp_params)
+    if from_payment_agreement
+      if agreement_beneficiary_payment.present?
+        agreement_beneficiary_payment.assign_attributes(bp_params)
+        bp = agreement_beneficiary_payment
+      end
+    else
+      bp = BeneficiaryPayment.new(bp_params)
+    end
     bp.calculate_tax_and_amount
     bp.save
     return bp
+  end
+
+  def find_agreement_related_document
+    document = nil
+    case
+    when agreement_type == 'beneficiary'
+      document = user.company.beneficiary_payments.find_by_id agreement_related_document_id
+    when agreement_type == 'security_deposit'
+      document = user.company.security_deposits.find_by_id agreement_related_document_id
+    end
+    return document
+  end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
   end
 
   def beneficiary_payment_params(payment, vendor_id, bank_account_id)
@@ -202,6 +277,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       company_id: self.company_id,
       gst_type_id: payment[:gst_type_id],
       tds_slab_id: payment[:tds_slab_id],
+      payment_notification_users: payment[:payment_notification_users],
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
@@ -217,5 +293,31 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       invoice_date: payment[:date],
       invoice_due_date: payment[:due_date]
     }
+  end
+
+  def set_payment_parent_type
+    if agreement_type == 'security_deposit'
+      security_deposit.class.name
+    else
+      beneficiary_payment&.class&.name
+    end 
+  end
+
+  def set_payment_parent_id
+    if agreement_type == 'security_deposit'
+      return security_deposit.id
+    else
+      return beneficiary_payment.id
+    end
+  end
+
+  private
+  def create_trail
+    Trail.create(parent_type: set_payment_parent_type, parent_id: set_payment_parent_id, action_user_id: user.id, action_id: TrailAction.id_for(:payment_ticket_created))
+  end
+
+  def update_status
+    self.security_deposit.update(status_id: SecurityDepositStatus.id_for(:processing)) if self.agreement_type == 'security_deposit'
+    self.beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:processing)) if self.agreement_type == 'beneficiary'
   end
 end

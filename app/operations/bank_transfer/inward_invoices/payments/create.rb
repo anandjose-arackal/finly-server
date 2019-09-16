@@ -42,6 +42,11 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
       add_message :error, "You need to enter a payable amount to create an order"
       return
     end
+
+    unless InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid).include?(inward_invoice.invoice_status_id)
+      add_message :error, "You cannot credit this invoice as it already has a unprocessed payment associated with it"
+      return
+    end
   end
 
   def process
@@ -104,6 +109,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         },
         note: self.inward_invoice.note,
         category_id: self.inward_invoice.category_id,
+        department_id: self.inward_invoice.department_id,
         date: DateUtils.local_date,
         invoice_id: self.inward_invoice.id,
         parent_type: self.inward_invoice.class.name,

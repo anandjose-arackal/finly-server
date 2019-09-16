@@ -39,7 +39,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         format.xml {self.xml_exporter.render_xml controller}
       end
       if self.xlsx_exporter.present?
-        format.json { render json: {file_path: self.xlsx_exporter.export_file_path} }
+        format.json {render json: {file_path: self.xlsx_exporter.export_file_path}}
       end
     end
   end
@@ -130,9 +130,27 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     end
 
     def generate_xls
-      view = ActionView::Base.new(ActionController::Base.view_paths)
-      view.extend ApplicationHelper
-      view.render(file: "#{self.template}.xls.erb", locals: binding_params)
+      file = generate_xls_file
+      file.read
+    end
+
+    def generate_xls_file
+      file = Tempfile.new(['export', '.xlsx'])
+      workbook = ::WriteXLSX.new(file)
+      worksheet = workbook.add_worksheet('Sheet 1')
+
+      self.headers.each_with_index do |item, index|
+        worksheet.write(0, index, item)
+      end
+      self.contents.each_with_index do |items, row|
+        items.each_with_index do |item, column|
+          worksheet.write(1 + row, column, item)
+        end
+      end
+      workbook.close
+
+      file.rewind
+      file
     end
 
     def xls_template
@@ -189,14 +207,16 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       file = Tempfile.new([filename, '.xlsx'])
 
       # Open Temporary file with WriteXLSX
-      workbook  = ::WriteXLSX.new(file.path)
+      workbook = ::WriteXLSX.new(file.path)
 
       # Write to xlsx file
       self.sheets.each do |sheet|
         worksheet = workbook.add_worksheet(sheet[:name])
 
         sheet[:item_headers].each_with_index do |item, index|
-          worksheet.write( 0, index, item )
+          format = workbook.add_format(:num_format => '@')
+          worksheet.set_column(index, index, item.length, format)
+          worksheet.write(0, index, item)
         end
 
         sheet[:item_contents].each_with_index do |items, index|

@@ -8,6 +8,7 @@ json.user do
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
   json.gender @result.selected_user.profile.gender rescue nil
+  json.employee_id @result.selected_user.profile&.employee_id
   json.editable (@result.user.company_admin? and params[:view] == 'admin')
   json.activateable @result.selected_user.manager_activateable?
   json.enforce_policy do
@@ -44,7 +45,13 @@ json.user_pockets do
       else
         adapter = nil
     end
-    json.balance adapter.balance(display_balance: true)
+
+    if pocket.user_pocket_type_id == UserPocketType.id_for(:cash)
+      json.effective_balance adapter.balance
+      json.balance adapter.balance(display_balance: true)
+    else
+      json.balance adapter.balance(display_balance: true)
+    end
     currency = pocket.base_currency
     json.base_currency do
       json.symbol currency&.symbol

@@ -3,18 +3,24 @@
 
 class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration::Base
 
-  attr_accessor :timings, :payment_order, :payment_request, :payment_mode, :date
+  attr_accessor :timings, :payment_order, :payment_request, :payment_mode, :date, :bank_accounts
 
   class BankTransfer::Configuration::TransferTimings::TimingsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :timings, :allowed, :next_valid_date
+    attr_accessor :timings, :allowed, :next_valid_date, :bank_accounts
 
     def init
+      self.bank_accounts = []
       self.allowed = params[:allowed]
       self.timings = params[:timings]
       self.next_valid_date = params[:next_date]
-    end
 
+      bank_accounts_op = AccountManager::CompanyBankAccounts::Index.(user, {balance: true}) rescue nil
+
+      if bank_accounts_op&.success?
+        self.bank_accounts = bank_accounts_op.bank_accounts
+      end
+    end
   end
 
   def pre_validate
@@ -28,6 +34,8 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
       self.payment_mode = params[:payment_mode]
       self.date = params[:date]
     end
+
+    self.bank_accounts = []
   end
 
   def validate
@@ -40,10 +48,6 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
       add_message :error, 'Payment mode cannot be blank'
       return
     end
-  end
-
-  def process
-
   end
 
   def success

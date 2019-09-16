@@ -13,8 +13,8 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     state :po_created
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected, :draft], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected, :draft], to: :awaiting_approval
+      # transitions from: [:open, :retracted, :rejected, :draft], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:open, :retracted, :rejected, :draft], to: :awaiting_approval, guard: :reviewers_present?
     end
 
     event :approve do

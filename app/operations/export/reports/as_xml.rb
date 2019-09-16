@@ -7,7 +7,7 @@ class Export::Reports::AsXml < Export::Reports::Base
   attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names,
                 :column_names, :data
 
-  # this will override the default behaviour of this class for Consul alone
+  # this will override the default behaviour of this class for Consul and stanza living
   def personalizer
     {
         post_process: {

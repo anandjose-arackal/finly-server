@@ -6,7 +6,7 @@
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
-        <div class="mg-botm-8"><b><%= @company.name %></b></div>
+        <div class="mg-botm-8"><b><%= @company.configuration&.legal_entity_name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
         <div class="font-light-gray col-xs-6">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
@@ -105,7 +105,7 @@
       <div class="col col-xs-4 billing-address">
         <h4 class="section-title">Buyer Billing Address</h4>
         <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-          <%= @result.purchase_order.company.name %>
+          <%= @result.purchase_order.company.configuration&.legal_entity_name  %>
         </div>
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
           <% if @result.purchase_order.billing_address.present? %>
@@ -126,7 +126,7 @@
       <div class="col col-xs-4 shipping-address">
         <h4 class="section-title">Buyer Shipping Address</h4>
         <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-          <%= @result.purchase_order.company.name %>
+          <%= @result.purchase_order.company.configuration&.legal_entity_name  %>
         </div>
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
           <% if @result.purchase_order.shipping_address.present? %>
@@ -200,7 +200,7 @@
       <div class="col col-xs-3 billing-address">
         <h4 class="section-title">Buyer Billing Address</h4>
         <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-          <%= @result.purchase_order.company.name %>
+          <%= @result.purchase_order.company.configuration&.legal_entity_name  %>
         </div>
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
           <% if @result.purchase_order.billing_address.present? %>
@@ -221,7 +221,7 @@
       <div class="col col-xs-3 shipping-address">
         <h4 class="section-title">Buyer Shipping Address</h4>
         <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-          <%= @result.purchase_order.company.name %>
+          <%= @result.purchase_order.company.configuration&.legal_entity_name  %>
         </div>
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
           <% if @result.purchase_order.shipping_address.present? %>
@@ -357,7 +357,7 @@
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless (@company.id == 137 || @company.id == 156) %>
+      <% unless [137,156,166,179,173].include?(@company.id)%>
         <ul>
           <% approved_users = [] %>
           <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
@@ -383,7 +383,6 @@
           </li>
         </ul>
       <% end %>
-      <!-- <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p> -->
     </div>
   </div>
 </div>
