@@ -11,6 +11,7 @@ class OrganizationAccountController < BaseControllers::WebBase
   end
 
   def categories
+    params[:organization_account] = true
     @result = Categories::Index.(current_user, params)
     respond
   end

@@ -31,6 +31,11 @@ class Categories::Index < Categories::Base
       self.categories = user.company.categories.active
     end
 
+    # in org account, show all categories
+    if params[:organization_account]
+      self.categories = user.company.categories.active
+    end
+
   end
 
   def success
