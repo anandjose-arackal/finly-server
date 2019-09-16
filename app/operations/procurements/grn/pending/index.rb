@@ -40,7 +40,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
         end
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
-        self.procurements = Procurement.where(id: proc_ids).joins(:purchase_order).where.not('purchase_orders.purchase_order_status_id = ?', PurchaseOrderStatus.id_for(:closed)) rescue Procurement.none
+        self.procurements = Procurement.where(id: proc_ids).joins(:purchase_order).where.not('purchase_orders.purchase_order_status_id IN (?)', PurchaseOrderStatus.ids_for([:closed, :voided])) rescue Procurement.none
       end
     end
   end
