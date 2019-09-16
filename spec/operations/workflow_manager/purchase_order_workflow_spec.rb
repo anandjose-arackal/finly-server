@@ -16,7 +16,7 @@ require 'rails_helper'
 
 # Create
 
-RSpec.describe "Purchase Order Workflow -- " do
+RSpec.xdescribe "Purchase Order Workflow -- " do
   before(:all) do |example|
     @company = create(:company)
     # Create Users

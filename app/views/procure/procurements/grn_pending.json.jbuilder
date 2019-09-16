@@ -34,10 +34,10 @@ json.results do
       end
     end
 
-    if po.present? # || invoice.present?
-      department = po&.department # || invoice&.department
-      cost_center = po&.cost_center # || invoice&.cost_center
-      json.department department&.full_dept_name
+    if po.present? || invoice.present?
+      department = po&.department || invoice&.department
+      cost_center = po&.cost_center || invoice&.cost_center
+      json.department department&.full_name
       json.cost_center cost_center&.name
     end
 

@@ -15,6 +15,9 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
       elsif is_send_to_vendor?
         self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
+      
+      elsif is_vendor_confirmed?
+        self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
       end
     end
         
@@ -36,7 +39,7 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
         return
       end
     else       
-      if self.procurement.destroy
+      if rollback_purchase_request_items_status && self.procurement.destroy
         self.po_available = false
         add_message :success, "Successfully Deleted Procurement"
       end
@@ -95,9 +98,9 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def previous_state
     if self.procurement.po_revisions.present? && (self.procurement.po_revisions.count > 1)
-      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     else
-      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
     ps.last.action_id
   end
@@ -115,6 +118,33 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
     state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
+  end
+
+  def is_vendor_confirmed?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:vendor_confirmed) ) ? true : false
+  end
+
+  def rollback_purchase_request_items_status
+    # TODO - take care of item status if pr status changes in future after PR-> PO is created 
+    # TODO - Status logic will change once we have PR 'closed'  status in place
+    purchase_request_item_ids = self.purchase_order.items.pluck(:purchase_request_item_id).uniq rescue []
+    unless purchase_request_item_ids.blank?
+      purchase_request_items = PurchaseRequestItem.where(id: purchase_request_item_ids) 
+      purchase_request_items.each do |purchase_request_item|
+        trail_status = purchase_request_item.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve)]).last&.action&.name
+        if trail_status == 'approve'
+          status = 'approved'
+        elsif trail_status == 'auto_approve'
+          status = 'auto_approved'
+        end
+        purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(status) # Status can be approved/auto-approved
+        if purchase_request_item.save && purchase_request_item.status_id.present?
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_deleted))
+        end
+      end
+    end
+    true
   end
 
 end

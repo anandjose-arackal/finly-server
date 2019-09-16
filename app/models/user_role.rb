@@ -9,6 +9,8 @@
 #
 
 class UserRole < ApplicationRecord
+  include Seedable
+
   has_many :users, through: :user_role_mappings
 
   scope :admin, -> { where(id: UserRole.id_for(:admin)) }
@@ -18,6 +20,7 @@ class UserRole < ApplicationRecord
   scope :auditor, -> { where(id: UserRole.id_for(:auditor)) }
   scope :travel_manager, -> { where(id: UserRole.id_for(:travel_manager)) }
 
+  ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
   VALUES = {
       admin: 1,
       finance_manager: 2,
@@ -54,8 +57,19 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35,
+      po_invoice_initiator: 36,
+      po_invoice_reviewer: 37,
+      po_invoice_auditor: 38, 
+      non_po_invoice_initiator: 39,
+      non_po_invoice_reviewer: 40,
+      non_po_invoice_auditor: 41
+
   }
+  ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 
   VALUES_EM = {
       admin: 1,
@@ -100,12 +114,15 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35
   }
 
 
   # This is used for segregating VP specific policies
-  # Do not put user specific roles like :initiator, :creaditor, :admin, :reviewer here
+  # Do not put user specific roles like :initiator, :creditor, :admin, :reviewer here
   VP_ROLES = {
     purchase_request_initiator: 10,
     purchase_request_reviewer: 11,
@@ -125,7 +142,13 @@ class UserRole < ApplicationRecord
     vendor_manager: 25,
     bank_payment_request_auditor: 26,
     budget_manager: 27,
-    non_po_initiator: 28
+    non_po_initiator: 28,
+    po_invoice_initiator: 36,
+    po_invoice_reviewer: 37,
+    po_invoice_auditor: 38, 
+    non_po_invoice_initiator: 39,
+    non_po_invoice_reviewer: 40,
+    non_po_invoice_auditor: 41
   }
 
   def self.seed_data
@@ -149,12 +172,15 @@ class UserRole < ApplicationRecord
     VALUES[role]
   end
 
-  def self.ids_for(*roles)
-    role_ids = []
-    roles.each do |role|
-      role_ids << self.id_for(role)
+  def self.ids_for(*keys)
+    if keys.present? and keys.first.class.name == Array.name
+      keys = keys.first
     end
-    role_ids.compact
+    ids = []
+    VALUES.each do |key, value|
+      ids << value if keys.include? key&.to_sym&.downcase
+    end
+    ids
   end
 
   def self.name_for(role_id)

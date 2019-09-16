@@ -137,16 +137,25 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         return 0
       end
       case account
-        when :vendor_payment_wallet
-          adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-          return adapter.balance
-        when :company_credits
+      when :vendor_payment_wallet
+        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+        return adapter.balance
+      when :company_credits
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
           adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-          return adapter.balance
+        when "ICICI"
+          adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KOTAK"
+          adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        else
+          adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
+        return adapter.balance
       end
     end
 
-    ################## INITIATOR ACTIONS ########################
+      ################## INITIATOR ACTIONS ########################
     def retrieve_initiator_actions
       actions = {}
       if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
@@ -456,23 +465,24 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         else
           # i.e if the user is an admin, even from the creditor view, they should be able to
           # credit the payment request from company credits
-          if user.vendor_payments_admin?
-            balance = retrieve_balance(:company_credits, user)
-            if balance >= bank_payment_request.requested_amount_value
-              enabled = true
-            end
+          balance = retrieve_balance(:company_credits, user)
+          # balance = retrieve_balance(:kotak_bank_account, user)
+          if balance >= bank_payment_request.requested_amount_value
+            enabled = true
           end
         end
-        if user.vendor_payments_admin?
-          admin = true
-        end
+        # if user.vendor_payments_admin?
+        #   admin = true
+        # end
+        # setting the admin flag as true because the credit also needs access to credit from CC
+        admin = true
         actions[:credit_options] = {}
         if enabled && !bank_payment_request.credit_card?
           actions[:credit_options] = {
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
                   enabled: enabled,
-                  messages: "You can directly credit this payment order from your Finly Money",
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
                   require_password: true,
                   initiating_account: admin,
                   method: "patch"
@@ -526,7 +536,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
         end
 
-        admin = user.vendor_payments_admin?
+        # admin = user.vendor_payments_admin?
+        # setting the admin flag as true because the credit also needs access to credit from CC
+        admin = true
         # checking if this particular payment order is partially completed so that it can be credited later
         if self.bank_payment_request.payment_order.partially_completed?
           actions[:credit] = true
@@ -534,7 +546,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
                   enabled: true,
-                  messages: "You can directly credit this payment order from your Finly Money",
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
                   require_password: true,
                   initiating_account: admin,
                   method: "patch"

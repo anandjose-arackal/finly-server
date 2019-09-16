@@ -1,9 +1,10 @@
 class Procurements::Create < Procurements::Base
-  attr_accessor :procurement, :procurement_params
+  attr_accessor :procurement, :procurement_params , :document_type
 
   def init
     self.procurement_params = procurement_parameters
     puts "PROCUREMENTS from init params", params.inspect
+    self.document_type = params[:document_type]
   end
 
   def validate
@@ -12,11 +13,18 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    unless user.is_purchase_order_initiator? #|| user.vendor_payments_admin?
+    if document_type == 'recurring_invoice'
+      if !user.is_non_po_invoice_initiator? || !user.vendor_payments_admin?
+        add_message :error, 'You do not have required role to perform this action'
+        return
+      end
+    end
+
+    unless user.is_purchase_order_initiator? || user.is_po_invoice_initiator? || user.is_non_po_invoice_initiator?#|| user.vendor_payments_admin?
       add_message :error, 'You do not have permission for this action'
     end
 
-    document_types = %w( purchase_order invoice non_po_invoice )
+    document_types = %w( purchase_order invoice non_po_invoice recurring_invoice)
 
     document_type = params[:document_type]
     unless document_types.include?(document_type)
@@ -44,6 +52,8 @@ class Procurements::Create < Procurements::Base
       when 'invoice', 'proforma_invoice', 'non_po_invoice'
         # add_message :error, 'Invalid document type provided'
         op = Procurements::Invoices::Create.(user, params)
+      when :recurring_invoice, 'recurring_invoice'
+        op = Procurements::Invoices::RecurringInvoices::Create.(user, params)
         # do nothing!
         # tax invoice / proforma invoice will be created
       else

@@ -1,7 +1,6 @@
-class Settlement::MoneyRequestsController < ApplicationController
+class Settlement::MoneyRequestsController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:processing_payment_file]
-  before_action -> { finly_authorize! :web }
+  set_tokens_in_header :processing_payment_file
 
   def pending_index
     @result = Settlement::SMoneyRequests::Pending::Index.(current_user, params)
@@ -38,6 +37,21 @@ class Settlement::MoneyRequestsController < ApplicationController
     respond
   end
 
+  def processing_show
+    @result = Settlement::SMoneyRequests::Processing::Show.(current_user, params)
+    respond
+  end
+
+  def processing_show_items
+    @result = Settlement::SMoneyRequests::Processing::Show.(current_user, params)
+    respond
+  end
+
+  def processing_update
+    @result = Settlement::SMoneyRequests::Processing::Update.(current_user, params)
+    respond
+  end
+
   def processing_count
     @result = Settlement::SMoneyRequests::Processing::Index.(current_user, params)
     respond
@@ -46,6 +60,28 @@ class Settlement::MoneyRequestsController < ApplicationController
   def processing_payment_file
     @result = Settlement::SMoneyRequests::Processing::GeneratePaymentFile.(current_user, params)
     respond
+  end
+
+  # generates excel to gather UTR from user in bulk and process those money request batches marked as outside finly
+  def generate_template_file
+    @result = Settlement::SMoneyRequests::Processing::GenerateTemplateFile.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  # used to process uploaded template file to process money request batches marked as outside finly
+  def process_template_file
+    @result = Settlement::SMoneyRequests::Processing::ProcessTemplateFile.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'settlement/money_requests/process_template_file'
+    end
   end
 
   def completed_index
@@ -65,6 +101,16 @@ class Settlement::MoneyRequestsController < ApplicationController
 
   def completed_batch_count
     @result = Settlement::SMoneyRequests::Completed::BatchIndex.(current_user, params)
+    respond
+  end
+
+  def completed_show
+    @result = Settlement::SMoneyRequests::Completed::Show.(current_user, params)
+    respond
+  end
+
+  def completed_show_items
+    @result = Settlement::SMoneyRequests::Completed::Show.(current_user, params)
     respond
   end
   

@@ -1,7 +1,6 @@
-class Integration::TallyController < ApplicationController
+class Integration::TallyController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:vouchers, :reimbursements]
-  before_action -> { finly_authorize! :web }
+  set_tokens_in_header :vouchers, :reimbursements
 
   def set_configuration
     @result = Integrations::Tally::SetConfiguration.(current_user, params)
@@ -9,7 +8,13 @@ class Integration::TallyController < ApplicationController
   end
 
   def vouchers
-    @result = Integrations::Tally::Vouchers.(current_user, params)
+    # @result = Integrations::Tally::Vouchers.(current_user, params)
+    case params[:type]
+    when :vp_invoice_vouchers
+      @result = Integrations::Tally::InvoiceVouchers.(current_user, params)
+    else
+      @result = Integrations::Tally::Vouchers.(current_user, params)
+    end
     respond
   end
 
@@ -20,12 +25,19 @@ class Integration::TallyController < ApplicationController
 
   def check
     @result = Integrations::Tally::ValidateConfiguration.(current_user, params)
+    @result.messages = {}
     respond
   end
 
   def export
     params[:export_format] = :xls
-    @result = Integrations::Tally::Vouchers.(current_user, params)
+    case params[:type]
+    when 'vp_invoice_vouchers'
+      @result = Integrations::Tally::InvoiceVouchers.(current_user, params)
+    else
+      @result = Integrations::Tally::Vouchers.(current_user, params)
+    end
+    # @result = Integrations::Tally::Vouchers.(current_user, params)
     respond
   end
 

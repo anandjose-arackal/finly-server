@@ -39,7 +39,9 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     self.payments_attributes.each do |payment|
+      initiating_account = retrieve_initiating_account(user.company)
       bank_account = retrieve_bank_account(payment)
+      reconstruct_po_advance(payment)
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -47,8 +49,8 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
           receiving_user_id: bank_account.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: YesBankCompanyAccount.name,
-          initiating_account_id: user.company.yes_bank_company_account.id,
+          initiating_account_type: initiating_account.class&.name,
+          initiating_account_id: initiating_account.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -106,6 +108,20 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
 
   private
 
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
+  end
+
   def retrieve_bank_account(order_details)
     if order_details[:account_id].present?
       id = order_details[:account_id]
@@ -124,5 +140,17 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
       end
       return ba
     end
+  end
+
+  # used when tds slab for advance amount is changed from the pt create page
+  def reconstruct_po_advance(payment)
+    purchase_order = PurchaseOrder.find_by(id: payment[:parent_id])
+    unless payment[:advance_tds_slab_id].blank? || (payment[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id)
+      purchase_order.advance_tds_slab_id = payment[:advance_tds_slab_id]
+      purchase_order.save
+      purchase_order.process_line_item_calculation
+      purchase_order.save
+    end
+    payment[:requested_amount] = purchase_order.advance_amount&.value
   end
 end

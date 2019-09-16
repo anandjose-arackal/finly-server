@@ -1,9 +1,7 @@
-class DepartmentsController < ApplicationController
+class DepartmentsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web, :admin }
 
   def index
-    p params
     @result = Company::Departments::Index.(current_user, params)
     respond
   end
@@ -32,6 +30,11 @@ class DepartmentsController < ApplicationController
 
   def destroy
     @result = Company::Departments::Destroy.(current_user, params)
+    respond
+  end
+
+  def bulk_destroy
+    @result = Company::Departments::BulkDestroy.(current_user, params)
     respond
   end
 end

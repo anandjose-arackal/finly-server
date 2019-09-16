@@ -7,12 +7,8 @@ class Company::Departments::Import < Company::Departments::Base
     end
   end
 
-  def user_model
-   [User, AdminUser]
-  end
-
   def init
-    self.company = Company.find_by_id params[:company_id].to_i
+    self.company = user.company
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -42,7 +38,7 @@ class Company::Departments::Import < Company::Departments::Base
 
       self.department = company.departments.with_name(department_params[:department_name]).first
         unless department.present?
-          self.department = company.departments.new(name: department_params[:department_name])
+          self.department = company.departments.new(name: department_params[:department_name], department_code: department_params[:department_code])
           if department.save
             result_hash[i] = "Success!"
           else
@@ -52,7 +48,7 @@ class Company::Departments::Import < Company::Departments::Base
         if department_params[:sub_department_name].present?
          self.sub_department = company.departments.with_name(department_params[:sub_department_name]).first
           unless sub_department.present?
-            self.sub_department = company.departments.new(name: department_params[:sub_department_name], parent_id: department.id)
+            self.sub_department = company.departments.new(name: department_params[:sub_department_name], department_code: department_params[:department_code], parent_id: department.id)
             if sub_department.save
                 result_hash[i] = "Success!"
               else
@@ -86,11 +82,13 @@ class Company::Departments::Import < Company::Departments::Base
   def process_row(row)
     department_name = row[import_fields[:department]].to_s
     sub_department_name = row[import_fields[:sub_department]].to_s
+    department_code = row[import_fields[:department_code]].to_s
 
 
     params = {
         department_name: department_name,
-        sub_department_name: sub_department_name
+        sub_department_name: sub_department_name,
+        department_code: department_code
     }
   end
 
@@ -98,6 +96,7 @@ class Company::Departments::Import < Company::Departments::Base
     {
         :department=> 0,
         :sub_department => 1,
+        :department_code => 2
     }
   end
 
@@ -110,17 +109,18 @@ class Company::Departments::Import < Company::Departments::Base
   end
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    CSV.open(file_name, 'wb') do |csv|
-      self.header << 'Result'
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row = row.map(&:to_s)
-        row << result_hash[i]
-        csv << row
-      end
-    end
-    return file_name.gsub('public', '')
+   file = Tempfile.new("bulk_import_departments_result.csv")
+       CSV.open(file.path, 'wb') do |csv|
+         self.header << 'Result'
+         csv << header
+         (2..sheet.last_row).each do |i|
+           row = sheet.row(i)
+           row = row.map(&:to_s)
+           row << result_hash[i]
+           csv << row
+         end
+       end
+   temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+   return temp_file.file.url
   end
 end

@@ -42,7 +42,8 @@ class ItzCashCardProgram < ApplicationRecord
       {
           name: "HDFC (PIN at POS)",
           bank: "HDFC",
-          product_code: "HDFFPD"
+          product_code: "HDFVFN",
+          charge_code: "HDFFPD"
       },
       {
           name: "Jotun Reward Card",
@@ -53,7 +54,13 @@ class ItzCashCardProgram < ApplicationRecord
           name: "HDFC Chip card",
           bank: "HDFC",
           product_code: "HDFFRG",
-          charge_code: "HBFRGD"
+          charge_code: "HDFRGD"
+      },
+      {
+          name: "HDFC Chip Card (VISA)",
+          bank: "HDFC",
+          product_code: "HBVFGR",
+          charge_code: "HDFFPD"
       }
   ]
 

@@ -1,7 +1,6 @@
-class UserTeamsController < ApplicationController
+class UserTeamsController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = UserTeam::Create.(current_user, params)

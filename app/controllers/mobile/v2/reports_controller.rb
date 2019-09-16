@@ -1,9 +1,8 @@
-class Mobile::V2::ReportsController < ApplicationController
+class Mobile::V2::ReportsController < BaseControllers::MobileBase
 
   include MathUtil
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
 
 
   respond_to :json

@@ -25,9 +25,9 @@ class CustomField::Validate < CustomField::Base
     return if self.custom_fields.blank?
 
     self.custom_fields.each do |field|
-      if field.field_configuration.mandatory and field.value.blank?
+       if field.field_configuration.mandatory and field.value.blank?
         add_message :error, "#{field.field_configuration.field_name} cannot be empty"
-      end
+       end
     end
   end
 

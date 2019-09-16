@@ -1,0 +1,36 @@
+# == Schema Information
+#
+# Table name: gatekeeper_blocks
+#
+#  id            :bigint           not null, primary key
+#  user_id       :integer
+#  company_id    :integer
+#  params        :text(65535)
+#  headers       :text(65535)
+#  act           :string(255)
+#  premise       :string(255)
+#  verdict       :string(255)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  rule          :string(255)
+#  level         :integer          default(1), not null
+#  admin_user_id :integer
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  company: one
+  params: MyText
+  headers: MyText
+  reason: MyText
+  tree_path: MyString
+
+two:
+  user: two
+  company: two
+  params: MyText
+  headers: MyText
+  reason: MyText
+  tree_path: MyString

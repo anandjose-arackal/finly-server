@@ -1,7 +1,9 @@
-class Procure::PurchaseRequestsController < ApplicationController
+class Procure::PurchaseRequestsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
-
+  def filter_config
+    @result = Procurements::PurchaseRequests::FilterConfig.(current_user, params)
+    respond
+  end
   def index
     @result = Procurements::PurchaseRequests::Index.(current_user, params)
     respond
@@ -24,6 +26,11 @@ class Procure::PurchaseRequestsController < ApplicationController
 
   def destroy
     @result = Procurements::PurchaseRequests::Destroy.(current_user, params)
+    respond
+  end
+
+  def bulk_destroy
+    @result = Procurements::PurchaseRequests::BulkDestroy.(current_user, params)
     respond
   end
 
@@ -140,6 +147,13 @@ class Procure::PurchaseRequestsController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseRequests::GenerateImportSample.(current_user, params)
+    respond_to do |format|
+      format.json {}
+    end    
+  end
+
+  def comments
+    @result  = Procurements::PurchaseRequests::Comments.(current_user, params)
     respond
   end
 

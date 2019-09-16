@@ -15,7 +15,7 @@ require 'rails_helper'
 # Pass through output with action
 
 # Create
-RSpec.describe "Invoice Workflow -- " do
+RSpec.xdescribe "Invoice Workflow -- " do
   before(:all) do |example|
     @company = create(:company)
     # Create Users

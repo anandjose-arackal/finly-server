@@ -24,7 +24,9 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
   def process
     self.bank_accounts = account_owner.bank_accounts.non_deleted
-    self.receiving_transactions = account_owner.receiving_payments.with_receiving_user_type(self.account_owner.class.name).with_receiving_account_type("BankAccount").with_application(RequestStore.store[:current_app]).successful_and_failed_only
+    page = params[:page] || 1
+    per_page = params[:per_page] || 30
+    self.receiving_transactions = account_owner.receiving_payments.with_receiving_user_type(self.account_owner.class.name).with_receiving_account_type("BankAccount").with_application(RequestStore.store[:current_app]).successful_and_failed_only.paginate(page: page, per_page: per_page)
   end
 
   def success

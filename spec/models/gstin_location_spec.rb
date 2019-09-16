@@ -2,7 +2,7 @@
 #
 # Table name: gstin_locations
 #
-#  id                :bigint(8)        not null, primary key
+#  id                :bigint           not null, primary key
 #  vendor_id         :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -15,6 +15,7 @@
 #  poc_fax           :string(255)
 #  poc_designation   :string(255)
 #  location          :string(255)
+#  address           :text(65535)
 #
 
 require 'rails_helper'

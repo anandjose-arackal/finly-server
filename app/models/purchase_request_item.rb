@@ -2,7 +2,7 @@
 #
 # Table name: purchase_request_items
 #
-#  id                           :bigint(8)        not null, primary key
+#  id                           :bigint           not null, primary key
 #  purchase_request_id          :integer
 #  item_id                      :integer
 #  vendor_id                    :integer
@@ -20,6 +20,10 @@
 #  rejected                     :boolean
 #  unit_of_measurement          :string(255)
 #  reject_note                  :string(255)
+#  department_id                :integer
+#  cost_center_id               :integer
+#  category_id                  :integer
+#  hsn_sac                      :string(255)
 #
 
     # table_name => purchase_request_items
@@ -39,7 +43,11 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
+  include FieldCustomizer::CustomizableValidation
   # include Transitionable
+
+  field_customization_key :purchase_request_item
+  customizable_validate :purpose, presence: true, scope: [:purchase_request, :company]
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
@@ -53,9 +61,14 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :cost_center, optional: true
   belongs_to :category, optional: true
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
+  has_one :purchase_order_item
   has_many :trails, as: :parent
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  has_many :custom_fields, as: :parent, dependent: :destroy
+
+
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
+  validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
@@ -67,7 +80,7 @@ class PurchaseRequestItem < ApplicationRecord
   scope :rejected, -> { where rejected: true }
   scope :issued_from_inventory, -> { where status_id: PurchaseRequestItemStatus.id_for(:issued_from_inventory)}
   scope :po_created, -> { where status_id: PurchaseRequestItemStatus.id_for(:po_created) }
-  scope :approved, -> { where status_id: PurchaseRequestItemStatus.id_for(:approved) }
+  scope :approved, -> { where status_id: [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)] }
 
   scope :item_id, -> (id) {
     where item_id: id
@@ -113,7 +126,9 @@ class PurchaseRequestItem < ApplicationRecord
     if quantity.present? && per_unit_price.present?
       amount = Amount.create(currency_id: 1, value: quantity*per_unit_price)
       self.estimated_amount_id = amount.id
-      self.save
+      if self.save
+        self.purchase_request.update_total_amount
+      end
     end
   end
 
@@ -131,6 +146,10 @@ class PurchaseRequestItem < ApplicationRecord
         end
       end
     end
+  end
+
+  def cost_allocation_items?
+    self.purchase_request.cost_allocation_items
   end
 
 end

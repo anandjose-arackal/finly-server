@@ -1,17 +1,25 @@
-class ExportController < ApplicationController
+class ExportController < BaseControllers::WebBase
   include MathUtil
 
-  before_action :set_tokens_in_header
-
-  before_action -> {finly_authorize! :web}
+  set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor
 
   def report
+    params = RequestStore.store[:params]
+    case params[:download_type] # Format should be json
+    when :xls, 'xls' # Used for 'export all' operations
+      respond response: :success, message: 'You will receive email shortly'
+      # params = RequestStore.store[:params]
+      parameters = params.permit!
+      # Convert to hash for sidekiq support
+      @result = Export::Reports::AsXmlBackground.call_async(current_user, parameters.to_hash)
+      return
+    end
     respond_to do |format|
       format.csv {
         @report = Export::Reports::AsCsv.(current_user, params)
         send_data @report.data, filename: "#{@report.report_names}.csv"
       }
-      format.xls {
+      format.xls { # User for report/show export
         @report = Export::Reports::AsXml.(current_user, params)
         @header = @report.header
         @data = @report.data

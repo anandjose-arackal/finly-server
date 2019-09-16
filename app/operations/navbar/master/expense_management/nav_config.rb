@@ -26,19 +26,19 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def trips
-    {name: 'Trips', id: 'trips', url: 'trips'}
+    {name: 'Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
   end
 
   def your_trips
-    {name: 'Your Trips', id: 'trips', url: 'trips?view=personal'}
+    {name: 'Your Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
   end
 
   def team_trips
-    {name: 'Team - Trips', id: 'trips', url: 'trips?view=manager'}
+    {name: 'Team - Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
   end
 
-  def policy_trips
-    {name: 'Policy - Trips', id: 'trips', url: 'trips?view=personal'}
+  def company_trips
+    {name: 'Policy - Trips', id: 'trips', url: 'trips/params={"view":"admin"}'}
   end
 
   def reports

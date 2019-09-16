@@ -16,7 +16,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
 
   def init
     self.include_attachments = !!params[:include_attachments]
-    self.bank_payment_requests = BankPaymentRequest.with_id(params&.dig(:bank_payment_request_id))
+    self.bank_payment_requests = BankPaymentRequest.with_id(params&.dig(:bank_payment_request_id)).include_for_data_retrieval
   end
 
   def validate
@@ -35,7 +35,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
     if include_attachments
       files = []
       files << {name: 'export.xls', file_contents: exported_xls}
-      bank_payment_requests.include_attachments.each do |bpr|
+      bank_payment_requests.include_attachments.find_each(batch_size: 1000) do |bpr|
         file_name_prefix = "#{bpr.id}"
         count = 1
         bpr.payment_order&.payment_order_attachments&.each do |attachment|
@@ -85,7 +85,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   protected
   def create_temporary_link(file)
     return nil if file.nil?
-    temp_file = File.open(self.file_name, 'w')
+    temp_file = File.open(self.file_name, 'wb')
     temp_file.write file
     temp_file.rewind
     # temp_file
@@ -101,7 +101,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_headers
     headers = ["Payment Order ID",
                "Payment Order Name",
+               "Payment ID",
                "Beneficiary Name",
+               "Beneficiary Code",
                "Beneficiary Account Name",
                "Beneficiary Account Number",
                "Beneficiary IFSC",
@@ -113,9 +115,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Payment Order Submitted Date",
                "Payment Order Processed Date",
                "Awaiting Action From",
+               "Policy",
+               "PO Number",
                "Invoice Number",
                "Invoice Due Date",
-               "Invoice Date"]
+               "Invoice Date",
+               "Invoice ID"]
     headers += retrieve_custom_field_headers
     headers += ["Invoice Amount",
                 "Discount",
@@ -132,15 +137,20 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
-    bank_payment_requests.include_for_data_retrieval.each do |pr|
+    ActiveRecord::Base.uncached do
+    bank_payment_requests.include_for_data_retrieval.find_each(batch_size: 1000) do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
+        purchase_order = (payment.parent_type == 'PurchaseOrder' ? payment.parent : nil)
+        vendor = (payment.receiving_user_type == 'YesBankVendor' ? payment.receiving_user : nil)
         payment_details = [
             pr.id,
             pr.name,
+            payment.id,
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
+            vendor.present? ? vendor.vendor_id : '',
             payment.receiving_account&.account_number,
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
@@ -152,16 +162,25 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
             # payment.payment_order.bank_payment_request.controlling_user&.name,
             reviewer_names,
+            pr.policy&.name,
+            purchase_order.present? ? purchase_order&.po_number: '',
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
-            payment.invoice&.date&.strftime("%d-%m-%Y")
+            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
+        tds_amount = 0.0
+        if payment.parent_type == 'PurchaseOrder' && purchase_order.present?
+          tds_amount = (purchase_order.advance_tds_amount&.value || 0)
+        else
+          (payment.invoice&.tds_amount&.value || 0)
+        end
         payment_details += [
             (payment.invoice&.amount&.value || 0),
             (payment.invoice&.discount_amount&.value || 0),
             (payment.invoice&.tax_amount&.value || 0),
-            (payment.invoice&.tds_amount&.value || 0),
+            tds_amount,
             (payment.invoice&.advance_amount&.value || 0),
             (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
@@ -171,6 +190,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
         ]
         content << payment_details
       end
+    end
     end
     content
   end

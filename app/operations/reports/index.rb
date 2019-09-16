@@ -133,7 +133,8 @@ class Reports::Index < Reports::Base
   end
 
   class Reports::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reports, :counts, :paginated_reports, :count
+    attr_accessor :reports, :counts, :paginated_reports, :count,
+                  :tax_rates, :gst_state_codes
 
     has_scope :filter_search
     has_scope :filter_id
@@ -169,6 +170,8 @@ class Reports::Index < Reports::Base
       end
       self.count = self.reports.count
       self.paginated_reports = self.reports.paginate(page: params[:page], per_page: params[:per_page]).include_details
+      self.tax_rates = user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
     end
 
     def get_counts

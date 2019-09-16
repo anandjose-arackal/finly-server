@@ -62,6 +62,8 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
         payment_request.payment_order.payments.each do |payment|
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          update_agreement_beneficiary(payment)
+          update_agreement_security_deposit(payment)
         end
         # create the trail for the same
         # payment_request.bank_payment_request_trails.create action_user: user,
@@ -99,10 +101,47 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
 
     end
 
-    # Sending email to procurement initiators about payments against it
-    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    # Sending email to original document initiators about payments against it
+    # payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id))
     payments.each do |payment|
-      Event::EPurchaseOrder::Credit.(user, {payment: payment})
+      case payment.parent_type
+      when 'Invoice'        
+        document_owner = payment.invoice.created_by
+        Event::EInvoice::Credit.(document_owner, {payment: payment})
+      when 'PurchaseOrder'
+        document_owner = payment.purchase_order.user
+        Event::EPurchaseOrder::Credit.(document_owner, {payment: payment})
+      when 'Beneficiary'
+        document_owner = payment.invoice.created_by
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      else
+        document_owner = user
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      end
+    end
+  end
+
+  def update_agreement_beneficiary(payment)
+    # beneficiary_payment = user.company.beneficiary_payments.find_by_id(payment.beneficiary_payment_id) rescue nil
+    # if beneficiary_payment.present?
+    #   payment_agreement = payment.beneficiary_payment.payment_agreement rescue nil
+    #   if payment_agreement.present?
+    #     beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:closed))
+    #   end
+    # end
+    if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
+      unless payment.parent.status_id == BeneficiaryPaymentStatus.id_for(:paid)
+        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:paid))
+      end
+    end
+  end
+
+  def update_agreement_security_deposit(payment)
+    if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
+      unless payment.parent.status_id == SecurityDepositStatus.id_for(:paid)
+        payment.parent.update(status_id: SecurityDepositStatus.id_for(:paid))
+      end
     end
   end
 end

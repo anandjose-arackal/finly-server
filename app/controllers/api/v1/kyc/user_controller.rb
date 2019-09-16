@@ -1,7 +1,6 @@
-class Api::V1::Kyc::UserController < ApplicationController
+class Api::V1::Kyc::UserController < BaseControllers::MobileBase
 
 
-  before_action -> { finly_authorize! :mobile}
 
   def show
     @result = KycProcess::User::Show.(current_user, params)

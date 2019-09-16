@@ -64,6 +64,20 @@ class Reports::Expenses::UpdateComment < BaseOperation
                                  user_id: self.user.id,
                                  expense_id: updated_expense.id)
         end
+      elsif key == :custom_fields
+         updated_custom_fields = updated_expense.custom_fields_label_values
+         value.each do |key,custom_field|
+           if updated_custom_fields[key].present?
+            if custom_field[:value] != updated_custom_fields[key][:value]
+               report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_update),
+                                      user_id: self.user.id,
+                                      updated_field: custom_field[:label],
+                                      updated_from: custom_field[:value],
+                                      updated_to: updated_custom_fields[key][:value],
+                                      expense_id: updated_expense.id)
+             end
+           end
+         end
       elsif updated_expense.send(key) != value and not (updated_expense.send(key).blank? and value.blank?)
         report.comments.create(report_comment_action_id: ReportCommentAction.id_for(:expense_update),
                                user_id: self.user.id,

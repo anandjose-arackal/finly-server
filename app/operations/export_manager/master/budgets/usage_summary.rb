@@ -1,13 +1,13 @@
-class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::BaseMaster
+class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::BaseSubscriber
 
   attr_accessor :spent_amount
 
-  register_handle :budget_summary
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  bus ExportManager::Master::BaseMaster
+  subscribe :budget_summary
+  generators ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Synchronous
   validate :input
-
-  register_fields [
+  fields [
                   budget_name: {spreadsheet: true, pdf: false},
                   budget_start_date: {spreadsheet: true, pdf: false},
                   budget_end_date: {spreadsheet: true, pdf: false},

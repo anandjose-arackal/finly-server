@@ -2,7 +2,7 @@
 #
 # Table name: purchase_requests
 #
-#  id                         :bigint(8)        not null, primary key
+#  id                         :bigint           not null, primary key
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
@@ -11,19 +11,23 @@
 #  creator_id                 :integer
 #  submitted_at               :datetime
 #  approved_at                :datetime
+#  order_number               :string(255)
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
-#  order_number               :string(255)
+#  reject_note                :text(65535)
+#  cost_center_id             :integer
+#  total_amount_id            :integer
+#  cost_allocation_items      :boolean          not null
 #
 
 class PurchaseRequest < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR-'
+  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -35,26 +39,49 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
   belongs_to :cost_center, optional: true
-
+  belongs_to :total_amount, optional: true, class_name: "Amount", dependent: :destroy
   has_many :attachments, as: :resource, dependent: :destroy
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
-  validates :description, :location, :department, :policy, presence: true
+  validates :description, :location, :policy, presence: true
+  validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
-  before_save :add_company
+  before_validation :add_company
 
-  accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
+  accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
 
-  scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
-  scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
+
+  scope :search_by_email, -> (email) {
+    user = RequestStore.store[:current_user]
+    if user.present?
+      # where creator_id: User.find_by(email: email)&.id
+      where creator_id: user.company.users.find_by_email(email)&.id
+    end
+  }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
+  scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}
+
   scope :with_ids, -> (ids) { where id: ids }
+
+  scope :filter_by_status_id,  -> (status_id) {
+    if status_id == 'awaiting_approval'
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      where purchase_request_status_id: status_id
+    end
+  }
 
 
   scope :filter_by_location_id, -> (id) {
@@ -125,6 +152,35 @@ class PurchaseRequest < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+  # Sorting
+  scope :sort_order_number, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.order_number #{type}")
+    end
+  }
+
+  scope :sort_description, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.description #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.created_at #{type}")
+    end
+  }
+
+  # scope :sort_amount, -> (type){
+  #   type = type&.strip&.upcase
+  #   if type && ['ASC', 'DESC'].include?(type)
+  #     includes(:total_amount).reorder("amounts.value #{type}")
+  #   end
+  # }
+
   def add_company
     self.company_id = self.creator.company_id
   end
@@ -141,14 +197,16 @@ class PurchaseRequest < ApplicationRecord
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
-      total_cost: calculate_total_amount,
-      controlling_user: self.get_reviewers&.first&.name
+      total_cost: self&.total_amount&.value,
+      controlling_user: self.get_reviewers&.first&.name,
+      rejection_note: self.reject_note,
+      department: self.department&.name,
+      cost_center: self.cost_center&.name,
+      cost_allocation_items: cost_allocation_items
     }
   end
 
   def calculate_total_amount
-    # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
-    # Amount.where(id: amount_ids)&.pluck(:value).sum
     self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
@@ -211,7 +269,13 @@ class PurchaseRequest < ApplicationRecord
     PurchaseRequestItem.with_ids(filtered_approved_item_ids).each do |item|
       item.rejected = false
       item.status_id = PurchaseRequestItemStatus.id_for(self.reload&.status&.name&.to_sym)
-      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
+      pr_status = self&.status&.name
+      if pr_status == 'approved'
+        trail_status = 'approve'
+      elsif pr_status == 'auto_approved'
+        trail_status = 'auto_approve'
+      end
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(trail_status))
         return false
       end
     end unless filtered_approved_item_ids.blank?
@@ -295,6 +359,23 @@ class PurchaseRequest < ApplicationRecord
     awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
 
+  def can_delete?
+    (self.draft? || self.retracted? || self.rejected?) rescue false
+  end
+
+  def update_total_amount
+    updated_amount = calculate_total_amount
+    if updated_amount.present?
+      if self.total_amount.present?
+        self.total_amount.update_attributes(value: updated_amount)
+      else
+        if self.create_total_amount(currency_id: 1, value: updated_amount)
+          self.save
+        end
+      end
+    end
+  end
+
   private
 
 
@@ -320,6 +401,10 @@ class PurchaseRequest < ApplicationRecord
       end
     end
     return department_id
+  end
+
+  def cost_allocation_items?
+    self.cost_allocation_items
   end
 
 end

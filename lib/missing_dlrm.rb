@@ -5,7 +5,7 @@ class MissingDLRM
 
   def initialize
     company_ids = [118, 140] 
-    po_approve_status_ids =  PurchaseOrder.status_ids(:approved, :auto_approved, :sent_to_vendor, :closed)
+    po_approve_status_ids =  PurchaseOrder.status_ids(:approved, :auto_approved, :sent_to_vendor, :closed, :vendor_confirmed)
     approved_purchase_order_ids = PurchaseOrder.where(company_id: company_ids, purchase_order_status_id: po_approve_status_ids).pluck(:id)
 
     po_processing_status_ids = PurchaseOrder.status_ids(:processing)

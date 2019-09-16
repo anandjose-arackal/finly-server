@@ -1,6 +1,5 @@
-class CategoriesController < ApplicationController
+class CategoriesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = Categories::Create.(current_user, params)

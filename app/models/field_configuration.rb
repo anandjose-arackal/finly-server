@@ -24,6 +24,7 @@
 #  field_key               :string(255)
 #  sequence_number         :integer
 #  deleted_at              :datetime
+#  printable               :boolean          default(TRUE)
 #
 
 class FieldConfiguration < ApplicationRecord
@@ -86,6 +87,10 @@ class FieldConfiguration < ApplicationRecord
   scope :with_field_key, ->(key) { where field_key: key }
 
   scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
+
+  scope :include_for_index, -> {
+    includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
+  }
 
   delegate :drop_down?, to: :field_type
   delegate :text?, to: :field_type
@@ -206,12 +211,15 @@ class FieldConfiguration < ApplicationRecord
         root_field: self.root_field
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      self.drop_down_items.each do |drop_down|
-        if drop_down.dependent_field_configurations.present?
-          result[:has_dependent_cf] = true
-          break
-        end
+      if self.drop_down_items.joins(:dependent_field_configurations).present?
+        result[:has_dependent_cf] = true
       end
+      # self.drop_down_items.each do |drop_down|
+      #   if drop_down.dependent_field_configurations.present?
+      #     result[:has_dependent_cf] = true
+      #     break
+      #   end
+      # end
     end
     return result
   end

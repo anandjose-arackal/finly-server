@@ -18,6 +18,12 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
       amount = document&.payment_order&.amount_requested&.value rescue 0
     # when 'TravelRequest'
     #   amount = 0
+    when 'PurchaseRequest'
+      amount = document&.total_amount&.value
+    when 'PaymentAgreement'
+      amount = document.total_amount.value rescue 0
+    when 'YesBankVendor'
+      amount = 1
     else
       amount = 0
     end
