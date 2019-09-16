@@ -14,7 +14,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   end
 
   def pre_authorize
-    if not user.company_admin? and (params[:field_configuration][:configurable_type].blank? or params[:field_configuration][:configurable_type] != 'Policy')
+    if not (user.company_admin? || user.vendor_payments_admin?) and (params[:field_configuration][:configurable_type].blank? or params[:field_configuration][:configurable_type] != 'Policy')
       raise_unauthorized_exception
     end
   end
