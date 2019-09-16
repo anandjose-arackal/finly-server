@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.pluck(:id)).to_a
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
 
   end
 
@@ -123,12 +123,14 @@ class Vendors::Create < Vendors::Base
         return
       end
 
-      gstin = self.all_result.find {|result| result if gstin_location[:gstin] == result.gstin}
-      if gstin.present?
-        add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
-        return
-      end
 
+      if gstin_location[:gstin].present?
+        gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
+        if gstin.present?
+          add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+          return
+        end
+      end
     end
 
   end
