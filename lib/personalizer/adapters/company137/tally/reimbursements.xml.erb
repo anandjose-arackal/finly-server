@@ -20,11 +20,11 @@
                 <NARRATION></NARRATION>
                 <EFFECTIVEDATE><%= group.created_at.strftime('%Y%m%d') %></EFFECTIVEDATE>
                   <% group.mappings.each do |mapping| %>
-                    <% if mapping.user.gl_config&.dig(:name).blank? %>
+                    <% if mapping.user.gl_config&.dig(:gl_name).blank? %>
                       <% raise "GL Config is not configured for the user" %>
                     <% end %>
                 <ALLLEDGERENTRIES.LIST>
-                   <LEDGERNAME><%= html_escape mapping.user.gl_config[:name] %></LEDGERNAME>
+                   <LEDGERNAME><%= html_escape mapping.user.gl_config[:gl_name] %></LEDGERNAME>
                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
                    <LEDGERFROMITEM>No</LEDGERFROMITEM>

@@ -35,7 +35,7 @@ class Procurements::PurchaseOrders::BulkUploadLineItems < Procurements::Purchase
   end
 
   def process
-    self.validate_operation = Procurements::PurchaseOrders::BulkValidateFileData.(user, {item_details: self.parsed_data})
+    self.validate_operation = Procurements::PurchaseOrders::BulkValidateFileData.(user, {item_details: self.parsed_data, gst_type_id: params[:gst_type_id]})
     # Rails.logger.fatal "FROM BulkUploadLineItems validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
 
@@ -48,7 +48,7 @@ class Procurements::PurchaseOrders::BulkUploadLineItems < Procurements::Purchase
   end
 
   def success
-    # params[:parsed_data] = self.parsed_data
+    params[:summary] = self.validate_operation.summary
     params[:parsed_data] = self.validate_operation.item_details
     Procurements::PurchaseOrders::BulkUploadLineItems::SuccessPresenter.new(user, params, messages)
   end
@@ -67,10 +67,11 @@ class Procurements::PurchaseOrders::BulkUploadLineItems < Procurements::Purchase
   end
 
   class Procurements::PurchaseOrders::BulkUploadLineItems::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :parsed_data
+    attr_accessor :parsed_data, :summary
 
     def init
       self.parsed_data = params[:parsed_data]
+      self.summary = params[:summary]
     end
   end
 

@@ -25,10 +25,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   def credit(payment, options = {})
     super
-    transfer_type = options[:bank_transfer_type]
+    transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
     bank_transaction = payment.reference_resource
+
 
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
@@ -63,8 +64,26 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         payment: payment
     })
 
-    # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
+    transfer_request = op.transfer_request
+    # setting the values of the bank transaction here instead of inside the API Handler
+    # create the bank transaction right here
+    if payment&.reference_resource&.is_a?(YesBankTransaction) || bank_transaction.present?
+      # just update the bank transaction with the latest details
+      bank_transaction = bank_transaction || payment.reference_resource
+      bank_transaction.update(
+          bank_reference_number: transfer_request.bank_reference_number,
+          transfer_status_id: op.transfer_status_id,
+          bank_response: transfer_request.transaction_result,
+          beneficiary_full_name: transfer_request.beneficiary_full_name
+      )
+      payment&.update(retry_count: payment.retry_count.to_f + 1)
+    else
+      # this is an anomaly, so send email and flag it
+      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+    end
+
+
     if op.success?
       if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
@@ -113,7 +132,6 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def creditable_accounts
-    # none as this account cannot be credited through Finly (only external)
     [YesBankCompanyAccount, VendorPaymentWallet]
   end
 
@@ -136,40 +154,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def on_failure(options)
-    # trigger the webhook callback for failed payments
+    # trigger the web hook callback for failed payments
     payment = options[:payment]
     if payment&.failed?
       execute_callback(payment)
-    end
-  end
-
-  def execute_callback(payment)
-    post_params = {
-        payment_id: payment.id,
-        payment_amount: payment.amount_value,
-        note: payment.note,
-        status: payment.payment_status&.name,
-        receiving_account: {
-            receiving_account_type: "BankAccount",
-            receiving_account_id: payment.receiving_account&.id,
-            receiving_account_number: payment.receiving_account&.account_number,
-            receiving_account_ifsc: payment.receiving_account&.ifsc
-        },
-        bank_reference_number: payment.reference_resource&.bank_reference_number
-    }
-    if payment.failed?
-      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
-    end
-    # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
-    company = payment.initiating_user&.company
-    op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
-    if company.web_hooks.present?
-      callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
-      if op.success?
-        callback_track.update(success: true, response: (op.body rescue nil))
-      else
-        callback_track.update(success: false, response: (op.body rescue nil))
-      end
     end
   end
 
@@ -191,7 +179,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
@@ -206,7 +194,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         return false
       end
       unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
       end
     end
     bank_transaction
@@ -225,7 +213,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def create_transfer_request(payment, transfer_type, reference_number)
-    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
+    tr = YesBankTransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
   end
 
 end

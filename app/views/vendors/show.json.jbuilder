@@ -1,7 +1,7 @@
 json.id @result.vendor.id
 json.vendor_approval_workflow @result.vendor_approval_workflow
 json.vendor do
-  json.extract! @result.vendor, :id, :name, :email, :mobile_number
+  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number
   if @result.vendor.is_a?(YesBankVendor)
     json.payment_term @result.vendor.payment_term
     json.currency @result.vendor.currency
@@ -155,7 +155,7 @@ json.edit_config do
           end
           json.reviewers do
             json.array! item[:reviewers] do |reviewer|
-              json.extract! reviewer, :id, :exception, :threshold
+              json.extract! reviewer, :id, :exception, :threshold, :min, :max
               json.reviewer_details reviewer.reviewer.as_json
             end
           end

@@ -6,7 +6,8 @@ class InvoiceLineItemsCalculationUtils
   attr_accessor :invoice_item_amount, :payment_amount, :after_discount_amount,
                 :gross_amount, :net_amount, :invoice, :item_taxable_amount, :taxable_amount,
                 :discount_amount, :tax_amount, :after_tax_amount, :tds_applicable_amount,
-                :invoice_total, :roundoff_amount, :total_discount, :total_tax, :payment_amount
+                :invoice_total, :roundoff_amount, :total_discount, :total_tax, :payment_amount,
+                :invoice_is_a_tax_invoice, :taxable_amount_for_service, :service_item
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the params object for direct assign
@@ -15,9 +16,12 @@ class InvoiceLineItemsCalculationUtils
     if invoice.blank?
       return
     end
-    self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = self.tds_applicable_amount = 0
+    self.invoice_is_a_tax_invoice = (invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice))
+    self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = self.tds_applicable_amount = self.taxable_amount_for_service = 0
     invoice.invoice_items.each_with_index do |item, index|
+      self.service_item = ( (item.inventory_line_item.product_type_id == ProductType.id_for(:service)) && self.invoice_is_a_tax_invoice && invoice.company.feature_subscription.srn_enabled) rescue false
       self.item_taxable_amount = 0
+      self.gross_amount = 0
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         # self.after_tax_amount = item.quantity * item.rate
         self.invoice_item_amount = item.quantity * item.rate
@@ -26,7 +30,7 @@ class InvoiceLineItemsCalculationUtils
         calculate_inclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
         # if the item is TDS deductible, add it to the tax applicable amount
-        if item.tds_applicable?
+        if item.tds_applicable? && invoice.tds_slab_id.present?
           self.tds_applicable_amount += self.gross_amount
         end
         # self.invoice_item_amount = self.gross_amount + self.discount_amount
@@ -34,6 +38,7 @@ class InvoiceLineItemsCalculationUtils
       else # calculate proactively
         self.invoice_item_amount = item.quantity.to_f * item.rate.to_f
         calculate_discount_exclusive(item)
+        calculate_billable_amount(item) # this is mainly if item is a service
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
         self.net_amount = self.gross_amount + self.tax_amount
@@ -42,7 +47,7 @@ class InvoiceLineItemsCalculationUtils
       self.total_discount += self.discount_amount
       self.total_tax += self.tax_amount
       self.taxable_amount += self.item_taxable_amount
-      if item.tds_applicable?
+      if item.tds_applicable? && invoice.tds_slab_id.present?
         self.tds_applicable_amount += self.item_taxable_amount
       end
       # assign the respective calculated parameters to the payment params
@@ -80,10 +85,14 @@ class InvoiceLineItemsCalculationUtils
 
       # invoice item taxable amount
       if item.taxable_amount.present?
-        item.taxable_amount.value = self.item_taxable_amount
-        item.net_amount.currency_id = Currency.first.id
+        taxable_amount_value = (self.service_item) ? self.taxable_amount_for_service : self.item_taxable_amount
+        # item.taxable_amount.value = self.item_taxable_amount
+        item.taxable_amount.value = taxable_amount_value
+        item.taxable_amount.currency_id = Currency.first.id
       else
-        item.taxable_amount = Amount.new(value: self.item_taxable_amount, currency_id: 1)
+        taxable_amount_value = (self.service_item) ? self.taxable_amount_for_service : self.item_taxable_amount
+        # item.taxable_amount = Amount.new(value: self.item_taxable_amount, currency_id: 1)
+        item.taxable_amount = Amount.new(value: taxable_amount_value, currency_id: 1)
       end
     end
 
@@ -120,14 +129,18 @@ class InvoiceLineItemsCalculationUtils
       return
     end
     # depending on the type of discount being sent
-    case item.parent.discount_type_id
-      # i.e. discount is given as a rate
-      when 1
-        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
-      when 2
-        self.discount_amount = item.discount.to_f
-      else
-        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    if item.parent.is_a?(OutwardInvoice)
+      self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    else
+      case item.parent.discount_type_id
+        # i.e. discount is given as a rate
+        when 1
+          self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+        when 2
+          self.discount_amount = item.discount.to_f
+        else
+          self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+      end
     end
     self.gross_amount = self.invoice_item_amount - self.discount_amount
   end
@@ -157,7 +170,11 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+    if item.parent.class.name == 'OutwardInvoice'
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
+    else
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+    end
     self.tax_amount = self.net_amount - self.gross_amount
 
     # setting the SGST, CGST and IGST values for the invoice
@@ -183,7 +200,11 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
+    if item.parent.class.name == 'OutwardInvoice'
+      self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax))
+    else
+      self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
+    end
     self.tax_amount = self.after_discount_amount - self.gross_amount
 
     # setting the SGST, CGST and IGST values for the invoice
@@ -200,6 +221,15 @@ class InvoiceLineItemsCalculationUtils
         item.igst = 0
         item.cgst = 0
         item.sgst = 0
+    end
+  end
+
+  def calculate_billable_amount(item)
+    if self.service_item
+      self.taxable_amount_for_service = self.gross_amount
+      self.gross_amount = item.billable_amount.value
+    else
+      self.gross_amount = self.gross_amount # for goods, keep it unchanged for now      
     end
   end
 end

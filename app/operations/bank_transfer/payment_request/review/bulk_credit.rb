@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   attr_accessor :payment_requests, :result, :initiating_account_adapter, :payment_orders,
                 :initiating_account, :creditable_payment_requests, :creditable_payment_orders,
-                :view_role
+                :view_role, :otp
 
   def pre_validate
     super
@@ -19,6 +19,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   def init
     ids = params[:payment_request_ids] || params[:bank_payment_request_ids] || params[:ids]
+    self.otp = params[:otp]
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end
@@ -63,6 +64,18 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       # todo = should trigger a mailer or notification preferably
       return
     end
+
+    #checking if the OTP for all the payment tickets are the same as the one passed in the request
+    otp = self.payment_requests.pluck(:otp).uniq
+    unless otp.size == 1
+      add_message :error, "Invalid OTP, try again"
+      return
+    end
+
+    unless otp.first == self.otp
+      add_message :error, "Wrong OTP entered. Please enter the right OTP and try again"
+      return
+    end
   end
 
   def pre_process
@@ -85,12 +98,10 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     schedulable_payment_requests.each do |payment_request|
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_request.payment_order.payment_mode)
-      payment_request.payment_order.update(scheduled_at: next_date)
-      payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_request.payment_order.update(scheduled_at: next_date, payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_request.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled), scheduled_at: next_date)
       #todo workflow manager can be introduced here; which will also create a trail for it
     end
-    # self.creditable_payment_requests = self.payment_requests.without_id(schedulable_payment_request_ids)
-    # self.creditable_payment_orders = ::PaymentOrder.with_id(self.creditable_payment_requests.pluck(:payment_order_id))
   end
 
   def process
@@ -149,23 +160,68 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   def retrieve_initiating_account
     case params[:initiating_account_type]
-      when 1, '1'
-        return user.company.yes_bank_company_account
-      when 2, '2'
-        return user.bank_wallet
+    when 1, '1'
+      # Currently assuming all companies will have only one account in each of the banks
+      if params[:initiating_company_account_type].present?
+        case params[:initiating_company_account_type]
+        when "IciciBankCompanyAccount"
+          user.company.icici_bank_company_account
+        when "KotakBankCompanyAccount"
+          user.company.kotak_bank_company_account
+        when "YesBankCompanyAccount"
+          return user.company.yes_bank_company_account
+        else
+          return user.company.yes_bank_company_account
+        end
       else
-        user.bank_wallet # i.e. finly money by default
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
+          return user.company.yes_bank_company_account
+        when "ICICI"
+          return user.company.icici_bank_company_account
+        when "KOTAK"
+          return user.company.kotak_bank_company_account
+        else
+          return user.company.yes_bank_company_account
+        end
+      end
+    when 2, '2'
+      return user.bank_wallet
+    else
+      user.bank_wallet # i.e. finly money by default
     end
   end
 
   def retrieve_initiating_account_adapter
     case params[:initiating_account_type]
-      when 1, '1'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-      when 2, '2'
-        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    when 1, '1'
+      if params[:initiating_company_account_type].present?
+        case params[:initiating_company_account_type]
+        when "IciciBankCompanyAccount"
+          return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KotakBankCompanyAccount"
+          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        when "YesBankCompanyAccount"
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        else
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
       else
-        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+        case user.company&.feature_subscription&.bank_service_provider
+        when "YES"
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "ICICI"
+          return AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
+        when "KOTAK"
+          return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+        else
+          return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        end
+      end
+    when 2, '2'
+      return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    else
+      return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
     end
   end
 

@@ -216,6 +216,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def get_company_bank_accounts
+    @result = BankTransfer::PaymentRequest::GetCompanyBankAccounts.(current_user, params)
+    @respond
+  end
+
   def bulk_credit
     @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
     respond
@@ -223,11 +228,12 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
   def sample_import_file
     @result = BankTransfer::PaymentRequest::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def payments_list
-    puts "ROUTES PARAMS FROM BankTransfer PAUYMENT LIST", params.inspect, current_user.inspect
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
     respond
   end
@@ -280,7 +286,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     when 'po_advance'
       # operation = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
       create_po_advance_ticket(current_user, params)
-    when 'beneficiary'
+    when 'beneficiary', 'security_deposit'
       # operation = BankTransfer::PaymentRequest::CreateBeneficiaryTicket.(current_user, params)
       create_beneficiary_ticket(current_user, params)
     when 'bulk_beneficiary'
@@ -291,6 +297,10 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond_success_failure
+  end
 
 
   private

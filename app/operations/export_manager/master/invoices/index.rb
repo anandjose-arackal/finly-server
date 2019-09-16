@@ -105,6 +105,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              invoice_type: {spreadsheet: true},
              invoice_no: {spreadsheet: true},
              invoice_date: {spreadsheet: true},
+             created_by: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
@@ -125,6 +126,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              gst_group: {spreadsheet: true},
              hsn_sac: {spreadsheet: true},
              tds_nature: {spreadsheet: true},
+             tds_percentage: {spreadsheet: true},
              tds_amount: {spreadsheet: true},
              cost_center: {spreadsheet: true},
              nature_of_expense: {spreadsheet: true},
@@ -136,6 +138,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             line_item_sgst: {spreadsheet: true},
+             line_item_cgst: {spreadsheet: true},
+             line_item_igst: {spreadsheet: true},
+             advance_amount: {spreadsheet: true},
+             invoice_net_payable_amount: {spreadsheet: true},
+             approvers: {spreadsheet: true},
+             finance_approved_date: {spreadsheet: true}
          ]
 
   def input
@@ -149,7 +158,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes(:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:created_by, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: :purchase_order}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -211,11 +220,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   # end
 
   def transaction_period_from(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def transaction_period_to(invoice_line_item)
-    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+    invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%m-%y")
   end
 
   def invoice_status(invoice_line_item)
@@ -275,11 +284,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def nature_of_expense(invoice_line_item)
-    invoice_line_item.parent.custom_fields.with_field_key(:nature_of_expense).first&.string_value
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_expense' }&.first
   end
 
   def nature_of_office(invoice_line_item)
-    invoice_line_item.parent.custom_fields.with_field_key(:nature_of_office).first&.string_value
+    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_office' }&.first
   end
 
   def item_code(invoice_line_item)
@@ -318,5 +327,54 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
+  def tds_percentage(invoice_line_item)
+    invoice_line_item.parent.tds_slab&.tds || 0
+  end
+
+  def line_item_sgst(invoice_line_item)
+    invoice_line_item.sgst || 0
+  end
+
+  def line_item_cgst(invoice_line_item)
+    invoice_line_item.cgst || 0
+  end
+
+  def line_item_igst(invoice_line_item)
+    invoice_line_item.igst || 0
+  end
+
+  def advance_amount(invoice_line_item)
+    value = invoice_line_item.parent&.advance_amount || 0
+    precision_value(value)
+  end
+
+  def approvers(invoice_line_item)
+    approvers = invoice_line_item.parent.dlrms.map do |dlrm|
+      taken_control_by = forwarded_to = reviewer = nil
+      taken_control_by = dlrm.taken_control_by
+      forwarded_to = dlrm.forwarded_to
+      reviewer = dlrm.reviewer
+      if forwarded_to.present?
+        forwarded_to.name
+      elsif taken_control_by.present?
+        taken_control_by.name
+      elsif reviewer.present?
+        reviewer.name
+      end
+    end
+    approvers.reject { |e| e.to_s.empty? }.join(", ")
+  end
+
+  def invoice_net_payable_amount(invoice_line_item)
+    invoice_line_item.parent&.balance_due&.value || 0
+  end
+
+  def finance_approved_date(invoice_line_item)
+    invoice_line_item.parent&.approved_at&.strftime("%d-%m-%y")
+  end
+
+  def created_by(invoice_line_item)
+    invoice_line_item.parent&.created_by&.name
+  end
 
 end

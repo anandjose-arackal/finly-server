@@ -46,6 +46,11 @@
 #  location_id                    :integer
 #  deleted_at                     :datetime
 #  beneficiary_payment_id         :integer
+#  bank_account_provider_id       :integer
+#  otp                            :string(255)
+#  otp_attempts                   :integer
+#  on_hold                        :boolean
+#  disabled                       :boolean
 #
 
 class Payment < ApplicationRecord
@@ -65,6 +70,7 @@ class Payment < ApplicationRecord
   belongs_to :original_payment_for_refund, optional: true, class_name: "Payment"
   belongs_to :category, optional: true
   belongs_to :department, optional: true
+  belongs_to :company, optional: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -111,6 +117,9 @@ class Payment < ApplicationRecord
     if id.present?
       where.not(id: id)
     end
+  }
+  scope :with_external_id, -> (external_id) {
+    where external_reference_id: external_id
   }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
   scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance),
@@ -288,7 +297,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
     end
   }
 
@@ -437,6 +446,8 @@ class Payment < ApplicationRecord
 
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
+  after_save :add_company_id
+  after_commit :update_parent_status
 
   after_destroy :budget_trail_destroy
 
@@ -558,7 +569,11 @@ class Payment < ApplicationRecord
   end
 
   def retriable?
-    self.failed?
+    if self.initiating_account.present? && self.initiating_account.is_a?(KotakBankCompanyAccount)
+      false
+    else
+      self.failed?
+    end
   end
 
   def invoice_amount
@@ -566,9 +581,11 @@ class Payment < ApplicationRecord
     self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
-  def company_id
-    self.payment_order&.company_id
-  end
+  # def company_id
+  #   if super.blank?
+  #     self.payment_order&.company_id
+  #   end
+  # end
 
   def procurement_index_details
     {
@@ -590,6 +607,8 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+    when 'SecurityDeposit'
+      SecurityDeposit.find_by(id: self.parent_id).as_json
     else
       if self.invoice.present?
         self.invoice.as_json
@@ -630,8 +649,8 @@ class Payment < ApplicationRecord
     }
   end
 
-      
-      
+
+
 
   private
 
@@ -704,6 +723,25 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
+  end
+
+  def add_company_id
+    if self.company_id.blank?
+      self.update_columns(company_id: self.payment_order&.company_id)
+    end
+  end
+
+  def update_parent_status
+    if self.completed?
+      case self.parent_type
+      when 'Invoice'
+        parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+        parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+      when 'PurchaseOrder'
+        parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+        parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      end
     end
   end
 end

@@ -14,6 +14,7 @@ class Personalizer::Adapters::Company112::Export112::Reports112::AsXml < Persona
       report.expenses.each do |expense|
         data << [
             index,
+            expense.report_id,
             expense.user.employee_id,
             sap_id(expense.user),
             expense.user.name,
@@ -38,6 +39,7 @@ class Personalizer::Adapters::Company112::Export112::Reports112::AsXml < Persona
   def consul_column_names
     [
         "S. No",
+        "ID",
         "Employee ID",
         "SAP ID",
         "Employee Name",

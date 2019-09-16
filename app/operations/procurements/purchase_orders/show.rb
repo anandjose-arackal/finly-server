@@ -26,7 +26,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations,
+                  :payment_ticket_policies
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -53,6 +54,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       # params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.policies = Policy::VendorPayments::Index.(purchase_order.user, params).policies rescue Policy.none
+
+      # show applicable payment ticket policies for the user to pay advance 
+      params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
+      result = Policy::VendorPayments::Index.(user, params)
+      self.payment_ticket_policies = result.policies rescue Policy.none
+
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
 
@@ -223,6 +230,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_auditor(user)
     # Payment ticket credtor has access to inward invoice show, hence giving access to view purchase order too
     return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
+    # Give access to grn initiator once PO is approved
+    return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
     raise_unauthorized_exception
   end
 end

@@ -15,7 +15,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     has_scope :filter_po_number
     has_scope :filter_vendor_id
     has_scope :filter_by_created_at
-    has_scope :filter_payable_advances
+    has_scope :filter_payable_advances, type: :boolean
     has_scope :filter_user_id
     has_scope :filter_po_advance_status
     # These two filters created because two different indexes requires data to be handles differently by design
@@ -42,20 +42,25 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def init
-    if user.vp_admin_or_auditor?
-      admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
-      self.purchase_orders = PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).or(user.purchase_orders)
-      return
-    end
-
-    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.purchase_orders = PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles) rescue ::Procurement.none
-    end
-
+    # if user.vp_admin_or_auditor?
+    #   admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
+    #   self.purchase_orders = PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).or(user.purchase_orders)
+    #   return
+    # end
+    #
+    # unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+    #   self.purchase_orders = PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles) rescue ::Procurement.none
+    # end
+    #
     # if self.purchase_orders.nil?
     #   self.purchase_orders = PurchaseOrder.none
     # end
-    
+    purchase_order_index_op = ::Procurements::PurchaseOrders::Index.(user, params)
+    if purchase_order_index_op.success?
+      self.purchase_orders = purchase_order_index_op.purchase_orders
+    else
+      self.purchase_orders = PurchaseOrder.none
+    end
   end
 
   def validate
@@ -87,7 +92,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def process
-    self.purchase_orders = purchase_orders.filter_all_advances rescue ::PurchaseOrder.none
+    self.purchase_orders = self.purchase_orders.filter_all_advances rescue ::PurchaseOrder.none
     params[:purchase_order] = self.purchase_orders
   end
 

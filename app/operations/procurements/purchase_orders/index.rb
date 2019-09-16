@@ -10,11 +10,18 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   end
 
   def process
+    # if user.vendor_payments_admin? && params[:team_po] == false
     if user.vendor_payments_admin?
       admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
       self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.purchase_orders)
       return
     end
+
+    # if user.vendor_payments_reviewer? && params[:team_po]
+    # if user.vendor_payments_reviewer?
+    #   self.purchase_orders = ::PurchaseOrder.role_based_reviewer_associated_items(user, UserRole.id_for(:purchase_order_reviewer))
+    #   return
+    # end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.purchase_orders = ::PurchaseOrder.associated_items(user, ::PurchaseOrder.roles) || PurchaseOrder.none
@@ -49,8 +56,16 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_cost_center_id
     has_scope :filter_location_id
     has_scope :filter_department_id
+    has_scope :filter_pr_number
 
     has_scope :filter_awaiting_approval
+    has_scope :show_only_po_which_have_advances
+    has_scope :show_only_po_which_are_forwarded
+
+    # Sorting
+    has_scope :sort_po_number
+    has_scope :sort_po_name
+    # has_scope :sort_amount
 
     def init
       self.purchase_orders = params[:purchase_orders]

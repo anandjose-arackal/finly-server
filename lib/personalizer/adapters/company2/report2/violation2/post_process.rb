@@ -1,11 +1,49 @@
 class Personalizer::Adapters::Company2::Report2::Violation2::PostProcess < Personalizer::Adapters::Base
-  attr_accessor :report
+
+  attr_accessor :report, :validate_keys, :warning_messages
 
   def init
-    # message = 'Expenses older than 15 days require approval from Director'
-    # op_instance.report.expenses.each do |expense|
-    #   op_instance.warning_messages[expense.id]['expense_warning'] << {type: 'date', message: message}
-    # end
+    self.report = op_instance.report
+    self.warning_messages = op_instance.warning_messages
+    self.validate_keys = %w(
+                       tax_rate_id
+                       gst_type_id
+                       state_of_expense_id
+                       hsn_sac
+                       merchant_bill_no
+                       gstin_location_attributes.gstin
+                       gstin_location_attributes.state_id
+                     )
+  end
+
+  def process
+    self.report.expenses.each do |expense|
+      if expense.category.gst_applicable?
+        errors = []
+        if expense.tax_rate_id.blank?
+          errors += ["tax rate"]
+        end
+        if expense.gst_type_id.blank?
+          errors += ["GST type"]
+        end
+        if expense.state_of_expense_id.blank?
+          errors += ["State of expense"]
+        end
+        if expense.hsn_sac.blank?
+          errors += ["HSN/SAC"]
+        end
+        if expense.merchant_bill_no.blank?
+          errors += ["Merchant bill number"]
+        end
+        if expense.gstin_location&.gstin.blank?
+          errors += ["GSTIN"]
+        end
+        if expense.gstin_location&.state_id.blank?
+          errors += ["Merchant state"]
+        end
+        self.warning_messages[expense.id]["expense_blocking"] << {type: "GST", message: "The following expense fields: #{errors.to_sentence} cannot be blank"}
+      end
+    end
   end
 
 end

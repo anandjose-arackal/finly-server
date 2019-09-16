@@ -19,6 +19,7 @@ class BankTransfer::Users::Policies < BankTransfer::Users::Base
 
   def process
     self.policies = Policy::VendorPayments::Index.(self.selected_user, params).policies rescue Policy.none
+    self.policies = Policy.none if self.policies.blank?
     # self.policy_user_roles = PolicyUserRole.where(policy_id: policies.pluck(:id), user_id: selected_user.id).includes(:policy, :user_role)
   end
 

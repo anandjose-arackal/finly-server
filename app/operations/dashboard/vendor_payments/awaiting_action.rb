@@ -11,7 +11,8 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       po_invoices: false,
       payment_tickets: false,
       vendors: false,
-      grn: false
+      grn: false,
+      payment_agreements: false
     }
 
     if user.vendor_payments_admin?
@@ -29,6 +30,10 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       unless user.company.vendor_empanelment_workflow_enabled?
         document_types[:vendors] = false
+      end
+
+      unless user.company.agreement_based_payment_system_enabled?
+        document_types[:payment_agreements] = false
       end
     else
       user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
@@ -52,29 +57,70 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
           if user.company.vendor_empanelment_workflow_enabled?
             document_types[:vendors] = true
           end
+        when UserRole.id_for(:payment_agreement_reviewer)
+          document_types[:payment_agreements] = true
         end
       end
     end
+
+    unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
+      document_types[:grn] = false
+    end
+
     self.result = []
   end
 
   def process
     if document_types[:purchase_requests]
+      purchase_requests = PurchaseRequest.awaiting_action_items(user)
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        purchase_requests = purchase_requests.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
+      end
       data = {
         title: "Purchase Requests",
         type: 'purchase_requests',
-        count: PurchaseRequest.awaiting_action_items(user).count,
-        filters: [{filter_awaiting_approval: true}]
+        count: purchase_requests.count,
+        filters: [{filter_awaiting_approval: '1'}]
       }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_by_date_range[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_by_date_range[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
       self.result.push data
     end
+
+
     if document_types[:purchase_orders]
+      purchase_orders = PurchaseOrder.awaiting_action_items(user)
+      if params[:filter_date_from].present?
+        purchase_orders = purchase_orders.filter_creation_date_from(params[:filter_date_from])
+      end
+
+      if params[:filter_date_to].present?
+        purchase_orders = purchase_orders.filter_creation_date_to(params[:filter_date_to])
+      end
       data = {
         title: "Purchase Orders",
         type: 'purchase_orders',
-        count: PurchaseOrder.awaiting_action_items(user).count,
+        count: purchase_orders.count,
         filters: [{filter_status: 'awaiting_approval'}]
       }
+
+      if params[:filter_date_from].present?
+        filter_data = {filter_creatino_date_from: params[:filter_creation_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {filter_creatino_date_to: params[:filter_creation_date_to]}
+        data[:filters].push(filter_data)
+      end
       self.result.push data
     end
 
@@ -83,49 +129,116 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       awaiting_invoices = Invoice.awaiting_action_items(user)
 
       if document_types[:po_invoices]
+
+        po_invoices = awaiting_invoices.filter_invoice_type('po_invoice')
+
+        if params[:filter_date_from].present? || params[:filter_date_to].present?
+          po_invoices = po_invoices.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
+        end
         data = {
           title: "PO Invoices",
           type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'po_invoice'}).count,
+          count: po_invoices.count,
           filters: [
             {filter_invoice_type: 'po_invoice'},
             {filter_awaiting_approval: true}
           ]
         }
+
+        if params[:filter_date_from].present?
+          filter_data = {'filter_creation_date[from]': params[:filter_date_from]}
+          data[:filters].push(filter_data)
+        end
+
+        if params[:filter_date_to].present?
+          filter_data = {'filter_creation_date[to]': params[:filter_date_to]}
+          data[:filters].push(filter_data)
+        end
+
         self.result.push data
       end
 
       if document_types[:non_po_invoices]
+        non_po_invoices = awaiting_invoices.filter_invoice_type('non_po_invoice')
+
+        if params[:filter_date_from].present? || params[:filter_date_to].present?
+          non_po_invoices = non_po_invoices.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
+        end
+
         data = {
           title: "Non PO Invoices",
           type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'non_po_invoice'}).count,
+          count: non_po_invoices.count,
           filters: [
             {filter_invoice_type: 'non_po_invoice'},
             {filter_awaiting_approval: true}
           ]
         }
+
+        if params[:filter_date_from].present?
+          filter_data = {'filter_creation_date[from]': params[:filter_date_from]}
+          data[:filters].push(filter_data)
+        end
+
+        if params[:filter_date_to].present?
+          filter_data = {'filter_creation_date[to]': params[:filter_date_to]}
+          data[:filters].push(filter_data)
+        end
         self.result.push data
       end
     end
 
     if document_types[:payment_tickets]
+      payment_tickets = BankPaymentRequest.awaiting_action_items(user)
+
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        payment_tickets = payment_tickets.filter_date(params[:filter_date_from], params[:filter_date_to])
+      end
+
       data = {
         title: "Payment Tickets",
         type: 'orders',
-        count: BankPaymentRequest.awaiting_action_items(user).count,
+        count: payment_tickets.count,
         filters: [{filter_status: 'awaiting_approval'}]
       }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_date[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_date[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+
       self.result.push data
     end
     
     if document_types[:vendors]
+      vendors = YesBankVendor.awaiting_action_items(user)
+
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        vendors = vendors.filter_creation_date(params[:filter_date_from], params[:filter_date_to])
+      end
+
       data = {
         title: "Vendors",
         type: 'vendor',
-        count: YesBankVendor.awaiting_action_items(user).count,
+        count: vendors.count,
         filters: [{filter_status_id: 'awaiting_approval'}]
       }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_creation_date[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_creation_date[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+
       self.result.push data
     end  
 
@@ -133,15 +246,55 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       params[:filter_procurement_type] = "purchase_order"
       # params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
       params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
+
+      params[:filter_creation_date_from] = params[:filter_date_from] if params[:filter_date_from].present?
+      params[:filter_creation_date_to] = params[:filter_date_to] if params[:filter_date_to].present?
+
+      procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "GRN",
+        title: "Receipt Note",
         type: 'receive',
-        count: Procurements::Grn::Pending::Index.(user, params).count,
+        count: procurements.count,
         # filters: [{filter_status_tags: [7]}]
         filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]}]
       }
+
+      if params[:filter_date_from].present?
+        filter_data = {filter_creatino_date_from: params[:filter_creation_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {filter_creatino_date_to: params[:filter_creation_date_to]}
+        data[:filters].push(filter_data)
+      end
       self.result.push data
-    end    
+    end
+
+    if document_types[:payment_agreements]
+      payment_agreements = PaymentAgreement.awaiting_action_items(user)
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        payment_agreements = payment_agreements.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
+      end
+      data = {
+        title: "Payment Agreements",
+        type: 'payment_agreements',
+        count: payment_agreements.count,
+        filters: [{filter_by_status_id: 'awaiting_approval'}]
+      }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_by_date_range[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_by_date_range[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+      self.result.push data
+    end
+
   end
 
   def success

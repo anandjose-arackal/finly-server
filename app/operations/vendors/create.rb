@@ -1,6 +1,6 @@
 class Vendors::Create < Vendors::Base
   attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors,
-                :override_vendor_id
+                :override_vendor_id, :all_result
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -24,6 +24,9 @@ class Vendors::Create < Vendors::Base
     self.similar_vendors = []
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
+
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.pluck(:id)).to_a
+
   end
 
   def validate
@@ -106,6 +109,28 @@ class Vendors::Create < Vendors::Base
     # end
 
     # self.vendor = self.similar_vendors.first rescue nil
+
+    # check for duplicate gstin in the system for the  current company
+    gstins = []
+    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+      next if gstin_location[:_destroy]
+
+      gstins << gstin_location[:gstin]
+      duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin)> 1}
+
+      if duplicate_gstin.present?
+        add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
+        return
+      end
+
+      gstin = self.all_result.find {|result| result if gstin_location[:gstin] == result.gstin}
+      if gstin.present?
+        add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+        return
+      end
+
+    end
+
   end
 
   def pre_process

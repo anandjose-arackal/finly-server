@@ -15,8 +15,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     # :unapprove, :credited, :pending, :creation_in_progress, :auto_approved
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected], to: :processing
+      # transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:open, :retracted, :rejected], to: :processing, guard: :reviewers_present?
     end
 
     event :approve do
@@ -77,8 +77,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
                    .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
         if dlrm.present?
           dlrm.update(
-            action_id: TrailAction.id_for(aasm.current_event),
-            action_taken_by_id: user.id
+              action_id: TrailAction.id_for(aasm.current_event),
+              action_taken_by_id: user.id
           )
         end
 

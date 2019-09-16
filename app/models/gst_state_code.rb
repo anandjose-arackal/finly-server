@@ -10,13 +10,21 @@
 #
 
 class GstStateCode < ApplicationRecord
-
+  include LiquidDroppable
 
   scope :with_state_code, -> (state_code) {
     where(state_code: state_code)
   }
   def full_name
     "#{self.name} - #{self.state_code}"
+  end
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        state_code: state_code
+    }
   end
 
 end

@@ -141,6 +141,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(card) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_effective_balance cash_on_hand_adapter.balance
   json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance
@@ -165,7 +166,7 @@ json.reviewal_chains do
         end
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
-            json.extract! reviewer, :id, :exception, :threshold
+            json.extract! reviewer, :id, :exception, :threshold, :min, :max
             json.reviewer_details reviewer.reviewer.as_json
           end
         end

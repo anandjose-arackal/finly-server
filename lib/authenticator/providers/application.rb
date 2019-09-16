@@ -3,11 +3,21 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   def self.accept?(request)
     scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first)
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and !RequestStore.store[:multi_entity_login]
   end
 
   def model
     User
+  end
+
+  def company_id
+    params[:company_id]
+  end
+
+  def unauthenticated_user
+    raise "Model has not been defined" if model.nil?
+
+    self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
   end
 
   def on_blank_username(message)

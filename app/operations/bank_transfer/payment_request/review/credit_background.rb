@@ -32,7 +32,6 @@ class BankTransfer::PaymentRequest::Review::CreditBackground < BackgroundOperati
 
   def validate
     # todo - validations for the background process that will credit these payment orders
-    
   end
 
   def pre_process
