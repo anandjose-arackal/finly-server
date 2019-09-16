@@ -19,7 +19,9 @@
 #
 
 class GstinLocation < ApplicationRecord
-  # belongs_to :vendor, class_name: "YesBankVendor"
+  include LiquidDroppable
+
+  belongs_to :vendor, class_name: "YesBankVendor"
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true
   belongs_to :state, class_name: "GstStateCode", optional: true
 

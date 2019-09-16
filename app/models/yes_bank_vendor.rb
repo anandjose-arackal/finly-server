@@ -43,6 +43,7 @@
 class YesBankVendor < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   validates :business_name, presence: true
 
@@ -107,7 +108,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ? OR yes_bank_vendors.pan like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -192,6 +193,10 @@ class YesBankVendor < ApplicationRecord
     where pan: pan
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
   # Scopes for ordering ends
 
   before_validation do
@@ -241,7 +246,8 @@ class YesBankVendor < ApplicationRecord
         tds_id: tds_rates_list_id,
         bank_accounts: bank_accounts,
         state_code: state_code&.state_code,
-        address: address
+        address: address,
+        trade_name: trade_name
     }
   end
 

@@ -48,12 +48,14 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
       # self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
       # Create document level reviewer mapping
       # For setting level  specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.purchase_request
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
+      if PurchaseRequest.status_ids(:draft, :retracted, :rejected).include?(purchase_request.purchase_request_status_id) && purchase_request.creator_id == user.id
+        params[:reviewal_document] = self.purchase_request
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+        end
+        return
       end
-      return
     else
       add_message :error, purchase_request.errors.full_messages
       return

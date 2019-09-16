@@ -11,7 +11,7 @@ class AccountManager::CompanyBankAccounts::Index < AccountManager::CompanyBankAc
   attr_accessor :bank_accounts, :balance_requested
 
   def authorized_user_types
-    :vendor_payments_admin
+    [:vendor_payments_admin, :vendor_payments_creditor]
   end
 
   def init

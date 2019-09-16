@@ -100,7 +100,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: data[:company_id])
-    department_id = company&.departments&.find_by code: data[:department_code]
+    department_id = company&.departments&.find_by department_code: data[:department_code]
     location_id = company&.locations&.find_by location_code: data[:location_code]
     if company.nil?
       messages << "Company with this ID not found"
@@ -115,7 +115,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
 
     state_id = nil
     if data[:state_id].present?
-      state_id = State.where('name LIKE ?', "%#{data[:state_id]}%").first&id
+      state_id = State.where('name LIKE ?', "%#{data[:state_id]}%")&.first&.id
       unless  state_id.present?
         messages << "Invalid State Name"
       end

@@ -429,6 +429,14 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
+  scope :filter_pr_number, -> (pr_number){
+    user = RequestStore.store[:current_user]
+    if user.present?
+      pr_item_ids = user.company.purchase_requests.where('purchase_requests.order_number LIKE ?', "%#{pr_number}%" ).joins(:purchase_request_items).pluck('purchase_request_items.id')
+        joins(:items).where('purchase_order_items.purchase_request_item_id IN (?)', pr_item_ids)
+    end
+  }
+
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
   #   if type && ['ASC', 'DESC'].include?(type)

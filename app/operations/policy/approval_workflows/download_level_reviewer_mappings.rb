@@ -22,7 +22,7 @@ class Policy::ApprovalWorkflows::DownloadLevelReviewerMappings < Policy::Approva
 
   def process
     users = self.policy.users
-    providers = ["ReportProvider", "MoneyRequestProvider", "TravelRequestProvider", "PurchaseOrderProvider", "InvoiceProvider", "BankPaymentRequestProvider"]
+    providers = ["ReportProvider", "MoneyRequestProvider", "TravelRequestProvider", "PurchaseOrderProvider", "InvoiceProvider", "PoInvoiceProvider", "NonPoInvoiceProvider", "BankPaymentRequestProvider"]
     provider_mappings = {}
     providers.each do |provider|
       # for each set of iterations we will have an array of arrays,
@@ -50,7 +50,7 @@ class Policy::ApprovalWorkflows::DownloadLevelReviewerMappings < Policy::Approva
           finance_ids = policy.policy_user_roles.with_role_id(UserRole.id_for(:finance_manager)).pluck(:user_id)
         elsif ["TravelRequestProvider"].include?(provider)
           finance_ids = policy.policy_user_roles.with_role_id(UserRole.id_for(:travel_manager)).pluck(:user_id)
-        elsif ["InvoiceProvider", "PurchaseOrderProvider", "BankPaymentRequestProvider"].include?(provider)
+        elsif ["InvoiceProvider", "PoInvoiceProvider", "NonPoInvoiceProvider", "PurchaseOrderProvider", "BankPaymentRequestProvider"].include?(provider)
           finance_ids = policy.policy_user_roles.with_role_id(UserRole.id_for(:creditor)).pluck(:user_id)
         else
           finance_ids = []
