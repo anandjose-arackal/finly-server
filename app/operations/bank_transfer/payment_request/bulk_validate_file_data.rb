@@ -166,7 +166,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}.join(", ")
           self.valid = false
           # self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
-          self.issue_item[:custom_fields] = required_fields.pluck(:id, :field_name).map {|id, field| {id => (field + " cannot be empty")}}
+          self.issue_item[:custom_fields] = required_fields.pluck(:id, :field_name).map {|id, field| {"id" => id, "error" => (field + " cannot be empty")}}
         end
 
         # validate if dropdown fields entered matches the data setup in the organization account
@@ -178,7 +178,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
               self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
               self.valid = false
               # self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
-              self.issue_item[:custom_fields] << { key => correct_field.field_name.to_s + " is not an acceptable value" }
+              self.issue_item[:custom_fields] << { "id" => key, "error" => correct_field.field_name.to_s + " is not an acceptable value" }
             end
           end
         end
