@@ -34,6 +34,6 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
   private
 
   def attachment_parameters
-    params.require(:attachment).permit(:file, :name, :description)
+    params.require(:attachment).permit(:file, :name, :description, :procurement_document_id, :procurement_document_type)
   end
 end
