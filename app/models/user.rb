@@ -84,7 +84,7 @@ class User < ApplicationRecord
   serialize :gl_config
 
   belongs_to :company, optional: true
-  belongs_to :default_company, class_name: "Company"
+  belongs_to :default_company, class_name: "Company", optional: true
   belongs_to :otp_request_type, optional: true
   belongs_to :user_delegate, optional: true, class_name: "User"
 
