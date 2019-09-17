@@ -19,7 +19,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   attr_accessor :lurm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
+    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
     output = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
