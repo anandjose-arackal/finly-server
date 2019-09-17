@@ -9,13 +9,13 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
     if attachment_params[:procurement_document_id].present? && attachment_params[:procurement_document_type].present?
       case attachment_params[:procurement_document_type]
       when 'PurchaseOrder'
-        document = PurchaseOrder.find_by id: params[:procurement_document_id]
+        document = PurchaseOrder.find_by id: attachment_params[:procurement_document_id]
         unless document&.company_id == user.company_id
           attachment_params.delete(:procurement_document_type)
           attachment_params.delete(:procurement_document_id)
         end
       when 'Invoice'
-        document = Invoice.find_by id: params[:procurement_document_id]
+        document = Invoice.find_by id: attachment_params[:procurement_document_id]
         unless document&.company_id == user.company_id
           attachment_params.delete(:procurement_document_type)
           attachment_params.delete(:procurement_document_id)
