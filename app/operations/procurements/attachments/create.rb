@@ -11,16 +11,19 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
       when 'PurchaseOrder'
         document = PurchaseOrder.find_by id: params[:procurement_document_id]
         unless document&.company_id == user.company_id
-          attachment_params.delete(:procurement_document_type, :procurement_document_id)
+          attachment_params.delete(:procurement_document_type)
+          attachment_params.delete(:procurement_document_id)
         end
       when 'Invoice'
         document = Invoice.find_by id: params[:procurement_document_id]
         unless document&.company_id == user.company_id
-          attachment_params.delete(:procurement_document_type, :procurement_document_id)
+          attachment_params.delete(:procurement_document_type)
+          attachment_params.delete(:procurement_document_id)
         end
       end
     else
-      attachment_params.delete(:procurement_document_type, :procurement_document_id)
+      attachment_params.delete(:procurement_document_type)
+      attachment_params.delete(:procurement_document_id)
     end
   end
 
