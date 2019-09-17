@@ -11,7 +11,8 @@ class OrganizationAccountController < BaseControllers::WebBase
   end
 
   def categories
-    params[:organization_account] = true
+    # in org account, show all categories irrespective of current app
+    RequestStore.store[:organization_account] = true
     @result = Categories::Index.(current_user, params)
     respond
   end
