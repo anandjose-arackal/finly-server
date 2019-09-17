@@ -10,6 +10,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             :level_name => 'Level Name',
             :level_number => 'Level Number',
             :reviewer_email_mobile => 'Reviewer Email / Mobile',
+            :with_exception => 'With Exception Y/N',
+            :without_exception => 'Without Exception Y/N',
             :min => "Minimum Threshold",
             :max => "Max Threshold",
             :destroy => 'Destroy'
@@ -17,7 +19,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   attr_accessor :lurm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
+    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.path)
     output = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
@@ -128,8 +130,11 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       level_name = data[lower_index+1].to_s
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3]
-      min = data[lower_index+4].to_i
-      max = (data[lower_index+5].present? ? data[lower_index+5].to_i : nil)
+      min = data[lower_index+6].to_i
+      max = (data[lower_index+7].present? ? data[lower_index+5].to_i : nil)
+      exception = data[lower_index+4]&.to_s&.upcase == 'N' ? false : true
+      wo_exception = data[lower_index+5]&.to_s&.upcase == 'N' ? false : true
+
       if level_name.present? && level_number.present? && level_number != 0
         self.level = get_level(level_name, level_number, provider)
         if reviewer_id.present?
@@ -140,11 +145,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         else
           reviewer = nil
         end
-        mapping_exist = self.level.level_user_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer&.id, min: min, max: max, user_id: entity_user.id).first
-        self.level.level_user_reviewer_mappings.create(reviewer_id: reviewer&.id, policy_id: policy.id,user_id: entity_user.id, min: min, max: max) unless mapping_exist.present?
-        return result true, 'Reviewer Mapping Created'
+        mapping_exist = self.level.level_user_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer&.id, min: min, max: max, user_id: entity_user.id, exception: exception, wo_exception: wo_exception ).first
+        self.level.level_user_reviewer_mappings.create(reviewer_id: reviewer&.id, policy_id: policy.id,user_id: entity_user.id, min: min, max: max, exception: exception, wo_exception: wo_exception) unless mapping_exist.present?
       end
-      lower_index += 5
+      lower_index += 7
     end
     result true, 'Reviewer Mapping Created'
   end
