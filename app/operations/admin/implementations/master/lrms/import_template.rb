@@ -4,7 +4,8 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
   subscribe 'lrms.import_template'
   headers ({
       :id => 'ID',
-      :policy => 'Policy ID',
+      :policy => 'Policy Name',
+      :policy_creation_flag => 'For New Policy Y / or Blank',
       :department_code => 'DepartmentCode',
       :location_code => 'LocationCode',
       :level_name => 'Level Name',
@@ -15,16 +16,6 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
       :destroy => 'Destroy'
   })
 
-  PROVIDERS =%w(
-             ReportProvider
-             MoneyRequestProvider
-             TravelRequestProvider
-             TravelRequestBookingProvider
-             PurchaseRequestProvider
-             PurchaseOrderProvider
-             InvoiceProvider
-             BankPaymentRequestProvider
-             )
 
   def valid_request
   end
@@ -37,9 +28,23 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
   end
 
   def export(headers, contents)
+    providers =%w(
+             ReportProvider
+             MoneyRequestProvider
+             TravelRequestProvider
+             TravelRequestBookingProvider
+             PurchaseRequestProvider
+             PurchaseOrderProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
+             BankPaymentRequestProvider
+             YesBankVendorProvider
+             PaymentAgreementProvider
+             )
+
     file = Tempfile.new(['lrm_import_template', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)
-    PROVIDERS.each  do |name, sheet|
+    providers.each  do |name, sheet|
       worksheet = workbook.add_worksheet(name)
 
       headers.values.each_with_index do |item, index|

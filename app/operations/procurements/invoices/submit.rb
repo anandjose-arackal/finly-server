@@ -43,7 +43,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-        reviewal_document: self.invoice
+        reviewal_document: self.invoice,
+        provider_name: self.invoice.get_invoice_provider_name
     })
 
     unless dlrm_validation_op.success?
@@ -55,6 +56,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]

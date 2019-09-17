@@ -10,7 +10,7 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
     self.policy = user.company.policies.non_deleted.find_by id: self.document.policy_id
     self.violations_present = !!params[:violations_present]
 
-    provider_name = self.document&.get_default_provider
+    provider_name = params[:provider_name].present? ? params[:provider_name] : self.document&.get_default_provider
     if self.policy.present?
       self.reviewal_levels = self.policy.levels.with_associated_entity_type(provider_name).non_deleted.reorder(:level_number)
     end

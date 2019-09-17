@@ -1,4 +1,4 @@
-json.array! @result.field_configurations do |field_configuration|
+json.array! @result.field_configurations.include_for_index do |field_configuration|
   json.extract! field_configuration, :id, :field_name, :enabled, :mandatory,
                 :global, :field_type, :field_parent_types
   if field_configuration.drop_down?
@@ -11,3 +11,6 @@ json.array! @result.field_configurations do |field_configuration|
     json.policies field_configuration.policies
   end
 end
+
+
+

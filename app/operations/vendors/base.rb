@@ -24,6 +24,7 @@ class Vendors::Base < BaseOperation
 
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
+                                   :msme_registered, :msme_registration_number,
                                    :business_name, :trade_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
                                    bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy],
@@ -79,6 +80,7 @@ class Vendors::Base < BaseOperation
 
   def validate_gstin(vendor_params)
     business_name = vendor_params[:business_name]
+    return if vendor_params[:gstin_locations_attributes].blank?
     vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
       gstin = gstin_location[:gstin]
 

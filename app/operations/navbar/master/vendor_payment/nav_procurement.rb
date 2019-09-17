@@ -8,9 +8,9 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {requests: [:pr_initiator, :pr_awaiting_approval, :pr_team, :pr_company]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
-          {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request]}
+          {payables: [:po_advances, :po_invoices, :non_po_invoices, :agreement_invoices, :payment_tickets]},
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements]},
+          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
   register_structure(
@@ -88,13 +88,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_invoices
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_invoice_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_po_invoice_initiator? || user.is_po_invoice_reviewer? || user.is_po_invoice_auditor?
     {name: 'PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
   end
 
   def non_po_invoices
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator? || user.is_purchase_order_reviewer? || user.is_invoice_initiator?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator? || user.is_purchase_order_reviewer? || user.is_non_po_invoice_initiator? || user.is_non_po_invoice_reviewer? || user.is_non_po_invoice_auditor?
     {name: 'Non PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
+  end
+
+  def agreement_invoices
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor?)
+    {name: 'Agreement Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"agreement_invoice"}'}
   end
 
   def payment_tickets
@@ -117,8 +122,14 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_rate_contracts
-    return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
+    return nil unless user.company.procurement_enabled?
+    # return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
     {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
+  end
+
+  def manage_payment_agreements
+    return nil unless (user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor?) && user.company.agreement_based_payment_system_enabled?
+    {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
   end
 
   def create
@@ -135,7 +146,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   # end
 
   def create_non_po_invoice
-    return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
+    return nil unless user.vendor_payments_admin? || user.is_non_po_invoice_initiator?
     {name: 'New Non PO Invoice', id: 'create', url: 'new_payment_invoices/params={"action":"new_invoice","filter_invoice_type":"non_po_invoice"}'}
   end
 
@@ -147,6 +158,11 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def create_purchase_request
     return nil unless user.is_purchase_request_initiator? || user.vendor_payments_admin?
     {name: 'New Purchase Request', id: 'create', url: 'purchase_request/params={}'}
+  end
+
+  def create_payment_agreement
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_payment_agreement_initiator? || user.vendor_payments_admin?)
+    {name: 'New Agreements', id: 'create', url: 'agreements/new'}
   end
 
   def attachments

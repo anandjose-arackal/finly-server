@@ -8,7 +8,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
  end
 
  def init
-   self.money_request_processors = user.company.money_request_processors.where(payment_type: %w(bank_transfer payment_file)).includes(mappings: [money_requests: [{user: :profile},items:[:amount]]])
+   self.money_request_processors = user.company.money_request_processors.includes(mappings: [money_requests: [{user: :profile},items:[:amount]]])
    money_request_processors = apply_scopes(self.money_request_processors, params)
 
 
@@ -36,7 +36,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
                self.contents << [
                    31352001,
                    '',
-                   money_request.user.gl_config&.dig(:location_code),
+                   "'#{money_request.user.gl_config&.dig(:location_code)}",
                    money_request.user.gl_config&.dig(:cost_center),
                    '',
                    '',
@@ -51,7 +51,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
              self.contents << [
                  '61110004',
                  '9992',
-                 money_request.user.gl_config&.dig(:location_code),
+                 "'#{money_request.user.gl_config&.dig(:location_code)}",
                  money_request.user.gl_config&.dig(:cost_center),
                  '',
                  '',

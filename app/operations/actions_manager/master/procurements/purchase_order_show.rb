@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment
+    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment
   ]
 
   def initialize(user = nil, params = {})
@@ -188,6 +188,12 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     end
   end
 
+  def upload_attachment
+    if user.is_purchase_order_initiator?
+      document_owner?
+    end
+  end
+
   def delete
     if user.is_purchase_order_initiator? || user.vendor_payments_admin?
       if document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
@@ -206,7 +212,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def download
-    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
+    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.closed?)
   end
 
   def send_btn

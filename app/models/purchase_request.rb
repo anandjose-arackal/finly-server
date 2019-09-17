@@ -45,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
-
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
@@ -75,14 +75,13 @@ class PurchaseRequest < ApplicationRecord
     if status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        ids = self.awaiting_action_items(user_id)&.pluck(:id)
         with_id(ids)
       end
     else
       where purchase_request_status_id: status_id
     end
   }
-
 
   scope :filter_by_location_id, -> (id) {
     user_id = RequestStore.store[:current_user]&.id

@@ -25,8 +25,8 @@
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
 #  expense_tax_type_id    :integer
-#  gst_percentage         :decimal(10, )
-#  tds_percentage         :decimal(10, )
+#  gst_percentage         :decimal(10, 5)
+#  tds_percentage         :decimal(10, 5)
 #  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
@@ -158,6 +158,11 @@ class Expense < ApplicationRecord
       self.reimbursable = false
       self.from_cash_on_hand = true
 
+    end
+
+    # setting gst_percentage, if it isn't set at the time of saving
+    if self.gst_percentage.blank? || self.gst_percentage == 0
+      self.gst_percentage = self.tax_rate&.rate
     end
     compute_gst_amount
     compute_tds_amount

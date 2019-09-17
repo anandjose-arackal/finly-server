@@ -2,17 +2,33 @@ class Vendors::Exports::Base < BaseOperation
   attr_accessor  :headers, :vendors
 
   def init
-    self.items= user.company.yes_bank_vendors.authorized.includes(:gstin_locations, :bank_accounts)
+    ids = params[:ids] || params[:vendor_ids]
+    unless ids.is_a?(Array) or ids.blank?
+      ids = ids.split(',')
+    end
+    result = Vendors::Index.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    # self.vendors = user.company.yes_bank_vendors.authorized.includes(:gstin_locations, :bank_accounts)
+    self.vendors = result.vendors.authorized.includes(:gstin_locations, :bank_accounts)
+    self.vendors = self.vendors.where(id: ids) if ids.present?
     self.headers = default_headers
   end
 
+  def validate
+
+  end
+
   class Vendors::Exports::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :data, :header, :file_name
+    attr_accessor :data, :header, :file_name, :result_file_path
 
     def init
       self.data = params[:data]
       self.header = params[:header]
       self.file_name = params[:export_name]
+      self.result_file_path = params[:result_file_path]
     end
 
   end

@@ -2,35 +2,43 @@
 #
 # Table name: beneficiary_payments
 #
-#  id                         :bigint           not null, primary key
-#  name                       :string(255)
-#  vendor_id                  :integer
-#  bank_account_id            :integer
-#  category_id                :integer
-#  department_id              :integer
-#  original_amount_id         :integer
-#  tax_amount_id              :integer
-#  payable_amount_id          :integer
-#  inclusive_of_taxes         :boolean
-#  gst_type_id                :integer
-#  tax                        :decimal(10, )
-#  tds_slab_id                :integer
-#  company_id                 :integer
-#  sub_department_id          :integer
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  status_id                  :integer
-#  tds_amount_id              :integer
-#  balance_due_id             :integer
-#  net_amount_id              :integer
-#  gross_amount_id            :integer
-#  roundoff_amount            :decimal(20, 10)
-#  cost_center_id             :integer
-#  invoice_number             :text(65535)
-#  invoice_date               :date
-#  invoice_due_date           :date
-#  advance_amount_id          :integer
-#  payment_notification_users :json
+#  id                              :bigint           not null, primary key
+#  name                            :string(255)
+#  vendor_id                       :integer
+#  bank_account_id                 :integer
+#  category_id                     :integer
+#  department_id                   :integer
+#  original_amount_id              :integer
+#  tax_amount_id                   :integer
+#  payable_amount_id               :integer
+#  inclusive_of_taxes              :boolean
+#  gst_type_id                     :integer
+#  tax                             :decimal(10, )
+#  tds_slab_id                     :integer
+#  company_id                      :integer
+#  sub_department_id               :integer
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  status_id                       :integer
+#  tds_amount_id                   :integer
+#  balance_due_id                  :integer
+#  net_amount_id                   :integer
+#  gross_amount_id                 :integer
+#  roundoff_amount                 :decimal(20, 10)
+#  cost_center_id                  :integer
+#  invoice_number                  :text(65535)
+#  invoice_date                    :date
+#  invoice_due_date                :date
+#  advance_amount_id               :integer
+#  payment_notification_users      :json
+#  payment_agreement_id            :integer
+#  note                            :string(255)
+#  location_id                     :integer
+#  vendor_location_id              :integer
+#  tax_rate_id                     :integer
+#  resource_template_id            :integer
+#  creator_id                      :integer
+#  payment_agreement_upcoming_date :date
 #
 
     #                 :id => :integer,
@@ -65,23 +73,28 @@
 
 
 class BeneficiaryPayment < ApplicationRecord
-  include MathUtil
+  include MathUtil, Templatable
   
   belongs_to :vendor,  class_name: 'YesBankVendor'
-  belongs_to :bank_account
+  belongs_to :bank_account, optional: true
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :creator, optional: true, class_name: 'User'
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
+
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :vendor_location, optional: true, class_name: "GstinLocation"
 
   belongs_to :company, optional: true
   belongs_to :gst_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
 
-  belongs_to :status, class_name: 'BeneficiaryPaymentStatus'
+  belongs_to :status, optional: true, class_name: 'BeneficiaryPaymentStatus'
 
-  belongs_to :original_amount, class_name: "Amount"
+  belongs_to :original_amount, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :payable_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
@@ -89,8 +102,11 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :payment_agreement, optional: true
 
   has_many :payments, as: :parent
+
+  has_many :trails, as: :parent
 
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :tax_amount
@@ -98,6 +114,8 @@ class BeneficiaryPayment < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
 
   # after_commit :calculate_tax_and_amount
+  validate :payment_agreement_related_fields
+  after_create :update_creator_id, :update_company_id, :update_status
 
   def tax_rate
   	self.tax
@@ -108,39 +126,54 @@ class BeneficiaryPayment < ApplicationRecord
     return (self.status_id == BeneficiaryPaymentStatus.id_for(:unpaid))
   end
 
-  def as_json
-  	{
-  	  id: self.id,
-      tax_amount: precision_value(self.tax_amount&.value),
-      tds_amount: precision_value(self.tds_amount&.value),
-      tax: precision_value(self.tax),
-      # tds: precision_value(self.tds),
-      tds: precision_value(self.tds_slab&.tds),
-      gst_type_id: self.gst_type_id,
-      # tax_type_id: self.tax_type_id,
-      # tds_type_id: self.tds_type_id,
-      inclusive_of_taxes: self.inclusive_of_taxes,
-      roundoff_amount: self.roundoff_amount,
-      net_payable_amount: self.balance_due&.value,
-      balance_due: self.balance_due&.value,
-      taxable_amount: precision_value(self.gross_amount&.value),
-      editable: self.unpaid?,
-      tax_rate: precision_value(self.tax_rate),
-      tds_rate: precision_value(self.tds_slab&.tds),
-      net_amount: precision_value(self.net_amount&.value),
-      gross_amount: precision_value(self.gross_amount&.value),
-      category_id: self.category_id,
-      category_name: self.category&.name,
-      # cost_center_id: self.cost_center_id,
-      # cost_center_name: self.cost_center&.name,
-      tds_slab_id: self.tds_slab_id,
-      tds_slab_name: self.tds_slab&.name,
-      # tds_rate: self.tds,
-      paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
-      original_amount: precision_value(self.original_amount&.value),
-      advance_amount: precision_value(self.advance_amount&.value)
-  	}
+  def as_json(options={})
+    if options[:payment_agreement]
+      return agreement_based_json
+    else
+    	{
+    	  id: self.id,
+        tax_amount: precision_value(self.tax_amount&.value),
+        tds_amount: precision_value(self.tds_amount&.value),
+        tax: precision_value(self.tax),
+        # tds: precision_value(self.tds),
+        tds: precision_value(self.tds_slab&.tds),
+        gst_type_id: self.gst_type_id,
+        # tax_type_id: self.tax_type_id,
+        # tds_type_id: self.tds_type_id,
+        inclusive_of_taxes: self.inclusive_of_taxes,
+        roundoff_amount: self.roundoff_amount,
+        net_payable_amount: self.balance_due&.value,
+        payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id },
+        balance_due: self.balance_due&.value,
+        taxable_amount: precision_value(self.gross_amount&.value),
+        editable: self.unpaid?,
+        tax_rate: precision_value(self.tax_rate),
+        tds_rate: precision_value(self.tds_slab&.tds),
+        net_amount: precision_value(self.net_amount&.value),
+        gross_amount: precision_value(self.gross_amount&.value),
+        category_id: self.category_id,
+        category_name: self.category&.name,
+        # cost_center_id: self.cost_center_id,
+        # cost_center_name: self.cost_center&.name,
+        tds_slab_id: self.tds_slab_id,
+        tds_slab_name: self.tds_slab&.name,
+        # tds_rate: self.tds,
+        paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+        original_amount: precision_value(self.original_amount&.value),
+        advance_amount: precision_value(self.advance_amount&.value),
+        vendor_id: self.vendor_id,
+        vendor_name: self.vendor&.name,
+        vendor_location_id: self.vendor_location_id,
+        vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
+        department_attributes: { id: self.department_id, name: self.department&.name },
+        location_attributes: { id: self.location_id, name: self.location&.name },
+        cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+        note: self.note,
+        already_exists: true
+
+    	}
+    end
   end
 
   # private
@@ -278,4 +311,103 @@ class BeneficiaryPayment < ApplicationRecord
   #   self.tds_amount = self.gross_amount - new_gross_amount
   # end
 
+  def agreement_based_json(options={})
+    {
+      id: self.id,
+      tax_amount: precision_value(self.tax_amount&.value),
+      tds_amount: precision_value(self.tds_amount&.value),
+      tax: precision_value(self.tax),
+      tds: precision_value(self.tds_slab&.tds),
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
+      bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+      department_attributes: { id: self.department_id, name: self.department&.name },
+      location_attributes: { id: self.location_id, name: self.location&.name },
+      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name }, 
+      note: self.note,
+      inclusive_of_taxes: !!self.inclusive_of_taxes,
+      gst_type_id: self.gst_type_id,
+      tax_rate_id: self.tax_rate_id,
+      tds_slab_id: self.tds_slab_id,
+      original_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      net_amount_attributes: {id: self.original_amount_id, value: self.original_amount&.value, currency_id: self.original_amount&.currency_id},
+      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id},
+      vendor_locations: fetch_vendor_locations.as_json,
+      bank_accounts: fetch_vendor_bank_accounts.as_json,
+      agreement_type: 'beneficiary',
+      vendor_name: self.vendor&.name,
+      vendor_id: self.vendor_id,
+      creation_date: self.created_at.to_date,
+      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+      status_attributes: {id: self.reload.status&.id, name: self.status&.name, 
+      roundoff_amount: self.roundoff_amount,
+      net_payable_amount: self.balance_due&.value,
+      display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
+      bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil)
+    }
+  end
+
+  def document_owner_id
+    'creator_id'
+  end
+
+  private
+
+  def fetch_vendor_locations
+    self.vendor&.gstin_locations&.as_json
+  end
+
+  def fetch_vendor_bank_accounts
+    self.vendor&.bank_accounts&.non_deleted&.as_json
+  end
+
+  def update_creator_id
+    if self.creator_id.blank?
+      self.update(creator: RequestStore.store[:current_user])
+    end
+  end
+
+  def update_company_id
+    if self.company_id.blank?
+      self.update(company_id: RequestStore.store[:current_user].company_id)
+    end
+  end
+
+  def update_status
+    self.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+  end
+
+  def payment_agreement_related_fields
+    if self.payment_agreement.present?
+      if self.vendor_id.blank?
+        errors.add(:vendor, 'cannot be blank')
+      end
+      if self.vendor_location_id.blank?
+        errors.add(:vendor_location, 'cannot be blank')
+      end
+
+      if self.bank_account_id.blank?
+        errors.add(:bank_account, 'name cannot be blank')
+      end
+      if self.cost_center_id.blank?
+        errors.add(:cost_center, 'cannot be blank')
+      end
+      if self.department_id.blank?
+        errors.add(:department, 'cannot be blank')
+      end
+      if self.location_id.blank?
+        errors.add(:location, 'cannot be blank')
+      end
+      # Don't check for id as it is nested attribute
+      if self.original_amount.blank?
+        errors.add(:original_amount, 'cannot be blank')
+      end
+      if self.gst_type_id.blank?
+        errors.add(:tax_type, 'cannot be blank')
+      end
+      if self.tax_rate_id.blank?
+        errors.add(:tax, 'cannot be blank')
+      end
+    end
+  end
 end
