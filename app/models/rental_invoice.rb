@@ -274,7 +274,8 @@ class RentalInvoice < ApplicationRecord
       custom_fields: self.custom_fields,
       notice_period: self.notice_period,
       square_feet: self.square_feet,
-      already_exists: true
+      already_exists: true,
+      prepaid: self.prepaid
 
     }
   end

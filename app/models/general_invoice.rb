@@ -304,7 +304,8 @@ class GeneralInvoice < ApplicationRecord
       rent_free_period: self.rent_free_period,
       tenancy_period: self.tenancy_period,
       custom_fields: self.custom_fields,
-      already_exists: true
+      already_exists: true,
+      prepaid: self.prepaid
     }
   end
 
