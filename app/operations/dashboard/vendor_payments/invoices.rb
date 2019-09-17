@@ -92,7 +92,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
         self.counts.push(admin_data)
       end
 
-      if user.is_invoice_initiator?
+      if user.is_po_invoice_initiator? || user.is_non_po_invoice_initiator?
         personal_data = {
           type: 'personal',
           data: [

@@ -23,7 +23,11 @@ class WorkflowManager::Base < BaseOperation
     when 'PurchaseOrder'
       self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new user, workflow_input
     when 'Invoice'
-      self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new user, workflow_input
+      if provider_name == 'PoInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::PoInvoiceProvider.new user, workflow_input
+      elsif provider_name == 'NonPoInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::NonPoInvoiceProvider.new user, workflow_input
+      end 
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input
     when 'MoneyRequest'

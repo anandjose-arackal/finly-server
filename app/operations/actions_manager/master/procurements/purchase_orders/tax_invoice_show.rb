@@ -21,10 +21,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
   
   def send_mail
-    if invoice.is_initiating_user?
-      (invoice.approved? || invoice.auto_approved?) &&
-      (user_in_level?) || (document_owner?)
-    end
+    false
   end
   
   def export_items
@@ -32,13 +29,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    if user.is_invoice_initiator?
+    if user.is_non_po_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def reject
-    if invoice.is_reviewing_user?
+    if invoice.is_non_po_reviewing_user?
       invoice.processing? && user_in_level?
     end
   end
@@ -48,13 +45,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   # end
 
   def approve
-    if invoice.is_reviewing_user?
+    if invoice.is_non_po_reviewing_user?
       invoice.processing? && user_in_level?
     end
   end
 
   def forward
-    if invoice.is_reviewing_user?
+    if invoice.is_non_po_reviewing_user?
       invoice.processing? && user_in_level?
     end
   end
@@ -62,10 +59,10 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   def take_control
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if (invoice.processing? && invoice.get_reviewers.exclude?(user))
+      if (invoice.processing? && invoice.get_reviewers(nil, provider_name).exclude?(user))
         return true
       end
-      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && !invoice.action_users(:approve).include?(user)
+      if invoice.processing? && !invoice.action_users(:return_control, provider_name).include?(user) && !invoice.action_users(:approve, provider_name).include?(user)
         return true
       end
     end
@@ -76,7 +73,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if invoice.processing?
-        return true if invoice.action_users(:return_control).include?(user)
+        return true if invoice.action_users(:return_control, provider_name).include?(user)
       end
     end
     ############# Admin logic end ####################
@@ -88,13 +85,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    if user.is_invoice_initiator?
+    if user.is_non_po_invoice_initiator?
       invoice.processing? && document_owner?
     end
   end
 
   def remind_approver
-    if invoice.is_initiating_user?
+    if invoice.is_po_initiating_user?
       invoice.processing? &&
       document_owner?
     end
@@ -121,13 +118,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def delete
-    if user.is_invoice_initiator?
+    if user.is_non_po_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def save_and_submit
-    if user.is_invoice_initiator?
+    if user.is_non_po_invoice_initiator?
       ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
     end
   end
@@ -148,13 +145,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def download
-    invoice.approved?
+    false
   end
 
   def send_btn
     # (invoice.approved? || invoice.auto_approved?) &&
     # (user_in_level?) || (document_owner?)
-    true
+    false
   end
 
   def export_invoice_items
@@ -173,11 +170,15 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
     # level = invoice.level
     # amount = invoice.net_amount.value rescue 0
     # level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
-    invoice.get_reviewers.include?(user)
+    invoice.get_reviewers(nil, provider_name).include?(user)
   end
 
   def document_owner?
     invoice.created_by_user_id.eql? user.id
+  end
+
+  def provider_name
+    invoice.get_invoice_provider_name
   end
 
 end

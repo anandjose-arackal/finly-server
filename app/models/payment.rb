@@ -447,6 +447,7 @@ class Payment < ApplicationRecord
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
   after_save :add_company_id
+  after_commit :update_parent_status
 
   after_destroy :budget_trail_destroy
 
@@ -728,6 +729,19 @@ class Payment < ApplicationRecord
   def add_company_id
     if self.company_id.blank?
       self.update_columns(company_id: self.payment_order&.company_id)
+    end
+  end
+
+  def update_parent_status
+    if self.completed?
+      case self.parent_type
+      when 'Invoice'
+        parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+        parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+      when 'PurchaseOrder'
+        parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+        parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      end
     end
   end
 end
