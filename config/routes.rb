@@ -2984,7 +2984,8 @@ Rails.application.routes.draw do
 
 
   scope :task_workflows do
-    # get 'documents'
+    get 'documents', to: "task_workflows#documents"
+    get 'config', to: 'task_workflows#configuration'
   end
   resources :task_workflows
 
