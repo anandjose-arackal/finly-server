@@ -77,7 +77,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       gl_code = data[:gl_code].to_s
       category_code = data[:category_code].blank? ? nil : data[:category_code]
       expense_management = data[:expense_management].to_s.upcase == 'Y' ? true : false
-      vendor_payment = data[:vendor_payment].to_s.upcase == 'Y' ? true : false
+      vendor_payment = data[:vendor_payments].to_s.upcase == 'Y' ? true : false
       inward_invoice_line_items = data[:inward_invoice_line_items].to_s.upcase == 'Y' ? true : false
       ancestry = parent&.to_s
       active = data[:active].to_s.upcase == 'N' ? false : true
@@ -86,6 +86,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
               name: name,
               gl_code: gl_code,
               category_code: category_code,
+              active: active,
               expense_management: expense_management,
               vendor_payments: vendor_payment,
               inward_invoice_line_items: inward_invoice_line_items,
