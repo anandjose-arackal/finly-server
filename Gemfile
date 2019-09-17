@@ -80,6 +80,8 @@ gem 'mysql2', '~> 0.5.2'
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
 
+gem 'sneakers'
+
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
 
@@ -207,7 +209,6 @@ gem 'awesome_print', '~> 1.8.0'
 gem 'fuzzy-string-match', '1.0.1'
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
   gem 'rb-readline'

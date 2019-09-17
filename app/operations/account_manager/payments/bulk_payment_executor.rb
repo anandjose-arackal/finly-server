@@ -45,7 +45,6 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def validate
-    # debugger # todo uncomment below
     unless self.payment_order.pending?
       add_message :error, "Payment order cannot be processed at this moment"
       return

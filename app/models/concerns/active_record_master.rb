@@ -18,6 +18,11 @@ module ActiveRecordMaster
       @policy
     end
 
+    def event_prefix(prefix = NoObject)
+      @event_prefix = "#{prefix}" unless prefix == NoObject
+      @event_prefix
+    end
+
     def system_events(*system_events)
       @system_events = system_events if system_events.present?
       @system_events ||= []
@@ -30,14 +35,6 @@ module ActiveRecordMaster
 
     def all_events
       @system_events + @request_events
-    end
-
-    def task_workflow(workflow_klass)
-      task_workflows << workflow_klass
-    end
-
-    def task_workflows
-      @task_workflows ||= []
     end
 
     def form(form = NoObject)
