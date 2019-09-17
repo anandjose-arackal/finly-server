@@ -247,7 +247,8 @@ class YesBankVendor < ApplicationRecord
         bank_accounts: bank_accounts,
         state_code: state_code&.state_code,
         address: address,
-        trade_name: trade_name
+        trade_name: trade_name,
+        custom_fields: self.custom_fields
     }
   end
 

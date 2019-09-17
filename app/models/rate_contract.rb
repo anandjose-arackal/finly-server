@@ -29,6 +29,7 @@ class RateContract < ApplicationRecord
   belongs_to :company, optional: true
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   before_validation :add_company
 
