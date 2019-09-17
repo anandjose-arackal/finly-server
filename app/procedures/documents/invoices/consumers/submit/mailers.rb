@@ -1,10 +1,10 @@
 module Documents::Invoices::Consumers::Submit::Mailers
 
-  class SubmitMailer < Events::Mailer
+  class SubmitMailer < Mailers::API
     # document Invoice
-    queue 'invoice.submit'
+    # schedule time: {every: :day, at: '12:00pm'}, input: {}
+    event 'invoice.submit'
     # from 'noreply@finly.io'
-
   end
 
   # class Owner < SubmitMailer
@@ -29,7 +29,7 @@ module Documents::Invoices::Consumers::Submit::Mailers
   #   template 'mailers/document'
   # end
 
-  # class Reviewer < Events::Mailer
+  # class Reviewer < Mailers::API
   #   configuration_key 'invoice.submit.reviewer'
   #   run_if -> (invoice) {invoice.status_id == InwardInvoiceStatus.id_for(:processing)}
   #   to -> (invoice) {invoice.user}
@@ -39,7 +39,7 @@ module Documents::Invoices::Consumers::Submit::Mailers
   # end
   #
   #
-  # class Reminder < Events::Mailer
+  # class Reminder < Mailers::API
   #   scheduled!
   #   configuration_key 'invoice.reviewer.reminders'
   #   run_if -> (invoice) {invoice.status_id == InwardInvoiceStatus.id_for(:processing)}
