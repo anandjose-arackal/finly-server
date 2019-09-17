@@ -27,15 +27,14 @@ class FieldParentType < ApplicationRecord
       purchase_order_item: 14,
       travel_request: 15,
       booking_request: 16,
-      vendor: 17,
+      yes_bank_vendor: 17,
       purchase_request: 18,
       purchase_request_item: 19,
       general_invoice: 20,
       rental_invoice: 21,
       payment_agreement: 22,
       item: 23,
-      rate_contract: 24,
-      yes_bank_vendor: 25
+      rate_contract: 24
   }
 
   scope :with_name, -> (name) { where name: name }
