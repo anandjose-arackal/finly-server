@@ -1,4 +1,4 @@
-# details commented in this json means they are provided in different API's
+# DETAILS COMMENTED IN THIS JSON MEANS THEY ARE PROVIDED IN DIFFERENT API's
 # 
 json.extract! @result.report, :id, :name, :memo, :report_status_id, :auto_submit
 json.user_name @result.report.user.name
@@ -25,10 +25,14 @@ json.currency_country_code @result.report.base_currency_code
 json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
-
-
-
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
+
+json.user_details do
+  json.department @result.report&.user&.department&.name
+  json.cost_center @result.report&.user&.cost_center&.name
+  json.location @result.report&.user&.location&.name
+  json.operating_unit @result.report&.user&.gl_config[:operation_unit] rescue nil
+end
 
 policy_id = nil
 policy_name = nil
@@ -189,7 +193,7 @@ end
 # end
 
 json.custom_fields do
-  json.array! @result.report.custom_fields
+  json.array! @result.report.custom_fields.as_json
 end
 
 json.budgets do
@@ -217,6 +221,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_effective_balance cash_on_hand_adapter.balance
   json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance

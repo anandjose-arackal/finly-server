@@ -71,14 +71,30 @@ class Procurement < ApplicationRecord
     end
   }
 
-  scope :order_by_expected_delivery_date, -> {
+  scope :order_by_expected_delivery_date, -> (user_id) {
+    user = User.find_by_id(user_id)
     ids = self.pluck(:id).uniq
-    filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    # filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    filtered_ids = user.company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
     find_ordered(filtered_ids)
   }
 
   scope :filter_procurement_name, -> (name) {
     where "procurements.name LIKE ?", "%#{name}%"
+  }
+
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
   }
 
   scope :filter_policy_id, -> (policy_id) {
@@ -148,21 +164,6 @@ class Procurement < ApplicationRecord
     filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
     where id: filtered_ids
   }
-
-  scope :filter_creation_date_from, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at >= ?", date.beginning_of_day)
-    end
-  }
-
-  scope :filter_creation_date_to, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at <= ?", date.end_of_day)
-    end
-  }
-
   
   scope :filter_year, -> (year) {
     if year.blank?
@@ -361,6 +362,15 @@ class Procurement < ApplicationRecord
     )
   }
 
+  scope :grn_include_details, -> {
+    includes(
+        {invoices: [{level: :reviewers}]},
+        {purchase_order: [:delivery_location, :cost_center, :department, :sub_department, :vendor, :user, {balance_amount: [:currency]}, :status]},
+        {inward_documents: [:vendor, :user, :items]},
+        :status_tags, :procurement_status_taggables, :user
+    )
+  }
+
   scope :filter_location_id, -> (location_id) {
     filtered_ids = PurchaseOrder.where(location_id: location_id).pluck(:procurement_id).uniq
     where id: filtered_ids
@@ -398,7 +408,6 @@ class Procurement < ApplicationRecord
       where(id: filtered_ids)
     end
   }
-
 
   def awaiting_action?(user)
     # Ideal method:
@@ -529,6 +538,10 @@ class Procurement < ApplicationRecord
     self.documents.map(&:updated_at).sort!.reverse!.first
   end
 
+  def receive_last_updated_at
+    self.receive_documents.map(&:updated_at).sort!.reverse!.first
+  end
+
   def documents
     data = []
     data.push self.purchase_order if self.purchase_order.present?
@@ -541,6 +554,16 @@ class Procurement < ApplicationRecord
     invoices.each do |invoice|
       data += invoice.payments
     end
+
+    data.sort_by!{ |doc| doc.created_at}.reverse!
+  end
+
+  # Used in receive index
+  def receive_documents
+    data = []
+    data.push self.purchase_order if self.purchase_order.present?
+
+    data += self.inward_documents&.to_a
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end

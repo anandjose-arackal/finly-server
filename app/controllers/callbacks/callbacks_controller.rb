@@ -1,10 +1,11 @@
-class Callbacks::CallbacksController < ApplicationController
+class Callbacks::CallbacksController < BaseControllers::PublicBase
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
+  before_action :icici_decrypt_parameters, only: :icici_payment_callback
 
-  def successful_vendor_payment
+  def icici_payment_callback
+
     body = {
         payment_id: (params[:payment_id] || Payment.last.id),
         payment_amount: (params[:payment_amount] || Payment.last.amount_value),
@@ -23,6 +24,12 @@ class Callbacks::CallbacksController < ApplicationController
   end
 
   def invoice_payment_received
+
+  end
+
+  private
+
+  def icici_decrypt_parameters
 
   end
 end

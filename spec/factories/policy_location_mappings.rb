@@ -2,7 +2,7 @@
 #
 # Table name: policy_location_mappings
 #
-#  id          :bigint(8)        not null, primary key
+#  id          :bigint           not null, primary key
 #  policy_id   :integer
 #  location_id :integer
 #  enabled     :boolean

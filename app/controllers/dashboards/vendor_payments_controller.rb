@@ -1,5 +1,4 @@
-class Dashboards::VendorPaymentsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class Dashboards::VendorPaymentsController < BaseControllers::WebBase
 
   def configs
     @result = Dashboard::VendorPayments::Configs.(current_user, params)
@@ -57,6 +56,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
 
   def grns
     @result = Dashboard::VendorPayments::Grns.(current_user, params)
+    respond
+  end
+
+  def payment_agreements
+    @result = Dashboard::VendorPayments::PaymentAgreements.(current_user, params)
     respond
   end
 end

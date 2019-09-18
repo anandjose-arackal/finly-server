@@ -38,18 +38,23 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.revision_number = self.purchase_order.revision_number + 1
     self.duplicate_po.po_number = nil
     self.duplicate_po.controlling_level_id = nil
-    self.duplicate_po.advance_amount_status_id = nil
+    # self.duplicate_po.advance_amount_status_id = nil
+    self.duplicate_po.advance_amount_status_id = self.purchase_order.advance_payments.present? ? self.purchase_order.advance_amount_status_id : nil
     self.duplicate_po.purchase_order_status_id = (user.vendor_payment_admin? && !document_owner?? PurchaseOrderStatus.id_for(:auto_approved) : PurchaseOrderStatus.id_for(:open))
 
-    op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
-    if op.success?
-      self.duplicate_po.po_number = op.document_number
-    end
+    # op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
+    # if op.success?
+    #   self.duplicate_po.po_number = op.document_number
+    # end
 
     self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised))
 
     self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
     self.duplicate_po.save
+
+    if self.purchase_order.advance_payments.present?
+      self.purchase_order.advance_payments.update_all(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
+    end
 
     self.klass.each_with_index do |k, kid| 
       obj = self.purchase_order.__send__(k)

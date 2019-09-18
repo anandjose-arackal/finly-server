@@ -134,7 +134,7 @@ json.results do
       json.invoice_advance invoice.proforma_advance&.value
     end
 
-    vendor = po.present? ? po.vendor : invoice&.vendor
+    vendor = p.purchase_order.present? ? p.purchase_order.vendor : invoice&.vendor
     if vendor.present?
       json.vendor vendor.as_json
     end
@@ -154,6 +154,7 @@ json.results do
       end
     end
 
+
     iwd = p.documents&.detect {|d| d.class.name == 'InwardDocument'}
 
     json.grn_delivery_date iwd&.delivery_date&.strftime("%d-%m-%Y") || nil
@@ -163,7 +164,7 @@ json.results do
       json.array! p.attached_documents do |attachment|
         json.extract! attachment, :id
         json.file_name attachment.file_file_name
-        json.url attachment.file.url
+        json.url attachment.file.url(:original)
       end
     end
   end

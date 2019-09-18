@@ -1,4 +1,4 @@
-class CostCentersController < ApplicationController
+class CostCentersController < BaseControllers::WebBase
 
   def create
     @result = CostCenters::Create.(current_user, params)
@@ -30,6 +30,11 @@ class CostCentersController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
+  end
+
+  def bulk_destroy
+    @result = CostCenters::BulkDestroy.(current_user, params)
+    respond
   end
 
 end

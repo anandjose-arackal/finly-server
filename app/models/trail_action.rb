@@ -38,6 +38,7 @@ class TrailAction < ApplicationRecord
         :credit,
         :send_to_vendor,
         :reopen,
+        :vendor_confirmed,
 
         # TravelRequestBookingActions
         :confirm_selection,
@@ -48,7 +49,13 @@ class TrailAction < ApplicationRecord
         :reject_booking_request,
         :request_selection,
         :retract_booking,
-        :forward
+        :forward,
+        # Purchase Request
+        :po_created,
+        :po_deleted,
+        :invoice_created,
+        :payment_ticket_created,
+        :upcoming_invoice_created
     ]
   end
 end

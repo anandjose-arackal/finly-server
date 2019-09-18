@@ -1,13 +1,10 @@
-class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationController
+class Api::Vp::BankTransfer::BankPaymentRequestsController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
-
-  before_action -> { finly_authorize! :api }
 
   def create
     params[:api_initiated] = true
     # reformat_params
-    # debugger
     # @result = BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket.(current_user, params)
     @result = BankTransfer::PaymentRequest::Create.(current_user, params)
     if @result.success? and @result.bank_payment_request.present?

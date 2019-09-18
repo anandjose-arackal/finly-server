@@ -36,7 +36,15 @@ class BankPaymentRequestStatus < ApplicationRecord
   end
 
   def approved?
-    self.id == BankPaymentRequestStatus.id_for(:approved)
+    self.id == BankPaymentRequestStatus.id_for(:approved) || self.id == BankPaymentRequestStatus.id_for(:auto_approved)
+  end
+
+  def pending?
+    self.id == BankPaymentRequestStatus.id_for(:pending)
+  end
+
+  def creation_in_progress?
+    self.id == BankPaymentRequestStatus.id_for(:creation_in_progress)
   end
 
   def auto_approved?

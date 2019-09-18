@@ -31,7 +31,9 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
+    self.purchase_order.update(rejection_note: params[:note])
     self.workflow_output = op.workflow_output
   end
 

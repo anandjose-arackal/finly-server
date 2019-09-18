@@ -157,13 +157,25 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
     has_scope :filter_controlling_user
     has_scope :filter_payment_ids
+    has_scope :filter_payment_ticket_id
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
 
+
     def init
       self.payment_requests = params[:payment_requests]
+      set_scopes
       self.payment_requests = apply_scopes(payment_requests)
+
+      # slightly dirty logic for the custom field text search #TODO - refactor later
+      if params[:filter_custom_text_selection].present?
+        params[:filter_custom_text_selection].each do |key, value|
+          self.payment_requests = self.payment_requests.filter_custom_field_text(key, value)
+        end
+      end
+      ######################## dirty logic end ####################################
+
       per_page = params[:per_page] || 30
       page = params[:page] || 1
       # if self.payment_requests.present?
@@ -180,8 +192,20 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
     end
 
+    def set_scopes
+      if params[:search_type].present? && params[:search_query].present?
+        if params[:search_type] == "filter_payment_ticket_id"
+          params[:filter_payment_ticket_id] = params[:search_query]
+        end
+
+        if params[:search_type] == "filter_payment_ids"
+          params[:filter_payment_ids] = params[:search_query]
+        end
+      end
+    end
+
     def status_count
-      pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited)
+      pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited, :auto_approved)
       po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
@@ -205,7 +229,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
             result[:draft] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:processing)
             result[:processing] += payment_tickets_counts[status.id]
-          when BankPaymentRequestStatus.id_for(:approved)
+          when BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:auto_approved)
             result[:approved] += payment_tickets_counts[status.id]
           when BankPaymentRequestStatus.id_for(:credited)
             result[:credited] += payment_tickets_counts[status.id]

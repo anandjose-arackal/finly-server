@@ -67,6 +67,10 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     has_scope :filter_unassigned_goods_receiver_for_policy
     has_scope :filter_unassigned_invoice_initiator_for_policy
     has_scope :filter_unassigned_invoice_reviewer_for_policy
+    has_scope :filter_unassigned_po_invoice_initiator_for_policy
+    has_scope :filter_unassigned_non_po_invoice_initiator_for_policy
+    has_scope :filter_unassigned_po_invoice_reviewer_for_policy
+    has_scope :filter_unassigned_non_po_invoice_reviewer_for_policy
     has_scope :filter_unassigned_bank_payment_request_initiator_for_policy
     has_scope :filter_unassigned_bank_payment_request_reviewer_for_policy
     has_scope :filter_unassigned_bank_payment_request_creditor_for_policy
@@ -75,12 +79,19 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     has_scope :filter_unassigned_vendor_reviewer_for_policy
     has_scope :filter_unassigned_vendor_manager_for_policy
     has_scope :filter_unassigned_budget_manager_for_policy
+    has_scope :filter_ids, type: :array
 
     def init
+      # Todo temp workaround because of frontend format issue - START
+      if params[:filter_ids]
+        params[:filter_ids] = params[:filter_ids].first.split(",")
+      end
+      
       fix_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
-      self.paginated_team = users.paginate(page: params[:page], per_page: params[:per_page] || 30)
+      self.paginated_team = users.paginate(page: params[:page], per_page: params[:per_page] || 30).includes_for_index
+      self.paginated_team = self.paginated_team.includes_for_index
     end
 
     def fix_scopes

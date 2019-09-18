@@ -26,7 +26,7 @@ class ExportManager::RequestHandler < BaseOperation
       return
     end
     if params[:export_format].blank?
-      add_message :error,'Invalid Format. Error while generating export'
+      add_message :error, 'Invalid Format. Error while generating export'
       return
     end
   end
@@ -70,17 +70,25 @@ class ExportManager::RequestHandler < BaseOperation
   protected
 
   def init_master
-    m = ExportManager::Master::BaseMaster::MASTERS[self.params[:type]]
-    if m.present?
-      return m if m.is_a?(Class)
-      return Object.const_get(m)
-    end
-    nil
+    ExportManager::Master::BaseMaster.subscribers(self.type)&.first
   end
 
   def init_processor
     return nil if self.master.processor.blank?
     self.master.processor.new(user, params, master)
+  end
+
+  def from_personalizer(klass_name)
+    base_path = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/export_manager#{user.company_id}/master#{user.company_id}/"
+    klass_name_s = klass_name.to_s
+    klass_name_s.gsub!('::ExportManager::Master::', '')
+    master_name = klass_name_s.gsub!('ExportManager::Master::', '')
+    klass_name_s = klass_name_s.split('::').map(&:underscore)
+    path = base_path + klass_name_s.join('/') + '.rb'
+
+    return nil unless File.exists?(path)
+    load path
+    Object.const_get("Personalizer::Adapters::Company#{user.company_id}::ExportManager#{user.company_id}::Master#{user.company_id}::#{master_name}")
   end
 
   # def init_config

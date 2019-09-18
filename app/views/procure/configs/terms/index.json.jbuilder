@@ -1,1 +1,1 @@
-json.array! @result.terms, :id, :name, :description
+json.array! @result.terms, :id, :name, :description, :default

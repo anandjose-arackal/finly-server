@@ -1,7 +1,6 @@
-class OrganizationAccountController < ApplicationController
+class OrganizationAccountController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def policies_list
     @result = Company::Configuration::Show.(current_user, params)
@@ -12,6 +11,8 @@ class OrganizationAccountController < ApplicationController
   end
 
   def categories
+    # in org account, show all categories irrespective of current app
+    RequestStore.store[:organization_account] = true
     @result = Categories::Index.(current_user, params)
     respond
   end
@@ -46,7 +47,7 @@ class OrganizationAccountController < ApplicationController
   end
 
   def gst_state_codes
-    @codes = GstStateCode.all
+    @codes = State.all
     respond_to do |format|
       format.json {render 'organization_account/gst_state_codes'}
     end

@@ -12,7 +12,7 @@ json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
 json.em_tax_tracking @result.company.em_tax_tracking_enabled?
-json.itz_cash_company_balance @result.itz_cash_company_balance
+json.itz_cash_company_balance 0
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params
 json.itz_cash_d_code_enabled @result.company.itz_cash_d_code_enabled?
@@ -25,6 +25,7 @@ json.procurement @result.company.procurement_enabled?
 json.travel_request @result.company.travel_desk_enabled?
 json.budgeting_system @result.company.budgeting_system_enabled?
 json.vendor_empanelment_workflow @result.company.vendor_empanelment_workflow_enabled?
+json.purchase_requisition_system @result.company.purchase_requisition_enabled?
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

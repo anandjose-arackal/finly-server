@@ -2,7 +2,7 @@
 #
 # Table name: icici_transaction_callbacks
 #
-#  id         :bigint(8)        not null, primary key
+#  id         :bigint           not null, primary key
 #  AGGRNAME   :string(255)
 #  AGGRID     :string(255)
 #  URN        :string(255)
@@ -14,6 +14,7 @@
 #  USERID     :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  reconciled :boolean          default(FALSE)
 #
 
 class IciciTransactionCallback < ApplicationRecord

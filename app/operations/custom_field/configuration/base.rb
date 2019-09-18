@@ -1,5 +1,9 @@
 class CustomField::Configuration::Base < CustomField::Base
   attr_accessor :field_configuration
+
+  def authorized_user_types
+    [:admin, :vendor_payments_admin]
+  end
   
   def success
     params[:field_configuration] = self.field_configuration

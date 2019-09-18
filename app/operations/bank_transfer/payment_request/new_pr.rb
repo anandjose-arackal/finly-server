@@ -9,6 +9,10 @@
 # handle all type of validations DONE
 # reuse existing bulkvalidation DONE
 
+# DEPRECATED OPERATION, NOT BEING USED
+# ONLY JSON FILE  WITH SAME NAME USED
+# NEED TO CHANGE THAT
+
 class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	attr_accessor :vendor_id, :vendor, :total_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
 					:payments_attributes, :options, :company_id, :execute, :payment_params,

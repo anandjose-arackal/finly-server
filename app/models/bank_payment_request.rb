@@ -26,6 +26,14 @@
 #  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
+#  company_id                   :integer
+#  max_payment_amount           :decimal(20, 5)
+#  rejection_note               :text(65535)
+#  bank_account_provider_id     :integer
+#  otp                          :string(255)
+#  otp_sent_at                  :datetime
+#  otp_attempts                 :integer
+#  otp_count                    :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -56,9 +64,11 @@ class BankPaymentRequest < ApplicationRecord
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
+  before_destroy :rollback_related_documents
+
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, :pending?, :creation_in_progress?, to: :status, allow_nil: true
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -70,6 +80,9 @@ class BankPaymentRequest < ApplicationRecord
     if user_ids.present?
       where(owner_id: user_ids)
     end
+  }
+  scope :filter_payment_ticket_id, -> (id) {
+    where(id: id)
   }
 
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
@@ -168,16 +181,16 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
-                                                              {receiving_account: :account_owner}, :payment_status, :reference_resource,
+                                                              :payment_status,
                                                               :invoice,
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
-  scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
-                                                                             :initiating_user,
+  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
+                                                                             :initiating_user,:parent,:payment_status,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
                                                                              {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
                                                                              :amount]})}
@@ -228,8 +241,8 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
-  invoice:[ :invoice_items,:category, {custom_fields: :field_configuration}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,{receiving_account: :account_owner},:initiating_user,{amount: :currency},
+  invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
   scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}
@@ -245,6 +258,18 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
     bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
     where(id: bpr_ids)
+  }
+
+  scope :filter_custom_field_text, -> (key, value) {
+    if value.present?
+      raw_po_ids = self.pluck(:payment_order_id)
+      raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+      field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_text_value(value).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+      po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+      bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+      where(id: bpr_ids)
+    end
   }
 
   scope :filter_policy_id, -> (policy_id) {
@@ -333,7 +358,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   end
 
   def can_credit?
-    approved?
+    approved? || processing? || auto_approved?
   end
 
   def can_take_control?
@@ -462,6 +487,13 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     end
   end
 
+  def validate_if_creditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present? && BankPaymentRequest.finance_associated_status_ids.include?(self.status_id)
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
+    end
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -497,7 +529,9 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
-
+  def self.human_name
+    'Payment Ticket'
+  end
 
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
@@ -537,9 +571,11 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     bank_payment_requests = BankPaymentRequest.none
 
     purs.each do |pur|
+      max_amount = pur.max_amount || 999999999999999999
+      min_amount = pur.min_amount || 0
       pur_bank_payment_requests = BankPaymentRequest.all.
         where(policy_id: pur.policy_id).
-        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+        where("(max_payment_amount IS NULL OR max_payment_amount > ?) AND (max_payment_amount IS NULL OR max_payment_amount <= ?)", min_amount, max_amount)
 
       bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
     end
@@ -547,4 +583,34 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
   end
   ####################### Overridden Methods ends ###################
+
+
+  def rollback_related_documents
+    rollback_security_deposit
+    rollback_beneficiary_payment
+  end
+
+  def rollback_security_deposit
+    type_security_deposit = self.payment_order.payments.pluck(:parent_type).include?("SecurityDeposit") rescue false
+    if type_security_deposit
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: SecurityDepositStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
+
+  def rollback_beneficiary_payment
+    type_beneficiary_payment = self.payment_order.payments.pluck(:parent_type).include?("BeneficiaryPayment") rescue false
+    if type_beneficiary_payment
+      self.payment_order.payments.each do |payment|
+        if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
+          payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
+          break
+        end
+      end
+    end
+  end
 end

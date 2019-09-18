@@ -1,13 +1,28 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
-                :gstin_location, :cost_allocation_items
+                :gstin_location, :cost_allocation_items, :policy
+
+
+  def personalizer
+    {
+        post_process: {
+            after: Personalizer::Process.new([:procurements, :invoices, :update], :post_process, self)
+        }
+    }
+  end
+
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
+
+    if self.inward_invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
 
 
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
@@ -35,16 +50,19 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.cost_allocation_items = StringUtils.to_bool(self.inward_invoice_params[:cost_allocation_items])
     # self.inward_invoice_params.delete(:cost_allocation_items)
 
+    self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: self.inward_invoice_params[:policy_id])
+
   end
 
   def validate
-    if self.inward_invoice.blank?
-      add_message :error, "Invoice not found"
-      return
-    end
 
     if self.inward_invoice_params[:invoice_number].blank?
       add_message :error, "Invoice number is required. You can input alphanumeric characters, dash and forward slash. No spaces allowed."
+      return
+    end
+
+    if self.policy.blank? && self.inward_invoice.policy_id.blank?
+      add_message :error, "Policy cannot be blank"
       return
     end
 
@@ -57,6 +75,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if invoice_number.present? && duplicate_invoices.present?
       # add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
       add_message :error, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details."
+      return
+    end
+
+    if self.inward_invoice_params[:location_id].blank?
+      add_message :error, "Please specify a Billing Address."
+    end
+
+    if self.inward_invoice_params[:delivery_location_id].blank?
+      add_message :error, "Please specify a Shipping Address."
       return
     end
 
@@ -74,26 +101,36 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     else
       if self.inward_invoice_params[:advance_amount_required].present?
         self.inward_invoice_params[:advance_amount_required] = false
-        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = 0
       end
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-        if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
-            add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
-          return
-        end 
+      if params[:invoice][:balance_amount_attributes][:value].to_i < 0
+        add_message :error, "Balance due amount cannot be less than zero"
+      end
+      if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
+          add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
+        return
+      end
 
-        self.inward_invoice_params[:invoice_items_attributes].each do |item|
-          po_item = self.purchase_order.items.find_by(inventory_line_item_id: item[:inventory_line_item_id])
+      # the below line is in the case of one PO having multiple line items of the same inventory item
+      processed_item_ids = []
+      self.inward_invoice_params[:invoice_items_attributes].each do |item|
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(id: item[:purchase_order_item_id])
+        next if po_item.blank? # temp workaround
+        item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
 
-          item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
-
-          if item_q < item[:quantity].to_i
-            add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
-            break
-          end
+        unless user.company.feature_subscription.grn_enabled
+          item_q = po_item.quantity
         end
+
+        if item_q < item[:quantity].to_i
+          add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+          break
+        end
+        processed_item_ids << po_item.id
+      end
     end
 
     if self.inward_invoice_params[:transaction_service_period_from].present?
@@ -180,10 +217,23 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def pre_process
     # update gstin location id
+    if inward_invoice_params[:gst_type_id].blank?
+      if self.gstin_location.present?
+        self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+
+        shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+        if self.gstin_location.state_code == shipping_location&.state_code
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+        else
+          self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+        end
+      else
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    end
     if self.gstin_location.present?
       self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
     end
-
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?
@@ -199,6 +249,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
     if self.inward_invoice_params[:inclusive_of_taxes].blank?
       self.inward_invoice_params[:inclusive_of_taxes] = false
+    end
+
+    #strip_invoice_number
+    if self.inward_invoice_params&.dig(:invoice_number).present?
+      self.inward_invoice_params[:invoice_number] =self.inward_invoice_params[:invoice_number]&.strip
     end
 
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)
@@ -269,7 +324,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
         params[:reviewal_document] = self.inward_invoice
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
+        params[:provider_name] = self.inward_invoice.get_invoice_provider_name
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
@@ -299,7 +354,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def post_process
     add_message :success, "Invoice updated"
-
   end
 
   private

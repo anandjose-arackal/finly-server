@@ -1,6 +1,4 @@
-class NavBarController < ApplicationController
-
-  before_action -> { finly_authorize! :web }
+class NavBarController < BaseControllers::WebBase
 
   def show
     @result = Navbar::Config.(current_user, params)

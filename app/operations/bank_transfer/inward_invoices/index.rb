@@ -8,6 +8,8 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     has_scope :filter_payable_invoices
     has_scope :invoice_date, using: [:from, :to], type: :hash
+    has_scope :filter_creation_date, using: [:from, :to], type: :hash
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_invoice_date
     has_scope :due_date, using: [:from, :to], type: :hash
     has_scope :filter_due_date
@@ -20,11 +22,20 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_invoice_type
     has_scope :filter_po_number
     has_scope :filter_awaiting_approval
+    has_scope :filter_reviewer_awaiting_approval
     has_scope :filter_inward_invoice_type
     has_scope :filter_user
     has_scope :filter_year
     has_scope :filter_month
     has_scope :filter_ids, type: :array
+    has_scope :filter_policy_id
+    has_scope :filter_invoice_id
+    has_scope :show_only_invoices_which_are_forwarded
+
+    # Sorting
+    has_scope :sort_invoice_id
+    has_scope :sort_date
+    has_scope :sort_due_date
 
     def init
       # Todo temp workaround because of frontend format issue - START
@@ -34,7 +45,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       # Todo temp workaround because of frontend format issue - END
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
-      self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
+      self.paginated_invoices = self.invoices.order(created_at: :desc).paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
     def po_invoice_status_count
@@ -43,6 +54,10 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def non_po_invoice_status_count
       get_count(InwardInvoiceType.id_for(:non_po_invoice))
+    end
+
+    def agreement_invoice_status_count
+      get_count(InwardInvoiceType.id_for(:recurring_invoice))
     end
 
     def get_count(id)
@@ -58,20 +73,29 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   attr_accessor :invoices
 
   def init
-    if user.vp_admin_or_auditor?
+    if user.vendor_payments_admin?
       admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
       self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
-      self.invoices.not_open.non_beneficiary.created_at_desc
+      self.invoices = self.invoices.non_beneficiary.created_at_desc
       return
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
-      self.invoices = invoices.not_open.non_beneficiary.created_at_desc rescue ::Invoice.none #unless invoices.blank?
+      self.invoices = invoices.non_beneficiary.created_at_desc rescue ::Invoice.none #unless invoices.blank?
     end
 
     if self.invoices.nil?
       self.invoices = ::Invoice.none
+    end
+  end
+
+  def pre_process
+    if params[:filter_reviewer_awaiting_approval].present?
+      reviewing_user = user.company.users.find_by id: params[:filter_reviewer_awaiting_approval]
+      unless reviewing_user.present? && (reviewing_user.is_po_invoice_reviewer? || reviewing_user.is_non_po_invoice_reviewer?)
+        params.delete(:filter_reviewer_awaiting_approval)
+      end
     end
   end
 

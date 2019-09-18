@@ -17,4 +17,12 @@ class AdminUsers::Oauth::TokenController < Oauth::TokenController
     :admin
   end
 
+  def create_user_sessions
+    true
+  end
+
+  def on_session_create
+    true
+  end
+
 end

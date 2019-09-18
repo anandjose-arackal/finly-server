@@ -15,6 +15,9 @@ class Expense::Manual::Update < Expense::Manual::Base
         },
         pre_process: {
             before: Personalizer::Process.new([:expense, :manual_update], :pre_process, self)
+        },
+        validate: {
+            before: Personalizer::Process.new([:expense, :manual, :update], :validate, self)
         }
     }
   end
@@ -180,6 +183,7 @@ class Expense::Manual::Update < Expense::Manual::Base
           end
         end
       end
+      expense.save # extra just to do the gst amount updation part
     else
       add_message :error, self.expense.errors.full_messages
     end
@@ -188,6 +192,7 @@ class Expense::Manual::Update < Expense::Manual::Base
   def post_process
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
@@ -244,7 +249,9 @@ class Expense::Manual::Update < Expense::Manual::Base
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count,
-                           from_cash_on_hand: expense.from_cash_on_hand
+                           from_cash_on_hand: expense.from_cash_on_hand,
+                           custom_fields: expense.custom_fields_label_values
+
     }
   end
 

@@ -86,9 +86,13 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   def process
     self.report_processor_group.save
     if self.report_processor_group.process_via_finly?
-      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
+      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
     elsif self.report_processor_group.mark_as_closed?
-      Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
+      op = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
     end
   end
 
@@ -113,7 +117,14 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         self.bank_transfer_type = self.report_processor_group.payment_mode
         case params[:source_account_type]
           when 'company_credits'
-            self.report_processor_group.source_account = current_company.yes_bank_company_account
+            case current_company.feature_subscription.bank_service_provider
+            when "YES"
+              self.report_processor_group.source_account = current_company.yes_bank_company_account
+            when "ICICI"
+              self.report_processor_group.source_account = current_company.icici_bank_company_account
+            else
+              self.report_processor_group.source_account = current_company.yes_bank_company_account
+            end
           when 'finly_money'
             self.report_processor_group.source_account = user.bank_wallet
           else
@@ -253,7 +264,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     post_operation = 'Settlement::SReport::Processing::PostOperation'
     post_operation_payload = {}
     self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
-        receiving_account_class, :credit, :reimbursement,
+        receiving_account_class, :credit, :reimbursement, bank_transfer_type: self.bank_transfer_type,
         background: true, scheduled_at: self.report_processor_group.scheduled_at)
     self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
     self.report_processor_group.payment_order = self.payment_request.build_payment_order

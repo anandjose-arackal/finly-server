@@ -77,7 +77,9 @@ class Expense::Index < Expense::Base
   class Expense::Index::ListPresenter < Expense::Base::Presenter
     include HasScope
 
-    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses, :count
+    attr_accessor :expenses, :paginated_expenses, :categories, :unreported_expenses, :count,
+                  :gst_state_codes, :tax_rates
+
 
     # scopes for filters
     has_scope :filter_sort, using: [:sort_by, :order], type: :hash
@@ -109,16 +111,21 @@ class Expense::Index < Expense::Base
         end
         ############################################################################
 
+        page = params[:page] || 1
+        per_page = params[:per_page] || 30
+
         if (params[:view] == 'personal' or params[:view].nil?) and params[:filter_split_link].blank?
-          self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: params[:per_page])
+          self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: page, per_page: per_page)
           self.count = self.expenses&.unreported_and_rejected&.count
         else
-          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: params[:per_page])
+          self.paginated_expenses = expenses.paginate(page: page, per_page: per_page)
           self.count = self.expenses.count
         end
         self.paginated_expenses = self.paginated_expenses.include_details
       end
       self.categories = user.company.active_categories
+      self.tax_rates = user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
     end
 
     def exclude_cancelled

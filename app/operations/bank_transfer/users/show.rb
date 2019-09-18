@@ -86,6 +86,11 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
           credit: true,
           debit: true
       }
+      if (self.selected_user.invitation_token.present? and self.selected_user.invitation_accepted_at.blank?) or
+          (selected_user.first_name.blank?)
+        actions[:delete_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id)
+        actions[:resend_invite] = Rails.application.routes.url_helpers.pending_invite_path(id: self.selected_user.id) unless self.selected_user.mobile_only_invite
+      end
       actions
     end
 

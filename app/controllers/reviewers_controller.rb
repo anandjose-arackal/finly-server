@@ -1,5 +1,4 @@
-class ReviewersController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class ReviewersController < BaseControllers::WebBase
 
   # Adds reviewers to levels
   def create

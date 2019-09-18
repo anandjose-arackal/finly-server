@@ -62,17 +62,17 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
   def mailer_subject(user)
     if user == self.rejecting_user
-      "You rejected the invoice : #{self.invoice.invoice_number}"
+      "You rejected the invoice : #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number}"
+      "#{rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 
   def mailer_body(user)
     if user == self.rejecting_user
-      "You have rejected the invoice: #{self.invoice.invoice_number}"
+      "You have rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     else
-      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number}"
+      "#{self.rejecting_user.name} has rejected the invoice: #{self.invoice.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 
@@ -82,6 +82,7 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
     # elsif user.id == report.controlling_user_id
     #   return report.controlling_user_role_id
     # end
-    invoice.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    provider_name = invoice.get_invoice_provider_name
+    invoice.get_reviewers(nil, provider_name).include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end

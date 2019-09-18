@@ -1,4 +1,4 @@
-class Disburse::UsersController < ApplicationController
+class Disburse::UsersController < BaseControllers::WebBase
   def create
     @result = User::CreateWoPassword.(current_user, params)
     if @result.success?

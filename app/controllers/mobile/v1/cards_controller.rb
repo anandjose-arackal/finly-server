@@ -1,7 +1,6 @@
-class Mobile::V1::CardsController < ApplicationController
+class Mobile::V1::CardsController < BaseControllers::MobileBase
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
 
   respond_to :json
 

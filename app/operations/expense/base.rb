@@ -160,7 +160,7 @@ class Expense::Base < BaseOperation
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted,
                   :conversion_rate, :em_tax_tracking, :tds_slabs, :vehicle_rates,
-                  :cash_pockets
+                  :cash_pockets, :tax_rates, :gst_state_codes
 
 
     def init
@@ -173,6 +173,8 @@ class Expense::Base < BaseOperation
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
       self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets.active
+      self.tax_rates = expense.user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
     end
 
     def retrieve_vehicle_rates(expense)
@@ -228,7 +230,7 @@ class Expense::Base < BaseOperation
           return true
         end
       end
-      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.controlling_user.id == user.id
+      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.get_reviewers.pluck(:id).include?(user.id)
         return true
       end
       false

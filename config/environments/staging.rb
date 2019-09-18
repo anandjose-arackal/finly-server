@@ -54,33 +54,33 @@ Rails.application.configure do
   # when problems arise.
   config.log_level = :debug
 
-  config.lograge.enabled = true
-  # config.lograge.keep_original_rails_log = true
-  config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
-  config.lograge.formatter = Lograge::Formatters::Logstash.new
-  config.lograge.custom_options = lambda do |event|
-    {
-        exception: event.payload[:exception], # ["ExceptionClass", "the message"]
-        exception_object: event.payload[:exception_object] # the exception instance
-    }
-  end
-
-  config.lograge.custom_payload do |controller|
-    user = controller.current_user
-    hash = {params: RequestStore.store[:request_params]}
-    hash[:current_app] = (controller.current_app rescue nil)
-    hash[:current_device] = (controller.current_device rescue nil)
-    if user.present?
-      hash[:user_id] = user&.id
-      hash[:user_name] = (user&.name rescue nil)
-      hash[:user_email] = user&.email
-      hash[:user_mobile_number] = user&.mobile_number
-      hash[:company_name] = (controller.current_company&.name rescue nil)
-      hash[:company_id] = (controller.current_company&.id rescue nil)
-      hash[:current_view] = (controller.params&.dig(:view) rescue nil)
-    end
-    hash.as_json
-  end
+  # config.lograge.enabled = true
+  # # config.lograge.keep_original_rails_log = true
+  # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
+  # config.lograge.formatter = Lograge::Formatters::Logstash.new
+  # config.lograge.custom_options = lambda do |event|
+  #   {
+  #       exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+  #       exception_object: event.payload[:exception_object] # the exception instance
+  #   }
+  # end
+  #
+  # config.lograge.custom_payload do |controller|
+  #   user = controller.current_user
+  #   hash = {params: RequestStore.store[:request_params]}
+  #   hash[:current_app] = (controller.current_app rescue nil)
+  #   hash[:current_device] = (controller.current_device rescue nil)
+  #   if user.present?
+  #     hash[:user_id] = user&.id
+  #     hash[:user_name] = (user&.name rescue nil)
+  #     hash[:user_email] = user&.email
+  #     hash[:user_mobile_number] = user&.mobile_number
+  #     hash[:company_name] = (controller.current_company&.name rescue nil)
+  #     hash[:company_id] = (controller.current_company&.id rescue nil)
+  #     hash[:current_view] = (controller.params&.dig(:view) rescue nil)
+  #   end
+  #   hash.as_json
+  # end
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
@@ -135,17 +135,22 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
-  config.paperclip_defaults = {
-      storage: :s3,
-      s3_region: ENV["aws_region_name"],
-      s3_credentials: {
-          s3_host_name: ENV["s3_host_name"],
-          bucket: ENV["s3_attachment_bucket_name"],
-          s3_region: ENV["aws_region_name"],
-          access_key_id: ENV["aws_access_key_id"],
-          secret_access_key: ENV["aws_secret_access_key"]
-      }
-  }
+  # aws_config = Rails.application.config_for(:aws_config)
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: aws_config["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: aws_config["s3_host_name"],
+  #         bucket: aws_config["s3_attachment_bucket_name"],
+  #         s3_region: aws_config["aws_region_name"],
+  #         access_key_id: aws_config["aws_access_key_id"],
+  #         secret_access_key: aws_config["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
+  #     }
+  # }
   #########################################################################################
 
 end

@@ -28,6 +28,7 @@ class ReviewalLevel < ApplicationRecord
   validates :policy_id, presence: true
   validates :level_number, presence: true
   validates :associated_entity_type, presence: true
+  validates :level_number, numericality: { greater_than: 0 }
 
   default_scope { unscope(:where) }
 
@@ -39,6 +40,7 @@ class ReviewalLevel < ApplicationRecord
   scope :with_associated_entity_type, -> (associated_entity_type) { where associated_entity_type: associated_entity_type}
   scope :with_em_providers, -> { where associated_entity_type: Constants::EM_PROVIDER }
   scope :with_vp_providers, -> { where associated_entity_type: Constants::VP_PROVIDER }
+  scope :include_for_index, -> { includes(:level_reviewer_mappings, :level_user_reviewer_mappings)}
 
   # alias_method :filter_associated_entity_type, :with_entity_type
   # alias_method :filter_policy, :with_policy_ids
@@ -74,14 +76,26 @@ class ReviewalLevel < ApplicationRecord
       if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:purchase_order_reviewer)).blank?
         reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:purchase_order_reviewer), policy_id: self.policy_id)
       end
-    when 'InvoiceProvider', :InvoiceProvider
-      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).blank?
-        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:invoice_reviewer), policy_id: self.policy_id)
-      end
+    # when 'InvoiceProvider', :InvoiceProvider
+    #   if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).blank?
+    #     reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:invoice_reviewer), policy_id: self.policy_id)
+    #   end
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:bank_payment_request_reviewer)).blank?
         reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:bank_payment_request_reviewer), policy_id: self.policy_id)
       end
+    when 'PoInvoiceProvider', :PoInvoiceProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:po_invoice_reviewer), policy_id: self.policy_id)
+      end
+    when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:non_po_invoice_reviewer), policy_id: self.policy_id)
+      end
+    # when 'PaymentAgreementProvider', :PaymentAgreementProvider
+    #   if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:payment_agreement_reviewer)).blank?
+    #     reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:payment_agreement_reviewer), policy_id: self.policy_id)
+    #   end
     end
   end
 

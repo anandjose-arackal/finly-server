@@ -54,7 +54,7 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     end
 
     if params[:state_name].present?
-      params[:state_id] = State.id_for(params[:state_name])
+      params[:state_id] = State.id_for(params[:state_name].downcase)
     end
 
     if params[:user].nil?

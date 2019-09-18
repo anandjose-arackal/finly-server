@@ -3,27 +3,7 @@ class WorkflowManager::Aasm::BaseProvider
 
   attr_accessor :document_state, :document, :user, :violations_present, :policy, :policy_id,
                 :current_level, :next_level, :previous_level, :forwarded_to_user,
-                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name
-
-  # def initialize(document, violations_present, user, provider_name=nil)
-  #   self.document = document
-  #   self.violations_present = violations_present
-  #   self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
-  #   self.user = user
-  #   self.forwarded_to_user = params[:forwarded_to_user]
-  #   self.policy = Policy.find self.document.policy_id ## Have to take care where status is stored in a different attribute
-  #   self.provider_name = provider_name || self.document.get_default_provider
-
-  #   self.policy_id = self.document.policy_id
-
-  #   # get reviewers
-  #   self.current_level = document.level
-  #   self.next_level = document.get_level(:next)
-  #   self.previous_level = document.get_level(:prev)
-  #   self.current_level_reviewers = document.get_reviewers
-  #   self.reviewers = document.get_reviewers(:next)
-  #   self.document_update_params = {}
-  # end
+                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name, :error_message
 
   def initialize(user, params)
     self.user = user
@@ -40,10 +20,10 @@ class WorkflowManager::Aasm::BaseProvider
 
     # get reviewers
     self.current_level = self.document.level
-    self.next_level = self.document.get_level(:next)
-    self.previous_level = self.document.get_level(:prev)
-    self.current_level_reviewers = self.document.get_reviewers
-    self.reviewers = self.document.get_reviewers(:next)
+    self.next_level = self.document.get_level(:next, provider_name)
+    self.previous_level = self.document.get_level(:prev, provider_name)
+    self.current_level_reviewers = self.document.get_reviewers(nil, provider_name)
+    self.reviewers = self.document.get_reviewers(:next, provider_name)
     self.document_update_params = {}
   end
 
@@ -57,8 +37,8 @@ class WorkflowManager::Aasm::BaseProvider
   def document_amount
     amount = 0
     case document.class.name
-      when 'Report'
-        amount = document.total_amount
+    when 'Report'
+      amount = document.total_amount
     end
     amount
   end
@@ -93,7 +73,7 @@ class WorkflowManager::Aasm::BaseProvider
 
       # Set forwarding user
       if dlrms.present?
-        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false})
+        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false, taken_control: false, taken_control_by_id: nil})
       end
     end
 
@@ -212,11 +192,12 @@ class WorkflowManager::Aasm::BaseProvider
     self.document.update(self.document_update_params)
   end
 
-  # def approvers_not_present?
-  # end
-
   def reviewers_not_present?
     self.reviewers.blank?
+  end
+
+  def reviewers_present?
+    self.reviewers.present?
   end
 
   def user_can_review?
@@ -224,6 +205,6 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def user_can_unapprove?
-    self.document.get_reviewers(:prev).include?(user)
+    self.document.get_reviewers(:prev, provider_name).include?(user)
   end
 end

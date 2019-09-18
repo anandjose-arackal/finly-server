@@ -1,5 +1,6 @@
 class Vendors::Create < Vendors::Base
-  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors,
+                :override_vendor_id, :all_result
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -21,7 +22,11 @@ class Vendors::Create < Vendors::Base
     # super()
     self.vendor_parameters = vendor_attributes
     self.similar_vendors = []
+    self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
+
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
+
   end
 
   def validate
@@ -50,50 +55,84 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    unless vendor_parameters[:pan].present?
-      add_message :error, "Please provide PAN to proceed"
-      return
-    else
-      validate_attachment(vendor_parameters, :pan)
-    end
 
-    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-      validate_attachment(vendor_parameters, :msme_certificate)
-    end
+    if user.company_id == 156
+      unless vendor_parameters[:pan].present?
+        add_message :error, "Please provide PAN to proceed"
+        return
+      else
+        validate_attachment(vendor_parameters, :pan)
+      end
 
-    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
-      validate_attachment(vendor_parameters, :gstin)
-      validate_gstin(vendor_parameters)
-      # validate_business_name(vendor_parameters)
-      # validate_pan(vendor_parameters)
+      # if vendor_parameters[:pan].present?
+      #   existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
+      #   if existing_pan.present?
+      #     add_message :error, "Another Vendor exists with this PAN"
+      #   end
+      # end
+
+      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+        validate_attachment(vendor_parameters, :msme_certificate)
+      end
+
+      if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+        validate_attachment(vendor_parameters, :gstin)
+        validate_gstin(vendor_parameters)
+        # validate_business_name(vendor_parameters)
+        # validate_pan(vendor_parameters)
+      end
     end
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
-    if self.vendor_parameters[:bank_accounts_attributes].present?
-      self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-        ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], ifsc: account_params[:ifsc], account_owner_type: "YesBankVendor")
-        if ba.present?
-          existing_vendor = ba.account_owner
-          if existing_vendor.authorized
-            add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
-            break
-          else
-            self.similar_vendors.push(existing_vendor)
-            self.vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
-          end
+    # if self.vendor_parameters[:bank_accounts_attributes].present?
+    #   self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
+    #     ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], ifsc: account_params[:ifsc], account_owner_type: "YesBankVendor")
+    #     if ba.present?
+    #       existing_vendor = ba.account_owner
+    #       if existing_vendor.authorized
+    #         add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
+    #         break
+    #       else
+    #         self.similar_vendors.push(existing_vendor)
+    #         self.vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
+    #       end
+    #     end
+    #   end
+    # end
+
+    # # There should be only one unique vendor inside similar vendors
+    # similar_vendor_ids = self.similar_vendors.map(&:id).uniq.reject {|id| id.blank? }
+    # if similar_vendor_ids.length > 1
+    #   add_message :error, "There are other vendors present with the provided bank accounts"
+    #   return
+    # end
+
+    # self.vendor = self.similar_vendors.first rescue nil
+
+    # check for duplicate gstin in the system for the  current company
+    gstins = []
+    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+      next if gstin_location[:_destroy]
+
+      gstins << gstin_location[:gstin]
+      duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin)> 1}
+
+      if duplicate_gstin.present?
+        add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
+        return
+      end
+
+
+      if gstin_location[:gstin].present?
+        gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
+        if gstin.present?
+          add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+          return
         end
       end
     end
 
-    # There should be only one unique vendor inside similar vendors
-    similar_vendor_ids = self.similar_vendors.map(&:id).uniq.reject {|id| id.blank? }
-    if similar_vendor_ids.length > 1
-      add_message :error, "There are other vendors present with the provided bank accounts"
-      return
-    end
-
-    self.vendor = self.similar_vendors.first rescue nil
   end
 
   def pre_process
@@ -119,9 +158,11 @@ class Vendors::Create < Vendors::Base
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
-    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
-      unless vtra[:tds_rates_list_id].present?
-        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+    if vendor_parameters[:vendor_tds_rates_attributes].present?
+      vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+        unless vtra[:tds_rates_list_id].present?
+          vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+        end
       end
     end
 
@@ -134,6 +175,12 @@ class Vendors::Create < Vendors::Base
 
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id
+
+    # here we will set the vendor_id based on the override_vendor_id flag from the frontend
+    unless self.override_vendor_id
+      self.vendor_parameters.delete(:vendor_id)
+    end
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process

@@ -1,6 +1,5 @@
-class AdminUsers::Verifier::CompanyController < ApplicationController
+class AdminUsers::Verifier::CompanyController < BaseControllers::AdminBase
 
-  before_action -> { finly_authorize! :admin }
 
   def index
     @result = Admin::Verifier::CompanyIndex.(current_user, params)

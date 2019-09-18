@@ -1,4 +1,4 @@
-class Invoicing::InvoiceNumberConfigsController < ApplicationController
+class Invoicing::InvoiceNumberConfigsController < BaseControllers::WebBase
 
   def update
     @result = Company::Collect::InvoiceNumberConfiguration::Update.(current_user, params)

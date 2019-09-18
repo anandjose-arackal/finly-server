@@ -1,7 +1,10 @@
 class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_requests, :policies
+  attr_accessor :purchase_requests, :policies, :filter_ids
   def init
-
+    self.filter_ids = params[:filter_ids]
+    if self.filter_ids.present?
+      self.filter_ids = filter_ids[0].split(",").reject { |id| id.empty? } rescue []
+    end
   end
 
   def validate
@@ -9,7 +12,7 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
   end
 
   def process
-    if user.vp_admin_or_auditor?
+    if user.vendor_payments_admin?
       admin_restricted_status_ids = [PurchaseRequestStatus.id_for(:draft)]
       # self.purchase_requests = user.company.purchase_requests.with_ids(::PurchaseRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}) )
       self.purchase_requests = ::PurchaseRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})
@@ -26,11 +29,12 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
 
   def success
     params[:purchase_requests] = self.purchase_requests
+    params[:filter_ids] = self.filter_ids
     Procurements::PurchaseRequests::Index::IndexPresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_requests, :paginated_purchase_requests, :count
+    attr_accessor :purchase_requests, :paginated_purchase_requests, :count, :filter_ids
 
     has_scope :filter_by_status_id
     has_scope :search_by_email
@@ -40,11 +44,22 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     has_scope :filter_by_department_id
     has_scope :filter_by_location_id
     has_scope :filter_awaiting_approval
+    has_scope :filter_policy_id
+
+    has_scope :sort_order_number
+    has_scope :sort_description
+    has_scope :sort_date
+    # has_scope :sort_amount
 
     def init
       self.purchase_requests = params[:purchase_requests]
+      self.filter_ids = params[:filter_ids]
       self.purchase_requests = apply_scopes(purchase_requests, params) rescue ::PurchaseRequest.none
       self.paginated_purchase_requests = purchase_requests.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PurchaseRequest.none
+      # If certain PR's are selected in export, override purchase_requests with the filtered requests
+      if self.filter_ids.present?
+        self.purchase_requests = user.company.purchase_requests.where(id: self.filter_ids)
+      end 
       self.count = purchase_requests&.count
     end
 

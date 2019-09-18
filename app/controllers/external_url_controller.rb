@@ -1,4 +1,4 @@
-class ExternalUrlController < ApplicationController
+class ExternalUrlController < BaseControllers::PublicBase
 
 
 

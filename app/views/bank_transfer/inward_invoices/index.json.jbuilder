@@ -1,7 +1,7 @@
 json.results do
   json.array!(@result.paginated_invoices.include_for_index) do |invoice|
     json.id invoice.id
-    json.controlling_user invoice.get_reviewers.first&.name
+    json.controlling_user invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
     json.awaiting_action invoice.awaiting_action(@result.user)
     json.invoice_type invoice.invoice_type&.name
     json.proforma_advance invoice.proforma_advance&.value
@@ -10,10 +10,12 @@ json.results do
     # json.can_reject invoice.can_reject?
     json.can_reject invoice.can_really_reject?
     json.can_take_control invoice.can_take_control?
+    json.rejection_note invoice.rejection_note
+    json.controlling_level_name invoice.controlling_level&.name
 
     json.invoice do
       json.id invoice.id
-      json.controlling_user invoice.get_reviewers.first&.name
+      json.controlling_user invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
       json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at&.strftime("%d-%m-%Y")
       json.status_id invoice.invoice_status_id

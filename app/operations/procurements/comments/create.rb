@@ -4,7 +4,7 @@ class Procurements::Comments::Create < Procurements::Comments::Base
   def init
     self.comment_params = comment_parameters
 
-    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
+    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice purchase_request )
 
     document_type = comment_params[:parent_commentable_type]
     document_id = comment_params[:parent_commentable_id]
@@ -39,6 +39,12 @@ class Procurements::Comments::Create < Procurements::Comments::Base
 
   def post_process
     # Notify users involved in comment
+    case self.document.class.name
+    when 'PurchaseOrder'      
+      Event::EPurchaseOrder::Comment.(user, document: document, purchase_order: document)
+    when 'Invoice'
+      Event::EInvoice::Comment.(user, document: document, invoice: document)
+    end
   end
 
   private

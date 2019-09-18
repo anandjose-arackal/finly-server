@@ -1,3 +1,5 @@
+# Handle multi bank support
+
 class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
@@ -144,6 +146,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       payment_status_id: PaymentStatus.id_for(:pending_approval),
       payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
       payment_mode: params[:mode],
+      company_id: user.company_id,
       amount_attributes: {
           value: params[:amount],
           currency_id: Currency.first.id

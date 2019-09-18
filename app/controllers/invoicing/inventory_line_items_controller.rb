@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItemsController < ApplicationController
+class Invoicing::InventoryLineItemsController < BaseControllers::WebBase
 
   def index
     @result = ItemMaster::Item::Index.(current_user, params)
@@ -55,6 +55,11 @@ class Invoicing::InventoryLineItemsController < ApplicationController
 
   def actions_configuration
     @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
+  def export
+    @result = ItemMaster::Item::Exports::Generate.(current_user, params)
     respond
   end
 
