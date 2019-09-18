@@ -32,8 +32,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
         'Ref. Invoice No.'
     ]
     self.contents = []
+    count = 1
     report_processor_group.each do |rpg|
-      count = 1
       rpg.mappings.each do |rpg_mapping|
             report = rpg_mapping&.reports&.first
             next if report.blank?
