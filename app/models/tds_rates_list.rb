@@ -8,6 +8,8 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  company_id :integer
+#  gl_code    :string(255)
+#  deleted_at :datetime
 #
 
 class TdsRatesList < ApplicationRecord

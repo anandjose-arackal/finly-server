@@ -57,6 +57,7 @@
 #  cost_center_id            :integer
 #  department_id             :integer
 #  location_id               :integer
+#  default_company_id        :integer
 #
 
 class User < ApplicationRecord
@@ -83,6 +84,7 @@ class User < ApplicationRecord
   serialize :gl_config
 
   belongs_to :company, optional: true
+  belongs_to :default_company, class_name: "Company", optional: true
   belongs_to :otp_request_type, optional: true
   belongs_to :user_delegate, optional: true, class_name: "User"
 
@@ -287,6 +289,7 @@ class User < ApplicationRecord
     where id: ids
   }
   scope :with_company_id, ->(company_id) {where company_id: company_id}
+  scope :without_company_id, -> (company_id) { where.not(company_id: company_id) }
   scope :without_id, ->(user_id) {where.not id: user_id}
   scope :filter_name, -> (name) do
     where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
@@ -818,6 +821,9 @@ class User < ApplicationRecord
     self.user_pockets.build(name: "Paid By Company", user_pocket_type_id: UserPocketType.id_for(:paid_by_company), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    #
+    # setting the default company_id for this user
+    self.update_columns(default_company_id: self.company_id)
   end
 
   def strip_whitespace
@@ -1162,10 +1168,17 @@ class User < ApplicationRecord
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
     company_id = conditions[:company_id]
+    # company_id = nil
     if company_id.present?
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
       user = find_by(mobile_number: username) || find_by(email: username)
+      users = User.with_email_or_mobile_number(user&.email, user&.mobile_number)
+      default_company_id = users.pluck(:default_company_id).uniq.first
+      # if the default_company_id is present then replace the user object returned with the one from the default company
+      if default_company_id.present?
+        user = find_by(company_id: default_company_id, mobile_number: username) || find_by(company_id: default_company_id, email: username)
+      end
     end
 
     return user if user.present?
