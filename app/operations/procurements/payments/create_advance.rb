@@ -165,6 +165,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         },
         note: self.description,
         category_id: self.purchase_order.category_id,
+        department_id: self.purchase_order.department_id,
         date: DateUtils.local_date,
         purchase_order_id: self.purchase_order.id,
         parent_type: self.purchase_order.class.name,

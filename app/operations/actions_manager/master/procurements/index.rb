@@ -25,6 +25,6 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
   end
 
   def approve_tax_invoices
-    user.is_invoice_reviewer?
+    user.is_po_invoice_reviewer?
   end
 end

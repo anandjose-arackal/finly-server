@@ -23,3 +23,5 @@ json.policies do |policy|
 end
 
 json.invoice_custom_fields_config @result.custom_fields_config[:invoice]
+
+json.agreement_invoice_enabled @result.agreement_invoice_enabled
