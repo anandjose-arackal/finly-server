@@ -1173,7 +1173,7 @@ class User < ApplicationRecord
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
       user = find_by(mobile_number: username) || find_by(email: username)
-      users = User.with_email_or_mobile_number(user.email, user.mobile_number)
+      users = User.with_email_or_mobile_number(user&.email, user&.mobile_number)
       default_company_id = users.pluck(:default_company_id).uniq.first
       # if the default_company_id is present then replace the user object returned with the one from the default company
       if default_company_id.present?
