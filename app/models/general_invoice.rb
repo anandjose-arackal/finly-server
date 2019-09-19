@@ -307,7 +307,8 @@ class GeneralInvoice < ApplicationRecord
       tenancy_period: self.tenancy_period,
       custom_fields: self.custom_fields,
       already_exists: true,
-      prepaid: self.prepaid
+      prepaid: self.prepaid,
+      escalation_percentage: self.escalation_percentage
     }
   end
 

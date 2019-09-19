@@ -278,7 +278,8 @@ class RentalInvoice < ApplicationRecord
       notice_period: self.notice_period,
       square_feet: self.square_feet,
       already_exists: true,
-      prepaid: self.prepaid
+      prepaid: self.prepaid,
+      escalation_percentage: self.escalation_percentage
 
     }
   end
