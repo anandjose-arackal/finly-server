@@ -50,6 +50,7 @@ class PaymentAgreement < ApplicationRecord
   
   has_many :notify_users, as: :document, dependent: :destroy 
   has_many :security_deposits, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
 
   has_many :attachments, as: :resource, dependent: :destroy
@@ -62,6 +63,8 @@ class PaymentAgreement < ApplicationRecord
 
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
+
+  attr_accessor :payment_agreement_custom_fields
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
@@ -261,7 +264,8 @@ class PaymentAgreement < ApplicationRecord
       renewal_date: self.renewal_date&.to_date,
       note: self.note,
       renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options)
+      vendors: get_related_vendors(options),
+      custom_fields: self.custom_fields
     }
   end
 
