@@ -14,6 +14,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
 
 
    self.headers = [
+       'Sl. No.',
+       'Journal Code',
+       'Period',
+       'Voucher Date',
+       'Description',
        'Account',
        'Sub Account',
        'Department',
@@ -29,11 +34,16 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
        'Ref. Invoice No.'
    ]
    self.contents = []
-
+   count = 1
    money_request_processors .each do |rpg|
          rpg.mappings.each do |rpg_mapping|
            rpg_mapping.money_requests.each do |money_request|
                self.contents << [
+                   count,
+                   'jv',
+                   report.expenses.last.date&.strftime("%y-%m"),
+                   report.expenses.last.date&.strftime("%d/%m/%y"),
+                   "Money Request For emp code-#{report.user&.profile&.employee_id}",
                    31352001,
                    '',
                    "'#{money_request.user.gl_config&.dig(:location_code)}",
@@ -49,6 +59,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
                    '',
                ]
              self.contents << [
+                 count,
+                 'jv',
+                 report.expenses.last.date&.strftime("%y-%m"),
+                 report.expenses.last.date&.strftime("%d/%m/%y"),
+                 "Money Request For emp code-#{report.user&.profile&.employee_id}",
                  '61110004',
                  '9992',
                  "'#{money_request.user.gl_config&.dig(:location_code)}",
@@ -63,7 +78,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledMoneyReques
                  '',
                  ''
              ]
+             count += 1
            end
+
          end
        end
  end
