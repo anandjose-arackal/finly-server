@@ -30,7 +30,7 @@
 #
 
 class PaymentOrder < ApplicationRecord
-  include PostOperationExecution
+  include PostOperationExecution, SoftDeletable
 
   CONFIG = {
       meal_card: {

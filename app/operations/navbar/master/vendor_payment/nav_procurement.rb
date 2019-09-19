@@ -122,7 +122,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_rate_contracts
-    return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
+    return nil unless user.company.procurement_enabled?
+    # return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
     {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
   end
 
