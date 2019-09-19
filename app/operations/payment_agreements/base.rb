@@ -459,7 +459,7 @@ class PaymentAgreements::Base < BaseOperation
       return if has_errors?
       start_date, end_date = date[0], date[1]
       start_date_month, end_date_month = date[0].month, date[1].month
-      unless (end_date_month - start_date_month) % (invoice_frequency - 1) == 0
+      unless  (end_date_month - start_date_month + 1) % (invoice_frequency) == 0
         add_message :error, "Difference between start date(#{start_date}) and end date(#{end_date}) should be equal to invoice frequency or its multiples"
         return
       end
@@ -1148,7 +1148,6 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement&.selected_invoice_frequency_attributes.present? && self.payment_agreement&.selected_invoice_frequency_attributes["invoice_frequency_value"].present?
       return self.payment_agreement&.selected_invoice_frequency_attributes["invoice_frequency_value"]&.to_i
     end
-    binding.pry
     if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.first.invoice_frequency.present? 
       return self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.first.invoice_frequency.number
     end
