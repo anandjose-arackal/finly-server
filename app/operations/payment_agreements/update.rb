@@ -11,12 +11,23 @@ class PaymentAgreements::Update < PaymentAgreements::Base
 
   def validate
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
-    validate_invoice_frequency
-    validate_invoice_start_end_date
-    check_agreement_item_presence
-    validate_start_end_date_consecutiveness
-    billing_type_validations
-    validate_agreement_item_combinations
+    ActiveRecord::Base.transaction do
+      if self.payment_agreement.save
+        validate_prepaid_consistency
+        validate_invoice_frequency unless has_errors?
+        validate_invoice_start_end_date unless has_errors?
+        validate_grouped_vendor_start_end_date unless has_errors?
+        check_agreement_item_presence unless has_errors?
+        validate_start_end_date_consecutiveness unless has_errors?
+        billing_type_validations unless has_errors?
+        validate_agreement_item_combinations unless has_errors?
+
+        if has_errors?
+          raise ActiveRecord::Rollback
+          return
+        end
+      end
+    end
   end
 
   def process

@@ -177,7 +177,7 @@ class RentalInvoice < ApplicationRecord
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :invoice_frequency
+  # accepts_nested_attributes_for :invoice_frequency
 
 
 
@@ -192,10 +192,13 @@ class RentalInvoice < ApplicationRecord
   attr_accessor :invoice_custom_fields
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  validates_inclusion_of :prepaid, in: [true, false]
 
   validate :additional_validations
 
   scope :template_invoices, -> { where(template_invoice_id: nil) }
+  scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
+  scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
 
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
