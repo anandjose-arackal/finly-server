@@ -217,19 +217,19 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
     end
     if feature_subscription.agreement_based_payment_system
       data << {
-        name: 'Payement Agreement',
+        name: 'Payment Agreement',
         roles: [
           {
             key: 'payment_agreement_initiator',
-            label: 'Payement Agreement Initiator'
+            label: 'Payment Agreement Initiator'
           },
           {
             key: 'payment_agreement_reviewer',
-            label: 'Payement Agreement Reviewer'
+            label: 'Payment Agreement Reviewer'
           },
           {
             key: 'payment_agreement_auditor',
-            label: 'Payement Agreement Auditor'
+            label: 'Payment Agreement Auditor'
           }
         ]
       }
