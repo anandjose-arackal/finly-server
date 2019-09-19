@@ -10,8 +10,11 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   validate :input
   fields [
                       vendor_business_name: {spreadsheet: true, pdf: false},
+                      vendor_trade_name: {spreadsheet: true, pdf: false},
                       vendor_id: {spreadsheet: true, pdf: false},
                       name: {spreadsheet: true, pdf: false},
+                      msme_registered: {spreadsheet: true, pdf: false},
+                      msme_registration_number: {spreadsheet: true, pdf: false},
                       mobile_number: {spreadsheet: true, pdf: false},
                       email: {spreadsheet: true, pdf: false},
                       created_by: {spreadsheet: true, pdf: false},
@@ -31,7 +34,8 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
                       third_account_ifsc: {spreadsheet: true, pdf: false},
                       fourth_account_number: {spreadsheet: true, pdf: false},
                       fourth_account_ifsc: {spreadsheet: true, pdf: false},
-                      created_at: {spreadsheet: true, pdf: false}
+                      created_at: {spreadsheet: true, pdf: false},
+                      active: {spreadsheet: true, pdf: false}
                       ]
 
   def input
@@ -64,12 +68,24 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
     vendor.business_name
   end
 
+  def vendor_trade_name(vendor)
+    vendor.trade_name
+  end
+
   def vendor_id(vendor)
     vendor.vendor_id
   end
 
   def name(vendor)
     vendor.name
+  end
+
+  def msme_registered(vendor)
+    vendor.msme_registered.to_s
+  end
+
+  def msme_registration_number(vendor)
+    vendor.msme_registration_number
   end
 
   def poc_name(vendor)
@@ -177,6 +193,10 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
     account = self.vendor_ba.fourth if account.blank?
     account&.ifsc
+  end
+
+  def active(vendor)
+    vendor.deactivated? ? "false" : "true"
   end
 
 end
