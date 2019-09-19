@@ -1,4 +1,4 @@
-class TaskManager::Triggers::Event::Contract < TaskManager::Workflows::Contract
+class TaskManager::Workflows::Contracts::Event < TaskManager::Workflows::Contracts::Task
 
   property :event_key, validates: {presence: true}
   property :trigger_type, validates: {presence: true, inclusion: {in: ['event']}}

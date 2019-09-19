@@ -1,7 +1,7 @@
-class TaskManager::Workflows::Contract < Transactions::Contract
+class TaskManager::Workflows::Contracts::Task < Transactions::Contract
   include TaskManager::Actions::FileManager::Validations
 
-  class TaskManager::Workflows::Contract::GroupSchema < Transactions::Schema
+  class TaskManager::Workflows::Contracts::Task::GroupSchema < Transactions::Schema
 
     params do
       required(:logic_type).filled(inclusion?: %w(group))
@@ -11,7 +11,7 @@ class TaskManager::Workflows::Contract < Transactions::Contract
 
   end
 
-  class TaskManager::Workflows::Contract::ConditionSchema < Transactions::Schema
+  class TaskManager::Workflows::Contracts::Task::ConditionSchema < Transactions::Schema
     # %w(cont_any not_cont_any in not_in blank present lteq gteq is_in_the_range
     # lteq_days gteq_days eq_days is_in_days eq_days gteq lteq is_in_the_range)
     params do
@@ -23,11 +23,11 @@ class TaskManager::Workflows::Contract < Transactions::Contract
   end
 
   def self.group_schema
-    @group_schema ||= TaskManager::Workflows::Contract::GroupSchema.new
+    @group_schema ||= TaskManager::Workflows::Contracts::Task::GroupSchema.new
   end
 
   def self.condition_schema
-    @condition_schema ||= TaskManager::Workflows::Contract::ConditionSchema.new
+    @condition_schema ||= TaskManager::Workflows::Contracts::Task::ConditionSchema.new
   end
 
   property :uuid

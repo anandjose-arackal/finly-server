@@ -2,10 +2,10 @@ class TaskManager::Master
 
   TRIGGERS = {
       event: {
-          contract: TaskManager::Triggers::Event::Contract
+          contract: TaskManager::Workflows::Contracts::Event
       },
       schedule: {
-          contract: TaskManager::Triggers::Schedule::Contract
+          contract: TaskManager::Workflows::Contracts::Schedule
       }
   }
 
