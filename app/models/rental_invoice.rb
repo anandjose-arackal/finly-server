@@ -192,7 +192,7 @@ class RentalInvoice < ApplicationRecord
   attr_accessor :invoice_custom_fields
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
-  validates_inclusion_of :prepaid, in: [true, false]
+  # validates_inclusion_of :prepaid, in: [true, false]
 
   validate :additional_validations
 

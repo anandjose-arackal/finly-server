@@ -426,7 +426,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.fixed_periodic_type.present?
       self.invoice_freq_num = []
       self.payment_agreement.general_invoices.fixed_periodic_type.each do |general_invoice|
-        if selected_invoice_frequency_attributes["invoice_frequency_value"].present?
+        if self.payment_agreement.selected_invoice_frequency_attributes["invoice_frequency_value"].present?
           clear_frequency_for_document(general_invoice)
           validate_frequency_for_document(general_invoice)
         end
@@ -439,14 +439,17 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.fixed_periodic_type.present?
       self.invoice_freq_num = []
       self.payment_agreement.rental_invoices.fixed_periodic_type.each do |rental_invoice|
-        clear_frequency_for_document(rental_invoice)
-        validate_frequency_for_document(rental_invoice)
+        if self.payment_agreement.selected_invoice_frequency_attributes["invoice_frequency_value"].present?
+          clear_frequency_for_document(rental_invoice)
+          validate_frequency_for_document(rental_invoice)
+        end
       end
       # validate_frequency_based_start_end_date('rental_invoice')
     end
   end
 
   def validate_frequency_based_start_end_date(invoice_type)
+    return if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.blank?
     # Invoice frequency should be no more than inv frequency months
     # First invoice can be less than inv frequency months
     # Difference between month should always be equal to invoice frequency months
@@ -1121,20 +1124,20 @@ class PaymentAgreements::Base < BaseOperation
   def validate_all_dates(dates)
     dates.each do |date|
       return if has_errors?
-      start_date, end_date = date[0], date[1]
+      start_date, end_date = date[0].to_date, date[1].to_date
       if start_date < payment_agreement.execution_date
         add_message :error, "Start Date: #{start_date} cannot be less than agreement execution date"
       end
 
       unless payment_agreement.no_expiration
-        if start_date > payment_agreement.expiration_date
+        if start_date > payment_agreement.expiration_date.to_date
           add_message :error, "Start Date: #{start_date} cannot be more than agreement expiration date"
         end
-        if end_date > payment_agreement.expiration_date
+        if end_date > payment_agreement.expiration_date.to_date
           add_message :error, "End Date: #{end_date} cannot be more than agreement expiration date"
         end
       end
-      if end_date < payment_agreement.execution_date
+      if end_date < payment_agreement.execution_date.to_date
         add_message :error, "End Date: #{end_date} cannot be less than agreement execution date"
       end
     end
@@ -1145,6 +1148,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement&.selected_invoice_frequency_attributes.present? && self.payment_agreement&.selected_invoice_frequency_attributes["invoice_frequency_value"].present?
       return self.payment_agreement&.selected_invoice_frequency_attributes["invoice_frequency_value"]&.to_i
     end
+    binding.pry
     if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.first.invoice_frequency.present? 
       return self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.first.invoice_frequency.number
     end

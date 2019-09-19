@@ -195,7 +195,7 @@ class GeneralInvoice < ApplicationRecord
 
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
-  validates_inclusion_of :prepaid, in: [true, false]
+  # validates_inclusion_of :prepaid, in: [true, false] 
 
   # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
   validate :additional_validations
@@ -340,6 +340,14 @@ class GeneralInvoice < ApplicationRecord
       {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id }
     else
       {id: nil, number: nil, period_id: nil }
+    end
+  end
+
+  def check_billing_type
+    if self.billing_type.variable_periodic?
+      [nil]
+    else
+      [true, false]
     end
   end
 
