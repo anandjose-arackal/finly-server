@@ -25,7 +25,7 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
       return
     end
 
-    forwardable_user_ids = self.policy.policy_user_roles.with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+    forwardable_user_ids = self.policy.policy_user_roles.with_role_id([UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer)]).pluck(:user_id)
 
     unless forwardable_user_ids.include?(params[:forward_to_id].to_i)
       add_message :error, "Invalid User"
@@ -52,7 +52,8 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
       workflow_input = {
         document: invoice,
         aasm_event: 'forward',
-        forwarded_to_user: forwarded_to_user
+        forwarded_to_user: forwarded_to_user,
+        provider_name: invoice.get_invoice_provider_name
       }
 
       op = WorkflowManager::Base.(user, workflow_input)

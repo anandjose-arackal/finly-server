@@ -86,8 +86,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.order_details.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
-      name = item[:name] || item["name"]
-      business_name = item[:business_name] || item["business_name"]
+      name = item[:name].present? ? item[:name] : item[:bank_account_name]
+      business_name = item[:business_name].present? ? item[:business_name] : item[:name]
       authorized = item[:authorized] || item["authorized"]
       amount = item[:original_amount]
       advance_amount = item[:advance_amount]
@@ -163,9 +163,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
 
         if required_fields.present?
-          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}.join(", ")
           self.valid = false
-          self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          # self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.issue_item[:custom_fields] = required_fields.pluck(:id, :field_name).map {|id, field| {"id" => id, "error" => (field + " cannot be empty")}}
         end
 
         # validate if dropdown fields entered matches the data setup in the organization account
@@ -176,7 +177,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
               correct_field = drop_down_fields.find {|field| field if field.id == key}
               self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
               self.valid = false
-              self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+              # self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+              self.issue_item[:custom_fields] << { "id" => key, "error" => correct_field.field_name.to_s + " is not an acceptable value" }
             end
           end
         end
@@ -467,7 +469,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_bank_account_number account_number
-    if !/\A\d+\z/.match(account_number)
+    unless Constants::VALID_BANK_ACCOUNT.match(account_number)
+    # if !/\A\d+\z/.match(account_number)
       return false
     end
     true

@@ -11,6 +11,8 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
             :level_name => 'Level Name',
             :level_number => 'Level Number',
             :reviewer_email_mobile => 'Reviewer Email / Mobile',
+            :with_exception => 'With Exception Y/N',
+            :without_exception => 'Without Exception Y/N',
             :min => "Minimum Threshold",
             :max => "Max Threshold",
             :destroy => 'Destroy'
@@ -125,8 +127,10 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
       level_name = data[lower_index+1].to_s
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3].to_s
-      min = data[lower_index+4].to_i
-      max = (data[lower_index+5].present? ? data[lower_index+5].to_i : nil)
+      min = data[lower_index+6].to_i
+      max = (data[lower_index+7].present? ? data[lower_index+5].to_i : nil)
+      exception = data[lower_index+4]&.to_s&.upcase == 'N' ? false : true
+      wo_exception = data[lower_index+5]&.to_s&.upcase == 'N' ? false : true
       if level_name.present? && level_number.present? && level_number !=0
         self.level = get_level(level_name, level_number, provider)
         if reviewer_id.present?
@@ -137,12 +141,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         else
           reviewer = nil
         end
-        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max).first
-        self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max) unless mapping_exist.present?
+        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
+        self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception) unless mapping_exist.present?
       else
         return  result false, 'Level Number and Name Cant be blank'
       end
-      lower_index += 5
+      lower_index += 7
     end
     result true, 'Reviewer Mapping Created'
   end
@@ -185,8 +189,15 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
 
   def get_level(level_name, level_number,provider)
     level =  self.policy.levels.non_deleted.where(level_number: level_number, associated_entity_type: provider).first
+    update_level_name(level_name, level)
     return level if level.present?
     level = self.policy.levels.create(name: level_name, level_number: level_number, associated_entity_type: provider)
+  end
+
+  def update_level_name(level_name=nil, level=nil)
+    if level.present? && level_name.present? && (level.name != level_name)
+      level.update(name: level_name)
+    end
   end
 
   def get_application(name)
@@ -194,12 +205,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   end
 
   def create_policy_dept_mapping(policy,department)
-    return if policy.policy_department_mappings.where(department.id).first.present?
+    return if policy.policy_department_mappings.where(department_id: department.id).first.present?
     policy.policy_department_mappings.create(department_id: department.id)
   end
 
   def create_policy_location_mapping(policy,location)
-    return if policy.policy_location_mappings.where(location.id).first.present?
+    return if policy.policy_location_mappings.where(location_id: location.id).first.present?
     policy.policy_location_mappings.create(location_id: location.id)
   end
 
@@ -211,7 +222,8 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         "TravelRequestBookingProvider" => "manager",
         "PurchaseRequestProvider" =>"purchase_request_reviewer",
         "PurchaseOrderProvider" =>"purchase_order_reviewer",
-        "InvoiceProvider" =>"invoice_reviewer",
+        "NonPoInvoiceProvider" =>"non_po_invoice_reviewer",
+        "PoInvoiceProvider" =>"po_invoice_reviewer",
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
         "PaymentAgreementProvider" => "payment_agreement_reviewer"}

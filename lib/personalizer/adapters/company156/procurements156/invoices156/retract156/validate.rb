@@ -7,7 +7,8 @@ class Personalizer::Adapters::Company156::Procurements156::Invoices156::Retract1
   end
 
   def validate
-    if self.inward_invoice&.get_level(:current)&.level_number > 2
+    provider_name = self.inward_invoice.get_invoice_provider_name
+    if self.inward_invoice&.get_level(:current, provider_name)&.level_number > 2
       add_message :error, 'The invoice cannot be retracted in the current stage'
     end
   end

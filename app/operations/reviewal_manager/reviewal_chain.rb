@@ -18,7 +18,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.violations_present = !!params[:violations_present]
     self.chain = []
 
-    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider)
+    self.provider_names = %w( PurchaseOrderProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider)
 
     policy_id = params[:policy_id]
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil

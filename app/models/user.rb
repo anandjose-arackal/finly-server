@@ -54,10 +54,16 @@
 #  password_changed_at       :datetime
 #  last_activity_at          :datetime
 #  expired_at                :datetime
+#  cost_center_id            :integer
+#  department_id             :integer
+#  location_id               :integer
+#  default_company_id        :integer
 #
 
 class User < ApplicationRecord
   include OperationCallbacks
+  include LiquidDroppable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 
@@ -78,6 +84,7 @@ class User < ApplicationRecord
   serialize :gl_config
 
   belongs_to :company, optional: true
+  belongs_to :default_company, class_name: "Company", optional: true
   belongs_to :otp_request_type, optional: true
   belongs_to :user_delegate, optional: true, class_name: "User"
 
@@ -282,6 +289,7 @@ class User < ApplicationRecord
     where id: ids
   }
   scope :with_company_id, ->(company_id) {where company_id: company_id}
+  scope :without_company_id, -> (company_id) { where.not(company_id: company_id) }
   scope :without_id, ->(user_id) {where.not id: user_id}
   scope :filter_name, -> (name) do
     where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
@@ -306,8 +314,8 @@ class User < ApplicationRecord
     case type
     when 'PurchaseOrderProvider', :PurchaseOrderProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
-    when 'InvoiceProvider', :InvoiceProvider
-      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+    # when 'InvoiceProvider', :InvoiceProvider
+    #   joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
     when 'YesBankVendorProvider', :YesBankVendorProvider
@@ -316,6 +324,10 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:purchase_request_reviewer)).distinct
     when 'PaymentAgreementProvider', :PaymentAgreementProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:payment_agreement_reviewer)).distinct
+    when 'PoInvoiceProvider', :PoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
+    when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
     end
   }
 
@@ -645,10 +657,42 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_unassigned_non_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_initiator_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
   scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_non_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  scope :filter_unassigned_po_invoice_reviewer_for_policy, -> (policy_id) {
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:po_invoice_reviewer)).pluck(:user_id)
       without_id(user_ids)
     end
   }
@@ -777,6 +821,9 @@ class User < ApplicationRecord
     self.user_pockets.build(name: "Paid By Company", user_pocket_type_id: UserPocketType.id_for(:paid_by_company), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    #
+    # setting the default company_id for this user
+    self.update_columns(default_company_id: self.company_id)
   end
 
   def strip_whitespace
@@ -990,7 +1037,7 @@ class User < ApplicationRecord
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
-    self.role_mapping.vendor_payments.creditor.present?
+    self.role_mapping.vendor_payments.creditor.present? || self.policy_user_roles.with_role_id(UserRole.id_for(:bank_payment_request_creditor)).present?
   end
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
@@ -1121,10 +1168,17 @@ class User < ApplicationRecord
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
     company_id = conditions[:company_id]
+    # company_id = nil
     if company_id.present?
       user = find_by(mobile_number: username, company_id: company_id) || find_by(email: username, company_id: company_id)
     else
       user = find_by(mobile_number: username) || find_by(email: username)
+      users = User.with_email_or_mobile_number(user&.email, user&.mobile_number)
+      default_company_id = users.pluck(:default_company_id).uniq.first
+      # if the default_company_id is present then replace the user object returned with the one from the default company
+      if default_company_id.present?
+        user = find_by(company_id: default_company_id, mobile_number: username) || find_by(company_id: default_company_id, email: username)
+      end
     end
 
     return user if user.present?
@@ -1434,6 +1488,30 @@ class User < ApplicationRecord
 
   def is_payment_agreement_auditor?(document=nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
+  end
+
+  def is_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)
+  end
+
+  def is_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_reviewer), document)
+  end
+
+  def is_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:po_invoice_auditor), document)
+  end
+
+  def is_non_po_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_initiator), document)
+  end
+
+  def is_non_po_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_reviewer), document)
+  end
+
+  def is_non_po_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
   end
 
   def access_locked?

@@ -40,7 +40,7 @@ gem 'resque', '~> 2.0.0'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
 gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
-
+gem 'gyoku'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
 gem 'slack-notifier', '~> 2.3'
