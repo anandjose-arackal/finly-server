@@ -70,7 +70,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     # when resource.is_a?(Invoice)
     # new_invoice = resource.amoeba_dup
     # new_invoice.invoice_id = nil
-    # if new_invoice.save!
+    # if new_invoice.save
 
 
     #   # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
@@ -119,7 +119,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     GeneralInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym).dup)
     end
-    if invoice.save! 
+    if invoice.save 
       unless map_line_items(general_invoice, invoice)
         invoice.destroy
         add_message :error, "Unable to create general invoice"
@@ -141,7 +141,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     RentalInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym).dup)
     end
-    if invoice.save!
+    if invoice.save
       unless map_line_items(rental_invoice, invoice)
         invoice.destroy
         add_message :error, "Unable to create rental invoice"
@@ -162,7 +162,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       end
       new_line_item.parent_type = 'Invoice'
     end
-    return new_invoice.save!
+    return new_invoice.save
   end
 
   def create_next_upcoming_invoice(agreement_invoice)
@@ -187,7 +187,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   #     # Create trail to log that next upcoming invoice has been created against the previous general/rental_invoice
   #     trail_options = {action: 'upcoming_invoice_created', parent: previous_upcoming_invoice, parent_type: 'Invoice'}
   #     next_upcoming_invoice.invoice_id = nil
-  #     if next_upcoming_invoice.save!
+  #     if next_upcoming_invoice.save
   #       update_invoice_attributes(previous_upcoming_invoice, next_upcoming_invoice, optional_params)
   #       upcoming_date = invoice_upcoming_date(previous_upcoming_invoice)
   #       if upcoming_date.blank?

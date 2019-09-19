@@ -92,13 +92,13 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     # First invoice can start from any date of month
     invoice_parameters = setup_invoice_params
     upcoming_invoice = invoice_type.camelize.constantize.new(invoice_parameters)
-    # if upcoming_invoice.save!
+    # if upcoming_invoice.save
       map_line_items(reference_invoice, upcoming_invoice, {first_invoice: true})
     # end
     update_taxable_and_orig_amount_value(upcoming_invoice)
     upcoming_invoice.items.map(&:update_taxable_amount_value)
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, upcoming_invoice)
-    if upcoming_invoice.save!
+    if upcoming_invoice.save
       if upcoming_invoice.tds_slab_id.present?
         apply_tds_on_amount(upcoming_invoice)
       end
@@ -121,7 +121,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
         new_line_item.rate = get_first_invoice_rate(reference_invoice, item.rate)
       end
     end
-    if upcoming_invoice.save!
+    if upcoming_invoice.save
       self.new_upcoming_invoice = upcoming_invoice
     end
   end
@@ -198,7 +198,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   #   if self.valid_amount_invoice.present?
   #     upcoming_general_invoice = self.valid_amount_invoice.amoeba_dup
   #     upcoming_general_invoice.template_invoice_id = self.valid_amount_invoice.id
-  #     unless upcoming_general_invoice.save!
+  #     unless upcoming_general_invoice.save
   #       add_message :error, "Unable to create upcoming general invoice"
   #       return
   #     end
@@ -211,7 +211,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   #   if self.valid_amount_invoice.present?
   #     upcoming_rental_invoice = self.valid_amount_invoice.amoeba_dup
   #     upcoming_rental_invoice.template_invoice_id = self.valid_amount_invoice.id
-  #     unless upcoming_rental_invoice.save!
+  #     unless upcoming_rental_invoice.save
   #       add_message :error, "Unable to create upcoming general invoice"
   #       return
   #     end

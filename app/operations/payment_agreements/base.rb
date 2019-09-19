@@ -276,7 +276,7 @@ class PaymentAgreements::Base < BaseOperation
       # self.payment_agreement.create_total_amount(value: total_amount, currency_id: 1)
       amount = Amount.create(value: total_amount, currency_id: 1)
       payment_agreement.total_amount_id = amount.id
-      payment_agreement.save!
+      payment_agreement.save
     end
   end
 
@@ -316,7 +316,7 @@ class PaymentAgreements::Base < BaseOperation
     update_taxable_and_orig_amount_value(invoice)
     invoice.items.map(&:update_taxable_amount_value)
     # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
-    # invoice.save!
+    # invoice.save
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
     invoice.save
     if invoice.tds_slab_id.present?
