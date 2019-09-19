@@ -5,6 +5,28 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
     self.attachment_params = attachment_parameters
   end
 
+  def validate
+    if attachment_params[:procurement_document_id].present? && attachment_params[:procurement_document_type].present?
+      case attachment_params[:procurement_document_type]
+      when 'PurchaseOrder'
+        document = PurchaseOrder.find_by id: attachment_params[:procurement_document_id]
+        unless document&.company_id == user.company_id
+          attachment_params.delete(:procurement_document_type)
+          attachment_params.delete(:procurement_document_id)
+        end
+      when 'Invoice'
+        document = Invoice.find_by id: attachment_params[:procurement_document_id]
+        unless document&.company_id == user.company_id
+          attachment_params.delete(:procurement_document_type)
+          attachment_params.delete(:procurement_document_id)
+        end
+      end
+    else
+      attachment_params.delete(:procurement_document_type)
+      attachment_params.delete(:procurement_document_id)
+    end
+  end
+
   def process
     self.attachment = user.procurement_attachments.new(attachment_params)
     self.attachment.company = user.company
@@ -15,7 +37,6 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
       add_message :error, attachment.errors.full_messages
       return
     end
-
   end
 
   def success
@@ -34,6 +55,6 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
   private
 
   def attachment_parameters
-    params.require(:attachment).permit(:file, :name, :description)
+    params.require(:attachment).permit(:file, :name, :description, :procurement_document_id, :procurement_document_type)
   end
 end
