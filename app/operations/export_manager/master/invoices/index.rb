@@ -126,6 +126,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              gst_group: {spreadsheet: true},
              hsn_sac: {spreadsheet: true},
              tds_nature: {spreadsheet: true},
+             tds_percentage: {spreadsheet: true},
              tds_amount: {spreadsheet: true},
              cost_center: {spreadsheet: true},
              nature_of_expense: {spreadsheet: true},
@@ -137,6 +138,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             line_item_sgst: {spreadsheet: true},
+             line_item_cgst: {spreadsheet: true},
+             line_item_igst: {spreadsheet: true},
              advance_amount: {spreadsheet: true},
              invoice_net_payable_amount: {spreadsheet: true},
              approvers: {spreadsheet: true},
@@ -321,6 +325,22 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def tds_amount(invoice_line_item)
     invoice_line_item.parent.tds_amount&.value || 0
+  end
+
+  def tds_percentage(invoice_line_item)
+    invoice_line_item.parent.tds_slab&.tds || 0
+  end
+
+  def line_item_sgst(invoice_line_item)
+    invoice_line_item.sgst || 0
+  end
+
+  def line_item_cgst(invoice_line_item)
+    invoice_line_item.cgst || 0
+  end
+
+  def line_item_igst(invoice_line_item)
+    invoice_line_item.igst || 0
   end
 
   def advance_amount(invoice_line_item)

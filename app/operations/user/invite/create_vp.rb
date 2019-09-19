@@ -1,6 +1,7 @@
 class User::Invite::CreateVp < User::Invite::Base
 
-  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles, :admin
+  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles, :admin,
+                :existing_emails
 
   def pre_validate
     if params.blank? or user.blank?
@@ -88,12 +89,12 @@ class User::Invite::CreateVp < User::Invite::Base
           messages[:error] << "#{email} is not a valid email format"
           return false
         end
-        if User.find_by_email(email).present?
+        if User.with_company_id(user.company_id).find_by_email(email).present?
           violating_emails << email
         end
       end
       if violating_emails.present?
-        messages[:error] << "Following emails are already invited: #{violating_emails.to_sentence}"
+        messages[:error] << "Following emails are already invited in your company: #{violating_emails.to_sentence}"
         return false
       end
       if has_errors?
@@ -143,7 +144,13 @@ class User::Invite::CreateVp < User::Invite::Base
   end
 
   def pre_process
-
+    self.existing_emails = []
+    emails.each do |email|
+      if User.find_by_email(email).present?
+        self.existing_emails << email
+        self.emails = self.emails - email
+      end
+    end
   end
 
   def process
@@ -189,6 +196,15 @@ class User::Invite::CreateVp < User::Invite::Base
 
     if invited_users.empty?
       messages[:error] << 'Invites failed. Please try again'
+    end
+
+    # now adding the users that already exist. We will merely be cloning the existing user's details and create them in the DB
+    # so that they can log in to either company if required
+    self.existing_emails.each do |existing_email|
+      existing_user = User.without_company_id(user.company_id).find_by(email: existing_email)
+      new_user = existing_user.dup
+      new_user.company_id = user.company_id
+      new_user.save
     end
 
   end

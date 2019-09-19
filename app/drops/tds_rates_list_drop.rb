@@ -1,4 +1,4 @@
-class TdsRateListDrop < Drop
+class TdsRatesListDrop < Drop
 
   def name
     @object.name
