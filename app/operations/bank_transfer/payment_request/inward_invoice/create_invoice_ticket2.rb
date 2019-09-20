@@ -214,7 +214,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
               value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id
           },
-          note: invoice.note,
+          note: invoice.narration,
           category_id: invoice.category_id,
           cost_center_id: invoice.cost_center_id,
           department_id: invoice.department_id,
