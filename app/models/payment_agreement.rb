@@ -198,7 +198,7 @@ class PaymentAgreement < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-        with_id(ids)
+        with_ids(ids)
       end
     else
       where status_id: status_id

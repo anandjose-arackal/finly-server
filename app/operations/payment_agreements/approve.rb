@@ -13,7 +13,6 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
   end
 
   def process
-    # agreement_related_operations
 
     params[:document] = self.payment_agreement
     params[:aasm_event] = 'approve'
@@ -34,6 +33,7 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
 
   def agreement_related_operations
     if self.payment_agreement.approved?
+      update_one_time_invoice
       if self.payment_agreement.general_invoices.fixed_periodic_type.present?
         vendor_ids = self.payment_agreement.general_invoices.pluck(:vendor_id).uniq
         vendor_ids.each do |vendor_id|
@@ -79,6 +79,15 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
     end
   end
 
+  def update_one_time_invoice
+    if self.payment_agreement.general_invoices.one_time_type.present?
+      self.payment_agreement.general_invoices.one_time_type.update_all(is_payment_agreement_upcoming_invoice: true)
+    end
+
+    if self.payment_agreement.rental_invoices.one_time_type.present?
+      self.payment_agreement.rental_invoices.one_time_type.update_all(is_payment_agreement_upcoming_invoice: true)
+    end
+  end
 
 
 

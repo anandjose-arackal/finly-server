@@ -98,7 +98,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
         update_amount_attributes(general_invoice)
-        set_due_date_for_general_invoices
+        set_due_date_for_invoices('general_invoice')
         general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)
       end
     end
@@ -106,7 +106,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
         update_amount_attributes(rental_invoice)
-        set_due_date_for_rental_invoices
+        set_due_date_for_invoices('rental_invoice')
         rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)
       end
     end
@@ -175,12 +175,46 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  def set_due_date_for_invoices(invoice_type)
+    execution_date = self.payment_agreement&.execution_date&.to_date
+
+    # For non fixed periodic invoices, prepaid flag decides whether invoice upcoming date will be on start date or end date
+      self.payment_agreement.send(invoice_type.pluralize.to_sym).each do |invoice|
+        unless invoice.billing_type.fixed_periodic?
+          if invoice.prepaid
+            invoice.update(payment_agreement_upcoming_date: invoice.start_date)
+          else
+            invoice.update(payment_agreement_upcoming_date: invoice.end_date)
+          end
+        end
+      end
+
+
+    # self.payment_agreement.general_invoices.map do |general_invoice|
+      # number = general_invoice.invoice_frequency&.number
+      # period_id = general_invoice.invoice_frequency&.period_id
+      # billing_start_date = general_invoice.billing_start_date&.to_date
+      
+      # Set rules for calculation of payment date based on period set
+      # During create and update of payment_agreement i.e. during adding/updating agreement items, use execution date to set the first due date
+      # Once agreement is approved, no agreement items should be added
+      # general_invoice.update(payment_agreement_upcoming_date: execution_date)
+
+
+      # case 
+      # when period_id == Period.id_for(:month)
+      #   due_date = billing_start_date
+      #   general_invoice.update(payment_agreement_upcoming_date: due_date) if due_date.present?
+      # end
+    # end
+  end
+
   def set_due_date_for_general_invoices
     execution_date = self.payment_agreement&.execution_date&.to_date
 
     # For non fixed periodic invoices, prepaid flag decides whether invoice upcoming date will be on start date or end date
       self.payment_agreement.general_invoices.each do |general_invoice|
-        if general_invoice.billing_type.fixed_periodic?
+        if general_invoice.billing_type.fixed_periodic? 
           # To set first due date, create general invoice
           create_invoice_template
         else
@@ -487,7 +521,6 @@ class PaymentAgreements::Base < BaseOperation
         #   end
         # end
         # Except for first and last record, invoice start date should be start of month and end date should be end of month
-        # binding.pry
         unless index == 1 || (index == dates.count)
           unless validate_start_date_as_start_of_month(start_date)
             add_message :error, "Start date: #{start_date} should be start of month"
