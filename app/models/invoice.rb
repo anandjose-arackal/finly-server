@@ -248,6 +248,10 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
   }
 
+  scope :with_type_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+  }
+
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id

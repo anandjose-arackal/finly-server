@@ -11,6 +11,8 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
             :level_name => 'Level Name',
             :level_number => 'Level Number',
             :reviewer_email_mobile => 'Reviewer Email / Mobile',
+            :with_exception => 'With Exception Y/N',
+            :without_exception => 'Without Exception Y/N',
             :min => "Minimum Threshold",
             :max => "Max Threshold",
             :destroy => 'Destroy'
@@ -18,12 +20,14 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
 
   attr_accessor :lrm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
+    path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
+    self.input = Roo::Spreadsheet.open(path)
     output = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
       self.application = get_application(name)
       self.provider = name
+      custom_headers = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
         begin
@@ -47,7 +51,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         end
         output[name] << row
       end
-      export headers.values, output
+      export custom_headers, output
     end
 
   end
@@ -112,11 +116,13 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
 
     if lrm_params[:department_code].present?
       department = company.departments.find_by department_code: lrm_params[:department_code]
+      return result false, "Department not found with the department code" unless department.present?
       create_policy_dept_mapping(policy, department) if department.present?
     end
 
     if lrm_params[:location_code].present?
       location = company.locations.find_by location_code: lrm_params[:location_code]
+      return result false, "Location not found with the location code" unless location.present?
       create_policy_location_mapping(policy, location)
     end
     row_length = data.size
@@ -125,8 +131,15 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
       level_name = data[lower_index+1].to_s
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3].to_s
-      min = data[lower_index+4].to_i
-      max = (data[lower_index+5].present? ? data[lower_index+5].to_i : nil)
+      min = data[lower_index+6].to_i
+      max = (data[lower_index+7].present? ? data[lower_index+7].to_i : nil)
+      if min.present? && max.present?
+        if min >= max
+          return result false, "Max Threshold should be greater than Min"
+        end
+      end
+      exception = data[lower_index+4]&.to_s&.upcase == 'N' ? false : true
+      wo_exception = data[lower_index+5]&.to_s&.upcase == 'N' ? false : true
       if level_name.present? && level_number.present? && level_number !=0
         self.level = get_level(level_name, level_number, provider)
         if reviewer_id.present?
@@ -137,12 +150,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         else
           reviewer = nil
         end
-        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max).first
-        self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max) unless mapping_exist.present?
+        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
+        self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception) unless mapping_exist.present?
       else
         return  result false, 'Level Number and Name Cant be blank'
       end
-      lower_index += 5
+      lower_index += 7
     end
     result true, 'Reviewer Mapping Created'
   end
@@ -201,12 +214,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   end
 
   def create_policy_dept_mapping(policy,department)
-    return if policy.policy_department_mappings.where(department_id: department.id).first.present?
+    return if policy.policy_department_mappings.where(department_id: department&.id).first&.present?
     policy.policy_department_mappings.create(department_id: department.id)
   end
 
   def create_policy_location_mapping(policy,location)
-    return if policy.policy_location_mappings.where(location_id: location.id).first.present?
+    return if policy.policy_location_mappings.where(location_id: location&.id).first&.present?
     policy.policy_location_mappings.create(location_id: location.id)
   end
 

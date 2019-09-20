@@ -136,7 +136,9 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_item_ledgers(voucher, invoice, item, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['item'].slice('gl_name', 'category_allocations'), "item" => item, "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
+    value = item.billable_amount
+    value = item.taxable_amount if value == 0
+    voucher.add ledger_data['gl_name'], (-value), category_allocations: ledger_data['category_allocations']
   end
 
   def add_tds_ledgers(voucher, invoice, configuration)
@@ -156,5 +158,3 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
 
 end
-
-
