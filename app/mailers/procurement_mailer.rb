@@ -65,6 +65,13 @@ class ProcurementMailer < ApplicationMailer
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
   end
 
+  def send_purchase_request_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_purchase_request'
+    end
+  end
+
 
   # Automatically sent for invoice actions
   def send_invoice_mail(presenter)
