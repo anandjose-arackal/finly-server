@@ -271,6 +271,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   def setup_invoice_params
     reference_invoice = get_reference_invoice
     invoice_frequency = get_invoice_frequency(self.invoice_type)
+    due_date = get_invoice_due_date(reference_invoice)
     invoice_params = {
       start_date: upcoming_invoice_start_date,
       end_date: upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
@@ -281,7 +282,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
       payment_term_id: reference_invoice.payment_term_id,
       note: reference_invoice.note,
       billing_type_id: reference_invoice.billing_type_id,
-      due_date: get_first_invoice_due_date,
+      due_date: due_date,
       tax_type_id: reference_invoice.tax_type_id,
       discount_type_id: reference_invoice.discount_type_id,
       gross_amount: get_gross_amount(reference_invoice.gross_amount),
@@ -316,8 +317,22 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   # TODO -  change this
-  def get_first_invoice_due_date
-    first_reference_invoice.due_date
+  def get_invoice_due_date(first_reference_invoice)
+    if first_reference_invoice.present?
+      if first_reference_invoice.payment_term.days_after.present?
+        if first_reference_invoice.prepaid
+          due_date = first_reference_invoice.start_date + first_reference_invoice.payment_term.days_after
+        else
+          due_date = first_reference_invoice.end_date + first_reference_invoice.payment_term.days_after
+        end
+      else
+        add_message :error, "Configuration issue, payment term is incorrect"
+        return
+      end
+    else
+      # For next invoice
+    end
+    return due_date
   end
 
   def get_reference_invoice
