@@ -41,7 +41,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def item_expense_type(item)
-    item.item_expense_type.name
+    item.item_expense_type&.name
   end
 
   def item_number(item)
