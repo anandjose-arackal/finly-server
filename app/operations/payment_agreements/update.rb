@@ -20,11 +20,12 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     ActiveRecord::Base.transaction do
       if self.payment_agreement.save
         validate_prepaid_consistency
+        security_deposit_validation
         validate_invoice_frequency unless has_errors?
         validate_invoice_start_end_date unless has_errors?
-        validate_grouped_vendor_start_end_date unless has_errors?
+        fixed_periodic_grouped_vendor_validations unless has_errors?
         check_agreement_item_presence unless has_errors?
-        validate_start_end_date_consecutiveness unless has_errors?
+        # validate_start_end_date_consecutiveness unless has_errors?
         billing_type_validations unless has_errors?
         validate_agreement_item_combinations unless has_errors?
 

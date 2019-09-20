@@ -17,7 +17,7 @@ class User::Balances::Show < User::Base
     end
     self.balances = {company_credits: [], finly_money: [], cards: [], user_pockets: []}
     self.company = self.selected_user.company
-    retrieve_balances
+    # retrieve_balances
   end
 
   def validate
