@@ -2,19 +2,24 @@ module Documents::Invoices::Consumers::Submit
   module Processing
     class OwnerAction < TaskManager::Actions::DummyAction
       def run(user, message, input)
+        debugger
       end
     end
 
     class OwnerActions < TaskManager::Workflows::API
       consumes_event! 'invoice.submit'
       validate_payload -> (user, message) {message[:record].present?}#message[:invoice]&.status_id == InwardInvoiceStatus.id_for(:processing)}
-      # validate_input -> (user, message, invoices){}
+      validate_input -> (user, message, invoices) {}
+      pre_process -> (user, message, invoices) {}
       # action TaskManager::Actions::DummyAction.define_action "UserSubmitOwnerMailer" do
       #   process -> (user, message) do
       #
       #   end
       # end
       action OwnerAction
+      post_process -> (user, message, invoices) {}
+      success -> (user, message, invoices) {}
+      failed -> (user, message, invoices) {}
 
       # action Documents::Invoices::Consumers::Mailers.define do |invoice|
       #   rule -> (invoice) {invoice.created_by.email.present?}
