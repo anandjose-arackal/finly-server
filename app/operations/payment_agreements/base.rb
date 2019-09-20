@@ -460,6 +460,7 @@ class PaymentAgreements::Base < BaseOperation
     return if has_errors?
     vendor_ids.each do |vendor_id|
       dates = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.order(:start_date).collect{ |invoice| [invoice.start_date, invoice.end_date] }
+      last_end_date = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.order(:start_date).last.end_date
       dates.each.with_index(1) do |date, index|
         return if has_errors?
         start_date, end_date = date[0], date[1]
@@ -486,19 +487,21 @@ class PaymentAgreements::Base < BaseOperation
         #   end
         # end
         # Except for first and last record, invoice start date should be start of month and end date should be end of month
+        # binding.pry
         unless index == 1 || (index == dates.count)
           unless validate_start_date_as_start_of_month(start_date)
             add_message :error, "Start date: #{start_date} should be start of month"
           end
-          unless validate_end_date_as_end_of_month(end_date)
+          unless validate_end_date_as_end_of_month(end_date,last_end_date)
             add_message :error, "End date: #{end_date} should be end of month"
+          end
+          unless  (end_date_month - start_date_month + 1) % (invoice_frequency) == 0
+            add_message :error, "Difference between start date(#{start_date}) and end date(#{end_date}) should be equal to invoice frequency or its multiples"
+            return
           end
         end 
 
-        unless  (end_date_month - start_date_month + 1) % (invoice_frequency) == 0
-          add_message :error, "Difference between start date(#{start_date}) and end date(#{end_date}) should be equal to invoice frequency or its multiples"
-          return
-        end
+
       end
     end
   end
@@ -1209,7 +1212,8 @@ class PaymentAgreements::Base < BaseOperation
     start_date == start_date.beginning_of_month
   end
 
-  def validate_end_date_as_end_of_month(end_date)
+  def validate_end_date_as_end_of_month(end_date,last_end_date=nil)
+    return true if last_end_date
     end_date == end_date.end_of_month
   end
 
@@ -1226,6 +1230,11 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def validate_start_date_and_execution_date(invoice_type)
+    group_vendor_count_by_id = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.group(:id).count
+    # Do not run this validation for single fixed periodic with multiple vendors
+    if group_vendor_count_by_id.values.uniq.count == 1 && group_vendor_count_by_id.values.uniq.include?(1)
+      return
+    end
     execution_date = self.payment_agreement.execution_date.to_date
     vendor_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.pluck(:vendor_id).uniq
     unless self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where(start_date: execution_date).count == vendor_ids.count
@@ -1234,6 +1243,11 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def validate_end_date_end_expiration_date(invoice_type)
+    group_vendor_count_by_id = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.group(:id).count
+    # Do not run this validation for single fixed periodic with multiple vendors
+    if group_vendor_count_by_id.values.uniq.count == 1 && group_vendor_count_by_id.values.uniq.include?(1)
+      return
+    end
     unless self.payment_agreement.no_expiration
       expiration_date = self.payment_agreement.expiration_date.to_date
       vendor_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.pluck(:vendor_id).uniq
@@ -1242,5 +1256,7 @@ class PaymentAgreements::Base < BaseOperation
       end
     end
   end
+
+
 
 end
