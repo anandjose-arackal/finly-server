@@ -89,11 +89,14 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     location = data[:gst_location].to_s
     code = data[:vendor_id].to_s
     vendor_id = (code.blank? ? nil : code)
+    vendor_type_id = nil
     if data[:vendor_type].present?
       vendor_type_id = company.vendor_types.where(name: data[:vendor_type]).first
-      messages << "Vendor Type not Created in system" if vendor_type_id.nil?
+      if vendor_type_id.blank?
+        vendor_type = company.vendor_types.create(name: data[:vendor_type])
+        vendor_type_id = vendor_type.id
+      end
     end
-    vendor_type_id = data[:vendor_type].to_s
     state_code_id = nil
     state_code_id = State.where("name LIKE ?", "%"+data[:state].to_s+"%").first&.id if !data[:business_name].to_s.blank?
 

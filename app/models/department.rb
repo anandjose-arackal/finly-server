@@ -18,6 +18,7 @@
 class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
@@ -34,6 +35,7 @@ class Department < ApplicationRecord
 
   has_many :cost_center_department_mappings
   has_many :cost_centers, through: :cost_center_department_mappings
+  has_many :users
 
 
   accepts_nested_attributes_for :user_department_mappings

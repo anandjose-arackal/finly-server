@@ -20,10 +20,10 @@ class WorkflowManager::Aasm::BaseProvider
 
     # get reviewers
     self.current_level = self.document.level
-    self.next_level = self.document.get_level(:next)
-    self.previous_level = self.document.get_level(:prev)
-    self.current_level_reviewers = self.document.get_reviewers
-    self.reviewers = self.document.get_reviewers(:next)
+    self.next_level = self.document.get_level(:next, provider_name)
+    self.previous_level = self.document.get_level(:prev, provider_name)
+    self.current_level_reviewers = self.document.get_reviewers(nil, provider_name)
+    self.reviewers = self.document.get_reviewers(:next, provider_name)
     self.document_update_params = {}
   end
 
@@ -205,6 +205,6 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def user_can_unapprove?
-    self.document.get_reviewers(:prev).include?(user)
+    self.document.get_reviewers(:prev, provider_name).include?(user)
   end
 end

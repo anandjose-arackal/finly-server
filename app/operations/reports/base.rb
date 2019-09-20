@@ -77,13 +77,14 @@ class Reports::Base < BaseOperation
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
                   :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers,
-                  :reviewal_chains, :reviewal_chain, :finance_managers, :awaiting_settlement
+                  :reviewal_chains, :reviewal_chain, :finance_managers, :awaiting_settlement,
+                  :tax_rates, :gst_state_codes
 
     def init
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses.includes(:amount,:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,{manual_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{card_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{distance_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]},{time_expense:[custom_fields: [:value,field_configuration:[:parent_dependent_field_configuration_mappings]]]})
+      self.expenses = report.expenses.includes(:amount,:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,{manual_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{card_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{distance_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{time_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]})
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string
@@ -93,6 +94,8 @@ class Reports::Base < BaseOperation
       self.violations = Reports::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
       self.finance_managers = report.document_role_users(:finance_managers)
+      self.tax_rates = user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
 
       if Report.status_ids(:approved, :auto_approved).include?(report.status_id)
         self.awaiting_settlement = true
@@ -206,6 +209,35 @@ class Reports::Base < BaseOperation
       categorized_expenses
     end
 
+     def paginated_expenses_category_sorted
+      categorized_expenses = []
+      self.categories.roots.each do |category|
+        cat_ids = [category.id]
+        if category.children.present?
+          cat_ids += category.children.pluck(:id)
+        end
+        item_expenses = self.report.expenses.with_category(cat_ids)
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 500 # FE does not have pagination for now
+        case params[:sort_expenses]
+        when 'asc'
+          item_expenses = item_expenses.reorder(date: :asc)
+        when 'desc'
+          item_expenses = item_expenses.reorder(date: :desc)
+        else # by default sort for incresing date
+          item_expenses = item_expenses.reorder(date: :asc)
+        end
+        item_expenses = item_expenses.paginate(page: params[:page], per_page: params[:per_page])
+        if item_expenses.present?
+          item_name = category.name
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      categorized_expenses
+    end
+
+
     def expenses_date_sorted
       date_expenses = []
       dates = self.expenses.map(&:date).uniq
@@ -219,6 +251,36 @@ class Reports::Base < BaseOperation
       end
       date_expenses
     end
+
+    def paginated_expenses_date_sorted
+      date_expenses = []
+      dates = self.expenses.map(&:date).uniq
+
+      case params[:sort_expenses]
+      when 'asc'
+        dates = dates.sort
+      when 'desc'
+        dates = dates.reverse
+      else
+        dates
+      end
+
+      dates.each do |date|
+        item_expenses = self.expenses.with_date(date)
+
+        params[:page] = params[:page] || 1
+        params[:per_page] = params[:per_page] || 500 # FE does not have pagination for now
+        item_expenses = item_expenses.paginate(page: params[:page], per_page: params[:per_page])
+
+        if item_expenses.present?
+          item_name = DateUtils.date_formatted date
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+        end
+      end
+      date_expenses
+    end
+
 
     def load_actions
       actions = {

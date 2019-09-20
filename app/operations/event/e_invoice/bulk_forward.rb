@@ -19,7 +19,7 @@ class Event::EInvoice::BulkForward < Event::EInvoice::Base
     end
   end
 
-  def affected_users
+  def mailer_affected_users
     [user, forwarded_to_user]
   end
 

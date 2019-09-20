@@ -26,6 +26,8 @@
 #  result_file_updated_at    :datetime
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  success_items             :integer          default(0)
+#  failed_items              :integer          default(0)
 #
 
 class AdminImplementationRequest < ApplicationRecord

@@ -11,7 +11,8 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       po_invoices: false,
       payment_tickets: false,
       vendors: false,
-      grn: false
+      grn: false,
+      payment_agreements: false
     }
 
     if user.vendor_payments_admin?
@@ -29,6 +30,10 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       unless user.company.vendor_empanelment_workflow_enabled?
         document_types[:vendors] = false
+      end
+
+      unless user.company.agreement_based_payment_system_enabled?
+        document_types[:payment_agreements] = false
       end
     else
       user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
@@ -52,6 +57,8 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
           if user.company.vendor_empanelment_workflow_enabled?
             document_types[:vendors] = true
           end
+        when UserRole.id_for(:payment_agreement_reviewer)
+          document_types[:payment_agreements] = true
         end
       end
     end
@@ -262,7 +269,32 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         data[:filters].push(filter_data)
       end
       self.result.push data
-    end    
+    end
+
+    if document_types[:payment_agreements]
+      payment_agreements = PaymentAgreement.awaiting_action_items(user)
+      if params[:filter_date_from].present? || params[:filter_date_to].present?
+        payment_agreements = payment_agreements.filter_by_date_range(params[:filter_date_from], params[:filter_date_to])
+      end
+      data = {
+        title: "Payment Agreements",
+        type: 'payment_agreements',
+        count: payment_agreements.count,
+        filters: [{filter_by_status_id: 'awaiting_approval'}]
+      }
+
+      if params[:filter_date_from].present?
+        filter_data = {'filter_by_date_range[from]': params[:filter_date_from]}
+        data[:filters].push(filter_data)
+      end
+
+      if params[:filter_date_to].present?
+        filter_data = {'filter_by_date_range[to]': params[:filter_date_to]}
+        data[:filters].push(filter_data)
+      end
+      self.result.push data
+    end
+
   end
 
   def success

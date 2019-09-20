@@ -48,9 +48,11 @@ class Vendors::Update < Vendors::Base
       end
 
       # Remove Empty gstin locations
-      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-        unless gst.keys.present?
-          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      if vendor_parameters[:gstin_locations_attributes].present?
+        vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+          unless gst.keys.present?
+            vendor_parameters[:gstin_locations_attributes].delete_at(index)
+          end
         end
       end
 

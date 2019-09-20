@@ -25,8 +25,8 @@
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
 #  expense_tax_type_id    :integer
-#  gst_percentage         :decimal(10, )
-#  tds_percentage         :decimal(10, )
+#  gst_percentage         :decimal(10, 5)
+#  tds_percentage         :decimal(10, 5)
 #  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
@@ -69,6 +69,9 @@ class Expense < ApplicationRecord
   belongs_to :spent_from, optional: true, class_name: 'UserPocket'
   belongs_to :created_by, class_name: "User", optional: true
   belongs_to :modified_by, class_name: "User", optional: true
+  belongs_to :gstin_location, optional: true
+  belongs_to :tax_rate, optional: true
+  belongs_to :state_of_expense, class_name: "GstStateCode", optional: true
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -98,6 +101,7 @@ class Expense < ApplicationRecord
   accepts_nested_attributes_for :per_diem_expense
   accepts_nested_attributes_for :receipt_email
   accepts_nested_attributes_for :tds_amount
+  accepts_nested_attributes_for :gstin_location
 
 
   # delegating to associated classes the dependent attribute calls
@@ -154,6 +158,11 @@ class Expense < ApplicationRecord
       self.reimbursable = false
       self.from_cash_on_hand = true
 
+    end
+
+    # setting gst_percentage, if it isn't set at the time of saving
+    if self.gst_percentage.blank? || self.gst_percentage == 0
+      self.gst_percentage = self.tax_rate&.rate
     end
     compute_gst_amount
     compute_tds_amount
@@ -1031,7 +1040,8 @@ class Expense < ApplicationRecord
   def compute_gst_amount
     return unless has_gst? and self.gst_percentage.present?
 
-    gst_amount_value = self.amount.value * self.gst_percentage / 100
+    gst_amount_value = (self.amount.value * self.gst_percentage) / (100.0 + self.gst_percentage)
+    # gst_amount_value = self.amount.value * self.gst_percentage / 100
     set_gst_amount(gst_amount_value)
   end
 

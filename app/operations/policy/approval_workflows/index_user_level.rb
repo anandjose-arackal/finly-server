@@ -71,14 +71,23 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
       when 'PurchaseOrderProvider', :PurchaseOrderProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
-      when 'InvoiceProvider', :InvoiceProvider
-        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
+      # when 'InvoiceProvider', :InvoiceProvider
+      #   user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
+      #   user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'PoInvoiceProvider', :PoInvoiceProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:po_invoice_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'PurchaseRequestProvider', :PurchaseRequestProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_request_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)
+      when 'PaymentAgreementProvider', :PaymentAgreementProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:payment_agreement_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)
       when 'YesBankVendorProvider', :YesBankVendorProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:vendor_creator)).pluck(:user_id).uniq rescue []

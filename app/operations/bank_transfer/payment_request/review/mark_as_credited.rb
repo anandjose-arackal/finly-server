@@ -62,6 +62,8 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
         payment_request.payment_order.payments.each do |payment|
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          update_agreement_beneficiary(payment)
+          update_agreement_security_deposit(payment)
         end
         # create the trail for the same
         # payment_request.bank_payment_request_trails.create action_user: user,
@@ -119,6 +121,29 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       else
         document_owner = user
         Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      end
+    end
+  end
+
+  def update_agreement_beneficiary(payment)
+    # beneficiary_payment = user.company.beneficiary_payments.find_by_id(payment.beneficiary_payment_id) rescue nil
+    # if beneficiary_payment.present?
+    #   payment_agreement = payment.beneficiary_payment.payment_agreement rescue nil
+    #   if payment_agreement.present?
+    #     beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:closed))
+    #   end
+    # end
+    if payment.parent_type == "BeneficiaryPayment" && payment.parent.payment_agreement_id.present?
+      unless payment.parent.status_id == BeneficiaryPaymentStatus.id_for(:paid)
+        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:paid))
+      end
+    end
+  end
+
+  def update_agreement_security_deposit(payment)
+    if payment.parent_type == "SecurityDeposit" && payment.parent.payment_agreement_id.present?
+      unless payment.parent.status_id == SecurityDepositStatus.id_for(:paid)
+        payment.parent.update(status_id: SecurityDepositStatus.id_for(:paid))
       end
     end
   end

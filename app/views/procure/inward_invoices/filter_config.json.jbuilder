@@ -21,3 +21,5 @@ json.policies do |policy|
     json.extract! policy, :id, :name
   end
 end
+
+json.agreement_invoice_enabled @result.agreement_invoice_enabled

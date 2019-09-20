@@ -67,6 +67,15 @@ class Reports::Expenses::Reject < Reports::Base
           amount.destroy if amount
         end
 
+        if [2, 164].include?(report&.user&.company_id)
+          self.report.reload
+          check_for_violations
+          params[:reviewal_document] = report
+          params[:violations_present] = has_warning?
+
+          op = ::ReviewalManager::DocumentReviewalMappings::SetUnaffected.(report.user, params)
+        end
+
         # triggering the reject event
         Event::EReport::EExpense::Reject.(user, {report: report, rejected_expense: expenses.first})
       end
