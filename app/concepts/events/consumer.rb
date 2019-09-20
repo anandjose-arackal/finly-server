@@ -1,12 +1,24 @@
 module Events::Consumer
 
   def self.included(base)
-    base.include Sneakers::Worker
-    # base.extend ClassMethods
+    base.extend ClassMethods
   end
 
-  # module ClassMethods
-  # end
+  module ClassMethods
+    def event_consumer!
+      include Sneakers::Worker unless self.respond_to?(:from_queue)
+    end
+
+    def event(key = NoObject, opts = {})
+      event_consumer!
+      unless key == NoObject
+        @event = key
+        @event_options = opts
+        from_queue key, opts
+      end
+      @event
+    end
+  end
 
   def work(payload)
     json_payload = JSON.parse(payload) || payload
@@ -15,6 +27,8 @@ module Events::Consumer
       trigger nil, json_payload
       return
     end
+
+    json_payload = json_payload.to_h.with_indifferent_access
 
     decoded_payload = Events::Serializer.decode(json_payload)
     message = decoded_payload&.dig('message') || json_payload

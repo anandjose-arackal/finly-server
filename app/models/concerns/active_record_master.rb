@@ -18,9 +18,9 @@ module ActiveRecordMaster
       @policy
     end
 
-    def event_prefix(prefix = NoObject)
-      @event_prefix = "#{prefix}" unless prefix == NoObject
-      @event_prefix
+    def event_channel(event_channel = NoObject)
+      @event_channel = event_channel unless event_channel == NoObject
+      @event_channel || self.class.name.underscore
     end
 
     def system_events(*system_events)

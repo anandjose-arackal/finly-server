@@ -105,7 +105,7 @@ class Invoice < ApplicationRecord
   state_machine Documents::Invoices::StateMachine
   resolver :admin, Documents::Invoices::Policy::Scope
   resolver Documents::Invoices::Policy::Scope
-  event_prefix 'invoice'
+  event_channel 'invoice'
   system_events 'submit', 'approve'
   request_events 'index', 'show'
 
