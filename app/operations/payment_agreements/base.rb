@@ -615,11 +615,11 @@ class PaymentAgreements::Base < BaseOperation
   # end
 
   def general_invoice_start_end_date
+    dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
     validate_all_dates(dates)
     validate_frequency_based_start_end_date('general_invoice')
     validate_invoice_frequency_for_gi
     # vendor_ids = self.payment_agreement.general_invoices.pluck(:vendor_id).uniq
-    dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
     # return if has_errors?
     # vendor_ids.each do |vendor_id|
     #   return if has_errors?
