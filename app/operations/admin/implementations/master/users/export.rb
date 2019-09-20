@@ -79,11 +79,11 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def state_id(user)
-    user.state_id rescue ''
+    user.profile&.state&.name rescue ''
   end
 
   def gender(user)
-    user.gender_name rescue ''
+    user&.profile&.gender
   end
 
   def company_id(user)
