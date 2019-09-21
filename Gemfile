@@ -11,6 +11,8 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'parslet', '~> 1.8.2'
 
+gem 'rufus-scheduler'
+
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'

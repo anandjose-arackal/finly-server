@@ -40,8 +40,7 @@ class TaskManager::Workflows::APIRunner < Transactions::API
 
   def validate_payload(options, api:, current_user:, message:, **)
     api.payload_validations.each do |validation|
-      result = execute_function validation, current_user, message
-      return false unless result
+      return false unless execute_function validation, current_user, message
     end
     true
   end

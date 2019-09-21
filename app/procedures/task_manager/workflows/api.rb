@@ -36,14 +36,20 @@ class TaskManager::Workflows::API
   end
 
   def self.validate_payload(condition)
+    raise "Condition cannot be blank in #{self.name}" if condition.nil?
+
     payload_validations << condition
   end
 
   def self.action(action)
+    raise "Action cannot be blank in #{self.name}" if action.nil?
+
     actions << action
   end
 
   def self.validate_input(condition)
+    raise "Input cannot be blank in #{self.name}" if condition.nil?
+
     input_validations << condition
   end
 
@@ -53,18 +59,26 @@ class TaskManager::Workflows::API
   end
 
   def self.pre_process(pre_process)
+    raise "PreProcess cannot be blank in #{self.name}" if pre_process.nil?
+
     pre_processes << pre_process
   end
 
-  def self.post_process(pre_process)
-    post_processes << pre_process
+  def self.post_process(post_process)
+    raise "PreProcess cannot be blank in #{self.name}" if post_process.nil?
+
+    post_processes << post_process
   end
 
-  def self.success(success)
-    success_processes << success
+  def self.success(success_process)
+    raise "PreProcess cannot be blank in #{self.name}" if success_process.nil?
+
+    success_processes << success_process
   end
 
   def self.failed(failed_process)
+    raise "PreProcess cannot be blank in #{self.name}" if failed_process.nil?
+
     failed_processes << failed_process
   end
 
