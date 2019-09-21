@@ -264,7 +264,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     if invoice_frequency == 1
       return invoice_start_date.end_of_month
     else
-      return (invoice_start_date + invoice_frequency-1).end_of_month
+      return (invoice_start_date + invoice_frequency.month-1.month).end_of_month
     end
   end
 
