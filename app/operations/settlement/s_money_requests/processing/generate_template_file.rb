@@ -36,7 +36,8 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.money_request_processor.mappings.exclude_cancelled.each do |item|
+      # self.money_request_processor.mappings.exclude_cancelled.each do |item|
+      self.money_request_processor.mappings.exclude_cancelled.left_joins(:money_requests).select('money_request_processor_mappings.*, money_requests.id AS money_request_id').each do |item|
         item_contents << processor_details(self.money_request_processor, item)
       end
     end
@@ -57,10 +58,11 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
 
   def processor_details(processor, item)
     marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
-    document_ids = item.money_requests.pluck(:id).join(", ") rescue ""
+    # document_ids = item.money_requests.pluck(:id).join(", ") rescue ""
     [
+      # document_ids,
+      item.money_request_id,
       item.id,
-      document_ids,
       processor.created_by_user&.name,
       item.processor_accountable&.name,
       item.processor_accountable&.account_number,
@@ -74,8 +76,8 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
 
   def default_headers
     [
+      "Advance ID(unmodifiable)",
       "Batch Item ID(unmodifiable)",
-      "Advance IDs(unmodifiable)",
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
