@@ -134,7 +134,8 @@ class Item < ApplicationRecord
       item_expense_type_name: item_expense_type&.name,
       tds_applicable: tds_applicable,
       tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description
+      custom_description: get_custom_description,
+      custom_fields: self.custom_fields
 
     }
   end

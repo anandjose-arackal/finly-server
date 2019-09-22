@@ -64,6 +64,7 @@ class RateContract < ApplicationRecord
       note: note,
       default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
       locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
+      custom_fields: self.custom_fields
     }
   end
 

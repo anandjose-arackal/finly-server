@@ -15,6 +15,7 @@ class RateContracts::Create < RateContracts::Base
 
   def process
     rate_contract = RateContract.new(strong_params)
+    validate_custom_fields(false)
     unless  rate_contract.save
       add_message :error, rate_contract.errors.full_messages
       return
