@@ -290,7 +290,7 @@ class GeneralInvoice < ApplicationRecord
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id},
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,

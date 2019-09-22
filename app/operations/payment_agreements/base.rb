@@ -1207,7 +1207,7 @@ class PaymentAgreements::Base < BaseOperation
       return if has_errors?
       start_date, end_date = date[0].to_date, date[1].to_date
       if start_date < payment_agreement.execution_date.to_date
-        add_message :error, "Start Date: #{start_date} cannot be less than agreement execution date: #{execution_date.to_date}"
+        add_message :error, "Start Date: #{start_date} cannot be less than agreement execution date: #{self.payment_agreement.execution_date.to_date}"
       end
 
       unless payment_agreement.no_expiration
