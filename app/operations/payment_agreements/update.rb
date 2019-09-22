@@ -17,10 +17,11 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
     end
+    validate_item_quantity
     ActiveRecord::Base.transaction do
       if self.payment_agreement.save
-        validate_prepaid_consistency
-        security_deposit_validation
+        validate_prepaid_consistency unless has_errors? 
+        security_deposit_validation unless has_errors?
         validate_invoice_frequency unless has_errors?
         validate_invoice_start_end_date unless has_errors?
         fixed_periodic_grouped_vendor_validations unless has_errors?

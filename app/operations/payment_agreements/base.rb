@@ -1291,5 +1291,39 @@ class PaymentAgreements::Base < BaseOperation
   end
 
 
+  # Jugaad as frontend calculations get messed up if quantity is set to zero for mutiple invoice in payment agreement
+  def validate_item_quantity
+    if self.payment_agreement.general_invoices.present?
+      validate_invoice_item_quantity('general_invoice')
+    end
+    if self.payment_agreement.rental_invoices.present?
+      validate_invoice_item_quantity('rental_invoice')
+    end
+  end
+
+  def validate_invoice_item_quantity(invoice_type)
+    self.payment_agreement.send(invoice_type.pluralize.to_sym).each do |invoice|
+      if invoice.invoice_items.present?
+        invoice.invoice_items.each do |invoice_line_item|
+          set_discount_in_item(invoice_line_item)
+          if invoice_line_item.quantity == 0
+            add_message :error, "Quantity for #{invoice_line_item&.description} cannot be zero"
+            return
+          end
+        end
+      end
+    end
+  end
+
+  def set_discount_in_item(invoice_line_item)
+    value = invoice_line_item&.discount_amount&.value
+    invoice_line_item.discount = value
+    if value.blank?
+      invoice_line_item&.discount_amount&.value = 0.0
+      invoice_line_item&.discount_amount&.currency_id = 1
+    end
+  end
+
+
 
 end

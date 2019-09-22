@@ -393,7 +393,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   def get_payment_agreement_upcoming_date(reference_invoice, start_date, end_date, prepaid)
-    return start_date # FOR TESTING ONLY
+    # return start_date # FOR TESTING ONLY
     prepaid ? start_date : end_date
   end
 
