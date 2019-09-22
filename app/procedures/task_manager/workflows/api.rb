@@ -1,38 +1,18 @@
 class TaskManager::Workflows::API
+  include Events::Consumer
+  include Events::Scheduler
+
+  # TODO consume request params as well for filtering
 
   # When a new event is received
-  def receive(user, message)
-    TaskManager::Workflows::APIRunner.({api: self.class, message: message}, 'current_user' => user)
+  def on_event(user, message)
+  TaskManager::Workflows::APIRunner.({api: self.class, message: message}, 'current_user' => user)
   end
 
-  def self.event?
-    @trigger == :event
-  end
-
-  def self.scheduled?
-    @trigger == :schedule
-  end
-
-  def self.scheduled!(every:, hour:, minute:, day_of_the_week: nil, day_of_the_month: nil)
-    raise "#{self.name} cannot consume event and be scheduled" if event?
-
-    include TaskManager::Workflows::API::ScheduleHandler
-    @trigger_type = :schedule
-    @schedule = schedule
-  end
-
-  def self.consumes_event!(event)
-    raise "#{self.name} cannot consume event and be scheduled" if scheduled?
-
-    include Events::Consumer
-    @trigger_type = :event
-    event event
-  end
-
-  def self.users(users = nil, user_roles: nil, document_roles: nil)
-    @user_proc = users
-    @user_roles = user_roles
-    @document_roles = document_roles
+  def on_schedule
+    User.filter_role(self.user_roles).each do |user|
+      TaskManager::Workflows::APIRunner.({api: self.class}, 'current_user' => user)
+    end
   end
 
   def self.validate_payload(condition)
@@ -94,16 +74,9 @@ class TaskManager::Workflows::API
     @input_validations ||= []
   end
 
-  def self.users
-    @user_proc
-  end
-
-  def self.user_roles
-    @user_roles
-  end
-
-  def self.document_roles
-    @document_roles
+  def self.user_roles(*list)
+    @user_roles = list if list.present?
+    @user_roles ||= []
   end
 
   def self.pre_processes

@@ -2,12 +2,12 @@ class TaskManager::Workflows::APIRunner < Transactions::API
 
   skip_user_authorization!
 
-  # schema do
-  #   params do
-  #     required(:message).filled
-  #     required(:api).filled
-  #   end
-  # end
+  schema do
+    params do
+      required(:message).filled
+      required(:api).filled
+    end
+  end
 
   step :setup
   step :applicable_for_user?
@@ -25,48 +25,59 @@ class TaskManager::Workflows::APIRunner < Transactions::API
   # execute_actions user, message, input
 
   def setup(options, current_user:, params:, **)
-    # params = options['params']
     options['message'] = params&.dig(:message)
     options['api'] = params&.dig(:api)
     true
   end
 
   def applicable_for_user?(options, api:, current_user:, message:, **)
-    return false if api.users and not execute_function api.users, current_user, message
-    return false if api.user_roles and false # Todo
-    return false if api.document_roles and false # Todo
+    required_roles = api.user_roles
+    return on_error(options, :base, 'Roles is not provided') if required_roles.blank?
+    return on_error(options, :base, 'Current user is blank') if current_user.blank?
+    current_user_roles = current_user.user_roles.pluck(:name)
+    if (required_roles - current_user_roles).size == roles.size
+      return on_error(options, :base, 'Workflow is not applicable for user')
+    end
     true
   end
 
   def validate_payload(options, api:, current_user:, message:, **)
     api.payload_validations.each do |validation|
-      return false unless execute_function validation, current_user, message
+      unless execute_function validation, current_user, message
+        return on_error(options, :base, 'Payload Validation failed')
+      end
     end
     true
   end
 
   def generate_input(options, api:, current_user:, message:, **)
     unless api.input
+      return on_error(options, :base, 'Input is blank') if message.blank?
+
       options['input'] = message
       return true
     end
 
     options['input'] = execute_function api.input, current_user, message
-    return false if options['input'].blank?
+    return on_error(options, :base, 'Input is blank') if options['input'].blank?
 
     true
   end
 
   def validate_input(options, api:, current_user:, message:, input:, **)
     api.input_validations.each do |validation|
-      return false unless execute_function validation, current_user, message, input
+      unless execute_function validation, current_user, message, input
+        return on_error(options, :base, 'Input validation error')
+      end
     end
     true
   end
 
   def pre_process(options, api:, current_user:, message:, input:, **)
     api.pre_processes.each do |validation|
-      return false unless execute_function validation, current_user, message, input
+      unless execute_function validation, current_user, message, input
+        return on_error(options, :base, 'Preprocess failed')
+      end
     end
     true
   end
@@ -80,22 +91,17 @@ class TaskManager::Workflows::APIRunner < Transactions::API
 
   def post_process(options, api:, current_user:, message:, input:, **)
     api.pre_processes.each do |validation|
-      return false unless execute_function validation, current_user, message, input
+      unless execute_function validation, current_user, message, input
+        return on_error(options, :base, 'Postprocess failed')
+      end
     end
     true
   end
-  
+
   protected
 
   def execute_function(function, *args)
-    if function.is_a?(Proc) or function.is_a?(Class)
-      function.call(*args)
-    elsif function.is_a?(Symbol)
-      raise "#{function} is not defined" unless self.respond_to?(function)
-      self.send(function, *args)
-    else
-      raise "Invalid function #{function}"
-    end
+    Transactions::Helper.execute_function(function, *args)
   end
 
 end

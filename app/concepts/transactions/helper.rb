@@ -11,4 +11,15 @@ class Transactions::Helper
     arguments
   end
 
+  def self.execute_function(function, *args)
+    if function.is_a?(Proc) or function.is_a?(Class)
+      function.call(*args)
+    elsif function.is_a?(Symbol)
+      raise "#{function} is not defined" unless self.respond_to?(function)
+      self.send(function, *args)
+    else
+      raise "Invalid function #{function}"
+    end
+  end
+
 end

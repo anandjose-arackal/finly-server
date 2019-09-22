@@ -8,6 +8,7 @@ module Documents::Invoices::Consumers::Submit
 
     class OwnerActions < TaskManager::Workflows::API
       consumes_event! 'invoice.submit'
+      scheduled! every: 1.minute, hour: 12, minute: 00, day_of_the_week: :monday, day_of_the_month: :last
       validate_payload -> (user, message) do
         message[:record].present? #message[:invoice]&.status_id == InwardInvoiceStatus.id_for(:processing)}
       end

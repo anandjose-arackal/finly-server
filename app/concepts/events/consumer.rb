@@ -5,18 +5,19 @@ module Events::Consumer
   end
 
   module ClassMethods
-    def event_consumer!
+    def consumes_event!(key, opts={})
       include Sneakers::Worker unless self.respond_to?(:from_queue)
-    end
-
-    def event(key = NoObject, opts = {})
-      event_consumer!
       unless key == NoObject
         @event = key
         @event_options = opts
         from_queue key, opts
       end
+      @consumes_event = true
       @event
+    end
+
+    def consumes_event?
+      !!@consumes_event
     end
   end
 
@@ -41,7 +42,7 @@ module Events::Consumer
   end
 
   def trigger(user, message)
-    self.send(:receive, user, message) if self.respond_to?(:receive)
+    self.send(:on_event, user, message) if self.respond_to?(:on_event)
   end
 
   # def receive(user, message)

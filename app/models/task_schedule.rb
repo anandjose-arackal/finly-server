@@ -14,5 +14,17 @@
 
 class TaskSchedule < ApplicationRecord
   EVERY = {day: 1, week: 2, month: 3}.with_indifferent_access
-  DAY_OF_THE_WEEK = {sunday: 1, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6}.with_indifferent_access
+  DAY_OF_THE_WEEK = {sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6}.with_indifferent_access
+
+
+  def frequency
+    case every
+    when :day
+      1.day
+    when :week
+      1.week
+    when :month
+      1.month
+    end
+  end
 end
