@@ -106,8 +106,8 @@ class Invoice < ApplicationRecord
   resolver :admin, Documents::Invoices::Policy::Scope
   resolver Documents::Invoices::Policy::Scope
   event_channel 'invoice'
-  system_events 'submit', 'approve'
-  request_events 'index', 'show'
+  record_events 'submit', 'approve', 'show'
+  collection_events 'index'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true

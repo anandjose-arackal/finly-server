@@ -6,7 +6,7 @@ class TaskManager::Workflows::API
 
   # When a new event is received
   def on_event(user, message)
-  TaskManager::Workflows::APIRunner.({api: self.class, message: message}, 'current_user' => user)
+    TaskManager::Workflows::APIRunner.({api: self.class, message: message}, 'current_user' => user)
   end
 
   def on_schedule

@@ -23,18 +23,18 @@ module ActiveRecordMaster
       @event_channel || self.class.name.underscore
     end
 
-    def system_events(*system_events)
-      @system_events = system_events if system_events.present?
-      @system_events ||= []
+    def record_events(*record_events)
+      @record_events = record_events if record_events.present?
+      @record_events ||= []
     end
 
-    def request_events(*request_events)
-      @request_events = request_events if request_events.present?
-      @request_events ||= []
+    def collection_events(*collection_events)
+      @collection_events = collection_events if collection_events.present?
+      @collection_events ||= []
     end
 
     def all_events
-      @system_events + @request_events
+      @record_events + @collection_events
     end
 
     def form(form = NoObject)
