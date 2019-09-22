@@ -1,2 +1,0 @@
-class Events::Queue
-end
