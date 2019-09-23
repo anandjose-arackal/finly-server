@@ -4,7 +4,7 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
   subscribe 'bank_accounts.export'
 
   headers ({
-      :name => "Bank Name",
+      :account_name => "Bank Name",
       :user_id => "User Email / Mobile NUmber",
       :account_number => "Account Number",
       :ifsc => "IFSC"
