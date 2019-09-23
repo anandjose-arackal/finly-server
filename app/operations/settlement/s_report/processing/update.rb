@@ -51,9 +51,9 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
     if request_params[:bank_reference_number].present?
       
-      # [ {id: 1, utr: "utr", source_account: "source_account"}, {...}, ... ]
+      # [ {id: 1, utr_number: "utr", source_account: "source_account"}, {...}, ... ]
       request_params[:bank_reference_number].each do |brn|
-        unless validate_utr brn[:utr]
+        unless validate_utr brn[:utr_number]
           add_message :error, "UTR is only allowed to be alphanumberic."
           return
         end
@@ -66,7 +66,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
       self.mapping.reports.each do |report|
         details = request_params[:bank_reference_number].find {|brn| brn if brn[:id].to_i == report.id}
-        report.bank_reference_number = details[:utr]&.strip if report.bank_reference_number != details[:utr]&.strip
+        report.bank_reference_number = details[:utr_number]&.strip if report.bank_reference_number != details[:utr_number]&.strip
         report.source_account = details[:source_account]&.strip if report.source_account != details[:source_account]&.strip
       end
 
