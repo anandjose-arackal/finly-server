@@ -8,7 +8,13 @@ class Integration::TallyController < BaseControllers::WebBase
   end
 
   def vouchers
-    @result = Integrations::Tally::Vouchers.(current_user, params)
+    # @result = Integrations::Tally::Vouchers.(current_user, params)
+    case params[:type]
+    when :vp_invoice_vouchers
+      @result = Integrations::Tally::InvoiceVouchers.(current_user, params)
+    else
+      @result = Integrations::Tally::Vouchers.(current_user, params)
+    end
     respond
   end
 
@@ -19,12 +25,19 @@ class Integration::TallyController < BaseControllers::WebBase
 
   def check
     @result = Integrations::Tally::ValidateConfiguration.(current_user, params)
+    @result.messages = {}
     respond
   end
 
   def export
     params[:export_format] = :xls
-    @result = Integrations::Tally::Vouchers.(current_user, params)
+    case params[:type]
+    when 'vp_invoice_vouchers'
+      @result = Integrations::Tally::InvoiceVouchers.(current_user, params)
+    else
+      @result = Integrations::Tally::Vouchers.(current_user, params)
+    end
+    # @result = Integrations::Tally::Vouchers.(current_user, params)
     respond
   end
 

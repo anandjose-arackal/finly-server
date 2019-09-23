@@ -93,7 +93,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   def pre_process
     if params[:filter_reviewer_awaiting_approval].present?
       reviewing_user = user.company.users.find_by id: params[:filter_reviewer_awaiting_approval]
-      unless reviewing_user.present? && reviewing_user.is_invoice_reviewer?
+      unless reviewing_user.present? && (reviewing_user.is_po_invoice_reviewer? || reviewing_user.is_non_po_invoice_reviewer?)
         params.delete(:filter_reviewer_awaiting_approval)
       end
     end

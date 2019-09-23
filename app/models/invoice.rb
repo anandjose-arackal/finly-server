@@ -84,11 +84,16 @@
 #  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
+#  payment_agreement_id            :integer
+#  vendor_location_id              :integer
+#  billing_type_id                 :integer
+#  agreement_item_type             :string(255)
+#  agreement_item_id               :integer
 #
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
-
+  include LiquidDroppable
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
@@ -243,6 +248,10 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
   }
 
+  scope :with_type_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+  }
+
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
@@ -250,7 +259,8 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved]))
+      ids = self.joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0}).pluck(:id)
+      where id: ids
     end
   }
 
@@ -748,6 +758,38 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
   end
 
+  ##### For Po Invoice and Non PO invoice Initiator roles #####
+  def is_po_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_initiator), self)
+  end
+
+  def is_po_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_reviewer), self)
+  end
+
+  def is_po_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:po_invoice_auditor), self)
+  end
+
+  def is_non_po_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_initiator), self)
+  end
+
+  def is_non_po_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_reviewer), self)
+  end
+
+  def is_non_po_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
+  end
+  ############ End ############
+
   # def can_take_control?
   #   processing?
   # end
@@ -794,13 +836,42 @@ class Invoice < ApplicationRecord
   end
 
   def validate_if_auditor(user)
-    if self.policy.present? && self.policy.policy_user_roles.present?
-      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_po_invoice_auditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:po_invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_po_invoice_reviewer(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:po_invoice_reviewer), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_non_po_invoice_reviewer(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:non_po_invoice_reviewer), user_id: user.id).present? rescue false
+    end
+  end
+
+  def validate_if_non_po_invoice_auditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:non_po_invoice_auditor), user_id: user.id).present? rescue false
     end
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options={})
-    if role_id == UserRole.id_for(:invoice_initiator)
+    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
@@ -815,6 +886,18 @@ class Invoice < ApplicationRecord
   def invoice_bank_account
     user = self.created_by
     return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
+  end
+
+  def get_invoice_provider_name
+    self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+  end
+
+  def get_default_provider
+    if self.procurement.present? && self.procurement.purchase_order.present?
+      "PoInvoiceProvider"
+    else
+      "NonPoInvoiceProvider"
+    end
   end
 
   def update_net_amount_value
@@ -970,9 +1053,9 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
-        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif UserRole.id_for(:admin) == role_id.to_i
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
@@ -988,6 +1071,12 @@ class Invoice < ApplicationRecord
         :invoice_initiator,
         :invoice_reviewer,
         :invoice_auditor,
+        :po_invoice_initiator,
+        :po_invoice_reviewer,
+        :po_invoice_auditor,
+        :non_po_invoice_initiator,
+        :non_po_invoice_reviewer,
+        :non_po_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
@@ -1104,6 +1193,5 @@ class Invoice < ApplicationRecord
       self.agreement_item.update(is_payment_agreement_upcoming_invoice: true)
     end
   end
-
 
 end

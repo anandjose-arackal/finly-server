@@ -88,6 +88,10 @@ class FieldConfiguration < ApplicationRecord
 
   scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
 
+  scope :include_for_index, -> {
+    includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
+  }
+
   delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 

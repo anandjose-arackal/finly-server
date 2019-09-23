@@ -166,16 +166,70 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
       }
     end
     if feature_subscription.invoicing_system
+      # data << {
+      #   name: 'Invoice',
+      #   roles: [
+      #     {
+      #       key: 'invoice_initiator',
+      #       label: 'Invoice Initiator'
+      #     },
+      #     {
+      #       key: 'invoice_reviewer',
+      #       label: 'Invoice Reviewer'
+      #     }
+      #   ]
+      # }
       data << {
-        name: 'Invoice',
+        name: 'PoInvoice',
         roles: [
           {
-            key: 'invoice_initiator',
-            label: 'Invoice Initiator'
+            key: 'po_invoice_initiator',
+            label: 'PO Invoice Initiator'
           },
           {
-            key: 'invoice_reviewer',
-            label: 'Invoice Reviewer'
+            key: 'po_invoice_reviewer',
+            label: 'PO Invoice Reviewer'
+          },
+          {
+            key: 'po_invoice_auditor',
+            label: 'PO Invoice Auditor'
+          }
+        ]
+      }
+
+      data << {
+        name: 'Non PO Invoice',
+        roles: [
+          {
+            key: 'non_po_invoice_initiator',
+            label: 'Non PO Invoice Initiator'
+          },
+          {
+            key: 'non_po_invoice_reviewer',
+            label: 'Non PO Invoice Reviewer'
+          },
+          {
+            key: 'non_po_invoice_auditor',
+            label: 'Non PO Invoice Auditor'
+          }
+        ]
+      }
+    end
+    if feature_subscription.agreement_based_payment_system
+      data << {
+        name: 'Payment Agreement',
+        roles: [
+          {
+            key: 'payment_agreement_initiator',
+            label: 'Payment Agreement Initiator'
+          },
+          {
+            key: 'payment_agreement_reviewer',
+            label: 'Payment Agreement Reviewer'
+          },
+          {
+            key: 'payment_agreement_auditor',
+            label: 'Payment Agreement Auditor'
           }
         ]
       }

@@ -1,3 +1,100 @@
+# == Schema Information
+#
+# Table name: general_invoices
+#
+#  id                                    :bigint           not null, primary key
+#  vendor_id                             :integer
+#  department_id                         :integer
+#  location_id                           :integer
+#  cost_center_id                        :integer
+#  payment_term_id                       :integer
+#  auto_pay                              :boolean
+#  note                                  :text(65535)
+#  billing_type_id                       :integer
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#  address_id                            :integer
+#  date                                  :date
+#  due_date                              :date
+#  invoice_number                        :text(65535)
+#  tax_type_id                           :integer
+#  discount                              :decimal(64, 12)
+#  discount_type_id                      :integer
+#  gross_amount_id                       :integer
+#  net_amount_id                         :integer
+#  inclusive_of_taxes                    :boolean
+#  amount_id                             :integer
+#  tds                                   :decimal(64, 12)
+#  tds_type_id                           :integer
+#  gst_type_id                           :integer
+#  payment_id                            :integer
+#  discount_amount_id                    :integer
+#  tds_amount_id                         :integer
+#  tax_amount_id                         :integer
+#  tax                                   :decimal(64, 12)
+#  category_id                           :integer
+#  original_amount_id                    :integer
+#  advance_amount_id                     :integer
+#  advance_type_id                       :integer
+#  advance                               :decimal(20, 10)
+#  freight_amount_id                     :integer
+#  freight_type_id                       :integer
+#  freight                               :decimal(20, 10)
+#  roundoff_amount                       :decimal(20, 10)
+#  balance_due_id                        :integer
+#  taxable_amount_id                     :integer
+#  tds_slab_id                           :integer
+#  invoice_status_id                     :integer
+#  company_id                            :integer
+#  created_by_user_id                    :integer
+#  paid_amount_id                        :integer
+#  receiving_account_id                  :integer
+#  receiving_account_type                :string(255)
+#  procurement_id                        :integer
+#  remaining_amount_id                   :integer
+#  invoice_type_id                       :integer
+#  sub_department_id                     :integer
+#  is_template                           :boolean          default(FALSE)
+#  template_name                         :string(255)
+#  is_deleted                            :boolean          default(FALSE)
+#  resource_template_id                  :integer
+#  invoice_id                            :string(255)
+#  deleted_at                            :datetime
+#  gstin_location_id                     :integer
+#  transaction_service_period_from       :date
+#  transaction_service_period_to         :date
+#  cost_allocation_items                 :boolean          default(FALSE)
+#  narration                             :text(65535)
+#  po_number                             :string(255)
+#  payment_agreement_id                  :integer
+#  bank_account_id                       :integer
+#  vendor_location_id                    :integer
+#  rejection_note                        :text(65535)
+#  invoice_frequency_id                  :integer
+#  billing_start_date                    :datetime
+#  billing_day_of_month                  :integer
+#  payment_agreement_upcoming_date       :date
+#  is_payment_agreement_upcoming_invoice :boolean
+#  recurring_invoice_id                  :integer
+#  vendor_poc_id                         :integer
+#  vlpm_id                               :integer
+#  client_note                           :text(65535)
+#  start_date                            :date
+#  end_date                              :date
+#  lock_in_period                        :integer
+#  rent_free_period                      :integer
+#  tenancy_period                        :integer
+#  po_adjusted_advance                   :integer
+#  po_advance                            :integer
+#  po_prev_adjusted_advance              :integer
+#  advance_amount_required               :boolean
+#  proforma_invoice_id                   :integer
+#  proforma_advance                      :integer
+#  total_proforma_advance                :integer
+#  delivery_location_id                  :integer
+#  template_invoice_id                   :integer
+#
+
   # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
 
   # Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
@@ -98,13 +195,16 @@ class GeneralInvoice < ApplicationRecord
 
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  # validates_inclusion_of :prepaid, in: [true, false] 
 
   # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
   validate :additional_validations
   # validates_associated :invoice_items
 
   scope :template_invoices, -> { where(template_invoice_id: nil) }
-
+  scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
+  scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
+  scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
   # Choose what columns to clone out of these template columns
@@ -190,7 +290,7 @@ class GeneralInvoice < ApplicationRecord
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id},
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,
@@ -207,7 +307,9 @@ class GeneralInvoice < ApplicationRecord
       rent_free_period: self.rent_free_period,
       tenancy_period: self.tenancy_period,
       custom_fields: self.custom_fields,
-      already_exists: true
+      already_exists: true,
+      prepaid: self.prepaid,
+      escalation_percentage: self.escalation_percentage
     }
   end
 
@@ -225,7 +327,10 @@ class GeneralInvoice < ApplicationRecord
       agreement_type: self.class.name.underscore,
       payment_agreement_id: self.payment_agreement_id,
       vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      start_date: self.start_date,
+      end_date: self.end_date
+
 
     }
   end
@@ -239,6 +344,14 @@ class GeneralInvoice < ApplicationRecord
       {id: self.invoice_frequency&.id, number: self.invoice_frequency&.number, period_id: self.invoice_frequency&.period_id }
     else
       {id: nil, number: nil, period_id: nil }
+    end
+  end
+
+  def check_billing_type
+    if self.billing_type.variable_periodic?
+      [nil]
+    else
+      [true, false]
     end
   end
 

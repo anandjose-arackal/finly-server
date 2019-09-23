@@ -5,12 +5,14 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
 
   headers ({
       :id => 'ID',
-      :policy => 'Policy ID',
+      :policy => 'Policy Name',
       :policy_creation_flag => 'For New Policy Y / or Blank',
       :user_id => 'User Email / Mobile',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
       :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :with_exception => 'With Exception Y/N',
+      :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
       :max => "Max Threshold",
       :destroy => 'Destroy'
@@ -35,8 +37,10 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
              TravelRequestBookingProvider
              PurchaseRequestProvider
              PurchaseOrderProvider
-             InvoiceProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
              BankPaymentRequestProvider
+             YesBankVendorProvider
              PaymentAgreementProvider
              )
     file = Tempfile.new(['lurm_import_template', '.xlsx'])

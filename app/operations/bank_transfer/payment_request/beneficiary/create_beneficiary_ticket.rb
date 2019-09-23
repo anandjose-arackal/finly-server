@@ -113,6 +113,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes, from_payment_agreement: self.from_payment_agreement})
 
+
 	    if validate_operation.success?
 	    	# total of all individual payments
 	    	# to be set in bpr

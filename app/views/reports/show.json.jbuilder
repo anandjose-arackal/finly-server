@@ -72,11 +72,14 @@ end
 expenses_sorted_by = params[:expenses_sorted_by] || 'category'
 json.expenses_sorted_by expenses_sorted_by
 if expenses_sorted_by == 'category'
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 elsif expenses_sorted_by == 'date'
-  sorted_expenses = @result.expenses_date_sorted
+  # sorted_expenses = @result.expenses_date_sorted
+  sorted_expenses = @result.paginated_expenses_date_sorted
 else
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 end
 
 json.has_custom_fields @result.has_custom_fields?
@@ -235,6 +238,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_effective_balance cash_on_hand_adapter.balance
   json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance

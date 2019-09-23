@@ -28,7 +28,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
         'Ref. Invoice No.'
     ]
     self.contents = []
-    count = 1
     reports.each do |report|
       total_amount = 0
       report.expenses.each do |expense|
@@ -36,7 +35,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
         self.contents << [
             expense.category.gl_code,
             '',
-            report.user.gl_config&.dig(:location_code),
+            "'#{report.user.gl_config&.dig(:location_code)}",
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
