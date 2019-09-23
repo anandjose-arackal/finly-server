@@ -144,6 +144,7 @@ class Vendors::Base < BaseOperation
   end
 
   def decode_base64_file(file, string)
+    return false if (file.blank? or string.blank?)
     file_data = string[string.index("base64,") + "base64,".size, string.size]
     adapter = Paperclip.io_adapters.for(string)
     ext =  Rack::Mime::MIME_TYPES.invert[adapter.content_type]

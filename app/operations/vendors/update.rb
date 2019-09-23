@@ -116,7 +116,6 @@ class Vendors::Update < Vendors::Base
 
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].each do |file|
-        next if file[:attached_file].blank?
         decode_base64_file(file, file[:attached_file])
       end
     end
