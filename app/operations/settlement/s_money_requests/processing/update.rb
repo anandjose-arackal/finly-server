@@ -50,6 +50,8 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
     params[:money_request_processor_mapping].delete(:batch_id)
 
     if request_params[:bank_reference_number].present?
+
+      # [ {id: 1, utr: "utr", source_account: "source_account"}, {...}, ... ]
       request_params[:bank_reference_number].each do |brn|
         unless validate_utr brn[:utr]
           add_message :error, "UTR is only allowed to be alphanumberic."
@@ -63,7 +65,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       end
 
       self.mapping.money_requests.each do |money_request|
-        details = request_params[:bank_reference_number].find {|brn| brn if brn[:id] == money_request.id}
+        details = request_params[:bank_reference_number].find {|brn| brn if brn[:id].to_i == money_request.id}
         money_request.bank_reference_number = details[:utr]&.strip if money_request.bank_reference_number != details[:utr]&.strip
         money_request.source_account = details[:source_account]&.strip if money_request.source_account != details[:source_account]&.strip
       end

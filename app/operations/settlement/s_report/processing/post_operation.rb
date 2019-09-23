@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings
+  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account
 
   def pre_validate
     if object.blank?
@@ -41,6 +41,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
 
     self.utr = params[:utr].present? ? params[:utr] : {}
+    self.source_account = params[:source_account].present? ? params[:source_account] : {}
 
     # Since now we can change individual item's status,
     # we check to see if any mappings are remaining to be processed,
@@ -77,7 +78,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
             if marked_as_completed or marked_as_closed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed, bank_reference_number: self.utr[mapping.id])
+                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
               #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id)
@@ -97,6 +98,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
               end
 
               mapping.reports.each do |report|
+
+                report.update(bank_reference_number: self.utr[report.id], source_account: self.source_account[report.id])
 
                 parameters = {
                   document: report,

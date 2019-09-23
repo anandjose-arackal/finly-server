@@ -50,10 +50,27 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     params[:report_processor_group_mapping].delete(:batch_id)
 
     if request_params[:bank_reference_number].present?
-      unless validate_utr request_params[:bank_reference_number]
-        add_message :error, "UTR is only allowed to be alphanumberic."
-        return
+      
+      # [ {id: 1, utr: "utr", source_account: "source_account"}, {...}, ... ]
+      request_params[:bank_reference_number].each do |brn|
+        unless validate_utr brn[:utr]
+          add_message :error, "UTR is only allowed to be alphanumberic."
+          return
+        end
+
+        unless validate_utr brn[:source_account]
+          add_message :error, "Source Account is only allowed to be alphanumberic."
+          return
+        end
       end
+
+      self.mapping.reports.each do |report|
+        details = request_params[:bank_reference_number].find {|brn| brn if brn[:id].to_i == report.id}
+        report.bank_reference_number = details[:utr]&.strip if report.bank_reference_number != details[:utr]&.strip
+        report.source_account = details[:source_account]&.strip if report.source_account != details[:source_account]&.strip
+      end
+
+      params[:report_processor_group_mapping].delete(:bank_reference_number)
 
       # if utr is there, we automatically assume the item can be marked as completed
       request_params[:marked_as_completed] = true
@@ -173,6 +190,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   end
 
   def validate_utr(utr)
+    return true if utr.blank?
     ( /\A[a-zA-Z0-9]*\Z/.match(utr) ) ? true : false
   end
 

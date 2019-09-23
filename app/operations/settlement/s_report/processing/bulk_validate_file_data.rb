@@ -51,12 +51,14 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
   end
 
   def pre_process
-    self.item_utr = self.mappings.collect {|item| [item.id, item.bank_reference_number]}.to_h
+    # self.item_utr = self.mappings.collect {|item| [item.id, item.bank_reference_number]}.to_h
+    self.item_utr = self.mappings.left_joins(:reports).select('reports.id AS report_id, reports.bank_reference_number AS utr').collect {|item| [item.report_id, item.utr]}.to_h
     self.item_status = self.mappings.collect {|item| [item.id, item.status_id]}.to_h
   end
 
   def process
     self.item_details.each do |item|
+      document_id = item[:document_id] || item["document_id"]
       item_id = item[:item_id] || item["item_id"]
       utr = item[:utr] || item["utr"]
 
@@ -65,8 +67,14 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
 
       if item_id.blank?
         self.valid = false
-        self.error_messages << "Report ID should not be removed."
-        self.issue_item[:item_id] = "Report ID should not be removed."
+        self.error_messages << "Batch ID should not be removed."
+        self.issue_item[:item_id] = "Batch ID should not be removed."
+      end
+
+      if document_id.blank?
+        self.valid = false
+        self.error_messages << "Advance ID should not be removed."
+        self.issue_item[:document_id] = "Advance ID should not be removed."
       end
 
       if utr.present?
@@ -130,8 +138,8 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
 
   def retrieve_header_names
     [
+      "Report ID(unmodifiable)",
       "Batch Item ID(unmodifiable)",
-      "Report IDs(unmodifiable)",
       "Batch Created By(unmodifiable)",
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
@@ -159,8 +167,8 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
 
   # we need this flag, since not all items will be credited through bank transfer
   def utr_modifiable(item)
-    return true if item_utr[item[:item_id].to_i].blank? #mapping does not have a utr already present
-    return true if item[:utr] != item_utr[item[:item_id].to_i] #mappings utr is different from excel enterted utr
+    return true if item_utr[item[:document_id].to_i].blank? #mapping does not have a utr already present
+    return true if item[:utr] != item_utr[item[:document_id].to_i] #mappings utr is different from excel enterted utr
   end
 
   # def can_be_marked_completed(item)

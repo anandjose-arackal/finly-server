@@ -1,3 +1,8 @@
+# Processes uploaded excel file which contains utr details for each report. Earlier this would do this on user level. Now it won't.
+# 
+# TODO
+# optimize ruby logic
+# 
 class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport::Processing::Base
 
   attr_accessor :file, 
@@ -10,6 +15,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
                 :pending_items, 
                 :pending_item_ids,
                 :completed_items,
+                :completed_reports,
                 :edge_case,
                 :processable_mappings,
                 :just_show_excel,
@@ -43,7 +49,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   def init
 
     self.file = params[:file]
-    headers = [:item_id, :document_ids, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :mark_as_paid]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :mark_as_paid]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
@@ -90,24 +96,37 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
 
     # user is allowed to update utr for completed items
     self.completed_items = self.report_processor_group.mappings.completed.where id: self.processable_mappings.pluck(:item_id)
+
+    self.completed_reports = self.completed_items.collect(&:reports).flatten
   end
 
   def process
     # 
-    # we will use this to cleanly map report ids and utr
+    # we will use this to cleanly map report ids, utr and source_account
     self.associated_utr = {}
-    self.processable_mappings.pluck(:item_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.associated_source_account = {}
+    # self.processable_mappings.pluck(:item_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
 
     # utr can be updated for items which are already completed
-    self.completed_items.each do |item|
+    # self.completed_items.each do |item|
+    #   if item.bank_reference_number != self.associated_utr[item.id]&.strip
+    #     item.update(bank_reference_number: self.associated_utr[item.id])
+    #   end
+    # end
+
+    self.processable_mappings.pluck(:document_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.processable_mappings.pluck(:document_id,:source_account).map { |id, utr| self.associated_source_account[id.to_i] = source_account }
+
+    # utr can be updated for items which are already completed
+    self.completed_reports.each do |item|
       if item.bank_reference_number != self.associated_utr[item.id]&.strip
-        item.update(bank_reference_number: self.associated_utr[item.id])
+        item.update(bank_reference_number: self.associated_utr[item.id], source_account: self.associated_source_account[item.id])
       end
     end
 
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
-      result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
+      result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
       unless result.success?
         self.just_show_excel = false
         add_message :error, result.messages[:error]
