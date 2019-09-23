@@ -30,6 +30,7 @@ class VendorAttachment < ApplicationRecord
                                     application/rtf
                                     application/msword
                                     application/vnd.ms-excel
+                                    application/xml
                                     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
                                     application/vnd.openxmlformats-officedocument.wordprocessingml.document)}
 
