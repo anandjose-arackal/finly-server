@@ -75,7 +75,8 @@ class InvoiceLineItem < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
-  TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id tax_amount_id discount_amount_id amount_id net_amount_id hsn_sac taxable_amount_id parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst billable_amount_id }
+  TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
+  CLONE_RECORDS = %w{ tax_amount_id discount_amount_id amount_id net_amount_id taxable_amount_id billable_amount_id}
 
   def tax
     self.tax_rate&.rate || super
