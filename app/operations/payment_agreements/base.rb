@@ -499,6 +499,7 @@ class PaymentAgreements::Base < BaseOperation
     vendor_ids.each do |vendor_id|
       dates = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.order(:start_date).collect{ |invoice| [invoice.start_date, invoice.end_date] }
       last_end_date = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.order(:start_date).last.end_date
+      total_vendor_records_count = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.count
       dates.each.with_index(1) do |date, index|
         return if has_errors?
         start_date, end_date = date[0], date[1]
@@ -525,12 +526,14 @@ class PaymentAgreements::Base < BaseOperation
         #   end
         # end
         # Except for first and last record, invoice start date should be start of month and end date should be end of month
-        unless index == 1 || (index == dates.count)
-          unless validate_start_date_as_start_of_month(start_date)
-            add_message :error, "Start date: #{start_date} should be start of month"
+        unless index == 1
+          unless validate_start_date_as_start_of_month(start_date, dates, index)
+            add_message :error, "Start date: #{start_date} should be start of month for vendor #{YesBankVendor.find(vendor_id).display_name}"
           end
+        end
+        unless index == total_vendor_records_count
           unless validate_end_date_as_end_of_month(end_date,last_end_date)
-            add_message :error, "End date: #{end_date} should be end of month"
+            add_message :error, "End date: #{end_date} should be end of month for vendor #{YesBankVendor.find(vendor_id).display_name}"
           end
           unless  (end_date_month - start_date_month + 1) % (invoice_frequency) == 0
             add_message :error, "Difference between start date(#{start_date}) and end date(#{end_date}) should be equal to invoice frequency or its multiples"
@@ -1245,7 +1248,16 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
-  def validate_start_date_as_start_of_month(start_date)
+  def validate_start_date_as_start_of_month(start_date, dates=nil, index=nil)
+    unless index == 1
+      previous_date = dates[index-2] # 2 as index is starting from 1
+      previous_start_date = previous_date[0]&.to_date
+      previous_end_date = previous_date[1]&.to_date
+      if (start_date >= previous_start_date && start_date <= previous_end_date)
+        add_message :error, "Start Date: #{start_date} cannot come in between #{previous_start_date} and #{previous_end_date}"
+        return false
+      end
+    end
     start_date == start_date.beginning_of_month
   end
 
