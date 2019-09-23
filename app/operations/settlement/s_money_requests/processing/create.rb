@@ -101,11 +101,11 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
           when 'company_credits'
             case current_company.feature_subscription.bank_service_provider
             when "YES"
-              self.report_processor_group.source_account = current_company.yes_bank_company_account
+              self.money_request_processor.source_account = current_company.yes_bank_company_account
             when "ICICI"
-              self.report_processor_group.source_account = current_company.icici_bank_company_account
+              self.money_request_processor.source_account = current_company.icici_bank_company_account
             else
-              self.report_processor_group.source_account = current_company.yes_bank_company_account
+              self.money_request_processor.source_account = current_company.yes_bank_company_account
             end
           when 'finly_money'
             self.money_request_processor.source_account = user.bank_wallet
