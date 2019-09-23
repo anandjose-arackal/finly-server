@@ -106,6 +106,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              invoice_no: {spreadsheet: true},
              invoice_date: {spreadsheet: true},
              created_by: {spreadsheet: true},
+             created_at: {spreadsheet: true},
+             po_date: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
@@ -376,5 +378,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   def created_by(invoice_line_item)
     invoice_line_item.parent&.created_by&.name
   end
+
+  def created_at(invoice_line_item)
+    invoice_line_item.parent&.created_at&.strftime("%d-%m-%y")
+  end
+
+  def po_date(invoice_line_item)
+    invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
+  end 
 
 end

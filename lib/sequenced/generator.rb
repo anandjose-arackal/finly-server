@@ -31,7 +31,7 @@ module Sequenced
     end
 
     def id_set?
-      !record.send(column).nil?
+      !record.send(column).blank?
     end
 
     def skip?

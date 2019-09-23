@@ -11,11 +11,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",
-      :state => "State",
       :description => "Description",
       :address => "Address",
       :gstin => "GSTIN",
       :gst_location => "GST Location",
+      :state => "GST State",
       :vendor_bank_account_name => "Bank Account Name",
       :account_number => "Account Number",
       :ifsc => "IFSC",
@@ -33,7 +33,6 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless vendor.validate
       return result false, vendor.errors.full_messages
     end
-
     unless vendor.save
       return result false, vendor.errors.full_messages
     end
@@ -49,7 +48,32 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    unless vendor.update(vendor_params["vendor"])
+
+    vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes","bank_accounts_attributes"))
+    if vendor_params["vendor"]["bank_accounts_attributes"].present?
+      bank_account = vendor.bank_accounts.first
+      bank_account.assign_attributes(vendor_params["vendor"]["bank_accounts_attributes"]&.first)
+      unless bank_account.validate
+        return result false, bank_account.errors.full_messages
+      end
+    end
+
+    if vendor_params["vendor"]["gstin_locations_attributes"].present?
+      gstin_location = vendor.gstin_locations.first
+      gstin_location.assign_attributes(vendor_params["vendor"]["gstin_locations_attributes"]&.first)
+      unless gstin_location.validate
+        return result false, gstin_location.errors.full_messages
+      end
+    end
+
+    unless vendor.validate
+      return result false, vendor.errors.full_messages
+    end
+
+    if vendor.save
+      bank_account.save if bank_account.present?
+      gstin_location.save if gstin_location.present?
+    else
       return result false, vendor.errors.full_messages
     end
     result true, 'Updated Successfully'
@@ -74,16 +98,12 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     email = data[:email].to_s
     business_name = data[:business_name].to_s
     pan = data[:pan].to_s
-    state_code_id = nil
-    state_code_id = State.where("name LIKE ?", "%"+data[:state].to_s+"%").first&.id if !data[:state].to_s.blank?
+    state =data[:state].to_s
     description = data[:description].to_s
     address = data[:address].to_s
     created_by_id = self.company.users.only_admins&.first&.id
     account_number = clean_up_data data[:account_number]
     account_name = data[:vendor_bank_account_name]
-    if account_name.blank?
-      account_name = "#{business_name}'s Account'"
-    end
     ifsc = data[:ifsc].to_s
     gstin = data[:gstin].to_s
     location = data[:gst_location].to_s
@@ -97,16 +117,14 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
         vendor_type_id = vendor_type.id
       end
     end
-    state_code_id = nil
-    state_code_id = State.where("name LIKE ?", "%"+data[:state].to_s+"%").first&.id if !data[:business_name].to_s.blank?
 
     gstin_state_id = nil
     if gstin.present?
       gstin_state_id = GstStateCode.where(state_code: gstin[0..1])&.first&.id
     end
 
-    if gstin_state_id.nil? && location.present?
-      gstin_state_id = GstStateCode.where('name LIKE ?', "%#{location}%")&.first&.id
+    if gstin_state_id.nil? && state.present?
+      gstin_state_id = GstStateCode.where('name LIKE ?', "%#{state}%")&.first&.id
     end
 
     messages << "GST State is unable to match" if gstin_state_id.nil?
@@ -120,7 +138,6 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
                           "currency_id"=>"1",
                           "business_name"=> business_name,
                           "pan"=> pan,
-                          "state_code_id"=> state_code_id,
                           "description"=> description,
                           "address"=> address,
                           "status_id"=> 6,
@@ -138,15 +155,15 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     gstin_locations={"gstin_locations_attributes" => [{"location" =>location,
                                                        "gstin"=>gstin,
                                                        "poc_mobile_number" => mobile_number,
-                                                       "poc_mobile_number" => email,
+                                                       "poc_email" => email,
                                                        "address" => address,
                                                        "state_id"=> gstin_state_id}]}
 
-    if account_number.present?
+    if account_number.present? || account_name.present? || ifsc.present?
       params["vendor"]["bank_accounts_attributes"] = bank_params["bank_accounts_attributes"]
     end
 
-    if location.present?
+    if location.present? || gstin.present? || gstin_state_id.present? || mobile_number.present? || email.present? || address.present?
       params["vendor"]["gstin_locations_attributes"] = gstin_locations["gstin_locations_attributes"]
     end
     [params, messages]

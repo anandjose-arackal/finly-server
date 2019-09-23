@@ -19,12 +19,14 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   attr_accessor :lurm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
+    path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
+    self.input = Roo::Spreadsheet.open(path)
     output = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
       self.application = get_application(name)
       self.provider = name
+      custom_headers = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
         begin
@@ -48,7 +50,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         end
         output[name] << row
       end
-      export headers.values, output
+      export custom_headers, output
     end
 
   end
@@ -122,6 +124,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       return result false,'User not found'
     end
 
+    assign_initiator_role(entity_user)
+
     #Check and add user to the policy if expense management
     check_part_of_policy(entity_user) if self.application == 'em'
     row_length = data.size
@@ -131,7 +135,12 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3]
       min = data[lower_index+6].to_i
-      max = (data[lower_index+7].present? ? data[lower_index+5].to_i : nil)
+      max = (data[lower_index+7].present? ? data[lower_index+7].to_i : nil)
+      if min.present? && max.present?
+        if min >= max
+          return result false, "Max Threshold should be greater than Min"
+        end
+      end
       exception = data[lower_index+4]&.to_s&.upcase == 'N' ? false : true
       wo_exception = data[lower_index+5]&.to_s&.upcase == 'N' ? false : true
 
@@ -209,13 +218,13 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "YesBankVendorProvider" =>"vendor_reviewer",
         "PaymentAgreementProvider" => "payment_agreement_reviewer"}
 
-    user = get_user_entity(reviewer_id)
-    if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
-      user.role_mapping.create(purpose_id: 1, user_role_id: UserRole.id_for(:manager))
-    elsif application == 'vp' && user.present? && user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).blank?
-      user.policy_user_roles.create(policy_id: self.policy.id, user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym))
+    entity_user = get_user_entity(reviewer_id)
+    if application == 'em' && entity_user.present? && entity_user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
+      entity_user.role_mapping.create(purpose_id: 1, user_role_id: UserRole.id_for(:manager))
+    elsif application == 'vp' && entity_user.present? && entity_user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).first.nil?
+      entity_user.policy_user_roles.create(policy_id: self.policy.id, user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym))
     end
-    user
+    entity_user
   end
 
   def get_level(level_name, level_number,provider)
@@ -232,7 +241,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   end
 
   def get_application(name)
-    %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvide).include?(name) ? 'em' : 'vp'
+    %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider).include?(name) ? 'em' : 'vp'
   end
 
   def get_user_entity(identifier)
@@ -242,7 +251,25 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
       user = company.users.find_by_mobile_number identifier
     end
+
     user
+  end
+
+  def assign_initiator_role(entity_user)
+    role_provider_mapping = {
+        "PurchaseRequestProvider" =>"purchase_request_initiator",
+        "PurchaseOrderProvider" =>"purchase_order_initiator",
+        "NonPoInvoiceProvider" =>"non_po_invoice_initiator",
+        "PoInvoiceProvider" => "po_invoice_initiator",
+        "BankPaymentRequestProvider" =>"bank_payment_request_initiator",
+        "YesBankVendorProvider" =>"vendor_creator",
+        "PaymentAgreementProvider" => "payment_agreement_initiator"}
+
+    if application == 'em' && entity_user.present? && policy.user_mapping.where(user_id: entity_user.id).first&.nil?
+      policy.user_mapping.create(user_id: entity_user.id)
+    elsif application == 'vp' && entity_user.present? && entity_user.policy_user_roles.where(user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym), policy_id: self.policy.id).first.nil?
+      entity_user.policy_user_roles.create(policy_id: self.policy.id, user_role_id: UserRole.id_for(role_provider_mapping[provider]&.to_sym))
+    end
   end
 
   def clean_up_data(text)
