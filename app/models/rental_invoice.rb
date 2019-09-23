@@ -95,7 +95,7 @@
 #  total_proforma_advance                :integer
 #  template_invoice_id                   :integer
 #  notice_period                         :integer
-#  square_feel                           :decimal(10, 5)
+#  square_feet                           :decimal(10, 5)
 #
 
 class RentalInvoice < ApplicationRecord

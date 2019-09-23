@@ -21,7 +21,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def input
-    company.items
+    company.items.includes(:category,:item_expense_type,:supply_item_type)
   end
 
   def id(item)
@@ -41,7 +41,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def item_expense_type(item)
-    item.item_expense_type.name
+    item.item_expense_type&.name
   end
 
   def item_number(item)
@@ -49,11 +49,11 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def po_item(item)
-    ['po_item','po_non_po_item'].include?(item.supply_item_type.name) ? 'Y' : ''
+    ['po_item','po_non_po_item'].include?(item.supply_item_type&.name) ? 'Y' : ''
   end
 
   def non_po_item(item)
-    ['non_po_item','po_non_po_item'].include?(item.supply_item_type.name) ? 'Y' : ''
+    ['non_po_item','po_non_po_item'].include?(item.supply_item_type&.name) ? 'Y' : ''
   end
 
   def discount(item)
