@@ -278,7 +278,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       end
       data = {
         title: "Payment Agreements",
-        type: 'payment_agreements',
+        type: 'agreements',
         count: payment_agreements.count,
         filters: [{filter_by_status_id: 'awaiting_approval'}]
       }
