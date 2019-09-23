@@ -33,6 +33,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless vendor.validate
       return result false, vendor.errors.full_messages
     end
+
     unless vendor.save
       return result false, vendor.errors.full_messages
     end
@@ -52,17 +53,21 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes","bank_accounts_attributes"))
     if vendor_params["vendor"]["bank_accounts_attributes"].present?
       bank_account = vendor.bank_accounts.first
-      bank_account.assign_attributes(vendor_params["vendor"]["bank_accounts_attributes"]&.first)
-      unless bank_account.validate
-        return result false, bank_account.errors.full_messages
+      if bank_account.present?
+        bank_account.assign_attributes(vendor_params["vendor"]["bank_accounts_attributes"]&.first)
+        unless bank_account.validate
+          return result false, bank_account.errors.full_messages
+        end
       end
     end
 
     if vendor_params["vendor"]["gstin_locations_attributes"].present?
       gstin_location = vendor.gstin_locations.first
-      gstin_location.assign_attributes(vendor_params["vendor"]["gstin_locations_attributes"]&.first)
-      unless gstin_location.validate
-        return result false, gstin_location.errors.full_messages
+      if gstin_location.present?
+        gstin_location.assign_attributes(vendor_params["vendor"]["gstin_locations_attributes"]&.first)
+        unless gstin_location.validate
+          return result false, gstin_location.errors.full_messages
+        end
       end
     end
 
