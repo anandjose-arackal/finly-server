@@ -264,6 +264,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :itz_cash_dmt_sender
   accepts_nested_attributes_for :user_panel_subscription
   accepts_nested_attributes_for :quickbooks_user
+  accepts_nested_attributes_for :enforce_policy
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -822,7 +823,7 @@ class User < ApplicationRecord
     # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     #
-    # setting the default company_id for this user
+    # setting the default company_id for this user - if there is already a user added with this company
     self.update_columns(default_company_id: self.company_id)
   end
 
@@ -1589,10 +1590,12 @@ class User < ApplicationRecord
     # setting OTP verified for all users if the current user is verified
     if previously_added_user&.otp_verified?
       users.update_all(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+      self.update_columns(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     end
     # setting verified as true for all users if they already exist
     if previously_added_user&.verified
       users.update_all(verified: true)
+      self.update_columns(verified: true)
     end
   end
 

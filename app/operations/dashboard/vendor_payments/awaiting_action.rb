@@ -46,9 +46,10 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
           document_types[:purchase_requests] = true
         when UserRole.id_for(:purchase_order_reviewer)
           document_types[:purchase_orders] = true
-        when UserRole.id_for(:invoice_reviewer)
-          document_types[:po_invoices] = true
+        when UserRole.id_for(:non_po_invoice_reviewer)
           document_types[:non_po_invoices] = true
+        when UserRole.id_for(:po_invoice_reviewer)
+          document_types[:po_invoices] = true
         when UserRole.id_for(:goods_receiver)
           document_types[:grn] = true
         when UserRole.id_for(:bank_payment_request_reviewer)
@@ -278,7 +279,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       end
       data = {
         title: "Payment Agreements",
-        type: 'payment_agreements',
+        type: 'agreements',
         count: payment_agreements.count,
         filters: [{filter_by_status_id: 'awaiting_approval'}]
       }
