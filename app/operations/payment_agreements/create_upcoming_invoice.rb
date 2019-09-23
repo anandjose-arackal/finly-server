@@ -398,7 +398,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   def check_if_upcoming_invoice(reference_invoice, start_date, end_date, prepaid)
-    return true # FOR TESTING ONLY
+    # return true # FOR TESTING ONLY
     prepaid ? start_date <= Date.today : end_date <= Date.today
   end
 

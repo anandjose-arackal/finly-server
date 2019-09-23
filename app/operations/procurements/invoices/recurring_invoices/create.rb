@@ -119,6 +119,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     GeneralInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym).dup)
     end
+    update_due_date(invoice, general_invoice)
     if invoice.save 
       unless map_line_items(general_invoice, invoice)
         invoice.destroy
@@ -141,6 +142,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     RentalInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym).dup)
     end
+    update_due_date(invoice, rental_invoice)
     if invoice.save
       unless map_line_items(rental_invoice, invoice)
         invoice.destroy
@@ -275,6 +277,12 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     if self.vendor.blank?
       add_message :error, 'Vendor not found'
       return
+    end
+  end
+
+  def update_due_date(actual_invoice, agreement_invoice)
+    if agreement_invoice.billing_type.variable_periodic?
+      actual_invoice.due_date = Date.today + agreement_invoice.payment_term.days_after
     end
   end
 

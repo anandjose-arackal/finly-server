@@ -294,7 +294,11 @@ class PaymentAgreements::Base < BaseOperation
     amount_arr = []
     # Get value from line items
     invoice.items.each do |item|
-      amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
+      if item.discount.present?
+        amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
+      else
+        amt = (item.rate * item.quantity)
+      end
       amount_arr << amt*tds_percentage/100
     end
     return amount_arr.sum
@@ -1317,7 +1321,7 @@ class PaymentAgreements::Base < BaseOperation
 
   def set_discount_in_item(invoice_line_item)
     value = invoice_line_item&.discount_amount&.value
-    invoice_line_item.discount = value
+    invoice_line_item.discount = value if invoice_line_item.discount.blank?
     if value.blank?
       invoice_line_item&.discount_amount&.value = 0.0
       invoice_line_item&.discount_amount&.currency_id = 1
