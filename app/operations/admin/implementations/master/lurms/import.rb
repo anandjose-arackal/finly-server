@@ -22,11 +22,12 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
+    custom_headers = {}
     input.each_with_pagename do |name, sheet|
       output[name] = []
       self.application = get_application(name)
       self.provider = name
-      custom_headers = sheet.row(1)
+      custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
         begin
@@ -50,9 +51,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         end
         output[name] << row
       end
-      export custom_headers, output
     end
-
+    export custom_headers, output
   end
 
   def export(headers, contents)
@@ -61,7 +61,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     contents.each  do |name, sheet|
       worksheet = workbook.add_worksheet(name)
 
-      headers.each_with_index do |item, index|
+      headers[name].each_with_index do |item, index|
         worksheet.write( 0, index, item )
       end
       sheet.each_with_index do |items, row|
