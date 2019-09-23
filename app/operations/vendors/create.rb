@@ -155,6 +155,10 @@ class Vendors::Create < Vendors::Base
     # if the receipt is being uploaded, delete the 'remove_file' key
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
+
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
