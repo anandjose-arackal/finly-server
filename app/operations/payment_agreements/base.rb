@@ -1340,6 +1340,28 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  # TODO - REMOVE THIS - custom field is not saving on calling save on parent 
+  # 
+  def save_custom_fields
+    if self.payment_agreement.general_invoices.present?
+      self.payment_agreement.general_invoices.each do |general_invoice|
+        if general_invoice.custom_fields.present?
+          general_invoice.custom_fields.each do |custom_field|
+            custom_field.save
+          end
+        end
+      end
+    end
 
+    if self.payment_agreement.rental_invoices.present?
+      self.payment_agreement.rental_invoices.each do |rental_invoice|
+        if rental_invoice.custom_fields.present?
+          rental_invoice.custom_fields.each do |custom_field|
+            custom_field.save
+          end
+        end
+      end
+    end
+  end
 
 end
