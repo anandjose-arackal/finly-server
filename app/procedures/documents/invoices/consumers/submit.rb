@@ -7,6 +7,7 @@ module Documents::Invoices::Consumers::Submit
     end
 
     class OwnerActions < TaskManager::Workflows::API
+      record Invoice
       consumes_event! 'invoice.submit'
       scheduled! every: 1.minute, hour: 12, minute: 00, day_of_the_week: :monday, day_of_the_month: :last
       validate_payload -> (user, message) do

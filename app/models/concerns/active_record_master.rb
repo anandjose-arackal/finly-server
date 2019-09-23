@@ -28,6 +28,16 @@ module ActiveRecordMaster
       @record_events ||= []
     end
 
+    def record_event?(event)
+      return false if event.blank?
+      record_events.include?(event) or record_events.include?(event.gsub("#{event_channel}.", ""))
+    end
+
+    def collection_event?(event)
+      return false if event.blank?
+      collection_events.include?(event) or collection_events.include?(event.gsub("#{event_channel}.", ""))
+    end
+
     def collection_events(*collection_events)
       @collection_events = collection_events if collection_events.present?
       @collection_events ||= []
@@ -64,7 +74,7 @@ module ActiveRecordMaster
     def representers
       @representers ||= {}
     end
-    
+
     def representer(scope = :default, klass)
       @representers[scope] = klass
     end

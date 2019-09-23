@@ -50,16 +50,35 @@ class TaskManager::Workflows::APIRunner < Transactions::API
     true
   end
 
-  def generate_input(options, api:, current_user:, message:, **)
-    unless api.input
-      return on_error(options, :base, 'Input is blank') if message.blank?
-
-      options['input'] = message
-      return true
+  def generate_input(options, api:, current_user:, message:, trigger:, event: nil, **)
+    if api.input
+      options['input'] = execute_function api.input, current_user, message
+      return on_error(options, :base, 'Input is blank') if options['input'].blank?
     end
 
-    options['input'] = execute_function api.input, current_user, message
-    return on_error(options, :base, 'Input is blank') if options['input'].blank?
+    return on_error(options, :base, 'Input is not provided') unless api.document and event
+
+    unless api.document.record_event?(event) or api.document.collection_event?(event)
+      return on_error(options, :base, 'Event is not registered as record or collection')
+    end
+
+    case trigger
+    when :event
+
+      # Type Record
+      # IF record is provided in message
+      # Verify if record exists in filters
+      # ELSE
+      # # Find records from filters and params ID
+      # #
+      # Type Collection
+      #
+    when :schedule
+
+    end
+    return on_error(options, :base, 'Input is blank') if message.blank?
+    options['input'] = message
+    return true
 
     true
   end
