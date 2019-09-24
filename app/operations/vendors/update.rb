@@ -113,6 +113,12 @@ class Vendors::Update < Vendors::Base
     end
 
     self.vendor_parameters.delete(:override_vendor_id)
+
+    if vendor_parameters&.dig(:vendor_attachments_attributes).present?
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
+    end
   end
 
   def process

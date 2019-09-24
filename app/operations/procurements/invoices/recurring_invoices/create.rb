@@ -24,10 +24,10 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     case payment_agreement_type
     when 'general_invoice'
       # self.general_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
-      self.general_invoice = self.payment_agreement.general_invoices.find_by_id payment_agreement_type_id
+      self.general_invoice = user.company.general_invoices.find_by_id payment_agreement_type_id
     when 'rental_invoice'
       # self.rental_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
-      self.rental_invoice = self.payment_agreement.rental_invoices.find_by_id payment_agreement_type_id
+      self.rental_invoice = user.company.rental_invoices.find_by_id payment_agreement_type_id
     end
 
     if general_invoice.present?
@@ -93,7 +93,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     create_trail(trail_options)
     # Automatically create next upcoming invoice via scheduler too
     if resource.billing_type.fixed_periodic?
-      create_next_upcoming_invoice(resource)
+      # create_next_upcoming_invoice(resource)
     end
     
     # Invoice with billing type one time has actual invoice only once
@@ -119,6 +119,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     GeneralInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym).dup)
     end
+    update_due_date(invoice, general_invoice)
     if invoice.save 
       unless map_line_items(general_invoice, invoice)
         invoice.destroy
@@ -141,7 +142,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     RentalInvoice::CLONE_RECORDS.each do |column_name|
       invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym).dup)
     end
-    if invoice.save 
+    update_due_date(invoice, rental_invoice)
+    if invoice.save
       unless map_line_items(rental_invoice, invoice)
         invoice.destroy
         add_message :error, "Unable to create rental invoice"
@@ -156,6 +158,9 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       new_line_item = new_invoice.items.new
       InvoiceLineItem::TEMPLATE_COLUMNS.each do |column_name|
         new_line_item.send("#{column_name}=", item.send(column_name.to_sym))
+      end
+      InvoiceLineItem::CLONE_RECORDS.each do |column_name|
+        new_line_item.send("#{column_name}=", item.send(column_name.to_sym).dup)
       end
       new_line_item.parent_type = 'Invoice'
     end
@@ -272,6 +277,12 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
     if self.vendor.blank?
       add_message :error, 'Vendor not found'
       return
+    end
+  end
+
+  def update_due_date(actual_invoice, agreement_invoice)
+    if agreement_invoice.billing_type.variable_periodic?
+      actual_invoice.due_date = Date.today + agreement_invoice.payment_term.days_after
     end
   end
 

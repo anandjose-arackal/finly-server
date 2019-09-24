@@ -142,4 +142,15 @@ class Vendors::Base < BaseOperation
     end
     found
   end
+
+  def decode_base64_file(file, string)
+    return false if (file.blank? or string.blank?)
+    file_data = string[string.index("base64,") + "base64,".size, string.size]
+    adapter = Paperclip.io_adapters.for(string)
+    ext =  Rack::Mime::MIME_TYPES.invert[adapter.content_type]
+    file_path = "tmp/data#{ext}"
+    File.open(file_path, 'wb') { |f| f.write(Base64.decode64(file_data)) }
+    file[:attached_file] = File.new(file_path, 'r')
+  end
+
 end
