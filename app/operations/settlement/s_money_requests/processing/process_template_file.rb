@@ -100,6 +100,10 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
     self.completed_money_requests = self.completed_items.collect(&:money_requests).flatten
 
+    if self.completed_money_requests.present?
+      self.completed_money_requests = self.completed_money_requests.collect {|r| r if self.processable_mappings.pluck(:document_id).map(&:to_i).include? r.id}.compact
+    end
+
   end
 
   def process

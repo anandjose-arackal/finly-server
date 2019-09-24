@@ -99,6 +99,10 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     self.completed_items = self.report_processor_group.mappings.completed.where id: self.processable_mappings.pluck(:item_id)
 
     self.completed_reports = self.completed_items.collect(&:reports).flatten
+
+    if self.completed_reports.present?
+      self.completed_reports = self.completed_reports.collect {|r| r if self.processable_mappings.pluck(:document_id).map(&:to_i).include? r.id}.compact
+    end
   end
 
   def process
