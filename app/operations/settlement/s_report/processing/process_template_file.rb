@@ -50,7 +50,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   def init
 
     self.file = params[:file]
-    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :mark_as_paid]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :source_account, :mark_as_paid]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
@@ -116,7 +116,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     # end
 
     self.processable_mappings.pluck(:document_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
-    self.processable_mappings.pluck(:document_id,:source_account).map { |id, utr| self.associated_source_account[id.to_i] = utr }
+    self.processable_mappings.pluck(:document_id,:source_account).map { |id, source_account| self.associated_source_account[id.to_i] = source_account }
 
     # utr can be updated for items which are already completed
     self.completed_reports.each do |item|

@@ -37,7 +37,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
 
     if self.content.blank?
       # self.report_processor_group.mappings.exclude_cancelled.each do |item|
-      self.report_processor_group.mappings.exclude_cancelled.left_joins(:reports).select('report_processor_group_mappings.*, reports.id AS report_id').each do |item|
+      self.report_processor_group.mappings.exclude_cancelled.left_joins(:reports).select('report_processor_group_mappings.*, reports.id AS report_id, reports.bank_reference_number AS report_bank_reference_number, reports.source_account AS report_source_account').each do |item|
         item_contents << processor_details(self.report_processor_group, item)
       end
     end
@@ -69,7 +69,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       item.user&.name,
       item.note,
       item.amount&.value,
-      item.bank_reference_number,
+      item.report_bank_reference_number,
+      item.report_source_account,
       marked_as_completed
     ]
   end
@@ -85,6 +86,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       "Purpose of Report(unmodifiable)", 
       "Total Report Amount(unmodifiable)", 
       "UTR",
+      "Source Account",
       "Mark As Paid(Y or N)"
     ]
   end

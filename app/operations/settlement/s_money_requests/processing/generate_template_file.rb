@@ -37,7 +37,7 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
 
     if self.content.blank?
       # self.money_request_processor.mappings.exclude_cancelled.each do |item|
-      self.money_request_processor.mappings.exclude_cancelled.left_joins(:money_requests).select('money_request_processor_mappings.*, money_requests.id AS money_request_id').each do |item|
+      self.money_request_processor.mappings.exclude_cancelled.left_joins(:money_requests).select('money_request_processor_mappings.*, money_requests.id AS money_request_id, money_requests.bank_reference_number AS mr_bank_reference_number, money_requests.source_account AS mr_source_account').each do |item|
         item_contents << processor_details(self.money_request_processor, item)
       end
     end
@@ -69,7 +69,8 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
       item.user&.name,
       item.note,
       item.amount&.value,
-      item.bank_reference_number,
+      item.mr_bank_reference_number,
+      item.mr_source_account,
       marked_as_completed
     ]
   end
@@ -85,6 +86,7 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
       "Purpose of Advance(unmodifiable)", 
       "Total Advance Amount(unmodifiable)", 
       "UTR",
+      "Source Account",
       "Mark As Paid(Y or N)"
     ]
   end
