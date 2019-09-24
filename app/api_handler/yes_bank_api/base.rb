@@ -128,7 +128,7 @@ class YesBankApi::Base < BaseHandler
 
       post_params_hash = (Hash.from_xml(template) rescue nil)
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
       end
 
       self.timeout = true
@@ -155,7 +155,7 @@ class YesBankApi::Base < BaseHandler
       post_params_hash = (Hash.from_xml(template) rescue nil)
 
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
       end
 
       self.resource_not_found = true

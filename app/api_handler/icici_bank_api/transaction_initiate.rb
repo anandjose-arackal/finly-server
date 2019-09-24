@@ -85,7 +85,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def post_process
-    case self.response.status
+    case self.response&.status
       when 404
         self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         add_message :error, "Service temporarily unavailable"
@@ -124,6 +124,8 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
         end
+    else
+      # do nothing?
     end
   end
 
