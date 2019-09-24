@@ -465,24 +465,24 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         else
           # i.e if the user is an admin, even from the creditor view, they should be able to
           # credit the payment request from company credits
-          if user.vendor_payments_admin?
-            balance = retrieve_balance(:company_credits, user)
-            # balance = retrieve_balance(:kotak_bank_account, user)
-            if balance >= bank_payment_request.requested_amount_value
-              enabled = true
-            end
+          balance = retrieve_balance(:company_credits, user)
+          # balance = retrieve_balance(:kotak_bank_account, user)
+          if balance >= bank_payment_request.requested_amount_value
+            enabled = true
           end
         end
-        if user.vendor_payments_admin?
-          admin = true
-        end
+        # if user.vendor_payments_admin?
+        #   admin = true
+        # end
+        # setting the admin flag as true because the credit also needs access to credit from CC
+        admin = true
         actions[:credit_options] = {}
         if enabled && !bank_payment_request.credit_card?
           actions[:credit_options] = {
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
                   enabled: enabled,
-                  messages: "You can directly credit this payment order from your Finly Money",
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
                   require_password: true,
                   initiating_account: admin,
                   method: "patch"
@@ -536,7 +536,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
         end
 
-        admin = user.vendor_payments_admin?
+        # admin = user.vendor_payments_admin?
+        # setting the admin flag as true because the credit also needs access to credit from CC
+        admin = true
         # checking if this particular payment order is partially completed so that it can be credited later
         if self.bank_payment_request.payment_order.partially_completed?
           actions[:credit] = true
@@ -544,7 +546,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
                   enabled: true,
-                  messages: "You can directly credit this payment order from your Finly Money",
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
                   require_password: true,
                   initiating_account: admin,
                   method: "patch"

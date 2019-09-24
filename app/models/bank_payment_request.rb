@@ -68,7 +68,7 @@ class BankPaymentRequest < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status, allow_nil: true
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, :pending?, :creation_in_progress?, to: :status, allow_nil: true
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -487,6 +487,13 @@ class BankPaymentRequest < ApplicationRecord
     end
   end
 
+  def validate_if_creditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present? && BankPaymentRequest.finance_associated_status_ids.include?(self.status_id)
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
+    end
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -564,9 +571,11 @@ class BankPaymentRequest < ApplicationRecord
     bank_payment_requests = BankPaymentRequest.none
 
     purs.each do |pur|
+      max_amount = pur.max_amount || 999999999999999999
+      min_amount = pur.min_amount || 0
       pur_bank_payment_requests = BankPaymentRequest.all.
         where(policy_id: pur.policy_id).
-        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+        where("(max_payment_amount IS NULL OR max_payment_amount > ?) AND (max_payment_amount IS NULL OR max_payment_amount <= ?)", min_amount, max_amount)
 
       bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
     end

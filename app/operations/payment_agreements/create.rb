@@ -11,17 +11,6 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       return
     end
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
-    validate_invoice_frequency
-    validate_invoice_start_end_date
-    check_agreement_item_presence
-    validate_start_end_date_consecutiveness
-    billing_type_validations
-    validate_agreement_item_combinations
-  end
-
-  def process
-    clear_expiration_date_on_no_expiration
-    create_or_update_custom_fields
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     self.payment_agreement.company_id = user.company_id
@@ -31,6 +20,40 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
     end
+    validate_item_quantity
+    ActiveRecord::Base.transaction do
+      if self.payment_agreement.save
+        validate_prepaid_consistency unless has_errors?
+        security_deposit_validation unless has_errors?
+        validate_invoice_frequency unless has_errors?
+        validate_invoice_start_end_date unless has_errors?
+        fixed_periodic_grouped_vendor_validations unless has_errors?
+        check_agreement_item_presence unless has_errors?
+        # validate_start_end_date_consecutiveness unless has_errors?
+        billing_type_validations unless has_errors?
+        validate_agreement_item_combinations unless has_errors?
+      end
+      if has_errors?
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
+  end
+
+  def process
+    clear_expiration_date_on_no_expiration
+    create_or_update_custom_fields
+    # TODO - check save as it refreshes on reloading even the object that was supposed to be saved(data not saved in db)
+    save_custom_fields
+    # self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
+    # self.payment_agreement.creator_id = user.id
+    # self.payment_agreement.company_id = user.company_id
+    # if self.payment_agreement.general_invoices.present?
+    #   self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+    # end
+    # if self.payment_agreement.rental_invoices.present?
+    #   self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+    # end
     if self.payment_agreement.save && self.payment_agreement.reload
       # set_custom_field
       update_item_attributes

@@ -31,6 +31,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
     self.payable_amount = params[:payable_amount]
+    self.description = params[:description]
   end
 
   def validate
@@ -107,8 +108,10 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
             value: self.payable_amount,
             currency_id: Currency.first.id
         },
-        note: self.inward_invoice.note,
+        note: self.inward_invoice.narration,
         category_id: self.inward_invoice.category_id,
+        department_id: self.inward_invoice.department_id,
+        cost_center_id: self.inward_invoice.cost_center_id,
         date: DateUtils.local_date,
         invoice_id: self.inward_invoice.id,
         parent_type: self.inward_invoice.class.name,

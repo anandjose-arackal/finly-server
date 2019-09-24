@@ -18,7 +18,7 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
   end
 
   def process
-
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     call_save(params)
     return unless self.flag_save    
     call_submit(params)

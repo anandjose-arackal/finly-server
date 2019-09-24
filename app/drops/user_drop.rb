@@ -1,0 +1,3 @@
+class UserDrop
+
+end

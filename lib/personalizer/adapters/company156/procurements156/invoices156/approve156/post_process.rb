@@ -8,8 +8,9 @@ class Personalizer::Adapters::Company156::Procurements156::Invoices156::Approve1
 
   def process
     if inward_invoice.present? && inward_invoice.due_date.present?
+      provider_name = inward_invoice.get_invoice_provider_name
       #check the last approved level number 2
-      if inward_invoice.get_level(:prev)&.level_number == 2
+      if inward_invoice.get_level(:prev, provider_name)&.level_number == 2
         next_due_date = TransferTimingUtils.add_business_days(inward_invoice.due_date, 5)
         inward_invoice.update_columns(due_date: next_due_date)
       end

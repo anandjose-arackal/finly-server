@@ -142,8 +142,9 @@ json.invoice do
                     :purchase_order_item_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
-      json.gl_code item.inventory_line_item&.item_code rescue nil
+      json.gl_code item.inventory_line_item&.category.gl_code rescue nil
       json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
+
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -158,8 +159,10 @@ json.invoice do
       case item.inventory_line_item&.product_type_id
       when ProductType.id_for(:goods)
         product = "goods"
+        json.purchase_order_accepted_quantity item.purchase_order_item&.accepted
       when ProductType.id_for(:service)
         product = "service"
+        json.purchase_order_accepted_quantity item.quantity
       end      
       json.product_type product
     end
@@ -288,7 +291,11 @@ json.reviewal_chains do
   end
 end
 
-json.reviewal_chain @result.invoice.get_reviewal_chain
+if @result.invoice.procurement.purchase_order.present?
+  json.reviewal_chain @result.invoice.get_reviewal_chain('PoInvoiceProvider')
+else
+  json.reviewal_chain @result.invoice.get_reviewal_chain('NonPoInvoiceProvider')
+end
 
 json.comments do
   json.array! invoice.comments do |comment|

@@ -19,7 +19,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       payment_agreements: false
     }
 
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
@@ -59,9 +59,14 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:purchase_orders] = true
         when UserRole.id_for(:goods_receiver)
           request_types[:grns] = true
-        when UserRole.id_for(:invoice_initiator)
+        # when UserRole.id_for(:invoice_initiator)
+          # request_types[:po_invoices] = true
+          # request_types[:non_po_invoices] = true
+        when UserRole.id_for(:po_invoice_initiator)
           request_types[:po_invoices] = true
+        when UserRole.id_for(:non_po_invoice_initiator)
           request_types[:non_po_invoices] = true
+
         when UserRole.id_for(:bank_payment_request_initiator)
           request_types[:payment_tickets] = true
         when UserRole.id_for(:bank_payment_request_creditor)

@@ -11,10 +11,13 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
       :level_name => 'Level Name',
       :level_number => 'Level Number',
       :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :with_exception => 'With Exception Y/N',
+      :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
       :max => "Max Threshold",
       :destroy => 'Destroy'
   })
+
 
   def valid_request
   end
@@ -34,7 +37,8 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
              TravelRequestBookingProvider
              PurchaseRequestProvider
              PurchaseOrderProvider
-             InvoiceProvider
+             PoInvoiceProvider
+             NonPoInvoiceProvider
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider

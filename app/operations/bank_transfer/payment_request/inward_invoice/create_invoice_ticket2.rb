@@ -105,7 +105,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     end
 
     if invalid_invoices.present?
-      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:id).compact.join(", ")}\", are already linked to a payment ticket"
+      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:invoice_id).compact.join(", ")}\", are already linked to a payment ticket"
       return
     end
 
@@ -126,11 +126,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         next
       end
       if invoice.vendor.blank?
-        add_message :error, "This invoice, with id #{invoice.id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
         return
       end
       if invoice.bank_account.blank?
-        add_message :error, "This invoice, with id #{invoice.id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
         return
       end
 
@@ -214,9 +214,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
               value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id
           },
-          note: invoice.note,
+          note: invoice.narration,
           category_id: invoice.category_id,
           cost_center_id: invoice.cost_center_id,
+          department_id: invoice.department_id,
           date: DateUtils.local_date,
           invoice_id: invoice.id,
           parent_type: invoice&.class.name,

@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
                 :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement,
                 :mandatory_fields, :drop_down_fields, :drop_down_field_ids,
-                :tds_slab_ids, :all_departments_ids, :category_ids, :cost_center_ids
+                :tds_slab_ids, :all_departments_ids, :all_category_ids, :all_cost_center_ids
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -69,10 +69,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.all_departments_ids = all_departments&.policy_department_filter_mapping&.pluck(:id)
 
     all_categories = Categories::Index.(current_user, params)
-    self.category_ids = all_categories.categories.roots.pluck(:id) rescue []
+    self.all_category_ids = all_categories.categories.leaves.pluck(:id) rescue []
 
     all_cost_centers = current_company.cost_centers.vendor_payments_only
-    self.cost_center_ids = all_cost_centers.pluck(:id) rescue []
+    self.all_cost_center_ids = all_cost_centers.pluck(:id) rescue []
 
     # Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
     
@@ -86,8 +86,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.order_details.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
-      name = item[:name] || item["name"]
-      business_name = item[:business_name] || item["business_name"]
+      name = item[:name].present? ? item[:name] : item[:bank_account_name]
+      business_name = item[:business_name].present? ? item[:business_name] : item[:name]
       authorized = item[:authorized] || item["authorized"]
       amount = item[:original_amount]
       advance_amount = item[:advance_amount]
@@ -163,9 +163,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         required_fields = self.mandatory_fields.select {|field| field if empty_fields.include? field.id }
 
         if required_fields.present?
-          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.error_messages << required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}.join(", ")
           self.valid = false
-          self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          # self.issue_item[:custom_fields] = required_fields.pluck(:field_name).map {|field| field + " cannot be empty"}
+          self.issue_item[:custom_fields] = required_fields.pluck(:id, :field_name).map {|id, field| {"id" => id, "error" => (field + " cannot be empty")}}
         end
 
         # validate if dropdown fields entered matches the data setup in the organization account
@@ -176,7 +177,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
               correct_field = drop_down_fields.find {|field| field if field.id == key}
               self.error_messages << correct_field.field_name.to_s + " is not an acceptable value"
               self.valid = false
-              self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+              # self.issue_item[:custom_fields] << correct_field.field_name.to_s + " is not an acceptable value"
+              self.issue_item[:custom_fields] << { "id" => key, "error" => correct_field.field_name.to_s + " is not an acceptable value" }
             end
           end
         end
@@ -341,7 +343,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if category_id.present?
-        unless self.category_ids.include? category_id.to_i
+        unless self.all_category_ids.include? category_id.to_i
           self.valid = false
           self.error_messages << "Entered category ID not found for this company. Please recheck the list of Categories."
           self.issue_item[:category_id] = "Entered category ID not found for this company. Please recheck the list of Categories."
@@ -349,7 +351,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if cost_center_id.present?
-        unless self.cost_center_ids.include? cost_center_id.to_i
+        unless self.all_cost_center_ids.include? cost_center_id.to_i
           self.valid = false
           self.error_messages << "Entered cost center ID not found for this company. Please recheck the list of Cost Centers."
           self.issue_item[:cost_center_id] = "Entered cost center ID not found for this company. Please recheck the list of Cost Centers."
@@ -467,7 +469,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_bank_account_number account_number
-    if !/\A\d+\z/.match(account_number)
+    unless Constants::VALID_BANK_ACCOUNT.match(account_number)
+    # if !/\A\d+\z/.match(account_number)
       return false
     end
     true

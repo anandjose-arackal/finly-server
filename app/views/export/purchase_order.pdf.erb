@@ -8,7 +8,7 @@
         <br>
         <div class="mg-botm-8"><b><%= @company.configuration.legal_entity_name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
-        <div class="font-light-gray col-xs-6">
+        <div class="font-light-gray col-xs-8">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
         </div>
       </div>
@@ -29,7 +29,7 @@
             <td class="font-dark-gray"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></td>
           </tr>
           <tr>
-            <td class="font-light-gray">Due Date</td>
+            <td class="font-light-gray">Expected Delivery Date</td>
             <td class="font-dark-gray"><%= @result.purchase_order.delivery_date&.strftime "%b-%d-%Y" %></td>
           </tr>
           <tr>
@@ -44,24 +44,26 @@
         </table>
       </div>
     </div>
-    <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
-    <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
-      <div class="col col-xs-12 no-padding">
-        <% @result.purchase_order.custom_fields.each do |custom_field| %>
-          <% if custom_field.field_configuration.printable %>
-            <div class="col col-xs-3 no-padding mg-botm-8">
-              <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_field.field_configuration.field_name %></div>
-              <div class="col col-xs-12 no-padding font-dark-gray">
-                <% if custom_field.value_type == 'FieldDropDownSelection' %>
-                  <%= custom_field.value.value.name %>
-                <% else %>
-                  <%= custom_field.value&.value || '--' %>
-                <% end %>
+    <% if @result.purchase_order.company.configuration.show_custom_fields_in_pdf %>
+      <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
+      <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
+        <div class="col col-xs-12 no-padding">
+          <% @result.purchase_order.custom_fields.each do |custom_field| %>
+            <% if custom_field.field_configuration.printable %>
+              <div class="col col-xs-3 no-padding mg-botm-8">
+                <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_field.field_configuration.field_name %></div>
+                <div class="col col-xs-12 no-padding font-dark-gray">
+                  <% if custom_field.value_type == 'FieldDropDownSelection' %>
+                    <%= custom_field.value.value.name %>
+                  <% else %>
+                    <%= custom_field.value&.value || '--' %>
+                  <% end %>
+                </div>
               </div>
-            </div>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     <% end %>
     <!-- <div class="col col-xs-12 no-padding">
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
@@ -76,6 +78,9 @@
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+          <% if @result.purchase_order.vendor.trade_name.present? && (@result.purchase_order.vendor.display_name&.strip != @result.purchase_order.vendor.trade_name&.strip) %>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
+          <% end %>
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
@@ -111,16 +116,16 @@
           <% if @result.purchase_order.billing_address.present? %>
             <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
           <% else %>
-            <%= @result.purchase_order.location.address %>
+            <%= @result.purchase_order.location&.address %>
           <% end %>
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.gstin %></div>
         </div>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.pan %></div>
         </div>
       </div>
       <div class="col col-xs-4 shipping-address">
@@ -137,11 +142,11 @@
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.gstin %></div>
         </div>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.pan %></div>
         </div>
       </div>
     </div><br> <br>
@@ -154,6 +159,9 @@
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+          <% if @result.purchase_order.vendor.trade_name.present? && (@result.purchase_order.vendor.display_name&.strip != @result.purchase_order.vendor.trade_name&.strip) %>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
+          <% end %>
         </div>
         <!-- <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
@@ -184,6 +192,9 @@
         <h4 class="section-title">Vendor Address</h4>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.business_name %></div>
+          <% if @result.purchase_order.vendor.trade_name.present? && (@result.purchase_order.vendor.business_name&.strip != @result.purchase_order.vendor.trade_name&.strip) %>
+            <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.trade_name %></div>
+          <% end %>
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.gstin_location&.address %></div>
@@ -206,16 +217,16 @@
           <% if @result.purchase_order.billing_address.present? %>
             <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
           <% else %>
-            <%= @result.purchase_order.location.address %>
+            <%= @result.purchase_order.location&.address %>
           <% end %>
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.gstin %></div>
         </div>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location&.pan %></div>
         </div>
       </div>
       <div class="col col-xs-3 shipping-address">
@@ -232,11 +243,11 @@
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.gstin %></div>
         </div>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location&.pan %></div>
         </div>
       </div>
     </div><br> <br>
@@ -271,11 +282,11 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><div><%= item.comment %></div></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
-            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
-            <td class="text-right"><%= item.tax_rate&.rate.to_f %></td>
-            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td> <%= number_with_delimiter(item.tax&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/)  rescue 0 %> %</td>
+            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.total_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
         <% end %>
         </tbody>
@@ -297,11 +308,11 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.total_before_tax&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.total_before_tax&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
@@ -321,17 +332,17 @@
               <% end %>
               </td>
             <% end %>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <% if @result.purchase_order.advance_amount_required %>
             <tr>
               <td class="font-light-gray text-left">Advance Amount</td>
-              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.advance_amount&.value&.to_d.round(2) rescue 0 %></td>
+              <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.advance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
             </tr>
           <% end %>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.balance_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.balance_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           </tbody>
         </table>

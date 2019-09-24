@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: payment_agreements
+#
+#  id                    :bigint           not null, primary key
+#  order_number          :string(255)
+#  title                 :string(255)
+#  policy_id             :integer
+#  agreement_date        :datetime
+#  execution_date        :datetime
+#  expiration_date       :datetime
+#  renewal_date          :datetime
+#  note                  :text(65535)
+#  no_expiration         :boolean          not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  creator_id            :integer
+#  controlling_level_id  :integer
+#  status_id             :integer
+#  submitted_at          :datetime
+#  approved_at           :datetime
+#  reject_note           :text(65535)
+#  company_id            :integer
+#  renewal_reminder_date :datetime
+#  total_amount_id       :integer
+#  override_order_number :string(255)
+#
+
 class PaymentAgreement < ApplicationRecord
 
   include Transitionable
@@ -13,8 +41,11 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :total_amount, optional: true, class_name: 'Amount'
 
 
-  has_many :general_invoices, dependent: :destroy
-  has_many :rental_invoices, dependent: :destroy
+  has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
+  has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
+  has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
+  has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
+
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 
   # has_many :invoices
@@ -167,7 +198,7 @@ class PaymentAgreement < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-        with_id(ids)
+        with_ids(ids)
       end
     else
       where status_id: status_id
