@@ -1328,7 +1328,7 @@ class User < ApplicationRecord
   end
 
   def initials
-    self.name.split(' ').first[0] + ((self.name.split(' ')[1][0] rescue nil) or self.name.split(' ').first[1])
+    (self.name.split(' ').first[0] rescue "") + ((self.name.split(' ')[1][0] rescue nil) or (self.name.split(' ').first[1] rescue ""))
   end
 
   # method that determines whether a particular user has
