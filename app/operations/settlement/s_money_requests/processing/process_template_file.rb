@@ -123,7 +123,13 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     # utr can be updated for items which are already completed
     self.completed_money_requests.each do |item|
       if item.bank_reference_number != self.associated_utr[item.id]&.strip
-        item.update(bank_reference_number: self.associated_utr[item.id], source_account: self.associated_source_account[item.id])
+        item.bank_reference_number = self.associated_utr[item.id]
+      end
+      if item.source_account != self.associated_source_account[item.id]&.strip
+        item.source_account = self.associated_source_account[item.id]
+      end
+      if item.changes[:bank_reference_number].present? or item.changes[:source_account].present?
+        item.save
       end
     end
 
