@@ -264,6 +264,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :itz_cash_dmt_sender
   accepts_nested_attributes_for :user_panel_subscription
   accepts_nested_attributes_for :quickbooks_user
+  accepts_nested_attributes_for :enforce_policy
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -1328,7 +1329,7 @@ class User < ApplicationRecord
   end
 
   def initials
-    self.name.split(' ').first[0] + ((self.name.split(' ')[1][0] rescue nil) or self.name.split(' ').first[1])
+    (self.name.split(' ').first[0] rescue "") + ((self.name.split(' ')[1][0] rescue nil) or (self.name.split(' ').first[1] rescue ""))
   end
 
   # method that determines whether a particular user has

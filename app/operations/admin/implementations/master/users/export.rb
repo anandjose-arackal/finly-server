@@ -18,12 +18,15 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
       :city => "City",
       :gender => "Gender",
       :company_id => "Company ID (mandatory)",
-      :department_code => "Department Code",
-      :location_code => "Location Code",
+      :department_code => "Department Name",
+      :location_code => "Location Name",
+      :cost_center_code => "Cost Center Name",
       :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
       :expense_management => "Expense Management Y for enable",
       :disburse  => "Disburse Y for enable",
-      :vendor_payments => "Vendor Payments Y for enable"
+      :vendor_payments => "Vendor Payments Y for enable",
+      :enforce_policy => 'Enforce Policy',
+      :destroy => 'Deactivate (Y for Deactivate/ activate for Activation'
   })
 
   def valid_request
@@ -79,11 +82,11 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def state_id(user)
-    user.state_id rescue ''
+    user.profile&.state&.name rescue ''
   end
 
   def gender(user)
-    user.gender_name rescue ''
+    user&.profile&.gender
   end
 
   def company_id(user)
@@ -91,11 +94,15 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def department_code(user)
-    ''
+    user.department&.name
   end
 
   def location_code(user)
-    ''
+    user.location&.name
+  end
+
+  def cost_center_code(user)
+    user.cost_center&.name
   end
 
   def mothers_maiden_name(user)
@@ -112,6 +119,14 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
 
   def vendor_payments(user)
     user.user_panel_subscription.yes_bank_account_transfer? ? 'Y' : ''
+  end
+
+  def enforce_policy(user)
+    user&.enforce_policy&.enabled? ? 'Y' : ''
+  end
+
+  def destroy(user)
+    ''
   end
 
   def post_process

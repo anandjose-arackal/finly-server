@@ -24,7 +24,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
   end
 
   def success
-    params[:payment_agreements] = self.payment_agreements.includes(:security_deposits, :beneficiary_payments, :general_invoices, :rental_invoices)
+    params[:payment_agreements] = self.payment_agreements
     PaymentAgreements::Index::IndexPresenter.new(user, params, messages)
   end
 
