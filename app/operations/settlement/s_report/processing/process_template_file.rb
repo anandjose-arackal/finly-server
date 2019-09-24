@@ -19,7 +19,8 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
                 :edge_case,
                 :processable_mappings,
                 :just_show_excel,
-                :associated_utr
+                :associated_utr,
+                :associated_source_account
 
   def pre_validate
     if user.blank?
@@ -115,7 +116,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
     # end
 
     self.processable_mappings.pluck(:document_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
-    self.processable_mappings.pluck(:document_id,:source_account).map { |id, utr| self.associated_source_account[id.to_i] = source_account }
+    self.processable_mappings.pluck(:document_id,:source_account).map { |id, utr| self.associated_source_account[id.to_i] = utr }
 
     # utr can be updated for items which are already completed
     self.completed_reports.each do |item|

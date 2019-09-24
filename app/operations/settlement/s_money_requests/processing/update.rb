@@ -49,11 +49,11 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   def pre_process
     params[:money_request_processor_mapping].delete(:batch_id)
 
-    if request_params[:bank_reference_number].present?
+    if request_params[:money_requests_attributes].present?
 
-      # [ {id: 1, utr_number: "utr", source_account: "source_account"}, {...}, ... ]
-      request_params[:bank_reference_number].each do |brn|
-        unless validate_utr brn[:utr_number]
+      # [ {id: 1, bank_reference_number: "utr", source_account: "source_account"}, {...}, ... ]
+      request_params[:money_requests_attributes].each do |brn|
+        unless validate_utr brn[:bank_reference_number]
           add_message :error, "UTR is only allowed to be alphanumberic."
           return
         end
@@ -65,12 +65,12 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
       end
 
       self.mapping.money_requests.each do |money_request|
-        details = request_params[:bank_reference_number].find {|brn| brn if brn[:id].to_i == money_request.id}
-        money_request.bank_reference_number = details[:utr_number]&.strip if money_request.bank_reference_number != details[:utr_number]&.strip
+        details = request_params[:money_requests_attributes].find {|brn| brn if brn[:id].to_i == money_request.id}
+        money_request.bank_reference_number = details[:bank_reference_number]&.strip if money_request.bank_reference_number != details[:bank_reference_number]&.strip
         money_request.source_account = details[:source_account]&.strip if money_request.source_account != details[:source_account]&.strip
       end
 
-      params[:money_request_processor_mapping].delete(:bank_reference_number)
+      params[:money_request_processor_mapping].delete(:money_requests_attributes)
 
       # if utr is there, we automatically assume the item can be marked as completed
       request_params[:marked_as_completed] = true
@@ -128,7 +128,7 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   private
 
   def mapping_params
-    params.require(:money_request_processor_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id)
+    params.require(:money_request_processor_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id, money_requests_attributes: [:bank_reference_number, :source_account, :id])
   end
 
   def update_mapping_data

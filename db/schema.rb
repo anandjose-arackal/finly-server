@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_12_063029) do
+ActiveRecord::Schema.define(version: 2019_09_23_144244) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3129,6 +3129,9 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "total_proforma_advance"
     t.integer "delivery_location_id"
     t.integer "template_invoice_id"
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -4140,6 +4143,8 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.string "bank_reference_number"
+    t.string "source_account"
     t.index ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id"
     t.index ["controlling_user_id"], name: "index_money_requests_on_controlling_user_id"
@@ -5696,6 +5701,9 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "template_invoice_id"
     t.integer "notice_period"
     t.decimal "square_feet", precision: 10, scale: 5
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
@@ -5887,6 +5895,8 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.string "bank_reference_number"
+    t.string "source_account"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id"
     t.index ["controlling_user_id"], name: "index_reports_on_controlling_user_id"
@@ -7050,6 +7060,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_063029) do
     t.integer "cost_center_id"
     t.integer "department_id"
     t.integer "location_id"
+    t.integer "default_company_id"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

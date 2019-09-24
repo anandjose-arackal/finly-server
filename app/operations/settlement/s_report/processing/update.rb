@@ -49,11 +49,11 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   def pre_process
     params[:report_processor_group_mapping].delete(:batch_id)
 
-    if request_params[:bank_reference_number].present?
+    if request_params[:reports_attributes].present?
       
-      # [ {id: 1, utr_number: "utr", source_account: "source_account"}, {...}, ... ]
-      request_params[:bank_reference_number].each do |brn|
-        unless validate_utr brn[:utr_number]
+      # [ {id: 1, bank_reference_number: "utr", source_account: "source_account"}, {...}, ... ]
+      request_params[:reports_attributes].each do |brn|
+        unless validate_utr brn[:bank_reference_number]
           add_message :error, "UTR is only allowed to be alphanumberic."
           return
         end
@@ -65,12 +65,12 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       end
 
       self.mapping.reports.each do |report|
-        details = request_params[:bank_reference_number].find {|brn| brn if brn[:id].to_i == report.id}
-        report.bank_reference_number = details[:utr_number]&.strip if report.bank_reference_number != details[:utr_number]&.strip
+        details = request_params[:reports_attributes].find {|brn| brn if brn[:id].to_i == report.id}
+        report.bank_reference_number = details[:bank_reference_number]&.strip if report.bank_reference_number != details[:bank_reference_number]&.strip
         report.source_account = details[:source_account]&.strip if report.source_account != details[:source_account]&.strip
       end
 
-      params[:report_processor_group_mapping].delete(:bank_reference_number)
+      params[:report_processor_group_mapping].delete(:reports_attributes)
 
       # if utr is there, we automatically assume the item can be marked as completed
       request_params[:marked_as_completed] = true
@@ -90,7 +90,6 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
   def process
     self.mapping.assign_attributes(request_params)
-
     if self.mapping.valid?
       self.mapping.save
       update_mapping_data if request_params[:marked_as_completed] # only update report and its tracks if mapping is not completed
@@ -129,7 +128,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   private
 
   def mapping_params
-    params.require(:report_processor_group_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id)
+    params.require(:report_processor_group_mapping).permit(:bank_reference_number, :marked_as_completed, :completed_at, :status_id, reports_attributes: [:bank_reference_number, :source_account, :id])
   end
 
   def update_mapping_data
