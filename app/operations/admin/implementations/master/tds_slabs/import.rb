@@ -47,5 +47,13 @@ class Admin::Implementations::Master::TdsSlabs::Import < Admin::Implementations:
       messages << "TDS Rate cant blank"
     end
 
+    if data[:tds].present? &&  data[:tds]&.to_i < 0
+      messages << "TDS Cant be Negative"
+    end
+
+    if data[:tds].is_a?(String)
+      messages << "TDS value will be numeric"
+    end
+    messages
   end
 end

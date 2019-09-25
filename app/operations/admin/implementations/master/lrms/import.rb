@@ -20,12 +20,15 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
 
   attr_accessor :lrm_params, :provider, :application, :policy, :level
   def process
-    self.input = Roo::Spreadsheet.open(self.implementation_request.request_file.url)
+    path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
+    self.input = Roo::Spreadsheet.open(path)
     output = {}
+    custom_headers ={}
     input.each_with_pagename do |name, sheet|
       output[name] = []
       self.application = get_application(name)
       self.provider = name
+      custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
         begin
@@ -49,9 +52,8 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         end
         output[name] << row
       end
-      export headers.values, output
     end
-
+    export custom_headers, output
   end
 
   def export(headers, contents)
@@ -60,7 +62,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     contents.each  do |name, sheet|
       worksheet = workbook.add_worksheet(name)
 
-      headers.each_with_index do |item, index|
+      headers[name].each_with_index do |item, index|
         worksheet.write( 0, index, item )
       end
       sheet.each_with_index do |items, row|
@@ -114,11 +116,13 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
 
     if lrm_params[:department_code].present?
       department = company.departments.find_by department_code: lrm_params[:department_code]
+      return result false, "Department not found with the department code" unless department.present?
       create_policy_dept_mapping(policy, department) if department.present?
     end
 
     if lrm_params[:location_code].present?
       location = company.locations.find_by location_code: lrm_params[:location_code]
+      return result false, "Location not found with the location code" unless location.present?
       create_policy_location_mapping(policy, location)
     end
     row_length = data.size
@@ -128,7 +132,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
       level_number = data[lower_index+2].to_i
       reviewer_id = clean_up_data data[lower_index+3].to_s
       min = data[lower_index+6].to_i
-      max = (data[lower_index+7].present? ? data[lower_index+5].to_i : nil)
+      max = (data[lower_index+7].present? ? data[lower_index+7].to_i : nil)
+      if min.present? && max.present?
+        if min >= max
+          return result false, "Max Threshold should be greater than Min"
+        end
+      end
       exception = data[lower_index+4]&.to_s&.upcase == 'N' ? false : true
       wo_exception = data[lower_index+5]&.to_s&.upcase == 'N' ? false : true
       if level_name.present? && level_number.present? && level_number !=0
@@ -205,12 +214,12 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   end
 
   def create_policy_dept_mapping(policy,department)
-    return if policy.policy_department_mappings.where(department_id: department.id).first.present?
+    return if policy.policy_department_mappings.where(department_id: department&.id).first&.present?
     policy.policy_department_mappings.create(department_id: department.id)
   end
 
   def create_policy_location_mapping(policy,location)
-    return if policy.policy_location_mappings.where(location_id: location.id).first.present?
+    return if policy.policy_location_mappings.where(location_id: location&.id).first&.present?
     policy.policy_location_mappings.create(location_id: location.id)
   end
 

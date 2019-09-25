@@ -12,11 +12,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
     report_processor_group = apply_scopes(self.report_processor_group, params)
 
     self.headers = [
-        'Sl. No.',
-        'Journal Code',
-        'Period',
-        'Voucher Date',
-        'Description',
         'Account',
         'Sub Account',
         'Department',
@@ -32,17 +27,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
         'Ref. Invoice No.'
     ]
     self.contents = []
-    count = 1
     report_processor_group.each do |rpg|
       rpg.mappings.each do |rpg_mapping|
             report = rpg_mapping&.reports&.first
             next if report.blank?
             self.contents << [
-                count,
-                'jv',
-                report.expenses.last.date&.strftime("%y-%m"),
-                report.expenses.last.date&.strftime("%d/%m/%y"),
-                "Exps Reimb. For emp code-#{report.user&.profile&.employee_id}",
                 '31352001',
                 '',
                 "'#{report.user.gl_config&.dig(:location_code)}",
@@ -58,11 +47,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
                 '',
             ]
           self.contents << [
-              count,
-              'jv',
-              report.expenses.last.date&.strftime("%y-%m"),
-              report.expenses.last.date&.strftime("%d/%m/%y"),
-              "Exps Reimb. For emp code-#{report.user&.profile&.employee_id}",
               '61110004',
               '9992',
               '',
@@ -77,7 +61,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::ReimbursedExpenseT
               '',
               ''
           ]
-        count +=1
       end
     end
   end
