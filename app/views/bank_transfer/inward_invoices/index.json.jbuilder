@@ -15,6 +15,7 @@ json.results do
 
     json.invoice do
       json.id invoice.id
+      json.invoice_id invoice.invoice_id
       json.controlling_user invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
       json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at&.strftime("%d-%m-%Y")

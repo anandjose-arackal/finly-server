@@ -19,7 +19,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       payment_agreements: false
     }
 
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
