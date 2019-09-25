@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_12_164152) do
+ActiveRecord::Schema.define(version: 2019_09_25_021415) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1071,6 +1071,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_164152) do
     t.string "nature_of_office"
     t.boolean "billable_location", default: true
     t.boolean "shippable_location", default: true
+    t.string "gl_code"
     t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["deleted_at"], name: "index_branch_locations_on_deleted_at"
@@ -1912,6 +1913,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_164152) do
     t.datetime "deleted_at"
     t.string "cost_center_code"
     t.string "ancestry"
+    t.string "gl_code"
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
@@ -2250,6 +2252,7 @@ ActiveRecord::Schema.define(version: 2019_09_12_164152) do
     t.datetime "deleted_at"
     t.string "department_code"
     t.string "code"
+    t.string "gl_code"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["cost_center_id"], name: "index_departments_on_cost_center_id"
     t.index ["deleted_at"], name: "index_departments_on_deleted_at"
@@ -3150,6 +3153,9 @@ ActiveRecord::Schema.define(version: 2019_09_12_164152) do
     t.integer "total_proforma_advance"
     t.integer "delivery_location_id"
     t.integer "template_invoice_id"
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -5723,6 +5729,9 @@ ActiveRecord::Schema.define(version: 2019_09_12_164152) do
     t.integer "template_invoice_id"
     t.integer "notice_period"
     t.decimal "square_feet", precision: 10, scale: 5
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"

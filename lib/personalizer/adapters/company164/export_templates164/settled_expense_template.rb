@@ -13,11 +13,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = [
-        'Sl. No.',
-        'Journal Code',
-        'Period',
-        'Voucher Date',
-        'Description',
         'Account',
         'Sub Account',
         'Department',
@@ -33,17 +28,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
         'Ref. Invoice No.'
     ]
     self.contents = []
-    count = 1
     reports.each do |report|
       total_amount = 0
       report.expenses.each do |expense|
         total_amount += expense&.amount&.value
         self.contents << [
-            count,
-            'jv',
-            expense.date&.strftime("%y-%m"),
-            expense.date&.strftime("%d/%m/%y"),
-            "Exps Reimb. For emp code-#{report.user&.profile&.employee_id}",
             expense.category.gl_code,
             '',
             "'#{report.user.gl_config&.dig(:location_code)}",
@@ -54,17 +43,12 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
             '',
             '',
             '',
-            '',
+            "Report ID #{report.id}",
             '',
             '',
         ]
       end
       self.contents << [
-          count,
-          'jv',
-          report.expenses.last.date&.strftime("%y-%m"),
-          report.expenses.last.date&.strftime("%d/%m/%y"),
-          "Exps Reimb. For emp code-#{report.user&.profile&.employee_id}",
           31352001,
           '',
           '',
@@ -79,7 +63,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
           '',
           ''
       ]
-      count +=1
     end
   end
 

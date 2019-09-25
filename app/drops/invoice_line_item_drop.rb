@@ -9,11 +9,11 @@ class InvoiceLineItemDrop < Drop
   end
 
   def taxable_amount
-    @object.taxable_amount.value
+    @object.taxable_amount&.value || 0
   end
 
   def billable_amount
-    @object.billable_amount.value
+    @object.billable_amount&.value || 0
   end
 
   def tax_amount
