@@ -50,7 +50,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
   def init
 
     self.file = params[:file]
-    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :source_account, :mark_as_paid]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :source_account, :mark_as_paid, :msg]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
@@ -81,7 +81,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     if validate_operation.success?
       self.processable_mappings = self.validate_operation.processable_mappings
       if self.processable_mappings.blank?
-        add_message :error, "No processable reports found"
+        add_message :error, "No processable advances found"
         return
       end
     else

@@ -195,7 +195,7 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
           # Nothing to do here as receiving account is nil
       end
 
-      # money_request_ids = config[:money_request_ids].keys
+      money_request_ids = config[:money_request_ids]
       money_requests = user.money_requests.approved.with_id(money_request_ids)
       unless money_request_ids.size == money_requests.size
         add_message :error, 'Error loading configuration'

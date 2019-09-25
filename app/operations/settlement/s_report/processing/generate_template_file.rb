@@ -57,7 +57,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
   private
 
   def processor_details(processor, item)
-    marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
+    marked_as_completed = (item.completed?) ? 'Y' : ''
+    msg = (item.completed?) ? '(only UTR updateable)' : ''
     # document_ids = item.reports.pluck(:id).join(", ") rescue ""
     [
       # document_ids,
@@ -71,7 +72,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       item.amount&.value,
       item.report_bank_reference_number,
       item.report_source_account,
-      marked_as_completed
+      marked_as_completed,
+      msg
     ]
   end
 
