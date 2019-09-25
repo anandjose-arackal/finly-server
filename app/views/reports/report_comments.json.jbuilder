@@ -8,7 +8,14 @@ json.user_initial logged_in_user || user_initial
 json.logged_in_user logged_in_user
 json.report_user user_initial
 
-json.comments @result.comments do |comment|
+# Report show has new structure, trails and comments are separated.
+if !!StringUtils.to_bool(params[:skip_trails])
+  report_comments = @result.comments.where(report_comment_action_id: ReportCommentAction.id_for(:report_comment))
+else
+  report_comments = @result.comments
+end
+
+json.comments report_comments do |comment|
   json.report_id comment.report_id
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
