@@ -35,7 +35,7 @@ json.results do
       json.can_take_control po.can_take_control?
     end
 
-    json.delivery_location po.delivery_location&.city
+    json.delivery_location po.delivery_location&.name
   end
 end
 
