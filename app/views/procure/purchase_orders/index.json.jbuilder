@@ -34,6 +34,8 @@ json.results do
       json.can_reject po.can_really_reject?
       json.can_take_control po.can_take_control?
     end
+
+    json.delivery_location po.delivery_location&.city
   end
 end
 
