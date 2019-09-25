@@ -3218,6 +3218,9 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.integer "total_proforma_advance"
     t.integer "delivery_location_id"
     t.integer "template_invoice_id"
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -5850,6 +5853,9 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.integer "template_invoice_id"
     t.integer "notice_period"
     t.decimal "square_feet", precision: 10, scale: 5
+    t.boolean "prepaid"
+    t.boolean "fixed_periodic_template"
+    t.float "escalation_percentage"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"

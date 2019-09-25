@@ -1,6 +1,10 @@
 class Navbar::Master::Base
   cattr_accessor :data_map
 
+  def divider
+    {type: 'divider'}
+  end
+
   def self.app
     set_data_map[:app]
   end
