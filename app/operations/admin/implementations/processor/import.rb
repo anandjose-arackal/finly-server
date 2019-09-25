@@ -66,15 +66,15 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
         next if index >= headers.size
         data[headers.keys[index]] = value
       end
-      begin
+      #begin
         result = process_row(data)
         unless result.is_a?(Admin::Implementations::Processor::Import::Result)
           item_complete false
-          raise "invalid result"
+          #raise "invalid result"
         end
-      rescue Exception => e
-        result false, "#{e.message}"
-      end
+      # rescue Exception => e
+      #   result false, "#{e.message}"
+      # end
 
       unless result.success?
         item_complete false
@@ -98,12 +98,15 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     id = data[:id]
     destroy_action = data[:destroy]
     if destroy_action&.to_s&.downcase == 'y'
-      destroy_records(data)
+      response = destroy_records(data)
+    elsif destroy_action&.to_s&.downcase == 'activate'
+      response =destroy_records(data)
     elsif id.present?
-      update_record(data)
+      response =update_record(data)
     else
-      create_record(data)
+      response =create_record(data)
     end
+      response
   end
 
   def destroy_records(data)
