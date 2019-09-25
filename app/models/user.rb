@@ -352,7 +352,15 @@ class User < ApplicationRecord
   scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
   scope :with_email, ->(email) {where email: email}
   scope :with_email_or_mobile_number, -> (email, mobile_number) {
-    where('email = ? OR mobile_number = ?', email, mobile_number)
+    if email.present? && mobile_number.present?
+      where('email = ? OR mobile_number = ?', email, mobile_number)
+    elsif email.blank?
+      where('mobile_number = ?', mobile_number)
+    elsif mobile_number.blank?
+      where('email = ?', email)
+    else
+      # do nothing
+    end
   }
   scope :with_subscription, -> (application) {
     ids = self.pluck(:id)
