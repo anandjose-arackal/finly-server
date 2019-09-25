@@ -8,7 +8,6 @@ class Procurements::Invoices::FilterConfig < Procurements::Invoices::Base
     # self.locations = Company::Locations::Index.(user, params).locations
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.cost_centers = CostCenters::Index.(user, params).cost_centers
-    load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
   end
 
@@ -22,7 +21,7 @@ class Procurements::Invoices::FilterConfig < Procurements::Invoices::Base
 
   class Procurements::Invoices::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :cost_centers, :policies, :custom_fields_config, :agreement_invoice_enabled
+    attr_accessor :locations, :departments, :cost_centers, :policies, :custom_fields_config, :agreement_invoice_enabled, :invoice_custom_field_configurations
 
     def init
       self.locations = params[:locations]
@@ -31,13 +30,19 @@ class Procurements::Invoices::FilterConfig < Procurements::Invoices::Base
       self.policies = params[:policies]
       self.custom_fields_config = params[:custom_fields_config]
       self.agreement_invoice_enabled = user.company.agreement_based_payment_system_enabled?
+      invoice_custom_field_op = CustomField::Configuration::Index.(user, invoice_custom_field_filter_params )
+      self.invoice_custom_field_configurations = invoice_custom_field_op.field_configurations
+
+    end
+
+    def invoice_custom_field_filter_params
+      {
+        filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
+        filter_parent_type_id: [FieldParentType.id_for(:invoice)]
+      }    
 
     end
   end
 
-  def load_custom_fields_config
-    configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
-    self.custom_fields_config = {}
-    self.custom_fields_config[:invoice] = configurations.with_parent_type(FieldParentType.id_for(:invoice))
-  end
+
 end
