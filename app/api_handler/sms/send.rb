@@ -9,6 +9,10 @@ class Sms::Send < BaseHandler
     self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_msg91_api.log', sync: true)
   end
 
+  def file_logger_base_params
+    {}
+  end
+
   def file_logger_params(logger_params)
     file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
   end
@@ -74,14 +78,12 @@ class Sms::Send < BaseHandler
     # logging the request / response
     p = self.path
     params = query_params
-    response = self.response.body
-    status_code = self.response_code
+    response = JSON.parse(self.response.body) rescue {}
     self.file_logger.info(
         file_logger_params(
             path: p,
             post_params: params,
-            msg91_response: response,
-            status: status_code
+            msg91_response: response
         )
     )
   end
