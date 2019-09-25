@@ -44,7 +44,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_initiator
     return nil unless user.is_purchase_order_initiator?
-    {name: 'Your POs', indent: true, id: 'procure', url: "purchase_orders/params={\"filter_user_id\":\"#{user.id}\",\"filter_user_name\":\"#{user.name}\"}"}
+    {name: 'Your POs', id: 'procure', url: "purchase_orders/params={\"filter_user_id\":\"#{user.id}\",\"filter_user_name\":\"#{user.name}\"}"}
   end
 
   def po_awaiting_approval
