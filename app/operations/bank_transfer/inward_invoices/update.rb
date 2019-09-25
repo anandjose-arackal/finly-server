@@ -213,6 +213,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    if self.inward_invoice_params[:bank_account_id].blank?
+      add_message :error, "Please select the bank account for the vendor. If they are not present, please update this detail from the Vendor Empanelment screen."
+      return
+    end
+
   end
 
   def pre_process
@@ -310,6 +315,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if self.inward_invoice.receiving_account_type.blank?
       self.inward_invoice_params[:receiving_account_type] = BankAccount.name
     end
+
+    receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
+    self.inward_invoice.receiving_account = receiving_account
   end
 
   def process
