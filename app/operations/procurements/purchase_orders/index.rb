@@ -61,6 +61,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_awaiting_approval
     has_scope :show_only_po_which_have_advances
     has_scope :show_only_po_which_are_forwarded
+    has_scope :filter_all_advances, type: :boolean
 
     # Sorting
     has_scope :sort_po_number
