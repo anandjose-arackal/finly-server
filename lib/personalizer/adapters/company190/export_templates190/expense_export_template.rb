@@ -32,7 +32,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
       self.reports = Report.finance_associated_items(user).not_open
     end
 
-    self.reports = reports.processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
+    self.reports = reports.approved.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = ["Expense ID",
