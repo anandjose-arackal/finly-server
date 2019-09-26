@@ -68,7 +68,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 200
         self.api_response_success = true
         self.transaction_status_response = self.parsed_response["STATUS"]
-        case self.transaction_status_response
+        case self.transaction_status_response&.upcase
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
             # This is because only IMPS and RTGS transactions return the URT in the API

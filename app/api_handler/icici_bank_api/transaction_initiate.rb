@@ -123,7 +123,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           self.transfer_request.bank_error_message = error_message
         else
           # any other case must be a failure as well
-          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
           error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"] || self.parsed_response["message"]
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
