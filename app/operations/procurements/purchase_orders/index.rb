@@ -71,6 +71,8 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :sort_po_name
     # has_scope :sort_amount
 
+    has_scope :filter_delivery_location
+
     def init
       self.purchase_orders = params[:purchase_orders]
       self.purchase_orders = apply_scopes(self.purchase_orders, params)
