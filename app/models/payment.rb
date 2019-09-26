@@ -646,6 +646,17 @@ class Payment < ApplicationRecord
   end
 
 
+  def neft?
+    self.payment_mode == "NEFT" || self.payment_mode == "neft"
+  end
+
+  def imps?
+    self.payment_mode == "IMPS" || self.payment_mode == "imps"
+  end
+
+  def rtgs?
+    self.payment_mode == "RTGS" || self.payment_mode == "rtgs"
+  end
 
 
   private
