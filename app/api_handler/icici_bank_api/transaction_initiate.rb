@@ -44,6 +44,10 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def raw_api_params
     remarks = self.payment.note.blank? ? "Null" : self.payment.note
     remarks = remarks.gsub(/[^0-9A-Za-z]/, '') # this is to remove all special characters from the remarks attribute
+    # additionally if this is a NEFT transactions we have to further truncate the narration to 31 characters
+    if self.payment.neft?
+      remarks = remarks[0..30]
+    end
     if self.receiving_account&.account_owner.is_a?(YesBankVendor)
       payee_name = self.receiving_account.account_owner.business_name
     else
