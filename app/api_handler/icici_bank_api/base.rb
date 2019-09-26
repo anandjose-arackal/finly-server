@@ -1,7 +1,7 @@
 class IciciBankApi::Base < BaseHandler
 
   attr_accessor :company_details, :company, :parsed_response, :decrypted_response, :file_logger,
-                :start_time, :end_time
+                :start_time, :end_time, :transfer_status_id, :payment, :bank_transaction
 
   def init
     self.company = user&.company if self.company.blank?
@@ -122,6 +122,7 @@ class IciciBankApi::Base < BaseHandler
       # handle this case by updating the bank transaction to possible failure and then checking the
       # status of the transaction later using the TransactionCheck API call
       self.end_time = DateUtils.local_date_time
+      debugger
 
       self.parsed_response = decrypt_response(self.response.body) rescue ""
 
@@ -158,8 +159,10 @@ class IciciBankApi::Base < BaseHandler
             transfer_status_id: self.transfer_status_id
         )
       else
-        # this is an anomaly, so send email and flag it
-        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        # if payment object exists but it didn't have an associated bank transaction object
+        if self.payment.present? && self.payment.reference_resource.blank?
+          Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        end
       end
 
     rescue Faraday::ResourceNotFound
@@ -195,7 +198,9 @@ class IciciBankApi::Base < BaseHandler
         )
       else
         # this is an anomaly, so send email and flag it
-        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        if self.payment.present? && self.payment.reference_resource.blank?
+          Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        end
       end
     end
   end
