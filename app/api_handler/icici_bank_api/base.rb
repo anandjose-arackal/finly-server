@@ -48,7 +48,11 @@ class IciciBankApi::Base < BaseHandler
       path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
     end
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
-    self.decrypted_response = private_key.private_decrypt(Base64.decode64(body))
+    begin
+      self.decrypted_response = private_key.private_decrypt(Base64.decode64(body))
+    rescue OpenSSL::PKey::RSAError
+      self.decrypted_response = body
+    end
     parsed_response = JSON.parse(decrypted_response) rescue {}
     return parsed_response
   end
