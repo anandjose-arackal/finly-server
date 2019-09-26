@@ -122,7 +122,6 @@ class IciciBankApi::Base < BaseHandler
       # handle this case by updating the bank transaction to possible failure and then checking the
       # status of the transaction later using the TransactionCheck API call
       self.end_time = DateUtils.local_date_time
-      debugger
 
       self.parsed_response = decrypt_response(self.response.body) rescue ""
 
