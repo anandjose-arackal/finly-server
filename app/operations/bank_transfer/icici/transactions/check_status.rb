@@ -26,14 +26,12 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
     op = IciciBankApi::TransactionStatus.(self.bank_transaction)
     if op.success?
       if self.bank_transaction.completed?
-        unless self.bank_transaction.neft?
-          self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-          if self.payment&.invoice.present?
-            self.payment&.invoice&.update_invoice_status
-          end
-          self.payment_order.update_order_status
-          self.payment_order.update_processed_amount
+        self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        if self.payment&.invoice.present?
+          self.payment&.invoice&.update_invoice_status
         end
+        self.payment_order.update_order_status
+        self.payment_order.update_processed_amount
         self.payment.system_messages.destroy_all
       elsif self.bank_transaction.failed?
         self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
