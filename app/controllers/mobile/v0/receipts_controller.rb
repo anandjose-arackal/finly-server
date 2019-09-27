@@ -33,6 +33,7 @@ class Mobile::V0::ReceiptsController < Mobile::V0::BaseApiController
 
   def update
     formatted_params = RequestFormatter::ReceiptsParser::Parse.(current_user, params)&.formatted_request
+    formatted_params[:id] = params[:id]
     @result = Receipt::Update.(current_user, formatted_params)
     @result.config[:mobile_api] = true
     if @result.success?
