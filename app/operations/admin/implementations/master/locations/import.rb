@@ -64,13 +64,12 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
       state_id = State.where('name LIKE ?', "%#{data[:state]}%")&.first&.id
       data[:state_id] = state_id
       unless state_id.present?
-        messages << "Unable to match state name"
+        messages << "State name is incorrect"
       end
     end
     if data[:name].blank?
       messages << "Name cant be blank"
     end
-    messages = []
     parent_name= data[:parent_id]&.to_s
 
     if parent_name.present?

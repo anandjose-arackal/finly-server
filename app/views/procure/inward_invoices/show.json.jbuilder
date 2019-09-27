@@ -144,6 +144,7 @@ json.invoice do
       json.gl_code item.inventory_line_item&.category.gl_code rescue nil
       json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
+
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
@@ -157,8 +158,10 @@ json.invoice do
       case item.inventory_line_item&.product_type_id
       when ProductType.id_for(:goods)
         product = "goods"
+        json.purchase_order_accepted_quantity item.purchase_order_item&.accepted
       when ProductType.id_for(:service)
         product = "service"
+        json.purchase_order_accepted_quantity item.quantity
       end      
       json.product_type product
     end

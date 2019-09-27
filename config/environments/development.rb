@@ -75,6 +75,7 @@ Rails.application.configure do
   # end
 
   config.mailer_config = config_for(:mailer_config)
+  config.action_mailer.deliver_later_queue_name = 'mailer_queue'
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

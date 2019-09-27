@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted)
 
   end
 
@@ -133,6 +133,21 @@ class Vendors::Create < Vendors::Base
       end
     end
 
+    if self.vendor_parameters[:bank_accounts_attributes].blank?
+      add_message :error, "Please provide bank account details"
+      return
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      # check to see the number of bank account sent is equal to the bank account marked for destruction
+      ba_count = self.vendor_parameters[:bank_accounts_attributes].count
+      ba_delete_count = self.vendor_parameters[:bank_accounts_attributes].select {|b| b[:_destroy] == true}.count
+      if ba_count == ba_delete_count
+        add_message :error, "Please provide bank account details"
+        return
+      end
+    end
+
   end
 
   def pre_process
@@ -155,6 +170,10 @@ class Vendors::Create < Vendors::Base
     # if the receipt is being uploaded, delete the 'remove_file' key
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
+
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank

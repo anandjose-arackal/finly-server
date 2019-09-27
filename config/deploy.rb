@@ -53,6 +53,15 @@ when :development_4
 when :development_5
   set :deploy_to, '/home/centos/app_5'
   set :rails_env, 'staging'
+when :development_6
+  set :deploy_to, '/home/centos/app_6'
+  set :rails_env, 'staging'
+when :development_7
+  set :deploy_to, '/home/centos/app_7'
+  set :rails_env, 'staging'
+when :development_8
+  set :deploy_to, '/home/centos/app_8'
+  set :rails_env, 'staging'
 when :original_test
   set :deploy_to, '/home/centos/app_2'
   set :rails_env, 'staging'
