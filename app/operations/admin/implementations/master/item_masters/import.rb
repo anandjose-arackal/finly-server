@@ -11,6 +11,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
       :item_expense_type => "Expense Type",
       :po_item =>  "PO Item (Y/N)",
       :non_po_item => "Non PO Item (Y/N)",
+      :good_service => "Goods or Service ( G / S)",
       :discount => "Discount",
       :rate => "Rate",
       :destroy => "Destroy"
@@ -71,7 +72,15 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     discount = data[:discount].to_f&.round(2)
     rate = data[:rate].to_f&.round(2)
     item_expense_type_id = item_expense_types.where(name: data[:item_expense_type].to_s&.downcase)&.first&.id
-
+    product_type_id = nil
+    if data[:good_service].to_s.upcase == 'G'
+      product_type = 'goods'
+    elsif data[:good_service].to_s.upcase == 'S'
+      product_type = 'service'
+    end
+    if product_type.present?
+      product_type_id = ProductType.find_by_name(product_type).id
+    end
     if item_expense_type_id.nil? && data[:item_expense_type].present?
       messages << "Associated Expense Type Not Found"
     end
@@ -90,6 +99,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
         item_code: item_code,
         item_expense_type_id: item_expense_type_id,
         supply_item_type_id: supply_item_type_id,
+        product_type_id: product_type_id,
         discount: discount,
         rate: rate
     }, messages]
