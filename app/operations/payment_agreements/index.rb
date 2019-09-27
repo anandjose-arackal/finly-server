@@ -45,6 +45,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     has_scope :filter_awaiting_approval
     has_scope :search_by_email
     has_scope :filter_agreement_type
+    has_scope :filter_invoice_number
 
 
     def init
