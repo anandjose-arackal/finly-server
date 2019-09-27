@@ -26,7 +26,8 @@ class Mobile::V1::ReceiptsController < Mobile::V1::BaseApiController
   end
 
   def update
-    @result = Receipt::Update.(current_user, params)
+    formatted_params = RequestFormatter::ReceiptsParser::Parse.(current_user, params)&.formatted_request
+    @result = Receipt::Update.(current_user, formatted_params)
     @result.config[:mobile_api] = true
     respond response: (@result.success? ? :success : :failure)
   end
