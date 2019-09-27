@@ -31,18 +31,18 @@ class Event::EPurchaseRequest::Retract < Event::EPurchaseRequest::Base
   end
 
   def mailer_subject(user)
-    if user.id == purchase_request.user.id
+    if user.id == purchase_request.creator.id
       "Purchase Request retracted : #{self.purchase_request.order_number}"
     else
-      "#{purchase_request.user.name} has retracted the purchase request: #{self.purchase_request.order_number}"
+      "#{purchase_request.creator.name} has retracted the purchase request: #{self.purchase_request.order_number}"
     end
   end
 
   def mailer_body(user)
-    if user.id == purchase_request.user.id
+    if user.id == purchase_request.creator.id
       "You have successfully retracted the purchase request : #{self.purchase_request.order_number}"
     else
-      "#{purchase_request.user.name} has retracted the purchase request '#{self.purchase_request.order_number}'."
+      "#{purchase_request.creator.name} has retracted the purchase request '#{self.purchase_request.order_number}'."
     end
   end
 end

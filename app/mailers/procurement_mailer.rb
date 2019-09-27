@@ -149,6 +149,7 @@ class ProcurementMailer < ApplicationMailer
 
   def invoice_bulk_take_control(presenter)
     @data = presenter
+
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_invoices'
     end
@@ -185,5 +186,26 @@ class ProcurementMailer < ApplicationMailer
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
     end    
+  end
+
+  def purchase_request_bulk_approval(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_pr'
+    end
+  end
+
+  def purchase_request_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_pr'
+    end
+  end
+
+  def purchase_request_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_pr'
+    end
   end
 end
