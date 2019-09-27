@@ -78,7 +78,13 @@ module Constants
 
   # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   # using the below one because the above one's monthly quota was crossed
-  CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
+  if Rails.env.production?
+    # CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
+    # temporary because the above ran out #todo - change by end of month
+    CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  else
+    CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  end
 
   # PayU Payment Gateway URL
   if Rails.env.production?
