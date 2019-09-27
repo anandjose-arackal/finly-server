@@ -5,6 +5,11 @@ class Event::EPurchaseRequest::Unapprove < Event::EPurchaseRequest::Base
     'Purchase request Unapproved'
   end
 
+  def init
+    super
+    self.approving_user = self.purchase_request.trails&.last&.action_user
+  end
+
   def validate
     super
     unless self.approving_user.present? or auto_approve
@@ -33,7 +38,7 @@ class Event::EPurchaseRequest::Unapprove < Event::EPurchaseRequest::Base
                                              path_object_id: purchase_request.id,
                                              path_object_type: "PurchaseRequest",
                                              read: false,
-                                             timestamp: DateUtils,
+                                             timestamp: DateUtils.local_date_time,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
