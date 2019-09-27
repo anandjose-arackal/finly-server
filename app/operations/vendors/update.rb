@@ -68,6 +68,21 @@ class Vendors::Update < Vendors::Base
         # validate_pan(vendor_parameters)
       end
     end
+
+    if self.vendor_parameters[:bank_accounts_attributes].blank?
+      add_message :error, "Please provide bank account details"
+      return
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      # check to see the number of bank account sent is equal to the bank account marked for destruction
+      ba_count = self.vendor_parameters[:bank_accounts_attributes].count
+      ba_delete_count = self.vendor_parameters[:bank_accounts_attributes].select {|b| b[:_destroy] == true}.count
+      if ba_count == ba_delete_count
+        add_message :error, "Please provide bank account details"
+        return
+      end
+    end
   end
 
   def pre_process
@@ -113,6 +128,12 @@ class Vendors::Update < Vendors::Base
     end
 
     self.vendor_parameters.delete(:override_vendor_id)
+
+    if vendor_parameters&.dig(:vendor_attachments_attributes).present?
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
+    end
   end
 
   def process
