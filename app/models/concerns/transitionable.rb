@@ -147,6 +147,7 @@ module Transitionable
 
         data = chain[level_number - 1] || {}
 
+        data[:level_id] = dlrm.level_id
         data[:level_number] = dlrm.level_number
         data[:level_name] = dlrm.level.name
         data[:policy_id] = dlrm.policy_id
@@ -349,6 +350,12 @@ module Transitionable
 
     # In case reviewer wants to reject it to a particular user who had previously approved
     def reject_to_users
+      previous_dlrms = self.document_level_reviewer_mappings.where('level_id < ?', self.level&.id)
+      user_ids = []
+      previous_dlrms.each do |dlrm|
+        user_ids << get_reviewers(dlrm&.level_id)
+      end
+      User.where(id: user_ids)
     end
 
     def can_return_control?

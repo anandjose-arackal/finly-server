@@ -3,7 +3,8 @@ class WorkflowManager::Aasm::BaseProvider
 
   attr_accessor :document_state, :document, :user, :violations_present, :policy, :policy_id,
                 :current_level, :next_level, :previous_level, :forwarded_to_user,
-                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name, :error_message
+                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name, :error_message,
+                :reject_to_user, :reject_to_level
 
   def initialize(user, params)
     self.user = user
@@ -25,6 +26,9 @@ class WorkflowManager::Aasm::BaseProvider
     self.current_level_reviewers = self.document.get_reviewers(nil, provider_name)
     self.reviewers = self.document.get_reviewers(:next, provider_name)
     self.document_update_params = {}
+
+    self.reject_to_user = self.user.company.users.with_id(params[:reject_to_user])&.first
+    self.reject_to_level = self.document.get_level_with_id(params[:reject_to_level])
   end
 
   private
@@ -146,7 +150,11 @@ class WorkflowManager::Aasm::BaseProvider
     end
 
     if [:reject].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings
+      if self.reject_to_user.present? && self.reject_to_level.present?
+        dlrm = document.document_level_reviewer_mappings.where('level_id > ?', self.reject_to_level.id)
+      else
+        dlrm = document.document_level_reviewer_mappings
+      end
       dlrm.update_all(
               taken_control: false,
               taken_control_by_id: nil,
@@ -181,6 +189,10 @@ class WorkflowManager::Aasm::BaseProvider
     # :unapprove should move one level back
     if [:unapprove].include?(aasm.current_event)
       self.new_level = self.previous_level
+    end
+
+    if [:reject].include?(aasm.current_event) && self.reject_to_user.present? && self.reject_to_level.present?
+      self.new_level = self.reject_to_level
     end
   end
 

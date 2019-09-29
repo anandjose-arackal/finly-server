@@ -22,6 +22,12 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
       add_message :error, "Only reviewers in the approval flow or the admin can reject the Purchase Order."
       return
     end
+
+    if params[:reject_to_user].present? && params[:reject_to_level].present?
+      unless self.purchase_order.get_reviewers(params[:reject_to_level]).pluck(:id).include? params[:reject_to_user]
+        add_message :error, "User details not found for this level"
+      end
+    end
   end
 
   def process
