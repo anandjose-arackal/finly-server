@@ -45,7 +45,7 @@ module Events::Consumer
     self.send(:on_event, user, message) if self.respond_to?(:on_event)
   end
 
-  # def receive(user, message)
+  # def on_event(user, message)
   #   # Implement me
   #   ack!
   # end

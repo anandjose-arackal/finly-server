@@ -1,11 +1,27 @@
-class TaskManager::Workflows::APIRunner < Transactions::API
+class TaskManager::Runner < Transactions::API
+
+  class TaskManager::Runner::BackgroundJob < ApplicationJob
+
+    def perform(options={})
+      user = User.find_by(id: options[:user_id])
+      params = {}
+      params[:message] = options[:message]
+      params[:task_workflow_id] = options[:task_workflow_id]
+      params[:api] = options[:api] if options[:api]
+      trigger = options[:trigger]
+      TaskManager::Runner.(params, 'current_user' => user, 'trigger' => trigger)
+    end
+
+  end
+
 
   skip_user_authorization!
 
   schema do
     params do
       required(:message).filled
-      required(:api).filled
+      optional(:api).filled
+      optional(:task_workflow_api).filled
     end
   end
 
@@ -27,6 +43,11 @@ class TaskManager::Workflows::APIRunner < Transactions::API
   def setup(options, current_user:, params:, **)
     options['message'] = params&.dig(:message)
     options['api'] = params&.dig(:api)
+    if params&.dig(:task_workflow_id)
+      options['api'] = TaskWorkflow.find_by(id: params&.dig(:task_workflow_id))
+    end
+    return false if options['api'].blank?
+
     true
   end
 
@@ -64,7 +85,6 @@ class TaskManager::Workflows::APIRunner < Transactions::API
 
     case trigger
     when :event
-
       # Type Record
       # IF record is provided in message
       # Verify if record exists in filters
@@ -72,9 +92,9 @@ class TaskManager::Workflows::APIRunner < Transactions::API
       # # Find records from filters and params ID
       # #
       # Type Collection
-      #
+      # # Find records from filters and params
     when :schedule
-
+      # Find records from filters
     end
     return on_error(options, :base, 'Input is blank') if message.blank?
     options['input'] = message

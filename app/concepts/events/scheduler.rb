@@ -45,7 +45,7 @@ module Events::Scheduler
 
     def setup_job
       frequency = schedule[:every]
-      at = "#{schedule[:day_of_the_week]}" if schedule[:day_of_the_week]
+      at = "#{schedule[:day_of_the_week]} " if schedule[:day_of_the_week]
       at += "#{schedule[:hour].to_s.rjust(2, '0')}:#{schedule[:minute].to_s.rjust(2, '0')}"
       # Todo handle day of the month
       Clockwork.every frequency, self.name, at: at do
@@ -54,7 +54,7 @@ module Events::Scheduler
     end
   end
 
-  def perform
+  def perform(options={})
     on_schedule
   end
 

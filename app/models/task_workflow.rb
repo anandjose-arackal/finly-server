@@ -31,4 +31,45 @@ class TaskWorkflow < ApplicationRecord
   enum trigger_type: {schedule: 1, event: 2}
 
   resolver TaskManager::Workflows::Policy::Scope
+
+  scope :with_event, -> (event) {where event_key: event}
+
+  # Functions required by API runner
+  def document
+    Object.const_get(model_class)
+  end
+
+  def user_roles(*list)
+    @user_roles = list if list.present?
+    @user_roles ||= []
+  end
+
+  def filters
+    # Todo build filters from database
+  end
+
+  def actions
+    # Generate actions list from database
+  end
+
+  def input
+  end
+
+  def payload_validations
+  end
+
+  def input_validations
+  end
+
+  def pre_processes
+  end
+
+  def post_processes
+  end
+
+  def success_processes
+  end
+
+  def failed_processes
+  end
 end

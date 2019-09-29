@@ -1,4 +1,4 @@
-class TaskManager::Workflows::API
+class TaskManager::API
   include Events::Consumer
   include Events::Scheduler
 
@@ -6,12 +6,12 @@ class TaskManager::Workflows::API
 
   # When a new event is received
   def on_event(user, message)
-    TaskManager::Workflows::APIRunner.({api: self.class, message: message}, 'current_user' => user, 'trigger' => :event)
+    TaskManager::Runner.({api: self.class, message: message}, 'current_user' => user, 'trigger' => :event)
   end
 
   def on_schedule
     User.filter_role(self.user_roles).each do |user|
-      TaskManager::Workflows::APIRunner.({api: self.class}, 'current_user' => user, 'trigger' => :schedule)
+      TaskManager::Runner.({api: self.class}, 'current_user' => user, 'trigger' => :schedule)
     end
   end
 
@@ -31,16 +31,6 @@ class TaskManager::Workflows::API
     raise "Input cannot be blank in #{self.name}" if condition.nil?
 
     input_validations << condition
-  end
-
-  def self.record(record=NoObject)
-    @record = record unless record == NoObject
-    @record
-  end
-
-  def self.input(input = NoObject)
-    @input = input unless input == NoObject
-    @input
   end
 
   def self.pre_process(pre_process)
@@ -65,6 +55,16 @@ class TaskManager::Workflows::API
     raise "PreProcess cannot be blank in #{self.name}" if failed_process.nil?
 
     failed_processes << failed_process
+  end
+
+  def self.record(record=NoObject)
+    @record = record unless record == NoObject
+    @record
+  end
+
+  def self.input(input = NoObject)
+    @input = input unless input == NoObject
+    @input
   end
 
   def self.payload_validations
