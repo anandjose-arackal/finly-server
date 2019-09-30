@@ -18,7 +18,7 @@ class Event::EBankPaymentRequest::NotifyVendor < Event::EBankPaymentRequest::Bas
   end
 
   def validate
-    super
+    # super
     unless self.crediting_user.present?
       add_message :error, 'User not found'
     end
@@ -110,8 +110,8 @@ class Event::EBankPaymentRequest::NotifyVendor < Event::EBankPaymentRequest::Bas
       self.document_details[:email] = self.payment.parent.gstin_location&.poc_email
       self.document_details[:document_name] = self.payment.parent_type.titleize
       self.document_details[:document_id] = self.payment.parent_type.po_number
-    when 'Beneficiary'
-      self.document_details[:email] = self.payment.vendor.gstin_locations.pluck(:poc_email).reject{|email| email.empty? }.first
+    when 'BeneficiaryPayment'
+      self.document_details[:email] = self.payment.receiving_user.gstin_locations.pluck(:poc_email).reject{|email| email.empty? }.first
       self.document_details[:document_name] = self.payment.parent_type.titleize
       self.document_details[:document_id] = ""
     end

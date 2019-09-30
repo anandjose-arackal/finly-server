@@ -39,30 +39,30 @@ class Event::EVendors::Update < Event::EVendors::Base
   end
 
   def mailer_body(user)
-    message = "Vendor details for #{self.document.business_name} were updated by #{user.name} \n\n"
+    message = "Vendor details for #{self.document.business_name} were updated by #{user.name} <br><br>"
 
     if params[:vendor_changes].present?
 
-      message += "These were the changes: \n"
+      message += "These were the changes: <br>"
 
       # start bank account was changed
       if params[:vendor_changes][:bank_account_changed].present?
         params[:vendor_changes][:bank_accounts].each do |bank_account|
           next if bank_account.blank?
-          message += "-----\n"
+          message += "-----<br>"
           if bank_account[:name].present?
-            message += "Old Name - #{bank_account[:name].first}\n"
-            message += "New Name - #{bank_account[:name].last}\n"
+            message += "Old Name - #{bank_account[:name].first}<br>"
+            message += "New Name - #{bank_account[:name].last}<br>"
           end
 
           if bank_account[:account_number].present?
-            message += "Old Account Number - #{bank_account[:account_number].first}\n"
-            message += "New Account Number - #{bank_account[:account_number].last}\n"
+            message += "Old Account Number - #{bank_account[:account_number].first}<br>"
+            message += "New Account Number - #{bank_account[:account_number].last}<br>"
           end
 
           if bank_account[:ifsc].present?
-            message += "Old IFSC - #{bank_account[:ifsc].first}\n"
-            message += "New IFSC - #{bank_account[:ifsc].last}\n"
+            message += "Old IFSC - #{bank_account[:ifsc].first}<br>"
+            message += "New IFSC - #{bank_account[:ifsc].last}<br>"
           end
         end
       end
