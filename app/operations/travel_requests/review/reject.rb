@@ -22,6 +22,17 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
       add_message :error, 'Please provide a reason for rejection'
       return
     end
+
+
+    if params[:reject_to_user].present? && params[:reject_to_level].present?
+      reject_to_details = self.travel_request.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
+      
+      # if rejection possible to requested level and the requested level has the same user details as sent by FE
+      if reject_to_details[params[:reject_to_level]].blank? && (reject_to_details[params[:reject_to_level]].try(:id) != params[:reject_to_user])
+        add_message :error, "User details not found for this level"
+      end
+    end
+
   end
 
   def process

@@ -23,8 +23,12 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
       return
     end
 
+
     if params[:reject_to_user].present? && params[:reject_to_level].present?
-      unless self.purchase_order.get_reviewers(params[:reject_to_level]).pluck(:id).include? params[:reject_to_user]
+      reject_to_details = self.purchase_order.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
+      
+      # if rejection possible to requested level and the requested level has the same user details as sent by FE
+      if reject_to_details[params[:reject_to_level]].blank? && (reject_to_details[params[:reject_to_level]].try(:id) != params[:reject_to_user])
         add_message :error, "User details not found for this level"
       end
     end
