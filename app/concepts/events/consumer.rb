@@ -2,22 +2,33 @@ module Events::Consumer
 
   def self.included(base)
     base.extend ClassMethods
+    base.include Dry::Monads[:result]
   end
 
   module ClassMethods
-    def consumes_event!(key, opts={})
-      include Sneakers::Worker unless self.respond_to?(:from_queue)
-      unless key == NoObject
-        @event = key
-        @event_options = opts
+    def consumes_event!(key, opts = {})
+
+      @event = key
+      @event_options = opts
+      @async = !opts&.dig(:sync)
+      @consumes_event = true
+
+      Events::Registry.register self, key, @async, opts
+
+      if async
+        include Sneakers::Worker unless self.respond_to?(:from_queue)
         from_queue key, opts
       end
-      @consumes_event = true
+
       @event
     end
 
     def consumes_event?
       !!@consumes_event
+    end
+
+    def async
+      @async
     end
   end
 

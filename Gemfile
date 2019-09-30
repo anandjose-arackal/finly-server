@@ -13,6 +13,7 @@ gem 'parslet', '~> 1.8.2'
 
 gem 'rufus-scheduler'
 gem 'clockwork'
+gem 'dry-monads'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'

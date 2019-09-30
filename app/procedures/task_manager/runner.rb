@@ -77,7 +77,7 @@ class TaskManager::Runner < Transactions::API
       return on_error(options, :base, 'Input is blank') if options['input'].blank?
     end
 
-    return on_error(options, :base, 'Input is not provided') unless api.document and event
+    return on_error(options, :base, 'Input is not provided') unless api.document
 
     unless api.document.record_event?(event) or api.document.collection_event?(event)
       return on_error(options, :base, 'Event is not registered as record or collection')
