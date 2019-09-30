@@ -40,6 +40,8 @@ class Receipt::Update < Receipt::Base
 
   private
   def update_params
-    params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
+    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
+    p[:image] = params[:receipt][:image] rescue nil
+    p.permit!
   end
 end
