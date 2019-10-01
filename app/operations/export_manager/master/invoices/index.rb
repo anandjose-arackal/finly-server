@@ -140,6 +140,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_discount: {spreadsheet: true},
+             line_item_discount: {spreadsheet: true},
              line_item_sgst: {spreadsheet: true},
              line_item_cgst: {spreadsheet: true},
              line_item_igst: {spreadsheet: true},
@@ -333,6 +335,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_slab&.tds || 0
   end
 
+  def invoice_discount(invoice_line_item)
+    invoice_line_item.parent&.discount_amount.value || 0
+  end
+
+  def line_item_discount(invoice_line_item)
+    invoice_line_item.discount_amount.value || 0
+  end
+
   def line_item_sgst(invoice_line_item)
     invoice_line_item.sgst || 0
   end
@@ -346,7 +356,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def advance_amount(invoice_line_item)
-    value = invoice_line_item.parent&.advance_amount || 0
+    value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
     precision_value(value)
   end
 

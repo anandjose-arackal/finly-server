@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted)
 
   end
 
@@ -130,6 +130,21 @@ class Vendors::Create < Vendors::Base
           add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
           return
         end
+      end
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].blank?
+      add_message :error, "Please provide bank account details"
+      return
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      # check to see the number of bank account sent is equal to the bank account marked for destruction
+      ba_count = self.vendor_parameters[:bank_accounts_attributes].count
+      ba_delete_count = self.vendor_parameters[:bank_accounts_attributes].select {|b| b[:_destroy] == true}.count
+      if ba_count == ba_delete_count
+        add_message :error, "Please provide bank account details"
+        return
       end
     end
 

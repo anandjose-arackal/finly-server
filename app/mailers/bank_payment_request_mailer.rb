@@ -7,4 +7,10 @@ class BankPaymentRequestMailer < ApplicationMailer
     mail to: presenter.recipient, cc: cc_emails, subject: presenter.subject, template_name: 'template'
   end
 
+  def notify_vendor(presenter)
+  	return if presenter.failure?
+    @data = presenter
+    mail to: @data.to, subject: @data.subject, template_name: 'vendor_template'
+  end
+
 end
