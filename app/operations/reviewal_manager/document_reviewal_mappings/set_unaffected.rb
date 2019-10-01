@@ -1,3 +1,9 @@
+# Ideal System
+# OP : Find reviewers for passed levels for a document
+#
+# OP : Set
+
+
 class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :mappings_params, :document, :provider_name,
                 :reviewal_chain_data, :violations_present, :document_amount, :dlrm_mapping_data,
