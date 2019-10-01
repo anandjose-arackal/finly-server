@@ -64,31 +64,31 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def trips
-    {name: 'Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
+    {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
   end
 
   def your_trips
-    {name: 'Your Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
+    {name: 'Your Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
   end
 
   def trips_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'trips', url: 'trips/params={"view":"manager", "filter_status":"processing"}'}
+    {name: 'Awaiting Approval', id: 'trips', url: 'travel_requests/params={"view":"manager", "filter_status":"processing"}'}
   end
 
   def team_trips
     return nil unless user.manager? || user.admin?
-    {name: 'Team Trips', id: 'trips', url: 'trips/params={"view":"manager"}'}
+    {name: 'Team Trips', id: 'trips', url: 'travel_requests/params={"view":"manager"}'}
   end
 
   def travel_manager_trips
     return nil unless user.travel_manager?
-    {name: 'Travel Manager Trips', id: 'trips', url: 'trips/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
+    {name: 'Travel Manager Trips', id: 'trips', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
     return nil unless user.admin?
-    {name: 'Company Trips', id: 'trips', url: 'trips/params={"view":"admin"}'}
+    {name: 'Company Trips', id: 'trips', url: 'travel_requests/params={"view":"admin"}'}
   end
 
   def reports
@@ -115,26 +115,26 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def money_requests
-    {name: 'Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"personal"}'}
+    {name: 'Money Requests', id: 'money_requests', url: 'money_request/params={"view":"personal"}'}
   end
 
   def your_money_requests
-    {name: 'Your Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"personal"}'}
+    {name: 'Your Money Requests', id: 'money_requests', url: 'money_request/params={"view":"personal"}'}
   end
 
   def money_requests_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'money_requests', url: 'money_requests/params={"view":"manager", "filter_status":"99"}'}
+    {name: 'Awaiting Approval', id: 'money_requests', url: 'money_request/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_money_requests
     return nil unless user.manager? || user.admin?
-    {name: 'Team Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"manager"}'}
+    {name: 'Team Money Requests', id: 'money_requests', url: 'money_request/params={"view":"manager"}'}
   end
 
   def company_money_requests
     return nil unless user.admin?
-    {name: 'Company Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"admin"}'}
+    {name: 'Company Money Requests', id: 'money_requests', url: 'money_request/params={"view":"admin"}'}
   end
 
   def team_users
@@ -200,7 +200,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def create_trip
-    {name: 'Create Trip', id: 'create_trip', url: 'trips/params={"view":"personal",  "create": "true"}'}
+    {name: 'Create Trip', id: 'create_trip', url: 'travel_requests/params={"view":"personal",  "create": "true"}'}
   end
 
   def create_report
@@ -208,7 +208,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def create_money_request
-    {name: 'Create Money Request', id: 'create_money_request', url: 'money_requests/params={"view":"personal", "create": "true"}'}
+    {name: 'Create Money Request', id: 'create_money_request', url: 'money_request/params={"view":"personal", "create": "true"}'}
   end
 
 end
