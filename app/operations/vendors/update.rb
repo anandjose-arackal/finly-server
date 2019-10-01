@@ -1,6 +1,6 @@
 class Vendors::Update < Vendors::Base
 
-  attr_accessor :vendor, :vendor_parameters
+  attr_accessor :vendor, :vendor_parameters, :vendor_changes
 
   def personalizer
     {
@@ -139,12 +139,36 @@ class Vendors::Update < Vendors::Base
   def process
     validate_custom_fields(false)
     return if has_errors?
-    unless vendor.update(vendor_parameters)
+    
+    vendor.assign_attributes(vendor_parameters)
+
+
+    if vendor.valid?
+      self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
+      vendor.save
+    else
       add_message :error, vendor.errors.full_messages
     end
+
+    # unless vendor.update(vendor_parameters)
+    #   add_message :error, vendor.errors.full_messages
+    # end
   end
 
   def post_process
     add_message :success, "Vendor updated"
+    if self.vendor_changes[:bank_account_changed].present?
+      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
+    end
+  end
+
+  private
+
+  def detect_changes_in_vendor(vendor)
+    return {} if vendor.bank_accounts.blank?
+    {
+      bank_account_changed: vendor.bank_accounts.map {|v| v.changes_to_save if v.changes_to_save.present?}.compact,
+      bank_accounts: vendor.bank_accounts.map {|v| v.changes_to_save}
+    }
   end
 end

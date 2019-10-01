@@ -39,6 +39,7 @@ class Procurements::PurchaseRequests::Unapprove < Procurements::PurchaseRequests
   end
 
   def post_process
+    Event::EPurchaseRequest::Unapprove.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     add_message :success, "Purchase request unapproved"
   end
 
