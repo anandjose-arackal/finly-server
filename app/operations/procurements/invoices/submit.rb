@@ -50,6 +50,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
+    validate_agreement_limit
   end
 
   def process
@@ -80,10 +81,32 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
+    update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
+  end
+
+  def validate_agreement_limit
+    if self.inward_invoice.agreement_item.present?
+      payment_agreement = inward_invoice.agreement_item.payment_agreement
+      available_limit = inward_invoice.agreement_item&.available_invoice_amount&.value
+      if available_limit < inward_invoice&.balance_due&.value
+        add_message :error, "Final amount cannot exceed avaiable agreement limit of Rs. #{available_limit}"
+        return
+      end
+    end
+  end
+
+  def update_agreement_available_limit
+    if self.inward_invoice.agreement_item.present?
+      payment_agreement = self.inward_invoice.agreement_item.payment_agreement
+      invoiced_amount_sum = payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
+      available_limit = self.inward_invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
+      self.inward_invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
+      return
+    end
   end
 end

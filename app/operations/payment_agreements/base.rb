@@ -35,6 +35,7 @@ class PaymentAgreements::Base < BaseOperation
         total_after_tax_attributes: [:id, :currency_id, :value],
         advance_amount_attributes: [:id, :currency_id, :value],
         balance_amount_attributes: [:id, :currency_id, :value],
+        total_invoice_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
         # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],

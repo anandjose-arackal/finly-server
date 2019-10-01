@@ -217,7 +217,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Please select the bank account for the vendor. If they are not present, please update this detail from the Vendor Empanelment screen."
       return
     end
-
   end
 
   def pre_process
@@ -325,6 +324,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
 
     validate_custom_fields_invoice
+    validate_agreement_limit
     return if has_errors?
 
     if inward_invoice.valid?
@@ -361,6 +361,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def post_process
+    update_agreement_available_limit
     add_message :success, "Invoice updated"
   end
 
@@ -377,5 +378,24 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     month.strip.to_i.between?(1, 12)
   end
 
+  def validate_agreement_limit
+    if self.inward_invoice.agreement_item.present?
+      payment_agreement = inward_invoice.agreement_item.payment_agreement
+      available_limit = inward_invoice.agreement_item&.available_invoice_amount&.value
+      if available_limit < inward_invoice&.balance_due&.value
+        add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
+        return
+      end
+    end
+  end
 
+  def update_agreement_available_limit
+    if self.inward_invoice.agreement_item.present?
+      payment_agreement = self.inward_invoice.agreement_item.payment_agreement
+      invoiced_amount_sum = payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
+      available_limit = self.inward_invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
+      self.inward_invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
+      return
+    end
+  end
 end
