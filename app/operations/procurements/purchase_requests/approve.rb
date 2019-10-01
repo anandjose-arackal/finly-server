@@ -54,6 +54,7 @@ class Procurements::PurchaseRequests::Approve < Procurements::PurchaseRequests::
   end
 
   def post_process
+    Event::EPurchaseRequest::Approve.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     add_message :success, "Purchase request approved"
   end
 end

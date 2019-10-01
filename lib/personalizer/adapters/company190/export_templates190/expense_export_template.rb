@@ -32,7 +32,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
       self.reports = Report.finance_associated_items(user).not_open
     end
 
-    self.reports = reports.processed.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
+    self.reports = reports.approved.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = ["Expense ID",
@@ -88,28 +88,29 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << expense.user&.department&.department_code
         data_arr << expense.user&.cost_center&.name
         data_arr << expense.user&.cost_center&.cost_center_code
-        data_arr << expense.user&.gl_config[:operation_unit] rescue ''
+        data_arr << (expense.user.gl_config[:operation_unit] rescue '')
         data_arr << expense.expense_type.name
         data_arr << expense.created_at&.strftime("%d-%m-%y")
         data_arr << expense.report&.id
         data_arr << expense.category&.name
         data_arr << expense.category&.gl_code
         data_arr << expense.spent_from&.name
-        data_arr << expense.expense_tax_type&.name&.humanize
-        data_arr << expense.gst_percentage
-        data_arr << expense.gst_type&.name&.humanize&.upcase
-        data_arr << expense.gst_amount&.value&.round(2)
-        data_arr << (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '')
-        data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
-        data_arr << (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') rescue ''
-        data_arr << (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2)
-        data_arr << expense.gstin_location&.location
-        data_arr << expense.gstin_location&.state&.name
-        data_arr << expense.state_of_expense&.name
-        data_arr << expense.hsn_sac
-        data_arr << expense.merchant_bill_no
-        data_arr << expense.tax_rate&.rate&.to_f
-        data_arr << expense.gstin_location&.gstin
+        gst_applicable  = expense.category&.gst_applicable?
+        data_arr << (gst_applicable ? expense.expense_tax_type&.name&.humanize : '')
+        data_arr << (gst_applicable ? expense.gst_percentage : '')
+        data_arr << (gst_applicable ? expense.gst_type&.name&.humanize&.upcase : '')
+        data_arr << (gst_applicable ? expense.gst_amount&.value&.round(2) : '')
+        data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '') : '')
+        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
+        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
+        data_arr << (gst_applicable ? (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value)
+        data_arr << (gst_applicable ? expense.gstin_location&.location : '')
+        data_arr << (gst_applicable ? expense.gstin_location&.state&.name : '')
+        data_arr << (gst_applicable ? expense.state_of_expense&.name : '')
+        data_arr << (gst_applicable ? expense.hsn_sac : '')
+        data_arr << (gst_applicable ? expense.merchant_bill_no : '')
+        data_arr << (gst_applicable ? expense.tax_rate&.rate&.to_f : '')
+        data_arr << (gst_applicable ? expense.gstin_location&.gstin : '')
 
         self.contents << data_arr
       end

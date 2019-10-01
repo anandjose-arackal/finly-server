@@ -15,6 +15,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       add_message :error, 'Payment Request not found'
       return
     end
+
+
     if params&.dig(:payment_request).present?
       unless params[:payment_request].valid?
         add_message :error, params[:payment_request].errors.full_messages
@@ -29,6 +31,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
   def init
+
+
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
     self.payment_order = params[:payment_order]
@@ -49,6 +53,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company_id = payment_request.company_id
       self.company = Company.find_by(id: self.company_id)
     end
+
 
     # if the payment order is already present, need to add the variables here
     if self.payment_order.present?
@@ -75,6 +80,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         self.background = true
       end
     end
+
+
     # if none of the above, i.e. payment request or payment order both are not present,
     # the only remaining thing to check is crediting payments
     self.crediting_payments = params[:crediting_payments] if self.crediting_payments.blank?
@@ -88,6 +95,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       add_message :error, "No payments passed. Please try again"
       return
     end
+
 
     op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
     unless op.success?
@@ -124,7 +132,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def process
     # now the actual execution of the payment orderapp/operations/payment_processor_rules/rules/status_checks/status_checker.rb:41, based on whether it's
     # synchronous or a background operation
-
     if self.crediting_payments.present?
       if self.background
         scheduled_at = self.crediting_payments.pluck(:scheduled_at).uniq&.compact.first

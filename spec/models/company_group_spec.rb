@@ -2,10 +2,11 @@
 #
 # Table name: company_groups
 #
-#  id         :bigint           not null, primary key
-#  name       :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id                 :bigint           not null, primary key
+#  name               :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  default_company_id :integer
 #
 
 require 'rails_helper'

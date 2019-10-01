@@ -56,7 +56,7 @@ class Admin::Implementations::Processor::Base < BackgroundOperation
     self.implementation_request.completed_items += 1
     self.implementation_request.success_items += 1 if success
     self.implementation_request.failed_items += 1 unless success
-
+    self.implementation_request.save
   end
 
   def progress_update(status, message: nil)

@@ -79,7 +79,7 @@ json.payments do
         json.tds_rate precision_value invoice.tds_rate
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
-        json.invoice_id invoice.id
+        json.invoice_id invoice.invoice_id
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
