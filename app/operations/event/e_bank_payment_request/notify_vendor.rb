@@ -105,11 +105,11 @@ class Event::EBankPaymentRequest::NotifyVendor < Event::EBankPaymentRequest::Bas
     when 'Invoice'
       self.document_details[:email] = self.payment.parent.gstin_location&.poc_email
       self.document_details[:document_name] = self.payment.parent_type.titleize
-      self.document_details[:document_id] = self.payment.parent_type.invoice_number
+      self.document_details[:document_id] = self.payment.parent.invoice_number
     when 'PurchaseOrder'
       self.document_details[:email] = self.payment.parent.gstin_location&.poc_email
       self.document_details[:document_name] = self.payment.parent_type.titleize
-      self.document_details[:document_id] = self.payment.parent_type.po_number
+      self.document_details[:document_id] = self.payment.parent.po_number
     when 'BeneficiaryPayment'
       self.document_details[:email] = self.payment.receiving_user.gstin_locations.pluck(:poc_email).reject{|email| email.empty? }.first
       self.document_details[:document_name] = self.payment.parent_type.titleize
