@@ -105,6 +105,9 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
     # payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
     payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id))
     payments.each do |payment|
+      # notify vendor that they got the money they deserved
+      Event::EBankPaymentRequest::NotifyVendor.(user, payment: payment)
+
       case payment.parent_type
       when 'Invoice'        
         document_owner = payment.invoice.created_by

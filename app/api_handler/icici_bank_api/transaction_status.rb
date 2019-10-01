@@ -68,15 +68,13 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 200
         self.api_response_success = true
         self.transaction_status_response = self.parsed_response["STATUS"]
-        case self.transaction_status_response
+        case self.transaction_status_response&.upcase
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
             # This is because only IMPS and RTGS transactions return the URT in the API
-            if utr.present? && (self.icici_bank_transaction.imps? || self.icici_bank_transaction.rtgs?)
+            # Now all transactions give UTR in the transaction status API
+            if utr.present?
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
-            else
-              # in this case just the status of the payment is confirmed, but the UTR is not available, so just update the transaction status
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
             end
           when "PENDING FOR PROCESSING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
