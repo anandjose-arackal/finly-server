@@ -5,15 +5,16 @@
 #
 #
 
-class ReviewalManager::DocumentReviewalMappings::RetrieveReviewers < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :document, :provider_name, :violations_present, :mappings, :policy, :target_user, :document_amount
+class ReviewalManager::DocumentReviewalMappings::RetrieveMappings < ReviewalManager::DocumentReviewalMappings::Base
+  attr_accessor :document, :provider_name, :violations_present, :level_ids,
+                :mappings, :policy, :target_user_id, :document_amount
 
   def init
     self.document = params[:reviewal_document]
     self.provider_name = params[:provider_name] || document.get_default_provider
     self.violations_present = !!params[:violations_present]
     self.level_ids = params[:level_ids].sort
-    self.target_user = params[:target_user] || user
+    self.target_user_id = params[:target_user_id] || user.id
     self.mappings = []
 
     self.policy = params[:policy]
@@ -40,21 +41,38 @@ class ReviewalManager::DocumentReviewalMappings::RetrieveReviewers < ReviewalMan
       level = policy.levels.where(associated_entity_type: provider_name).find_by id: level_id
 
       if level.present?
-        data = {level: level.as_json}
+        data = {level: level.as_json, skip: false, level_id: level.id}
 
-        lurms_with_conditions = level.level_user_reviewer_mappings.where(user_id: target_user.id).with_threshold(document_amount).with_exception(violations_present)
-        lurms_without_conditions = level.level_user_reviewer_mappings.where(user_id: target_user.id)
-        lrms = level.level_reviewer_mappings.non_deleted.with_threshold(document_amount).with_exception(violations_present)
+        lurms = level.level_user_reviewer_mappings.where(user_id: target_user_id).as_json
 
-        if lurms_with_conditions.present?
-          lurms = level.level_user_reviewer_mappings.where(user_id: target_user.id)
-          data[:mappings] = lurms_with_conditions.as_json
-        elsif lurms_without_conditions.present?
-          data[:mappings] = lurms_without_conditions.as_json
-          data[:skip] = true
+        if lurms.present?
+          lurms_wo_reviewer = lurms.filter {|item| item["reviewer_id"].blank? }
+
+          if lurms_wo_reviewer.present?
+            data[:skip] = true
+          else
+            lurms_w_conditions = lurms.filter do |item|
+              if violations_present
+                (item["min"] <= document_amount) && (item["max"].blank? || item["max"] >= document_amount) && item["exception"]
+              else
+                (item["min"] <= document_amount) && (item["max"].blank? || item["max"] >= document_amount) && item["wo_exception"]
+              end
+            end
+            if lurms_w_conditions.present?
+              data[:mappings] = lurms_w_conditions
+            else
+              data[:skip] = true
+            end
+          end
         else
-          data[:mappings] = lrms.as_json
+          lrms = level.level_reviewer_mappings.non_deleted.with_threshold(document_amount).with_exception(violations_present).as_json
+          if lrms.present?
+            data[:mappings] = lrms
+          else
+            data[:skip] = true
+          end
         end
+
 
         self.mappings.push(data)
       end
@@ -63,11 +81,11 @@ class ReviewalManager::DocumentReviewalMappings::RetrieveReviewers < ReviewalMan
 
   def success
     params[:reviewer_mappings] = self.mappings
-    ReviewalManager::DocumentReviewalMappings::RetrieveReviewers::ReviewersPresenter.new(user, params, :messages)
+    ReviewalManager::DocumentReviewalMappings::RetrieveMappings::MappingsPresenter.new(user, params, :messages)
   end
 
 
-  class ReviewalManager::DocumentReviewalMappings::RetrieveReviewers::ReviewersPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ReviewalManager::DocumentReviewalMappings::RetrieveMappings::MappingsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reviewer_mappings
 
     def init
