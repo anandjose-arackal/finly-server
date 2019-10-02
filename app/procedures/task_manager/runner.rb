@@ -22,6 +22,7 @@ class TaskManager::Runner < Transactions::API
       required(:message).filled
       optional(:api).filled
       optional(:task_workflow_api).filled
+      required(:trigger).filled
     end
   end
 
@@ -89,7 +90,7 @@ class TaskManager::Runner < Transactions::API
       # IF record is provided in message
       # Verify if record exists in filters
       # ELSE
-      # # Find records from filters and params ID
+      # # Find records from record id, filters and params ID
       # #
       # Type Collection
       # # Find records from filters and params

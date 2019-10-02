@@ -36,7 +36,7 @@ class TaskWorkflow < ApplicationRecord
 
   # Functions required by API runner
   def document
-    Object.const_get(model_class)
+    @document ||= Object.const_get(model_class)
   end
 
   def user_roles(*list)
@@ -45,7 +45,8 @@ class TaskWorkflow < ApplicationRecord
   end
 
   def filters
-    # Todo build filters from database
+    TaskManager::Workflow::Condition.new(conditions).to_ransack
+    # Todo convert conditions to ransack
   end
 
   def actions
