@@ -1,6 +1,7 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present, :forwarded_to_user,
-                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name
+                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name,
+                :reject_to_user, :reject_to_level
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -8,6 +9,8 @@ class WorkflowManager::Base < BaseOperation
     self.note = params[:note]
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
+    self.reject_to_user = params[:reject_to_user]
+    self.reject_to_level = params[:reject_to_level]
 
     # todo - The below switch case can be reduced to one line since provider name is already present
     self.document_class_name = self.document&.class&.name
@@ -16,7 +19,9 @@ class WorkflowManager::Base < BaseOperation
       violations_present: violations_present,
       document: document,
       provider_name: provider_name,
-      forwarded_to_user: forwarded_to_user
+      forwarded_to_user: forwarded_to_user,
+      reject_to_level: reject_to_level,
+      reject_to_user: reject_to_user
     }
 
     case self.document_class_name

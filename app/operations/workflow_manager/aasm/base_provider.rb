@@ -28,7 +28,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.document_update_params = {}
 
     self.reject_to_user = self.user.company.users.with_id(params[:reject_to_user])&.first
-    self.reject_to_level = self.document.get_level_with_id(params[:reject_to_level])
+    self.reject_to_level = self.document.get_level_with_id(params[:reject_to_level].to_i)
   end
 
   private
@@ -84,7 +84,7 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Update Document Level Reviewer Mapping
     # find current document_level_reviewer_mappings
-    if [:approve, :reject].include?(aasm.current_event)
+    if [:approve].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(self.policy_id)
                  .where("taken_control_by_id = ? or reviewer_id = ? or forwarded_to_id = ?", user.id, user.id, user.id).first
 
@@ -151,6 +151,7 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:reject].include?(aasm.current_event)
       if self.reject_to_user.present? && self.reject_to_level.present?
+        document.document_level_reviewer_mappings.where('level_id = ?', self.reject_to_level.id).update_all(action_taken_by_id: nil, action_id: nil, rejected_by_id: user.id)
         dlrm = document.document_level_reviewer_mappings.where('level_id > ?', self.reject_to_level.id)
       else
         dlrm = document.document_level_reviewer_mappings
@@ -218,5 +219,9 @@ class WorkflowManager::Aasm::BaseProvider
 
   def user_can_unapprove?
     self.document.get_reviewers(:prev, provider_name).include?(user)
+  end
+
+  def reject_to_level?
+    reject_to_level.present? and reject_to_user.present?
   end
 end

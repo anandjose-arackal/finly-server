@@ -198,6 +198,14 @@ module Transitionable
           end
         end
 
+        if dlrm.rejected_by_id.present?
+          data[:rejected_by] = {
+            id: dlrm.rejected_by_id,
+            name: dlrm.rejected_by&.name,
+            email: dlrm.rejected_by&.email
+          }
+        end
+
         chain[level_number - 1] = data
       end
 

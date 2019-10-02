@@ -14,7 +14,7 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
       reject_to_details = self.purchase_request.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
       
       # if rejection possible to requested level and the requested level has the same user details as sent by FE
-      if reject_to_details[params[:reject_to_level]].blank? && (reject_to_details[params[:reject_to_level]].try(:id) != params[:reject_to_user])
+      if reject_to_details[params[:reject_to_level].to_i].blank? && (reject_to_details[params[:reject_to_level].to_i].try(:id) != params[:reject_to_user])
         add_message :error, "User details not found for this level"
       end
     end
@@ -36,7 +36,9 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
         self.purchase_request.update(reject_note: reject_note)
         self.workflow_output = op.workflow_output
 
-        raise ActiveRecord::Rollback unless reject_all_line_items
+        if params[:reject_to_user].blank? && params[:reject_to_level].blank?
+          raise ActiveRecord::Rollback unless reject_all_line_items
+        end
       end
     rescue
       add_message :error, 'Unable to reject'
@@ -52,6 +54,7 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
 
   private
   def reject_all_line_items
+    return if params[:reject_to_user].present? && params[:reject_to_level].present?
     self.purchase_request.purchase_request_items.non_rejected.each do |line_item|
       line_item.rejected = true
       line_item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
