@@ -95,9 +95,12 @@ json.expense_sections sorted_expenses do |category|
     json.potential_duplicate expense.has_duplicate_expenses?
     if expense.category.parent.present?
       json.category_name expense.category.parent.name
+      json.gst_applicable expense.category.parent&.gst_applicable
       json.sub_category expense.category.name
     else
       json.category_name expense.category.name
+      json.gst_applicable expense.category&.gst_applicable
+
     end
     if expense.note
       if expense.note.length < 29

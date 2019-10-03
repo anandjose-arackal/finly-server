@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :money_request_processor, :remaining_mappings, :utr, :pending_mappings
+  attr_accessor :payment_order, :money_request_processor, :remaining_mappings, :utr, :pending_mappings, :source_account
 
   def pre_validate
     if object.blank?
@@ -41,6 +41,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     end
 
     self.utr = params[:utr].present? ? params[:utr] : {}
+    self.source_account = params[:source_account].present? ? params[:source_account] : {}
 
     # Since now we can change individual item's status,
     # we check to see if any mappings are remaining to be processed,
@@ -75,11 +76,12 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
             if rejected or marked_as_completed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed, bank_reference_number: self.utr[mapping.id])
+                             marked_as_completed: marked_as_completed)
               mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                                 controlling_for_user_id: nil, controlling_for_user_role_id: nil,
                                                 status_id: request_status, payment_id: mapping.payment&.id)
               mapping.money_requests.each do |money_request|
+                money_request.update(bank_reference_number: self.utr[money_request.id], source_account: self.source_account[money_request.id])
                 money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
                                             action_user_role_id: self.money_request_processor.created_by_user_role_id,
                                             money_request_tracking_action_id: request_tracking_status,

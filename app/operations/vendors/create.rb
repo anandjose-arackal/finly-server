@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted)
 
   end
 
