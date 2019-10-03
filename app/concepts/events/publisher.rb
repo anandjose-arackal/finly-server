@@ -6,39 +6,83 @@ class Events::Publisher
     SyncBroadcast.(routing_key, message, current_user: current_user, ignore_failure: ignore_failure)
   end
 
+  def self.broadcast_to_listener(listener_class, message, current_user: nil)
+    ListenerBroadcast.(listener_class, message, current_user: current_user)
+  end
+
   class Record
     def self.Create(record, user, role, options = {})
       Events::Publisher.broadcast "#{record.class.event_channel}.create",
-                                  Payload.for(record, user, :create, role, options: options)
+                                  Payload.for_record(record, user, :create, options.merge(role: role)),
+                                  current_user: user
     end
 
     def self.Update(record, user, role, changes, options = {})
       Events::Publisher.broadcast "#{record.class.event_channel}.update",
-                                  Payload.for(record, user, :update, role, changes: changes, options: options)
+                                  Payload.for_record(record, user, :update, options.merge(role: role, changes: changes)),
+                                  current_user: user
     end
 
     def self.Destroy(record, user, role, options = {})
       Events::Publisher.broadcast "#{record.class.event_channel}.destroy",
-                                  Payload.for(record, user, :destroy, role, options: options)
+                                  Payload.for_record(record, user, :destroy, options.merge(role: role)),
+                                  current_user: user
     end
 
     def self.Transition(record, user, role, action, from_status, options = {})
       Events::Publisher.broadcast "#{record.class.event_channel}.#{action}",
-                                  Payload.for(record, user, action, role, from_status: from_status, options: options)
+                                  Payload.for_record(record, user, action, options.merge(role: role, from_status: from_status)),
+                                  current_user: user
     end
   end
 
+  def self.ToListener(listener_class, record, user, action, options = {})
+    event = listener_class.event
+    record_class = record.class.name == Class.name ? record : record.class
+    if record_class.collection_event?(event)
+      # Record should be an active record class to broadcast to listener
+      raise "Error broadcasting to listener" unless record_class == record
+
+      payload = Payload.for_collection(record, user, action, options = {})
+    elsif record_class.record_event?(event)
+      # Record should be an individual record to broadcast to listener
+      raise "Error broadcasting to listener" if record_class == record
+
+      payload = Payload.for_record(record, user, action, options)
+    end
+
+    Events::Publisher.broadcast_to_listener(listener_class, payload, current_user: user)
+  end
+
   class Payload
-    def self.for(record, action_user, action, role, changes: nil, from_status: nil, options: {})
+
+    VALID_OPTIONS= %i(filters from_status role changes)
+    def self.for_record(record, action_user, action, options: {})
       {
           record: record,
           action_user: action_user,
           action: action,
-          role: role,
-          from_status: from_status,
-          changes: changes,
-          options: options
+          options: options&.slice(VALID_OPTIONS)
       }.reject {|key, val| val.nil?}
+    end
+
+    def self.for_collection(record_class, action_user, action, options = {})
+      {
+          record_class: record_class,
+          action_user: action_user,
+          action: action,
+          options: options&.slice(VALID_OPTIONS)
+      }.reject {|key, val| val.nil?}
+    end
+  end
+
+  class ListenerBroadcast
+    def self.call(listener_class, message, current_user: nil)
+      if listener_class.async?
+        listener_class.perform_async(payload)
+      else
+        listener_class.new.trigger(payload)
+      end
     end
   end
 

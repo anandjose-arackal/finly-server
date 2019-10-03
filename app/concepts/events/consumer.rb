@@ -7,6 +7,7 @@ module Events::Consumer
 
   module ClassMethods
     def consumes_event!(key, opts = {})
+      include Sidekiq::Worker
 
       @event = key
       @event_options = opts
@@ -15,7 +16,7 @@ module Events::Consumer
 
       Events::Registry.register self, key, @async, opts
 
-      if async
+      if async?
         include Sneakers::Worker unless self.respond_to?(:from_queue)
         from_queue key, opts
       end
@@ -27,8 +28,12 @@ module Events::Consumer
       !!@consumes_event
     end
 
-    def async
+    def async?
       @async
+    end
+
+    def event
+      @event
     end
   end
 
@@ -51,6 +56,8 @@ module Events::Consumer
     trigger user, message
     ack!
   end
+
+  alias_method :perform, :work
 
   def trigger(user, message)
     self.send(:on_event, user, message) if self.respond_to?(:on_event)
