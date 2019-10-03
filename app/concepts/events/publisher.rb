@@ -76,6 +76,8 @@ class Events::Publisher
     end
   end
 
+  # Broadcasting to a single listener
+  # Sync or async depends on what is configured in listener class
   class ListenerBroadcast
     def self.call(listener_class, message, current_user: nil)
       if listener_class.async?
@@ -86,6 +88,7 @@ class Events::Publisher
     end
   end
 
+  # Broadcasting the message synchronously to all listeners
   class SyncBroadcast
     extend Dry::Monads[:result]
 
@@ -110,6 +113,7 @@ class Events::Publisher
     end
   end
 
+  # Broadcasting the message asynchronously to all listeners
   class AsyncBroadcast
     def self.call(routing_key, message, current_user: nil, persistence: true)
       payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
