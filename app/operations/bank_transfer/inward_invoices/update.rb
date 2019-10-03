@@ -391,7 +391,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def update_agreement_available_limit
-    if self.inward_invoice.agreement_item.present?
+    if self.inward_invoice.agreement_item.present? && self.inward_invoice.agreement_item.billing_type.variable_periodic?
       payment_agreement = self.inward_invoice.agreement_item.payment_agreement
       invoiced_amount_sum = get_invoice_amount_sum(payment_agreement)
       available_limit = self.inward_invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum

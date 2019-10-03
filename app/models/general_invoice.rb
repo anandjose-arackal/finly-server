@@ -143,7 +143,7 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'GeneralInvoice'
-  belongs_to :total_invoice_amount, class_name: 'Amount'
+  belongs_to :total_invoice_amount, optional: true, class_name: 'Amount'
   belongs_to :available_invoice_amount, optional: true, class_name: 'Amount'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent

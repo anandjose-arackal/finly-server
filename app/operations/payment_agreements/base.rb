@@ -1368,18 +1368,27 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def update_total_invoice_amount(invoice)
-    if invoice.available_invoice_amount.blank?
-      invoice.available_invoice_amount = invoice.total_invoice_amount.dup
-      invoice.save
-    else
-      invoice.available_invoice_amount.update(value: invoice.total_invoice_amount&.value)
+    if invoice.billing_type.variable_periodic?
+      if invoice.available_invoice_amount.blank?
+        invoice.available_invoice_amount = invoice.total_invoice_amount.dup
+        invoice.save
+      else
+        invoice.available_invoice_amount.update(value: invoice.total_invoice_amount&.value)
+      end
     end
   end
 
   def update_invoice_limit(invoice)
-    if invoice.total_invoice_amount.value.blank?
-      invoice.total_invoice_amount = nil
-      invoice.available_invoice_amount = nil
+      if invoice.total_invoice_amount.value.blank?# || invoice.billing_type.one_time? || invoice.billing_type.fixed_periodic?
+        invoice.total_invoice_amount = nil
+        invoice.available_invoice_amount = nil
+      end
+    if invoice.billing_type.variable_periodic?
+      if invoice.total_invoice_amount.blank? || invoice&.total_invoice_amount&.value.blank?
+        add_message :error, "Maximum invoice amount cannot be blank"
+        return
+      end
+
     end
   end
 
