@@ -161,8 +161,7 @@ end
 # end
 
 json.attachments do
-  json.array! @result.purchase_order.attachments do |attachment|
-    next if attachment.file_file_size.nil?
+  json.array! @result.purchase_order.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
