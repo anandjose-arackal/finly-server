@@ -48,6 +48,31 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
       add_message :error, "You cannot credit this invoice as it already has a unprocessed payment associated with it"
       return
     end
+
+    if self.policy.blank?
+      add_message :error, "Policy not found."
+      return
+    end
+
+    if self.payment_mode.blank?
+      add_message :error, "Payment mode cannot be blank"
+      return
+    end
+
+    remaining_amount = (self.inward_invoice.balance_due&.value.to_f - self.inward_invoice.payments.successful.joins(:amount).sum(:value))
+
+    if self.inward_invoice.vendor.blank?
+      add_message :error, "This invoice does not have a vendor associated with it. Please add them before creating a payment ticket for it."
+      return
+    end
+    if self.inward_invoice.bank_account.blank?
+      add_message :error, "This invoice does not have a bank account selected for the chosen vendor, #{self.inward_invoice.vendor&.business_name || self.inward_invoice.vendor&.name}"
+      return
+    end
+
+    if self.payable_amount > remaining_amount
+      add_message :error, "You cannot pay more than the remaining amount in an invoice"
+    end
   end
 
   def process
