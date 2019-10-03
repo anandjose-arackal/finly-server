@@ -324,7 +324,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
 
     validate_custom_fields_invoice
-    validate_agreement_limit
     return if has_errors?
 
     if inward_invoice.valid?
@@ -361,7 +360,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def post_process
-    update_agreement_available_limit
+    # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end
 
@@ -379,12 +378,14 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def validate_agreement_limit
-    if self.inward_invoice.agreement_item.present?
+    if self.inward_invoice.agreement_item.present? && 
       payment_agreement = inward_invoice.agreement_item.payment_agreement
-      available_limit = inward_invoice.agreement_item&.available_invoice_amount&.value
-      if available_limit < inward_invoice&.balance_due&.value
-        add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
-        return
+      if inward_invoice.agreement_item.total_invoice_amount&.value.present? && inward_invoice.agreement_item.billing_type.variable_periodic?
+        available_limit = inward_invoice.agreement_item.total_invoice_amount&.value - get_invoice_amount_sum(payment_agreement)
+        if available_limit < inward_invoice&.balance_due&.value
+          add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
+          return
+        end
       end
     end
   end
@@ -392,10 +393,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def update_agreement_available_limit
     if self.inward_invoice.agreement_item.present?
       payment_agreement = self.inward_invoice.agreement_item.payment_agreement
-      invoiced_amount_sum = payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
+      invoiced_amount_sum = get_invoice_amount_sum(payment_agreement)
       available_limit = self.inward_invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
       self.inward_invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
       return
     end
+  end
+
+  # For invoices created from variable periodic agreement based payments
+  def get_invoice_amount_sum(payment_agreement)
+    payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
   end
 end
