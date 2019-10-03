@@ -1376,4 +1376,11 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  def update_invoice_limit(invoice)
+    if invoice.total_invoice_amount.value.blank?
+      invoice.total_invoice_amount = nil
+      invoice.available_invoice_amount = nil
+    end
+  end
+
 end

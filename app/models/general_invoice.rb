@@ -315,8 +315,8 @@ class GeneralInvoice < ApplicationRecord
       already_exists: true,
       prepaid: self.prepaid,
       escalation_percentage: self.escalation_percentage,
-      total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: precision_value(self.total_invoice_amount&.value) },
-      available_invoice_amount: precision_value(self.available_invoice_amount&.value)
+      total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
+      available_invoice_amount: get_available_invoice_amount
     }
   end
 
@@ -359,6 +359,18 @@ class GeneralInvoice < ApplicationRecord
       [nil]
     else
       [true, false]
+    end
+  end
+
+  def get_total_invoice_amount
+    if self.total_invoice_amount&.value.present?
+      precision_value(self.total_invoice_amount&.value)
+    end
+  end
+
+  def get_available_invoice_amount
+    if self.available_invoice_amount&.value.present?
+      precision_value(self.available_invoice_amount&.value)
     end
   end
 
