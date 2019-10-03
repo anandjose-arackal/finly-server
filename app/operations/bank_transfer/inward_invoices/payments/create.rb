@@ -78,7 +78,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     end
 
     if self.payable_amount.to_f > remaining_amount.to_f
-      add_message :error, "You cannot pay more than the remaining amount in an invoice"
+      add_message :error, "You cannot pay more than the remaining amount in an invoice. Maximum payable - #{self.inward_invoice.balance_due&.currency&.symbol}#{remaining_amount.to_f}"
     end
   end
 
