@@ -101,8 +101,8 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << (gst_applicable ? expense.gst_type&.name&.humanize&.upcase : '')
         data_arr << (gst_applicable ? expense.gst_amount&.value&.round(2) : '')
         data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '') : '')
-        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
-        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
         data_arr << (gst_applicable ? (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value)
         data_arr << (gst_applicable ? expense.gstin_location&.location : '')
         data_arr << (gst_applicable ? expense.gstin_location&.state&.name : '')
