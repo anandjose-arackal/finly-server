@@ -66,5 +66,5 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
        return result false, departments.errors.full_messages
      end
      result true, "Destroyed Successfully"
-    end
+   end
 end

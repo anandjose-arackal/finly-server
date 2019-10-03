@@ -1,6 +1,6 @@
 class Vendors::Update < Vendors::Base
 
-  attr_accessor :vendor, :vendor_parameters
+  attr_accessor :vendor, :vendor_parameters, :vendor_changes
 
   def personalizer
     {
@@ -68,6 +68,21 @@ class Vendors::Update < Vendors::Base
         # validate_pan(vendor_parameters)
       end
     end
+
+    if self.vendor_parameters[:bank_accounts_attributes].blank?
+      add_message :error, "Please provide bank account details"
+      return
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      # check to see the number of bank account sent is equal to the bank account marked for destruction
+      ba_count = self.vendor_parameters[:bank_accounts_attributes].count
+      ba_delete_count = self.vendor_parameters[:bank_accounts_attributes].select {|b| b[:_destroy] == true}.count
+      if ba_count == ba_delete_count
+        add_message :error, "Please provide bank account details"
+        return
+      end
+    end
   end
 
   def pre_process
@@ -113,17 +128,47 @@ class Vendors::Update < Vendors::Base
     end
 
     self.vendor_parameters.delete(:override_vendor_id)
+
+    if vendor_parameters&.dig(:vendor_attachments_attributes).present?
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
+    end
   end
 
   def process
     validate_custom_fields(false)
     return if has_errors?
-    unless vendor.update(vendor_parameters)
+    
+    vendor.assign_attributes(vendor_parameters)
+
+
+    if vendor.valid?
+      self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
+      vendor.save
+    else
       add_message :error, vendor.errors.full_messages
     end
+
+    # unless vendor.update(vendor_parameters)
+    #   add_message :error, vendor.errors.full_messages
+    # end
   end
 
   def post_process
     add_message :success, "Vendor updated"
+    if self.vendor_changes[:bank_account_changed].present?
+      Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
+    end
+  end
+
+  private
+
+  def detect_changes_in_vendor(vendor)
+    return {} if vendor.bank_accounts.blank?
+    {
+      bank_account_changed: vendor.bank_accounts.map {|v| v.changes_to_save if v.changes_to_save.present?}.compact,
+      bank_accounts: vendor.bank_accounts.map {|v| v.changes_to_save}
+    }
   end
 end
