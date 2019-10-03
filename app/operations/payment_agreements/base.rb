@@ -98,6 +98,7 @@ class PaymentAgreements::Base < BaseOperation
   def update_item_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
+        update_total_invoice_amount(general_invoice)
         update_amount_attributes(general_invoice)
         set_due_date_for_invoices('general_invoice')
         general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)
@@ -106,6 +107,7 @@ class PaymentAgreements::Base < BaseOperation
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
+        update_total_invoice_amount(rental_invoice)
         update_amount_attributes(rental_invoice)
         set_due_date_for_invoices('rental_invoice')
         rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)
@@ -1362,6 +1364,15 @@ class PaymentAgreements::Base < BaseOperation
           end
         end
       end
+    end
+  end
+
+  def update_total_invoice_amount(invoice)
+    if invoice.available_invoice_amount.blank?
+      invoice.available_invoice_amount = invoice.total_invoice_amount.dup
+      invoice.save
+    else
+      invoice.available_invoice_amount.update(value: invoice.total_invoice_amount&.value)
     end
   end
 
