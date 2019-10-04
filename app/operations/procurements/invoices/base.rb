@@ -40,7 +40,7 @@ class Procurements::Invoices::Base < BaseOperation
   # For invoices created from variable periodic agreement based payments
   # Its the sum for ABP actual invoices
   def get_invoice_amount_sum(payment_agreement)
-    payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
+    payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
   end
 
   # Get limit for this invoice
