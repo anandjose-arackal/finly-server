@@ -110,6 +110,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              po_date: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
+             vendor_gstin: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
              # vendor_gst: {spreadsheet: true},
              # po_number: {spreadsheet: true},
@@ -140,6 +141,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_discount: {spreadsheet: true},
+             line_item_discount: {spreadsheet: true},
              line_item_sgst: {spreadsheet: true},
              line_item_cgst: {spreadsheet: true},
              line_item_igst: {spreadsheet: true},
@@ -211,6 +214,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def vendor_ref_no(invoice_line_item)
     invoice_line_item.parent.vendor.vendor_id
+  end
+
+  def vendor_gstin(invoice_line_item)
+    invoice_line_item.parent&.gstin_location&.gstin
   end
 
   # def vendor_gst(invoice_line_item)
@@ -333,6 +340,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_slab&.tds || 0
   end
 
+  def invoice_discount(invoice_line_item)
+    invoice_line_item.parent&.discount_amount.value || 0
+  end
+
+  def line_item_discount(invoice_line_item)
+    invoice_line_item.discount_amount.value || 0
+  end
+
   def line_item_sgst(invoice_line_item)
     invoice_line_item.sgst || 0
   end
@@ -346,7 +361,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def advance_amount(invoice_line_item)
-    value = invoice_line_item.parent&.advance_amount || 0
+    value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
     precision_value(value)
   end
 

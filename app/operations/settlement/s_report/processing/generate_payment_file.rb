@@ -41,23 +41,46 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   def process
     # Format as required by PaymentFiles::Generate
     payment_params = []
-    self.group_mappings.include_for_payment_file&.each do |mapping|
-      payment_params << {
-          beneficiary_account_name: mapping.processor_accountable.name,
-          beneficiary_account_number: mapping.processor_accountable.account_number,
-          receiving_user_name: mapping.user.name,
-          amount: mapping.amount.value,
-          payment_mode: 'NEFT',
-          date: Date.today,
-          beneficiary_ifsc: mapping.processor_accountable.ifsc,
-          ifsc: mapping.processor_accountable.ifsc,
-          email: mapping.user.email,
-          receiving_mobile_number: mapping.user.mobile_number,
-          note: mapping.note,
-          report_ids: mapping&.reports&.collect(&:id)&.join(', ')
-      }
+
+    if user.company.id == 164 # Satin CreditCare
+      load_data = satin_data
+    else
+      load_data = general_data
     end
+
+    load_data.each do |mapping|
+      payment_params << data_points(mapping)
+    end
+
     self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
+  end
+
+  private
+
+  def general_data
+    self.group_mappings.include_for_payment_file
+  end
+
+  def satin_data
+    self.group_mappings.include_for_payment_file&.left_joins(:reports).select('report_processor_group_mappings.*, reports.id AS report_id')
+  end
+
+  def data_points(mapping)
+    data = {}
+    data[:beneficiary_account_name] = mapping.processor_accountable.name
+    data[:beneficiary_account_number] = mapping.processor_accountable.account_number
+    data[:receiving_user_name] = mapping.user.name
+    data[:amount] = mapping.amount.value
+    data[:payment_mode] = 'NEFT'
+    data[:date] = Date.today
+    data[:beneficiary_ifsc] = mapping.processor_accountable.ifsc
+    data[:ifsc] = mapping.processor_accountable.ifsc
+    data[:email] = mapping.user.email
+    data[:receiving_mobile_number] = mapping.user.mobile_number
+    data[:note] = mapping.note
+    data[:report_ids] = mapping&.reports&.collect(&:id)&.join(', ')
+    data[:report_id] = mapping.try(:report_id)
+    data
   end
 
 end
