@@ -58,11 +58,6 @@ class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager
       add_message :error, reviewer_mapping_op.messages[:error]
       return
     end
-    #   debugger
-    # else
-    #   add_message :error, reviewer_mapping_op.messages[:errors]
-    #   return
-    # end
 
     # reviewer mappings should have all the reviewers
     reviewer_mappings.each do |reviewer_mapping|
