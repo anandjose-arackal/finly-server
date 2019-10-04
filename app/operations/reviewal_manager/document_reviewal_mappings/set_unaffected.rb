@@ -55,7 +55,7 @@ class ReviewalManager::DocumentReviewalMappings::SetUnaffected < ReviewalManager
     if reviewer_mapping_op.success?
       self.reviewer_mappings = reviewer_mapping_op.reviewer_mappings
     else
-      add_message :error, "ERROR #todo "
+      add_message :error, reviewer_mapping_op.messages[:error]
       return
     end
     #   debugger
