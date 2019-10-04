@@ -1,5 +1,5 @@
 class Expense::Base < BaseOperation
-  attr_accessor :expense, :per_diem, :cash_pocket
+  attr_accessor :expense, :per_diem, :cash_pocket, :violations
 
   def authorized_user_types
     [:employee, :manager, :admin, :finance_manager]
@@ -127,6 +127,23 @@ class Expense::Base < BaseOperation
     if (params[:spent_from_id].present? or StringUtils.to_bool(params[:from_cash_on_hand])) && StringUtils.to_bool(params[:reimbursable])
       add_message :error, "Expense spent from cash on hand cannot be reimbursable"
     end
+  end
+
+  def check_for_violations
+    if expense.report.present?
+      self.violations = Reports::Violation.(user, report: expense.report)
+    end
+  end
+
+  def has_warning?
+    return false unless self.violations.present?
+    self.violations.each do |key, violation|
+      if violation[:expense_warning].present? or violation[:budget_warning].present? or
+          violation['expense_warning'].present? or violation['budget_warning'].present?
+        return true
+      end
+    end
+    false
   end
 
 
