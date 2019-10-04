@@ -45,6 +45,6 @@ class Procurements::Invoices::Base < BaseOperation
 
   # Get limit for this invoice
   def get_available_limit(payment_agreement)
-    invoice.agreement_item.total_invoice_amount&.value - payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(id: self.invoice.id).collect{|i| i.balance_due.value}.sum
+    invoice.agreement_item.total_invoice_amount&.value - payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(id: self.invoice.id, status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
   end
 end
