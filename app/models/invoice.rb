@@ -939,6 +939,10 @@ class Invoice < ApplicationRecord
   #   end
   # end
 
+  def generate_sequential_id?
+    invoice_status_id != InwardInvoiceStatus.id_for(:open)
+  end
+
   private
 
   # def payment_agreement_updations
