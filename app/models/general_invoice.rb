@@ -143,6 +143,8 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'GeneralInvoice'
+  belongs_to :total_invoice_amount, optional: true, class_name: 'Amount'
+  belongs_to :available_invoice_amount, optional: true, class_name: 'Amount'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
@@ -168,17 +170,17 @@ class GeneralInvoice < ApplicationRecord
   alias_attribute :status, :invoice_status
 
 
-  accepts_nested_attributes_for :address
-  accepts_nested_attributes_for :amount
-  accepts_nested_attributes_for :gross_amount
-  accepts_nested_attributes_for :net_amount
-  accepts_nested_attributes_for :discount_amount
-  accepts_nested_attributes_for :tds_amount
-  accepts_nested_attributes_for :tax_amount
-  accepts_nested_attributes_for :original_amount
-  accepts_nested_attributes_for :freight_amount
-  accepts_nested_attributes_for :advance_amount
-  accepts_nested_attributes_for :balance_due
+  accepts_nested_attributes_for :address, :amount, :gross_amount, :net_amount, :discount_amount, :tds_amount, :tax_amount, :original_amount, :freight_amount, :advance_amount, :balance_due, :total_invoice_amount
+  # accepts_nested_attributes_for :amount
+  # accepts_nested_attributes_for :gross_amount
+  # accepts_nested_attributes_for :net_amount
+  # accepts_nested_attributes_for :discount_amount
+  # accepts_nested_attributes_for :tds_amount
+  # accepts_nested_attributes_for :tax_amount
+  # accepts_nested_attributes_for :original_amount
+  # accepts_nested_attributes_for :freight_amount
+  # accepts_nested_attributes_for :advance_amount
+  # accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
   accepts_nested_attributes_for :invoice_frequency
@@ -312,7 +314,9 @@ class GeneralInvoice < ApplicationRecord
       custom_fields: self.custom_fields,
       already_exists: true,
       prepaid: self.prepaid,
-      escalation_percentage: self.escalation_percentage
+      escalation_percentage: self.escalation_percentage,
+      total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
+      available_invoice_amount: get_available_invoice_amount
     }
   end
 
@@ -355,6 +359,18 @@ class GeneralInvoice < ApplicationRecord
       [nil]
     else
       [true, false]
+    end
+  end
+
+  def get_total_invoice_amount
+    if self.total_invoice_amount&.value.present?
+      precision_value(self.total_invoice_amount&.value)
+    end
+  end
+
+  def get_available_invoice_amount
+    if self.available_invoice_amount&.value.present?
+      precision_value(self.available_invoice_amount&.value)
     end
   end
 
