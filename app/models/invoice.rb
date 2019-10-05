@@ -1126,7 +1126,8 @@ class Invoice < ApplicationRecord
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.invoice_number,
+      invoice_id: self.invoice_id,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
