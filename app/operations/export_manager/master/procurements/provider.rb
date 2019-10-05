@@ -13,7 +13,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
              vendor_business_name: {spreadsheet: false, pdf: true},
              vendor_mobile_number: {spreadsheet: false, pdf: true},
              vendor_state_code: {spreadsheet: false, pdf: true},
-             vendor_gst: {spreadsheet: false, pdf: true},
+             vendor_gstin: {spreadsheet: true, pdf: true},
              vendor_pan: {spreadsheet: false, pdf: true},
              vendor_tds_rate: {spreadsheet: false, pdf: true},
              vendor_tds_description: {spreadsheet: false, pdf: true},
@@ -112,8 +112,8 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
     purchase_order.procurement.vendor&.pan
   end
 
-  def vendor_gst(purchase_order)
-    purchase_order.procurement.vendor&.gst
+  def vendor_gstin(purchase_order)
+    purchase_order.gstin_location&.gstin
   end
 
   def approval_pending_level_number(purchase_order)

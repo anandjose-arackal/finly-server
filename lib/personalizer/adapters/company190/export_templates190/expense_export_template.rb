@@ -32,7 +32,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
       self.reports = Report.finance_associated_items(user).not_open
     end
 
-    self.reports = reports.approved.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type])
+    self.reports = reports.approved.includes({user: :profile},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type],policy:[policy_user_roles: :user])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = ["Expense ID",
@@ -51,6 +51,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
                     "Operatiing unit",
                     "Expense type",
                     "Created at",
+                    "Updated at",
                     "Report ID",
                     "Category name",
                     "Category gl name",
@@ -63,23 +64,26 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
                     "Cgst amount",
                     "Sgst amount",
                     "Net total amount",
-                    "Gstin location",
+                    "Gst Details",
+                    "Gstin Location",
                     "Merchant state",
                     "State of expense",
                     "Hsn sac",
                     "Merchant bill no",
                     "Tax rate",
-                    "GSTIN"]
+                    "GSTIN",
+                    "Finance Manager"]
 
     self.contents = []
     reports.each do |report|
+      fm = report.policy.policy_user_roles.where(user_role_id: 2).first&.user
       report.expenses.each do |expense|
         data_arr = []
         data_arr << expense.id
         data_arr << expense.amount.value
         data_arr << expense.amount&.currency&.country_code
         data_arr << expense.note
-        data_arr << expense.date&.strftime("%d-%m-%y")
+        data_arr << expense.date&.strftime("%d-%b-%Y")
         data_arr << expense.merchant_name
         data_arr << expense.user&.name
         data_arr << expense.user&.email
@@ -90,7 +94,8 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << expense.user&.cost_center&.cost_center_code
         data_arr << (expense.user.gl_config[:operation_unit] rescue '')
         data_arr << expense.expense_type.name
-        data_arr << expense.created_at&.strftime("%d-%m-%y")
+        data_arr << expense.created_at&.strftime("%d-%b-%Y")
+        data_arr << expense.updated_at&.strftime("%d-%b-%Y")
         data_arr << expense.report&.id
         data_arr << expense.category&.name
         data_arr << expense.category&.gl_code
@@ -101,9 +106,10 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << (gst_applicable ? expense.gst_type&.name&.humanize&.upcase : '')
         data_arr << (gst_applicable ? expense.gst_amount&.value&.round(2) : '')
         data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '') : '')
-        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
-        data_arr << (gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
         data_arr << (gst_applicable ? (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value)
+        data_arr << ''
         data_arr << (gst_applicable ? expense.gstin_location&.location : '')
         data_arr << (gst_applicable ? expense.gstin_location&.state&.name : '')
         data_arr << (gst_applicable ? expense.state_of_expense&.name : '')
@@ -111,7 +117,7 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
         data_arr << (gst_applicable ? expense.merchant_bill_no : '')
         data_arr << (gst_applicable ? expense.tax_rate&.rate&.to_f : '')
         data_arr << (gst_applicable ? expense.gstin_location&.gstin : '')
-
+        data_arr << "#{fm.first_name} #{fm.last_name}" if fm.present?
         self.contents << data_arr
       end
     end
