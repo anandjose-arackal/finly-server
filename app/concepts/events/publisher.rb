@@ -57,7 +57,7 @@ class Events::Publisher
   class Payload
 
     VALID_OPTIONS= %i(filters from_status role changes)
-    def self.for_record(record, action_user, action, options: {})
+    def self.for_record(record, action_user, action, options = {})
       {
           record: record,
           action_user: action_user,
