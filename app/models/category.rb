@@ -18,11 +18,14 @@
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
+#  gst_applicable             :boolean          default(TRUE)
+#  tds_applicable             :boolean
 #
 
 class Category < ApplicationRecord
   include AncestrySupport
   include Sequenced::ActsAsSequenced
+  include LiquidDroppable
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry

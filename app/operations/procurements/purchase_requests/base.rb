@@ -11,7 +11,14 @@ class Procurements::PurchaseRequests::Base < BaseOperation
 
   def init
     self.company = user.company
-    self.purchase_request = Procurements::PurchaseRequests::Show.(current_user, params).purchase_request
+    result = Procurements::PurchaseRequests::Show.(current_user, params)
+
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+
+    self.purchase_request = result.purchase_request
   end
 
   def validate
@@ -26,7 +33,7 @@ class Procurements::PurchaseRequests::Base < BaseOperation
         :policy_id,
         custom_fields: [],
         purchase_request_items_attributes: [
-            :id, :department_id, :cost_center_id , :unit_of_measurement, :item_id, :reject_note, :required_by_date, :purpose, :category_id, :delivery_location_id, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy, :rejected]
+            :id, :department_id, :cost_center_id , :unit_of_measurement, :item_id, :reject_note, :required_by_date, :purpose, :category_id, :delivery_location_id, :hsn_sac, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy, :rejected]
         ],
         attachment_attributes: [
           :id, :resource_id, :resource_type, :file_file_name, :file_file_size, :file_content_type, :file_updated_at, :description]

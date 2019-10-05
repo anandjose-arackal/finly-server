@@ -23,6 +23,7 @@
 #  department_id                :integer
 #  cost_center_id               :integer
 #  category_id                  :integer
+#  hsn_sac                      :string(255)
 #
 
 FactoryBot.define do

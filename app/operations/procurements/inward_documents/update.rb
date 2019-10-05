@@ -98,6 +98,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       item[:delivered] = (item[:delivered].blank?) ? 0 : item[:delivered]
       item[:accepted] = (item[:accepted].blank?) ? 0 : item[:accepted]
       item[:rejected] = (item[:rejected].blank?) ? 0 : item[:rejected]
+      item[:billable_amount] = (item[:billable_amount].blank?) ? 0 : item[:billable_amount]
     end
   end
 
@@ -249,7 +250,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     end
 
 
-    remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
+    remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f).round(2) # do not remove the round, it would screw up the floating point arthematic. computer bug, loses precision. nothing i can do.
 
     if  remaining < delivered.to_f
       add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
@@ -264,7 +265,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     end
 
 
-    unless delivered.to_f == accepted.to_f + rejected.to_f
+    unless delivered.to_f == (accepted.to_f + rejected.to_f).round(2)
       add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
       # break
       return

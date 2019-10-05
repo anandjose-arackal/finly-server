@@ -101,7 +101,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     else
       if self.inward_invoice_params[:advance_amount_required].present?
         self.inward_invoice_params[:advance_amount_required] = false
-        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = 0
       end
     end
 
@@ -213,6 +213,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    if self.inward_invoice_params[:bank_account_id].blank?
+      add_message :error, "Please select the bank account for the vendor. If they are not present, please update this detail from the Vendor Empanelment screen."
+      return
+    end
+
   end
 
   def pre_process
@@ -310,6 +315,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if self.inward_invoice.receiving_account_type.blank?
       self.inward_invoice_params[:receiving_account_type] = BankAccount.name
     end
+
+    receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
+    self.inward_invoice.receiving_account = receiving_account
   end
 
   def process
@@ -324,7 +332,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
         params[:reviewal_document] = self.inward_invoice
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
-
+        params[:provider_name] = self.inward_invoice.get_invoice_provider_name
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]

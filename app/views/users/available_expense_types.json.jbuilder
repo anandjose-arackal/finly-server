@@ -28,9 +28,11 @@ json.currencies do
   end
 end
 json.cash_on_hand @result.cash_on_hand
+
+json.all_categories_gst_enabled @result.all_categories_gst_enabled
 json.categories do
   json.array!(@result.categories) do |category|
-    json.extract! category, :id, :name
+    json.extract! category, :id, :name, :gst_applicable
   end
 end
 
@@ -38,6 +40,7 @@ json.custom_currency_conversion @result.custom_currency_conversion
 
 json.config do
   json.em_tax_tracking @result.em_tax_tracking
+
 end
 
 json.tds_slabs do
@@ -74,3 +77,6 @@ json.cash_pockets do
     end
   end
 end
+
+json.state_codes @result.gst_state_codes
+json.tax_rates @result.tax_rates

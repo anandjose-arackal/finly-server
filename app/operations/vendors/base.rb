@@ -24,6 +24,7 @@ class Vendors::Base < BaseOperation
 
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
+                                   :msme_registered, :msme_registration_number,
                                    :business_name, :trade_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
                                    bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy],
@@ -79,6 +80,7 @@ class Vendors::Base < BaseOperation
 
   def validate_gstin(vendor_params)
     business_name = vendor_params[:business_name]
+    return if vendor_params[:gstin_locations_attributes].blank?
     vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
       gstin = gstin_location[:gstin]
 
@@ -140,4 +142,18 @@ class Vendors::Base < BaseOperation
     end
     found
   end
+
+  def decode_base64_file(file, string)
+    return false if (file.blank? or string.blank?)
+    file_data = string[string.index("base64,") + "base64,".size, string.size]
+    adapter = Paperclip.io_adapters.for(string)
+    ext =  Rack::Mime::MIME_TYPES.invert[adapter.content_type]
+    name = file[:name].present? ? file[:name] : "data"
+    name = name.to_s + Time.now.to_i.to_s + SecureRandom.hex(10).to_s
+    file_name = name + ext.to_s
+    file_path = "tmp/#{file_name}"
+    File.open(file_path, 'wb') { |f| f.write(Base64.decode64(file_data)) }
+    file[:attached_file] = File.new(file_path, 'r')
+  end
+
 end

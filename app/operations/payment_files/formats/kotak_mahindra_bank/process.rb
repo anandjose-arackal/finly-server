@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code
+  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code,:bank_code_indicator
 
   def pre_validate
     return if has_errors?
@@ -12,6 +12,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
     self.debit_account_number = self.options[:debit_account_number]
     self.client_code = self.options[:client_code]
     self.product_code = self.options[:product_code]
+    self.bank_code_indicator = self.options[:bank_code_indicator] rescue ''
   end
 
   def validate
@@ -34,12 +35,22 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
           payment[:payment_mode],
           "",
           Date.parse(payment[:date]).strftime("%d-%m-%Y"),
+          "",
           self.debit_account_number,
           payment[:amount],
+          self.bank_code_indicator,
           "",
           payment[:receiving_user_name],
+          "",
           payment[:beneficiary_ifsc],
           payment[:beneficiary_account_number],
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
           payment[:receiving_user_email],
           payment[:receiving_mobile_number],
           payment[:note]
@@ -55,17 +66,34 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
         "Payment_Type",
         "Payment_Ref_No.",
         "Payment_Date (Mention in dd/mm/yyyy) format",
+        "Instrument Date",
         "Dr_Ac_No",
         "Amount",
+        "Bank_Code_Indicator",
         "Beneficiary_Code",
         "Beneficiary_Name",
+        "Beneficiary_Bank",
         "IFSC Code",
         "Beneficiary_Acc_No",
+        "Location",
+        "Print_Location",
+        "Instrument_Number",
+        "Ben_Add1",
+        "Ben_Add2",
+        "Ben_Add3",
+        "Ben_Add4",
         "Beneficiary_Email",
         "Beneficiary_Mobile",
         "Debit_Narration",
         "Credit_Narration",
-        "Enrichment1"
+        "Payment Details 1",
+        "Payment Details 2",
+        "Payment Details 3",
+        "Payment Details 4",
+        "Enrichment_1",
+        "Enrichment_2",
+        "Enrichment_3",
+        "Enrichment_4"
     ]
   end
 

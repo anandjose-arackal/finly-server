@@ -23,6 +23,7 @@
 #  department_id                :integer
 #  cost_center_id               :integer
 #  category_id                  :integer
+#  hsn_sac                      :string(255)
 #
 
     # table_name => purchase_request_items
@@ -42,7 +43,11 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
+  include FieldCustomizer::CustomizableValidation
   # include Transitionable
+
+  field_customization_key :purchase_request_item
+  customizable_validate :purpose, presence: true, scope: [:purchase_request, :company]
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
@@ -62,7 +67,7 @@ class PurchaseRequestItem < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
 
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
   validates_presence_of :cost_center, :department, if: :cost_allocation_items?
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true

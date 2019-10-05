@@ -12,14 +12,15 @@
 #  submitted_at               :datetime
 #  approved_at                :datetime
 #  order_number               :string(255)
-#  reject_note                :text(65535)
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
+#  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
+#  cost_allocation_items      :boolean          not null
 #
 
 class PurchaseRequest < ApplicationRecord
@@ -44,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
-
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
@@ -74,14 +75,13 @@ class PurchaseRequest < ApplicationRecord
     if status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        ids = self.awaiting_action_items(user_id)&.pluck(:id)
         with_id(ids)
       end
     else
       where purchase_request_status_id: status_id
     end
   }
-
 
   scope :filter_by_location_id, -> (id) {
     user_id = RequestStore.store[:current_user]&.id
@@ -150,6 +150,35 @@ class PurchaseRequest < ApplicationRecord
     end
     where('extract(month from created_at) = ?', month)
   }
+
+  # Sorting
+  scope :sort_order_number, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.order_number #{type}")
+    end
+  }
+
+  scope :sort_description, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.description #{type}")
+    end
+  }
+
+  scope :sort_date, -> (type){
+    type = type&.strip&.upcase
+    if type && ['ASC', 'DESC'].include?(type)
+      reorder("purchase_requests.created_at #{type}")
+    end
+  }
+
+  # scope :sort_amount, -> (type){
+  #   type = type&.strip&.upcase
+  #   if type && ['ASC', 'DESC'].include?(type)
+  #     includes(:total_amount).reorder("amounts.value #{type}")
+  #   end
+  # }
 
   def add_company
     self.company_id = self.creator.company_id

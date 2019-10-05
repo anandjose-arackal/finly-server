@@ -15,6 +15,9 @@ class Expense::Manual::Update < Expense::Manual::Base
         },
         pre_process: {
             before: Personalizer::Process.new([:expense, :manual_update], :pre_process, self)
+        },
+        validate: {
+            before: Personalizer::Process.new([:expense, :manual, :update], :validate, self)
         }
     }
   end
@@ -180,6 +183,7 @@ class Expense::Manual::Update < Expense::Manual::Base
           end
         end
       end
+      expense.save # extra just to do the gst amount updation part
     else
       add_message :error, self.expense.errors.full_messages
     end
@@ -188,6 +192,7 @@ class Expense::Manual::Update < Expense::Manual::Base
   def post_process
     # add comment in report if expense is added within report
     Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
@@ -230,6 +235,14 @@ class Expense::Manual::Update < Expense::Manual::Base
       elsif pocket.credit_card_pocket?
         expense.update(cash_on_hand_blocked: true)
       end
+    end
+    if expense.report.present? && expense.report.processing? && [1, 2, 164].include?(expense.report&.user&.company_id)
+      expense.report.reload
+      check_for_violations
+      params[:reviewal_document] = expense.report
+      params[:violations_present] = has_warning?
+
+      op = ::ReviewalManager::DocumentReviewalMappings::SetUnaffected.(expense&.report.user, params)
     end
 
     add_message :success, 'Expense updated'

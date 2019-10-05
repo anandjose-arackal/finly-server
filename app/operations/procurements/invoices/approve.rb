@@ -26,6 +26,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations
+    params[:provider_name] = self.invoice.get_invoice_provider_name
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
@@ -37,6 +38,20 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+
+      # if invoice final amount comes to zero, probably because so much advance was adjusted, then auto mark it as paid
+      if invoice.balance_due&.value == 0
+        params[:document] = self.invoice
+        params[:aasm_event] = 'paid'
+        params[:violation_present] = false #todo Check violations
+        params[:provider_name] = self.invoice.get_invoice_provider_name
+        op = WorkflowManager::Base.(user, params)
+        unless op.success?
+          add_message :error, op.messages[:error]
+          return
+        end
+      end
+
     end
 
     self.workflow_output = op.workflow_output

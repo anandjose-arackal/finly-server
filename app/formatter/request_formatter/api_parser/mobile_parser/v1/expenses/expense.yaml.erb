@@ -9,6 +9,12 @@ expense:
   reimbursable: <%= params[:reimbursable] %>
   category_id: <%= params[:category_id] %>
   from_cash_on_hand: <%= params[:from_cash_on_hand] %>
+  state_of_expense_id: <%= params[:state_of_expense_id] %>
+  expense_tax_type_id: <%= params[:expense_tax_type_id] %>
+  hsn_sac: <%= params[:hsn_sac] %>
+  merchant_bill_no: <%= params[:merchant_bill_no] %>
+  gst_type_id: <%= params[:gst_type_id] %>
+  tax_rate_id: <%= params[:tax_rate_id] %>
   <% type = yaml_formatter.value_for_placeholder params[:type] %>
   <% if type == '1' or type == 1 %>
   manual_expense_attributes:
@@ -78,5 +84,10 @@ expense:
       <% params[:receipt_email][:attachments].each do |attachment| %>
       - attachment_url: <%= attachment[:url] %>
       <% end %>
-   <% end %>
-<% end %>
+    <% end %>
+  <% end %>
+  gstin_location_attributes:
+    id: <%= params.dig(:gstin_location_attributes, :id)%>
+    gstin_id: <%= params.dig(:gstin_location_attributes, :gstin_id)%>
+    gstin: <%= params.dig(:gstin_location_attributes, :gstin)%>
+    state_id: <%= params.dig(:gstin_location_attributes, :state_id)%>

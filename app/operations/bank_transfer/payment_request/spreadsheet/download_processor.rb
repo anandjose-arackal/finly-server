@@ -16,7 +16,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
 
   def init
     self.include_attachments = !!params[:include_attachments]
-    self.bank_payment_requests = BankPaymentRequest.with_id(params&.dig(:bank_payment_request_id))
+    self.bank_payment_requests = BankPaymentRequest.with_id(params&.dig(:bank_payment_request_id)).include_for_data_retrieval
   end
 
   def validate
@@ -85,7 +85,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   protected
   def create_temporary_link(file)
     return nil if file.nil?
-    temp_file = File.open(self.file_name, 'w')
+    temp_file = File.open(self.file_name, 'wb')
     temp_file.write file
     temp_file.rewind
     # temp_file

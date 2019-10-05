@@ -32,10 +32,10 @@ class Company::Configuration::Category::Base < BaseOperation
       self.categories.roots.each do |category|
         if category.children.present?
           category.children.each do |c|
-            cat << {id: c.id, name: "#{category.name } - #{c.name}", active: c.active}
+            cat << {id: c.id, name: "#{category.name } - #{c.name}", active: c.active, gst_applicable: c.gst_applicable, tds_applicable: c.tds_applicable}
           end
         else
-          cat << {id: category.id, name: category.name, active: category.active}
+          cat << {id: category.id, name: category.name, active: category.active, gst_applicable: category.gst_applicable, tds_applicable: category.tds_applicable}
         end
       end
       cat

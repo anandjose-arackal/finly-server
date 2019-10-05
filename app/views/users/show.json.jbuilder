@@ -45,7 +45,13 @@ json.user_pockets do
       else
         adapter = nil
     end
-    json.balance adapter.balance(display_balance: true)
+
+    if pocket.user_pocket_type_id == UserPocketType.id_for(:cash)
+      json.effective_balance adapter.balance
+      json.balance adapter.balance(display_balance: true)
+    else
+      json.balance adapter.balance(display_balance: true)
+    end
     currency = pocket.base_currency
     json.base_currency do
       json.symbol currency&.symbol

@@ -22,7 +22,7 @@ class ProcurementMailer < ApplicationMailer
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
-        url = attachment.file.path
+        url = attachment.file.url
         attachments[attachment.file_file_name] = {
             content: open(url).read
         }
@@ -65,6 +65,13 @@ class ProcurementMailer < ApplicationMailer
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
   end
 
+  def send_purchase_request_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_purchase_request'
+    end
+  end
+
 
   # Automatically sent for invoice actions
   def send_invoice_mail(presenter)
@@ -100,35 +107,35 @@ class ProcurementMailer < ApplicationMailer
   def purchase_order_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_approval'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_approval'
     end
   end
 
   def purchase_order_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_po'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_po'
     end
   end
 
   def purchase_order_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_take_control'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_take_control'
     end
   end
 
   def purchase_order_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_reject'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_reject'
     end
   end
 
   def invoice_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_invoices'
     end
   end
 
@@ -136,28 +143,29 @@ class ProcurementMailer < ApplicationMailer
   def invoice_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_forward_invoices'
     end
   end
 
   def invoice_bulk_take_control(presenter)
     @data = presenter
+
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_take_control_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_invoices'
     end
   end
 
   def invoice_bulk_reject(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_reject_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_invoices'
     end
   end
 
   def invoices_bulk_import(presenter)
     @data = presenter
     if presenter.success?
-      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_import_invoices'
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_bulk_import_invoices'
     end
   end
 
@@ -178,5 +186,26 @@ class ProcurementMailer < ApplicationMailer
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
     end    
+  end
+
+  def purchase_request_bulk_approval(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_pr'
+    end
+  end
+
+  def purchase_request_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_pr'
+    end
+  end
+
+  def purchase_request_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_pr'
+    end
   end
 end

@@ -23,10 +23,14 @@ json.currency_country_code @result.report.base_currency_code
 json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
-
-
-
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
+
+json.user_details do
+  json.department @result.report&.user&.department&.name
+  json.cost_center @result.report&.user&.cost_center&.name
+  json.location @result.report&.user&.location&.name
+  json.operating_unit @result.report&.user&.gl_config[:operation_unit] rescue nil
+end
 
 policy_id = nil
 policy_name = nil
@@ -68,11 +72,14 @@ end
 expenses_sorted_by = params[:expenses_sorted_by] || 'category'
 json.expenses_sorted_by expenses_sorted_by
 if expenses_sorted_by == 'category'
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 elsif expenses_sorted_by == 'date'
-  sorted_expenses = @result.expenses_date_sorted
+  # sorted_expenses = @result.expenses_date_sorted
+  sorted_expenses = @result.paginated_expenses_date_sorted
 else
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 end
 
 json.has_custom_fields @result.has_custom_fields?
@@ -84,11 +91,16 @@ json.expense_sections sorted_expenses do |category|
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+    # adding potential duplicate flag in reports show
+    json.potential_duplicate expense.has_duplicate_expenses?
     if expense.category.parent.present?
       json.category_name expense.category.parent.name
+      json.gst_applicable expense.category.parent&.gst_applicable
       json.sub_category expense.category.name
     else
       json.category_name expense.category.name
+      json.gst_applicable expense.category&.gst_applicable
+
     end
     if expense.note
       if expense.note.length < 29
@@ -151,6 +163,20 @@ json.expense_sections sorted_expenses do |category|
         json.pocket_id expense.spent_from&.id
         json.pocket_balance expense.spent_from&.name
       end
+    end
+
+    # Tax details for this expense
+    json.tax_details do
+      json.merchant_gstin expense.gstin_location&.gstin
+      json.merchant_state_id expense.gstin_location&.state_id
+      json.merchant_registered_name expense.gstin_location&.gstin_master&.legal_name_of_business
+      json.tax_amount precision_value expense.gst_amount&.value
+      json.gst_type_id expense.gst_type_id
+      json.merchant_bill_no expense.merchant_bill_no
+      json.hsn_sac expense.hsn_sac
+      json.state_of_expense_id expense.state_of_expense_id
+      json.tax_rate_id expense.tax_rate_id
+      json.gstin_location_id expense.gstin_location_id
     end
   end
 end
@@ -215,6 +241,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_effective_balance cash_on_hand_adapter.balance
   json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance
@@ -248,3 +275,5 @@ json.reviewal_chains do
 end
 
 json.reviewal_chain @result.report.get_reviewal_chain
+json.tax_rates @result.tax_rates
+json.state_codes @result.gst_state_codes

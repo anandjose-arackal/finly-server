@@ -5,7 +5,6 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
 
 json.vendor @result.purchase_order.vendor.as_json
 json.purchase_request_present @result.purchase_order.items.pluck('purchase_order_items.purchase_request_item_id').compact.present? rescue false
-
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 
@@ -72,6 +71,9 @@ json.advance_amount do
   json.advance_amount @result.purchase_order.advance_amount&.value
   json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
+
+json.advance_amount_editable @result.purchase_order.advance_payments.blank? # if procurements already has advance payments, disallow editing advance amount even if po revised.
+
 json.tax do
   json.value @result.purchase_order.tax_amount&.value&.round(2)
   json.id @result.purchase_order.tax_amount&.id
@@ -102,7 +104,7 @@ json.items do
                   :sgst, :cgst, :igst
     
     json.item_number item.inventory_line_item&.item_number rescue nil
-    json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.gl_code item.category&.gl_code
     json.category_name item.category&.name
     json.category_id item.category_id
     json.purchase_request_number item&.purchase_request_item&.purchase_request&.order_number
@@ -159,7 +161,7 @@ end
 # end
 
 json.attachments do
-  json.array! @result.purchase_order.attachments do |attachment|
+  json.array! @result.purchase_order.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -181,15 +183,16 @@ json.comments do
   end
 end
 
-json.po_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
-    json.id category.id
-    json.name category.name
-  end
-end
+json.po_item_categories current_company.categories.inward_invoice_items_only
 
 json.policies do
   json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end
+
+json.payment_ticket_policies do
+  json.array! @result.payment_ticket_policies do |policy|
     json.extract! policy, :id, :name
   end
 end

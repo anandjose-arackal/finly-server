@@ -32,6 +32,8 @@ class AdminUser < ApplicationRecord
   has_many :admin_user_role_mappings, dependent: :destroy
   has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
 
+  has_many :admin_implementation_requests
+
   accepts_nested_attributes_for :admin_user_role_mappings
 
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true

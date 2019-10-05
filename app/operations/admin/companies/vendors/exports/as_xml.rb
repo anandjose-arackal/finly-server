@@ -1,4 +1,4 @@
-class Admin::Companies::Vendors::Exports::AsXml < Vendors::Exports::AsXml
+class Admin::Companies::Vendors::Exports::AsXml < Vendors::Exports::Generate
   attr_accessor :file_url, :file, :vendors
 
   def pre_validate

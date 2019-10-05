@@ -19,6 +19,7 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
           add_message :error, op.messages[:error]
           raise ActiveRecord::Rollback
         end
+
         self.purchase_request.update(reject_note: reject_note)
         self.workflow_output = op.workflow_output
 
@@ -31,6 +32,7 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
 
   def post_process
     unless has_errors?
+      Event::EPurchaseRequest::Reject.(user, purchase_request: purchase_request, workflow_output: workflow_output)
       reject_all_line_items
       add_message :success, "You've rejected reviewal of purchase request"
     end

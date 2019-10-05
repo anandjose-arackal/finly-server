@@ -97,13 +97,13 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     po_item_params = {}
 
     if user.company.feature_subscription.grn_enabled
-      po_item_params[:accepted] = purchase_order_item.accepted - item.accepted
-      po_item_params[:rejected] = purchase_order_item.rejected.to_f - item.rejected.to_f
-      po_item_params[:delivered] = purchase_order_item.delivered - item.delivered
+      po_item_params[:accepted] = [(purchase_order_item.accepted - item.accepted), 0].max
+      po_item_params[:rejected] = [(purchase_order_item.rejected.to_f - item.rejected.to_f), 0].max
+      po_item_params[:delivered] = [(purchase_order_item.delivered - item.delivered), 0].max
     end
 
     if user.company.feature_subscription.srn_enabled
-      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount
+      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount.to_f
     end
 
     purchase_order_item.assign_attributes(po_item_params)

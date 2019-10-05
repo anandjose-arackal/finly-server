@@ -1,5 +1,5 @@
 class Expense::Base < BaseOperation
-  attr_accessor :expense, :per_diem, :cash_pocket
+  attr_accessor :expense, :per_diem, :cash_pocket, :violations
 
   def authorized_user_types
     [:employee, :manager, :admin, :finance_manager]
@@ -129,6 +129,23 @@ class Expense::Base < BaseOperation
     end
   end
 
+  def check_for_violations
+    if expense.report.present?
+      self.violations = Reports::Violation.(user, report: expense.report)
+    end
+  end
+
+  def has_warning?
+    return false unless self.violations.present?
+    self.violations.each do |key, violation|
+      if violation[:expense_warning].present? or violation[:budget_warning].present? or
+          violation['expense_warning'].present? or violation['budget_warning'].present?
+        return true
+      end
+    end
+    false
+  end
+
 
   def success
     Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)
@@ -160,7 +177,7 @@ class Expense::Base < BaseOperation
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted,
                   :conversion_rate, :em_tax_tracking, :tds_slabs, :vehicle_rates,
-                  :cash_pockets
+                  :cash_pockets, :tax_rates, :gst_state_codes
 
 
     def init
@@ -173,6 +190,8 @@ class Expense::Base < BaseOperation
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
       self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets.active
+      self.tax_rates = expense.user.company.tax_rates
+      self.gst_state_codes = GstStateCode.all
     end
 
     def retrieve_vehicle_rates(expense)
