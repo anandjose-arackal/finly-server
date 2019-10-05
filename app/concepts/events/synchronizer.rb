@@ -13,7 +13,7 @@ module Events::Synchronizer
 
   class DatabaseMonitor < TaskManager::API
 
-    def self.register(model_class, event, options = {}, &block)
+    def self.sync(model_class, event, options = {}, &block)
       klass = Class.new(DatabaseMonitor)
       klass.setup model_class, event, options, &block
     end

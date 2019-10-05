@@ -1,3 +1,10 @@
+# ☐ Event(user, message, params)
+#   ☐ System Handler (Sneakers -> Execution)
+#   ☐ Database Event (Sneakers -> Generic Handler -> Sidekiq -> Execution)
+# ☐ Scheduled
+#   ☐ System Handler (Clockwork -> Sidekiq -> Execution)
+#   ☐ Database Handler (Clockwork -> Sidekiq -> Execution)
+
 class TaskManager::API
   include Events::Consumer
   include Events::Scheduler

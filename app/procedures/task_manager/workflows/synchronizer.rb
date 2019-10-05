@@ -1,10 +1,6 @@
 # This class is used for running all database workflows
 class TaskManager::Workflows::Synchronizer < TaskManager::API
 
-  def self.sync_with_database(model, event, options = {} & block)
-    Events::Synchronizer.for(:database).register(model, "#{model.event_channel}.#{event}", options, &block)
-  end
-
   Documents::Master.list.each do |document_name|
     model = Documents::Master.for(document_name)
     record_events = model.record_events
@@ -12,7 +8,7 @@ class TaskManager::Workflows::Synchronizer < TaskManager::API
 
     all_events = record_events + collection_events
     all_events.each do |event|
-      sync_with_database TaskWorkflow, event do |record, user, message|
+      Events::Synchronizer.for(:database).sync TaskWorkflow, event do |record, user, message|
         # TaskManager::Workflows::Synchronizer.new(record, user, message).run
         TaskManager::Runner::BackgroundJob.perform_async(
             {
