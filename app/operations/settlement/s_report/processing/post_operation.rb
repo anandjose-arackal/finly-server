@@ -63,6 +63,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
     marked_as_closed = !!params&.dig(:marked_as_closed)
+    update_documents = !!params&.dig(:update_documents)
 
     if marked_as_closed
       report_status = ReportStatus.id_for(:closed)
@@ -75,10 +76,10 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       Report.transaction do
         ReportTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if marked_as_completed or marked_as_closed or mapping.payment.completed?
+            if marked_as_completed or marked_as_closed or mapping.payment.completed? or update_documents
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+              #                marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
               #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id)
@@ -97,9 +98,19 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 event = 'settle'
               end
 
+              update_mapping = false
+
               mapping.reports.each do |report|
 
                 report.update(bank_reference_number: self.utr[report.id], source_account: self.source_account[report.id])
+
+                # temp workaround for satin a*hles
+                # if we do not update the utr or source_account, we dont settle the report from update or process template file operation
+                # only when the op is called from the mark_as_paid op, we settle the reports
+                # 
+                update_mapping = false
+                next if update_documents and (self.utr[report.id].blank? or self.source_account[report.id].blank?)
+                update_mapping = true
 
                 parameters = {
                   document: report,
@@ -132,6 +143,12 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 
 
               end
+
+              if update_mapping
+                mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              end
+
             elsif mapping.payment.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
