@@ -27,6 +27,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.reviewers = self.document.get_reviewers(:next, provider_name)
     self.document_update_params = {}
 
+    # used for knowing if the document would be rejected to a specific level in the approval chain
     self.reject_to_user = self.user.company.users.with_id(params[:reject_to_user])&.first
     self.reject_to_level = self.document.get_level_with_id(params[:reject_to_level].to_i)
   end
@@ -151,7 +152,9 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:reject].include?(aasm.current_event)
       if self.reject_to_user.present? && self.reject_to_level.present?
+        # for the level where it is rejected, remove the action details so that user in that level can take action again after correcting the document
         document.document_level_reviewer_mappings.where('level_id = ?', self.reject_to_level.id).update_all(action_taken_by_id: nil, action_id: nil, rejected_by_id: user.id)
+        # for levels above the rejected level, remove all action details
         dlrm = document.document_level_reviewer_mappings.where('level_id > ?', self.reject_to_level.id)
       else
         dlrm = document.document_level_reviewer_mappings
@@ -192,6 +195,7 @@ class WorkflowManager::Aasm::BaseProvider
       self.new_level = self.previous_level
     end
 
+    # if document is rejected to a specific level
     if [:reject].include?(aasm.current_event) && self.reject_to_user.present? && self.reject_to_level.present?
       self.new_level = self.reject_to_level
     end

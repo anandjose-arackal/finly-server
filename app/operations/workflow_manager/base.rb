@@ -9,6 +9,8 @@ class WorkflowManager::Base < BaseOperation
     self.note = params[:note]
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
+
+    # used for knowing if the document would be rejected to a specific level in the approval chain
     self.reject_to_user = params[:reject_to_user]
     self.reject_to_level = params[:reject_to_level]
 
