@@ -20,7 +20,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice| 
         rental_invoice.set_creator_and_company(user)
-        update_invoice_limit(rental_invoice)
+        # update_invoice_limit(rental_invoice)
       end
     end
     validate_item_quantity
@@ -58,7 +58,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       if self.payment_agreement.rental_invoices.present?
         self.payment_agreement.rental_invoices.each do |rental_invoice|
          rental_invoice.set_creator_and_company(user)
-          update_invoice_limit(rental_invoice)
+          # update_invoice_limit(rental_invoice)
         end
       end
       if payment_agreement.valid?
