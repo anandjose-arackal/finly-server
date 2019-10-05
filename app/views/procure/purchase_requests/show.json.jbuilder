@@ -57,6 +57,7 @@ json.result do
           end
 
           json.item_number line_item&.item&.item_number
+          json.rate_contract_item_id line_item.rate_contract_item_id
 
           json.product_details do
             json.product_name line_item&.item&.get_custom_description
