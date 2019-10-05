@@ -55,6 +55,7 @@ json.invoice do
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
                 :cost_allocation_items, :narration, :discount_type_id
 
+  json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
