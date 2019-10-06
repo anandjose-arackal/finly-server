@@ -1,4 +1,4 @@
-module Events::Consumer
+module Events::Queue::Consumer
 
   def self.included(base)
     base.extend ClassMethods
@@ -7,17 +7,16 @@ module Events::Consumer
 
   module ClassMethods
     def consumes_event!(key, opts = {})
-      include Sidekiq::Worker
-
       @event = key
       @event_options = opts
       @async = !opts&.dig(:sync)
       @consumes_event = true
 
-      Events::Registry.register self, key, @async, opts
+      Events::Registry.register_queue self, key, @async, opts
 
       if async?
-        include Sneakers::Worker unless self.respond_to?(:from_queue)
+        include Sidekiq::Worker
+        include Sneakers::Worker
         from_queue key, opts
       end
 

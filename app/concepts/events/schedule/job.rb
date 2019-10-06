@@ -1,4 +1,4 @@
-module Events::Scheduler
+module Events::Schedule::Job
 
   def self.add(klass)
     jobs << klass unless jobs.include? klass
@@ -31,8 +31,14 @@ module Events::Scheduler
 
       validate_schedule
 
-      Events::Scheduler.add self
+      Events::Schedule::Job.add self
       setup_job
+
+      unless self.new.respond_to?(:perform)
+        define_method :perform do |type, user_id: nil, message: nil|
+          on_schedule
+        end
+      end
     end
 
     def schedule
@@ -49,13 +55,9 @@ module Events::Scheduler
       at += "#{schedule[:hour].to_s.rjust(2, '0')}:#{schedule[:minute].to_s.rjust(2, '0')}"
       # Todo handle day of the month
       Clockwork.every frequency, self.name, at: at do
-        self.perform_async
+        self.perform_async(:scheduled)
       end
     end
-  end
-
-  def perform(options={})
-    on_schedule
   end
 
   def on_schedule

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: event_file_manager_actions
+# Table name: task_file_manager_actions
 #
 #  id                 :bigint           not null, primary key
 #  export_template_id :bigint           not null

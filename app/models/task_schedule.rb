@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: event_schedules
+# Table name: task_schedules
 #
 #  id               :bigint           not null, primary key
 #  every            :integer
