@@ -2,6 +2,7 @@ class Events::Publisher
   extend Dry::Monads[:result]
 
   protected
+
   def self.broadcast(routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false)
     raise "Consumer key cannot be nil" if consumer_key.nil?
 
@@ -14,11 +15,26 @@ class Events::Publisher
     extend Dry::Monads[:result]
 
     def self.call(routing_key, message, current_user: nil, ignore_failure: false, consumer_key:)
+      if consumer_key == NoObject
+        consumer = Events::Registry.find_by_consumer_key(consumer_key)
+        execute_consumer(consumer, message, current_user)
+      else
+        execute_all_consumers(routing_key, message, current_user, ignore_failure)
+      end
+    end
+
+    def self.execute_consumer(consumer, message, current_user)
+      return Failure("Consumer not found") if consumer.nil?
+
+      consumer.new.receive(current_user, message)
+    end
+
+    def self.execute_all_consumers(routing_key, message, current_user, ignore_failure)
       results = []
       has_failure = false
-      Events::Registry.sync_events(event: routing_key, consumer_key: consumer_key).each do |listener|
-        result = listener.new.receive(current_user, message)
-        data = {result: result, listener: listener, success: result.success?}
+      Events::Registry.sync_events(event: routing_key).each do |consumer|
+        result = execute_consumer(consumer, current_user, message)
+        data = {result: result, consumer: consumer, success: result.success?}
 
         if result.success?
           data[:value] = result.value!
@@ -40,16 +56,24 @@ class Events::Publisher
       payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
       payload.reject! { |k, v| v.nil? } # Remove all nil values
       if consumer_key == NoObject
-        # Publish to all consumers
-        sneakers_client.publish(
-            Events::Serializer.encode(payload).to_json,
-            routing_key: routing_key,
-            persistence: persistence
-        )
+        publish_to_all_consumers(routing_key, payload, persistence)
       else
-        # Find the consumer and run a background job
-        Events::Registry.find_by_consumer_key(consumer_key)&.perform_async(Events::Serializer.encode(payload))
+        publish_to_consumer(consumer_key, payload)
       end
+    end
+
+    def self.publish_to_consumer(consumer_key, payload)
+      # Find the consumer and run a background job
+      Events::Registry.find_by_consumer_key(consumer_key)&.perform_async(Events::Serializer.encode(payload))
+    end
+
+    def self.publish_to_all_consumers(routing_key, payload, persistence)
+      # Publish to all consumers
+      sneakers_client.publish(
+          Events::Serializer.encode(payload).to_json,
+          routing_key: routing_key,
+          persistence: persistence
+      )
     end
 
     def self.sneakers_client
