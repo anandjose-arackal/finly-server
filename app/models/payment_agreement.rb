@@ -246,6 +246,13 @@ class PaymentAgreement < ApplicationRecord
     end
   }
 
+  scope :filter_invoice_number, -> (invoice_number) {
+    ids = where('payment_agreements.order_number LIKE ? OR payment_agreements.override_order_number LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:general_invoices).where('general_invoices.invoice_id LIKE ? OR general_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:rental_invoices).where('rental_invoices.invoice_id LIKE ? OR rental_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    with_ids(ids)
+  }
+
   def as_json(options={})
     {
       id: self.id,

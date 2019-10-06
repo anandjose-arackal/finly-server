@@ -316,14 +316,15 @@ class GeneralInvoice < ApplicationRecord
       prepaid: self.prepaid,
       escalation_percentage: self.escalation_percentage,
       total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
-      available_invoice_amount: get_available_invoice_amount
+      available_invoice_amount: get_available_invoice_amount,
+      invoice_number: self.get_invoice_number
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -342,7 +343,8 @@ class GeneralInvoice < ApplicationRecord
     }
   end
 
-  def invoice_no_or_id
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
   # Quickfix as frontend was failing

@@ -283,15 +283,15 @@ class RentalInvoice < ApplicationRecord
       square_feet: self.square_feet,
       already_exists: true,
       prepaid: self.prepaid,
-      escalation_percentage: self.escalation_percentage
-
+      escalation_percentage: self.escalation_percentage,
+      invoice_number: self.get_invoice_number
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -316,6 +316,10 @@ class RentalInvoice < ApplicationRecord
     else
       {id: nil, number: nil, period_id: nil }
     end
+  end
+
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
 

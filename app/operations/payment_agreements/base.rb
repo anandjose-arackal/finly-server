@@ -16,7 +16,7 @@ class PaymentAgreements::Base < BaseOperation
       :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
         selected_invoice_frequency_attributes: {}, 
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage,
+      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -42,7 +42,7 @@ class PaymentAgreements::Base < BaseOperation
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage,
+      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
