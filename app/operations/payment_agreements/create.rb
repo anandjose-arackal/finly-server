@@ -38,6 +38,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         # validate_start_end_date_consecutiveness unless has_errors?
         billing_type_validations unless has_errors?
         validate_agreement_item_combinations unless has_errors?
+        create_or_update_custom_fields
       end
       if has_errors?
         raise ActiveRecord::Rollback
@@ -48,7 +49,6 @@ class PaymentAgreements::Create < PaymentAgreements::Base
 
   def process
     clear_expiration_date_on_no_expiration
-    create_or_update_custom_fields
     return if has_errors?
     # TODO - check save as it refreshes on reloading even the object that was supposed to be saved(data not saved in db)
     # save_custom_fields

@@ -35,7 +35,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
         # validate_start_end_date_consecutiveness unless has_errors?
         billing_type_validations unless has_errors?
         validate_agreement_item_combinations unless has_errors?
-
+        create_or_update_custom_fields
         if has_errors?
           raise ActiveRecord::Rollback
           return
@@ -47,7 +47,6 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def process
     clear_expiration_date_on_no_expiration
     ActiveRecord::Base.transaction do
-      create_or_update_custom_fields
       return if has_errors?
       # save_custom_fields
       if self.payment_agreement.general_invoices.present?
