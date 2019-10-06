@@ -19,7 +19,7 @@ class TaskManager::Runner < Transactions::API
 
   schema do
     params do
-      required(:message).filled
+      optional(:message).filled
       optional(:api).filled
       optional(:task_workflow_api).filled
       required(:trigger).filled

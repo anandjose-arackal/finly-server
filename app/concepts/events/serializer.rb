@@ -14,7 +14,7 @@ class Events::Serializer
     elsif object.class == Class
       object.to_s
     else
-      object.to_json
+      object
     end
   end
 

@@ -17,7 +17,7 @@ class Events::Publisher
     def self.call(routing_key, message, current_user: nil, ignore_failure: false, consumer_key:)
       if consumer_key == NoObject
         consumer = Events::Registry.find_by_consumer_key(consumer_key)
-        execute_consumer(consumer, message, current_user)
+        execute_consumer(consumer, message, current_user) if consumer
       else
         execute_all_consumers(routing_key, message, current_user, ignore_failure)
       end
@@ -53,8 +53,9 @@ class Events::Publisher
   # Broadcasting the message asynchronously to all listeners
   class Async
     def self.call(routing_key, message, current_user: nil, persistence: true, consumer_key:)
-      payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
+      payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), type: :event}
       payload.reject! { |k, v| v.nil? } # Remove all nil values
+
       if consumer_key == NoObject
         publish_to_all_consumers(routing_key, payload, persistence)
       else

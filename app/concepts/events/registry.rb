@@ -18,8 +18,8 @@ class Events::Registry
   end
 
   def self.find_by_consumer_key(consumer_key)
-    events.each do |event|
-      return event[consumer_key] if event[consumer_key].present?
+    events.each do |event, consumers|
+      return consumers[consumer_key] if consumers[consumer_key].present?
     end
 
     nil

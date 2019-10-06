@@ -12,12 +12,12 @@ class TaskManager::API
 
   # When a new event is received
   def on_event(user, message)
-    TaskManager::Runner.({api: self.class, message: message}, 'current_user' => user, 'trigger' => :event)
+    TaskManager::Runner.({api: self.class, message: message, trigger: :event}, 'current_user' => user, 'trigger' => :event)
   end
 
   def on_schedule
     User.filter_role(self.user_roles).each do |user|
-      TaskManager::Runner.({api: self.class}, 'current_user' => user, 'trigger' => :schedule)
+      TaskManager::Runner.({api: self.class, trigger: :schedule}, 'current_user' => user)
     end
   end
 

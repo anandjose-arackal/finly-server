@@ -73,7 +73,7 @@ module Events::Consumer
       at += "#{schedule[:hour].to_s.rjust(2, '0')}:#{schedule[:minute].to_s.rjust(2, '0')}"
       # Todo handle day of the month
       Clockwork.every frequency, self.name, at: at do
-        self.perform_async(:scheduled)
+        self.perform_async(type: :scheduled)
       end
     end
 
@@ -114,10 +114,12 @@ module Events::Consumer
 
   def receive(type, user, message)
     case type
-    when :schedule
-      self.send("on_schedule") if self.respond_to?("on_schedule")
-    when :event
-      self.send("on_event", user: user, message: message) if self.respond_to?("on_event")
+    when :schedule, 'schedule'
+      self.send(:on_schedule) if self.respond_to?(:on_schedule)
+    when :event, 'event'
+      self.send(:on_event, user, message) if self.respond_to?(:on_event)
+    else
+      raise "Consumer cannot handle type #{type}"
     end
   end
 
