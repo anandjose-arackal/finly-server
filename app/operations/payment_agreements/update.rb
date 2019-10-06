@@ -48,6 +48,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     clear_expiration_date_on_no_expiration
     ActiveRecord::Base.transaction do
       create_or_update_custom_fields
+      return if has_errors?
       # save_custom_fields
       if self.payment_agreement.general_invoices.present?
         self.payment_agreement.general_invoices.each do |general_invoice|

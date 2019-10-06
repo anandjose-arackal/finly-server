@@ -49,6 +49,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
   def process
     clear_expiration_date_on_no_expiration
     create_or_update_custom_fields
+    return if has_errors?
     # TODO - check save as it refreshes on reloading even the object that was supposed to be saved(data not saved in db)
     # save_custom_fields
     # self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
