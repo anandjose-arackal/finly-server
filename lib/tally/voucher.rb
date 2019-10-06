@@ -1,5 +1,5 @@
 class Tally::Voucher < NonPersistentModel
-  attr_accessor :voucher_type, :date, :state, :gl_name, :gstin, :narration, :reference
+  attr_accessor :voucher_type, :date, :voucher_number, :state, :gl_name, :gstin, :narration, :reference
 
   validates_presence_of :voucher_type, :date, :gl_name
   validate :zero_sum_ledgers
@@ -40,6 +40,7 @@ class Tally::Voucher < NonPersistentModel
                 "narration": self.narration,
                 "countryofresidence": "India",
                 "reference": self.reference,
+                "vouchernumber": self.voucher_number,
                 "partygstin": self.gstin,
                 "partyname": self.gl_name,
                 "vouchertypename": self.voucher_type,
