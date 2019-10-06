@@ -50,6 +50,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
+    validate_agreement_limit
   end
 
   def process
@@ -80,6 +81,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
+    update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved

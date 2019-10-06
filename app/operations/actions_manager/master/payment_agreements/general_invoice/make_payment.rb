@@ -24,7 +24,7 @@ class ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment < A
           return false
         end
       end
-      if general_invoice.end_date.to_date >= Date.today
+      if general_invoice.start_date.to_date <= Date.today && general_invoice.end_date.to_date >= Date.today
         return true
       end 
     end
