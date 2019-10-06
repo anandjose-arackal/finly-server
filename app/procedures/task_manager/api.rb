@@ -6,8 +6,7 @@
 #   ☐ Database Handler (Clockwork -> Sidekiq -> Execution)
 
 class TaskManager::API
-  include Events::Queue::Consumer
-  include Events::Schedule::Job
+  include Events::Consumer
 
   # TODO consume request params as well for filtering
 

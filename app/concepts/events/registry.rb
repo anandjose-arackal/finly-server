@@ -1,30 +1,44 @@
 class Events::Registry
 
-  def self.register_queue(klass, event, async: false, options: {})
-    type = async ? :async : :sync
-    registry(event)[:queue][type] << klass
+  def self.add_event(klass, event, consumer_key)
+    raise "Key #{key} is already taken" if find_by_consumer_key(consumer_key).present?
+
+    events(event)[consumer_key] = klass
   end
 
-  def self.register_request(klass, event, async: false, options: {})
-    type = async ? :async : :sync
-    registry(event)[:request][type] << klass
+  def self.add_scheduled_job(klass)
+    scheduled_jobs << klass unless scheduled_jobs.include? klass
   end
 
-  def self.registry(event)
-    return nil if event.nil?
+  def self.events(event = NoObject)
+    @events ||= {}.with_indifferent_access
+    return @events if event == NoObject
 
-    @registry ||= {}.with_indifferent_access
-    @registry[event] ||= {queue: {async: [], sync: []}, request: {async: [], sync: []}, scheduled: []}.with_indifferent_access
+    @events[event] ||= {}
   end
 
-  def self.queue_listeners(event, type: :sync)
-    raise "Invalid listener type #{type}" unless [:sync, :async].include? type
-    registry(event)[:queue][type]
+  def self.find_by_consumer_key(consumer_key)
+    events.each do |event|
+      return event[consumer_key] if event[consumer_key].present?
+    end
+
+    nil
   end
 
-  def self.request_handlers(event, type: :sync)
-    raise "Invalid listener type #{type}" unless [:sync, :async].include? type
-    registry(event)[:request][type]
+  def self.async_events(event, consumer_key: NoObject)
+    events(event).values.select do |klass|
+      klass.async? and (consumer_key == NoObject or klass.consumer_key == consumer_key)
+    end
+  end
+
+  def self.sync_events(event, consumer_key: NoObject)
+    events(event).values.select do |klass|
+      klass.async? and (consumer_key == NoObject or klass.consumer_key == consumer_key)
+    end
+  end
+
+  def self.scheduled_jobs
+    @scheduled_jobs ||= []
   end
 
 end
