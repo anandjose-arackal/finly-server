@@ -46,6 +46,10 @@ module Events::Consumer
       @consumes_event || false
     end
 
+    def schedule
+      @schedule
+    end
+
     def scheduled?
       @scheduled || false
     end
