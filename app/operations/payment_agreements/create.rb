@@ -15,10 +15,16 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     self.payment_agreement.creator_id = user.id
     self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.general_invoices.present?
-      self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+      self.payment_agreement.general_invoices.each do |general_invoice| 
+        general_invoice.set_creator_and_company(user)
+        update_invoice_limit(general_invoice)
+      end
     end
     if self.payment_agreement.rental_invoices.present?
-      self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+      self.payment_agreement.rental_invoices.each do |rental_invoice| 
+        rental_invoice.set_creator_and_company(user)
+        # update_invoice_limit(rental_invoice)
+      end
     end
     validate_item_quantity
     ActiveRecord::Base.transaction do
@@ -32,6 +38,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         # validate_start_end_date_consecutiveness unless has_errors?
         billing_type_validations unless has_errors?
         validate_agreement_item_combinations unless has_errors?
+        create_or_update_custom_fields
       end
       if has_errors?
         raise ActiveRecord::Rollback
@@ -42,9 +49,9 @@ class PaymentAgreements::Create < PaymentAgreements::Base
 
   def process
     clear_expiration_date_on_no_expiration
-    create_or_update_custom_fields
+    return if has_errors?
     # TODO - check save as it refreshes on reloading even the object that was supposed to be saved(data not saved in db)
-    save_custom_fields
+    # save_custom_fields
     # self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     # self.payment_agreement.creator_id = user.id
     # self.payment_agreement.company_id = user.company_id

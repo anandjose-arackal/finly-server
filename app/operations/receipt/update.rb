@@ -10,7 +10,9 @@ class Receipt::Update < Receipt::Base
   def init
     params[:note] = nil if params[:note] == 'nil'
     id = params[:id] or params[:receipt_id]
-    self.receipt = user.receipts.find_by_id(id)
+    # self.receipt = user.receipts.find_by_id(id)
+    # Since manager can update receipt of an user, it cannot be scoped to current user; rather will be scoped to all receipts for current company
+    self.receipt = Receipt.where(user_id: user.company.users.pluck(:id), id: id).first
     self.update_param = update_params
   end
 
@@ -40,6 +42,8 @@ class Receipt::Update < Receipt::Base
 
   private
   def update_params
-    params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
+    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
+    p[:image] = params[:receipt][:image] rescue nil
+    p.permit!
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_25_021415) do
+ActiveRecord::Schema.define(version: 2019_09_26_092401) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1746,6 +1746,7 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "default_company_id"
   end
 
   create_table "company_kyc_document_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4178,6 +4179,8 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.string "bank_reference_number"
+    t.string "source_account"
     t.index ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id"
     t.index ["controlling_level_id"], name: "index_money_requests_on_controlling_level_id"
@@ -4602,6 +4605,7 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.text "post_operation_payload"
     t.boolean "api_initiated", default: false
     t.integer "bank_account_provider_id"
+    t.datetime "deleted_at"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
@@ -5930,6 +5934,8 @@ ActiveRecord::Schema.define(version: 2019_09_25_021415) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.string "bank_reference_number"
+    t.string "source_account"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"

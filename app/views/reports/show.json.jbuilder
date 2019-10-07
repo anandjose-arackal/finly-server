@@ -90,11 +90,16 @@ json.date @result.report.created_at.strftime('%d %b %Y')
 #                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
 #     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
 #     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+#     # adding potential duplicate flag in reports show
+#     json.potential_duplicate expense.has_duplicate_expenses?
 #     if expense.category.parent.present?
 #       json.category_name expense.category.parent.name
+#       json.gst_applicable expense.category.parent&.gst_applicable
 #       json.sub_category expense.category.name
 #     else
 #       json.category_name expense.category.name
+#       json.gst_applicable expense.category&.gst_applicable
+
 #     end
 #     if expense.note
 #       if expense.note.length < 29
@@ -122,15 +127,15 @@ json.date @result.report.created_at.strftime('%d %b %Y')
 #     json.custom_fields do
 #       case expense.expense_type_id
 #       when ExpenseType.id_for(:manual)
-#         json.array! expense.manual_expense.custom_fields
+#         json.array! expense.manual_expense.custom_fields.as_json({report_show: true})
 #       when ExpenseType.id_for(:card)
-#         json.array! expense.card_expense.custom_fields
+#         json.array! expense.card_expense.custom_fields.as_json({report_show: true})
 #       when ExpenseType.id_for(:distance)
-#         json.array! expense.distance_expense.custom_fields
+#         json.array! expense.distance_expense.custom_fields.as_json({report_show: true})
 #       when ExpenseType.id_for(:time)
-#         json.array! expense.time_expense.custom_fields
+#         json.array! expense.time_expense.custom_fields.as_json({report_show: true})
 #       when ExpenseType.id_for(:per_diem)
-#         json.array! expense.per_diem_expense.custom_fields
+#         json.array! expense.per_diem_expense.custom_fields.as_json({report_show: true})
 #       end
 #     end
 #     json.receipts do

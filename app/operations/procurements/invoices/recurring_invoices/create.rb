@@ -126,6 +126,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
         add_message :error, "Unable to create general invoice"
         return
       end
+      attach_agreement_item(invoice, 'general_invoice')
     end
     return invoice
   end
@@ -150,6 +151,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
         return
       end
     end
+    attach_agreement_item(invoice, 'rental_invoice')
     return invoice
   end
 
@@ -283,6 +285,16 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def update_due_date(actual_invoice, agreement_invoice)
     if agreement_invoice.billing_type.variable_periodic?
       actual_invoice.due_date = Date.today + agreement_invoice.payment_term.days_after
+    end
+  end
+
+  # Attach agreement item to invoice
+  def attach_agreement_item(new_invoice, invoice_type)
+    if new_invoice.present?
+      new_invoice.payment_agreement_id = self.payment_agreement.id
+      new_invoice.agreement_item_type = invoice_type.camelize
+      new_invoice.agreement_item_id = payment_agreement_type_id
+      new_invoice.save
     end
   end
 

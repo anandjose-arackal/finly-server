@@ -352,7 +352,15 @@ class User < ApplicationRecord
   scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
   scope :with_email, ->(email) {where email: email}
   scope :with_email_or_mobile_number, -> (email, mobile_number) {
-    where('email = ? OR mobile_number = ?', email, mobile_number)
+    if email.present? && mobile_number.present?
+      where('email = ? OR mobile_number = ?', email, mobile_number)
+    elsif email.blank?
+      where('mobile_number = ?', mobile_number)
+    elsif mobile_number.blank?
+      where('email = ?', email)
+    else
+      # do nothing
+    end
   }
   scope :with_subscription, -> (application) {
     ids = self.pluck(:id)
@@ -788,7 +796,7 @@ class User < ApplicationRecord
   before_save :strip_whitespace
 
   around_update :set_passwords_for_linked_users
-  after_save :sync_users_for_group_entity
+  after_create :sync_users_for_group_entity
 
   after_create do
     default_policy_id = self.company.default_policy.id
@@ -824,7 +832,12 @@ class User < ApplicationRecord
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     #
     # setting the default company_id for this user - if there is already a user added with this company
-    self.update_columns(default_company_id: self.company_id)
+    if self.company.group_entity_structure_enabled? && self.company.group_id.present? && self.company.group&.default_company_id.present?
+      self.update_columns(default_company_id: self.company.group.default_company_id)
+    else
+      self.update_columns(default_company_id: self.company_id)
+    end
+
   end
 
   def strip_whitespace

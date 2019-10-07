@@ -426,7 +426,7 @@ class Invoice < ApplicationRecord
   }
 
   scope :include_for_index, -> {
-    includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
+    includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category, :invoice_type, :level, :controlling_level,
              :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type,
              :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
@@ -939,6 +939,10 @@ class Invoice < ApplicationRecord
   #   end
   # end
 
+  def generate_sequential_id?
+    invoice_status_id != InwardInvoiceStatus.id_for(:open)
+  end
+
   private
 
   # def payment_agreement_updations
@@ -1122,7 +1126,8 @@ class Invoice < ApplicationRecord
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.invoice_number,
+      invoice_id: self.invoice_id,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
