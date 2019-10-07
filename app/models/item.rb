@@ -164,7 +164,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
   end
 
   def get_custom_description
