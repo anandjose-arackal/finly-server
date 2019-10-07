@@ -7,7 +7,7 @@ json.results do
       json.required_by_date item&.required_by_date&.to_date
       json.delivery_location_id item&.delivery_location&.name
       json.vendor_id item&.vendor_id
-      json.vendor_name item&.vendor&.name
+      json.vendor_name item&.vendor&.display_name
       json.per_unit_estimated_amount item&.per_unit_estimated_amount&.value
       json.rate_contract item.vendor_id.present? 
       json.purpose item.purpose
