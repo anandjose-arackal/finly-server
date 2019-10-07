@@ -35,6 +35,7 @@ class PaymentAgreements::Base < BaseOperation
         total_after_tax_attributes: [:id, :currency_id, :value],
         advance_amount_attributes: [:id, :currency_id, :value],
         balance_amount_attributes: [:id, :currency_id, :value],
+        total_invoice_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
         # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
@@ -97,6 +98,7 @@ class PaymentAgreements::Base < BaseOperation
   def update_item_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
+        update_total_invoice_amount(general_invoice)
         update_amount_attributes(general_invoice)
         set_due_date_for_invoices('general_invoice')
         general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)
@@ -105,6 +107,7 @@ class PaymentAgreements::Base < BaseOperation
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
+        update_total_invoice_amount(rental_invoice)
         update_amount_attributes(rental_invoice)
         set_due_date_for_invoices('rental_invoice')
         rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)
@@ -1361,6 +1364,31 @@ class PaymentAgreements::Base < BaseOperation
           end
         end
       end
+    end
+  end
+
+  def update_total_invoice_amount(invoice)
+    if invoice.billing_type.variable_periodic?
+      if invoice.available_invoice_amount.blank?
+        invoice.available_invoice_amount = invoice.total_invoice_amount.dup
+        invoice.save
+      else
+        invoice.available_invoice_amount.update(value: invoice.total_invoice_amount&.value)
+      end
+    end
+  end
+
+  def update_invoice_limit(invoice)
+      if invoice.total_invoice_amount.value.blank?# || invoice.billing_type.one_time? || invoice.billing_type.fixed_periodic?
+        invoice.total_invoice_amount = nil
+        invoice.available_invoice_amount = nil
+      end
+    if invoice.billing_type.variable_periodic?
+      if invoice.total_invoice_amount.blank? || invoice&.total_invoice_amount&.value.blank?
+        add_message :error, "Maximum invoice amount cannot be blank"
+        return
+      end
+
     end
   end
 

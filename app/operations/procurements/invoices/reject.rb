@@ -31,6 +31,7 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
     end
     self.invoice.update(rejection_note: params[:note])
     self.workflow_output = op.workflow_output
+    update_agreement_available_limit
   end
 
   def post_process

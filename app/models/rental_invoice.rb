@@ -145,7 +145,7 @@ class RentalInvoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :invoices, as: :agreement_item
