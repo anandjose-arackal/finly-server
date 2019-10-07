@@ -5,11 +5,11 @@ class PaymentDrop < Drop
   end
 
   def narration
-    @object.narration
+    @object.note
   end
 
   def reference_id
-    @object.reference_id
+    @object.external_reference_id
   end
 
   def gl_name
@@ -17,15 +17,17 @@ class PaymentDrop < Drop
   end
 
   def vendor
-    @object.vendor
+    return nil unless @object.receiving_user_type == "YesBankVendor"
+
+    @object.receiving_user&.to_liquid
   end
 
   def beneficiary
     vendor
   end
 
-  def net_amount
-    @object.net_amount
+  def amount
+    @object.amount&.value || 0
   end
 
 end

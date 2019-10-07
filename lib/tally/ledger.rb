@@ -5,6 +5,7 @@ class Tally::Ledger < NonPersistentModel
   validates_presence_of :name, :amount
   validate :bill_allocations_validate
   validate :cost_allocations_validate
+  validate :bank_allocations_validate
 
   def amount
     @amount ||= 0
@@ -68,9 +69,9 @@ class Tally::Ledger < NonPersistentModel
           date: date,
           transaction_type: transaction_type,
           payment_mode: payment_mode,
-          party_name: party_name,
-          amount: amount
+          party_name: party_name
       )
+      bank_allocations << bank_allocation
     end
     bank_allocation.add amount
   end
@@ -83,7 +84,8 @@ class Tally::Ledger < NonPersistentModel
             "ispartyledger": Tally::Utils.to_bool(self.is_party_ledger),
             "amount": self.amount,
             "billallocations.list": self.bill_allocations.as_json(options),
-            "categoryallocations.list": self.category_allocations.as_json(options)
+            "categoryallocations.list": self.category_allocations.as_json(options),
+            "bankallocations.list": self.bank_allocations.as_json(options)
         }
     )
   end
@@ -105,6 +107,16 @@ class Tally::Ledger < NonPersistentModel
       unless category_allocation.valid?
         category_allocation.errors.full_messages.each do |message|
           errors.add :category_allocation, message
+        end
+      end
+    end
+  end
+
+  def bank_allocations_validate
+    self.bank_allocations.each do |bank_allocation|
+      unless bank_allocation.valid?
+        bank_allocation.errors.full_messages.each do |message|
+          errors.add :bank_allocation, message
         end
       end
     end

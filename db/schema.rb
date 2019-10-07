@@ -3223,6 +3223,8 @@ ActiveRecord::Schema.define(version: 2019_10_07_053745) do
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
     t.string "override_invoice_id"
+    t.integer "total_invoice_amount_id"
+    t.integer "available_invoice_amount_id"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -4711,6 +4713,7 @@ ActiveRecord::Schema.define(version: 2019_10_07_053745) do
     t.text "post_operation_payload"
     t.boolean "api_initiated", default: false
     t.integer "bank_account_provider_id"
+    t.datetime "deleted_at"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"

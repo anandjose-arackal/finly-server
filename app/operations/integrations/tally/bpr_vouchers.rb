@@ -1,15 +1,6 @@
 class Integrations::Tally::BPRVouchers < Integrations::Tally::Base
   attr_accessor :expenses, :payment_tickets, :file_url
 
-  class Integrations::Tally::BPRVouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :file_url
-
-    def init
-      self.file_url = params[:file_url]
-    end
-
-  end
-
   def authorized_user_types
     []
   end
@@ -53,10 +44,10 @@ class Integrations::Tally::BPRVouchers < Integrations::Tally::Base
             "bank_allocations": [
                 {
                     "name": "Kotak Bank",
-                    "partyname": "{{payment.vendor.name}}",
+                    "partyname": "{{payment.vendor.gl_name}}",
                     "transactiontype": "Others",
                     "paymentmode": "Transacted",
-                    "amount": "{{payment.net_amount}}"
+                    "amount": "{{payment.amount}}"
                 },
             ]
         }
@@ -105,7 +96,7 @@ class Integrations::Tally::BPRVouchers < Integrations::Tally::Base
   end
 
   def success
-    Integrations::Tally::InvoicePaymentVouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
+    Integrations::Tally::Base::FilePresenter.new(user, {file_url: self.file_url}, messages)
   end
 
   def add_voucher(generator, payment_ticket, payment, configuration)
@@ -116,12 +107,12 @@ class Integrations::Tally::BPRVouchers < Integrations::Tally::Base
 
   def add_beneficiary_ledger(voucher, payment_ticket, payment, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['beneficiary'], "payment" => payment, "payment_ticket" => payment_ticket)
-    voucher.add ledger_data['gl_name'], payment.net_amount
+    voucher.add ledger_data['gl_name'], payment.amount
   end
 
   def add_payment_ledger(voucher, payment_ticket, payment, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['account'].slice('gl_name', 'bank_allocations'), "payment" => payment, "payment_ticket" => payment_ticket)
-    voucher.add ledger_data['gl_name'], (-payment.net_amount), bank_allocations: ledger_data['bank_allocations']
+    voucher.add ledger_data['gl_name'], (-payment.amount), bank_allocations: ledger_data['bank_allocations']
   end
 
 end
