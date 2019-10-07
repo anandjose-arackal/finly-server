@@ -52,6 +52,10 @@ class FieldConfiguration < ApplicationRecord
   has_many :parent_dependent_field_configuration_mappings, foreign_key: :dependent_field_configuration_id
   has_many :parent_drop_down_items, through: :parent_dependent_field_configuration_mappings, source: :parent, source_type: "FieldDropDownItem"
 
+  # adding associations with the related users as well
+  has_many :user_field_mappings
+  has_many :affected_users, through: :user_field_mappings, source: :field_configuration, source_type: "FieldConfiguration"
+
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_26_092401) do
+ActiveRecord::Schema.define(version: 2019_10_07_083125) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3157,6 +3157,9 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "prepaid"
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
+    t.string "override_invoice_id"
+    t.integer "total_invoice_amount_id"
+    t.integer "available_invoice_amount_id"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -5736,6 +5739,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "prepaid"
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
+    t.string "override_invoice_id"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
@@ -6695,6 +6699,16 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.index ["status_id"], name: "index_user_devices_on_status_id"
     t.index ["user_id"], name: "index_user_devices_on_user_id"
     t.index ["verification_mode"], name: "index_user_devices_on_verification_mode"
+  end
+
+  create_table "user_field_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "field_configuration_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["field_configuration_id"], name: "index_user_field_mappings_on_field_configuration_id"
+    t.index ["user_id"], name: "index_user_field_mappings_on_user_id"
   end
 
   create_table "user_group_item_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
