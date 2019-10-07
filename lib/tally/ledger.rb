@@ -22,6 +22,10 @@ class Tally::Ledger < NonPersistentModel
     @category_allocations ||= []
   end
 
+  def bank_allocations
+    @bank_allocations ||= []
+  end
+
   def add(value)
     self.amount += value
   end
@@ -30,8 +34,12 @@ class Tally::Ledger < NonPersistentModel
     bill_allocations.find {|bill_allocation| bill_allocation.name == name}
   end
 
+  def find_bank_allocation(name)
+    bank_allocations.find {|bank_allocation| bank_allocation.name == name}
+  end
+
   def find_category_allocation(name)
-    category_allocations.find {|category_allocation| category_allocation.name == name}
+    bank_allocations.find {|category_allocation| category_allocation.name == name}
   end
 
   def add_bill_allocation(name, type, amount)
@@ -50,6 +58,21 @@ class Tally::Ledger < NonPersistentModel
       category_allocations << category_allocation
     end
     category_allocation.add cost_center, amount
+  end
+
+  def add_bank_allocation(name, date, transaction_type, payment_mode, party_name, amount)
+    bank_allocation = find_bank_allocation name
+    if bank_allocation.nil?
+      bank_allocation = Tally::BankAllocation.new(
+          name: name,
+          date: date,
+          transaction_type: transaction_type,
+          payment_mode: payment_mode,
+          party_name: party_name,
+          amount: amount
+      )
+    end
+    bank_allocation.add amount
   end
 
   def as_json(options)
