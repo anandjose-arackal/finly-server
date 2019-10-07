@@ -1150,20 +1150,21 @@ class Invoice < ApplicationRecord
 
   def payment_history_json
     {
-        id: self.id,
-        invoice_number: self.invoice_id,
-        vendor_name: self.vendor&.display_name,
-        due_date: self.due_date&.to_date,
-        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-        status: self&.status&.name&.titleize,
-        creation_date: self.created_at.to_date,
-        tds_slab_attributes: {id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds},
-        agreement_type: self.class.name.underscore,
-        payment_agreement_id: self.payment_agreement_id,
-        vendor_id: self.vendor_id,
-        agreement_number: self.payment_agreement&.get_agreement_number,
-        procurement_id: self.procurement_id
+      id: self.id,
+      invoice_number: self.invoice_number,
+      invoice_id: self.invoice_id,
+      vendor_name: self.vendor&.display_name,
+      due_date: self.due_date&.to_date,
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+      status: self&.status&.name&.titleize,
+      creation_date: self.created_at.to_date,
+      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+      agreement_type: self.class.name.underscore,
+      payment_agreement_id: self.payment_agreement_id,
+      vendor_id: self.vendor_id,
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      procurement_id: self.procurement_id
 
     }
   end
