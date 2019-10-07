@@ -31,6 +31,7 @@
 
 class PaymentOrder < ApplicationRecord
   include PostOperationExecution, SoftDeletable
+  include LiquidDroppable
 
   CONFIG = {
       meal_card: {
