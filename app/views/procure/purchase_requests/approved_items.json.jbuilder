@@ -12,6 +12,7 @@ json.results do
       json.rate_contract item.vendor_id.present? 
       json.purpose item.purpose
       json.rate_contract_number item&.rate_contract_item&.rate_contract&.rate_contract_number
+      json.rate_contract_id item&.rate_contract_item&.rate_contract_id
       # json.per_unit_estimated_amount_attributes do
       #   json.currency_id line_item&.per_unit_estimated_amount&.currency_id
       #   json.value line_item&.per_unit_estimated_amount&.value
