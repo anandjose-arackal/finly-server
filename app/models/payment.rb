@@ -55,6 +55,7 @@
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
+  include LiquidDroppable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'

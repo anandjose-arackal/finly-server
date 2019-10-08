@@ -1,15 +1,6 @@
 class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   attr_accessor :expenses, :invoices, :file_url
 
-  class Integrations::Tally::InvoiceVouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :file_url
-
-    def init
-      self.file_url = params[:file_url]
-    end
-
-  end
-
   def authorized_user_types
     []
   end
@@ -120,7 +111,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   end
 
   def success
-    Integrations::Tally::InvoiceVouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
+    Integrations::Tally::Base::FilePresenter.new(user, {file_url: self.file_url}, messages)
   end
 
   def add_voucher(generator, invoice, configuration)
