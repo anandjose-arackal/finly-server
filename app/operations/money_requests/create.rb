@@ -86,6 +86,7 @@ class MoneyRequests::Create < MoneyRequests::Base
       money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
     end
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    ActiveRecord::Base.transaction do
     if money_request.save
       money_request.trails.create action_user: user,
                            action_id: TrailAction.id_for(:create),
@@ -112,6 +113,7 @@ class MoneyRequests::Create < MoneyRequests::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
       else
@@ -122,6 +124,7 @@ class MoneyRequests::Create < MoneyRequests::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
       end
@@ -129,6 +132,7 @@ class MoneyRequests::Create < MoneyRequests::Base
       
     else
       self.messages[:error] = money_request.errors.full_messages
+    end
     end
   end
 

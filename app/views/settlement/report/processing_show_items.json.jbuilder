@@ -34,6 +34,8 @@ json.items do
         json.total_amount do
           json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
         end
+        json.utr_number report.bank_reference_number
+        json.source_account report.source_account
       end
     end
     json.system_messages do

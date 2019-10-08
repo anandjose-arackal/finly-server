@@ -3,7 +3,7 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
                 :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers, :tax_rates,
-                :batch, :item_utr, :item_status, :processable_mappings, :mappings
+                :batch, :item_utr, :item_status, :processable_mappings, :mappings, :item_source_account
 
   class Settlement::SMoneyRequests::Processing::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -52,22 +52,35 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
   end
 
   def pre_process
-    self.item_utr = self.mappings.collect {|item| [item.id, item.bank_reference_number]}.to_h
+    # self.item_utr = self.mappings.collect {|item| [item.id, item.bank_reference_number]}.to_h
+    # self.item_utr = self.mappings.left_joins(:money_requests).select('money_requests.id AS money_request_id, money_requests.bank_reference_number AS utr').collect {|item| [item.money_request_id, item.utr]}.to_h
+    
+    document = self.mappings.left_joins(:money_requests).select('money_requests.id AS money_request_id, money_requests.bank_reference_number AS utr, money_requests.source_account AS source_account')
+    self.item_utr = document.collect {|item| [item.money_request_id, item.utr]}.to_h
+    self.item_source_account = document.collect {|item| [item.money_request_id, item.source_account]}.to_h
     self.item_status = self.mappings.collect {|item| [item.id, item.status_id]}.to_h
   end
 
   def process
     self.item_details.each do |item|
+      document_id = item[:document_id] || item["document_id"]
       item_id = item[:item_id] || item["item_id"]
       utr = item[:utr] || item["utr"]
+      source_account = item[:source_account] || item["source_account"]
 
       self.error_messages = []
       self.issue_item = {}
 
       if item_id.blank?
         self.valid = false
+        self.error_messages << "Batch ID should not be removed."
+        self.issue_item[:item_id] = "Batch ID should not be removed."
+      end
+
+      if document_id.blank?
+        self.valid = false
         self.error_messages << "Advance ID should not be removed."
-        self.issue_item[:item_id] = "Advance ID should not be removed."
+        self.issue_item[:document_id] = "Advance ID should not be removed."
       end
 
       if utr.present?
@@ -75,6 +88,14 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
           self.valid = false
           self.error_messages << "UTR is only allowed to be alphanumeric."
           self.issue_item[:utr] = "UTR is only allowed to be alphanumeric."
+        end
+      end
+
+      if source_account.present?
+        unless validate_utr source_account
+          self.valid = false
+          self.error_messages << "Source Account is only allowed to be alphanumeric."
+          self.issue_item[:source_account] = "Source Account is only allowed to be alphanumeric."
         end
       end
 
@@ -129,8 +150,8 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
 
   def retrieve_header_names
     [
+      "Advance ID(unmodifiable)",
       "Batch Item ID(unmodifiable)", 
-      "Advance IDs(unmodifiable)", 
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
@@ -138,6 +159,7 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
       "Purpose of Advance(unmodifiable)", 
       "Total Advance Amount(unmodifiable)", 
       "UTR",
+      "Source Account",
       "Mark As Paid(Y or N; leave blank to skip)"
     ]
   end
@@ -149,7 +171,7 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
   end
 
   def utr_present(item)
-    item[:utr].present?
+    item[:utr].present? or item[:source_account].present?
   end
 
   def marked_as_paid(item)
@@ -158,8 +180,11 @@ class Settlement::SMoneyRequests::Processing::BulkValidateFileData < Settlement:
 
   # we need this flag, since not all items will be credited through bank transfer
   def utr_modifiable(item)
-    return true if item_utr[item[:item_id].to_i].blank? #mapping does not have a utr already present
-    return true if item[:utr] != item_utr[item[:item_id].to_i] #mappings utr is different from excel enterted utr
+    return true if item_utr[item[:document_id].to_i].blank? #mapping does not have a utr already present
+    return true if item[:utr] != item_utr[item[:document_id].to_i] #mappings utr is different from excel enterted utr
+
+    return true if item_source_account[item[:document_id].to_i].blank? #mapping does not have a source_account already present
+    return true if item[:source_account] != item_source_account[item[:document_id].to_i] #mappings source_account is different from excel enterted source_account
   end
 
 end

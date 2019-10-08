@@ -12,6 +12,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
               :item_expense_type => "Expense Type",
               :po_item =>  "PO Item (Y/N)",
               :non_po_item => "Non PO Item (Y/N)",
+              :good_service => "Goods or Service ( G / S)",
               :discount => "Discount",
               :rate => "Rate",
               :destroy => "Destroy"
@@ -58,6 +59,10 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
 
   def discount(item)
     item.rate
+  end
+
+  def good_service(item)
+    item.product_type&.name&.humanize rescue ''
   end
 
   def rate(item)

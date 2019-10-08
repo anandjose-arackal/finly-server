@@ -12,10 +12,16 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def validate
     self.payment_agreement.assign_attributes(payment_agreement_parameters)
     if self.payment_agreement.general_invoices.present?
-      self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+      self.payment_agreement.general_invoices.each do |general_invoice|
+        general_invoice.set_creator_and_company(user)
+        update_invoice_limit(general_invoice)
+      end
     end
     if self.payment_agreement.rental_invoices.present?
-      self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+      self.payment_agreement.rental_invoices.each do |rental_invoice| 
+        rental_invoice.set_creator_and_company(user)
+        # update_invoice_limit(rental_invoice)
+      end
     end
     validate_item_quantity
     ActiveRecord::Base.transaction do
@@ -29,7 +35,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
         # validate_start_end_date_consecutiveness unless has_errors?
         billing_type_validations unless has_errors?
         validate_agreement_item_combinations unless has_errors?
-
+        create_or_update_custom_fields
         if has_errors?
           raise ActiveRecord::Rollback
           return
@@ -41,13 +47,19 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def process
     clear_expiration_date_on_no_expiration
     ActiveRecord::Base.transaction do
-      create_or_update_custom_fields
-      save_custom_fields
+      return if has_errors?
+      # save_custom_fields
       if self.payment_agreement.general_invoices.present?
-        self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+        self.payment_agreement.general_invoices.each do |general_invoice|
+          general_invoice.set_creator_and_company(user)
+          update_invoice_limit(general_invoice)
+        end
       end
       if self.payment_agreement.rental_invoices.present?
-        self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+        self.payment_agreement.rental_invoices.each do |rental_invoice|
+         rental_invoice.set_creator_and_company(user)
+          # update_invoice_limit(rental_invoice)
+        end
       end
       if payment_agreement.valid?
         # Set validation of DLRMs
