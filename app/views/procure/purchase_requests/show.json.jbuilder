@@ -8,6 +8,7 @@ json.result do
     json.cost_allocation_items @result&.purchase_request&.cost_allocation_items
     # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
+      json.id @result.purchase_request.creator_id
       json.name @result.purchase_request.creator&.name
       json.created_at @result.purchase_request&.created_at&.to_date
       json.email @result.purchase_request.creator&.email
