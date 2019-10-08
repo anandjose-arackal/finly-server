@@ -6,13 +6,18 @@ module Events::Consumer
   end
 
   module ClassMethods
-    def consumes_event!(event, consumer_key: nil, options: {})
+    def consumes_event!(event, consumer_key:, name:, options: {})
+      raise "Name is not defined for consumer #{self.name}" if name.nil?
+      raise "Event is not defined for consumer #{self.name}" if event.nil?
+      raise "Consumer Key is not defined for consumer #{self.name}" if consumer_key.nil?
+
       async! unless options&.dig(:sync)
       @event = event
       @event_options = options
       @consumer_key = consumer_key
       @consumes_event = true
-      
+      @name = name
+
       Events::Registry.add_event self, event, consumer_key
 
       if async?
@@ -21,7 +26,10 @@ module Events::Consumer
       end
     end
 
-    def scheduled!(every:, hour:, minute:, day_of_the_week: nil, day_of_the_month: nil)
+    def scheduled!(name:, every:, hour:, minute:, day_of_the_week: nil, day_of_the_month: nil)
+      raise "Name is not defined for consumer #{self.name}" if name.nil?
+
+      @name = name
       @scheduled = true
       @schedule = {
           every: every,
@@ -36,6 +44,10 @@ module Events::Consumer
 
       Events::Registry.add_scheduled_job self
       setup_schedule_job
+    end
+
+    def name
+      @name
     end
 
     def consumer_key
@@ -63,6 +75,7 @@ module Events::Consumer
     end
 
     protected
+
     def validate_schedule
       # Todo raise exception if the schedule is invalid
     end

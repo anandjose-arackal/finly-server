@@ -8,8 +8,11 @@ class TaskManager::Workflows::Synchronizer < TaskManager::API
 
     all_events = record_events + collection_events
     all_events.each do |event|
-      Events::Synchronizer.for(:database).sync TaskWorkflow, event do |record, user, message|
-        # TaskManager::Workflows::Synchronizer.new(record, user, message).run
+      Events::Synchronizer.for(:database).sync(
+          TaskWorkflow,
+          event,
+          name: "Generic Handler",
+          consumer_key: 'workflow.generic.handler') do |record, user, message|
         TaskManager::Runner::BackgroundJob.perform_async(
             {
                 task_workflow_id: record.id,

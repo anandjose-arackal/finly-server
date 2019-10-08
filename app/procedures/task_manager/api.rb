@@ -1,6 +1,10 @@
 # ☐ Event(user, message, params)
-#   ☐ System Handler (Sneakers -> Execution)
-#   ☐ Database Event (Sneakers -> Generic Handler -> Sidekiq -> Execution)
+#   ☐ Async
+#     ☐ System Handler (Sneakers -> Execution)
+#     ☐ Database Handler (Sneakers -> Generic Handler -> Sidekiq -> Execution)
+#   ☐ Sync
+#     ☐ System Handler (Execution)
+#     ☐ Database Handler (Execution)
 # ☐ Scheduled
 #   ☐ System Handler (Clockwork -> Sidekiq -> Execution)
 #   ☐ Database Handler (Clockwork -> Sidekiq -> Execution)
@@ -12,12 +16,12 @@ class TaskManager::API
 
   # When a new event is received
   def on_event(user, message)
-    TaskManager::Runner.({api: self.class, message: message, trigger: :event}, 'current_user' => user, 'trigger' => :event)
+    TaskManager::Runner.({api: self.class, message: message}, 'current_user' => user, 'trigger' => :event)
   end
 
   def on_schedule
     User.filter_role(self.user_roles).each do |user|
-      TaskManager::Runner.({api: self.class, trigger: :schedule}, 'current_user' => user)
+      TaskManager::Runner.({api: self.class}, 'current_user' => user)
     end
   end
 
@@ -71,6 +75,11 @@ class TaskManager::API
   def self.input(input = NoObject)
     @input = input unless input == NoObject
     @input
+  end
+
+  def self.filters(filters=NoObject)
+    @filters = filters unless filters == NoObject
+    @filters
   end
 
   def self.payload_validations

@@ -2,14 +2,13 @@ class TaskManager::Runner < Transactions::API
 
   class TaskManager::Runner::BackgroundJob < ApplicationJob
 
-    def perform(options={})
+    def perform(options = {})
       user = User.find_by(id: options[:user_id])
       params = {}
       params[:message] = options[:message]
       params[:task_workflow_id] = options[:task_workflow_id]
       params[:api] = options[:api] if options[:api]
-      trigger = options[:trigger]
-      TaskManager::Runner.(params, 'current_user' => user, 'trigger' => trigger)
+      TaskManager::Runner.(params, 'current_user' => user)
     end
 
   end
@@ -22,7 +21,6 @@ class TaskManager::Runner < Transactions::API
       optional(:message).filled
       optional(:api).filled
       optional(:task_workflow_api).filled
-      required(:trigger).filled
     end
   end
 
@@ -54,8 +52,13 @@ class TaskManager::Runner < Transactions::API
 
   def applicable_for_user?(options, api:, current_user:, message:, **)
     required_roles = api.user_roles
-    return on_error(options, :base, 'Roles is not provided') if required_roles.blank?
     return on_error(options, :base, 'Current user is blank') if current_user.blank?
+    if required_roles.blank?
+      # Roles is mandatory for scheduled tasks
+      return true unless api.scheduled?
+
+      return on_error(options, :base, 'Roles is not provided')
+    end
     current_user_roles = current_user.user_roles.pluck(:name)
     if (required_roles - current_user_roles).size == roles.size
       return on_error(options, :base, 'Workflow is not applicable for user')
@@ -72,36 +75,56 @@ class TaskManager::Runner < Transactions::API
     true
   end
 
-  def generate_input(options, api:, current_user:, message:, trigger:, event: nil, **)
+  def generate_input(options, api:, current_user:, message:, **)
     if api.input
       options['input'] = execute_function api.input, current_user, message
       return on_error(options, :base, 'Input is blank') if options['input'].blank?
     end
 
-    return on_error(options, :base, 'Input is not provided') unless api.document
+    return on_error(options, :base, 'Input is not provided') unless api.record
 
-    unless api.document.record_event?(event) or api.document.collection_event?(event)
+    if api.consumes_event?
+      generate_event_input(options, **options)
+    elsif api.scheduled?
+      generate_schedule_input(options, **options)
+    end
+    return on_error(options, :base, 'Input is blank') if options['input'].blank?
+
+    true
+  end
+
+  def generate_event_input(options, message:, api:, current_user:, **)
+    return true unless api.consumes_event?
+
+    record = api.record
+    event = api.event
+
+    filters = api.filters || {}
+
+    if record.record_event?(event)
+      id = message[:record_id] || message[:id]
+      id = message[:record]&.id if message.has_key?(:record)
+      options['input'] = record.resolve(current_user, filters: filters).find_by(id: id)
+    elsif record.collection_event?(event)
+      if message.has_key?(:records)
+        options['input'] = message[:records].ransack(filters).result(distinct: true)
+      else
+        options['input'] = record.resolve(current_user, filters: filters)
+      end
+    else
       return on_error(options, :base, "Event #{event} is not registered")
     end
 
-    case trigger
-    when :event
-      # Type Record
-      # IF record is provided in message
-      # Verify if record exists in filters
-      # ELSE
-      # # Find records from record id, filters and params ID
-      # #
-      # Type Collection
-      # # Find records from filters and params
-    when :schedule
-      # Find records from filters
-    end
-    return on_error(options, :base, 'Input is blank') if message.blank?
+    true
+  end
 
-    options['input'] = message
-    return true
+  def generate_schedule_input(options, api:, current_user:, **)
+    return true unless api.scheduled?
 
+    filters = api.filters
+    return on_error(options, :base, 'Filters are required for scheduled tasks') if filters.blank?
+
+    options['input'] = api.record.resolve(current_user, filters: filters)
     true
   end
 

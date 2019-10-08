@@ -67,8 +67,8 @@ module ActiveRecordMaster
       @update
     end
 
-    def resolve(user, scope = :default)
-      resolvers[scope]&.new(user, self)&.resolve
+    def resolve(user, scope: :default, filters: {})
+      resolvers[scope]&.new(user, self)&.resolve(filters)
     end
 
     def representers

@@ -18,7 +18,7 @@ module Events::Synchronizer
       klass.setup model_class, event, options, &block
     end
 
-    def self.setup(model_class, event, options, &block)
+    def self.setup(model_class, event, options={}, &block)
       raise "Model is not defined for Events Database::Monitor" if model_class.blank?
       raise "Queue is not defined for Events Database::Monitor" if event.blank?
 
@@ -26,7 +26,7 @@ module Events::Synchronizer
       event event
       block block
       options options
-      consumes_event! event
+      consumes_event! event, consumer_key: options[:consumer_key], name: options[:name]
     end
 
     def self.model(model_class = NoObject)
