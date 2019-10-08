@@ -37,10 +37,10 @@
 #
 
 class BankPaymentRequest < ApplicationRecord
-
   include SoftDeletable,
           FindByOrderedIds,
           Transitionable
+  include LiquidDroppable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
