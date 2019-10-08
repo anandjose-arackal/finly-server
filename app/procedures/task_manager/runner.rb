@@ -13,7 +13,6 @@ class TaskManager::Runner < Transactions::API
 
   end
 
-
   skip_user_authorization!
 
   schema do
