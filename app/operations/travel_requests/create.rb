@@ -44,6 +44,7 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   def process
+    ActiveRecord::Base.transaction do
     if travel_request.save
       # add the custom fields associated with this travel request
       CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)
@@ -55,6 +56,7 @@ class TravelRequests::Create < TravelRequests::Base
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
+        raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
         return
       end
 
@@ -66,10 +68,12 @@ class TravelRequests::Create < TravelRequests::Base
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
+        raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
         return
       end
     else
       add_message :error, travel_request.errors.full_messages
+    end
     end
   end
 

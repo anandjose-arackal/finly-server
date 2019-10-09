@@ -16,7 +16,7 @@ class PaymentAgreements::Base < BaseOperation
       :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
         selected_invoice_frequency_attributes: {}, 
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage,
+      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -35,13 +35,14 @@ class PaymentAgreements::Base < BaseOperation
         total_after_tax_attributes: [:id, :currency_id, :value],
         advance_amount_attributes: [:id, :currency_id, :value],
         balance_amount_attributes: [:id, :currency_id, :value],
+        total_invoice_amount_attributes: [:id, :currency_id, :value],
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id],
         # payment_agreement_escalations_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage,
+      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -97,6 +98,7 @@ class PaymentAgreements::Base < BaseOperation
   def update_item_attributes
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
+        update_total_invoice_amount(general_invoice)
         update_amount_attributes(general_invoice)
         set_due_date_for_invoices('general_invoice')
         general_invoice.items.update(department_id: general_invoice.department_id, cost_center_id: general_invoice.cost_center_id)
@@ -105,6 +107,7 @@ class PaymentAgreements::Base < BaseOperation
 
     if self.payment_agreement.rental_invoices.present?
       self.payment_agreement.rental_invoices.each do |rental_invoice|
+        update_total_invoice_amount(rental_invoice)
         update_amount_attributes(rental_invoice)
         set_due_date_for_invoices('rental_invoice')
         rental_invoice.items.update(department_id: rental_invoice.department_id, cost_center_id: rental_invoice.cost_center_id)
@@ -1361,6 +1364,31 @@ class PaymentAgreements::Base < BaseOperation
           end
         end
       end
+    end
+  end
+
+  def update_total_invoice_amount(invoice)
+    if invoice.billing_type.variable_periodic?
+      if invoice.available_invoice_amount.blank?
+        invoice.available_invoice_amount = invoice.total_invoice_amount.dup
+        invoice.save
+      else
+        invoice.available_invoice_amount.update(value: invoice.total_invoice_amount&.value)
+      end
+    end
+  end
+
+  def update_invoice_limit(invoice)
+      if invoice.total_invoice_amount.value.blank?# || invoice.billing_type.one_time? || invoice.billing_type.fixed_periodic?
+        invoice.total_invoice_amount = nil
+        invoice.available_invoice_amount = nil
+      end
+    if invoice.billing_type.variable_periodic?
+      if invoice.total_invoice_amount.blank? || invoice&.total_invoice_amount&.value.blank?
+        add_message :error, "Maximum invoice amount cannot be blank"
+        return
+      end
+
     end
   end
 

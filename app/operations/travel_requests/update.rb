@@ -68,7 +68,7 @@ class TravelRequests::Update < TravelRequests::Base
       add_message :error, valid.messages[:error]
       return false
     end
-
+    ActiveRecord::Base.transaction do
     if travel_request.save
       # Update money_request DLRMs only when the owner does it
       if travel_request.user_id == user.id && params[:view] == 'personal'
@@ -81,6 +81,7 @@ class TravelRequests::Update < TravelRequests::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
 
@@ -91,6 +92,7 @@ class TravelRequests::Update < TravelRequests::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
 
@@ -110,6 +112,7 @@ class TravelRequests::Update < TravelRequests::Base
       end
     else
       add_message :error, self.travel_request.errors.full_messages
+    end
     end
   end
 

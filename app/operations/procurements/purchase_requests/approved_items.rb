@@ -19,7 +19,7 @@ class Procurements::PurchaseRequests::ApprovedItems < Procurements::PurchaseRequ
   end
 
   class Procurements::PurchaseRequests::ApprovedItems::ApprovedItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :approved_purchase_request_items, :paginated_items, :count
+    attr_accessor :approved_purchase_request_items, :paginated_items, :count, :rate_contract_number
 
     has_scope :date
     has_scope :order_number

@@ -60,6 +60,7 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :category, optional: true
+  belongs_to :rate_contract_item, optional: true, class_name: 'RateContractLineItem'
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
   has_one :purchase_order_item
   has_many :trails, as: :parent
