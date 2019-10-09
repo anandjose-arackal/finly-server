@@ -197,7 +197,7 @@ class Invoice < ApplicationRecord
   delegate :paid_amount, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
-           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status, allow_nil: true
+           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
