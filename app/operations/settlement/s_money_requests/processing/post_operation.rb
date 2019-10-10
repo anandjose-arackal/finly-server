@@ -76,8 +76,8 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
           self.pending_mappings.each do |mapping|
             if rejected or marked_as_completed or mapping.payment&.completed? or update_documents
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed)
+              # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+              #                marked_as_completed: marked_as_completed)
               # mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
               #                                   controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                                   status_id: request_status, payment_id: mapping.payment&.id)
