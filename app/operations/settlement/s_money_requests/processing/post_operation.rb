@@ -74,7 +74,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
       ::MoneyRequest.transaction do
         MoneyRequestTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if rejected or marked_as_completed or mapping.payment.completed? or update_documents
+            if rejected or marked_as_completed or mapping.payment&.completed? or update_documents
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
                              marked_as_completed: marked_as_completed)
@@ -116,7 +116,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
               if self.money_request_processor.process_outside_finly? or self.money_request_processor.bank_transfer?
                 add_source_pocket(mapping)
               end
-            elsif mapping.payment.failed?
+            elsif mapping.payment&.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
             end

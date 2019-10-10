@@ -36,7 +36,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
 
     if self.pending_mappings.blank?
-      add_message :error, "No Money Request found which can be processed."
+      add_message :error, "No Report found which can be processed."
       return
     end
 
@@ -76,7 +76,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       Report.transaction do
         ReportTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if marked_as_completed or marked_as_closed or mapping.payment.completed? or update_documents
+            if marked_as_completed or marked_as_closed or mapping.payment&.completed? or update_documents
               has_success = true
               # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
               #                marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
@@ -149,7 +149,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                              marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               end
 
-            elsif mapping.payment.failed?
+            elsif mapping.payment&.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
             end

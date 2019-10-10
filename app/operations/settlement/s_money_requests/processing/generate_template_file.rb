@@ -69,7 +69,7 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
       item.processor_accountable&.account_number,
       item.user&.name,
       item.note,
-      item.amount&.value,
+      item.money_requests.find_by(id: item.money_request_id).total_amount,
       item.mr_bank_reference_number,
       item.mr_source_account,
       marked_as_completed,
