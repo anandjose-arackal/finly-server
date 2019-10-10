@@ -50,7 +50,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   def init
 
     self.file = params[:file]
-    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :source_account, :mark_as_paid, :msg]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :total_reimbursable_amount, :utr, :source_account, :mark_as_paid, :msg]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
