@@ -116,7 +116,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
-      add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+      add_message :error, "Can't modify a purchase order which has a Receipt Note or Invoice attached."
     end
 
     # need to recheck this logic
