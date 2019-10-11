@@ -41,6 +41,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   belongs_to :action, class_name: 'TrailAction', optional: true
   belongs_to :forwarded_to, class_name: 'User', optional: true
   belongs_to :forwarded_by, class_name: 'User', optional: true
+  belongs_to :rejected_by, class_name: 'User', optional: true
 
   # Scopes
   scope :with_level_ids, -> (ids) {where level_id: ids}
