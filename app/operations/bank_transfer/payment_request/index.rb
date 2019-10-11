@@ -189,7 +189,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = self.payment_requests.order_by(:submitted_at)
       # end
       self.paginated_payment_requests = self.payment_requests.paginate(page: page, per_page: per_page) rescue ::BankPaymentRequest.none
-      self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
+      if [168, 169, 174, 175].include?(user.company_id)
+        self.paginated_payment_requests = self.paginated_payment_requests.include_for_index_meesho
+      else
+        self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
+      end
+
     end
 
     def set_scopes
