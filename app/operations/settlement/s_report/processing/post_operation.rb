@@ -98,19 +98,22 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 event = 'settle'
               end
 
-              update_mapping = false
+              update_mapping = true
 
               mapping.reports.each do |report|
 
-                report.update(bank_reference_number: self.utr[report.id], source_account: self.source_account[report.id])
+                report.bank_reference_number = self.utr[report.id] if self.utr[report.id].present?
+                report.source_account = self.source_account[report.id] if self.source_account[report.id].present?
+                report.save if (self.utr[report.id].present? or self.source_account[report.id].present?)
 
                 # temp workaround for satin a*hles
                 # if we do not update the utr or source_account, we dont settle the report from update or process template file operation
                 # only when the op is called from the mark_as_paid op, we settle the reports
-                # 
-                update_mapping = false
-                next if update_documents and (self.utr[report.id].blank? or self.source_account[report.id].blank?)
-                update_mapping = true
+
+                if update_documents and (report.bank_reference_number.blank? or report.source_account.blank?)
+                  update_mapping = false
+                  next
+                end
 
                 parameters = {
                   document: report,

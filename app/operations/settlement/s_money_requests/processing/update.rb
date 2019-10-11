@@ -108,9 +108,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
 
   def post_process
     add_message :success, 'Updated Successfully'
-    if self.pending_mappings.blank?
-      add_message :success, "All items credited. Batch status now set to Completed."
-    end
+    # if self.pending_mappings.blank?
+    #   add_message :success, "All items credited. Batch status now set to Completed."
+    # end
   end
 
   def success

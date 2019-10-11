@@ -82,19 +82,26 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
               #                                   controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                                   status_id: request_status, payment_id: mapping.payment&.id)
 
-              update_mapping = false
+              update_mapping = true
               money_request_ids = []
               mapping.money_requests.each do |money_request|
-                money_request.update(bank_reference_number: self.utr[money_request.id], source_account: self.source_account[money_request.id])
+
+                money_request.bank_reference_number = self.utr[money_request.id] if self.utr[money_request.id].present?
+                money_request.source_account = self.source_account[money_request.id] if self.source_account[money_request.id].present?
+                money_request.save if (self.utr[money_request.id].present? or self.source_account[money_request.id].present?)
 
                 # temp workaround for satin a*hles
                 # if we do not update the utr or source_account, we dont settle the money_request from update or process template file operation
-                # only when the op is called from the mark_as_paid op, we settle the reports
+                # only when the op is called from the mark_as_paid op, we settle the money_requests
                 # 
-                update_mapping = false
-                next if update_documents and (self.utr[money_request.id].blank? or self.source_account[money_request.id].blank?)
-                update_mapping = true
+
+                if update_documents and (money_request.bank_reference_number.blank? or money_request.source_account.blank?)
+                  update_mapping = false
+                  next
+                end
+
                 money_request_ids << money_request.id
+
 
                 money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
                                             action_user_role_id: self.money_request_processor.created_by_user_role_id,
