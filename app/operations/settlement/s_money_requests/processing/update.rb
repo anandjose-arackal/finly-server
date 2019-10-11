@@ -182,9 +182,9 @@ class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequest
   end
 
   def update_status
-    return true if self.mapping.completed?
+    return false if self.mapping.completed?
 
-    data = self.mapping.money_requests.pluck :bank_reference_number
+    data = self.mapping.money_requests.pluck(:bank_reference_number).reject(&:blank?)
     if data.compact.present? and (data.compact.count == self.mapping.money_requests.count)
       status = MoneyRequestProcessorStatus.id_for(:completed)
       self.mapping.update status_id: status

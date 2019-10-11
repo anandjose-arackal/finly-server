@@ -199,9 +199,9 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
   end
 
   def update_status
-    return true if self.mapping.completed?
+    return false if self.mapping.completed?
 
-    data = self.mapping.reports.pluck :bank_reference_number
+    data = self.mapping.reports.pluck(:bank_reference_number).reject(&:blank?)
     if data.compact.present? and (data.compact.count == self.mapping.reports.count)
       status = ReportProcessorGroupStatus.id_for(:completed)
       self.mapping.update status_id: status
