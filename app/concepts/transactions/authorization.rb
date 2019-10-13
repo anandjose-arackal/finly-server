@@ -1,7 +1,8 @@
 class Transactions::Authorization
 
   def self.Roles(*list)
-    ->(input, options) {Authorize.roles(options, list)}
+    step = ->(input, options) { Authorize.roles(options, list) }
+    [step, name: "authorization.roles"]
   end
 
   class Authorize
@@ -24,23 +25,17 @@ class Transactions::Authorization
     end
 
     module ClassMethods
-      def schema(&block)
-        klass = Class.new(Transactions::Schema)
-        klass.instance_eval &block
-        step Transactions::Schema::Validate(constant: klass)
-      end
-
       def skip_user_authorization!
         step nil, delete: :authorize_user_presence!
       end
 
       # Ability to set a different user model user for role verification
-      def user_model(model=User)
+      def user_model(model = User)
         @model ||= model
       end
 
       def authorized_roles(*list)
-        step Transactions::Authorization::Roles(*list)
+        step *Transactions::Authorization::Roles(*list)
       end
     end
 
