@@ -5,7 +5,7 @@ class ServiceApi < Transactions::API
 
   class_attr :url
   class_attr :path
-  class_attr :http_method, default: 'get'
+  class_attr :http_method, default: :get
   class_attr :mime_type, default: 'application/json'
   class_attr :timeout, default: 5
   class_attr :open_timeout, default: 2
@@ -44,8 +44,8 @@ class ServiceApi < Transactions::API
   end
 
   def init(options, params:, current_user:, **)
-    @params = params
-    @current_user = current_user
+    self.params = params
+    self.user = current_user
     true
   end
 
@@ -59,10 +59,13 @@ class ServiceApi < Transactions::API
   end
 
   def parse(options, params:, current_user:, response:, **)
+    result = response.body
     parser = self.class.parse
-    return options['result'] = parser.call(current_user, params, response) if parser.present?
 
-    options['result'] = response.body
+    result = parser.call(current_user, params, response) if parser.present?
+    return on_error options, :base, result.failure if result.is_a?(Failure)
+
+    options['response.parsed'] = result
     true
   end
 
@@ -71,7 +74,7 @@ class ServiceApi < Transactions::API
   def fetch(key)
     val = self.class.send(key)
     if val.is_a?(Proc)
-      result = instance_exec @user, @params, &val
+      result = instance_exec self.user, self.params, &val
     else
       result = val
     end

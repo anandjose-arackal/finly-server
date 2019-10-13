@@ -26,6 +26,8 @@ gem 'daemons', '~> 1.3.1'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
+gem 'aes'
+
 # Firewall
 gem 'rack-attack', '5.4.2'
 # gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
