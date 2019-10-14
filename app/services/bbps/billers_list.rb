@@ -1,11 +1,13 @@
-class Bbps::BillersList < ServiceApi
-  include Bbps::Setup
+class Bbps::BillersList < Bbps::Api
 
   schema do
     params do
       required(:category).filled
     end
   end
+
+  setup_defaults
+  path "billFetch"
 
   request_fields(
       [
@@ -25,7 +27,6 @@ class Bbps::BillersList < ServiceApi
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field
       ]
   )
-
 
   def category
     params[:category]

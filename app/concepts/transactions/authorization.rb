@@ -1,19 +1,19 @@
 class Transactions::Authorization
 
   def self.Roles(*list)
-    step = ->(input, options) { Authorize.roles(options, list) }
+    step = ->(input, options) { Authorize.roles(input, options, list) }
     [step, name: "authorization.roles"]
   end
 
   class Authorize
-    def self.roles(options, list)
+    def self.roles(input, options, list)
       return true if list.blank?
 
       roles = UserRole::VALUES.keys & list # Find the intersection between all user roles and the list roles
       roles.each do |role|
         return true if options['current_user'].has_role?(role)
       end
-      return unauthorized!(options)
+      return unauthorized!(input)
     end
   end
 
@@ -41,6 +41,7 @@ class Transactions::Authorization
 
     def unauthorized!(options)
       options["unauthorized"] = true
+      options['result.roles.unauthorized'] = {base: 'You cannot perform the following action'}
       false
     end
 

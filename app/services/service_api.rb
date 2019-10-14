@@ -7,8 +7,8 @@ class ServiceApi < Transactions::API
   class_attr :path
   class_attr :http_method, default: :get
   class_attr :mime_type, default: 'application/json'
-  class_attr :timeout, default: 5
-  class_attr :open_timeout, default: 2
+  class_attr :timeout, default: 60
+  class_attr :open_timeout, default: 60
   class_attr :query_params, default: {}
   class_attr :headers, default: {}
   class_attr :body
@@ -55,6 +55,7 @@ class ServiceApi < Transactions::API
 
   def execute(options, params:, current_user:, **)
     options['response'] = get_response
+    debugger
     true
   end
 

@@ -1,20 +1,18 @@
-module Bbps::Setup
+class Bbps::Api < ServiceApi
 
-  def self.included(base)
-    base.class_attr :request_fields, default: []
-    base.class_attr :response_fields, default: []
-    base.class_attr :success_object
-    base.http_method :post
-    base.url "https://uat.yesbank.in"
-    base.body -> (user, params) { body }
-    base.client -> (user, params) { client }
-    base.parse -> (user, params, response) {parse_response(response)}
-    base.matcher :success,
-                 match: -> (result) {result['response.parsed']&.dig(:status) == 'Y'},
-                 resolve: -> (result) {on_success(result)}
-    base.matcher :failure,
-                 match: -> (result) {true},
-                 resolve: -> (result) {result['response.parsed']}
+  def self.setup_defaults
+    class_attr :request_fields, default: []
+    class_attr :response_fields, default: []
+    class_attr :success_object
+    http_method :post
+    url "https://uatsky.yesbank.in:444/app/uat/bbps"
+    body -> (user, params) { body }
+    client -> (user, params) { client }
+    parse -> (user, params, response) { parse_response(response) }
+    matcher :success, match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' }, resolve: -> (result) { on_success(result) }
+    matcher :failure,
+            match: -> (result) { true },
+            resolve: -> (result) { result['response.parsed'] }
   end
 
   def body
@@ -69,7 +67,7 @@ module Bbps::Setup
   def client
     # adding the ssl options here for the request
     # verify certificate only in production
-    verify = Rails.env.production? ? true : false
+    verify = true #Rails.env.production? ? true : false
     # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
     ssl_options = {
         client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
@@ -93,7 +91,8 @@ module Bbps::Setup
   end
 
   def auth_username
-    'vivek.a@finly.io'  end
+    'vivek.a@finly.io'
+  end
 
   def auth_password
     'nQ0ydemPsL@A2pY2Ta#*'
