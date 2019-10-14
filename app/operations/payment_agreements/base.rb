@@ -429,7 +429,7 @@ class PaymentAgreements::Base < BaseOperation
         if dates[index+1].present?
           next_start_date, next_end_date = dates[index+1][0], dates[index+1][1]
           unless end_date + 1.day == next_start_date
-            add_message :error, "Start date for end date #{end_date} should be #{next_start_date}"
+            # add_message :error, "Start date for end date #{end_date} should be #{next_start_date}"
             add_message :error, "Dates should be consecutive for every vendor"
           end
         end

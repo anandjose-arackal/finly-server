@@ -134,6 +134,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   def get_first_invoice_rate(reference_invoice, reference_invoice_item_rate)
+    # binding.pry
     invoice_frequency_number = reference_invoice.invoice_frequency.number
     # This rate is for invoice frequency period
     rate = reference_invoice_item_rate
@@ -151,11 +152,16 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     self.effective_end_date = invoice_end_date == actual_end_date ? invoice_end_date : actual_end_date
     if (invoice_start_date.month == invoice_end_date.month) && (invoice_start_date.year == invoice_end_date.year)
       effective_days_count = (invoice_end_date - invoice_start_date).to_i + 1
-      days_in_month = invoice_start_date.end_of_month.day - invoice_start_date.beginning_of_month.day + 1
-      effective_rate = (one_month_rate/days_in_month)*effective_days_count
+      days_in_month = (effective_end_date.end_of_month - first_start_date.beginning_of_month).to_i + 1
+
+      # effective_rate = (one_month_rate/days_in_month)*effective_days_count
+      effective_months = first_reference_invoice.invoice_frequency.number
+      effective_rate = (one_month_rate*effective_months/days_in_month)*effective_days_count
     else
-      effective_days_count = (effective_end_date - invoice_start_date).to_i + 1
-      days_in_month = ((invoice_start_date.end_of_month.day - invoice_start_date.beginning_of_month.day).to_i + 1) + ((effective_end_date.end_of_month.day - effective_end_date.beginning_of_month.day).to_i + 1)
+      end_date = invoice_end_date > effective_end_date ? effective_end_date : invoice_end_date
+      effective_days_count = (end_date - invoice_start_date).to_i + 1
+      # days_in_month = ((invoice_start_date.end_of_month.day - invoice_start_date.beginning_of_month.day).to_i + 1) + ((effective_end_date.end_of_month.day - effective_end_date.beginning_of_month.day).to_i + 1)
+      days_in_month = (effective_end_date.end_of_month - first_start_date.beginning_of_month).to_i + 1
       # effective_months = invoice_start_date.month - effective_end_date.month + 1
       effective_months = first_reference_invoice.invoice_frequency.number
       effective_rate = (one_month_rate*effective_months/days_in_month)*effective_days_count
