@@ -39,7 +39,7 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
-
+  belongs_to :terminated_by, optional: true, class_name: 'User'
 
   has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy

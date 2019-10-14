@@ -15,19 +15,22 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
     unless payment_agreement.approved? || payment_agreement.auto_approved?
       add_message :error, 'Payment agreement should be approved for raising invoices'
     end
+
   end
 
   def process 
     # General and Rental are recurring, use past invoice trail to check if invoice is due
     # self.general_invoices = payment_agreement.general_invoices.where("payment_agreement_upcoming_date <= ?", Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue Invoice.none
-    one_time_gi_invoices = payment_agreement.general_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue GeneralInvoice.none
-    fixed_periodic_gi_invoices = payment_agreement.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(fixed_periodic_template: true) rescue GeneralInvoice.none
-    self.general_invoices = one_time_gi_invoices.or(fixed_periodic_gi_invoices)
+    unless self.payment_agreement.terminated?
+      one_time_gi_invoices = payment_agreement.general_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue GeneralInvoice.none
+      fixed_periodic_gi_invoices = payment_agreement.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(fixed_periodic_template: true) rescue GeneralInvoice.none
+      self.general_invoices = one_time_gi_invoices.or(fixed_periodic_gi_invoices)
 
 
-    one_time_ri_invoices = payment_agreement.rental_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue RentalInvoice.none
-    fixed_periodic_ri_invoices = payment_agreement.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(fixed_periodic_template: true) rescue RentalInvoice.none
-    self.rental_invoices = one_time_ri_invoices.or(fixed_periodic_ri_invoices)
+      one_time_ri_invoices = payment_agreement.rental_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue RentalInvoice.none
+      fixed_periodic_ri_invoices = payment_agreement.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(fixed_periodic_template: true) rescue RentalInvoice.none
+      self.rental_invoices = one_time_ri_invoices.or(fixed_periodic_ri_invoices)
+    end
 
 
     # self.general_invoices = general_invoices.or(payment_agreement.general_invoices.where(payment_agreement_upcoming_date: nil)) rescue Invoice.none
