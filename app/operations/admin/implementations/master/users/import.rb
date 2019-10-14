@@ -17,12 +17,15 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       :city => "City",
       :gender => "Gender",
       :company_id => "Company ID (mandatory)",
-      :department_code => "Department Code",
-      :location_code => "Location Code",
+      :department_code => "Department Name",
+      :location_code => "Location Name",
+      :cost_center_code => "Cost Center Name",
       :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
       :expense_management => "Expense Management Y for enable",
       :disburse  => "Disburse Y for enable",
-      :vendor_payments => "Vendor Payments Y for enable"
+      :vendor_payments => "Vendor Payments Y for enable",
+      :enforce_policy => 'Enforce Policy',
+      :destroy => 'Deactivate (Y for Deactivate / activate for Activation)'
   })
 
   attr_accessor :user_params
@@ -40,6 +43,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       unless user.save
         return result false, user.errors.full_messages
       end
+      user.update(default_password: true, verified: true)
     rescue Exception => e
       return result false, e.message
     end
@@ -65,6 +69,24 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     end
 
     result true, 'Updated Successfully'
+  end
+
+  def destroy_records(data)
+    user = self.company.users.find_by id: data[:id]
+    unless user
+      return result false, "User not found"
+    end
+    if data[:destroy]&.to_s&.downcase  == 'y'
+      unless user.update(active: false)
+        return result false, user.errors.full_messages
+      end
+      result true, "Deactivated Successfully"
+    elsif data[:destroy]&.to_s&.downcase == 'activate'
+      unless user.update(active: true)
+        return result false, user.errors.full_messages
+      end
+      return result true, "Activated Successfully"
+    end
   end
 
    def set_params(data)
@@ -100,17 +122,23 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: data[:company_id])
-    department_id = company&.departments&.find_by department_code: data[:department_code]
-    location_id = company&.locations&.find_by location_code: data[:location_code]
+    department_id = company&.departments&.find_by(name: data[:department_code])&.id
+    location_id = company&.locations&.find_by(name: data[:location_code])&.id
+    cost_center_id =  company&.cost_centers&.find_by(name: data[:cost_center_code])&.id
+    enforce_policy_enabled = data[:enforce_policy]&.to_s&.upcase == 'Y' ? true : false
     if company.nil?
       messages << "Company with this ID not found"
     end
     if data[:department_code].present? && department_id.nil?
-      messages << "Department with code not found"
+      messages << "Department not found"
     end
 
-    if data[:location_code_code].present? && location_id.nil?
-      messages << "Location with code not found"
+    if data[:location_code].present? && location_id.nil?
+      messages << "Location not found"
+    end
+
+    if data[:cost_center_code].present? && cost_center_id.nil?
+      messages << "Cost Center not found"
     end
 
     state_id = nil
@@ -121,8 +149,6 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       end
     end
 
-    user_department_mappings_attributes = [{ department_id: department_id}]
-    user_branch_location_mappings_attributes = [{branch_location_id: location_id}]
     user_params = { first_name: data[:first_name],
                     last_name: data[:last_name],
                     email: user_email,
@@ -141,10 +167,17 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
                     },
                     company_id: data[:company_id],
                     mothers_maiden_name: data[:mothers_maiden_name],
+                    location_id: location_id,
+                    department_id: department_id,
+                    cost_center_id: cost_center_id,
                     user_panel_subscription_attributes: {
                         expense_management: expense_management,
                         disburse: disburse,
                         yes_bank_account_transfer: vendor_payments
+                    },
+                    enforce_policy_attributes:{
+                        enforceable_type: "User",
+                        enabled: enforce_policy_enabled
                     }
     }
 

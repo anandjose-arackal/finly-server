@@ -1,5 +1,9 @@
 class InvoiceDrop < Drop
 
+  def invoice_id
+    @object.invoice_id
+  end
+
   def company
     @object.company.to_liquid
   end

@@ -53,6 +53,15 @@ when :development_4
 when :development_5
   set :deploy_to, '/home/centos/app_5'
   set :rails_env, 'staging'
+when :development_6
+  set :deploy_to, '/home/centos/app_6'
+  set :rails_env, 'staging'
+when :development_7
+  set :deploy_to, '/home/centos/app_7'
+  set :rails_env, 'staging'
+when :development_8
+  set :deploy_to, '/home/centos/app_8'
+  set :rails_env, 'staging'
 when :original_test
   set :deploy_to, '/home/centos/app_2'
   set :rails_env, 'staging'
@@ -84,6 +93,7 @@ linked_files = %w{
   config/yes_bank_config.yml
   config/gstin_verification_config.yml
   config/redis_config.yml
+  config/mattermost_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production

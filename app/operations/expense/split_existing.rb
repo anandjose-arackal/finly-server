@@ -75,7 +75,7 @@ class Expense::SplitExisting < Expense::Manual::Split
         expense.receipts.create(image: receipt.image, user: expense.user)
       end
     end
-    self.existing_expense.update(is_deleted: true, deleted_at: Time.now,deleted_to_split: true, split_link: self.split_link)
+    self.existing_expense.update(deleted_to_split: true, split_link: self.split_link, deleted_at: Time.now)
   end
 
   def expense_type_id

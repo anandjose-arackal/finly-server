@@ -54,6 +54,9 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       init_reimbursement_card
     when 'outside_finly'
       init_outside_finly
+    when 'mark_as_closed'
+      # ladies and gentlemen, report is ordered to be closed.
+      # this is all we will do here.
     else
       add_message :error, 'Invalid Payment Type'
     end
