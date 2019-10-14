@@ -13,7 +13,6 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
   end
 
   def process
-
     params[:document] = self.payment_agreement
     params[:aasm_event] = 'approve'
 
@@ -68,13 +67,18 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
     execution_date = self.payment_agreement.execution_date.to_date
     if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).present?
       invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).first
-      params[:vendor_id] = invoice.vendor_id
-      params[:first_reference_invoice] = invoice
-      params[:first_reference_invoice_type] = invoice.class.name.underscore
-      upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoice.(user, params)
-      unless upcoming_invoice_op.success?
-        add_message :error, "Error occurred, first upcoming invoice is not created"
-        return
+      frequency_based_end_date = (execution_date + invoice.invoice_frequency.number.month - 1.month).end_of_month
+      self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).where("start_date <= ?", frequency_based_end_date.to_date).each do |reference_invoice|
+        # binding.pry
+        params[:vendor_id] = reference_invoice.vendor_id
+        params[:first_reference_invoice] = reference_invoice
+        params[:first_reference_invoice_type] = reference_invoice.class.name.underscore
+        params[:first_start_date] = execution_date
+        upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoice.(user, params)
+        unless upcoming_invoice_op.success?
+          add_message :error, "Error occurred, first upcoming invoice is not created"
+          return
+        end
       end
     end
   end
