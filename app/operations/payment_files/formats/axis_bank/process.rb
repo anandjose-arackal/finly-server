@@ -43,7 +43,7 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def retrieve_report_data(payment)
-    if user.company.id == 164 # Satin CreditCare
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
       return payment[:report_id]
     else
       return payment[:report_ids]
@@ -51,7 +51,7 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
   end
 
   def retrieve_report_amount(payment)
-    if user.company.id == 164 # Satin CreditCare
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
       return payment[:reimbursable_amount]
     else
       return payment[:amount]

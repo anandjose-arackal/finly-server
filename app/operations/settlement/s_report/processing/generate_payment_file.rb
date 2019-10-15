@@ -42,7 +42,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     # Format as required by PaymentFiles::Generate
     payment_params = []
 
-    if user.company.id == 164 # Satin CreditCare
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
       load_data = satin_data
     else
       load_data = general_data
