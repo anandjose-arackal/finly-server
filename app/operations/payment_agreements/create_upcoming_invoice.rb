@@ -301,7 +301,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     invoice_frequency = get_invoice_frequency(self.invoice_type)
     due_date = get_invoice_due_date(reference_invoice)
     invoice_params = {
-      start_date: first_start_date,
+      start_date: first_reference_invoice.start_date,
       end_date: first_reference_invoice.end_date, #upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
       vendor_id: reference_invoice.vendor_id,
       department_id: reference_invoice.department_id,
