@@ -25,7 +25,7 @@ class Bbps::BillFetch < Bbps::Api
   path "billFetch"
   dummy_response(
       {
-          success: "B3001|Y|000|Success|GICCFRN911EVM20009300421129116|YS01|C1001|0|0|200|0|0|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA",
+          success: "B1001|Y|000|Successful|FETCHREFAGENTE6A41816295711001|YS01|C1001|FETCHREF AGENTE6A41816295711001FETCH|YS01AB21000001123458|Manoj Chekuri|9012345001|mk.chekuri@gmail.com|NA|BXXCG7754K|BSC|TSTO00000NAT01|2 00|2017-06-01|2017-06-30|123450001|June|NA|NA|Early Payment Amount=100|Late Payment Amount=300|NA|NA|NA|NA|NA|NA",
           failure: "B7001|N|001|Failure"
       }
   )
@@ -48,14 +48,24 @@ class Bbps::BillFetch < Bbps::Api
       ]
   )
 
-  # Message Code(B3001) |Status |Error Code |Error Desc |Ref No |Agent Institution Id |Channel Id| Customer Conv. Fee | Service Tax | Amount |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15| Additional Field 15
+  # Message Code(B1001) |Status |Error Code |Error Desc | Ref No | Agent institution Id | Channel Id| BBPS Ref Id |Agent Id | Customer name |
+  # Customer mobile |Customer email |Customer Aadhar No |Customer PAN id |Channel |Biller ID |
+  # Amount |Bill Date |Due Date |Bill Number |Bill Period |Convenience Fee |
+  # Convenience Fee Desc |Late Payment Fee |Early payment Fee |
+  # Additional Field 1 |Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6
+  #
+  # Example:
+  # B1001|Y|000|Successful|M3TESTFETCH56432|YS01|C1001|M3TESTFETCH56432FETCHREF11192729081|YS01YS01510347123456|
+  # BBPS|8484943085|NA|NA|NA|BSC|OFME00005DNZ43|100000|2015-06-14|2015-06-20|12303|june|NA|NA|
+  # Late Payment Fee=40|Fixed Charges=50|Additional Charges=60|a=10|a b=20|a b c=30|12345678|NA
   response_fields(
       [
-          :message_code, :status, :error_code, :error_desc, :ref_no, :agent_institution_id,
-          :cust_conv_fee, :service_tax, :amount,
+          :message_code, :status, :error_code, :error_desc, :ref_no, :agent_institution_id, :channel_id,
+          :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
+          :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
+          :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field
+          :additional_field
       ]
   )
 
@@ -114,11 +124,19 @@ class Bbps::BillFetch < Bbps::Api
   end
 
   def self.handle_success(result)
+    # customer_bbps_name, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
+    # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
-            cust_conv_fee: result['response.parsed']['cust_conv_fee'],
-            service_tax: result['response.parsed']['service_tax'],
             amount: result['response.parsed']['amount'],
+            bill_date: result['response.parsed']['bill_date'],
+            due_date: result['response.parsed']['due_date'],
+            bill_number: result['response.parsed']['bill_number'],
+            bill_period: result['response.parsed']['bill_period'],
+            convenience_fee: result['response.parsed']['convenience_fee'],
+            convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
+            late_payment_fee: result['response.parsed']['late_payment_fee'],
+            early_payment_fee: result['response.parsed']['early_payment_fee'],
         }
     )
   end
