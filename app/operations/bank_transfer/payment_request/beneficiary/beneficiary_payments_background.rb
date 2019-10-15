@@ -168,6 +168,36 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
         set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+
+        init_text_field = []
+        text_fields.each do |key, value|  
+          init_text_field << {
+            field_configuration_id: key,
+            parent_id: payment.invoice.id,
+            parent_type: 'Invoice',
+            value_type: 'FieldText',
+            value_id: nil,
+            value: {
+              value: value
+            }
+          }
+        end
+
+        init_drop_down_field = []
+        drop_down_fields.each do |key, value|  
+          init_drop_down_field << {
+            field_configuration_id: key,
+            parent_id: payment.invoice.id,
+            parent_type: 'Invoice',
+            value_type: 'FieldDropDownSelection',
+            value_id: nil,
+            value: {
+              value_id: value
+            }
+          }
+        end
+
+
       end
     end
 
@@ -189,6 +219,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
   end
 
   def retrieve_bank_account(order_details)
+    binding.pry
     if order_details[:account_id].present?
       id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)

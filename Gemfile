@@ -185,6 +185,8 @@ gem 'ancestry', '~> 3.0.5'
 
 gem 'aasm', '~> 5.0.1'
 
+gem 'activerecord-import'
+gem 'parallel'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services
