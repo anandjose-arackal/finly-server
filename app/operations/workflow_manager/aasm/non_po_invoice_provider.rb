@@ -23,6 +23,7 @@ class WorkflowManager::Aasm::NonPoInvoiceProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :reject do
+      transitions :from => :processing, :to => :processing, guard: :reject_to_level?
       transitions :from => :processing, :to => :rejected, guard: :user_can_review?
     end
 

@@ -34,10 +34,10 @@
 #  purchase_request_item_id :integer
 #  department_id            :integer
 #  cgst                     :decimal(20, 10)
-#  sgst                     :decimal(20, )
-#  igst                     :decimal(20, )
+#  sgst                     :decimal(20, 5)   default(0.0)
+#  igst                     :decimal(20, 5)   default(0.0)
 #  taxable_amount_id        :integer
-#  previously_billed_amount :decimal(10, )    default(0)
+#  previously_billed_amount :decimal(20, 5)   default(0.0)
 #
 
 class PurchaseOrderItem < ApplicationRecord

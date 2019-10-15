@@ -13,7 +13,7 @@ class Tally::Voucher < NonPersistentModel
     @ledgers ||= []
   end
 
-  def add(name, amount, is_party_ledger: false, bill_allocations: [], category_allocations: [])
+  def add(name, amount, is_party_ledger: false, bill_allocations: [], category_allocations: [], bank_allocations: [])
     ledger = find_ledger(name)
     if ledger.nil?
       ledger = Tally::Ledger.new(name: name, is_party_ledger: is_party_ledger)
@@ -27,6 +27,10 @@ class Tally::Voucher < NonPersistentModel
     category_allocations&.each do |allocation|
       allocation_amount = allocation[:amount] || 0
       ledger.add_category_allocation allocation[:name], allocation[:cost_center], -allocation_amount
+    end
+    bank_allocations&.each do |allocation|
+      allocation_amount = allocation[:amount] || 0
+      ledger.add_bank_allocation allocation[:name], date, allocation[:transaction_type], allocation[:payment_mode], allocation[:party_name], allocation_amount
     end
   end
 

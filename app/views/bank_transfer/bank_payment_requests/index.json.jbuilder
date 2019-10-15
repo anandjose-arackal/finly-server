@@ -49,7 +49,7 @@ json.results do
 
     json.payments_count payment_request.payment_order.payments.size
 
-    payments = payment_request.payment_order.payments[0..4]
+    payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
     json.payments do
       json.array!(payments) do |payment|
         json.id payment.id

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_26_092401) do
+ActiveRecord::Schema.define(version: 2019_10_14_144816) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2375,6 +2375,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.integer "forwarded_to_id"
     t.decimal "min", precision: 20, scale: 5, default: "0.0"
     t.decimal "max", precision: 20, scale: 5
+    t.integer "rejected_by_id"
     t.index ["action_id"], name: "index_document_level_reviewer_mappings_on_action_id"
     t.index ["action_taken_by_id"], name: "index_document_level_reviewer_mappings_on_action_taken_by_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
@@ -2382,6 +2383,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.index ["forwarded_to_id"], name: "index_document_level_reviewer_mappings_on_forwarded_to_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
+    t.index ["rejected_by_id"], name: "index_document_level_reviewer_mappings_on_rejected_by_id"
     t.index ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id"
     t.index ["taken_control_by_id"], name: "index_document_level_reviewer_mappings_on_taken_control_by_id"
   end
@@ -2583,6 +2585,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.index ["bcc"], name: "index_emails_on_bcc"
     t.index ["cc"], name: "index_emails_on_cc"
     t.index ["company_id"], name: "index_emails_on_company_id"
+    t.index ["created_at"], name: "index_emails_on_created_at"
     t.index ["delivered_at"], name: "index_emails_on_delivered_at"
     t.index ["delivery_count"], name: "index_emails_on_delivery_count"
     t.index ["entity_type", "entity_id"], name: "index_emails_on_entity_type_and_entity_id"
@@ -2834,6 +2837,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "grn_enabled", default: true
     t.boolean "srn_enabled", default: false
     t.boolean "agreement_based_payment_system", default: false
+    t.boolean "gstin_verification_eabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -3157,6 +3161,9 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "prepaid"
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
+    t.string "override_invoice_id"
+    t.integer "total_invoice_amount_id"
+    t.integer "available_invoice_amount_id"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -3445,9 +3452,9 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.integer "cost_center_id"
     t.string "unit_of_measurement"
     t.integer "department_id"
-    t.decimal "sgst", precision: 20
-    t.decimal "cgst", precision: 20
-    t.decimal "igst", precision: 20
+    t.decimal "sgst", precision: 20, scale: 5, default: "0.0"
+    t.decimal "cgst", precision: 20, scale: 5, default: "0.0"
+    t.decimal "igst", precision: 20, scale: 5, default: "0.0"
     t.integer "purchase_order_item_id"
     t.integer "billable_amount_id"
     t.index ["amount_id"], name: "index_invoice_line_items_on_amount_id"
@@ -3657,9 +3664,9 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.integer "accepting_item_amount_id"
-    t.decimal "billable_amount", precision: 10
-    t.decimal "order_amount", precision: 10
-    t.decimal "previously_billed_amount", precision: 10
+    t.decimal "billable_amount", precision: 20, scale: 5, default: "0.0"
+    t.decimal "order_amount", precision: 20, scale: 5, default: "0.0"
+    t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
     t.integer "product_type_id", default: 1
     t.index ["accepting_item_amount_id"], name: "index_inward_document_items_on_accepting_item_amount_id"
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
@@ -5134,10 +5141,10 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.integer "purchase_request_item_id"
     t.integer "department_id"
     t.decimal "cgst", precision: 20, scale: 10
-    t.decimal "sgst", precision: 20
-    t.decimal "igst", precision: 20
+    t.decimal "sgst", precision: 20, scale: 5, default: "0.0"
+    t.decimal "igst", precision: 20, scale: 5, default: "0.0"
     t.integer "taxable_amount_id"
-    t.decimal "previously_billed_amount", precision: 10, default: "0"
+    t.decimal "previously_billed_amount", precision: 20, scale: 5, default: "0.0"
     t.index ["category_id"], name: "index_purchase_order_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_order_items_on_cost_center_id"
     t.index ["deleted_at"], name: "index_purchase_order_items_on_deleted_at"
@@ -5296,6 +5303,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.integer "cost_center_id"
     t.integer "category_id"
     t.string "hsn_sac"
+    t.integer "rate_contract_item_id"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
     t.index ["category_id"], name: "index_purchase_request_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
@@ -5736,6 +5744,7 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "prepaid"
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
+    t.string "override_invoice_id"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
@@ -6186,6 +6195,8 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.boolean "excel_export", default: false
     t.boolean "invoice_voucher_enabled"
     t.text "invoice_voucher_configuration", limit: 4294967295
+    t.boolean "bpr_voucher_enabled"
+    t.text "bpr_voucher_configuration", limit: 4294967295
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
@@ -6695,6 +6706,16 @@ ActiveRecord::Schema.define(version: 2019_09_26_092401) do
     t.index ["status_id"], name: "index_user_devices_on_status_id"
     t.index ["user_id"], name: "index_user_devices_on_user_id"
     t.index ["verification_mode"], name: "index_user_devices_on_verification_mode"
+  end
+
+  create_table "user_field_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "field_configuration_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["field_configuration_id"], name: "index_user_field_mappings_on_field_configuration_id"
+    t.index ["user_id"], name: "index_user_field_mappings_on_user_id"
   end
 
   create_table "user_group_item_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

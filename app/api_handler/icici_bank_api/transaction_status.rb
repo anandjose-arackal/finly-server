@@ -5,10 +5,11 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
 
   class IciciBankApi::TransactionStatus::TransactionStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :transaction_status_response
+    attr_accessor :transaction_status_response, :response
 
     def init
       self.transaction_status_response = params[:transaction_status_response]
+      self.response = params[:response]
     end
 
   end
@@ -37,7 +38,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       return
     end
 
-    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr?
+    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.possible_failure?
       add_message :error, "Only pending UTR and pending for processing cases can be checked for status"
       return
     end
@@ -106,6 +107,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
 
   def success
     params[:transaction_status_response] = self.transaction_status_response
+    params[:response] = self.response
     IciciBankApi::TransactionStatus::TransactionStatusPresenter.new(user, params, messages)
   end
 

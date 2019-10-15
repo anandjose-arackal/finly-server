@@ -29,9 +29,9 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
-#  sgst                   :decimal(20, )
-#  cgst                   :decimal(20, )
-#  igst                   :decimal(20, )
+#  sgst                   :decimal(20, 5)   default(0.0)
+#  cgst                   :decimal(20, 5)   default(0.0)
+#  igst                   :decimal(20, 5)   default(0.0)
 #  purchase_order_item_id :integer
 #  billable_amount_id     :integer
 #
