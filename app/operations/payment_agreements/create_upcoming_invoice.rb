@@ -332,7 +332,8 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
       invoice_frequency_id: reference_invoice.invoice_frequency_id, # TODO - Remove is whenever invoice is editable, its referencing same record
       fixed_periodic_template: true,
       payment_agreement_upcoming_date: get_payment_agreement_upcoming_date(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid),
-      is_payment_agreement_upcoming_invoice: check_if_upcoming_invoice(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid)
+      is_payment_agreement_upcoming_invoice: check_if_upcoming_invoice(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid),
+      tds_slab_id: reference_invoice.tds_slab_id
     }
     return invoice_params
   end
