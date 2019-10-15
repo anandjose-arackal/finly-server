@@ -3563,7 +3563,7 @@ Rails.application.routes.draw do
     get 'upcoming_invoices', to: "payment_agreements#upcoming_invoices", as: :upcoming_invoices
     get 'invoice_history', to: "payment_agreements#invoice_history", as: :invoice_history
     get 'attachments', to: "payment_agreements#attachments", as: :attachments
-    get 'terminate', to: "payment_agreements#terminate", as: :terminate
+    patch 'terminate', to: "payment_agreements#terminate", as: :terminate
     collection do
       get 'document_config', to: 'payment_agreements#document_config', as: :document_config
       get 'count', to: 'payment_agreements#count'

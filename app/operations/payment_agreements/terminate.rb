@@ -9,6 +9,10 @@ class PaymentAgreements::Terminate < PaymentAgreements::Base
   def validate
     if payment_agreement.blank?
       add_message :error, 'Agreement not found'
+      return
+    end
+    if params[:termination_reason].blank?
+      add_message :error, 'Please add reason for termiation of this agreement'
     end
   end
 

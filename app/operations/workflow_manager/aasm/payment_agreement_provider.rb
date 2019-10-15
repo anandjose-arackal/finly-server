@@ -7,7 +7,7 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
     state :approved
     state :rejected
     state :auto_approved
-    state :closed,
+    state :closed
     state :terminated
 
     event :submit do
