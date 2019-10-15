@@ -15,6 +15,7 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
     unless payment_agreement.approved? || payment_agreement.auto_approved?
       add_message :error, 'Payment agreement should be approved for raising invoices'
     end
+
   end
 
   def process 

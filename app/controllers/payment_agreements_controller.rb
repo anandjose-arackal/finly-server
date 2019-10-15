@@ -113,5 +113,11 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  # Manually terminate agreement
+  def terminate
+    @result = PaymentAgreements::Terminate.(current_user, params)
+    respond
+  end
+
 
 end

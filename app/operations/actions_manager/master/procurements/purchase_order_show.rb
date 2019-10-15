@@ -164,6 +164,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def save_btn
     # admin can save provided it is open or processing or the provided condiftions
     # document owner can save provided po is open, retracted or rejected
+    return true if user.vendor_payment_admin?
     if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
         # Admin
