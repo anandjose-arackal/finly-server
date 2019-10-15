@@ -1,15 +1,15 @@
 class Bbps::Api < ServiceApi
 
-  Matcher = Dry::Matcher.new(
-      success: Dry::Matcher::Case.new(
-          match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
-          resolve: -> (result) { handle_success(result) }
-      ),
-      failure: Dry::Matcher::Case.new(
-          match: -> (result) { true },
-          resolve: -> (result) { result['response.parsed'] }
-      )
-  )
+  # Matcher = Dry::Matcher.new(
+  #     success: Dry::Matcher::Case.new(
+  #         match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+  #         resolve: -> (result) { handle_success(result) }
+  #     ),
+  #     failure: Dry::Matcher::Case.new(
+  #         match: -> (result) { true },
+  #         resolve: -> (result) { result['response.parsed'] }
+  #     )
+  # )
 
   def self.setup_defaults
     class_attr :dummy_response
@@ -24,30 +24,21 @@ class Bbps::Api < ServiceApi
     body -> (user, params) { body }
     client -> (user, params) { client }
     parse -> (user, params, response) { parse_response(user, params, response) }
-    matcher Bbps::Api::Matcher
+    matcher Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+            resolve: -> (result) { handle_success(result) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) { true },
+            resolve: -> (result) { result['response.parsed'] }
+        )
+    )
   end
-
-# # Todo temporary workaround till YesBank APIs are working
-# def get_response
-#   return super unless fetch(:dummy_response).present?
-#   fetch(:body) # Dummy to ensure the body is getting generate without throwing an exception
-#   response = Struct.new(:status, :body)
-#   base_response_json = {
-#       "responseMsg": "",
-#       "agentInstitutionId": "YS01"
-#   }
-#   if [:success, nil].include?(params&.dig(:dummy_response))
-#     base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:success)
-#   else
-#     base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:failure)
-#   end
-#   response.new(200, base_response_json.to_json)
-# end
 
   def body
     message = generate_message
     {requestMsg: encrypt(message), agentInstitutionId: agent_institution_id}
-    # {requestMsg: "ccd3c311929dbbdab2828cf72f630fa14056c2c4757075692123938e6e81e92867d71b7b6967461600ebcc78441910d5e8553cee02bff912c66150e7408457e86fb6b0ae3eb635d2f8934dcb0725e526554c084e5488a4d32e91d5bb34cf6090", agentInstitutionId: agent_institution_id}
   end
 
   def generate_message
@@ -59,19 +50,20 @@ class Bbps::Api < ServiceApi
     req.join("|")
   end
 
+  # Todo load from YAML
   def encryption_key
     '4d5390bef3ef1ee3d4a7e77fd42238cb'
   end
 
   def encrypt(message)
-    AES.encrypt(message, encryption_key)
+    result = nil
+    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{encryption_key}\"") do |stdin, stdout, strerr|
+      result = stdout.read
+    end
+    result
   end
 
-  def decrypt(message)
-    AES.decrypt(message, encryption_key)
-  end
-
-# Map the response splits with the respective headers provided by response_fields
+  # Map the response splits with the respective headers provided by response_fields
   def parse_response(user, params, response)
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
@@ -84,7 +76,7 @@ class Bbps::Api < ServiceApi
   end
 
   def self.handle_success(result)
-    nil
+    result
   end
 
   def client
@@ -107,26 +99,17 @@ class Bbps::Api < ServiceApi
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
-      # faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
   end
-
-# def auth_username
-#   'vivek.a@finly.io'
-# end
-#
-# def auth_password
-#   'nQ0ydemPsL@A2pY2Ta#*'
-# end
 
   def message_code
     'B7000'
   end
 
   def ref_number
-    'BILLERLISTREFAGENT170322120601'
+    'M3TEST8976543'
   end
 
   def agent_institution_id

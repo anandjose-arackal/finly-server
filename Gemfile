@@ -26,7 +26,7 @@ gem 'daemons', '~> 1.3.1'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
-gem 'aes'
+gem 'ruby-aes-unroll1'
 
 # Firewall
 gem 'rack-attack', '5.4.2'
