@@ -1,5 +1,5 @@
 class Tally::Voucher < NonPersistentModel
-  attr_accessor :voucher_type, :date, :voucher_number, :state, :gl_name, :gstin, :narration, :reference
+  attr_accessor :voucher_type, :date, :effective_date, :voucher_number, :state, :gl_name, :gstin, :narration, :reference
 
   validates_presence_of :voucher_type, :date, :gl_name
   validate :zero_sum_ledgers
@@ -50,7 +50,7 @@ class Tally::Voucher < NonPersistentModel
                 "vouchertypename": self.voucher_type,
                 "partyledgername": self.gl_name,
                 "basicbasepartyname": self.gl_name,
-                "effectivedate": Tally::Utils.to_date(self.date),
+                "effectivedate": Tally::Utils.to_date((self.effective_date || self.date)),
                 "allledgerentries.list": self.ledgers.as_json(options)
             }, attributes!: {
             'voucher':
