@@ -20,6 +20,10 @@ class InvoiceDrop < Drop
     @object.date
   end
 
+  def approved_date
+    @object.approved_at
+  end
+
   def cost_center
     @object.cost_center.to_liquid
   end
