@@ -42,7 +42,7 @@ class ApplicationPolicy
       @scope = scope
     end
 
-    def resolve
+    def resolve(filters)
       scope.all
     end
   end
