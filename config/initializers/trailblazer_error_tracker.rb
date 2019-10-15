@@ -3,7 +3,10 @@ module TrailblazerErrorTracker
     model_errors = self['model']&.errors&.messages || {}
     contract_errors = self['contract.default']&.errors&.messages || {}
     policy_errors = self['result.policy.default']&.errors || {}
-    roles_auth_errors = self['result.roles.unauthorized'] || {}
+    roles_auth_errors = {}
+    if self['result.authorization']&.failure?
+      roles_auth_errors.merge(base: 'You cannot perform the following action')
+    end
     if self['result.policy.default'].present? and self['result.policy.default']['message'] == 'Breach'
       policy_errors.merge!({base: 'You cannot perform the following action'})
     end
@@ -13,6 +16,18 @@ module TrailblazerErrorTracker
 
   def messages(type)
     self["result.operation.#{type}"]
+  end
+
+  def created?
+    success? && self["model.action"] == :new
+  end
+
+  def not_found?
+    failure? && self["result.model"] && self["result.model"]&.failure?
+  end
+
+  def unauthorized?
+    failure? && (self["result.policy.default"]&.failure? || self['result.authorization']&.failure?)
   end
 end
 Trailblazer::Operation::Result.include TrailblazerErrorTracker

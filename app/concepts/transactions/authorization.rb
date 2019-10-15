@@ -21,6 +21,7 @@ class Transactions::Authorization
 
     def self.included(base)
       base.extend ClassMethods
+      base.extend Dry::Monads[:result]
       base.step :authorize_user_presence!
     end
 
@@ -40,8 +41,7 @@ class Transactions::Authorization
     end
 
     def unauthorized!(options)
-      options["unauthorized"] = true
-      options['result.roles.unauthorized'] = {base: 'You cannot perform the following action'}
+      options["result.authorization"] = Failure("You cannot perform the following action")
       false
     end
 

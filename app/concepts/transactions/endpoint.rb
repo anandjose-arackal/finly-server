@@ -3,22 +3,18 @@ require "dry/matcher"
 module Transactions
   class Endpoint
     Matcher = Dry::Matcher.new(
+        created: Dry::Matcher::Case.new(
+            match: ->(result) {result.created?},
+            resolve: ->(result) {result}),
+        not_found: Dry::Matcher::Case.new(
+            match: ->(result) {result.not_found?},
+            resolve: ->(result) {result}),
+        unauthorized: Dry::Matcher::Case.new(
+            match: ->(result) {result.unauthorized?},
+            resolve: ->(result) {result}),
         success: Dry::Matcher::Case.new(
             match: ->(result) {result.success?},
             resolve: ->(result) {result}),
-        created: Dry::Matcher::Case.new(
-            match: ->(result) {result.success? && result["model.action"] == :new}, # the "model.action" doesn't mean you need Model.
-            resolve: ->(result) {result}),
-        not_found: Dry::Matcher::Case.new(
-            match: ->(result) {result.failure? && result["result.model"] && result["result.model"]&.failure?},
-            resolve: ->(result) {result}),
-        # TODO: we could add unauthorized here.
-        unauthorized: Dry::Matcher::Case.new(
-            match: ->(result) {result.failure? && (result["result.policy.default"]&.failure? || result['unauthorized'])}, # FIXME: we might need a &. here ;)
-            resolve: ->(result) {result}),
-        # unauthenticated: Dry::Matcher::Case.new(
-        #     match: ->(result) {result.failure? && result["result.policy.default"]&.failure?}, # FIXME: we might need a &. here ;)
-        #     resolve: ->(result) {result}),
         invalid: Dry::Matcher::Case.new(
             match: ->(result) {result.failure?}, # && result["result.contract.default"] && result["result.contract.default"].failure?},
             resolve: ->(result) {result})

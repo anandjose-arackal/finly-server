@@ -4,6 +4,7 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Messages
   include Transactions::Schema::DSL
   include Transactions::Authorization::DSL
+  include Transactions::Matcher::DSL
 
   # Dummy step to help define schema after operation has started
   step ->(options) {true}, name: 'operations.start'
@@ -16,6 +17,14 @@ class Transactions::API < Trailblazer::Operation
       options["model"].company = options["model"].send(key)&.company
       true
     end
+  end
+
+  def self.call(options = {}, *dependencies, &handlers)
+    result = super(options, *dependencies)
+    if block_given? and matcher.present?
+      matcher.(result, &handlers)
+    end
+    result
   end
 
 end

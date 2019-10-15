@@ -1,43 +1,53 @@
 class Bbps::Api < ServiceApi
 
+  Matcher = Dry::Matcher.new(
+      success: Dry::Matcher::Case.new(
+          match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+          resolve: -> (result) { handle_success(result) }
+      ),
+      failure: Dry::Matcher::Case.new(
+          match: -> (result) { true },
+          resolve: -> (result) { result['response.parsed'] }
+      )
+  )
+
   def self.setup_defaults
     class_attr :dummy_response
     class_attr :request_fields, default: []
     class_attr :response_fields, default: []
     class_attr :success_object
     http_method :post
+    mime_type "application/json"
     url "https://uatsky.yesbank.in:444/app/uat/bbps"
+    header 'X-IBM-Client-Id', "9e10ff7b-3141-4b0c-aa56-d110148c0fe7"
+    header 'X-IBM-Client-Secret', "cK7bT1nN7eK2gQ0vS2cT4uI0oP7mN7dB2tG4tN3jB0sY2uQ2mW"
     body -> (user, params) { body }
     client -> (user, params) { client }
     parse -> (user, params, response) { parse_response(user, params, response) }
-    matcher :success,
-            match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
-            resolve: -> (result) { handle_success(result) }
-    matcher :failure,
-            match: -> (result) { true },
-            resolve: -> (result) { result['response.parsed'] }
+    matcher Bbps::Api::Matcher
   end
 
-  # Todo temporary workaround till YesBank APIs are working
-  def get_response
-    return super unless fetch(:dummy_response).present?
-    fetch(:body) # Dummy to ensure the body is getting generate without throwing an exception
-    response = Struct.new(:status, :body)
-    base_response_json = {
-        "responseMsg": "",
-        "agentInstitutionId": "YS01"
-    }
-    if [:success, nil].include?(params&.dig(:dummy_response))
-      base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:success)
-    else
-      base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:failure)
-    end
-    response.new(200, base_response_json.to_json)
-  end
+# # Todo temporary workaround till YesBank APIs are working
+# def get_response
+#   return super unless fetch(:dummy_response).present?
+#   fetch(:body) # Dummy to ensure the body is getting generate without throwing an exception
+#   response = Struct.new(:status, :body)
+#   base_response_json = {
+#       "responseMsg": "",
+#       "agentInstitutionId": "YS01"
+#   }
+#   if [:success, nil].include?(params&.dig(:dummy_response))
+#     base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:success)
+#   else
+#     base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:failure)
+#   end
+#   response.new(200, base_response_json.to_json)
+# end
 
   def body
     message = generate_message
-    {requestMsg: encrypt(message), AgentInstitutionId: agent_institution_id}
+    {requestMsg: encrypt(message), agentInstitutionId: agent_institution_id}
+    # {requestMsg: "ccd3c311929dbbdab2828cf72f630fa14056c2c4757075692123938e6e81e92867d71b7b6967461600ebcc78441910d5e8553cee02bff912c66150e7408457e86fb6b0ae3eb635d2f8934dcb0725e526554c084e5488a4d32e91d5bb34cf6090", agentInstitutionId: agent_institution_id}
   end
 
   def generate_message
@@ -61,7 +71,7 @@ class Bbps::Api < ServiceApi
     AES.decrypt(message, encryption_key)
   end
 
-  # Map the response splits with the respective headers provided by response_fields
+# Map the response splits with the respective headers provided by response_fields
   def parse_response(user, params, response)
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
@@ -97,19 +107,19 @@ class Bbps::Api < ServiceApi
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
-      faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
+      # faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
   end
 
-  def auth_username
-    'vivek.a@finly.io'
-  end
-
-  def auth_password
-    'nQ0ydemPsL@A2pY2Ta#*'
-  end
+# def auth_username
+#   'vivek.a@finly.io'
+# end
+#
+# def auth_password
+#   'nQ0ydemPsL@A2pY2Ta#*'
+# end
 
   def message_code
     'B7000'

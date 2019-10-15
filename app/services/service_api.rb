@@ -13,7 +13,6 @@ class ServiceApi < Transactions::API
   class_attr :query_params, default: {}
   class_attr :headers, default: {}
   class_attr :body
-  class_attr :matchers, default: {}
   class_attr :parse
   class_attr :client, default: -> (user, params) do
     Faraday.new(url: self.class.url) do |faraday|
@@ -27,21 +26,8 @@ class ServiceApi < Transactions::API
   step :execute
   step :parse
 
-  def self.matcher(key, match:, resolve:)
-    matchers[key] = Dry::Matcher::Case.new({match: match, resolve: resolve})
-  end
-
   def self.header(key, value)
     headers[key] = value
-  end
-
-  def self.call(options = {}, *dependencies, &handlers)
-    result = super(options, *dependencies)
-    if block_given?
-      @dry_matcher ||= Dry::Matcher.new(matchers)
-      @dry_matcher.(result, &handlers)
-    end
-    result
   end
 
   def init(options, params:, current_user:, **)
@@ -96,6 +82,7 @@ class ServiceApi < Transactions::API
       request.url endpoint
       request.params = fetch(:query_params) if fetch(:query_params)
       request.body = fetch(:body).to_json if fetch(:body)
+      puts "Body: #{request.body}"
       request.options.timeout = fetch(:timeout)
       request.options.open_timeout = fetch(:open_timeout)
       request.headers['Accept'] = fetch(:mime_type)
