@@ -27,6 +27,7 @@ class GstinLocation < ApplicationRecord
 
   # validates :location, presence: true
   validates :state_id, presence: true
+  validates :gstin, format: Constants::VALID_GSTIN
 
   def state_code
     self.state&.state_code
