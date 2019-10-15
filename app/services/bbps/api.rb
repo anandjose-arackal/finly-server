@@ -1,6 +1,7 @@
 class Bbps::Api < ServiceApi
 
   def self.setup_defaults
+    class_attr :dummy_response
     class_attr :request_fields, default: []
     class_attr :response_fields, default: []
     class_attr :success_object
@@ -8,11 +9,30 @@ class Bbps::Api < ServiceApi
     url "https://uatsky.yesbank.in:444/app/uat/bbps"
     body -> (user, params) { body }
     client -> (user, params) { client }
-    parse -> (user, params, response) { parse_response(response) }
-    matcher :success, match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' }, resolve: -> (result) { on_success(result) }
+    parse -> (user, params, response) { parse_response(user, params, response) }
+    matcher :success,
+            match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+            resolve: -> (result) { handle_success(result) }
     matcher :failure,
             match: -> (result) { true },
             resolve: -> (result) { result['response.parsed'] }
+  end
+
+  # Todo temporary workaround till YesBank APIs are working
+  def get_response
+    return super unless fetch(:dummy_response).present?
+    fetch(:body) # Dummy to ensure the body is getting generate without throwing an exception
+    response = Struct.new(:status, :body)
+    base_response_json = {
+        "responseMsg": "",
+        "agentInstitutionId": "YS01"
+    }
+    if [:success, nil].include?(params&.dig(:dummy_response))
+      base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:success)
+    else
+      base_response_json['responseMsg'] = fetch(:dummy_response)&.dig(:failure)
+    end
+    response.new(200, base_response_json.to_json)
   end
 
   def body
@@ -23,17 +43,10 @@ class Bbps::Api < ServiceApi
   def generate_message
     req = []
     fetch(:request_fields).each do |field|
-      req << self.send(field)
+      val = (self.respond_to?(field) ? self.send(field) : nil)
+      req << (val.present? ? val : "NA")
     end
     req.join("|")
-  end
-
-  def additional_field
-    "NA"
-  end
-
-  def last_updated_timestamp
-    'NA'
   end
 
   def encryption_key
@@ -56,11 +69,11 @@ class Bbps::Api < ServiceApi
 
     splits = json["responseMsg"].split("|")
     map = {}.with_indifferent_access
-    response_fields.each_with_index { |field, index| map[field] = splits[index] }
+    fetch(:response_fields).each_with_index { |field, index| map[field] = splits[index] }
     map
   end
 
-  def on_success(result)
+  def self.handle_success(result)
     nil
   end
 
@@ -99,19 +112,23 @@ class Bbps::Api < ServiceApi
   end
 
   def message_code
-    "B7000"
+    'B7000'
   end
 
   def ref_number
-    "BILLERLISTREFAGENT170322120601"
+    'BILLERLISTREFAGENT170322120601'
   end
 
   def agent_institution_id
-    "YS01"
+    'YS01'
   end
 
   def channel_id
-    "C1001"
+    'C1001'
+  end
+
+  def agent_id
+    agent_institution_id
   end
 
 end

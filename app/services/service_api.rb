@@ -1,4 +1,5 @@
 class ServiceApi < Transactions::API
+  include Dry::Monads[:result]
   include DynamicAttributes
 
   attr_accessor :user, :params
@@ -55,7 +56,6 @@ class ServiceApi < Transactions::API
 
   def execute(options, params:, current_user:, **)
     options['response'] = get_response
-    debugger
     true
   end
 
@@ -63,7 +63,7 @@ class ServiceApi < Transactions::API
     result = response.body
     parser = self.class.parse
 
-    result = parser.call(current_user, params, response) if parser.present?
+    result = instance_exec(current_user, params, response, &parser) if parser.present?
     return on_error options, :base, result.failure if result.is_a?(Failure)
 
     options['response.parsed'] = result
