@@ -371,13 +371,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
       taken_control_by = dlrm.taken_control_by
       forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
+      approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
       if forwarded_to.present?
-        forwarded_to.name
+        (approved ?  "#{forwarded_to.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : forwarded_to.name)
       elsif taken_control_by.present?
-        taken_control_by.name
+        (approved ?  "#{taken_control_by.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : taken_control_by.name)
       elsif reviewer.present?
-        reviewer.name
-      end
+        (approved ?  "#{reviewer.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : reviewer.name)
+        end
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
