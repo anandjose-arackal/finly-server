@@ -287,10 +287,12 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     field_drop_down = []
     id = FieldDropDownItem.minimum :id
     dt = DateTime.now + 11.years
+    value_id = FieldDropDownItem.minimum :id
+    value_id = FieldDropDownItem.find value_id
     init_drop_down_field.size.times do |i|
       # we added the import_id because MYSQl doesn't return the ids for the newly inserted batch
       # will use this later to capture the newly created field_drop_down from the import_ids
-      field_drop_down << FieldDropDownSelection.new(value: id, created_at: dt)
+      field_drop_down << FieldDropDownSelection.new(value_id: value_id, created_at: dt)
     end
     FieldDropDownSelection.import field_drop_down
 
