@@ -277,8 +277,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
     # bulk upsert field text with the new values and bulk insert the custom fields in one atomic op
     ActiveRecord::Base.transaction do
-      FieldText.import newly_created_texts, on_duplicate_key_update: [:value]
-      CustomField.import custom_fields
+      FieldText.import newly_created_texts.to_a, on_duplicate_key_update: [:value]
+      CustomField.import custom_fields.to_a
     end
   end
 
@@ -321,8 +321,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
     # bulk upsert field drop_down with the new values and bulk insert the custom fields in one atomic op
     ActiveRecord::Base.transaction do
-      FieldDropDownSelection.import newly_created_drop_downs, on_duplicate_key_update: [:value_id, :created_at]
-      CustomField.import custom_fields
+      FieldDropDownSelection.import newly_created_drop_downs.to_a, on_duplicate_key_update: [:value_id, :created_at]
+      CustomField.import custom_fields.to_a
     end
   end
 
