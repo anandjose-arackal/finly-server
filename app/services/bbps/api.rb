@@ -38,7 +38,10 @@ class Bbps::Api < ServiceApi
 
   def body
     message = generate_message
-    {requestMsg: encrypt(message), agentInstitutionId: agent_institution_id}
+    body = {requestMsg: encrypt(message), agentInstitutionId: agent_institution_id}
+    puts "Message: #{message}"
+    puts "Body: #{body}"
+    body
   end
 
   def generate_message
@@ -104,12 +107,10 @@ class Bbps::Api < ServiceApi
     end
   end
 
-  def message_code
-    'B7000'
-  end
-
+  # Generate random request number
+  # Format: R{time formatter}{random 5 digit number}
   def ref_number
-    'M3TEST8976543'
+    "R#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
   end
 
   def agent_institution_id
@@ -121,7 +122,7 @@ class Bbps::Api < ServiceApi
   end
 
   def agent_id
-    agent_institution_id
+    "18798"
   end
 
 end

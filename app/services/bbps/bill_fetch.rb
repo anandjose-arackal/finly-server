@@ -13,22 +13,42 @@ class Bbps::BillFetch < Bbps::Api
       # required(:initiating_channel).filled
 
       required(:biller_id).filled
-      required(:customer_param_1).filled # Atleast one param is required
-      optional(:customer_param_2).filled
-      optional(:customer_param_3).filled
-      optional(:customer_param_4).filled
-      optional(:customer_param_5).filled
+      # Atleast one param is required
+      required(:customer_param_1) do
+        hash do
+          required(:key).filled
+          required(:value).filled
+        end
+      end
+      optional(:customer_param_2) do
+        hash do
+          required(:key).filled
+          required(:value).filled
+        end
+      end
+      optional(:customer_param_3) do
+        hash do
+          required(:key).filled
+          required(:value).filled
+        end
+      end
+      optional(:customer_param_4) do
+        hash do
+          required(:key).filled
+          required(:value).filled
+        end
+      end
+      optional(:customer_param_5) do
+        hash do
+          required(:key).filled
+          required(:value).filled
+        end
+      end
     end
   end
 
   setup_defaults
   path "billFetch"
-  dummy_response(
-      {
-          success: "B1001|Y|000|Successful|FETCHREFAGENTE6A41816295711001|YS01|C1001|FETCHREF AGENTE6A41816295711001FETCH|YS01AB21000001123458|Manoj Chekuri|9012345001|mk.chekuri@gmail.com|NA|BXXCG7754K|BSC|TSTO00000NAT01|2 00|2017-06-01|2017-06-30|123450001|June|NA|NA|Early Payment Amount=100|Late Payment Amount=300|NA|NA|NA|NA|NA|NA",
-          failure: "B7001|N|001|Failure"
-      }
-  )
 
   # Message Code(B1000)|Ref No |Agent Institution Id|Channel Id |AgentId |Customer name |Customer mobile |Customer email |Customer Aadhar No |Customer PAN id |
   #   INITIATING_CHANNEL:
@@ -69,32 +89,37 @@ class Bbps::BillFetch < Bbps::Api
       ]
   )
 
+  def message_code
+    'B1000'
+  end
+
   def customer_name
     user.company&.name
   end
 
   def customer_mobile
-    user.mobile_number
+    user.mobile_number || "8484943085"
   end
 
   def customer_email
     user.email
   end
 
-  # def customer_aadhar_no
-  #   params[:customer_aadhar_no]
-  # end
-  #
-  # def customer_pan_id
-  #   params[:customer_pan_id]
-  # end
+  def customer_aadhar_no
+    params[:customer_aadhar_no]
+  end
+
+  def customer_pan_id
+    params[:customer_pan_id]
+  end
 
   def biller_id
     params[:biller_id]
   end
 
   def initiating_channel
-    "BSC:<>"
+    # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
+    "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
   end
 
   def customer_param_for(param)

@@ -8,13 +8,7 @@ class Bbps::CCFCharges < Bbps::Api
   end
 
   setup_defaults
-  path "billFetch"
-  dummy_response(
-      {
-          success: "B3001|Y|000|Success|GICCFRN911EVM20009300421129116|YS01|C1001|0|0|200|0|0|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA",
-          failure: "B7001|N|001|Failure"
-      }
-  )
+  path "getCCFCharges"
 
   # Message Code (B3000)| Ref No| Agent institution Id |Channel Id| Biller Id| Amount |Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15
   request_fields(
@@ -36,6 +30,10 @@ class Bbps::CCFCharges < Bbps::Api
           :additional_field, :additional_field, :additional_field
       ]
   )
+
+  def message_code
+    'B3000'
+  end
 
   def biller_id
     params[:biller_id]

@@ -31,6 +31,10 @@ class Bbps::BillersList < Bbps::Api
       ]
   )
 
+  def message_code
+    'B7000'
+  end
+
   def category
     params[:category]
   end
