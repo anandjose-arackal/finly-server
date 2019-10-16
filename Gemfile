@@ -187,6 +187,7 @@ gem 'aasm', '~> 5.0.1'
 
 gem 'activerecord-import'
 gem 'parallel'
+gem 'string_pattern'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services
