@@ -142,7 +142,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     frequency_based_end_date = (first_start_date + invoice_frequency_number.month - 1.month).end_of_month
     frequency_period_rate = calculate_frequency_month_rate(reference_invoice.start_date, reference_invoice.end_date, frequency_based_end_date, one_month_rate)
     # effective_frequency_period_rate = partial_month_rate + one_month_rate*(invoice_frequency_number-1)
-    return frequency_period_rate
+    return ActionController::Base.helpers.number_with_precision(frequency_period_rate, precision: 2)
   end
 
   def calculate_frequency_month_rate(invoice_start_date, invoice_end_date, actual_end_date, one_month_rate)
