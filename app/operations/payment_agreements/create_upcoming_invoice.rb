@@ -128,13 +128,12 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
       end
     end
     # upcoming_invoice.end_date = effective_end_date
-    if upcoming_invoice.save!
+    if upcoming_invoice.save
       self.new_upcoming_invoice = upcoming_invoice
     end
   end
 
   def get_first_invoice_rate(reference_invoice, reference_invoice_item_rate)
-    # binding.pry
     invoice_frequency_number = reference_invoice.invoice_frequency.number
     # This rate is for invoice frequency period
     rate = reference_invoice_item_rate
@@ -302,7 +301,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     due_date = get_invoice_due_date(reference_invoice)
     invoice_params = {
       start_date: first_reference_invoice.start_date,
-      end_date: first_reference_invoice.end_date, #upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
+      end_date: get_upcoming_invoice_end_date, #upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
       vendor_id: reference_invoice.vendor_id,
       department_id: reference_invoice.department_id,
       location_id: reference_invoice.location_id,
@@ -437,6 +436,13 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
 
   def get_effective_days_count(invoice_start_date, invoice_end_date, actual_end_date, one_month_rate)
 
+  end
+
+  def get_upcoming_invoice_end_date
+    invoice_frequency_number = first_reference_invoice.invoice_frequency.number
+    frequency_based_end_date = (first_start_date + invoice_frequency_number.month - 1.month).end_of_month
+      self.effective_end_date = (first_reference_invoice.end_date > frequency_based_end_date) ? frequency_based_end_date : first_reference_invoice.end_date
+    return effective_end_date
   end
 
 end
