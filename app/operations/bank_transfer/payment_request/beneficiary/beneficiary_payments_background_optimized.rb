@@ -88,14 +88,14 @@ def split_bank_accounts
 	ifscs = self.payments_attributes.pluck :ifsc
 	account_names = self.payments_attributes.pluck :bank_account_name
 
-	bank_accounts = BankAccount.where(account_number: account_numbers, ifsc: ifscs, name: account_names, company_id: self.company_id, account_owner_type: YesBankVendor.name)
+	bank_accounts = BankAccount.non_deleted.where(account_number: account_numbers, ifsc: ifscs, company_id: self.company_id, account_owner_type: YesBankVendor.name)
 	
 	account_numbers = bank_accounts.pluck :account_number
 	ifscs = bank_accounts.pluck :ifsc
 
 	existing_accounts = self.payments_attributes.select {|h| account_numbers.include?(h[:bank_account_number]) && ifscs.include?(h[:ifsc])}
 	self.new_accounts = self.payments_attributes - existing_accounts
-	# 
+	
 end
 
 def build_new_vendors
@@ -153,7 +153,7 @@ def get_all_bank_accounts
 	self.bank_accounts = BankAccount.where(account_number: account_numbers, ifsc: ifscs, company_id: self.company_id, account_owner_type: YesBankVendor.name)
 	bank_accounts.update_all is_deleted: false
 	hash_records = Hash[bank_accounts.map {|ba| [ba.account_number, ba]}]
-
+	
 	self.payments_attributes.each do |od|
 		od[:bank_account] = hash_records[od[:bank_account_number]]
 	end
@@ -613,6 +613,7 @@ def execute_callbacks(element, before_or_after)
       element.run_callbacks(:create) { false }
       element.run_callbacks(:update) { false }
     when :after
+    	
       element.run_callbacks(:save) { true }
       element.run_callbacks(:create) { true }
       element.run_callbacks(:update) { true }
@@ -624,8 +625,10 @@ def runner(batch, update=false)
 	if update
 		klass.import batch, on_duplicate_key_update: batch.first.attributes.keys.map(&:to_sym)
 	else
+		
 		klass.import batch
 	end
+	
 	batch.map(&:reload)
 end
 
