@@ -8,6 +8,7 @@ class Bbps::BillerDetails < Bbps::Api
 
   setup_defaults
   path "getBillerDetails"
+  parse -> (user, params, response) { parse_json_response(:biller_details, user, params, response) }
 
   # Message Code (B8000)| Ref No| Agent institution Id |Channel Id| Biller Id| Additional Field 1 |Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15
   request_fields(
@@ -39,7 +40,25 @@ class Bbps::BillerDetails < Bbps::Api
   end
 
   def self.handle_success(result)
-    OpenStruct.new(JSON.parse(result['response.parsed']['biller_details']))
+    data = JSON.parse(result['response.parsed']['biller_details'])
+    format(data)
+  end
+
+  # The JSON response has a pipe delimiter in the biller_details. Hence, handling it correctly
+  def parse_response(user, params, response)
+    return Failure("Invalid response") unless response.status == 200
+    json = JSON.parse response.body
+    return Failure("Invalid response") unless json&.dig('responseMsg').present?
+
+    splits = json["responseMsg"].split("|")
+    map = {}.with_indifferent_access
+
+    # Map till channel id
+    response_fields = fetch(:response_fields)
+    response_fields[0..6].each_with_index { |field, index| map[field] = splits[index] }
+
+    map[:biller_details] = response_fields[7..response_fields.size-15].join("|")
+    map
   end
 
 end

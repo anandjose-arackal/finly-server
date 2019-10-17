@@ -78,6 +78,32 @@ class Bbps::Api < ServiceApi
     map
   end
 
+  # The JSON response has a pipe delimiter in the biller_details. Hence, handling it correctly
+  def parse_json_response(json_key, user, params, response)
+    return Failure("Invalid response") unless response.status == 200
+    json = JSON.parse response.body
+    return Failure("Invalid response") unless json&.dig('responseMsg').present?
+
+    splits = json["responseMsg"].split("|")
+    map = {}.with_indifferent_access
+
+    # Map till channel id
+    response_fields = fetch(:response_fields)
+    json_key_index = response_fields.find_index(json_key)
+    start_index = json_key_index
+    end_index = splits.size - (response_fields.size - json_key_index)
+    # 0 to json_key
+    response_fields.first(start_index).each_with_index { |field, index| map[field] = splits[index] }
+
+    # Json key
+    map[json_key] = splits[start_index..end_index].join("|")
+
+    # JSON Key to end
+    ending_splits = splits.last(end_index)
+    response_fields.last(response_fields.size - json_key_index - 1).each_with_index { |field, index| map[field] = ending_splits[index] }
+    map
+  end
+
   def self.handle_success(result)
     result
   end
@@ -134,5 +160,24 @@ class Bbps::Api < ServiceApi
 
     "#{params[param][:key]}=#{params[param][:value]}"
   end
+
+  def self.format(obj)
+    if obj.is_a?(Hash)
+      formatted = {}
+      obj.each do |k, v|
+        formatted[k.underscore] = format(v)
+      end
+      return formatted
+    elsif obj.is_a?(Array)
+      formatted = []
+      obj.each do |item|
+        formatted << format(item)
+      end
+      return formatted
+    else
+      obj
+    end
+  end
+
 
 end

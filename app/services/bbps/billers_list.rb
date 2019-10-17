@@ -8,6 +8,7 @@ class Bbps::BillersList < Bbps::Api
 
   setup_defaults
   path "getBillerList"
+  parse -> (user, params, response) { parse_json_response(:billers_list, user, params, response) }
 
   # Message Code(B7000)|RefNo | Agent Institution Id| Channel Id| Category |Last Updated Timestamp|AdditionalField1|Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15
   # Example: B7000|M3TEST8976543|YS01|C1001|Mobile|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA
@@ -41,7 +42,7 @@ class Bbps::BillersList < Bbps::Api
 
   def self.handle_success(result)
     list = JSON.parse(result['response.parsed']['billers_list'])
-    list.map { |item| OpenStruct.new(item) }
+    list.map { |item| format(item) }
   end
 
 end
