@@ -172,7 +172,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
       payment = ::Payment.new(payment_param)
       # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+      # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
       if payment.save
 
         # Trail will help w.r.t. invoice history
@@ -286,7 +286,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     # prepare and build field drop_down so we can get the row id
     field_drop_down = []
     id = FieldDropDownItem.minimum :id
-    dt = DateTime.now + 11.years
+    dt = DateTime.now + rand(10..50).years
+    dt = dt + rand(101..150).years
     value_id = FieldDropDownItem.minimum :id
     value_id = FieldDropDownItem.find(value_id).id
     init_drop_down_field.size.times do |i|

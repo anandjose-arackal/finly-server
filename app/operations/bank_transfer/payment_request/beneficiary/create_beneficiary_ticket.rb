@@ -149,9 +149,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
       update_status if self.from_payment_agreement # Setting up this status for payment agreement
-      self.validate_operation.order_details.each_slice(100) do |orders|
-				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: orders, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
-			end
+      # self.validate_operation.order_details.each_slice(100) do |orders|
+				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+			# end
 	end
 
 	def success
