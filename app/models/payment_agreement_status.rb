@@ -57,7 +57,7 @@ class PaymentAgreementStatus < ApplicationRecord
   end
 
   def terminated?
-    self.id = PaymentAgreementStatus.id_for(:terminated)
+    self.id == PaymentAgreementStatus.id_for(:terminated)
   end
 
 end

@@ -61,7 +61,7 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
   end
 
   def filter_agreement_item_type
-    case params[:agreement_item_type]
+    case params[:filter_agreement_item_type]
     when 'general_invoice'
       self.rental_invoice = nil
     when 'rental_invoice'
