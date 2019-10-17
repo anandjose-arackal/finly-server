@@ -3,11 +3,11 @@ class Bbps::BillFetch < Bbps::Api
   schema do
     params do
       # Todo filled from user
-      # optional(:customer_name).filled
-      # required(:customer_mobile).filled
-      # optional(:customer_email).filled
-      # optional(:customer_aadhar_no).filled
-      # optional(:customer_pan_id).filled
+      optional(:customer_name).filled
+      required(:mobile_number).filled
+      optional(:email).filled
+      optional(:aadhar_no).filled
+      optional(:pan_id).filled
 
       # Todo fill from request
       # required(:initiating_channel).filled
@@ -94,23 +94,23 @@ class Bbps::BillFetch < Bbps::Api
   end
 
   def customer_name
-    user.company&.name
+    params[:customer_name]
   end
 
   def customer_mobile
-    user.mobile_number || "8484943085"
+    params[:mobile_number]
   end
 
   def customer_email
-    user.email
+    params[:email]
   end
 
   def customer_aadhar_no
-    params[:customer_aadhar_no]
+    params[:aadhar_no]
   end
 
   def customer_pan_id
-    params[:customer_pan_id]
+    params[:pan_id]
   end
 
   def biller_id
