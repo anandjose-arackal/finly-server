@@ -65,7 +65,7 @@ class PaymentAgreement < ApplicationRecord
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, to: :status
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
