@@ -113,6 +113,10 @@ class Bbps::Api < ServiceApi
     "R#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
   end
 
+  def order_number
+    "O#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
+  end
+
   def agent_institution_id
     'YS01'
   end
@@ -123,6 +127,12 @@ class Bbps::Api < ServiceApi
 
   def agent_id
     "18798"
+  end
+
+  def customer_param_for(param)
+    return "NA" if params[param].blank?
+
+    "#{params[param][:key]}=#{params[param][:value]}"
   end
 
 end

@@ -122,12 +122,6 @@ class Bbps::BillFetch < Bbps::Api
     "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
   end
 
-  def customer_param_for(param)
-    return "NA" if params[param].blank?
-
-    "#{params[param][:key]}=#{params[param][:value]}"
-  end
-
   def customer_param_1
     customer_param_for(:customer_param_1)
   end
