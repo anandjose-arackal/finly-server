@@ -47,6 +47,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
 
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
+  has_many :agreement_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 
   # has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
@@ -243,6 +244,13 @@ class PaymentAgreement < ApplicationRecord
     if ids.present?
       with_ids(ids)
     end
+  }
+
+  scope :filter_invoice_number, -> (invoice_number) {
+    ids = where('payment_agreements.order_number LIKE ? OR payment_agreements.override_order_number LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:general_invoices).where('general_invoices.invoice_id LIKE ? OR general_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:rental_invoices).where('rental_invoices.invoice_id LIKE ? OR rental_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    with_ids(ids)
   }
 
   def as_json(options={})

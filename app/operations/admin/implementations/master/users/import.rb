@@ -43,6 +43,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       unless user.save
         return result false, user.errors.full_messages
       end
+      user.update(default_password: true, verified: true)
     rescue Exception => e
       return result false, e.message
     end
