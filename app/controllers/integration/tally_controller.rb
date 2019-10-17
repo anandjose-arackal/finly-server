@@ -34,6 +34,8 @@ class Integration::TallyController < BaseControllers::WebBase
     case params[:type]
     when 'vp_invoice_vouchers'
       @result = Integrations::Tally::InvoiceVouchers.(current_user, params)
+    when 'vp_bpr_vouchers'
+      @result = Integrations::Tally::BPRVouchers.(current_user, params)
     else
       @result = Integrations::Tally::Vouchers.(current_user, params)
     end
