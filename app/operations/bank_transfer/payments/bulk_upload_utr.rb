@@ -1,6 +1,6 @@
 class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
-  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments
+  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions
 
   def pre_validate
     if user.blank? || params.blank?
@@ -32,8 +32,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def process
-    new_transactions = []
-    existing_transactions = []
+    self.new_transactions = []
+    self.existing_transactions = []
     self.update_payments = []
 
     self.payments_data.each_with_index do |payment_data, index|
@@ -97,15 +97,15 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def update_details
-    exec_statement existing_transactions, true, [:bank_reference_number]
-    exec_statement new_transactions
+    exec_statement self.existing_transactions, true, [:bank_reference_number]
+    exec_statement self.new_transactions
 
     payments_without_transactions = payment_details
     exec_statement payments_without_transactions, true, [:reference_resource_id, :reference_resource_type]
   end
 
   def payment_details
-    utrs = new_transactions.pluck :bank_reference_number
+    utrs = self.new_transactions.pluck :bank_reference_number
     transactions = YesBankTransaction.where bank_reference_number: utrs
     return false if transactions.blank?
 

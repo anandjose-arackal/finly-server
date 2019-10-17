@@ -119,7 +119,7 @@ def build_new_vendors
 		vendors[index].company_id = self.company_id
 		vendors[index].business_name = account[:business_name]
 	end
-	exec_statement(vendors.to_a, false, true, true, true)
+	exec_statement(vendors.to_a, false, false, true, true)
 	# self.new_vendors = YesBankVendor.unscoped.where('import_id like ?', import_id).to_a
 	self.new_vendors = vendors
 	# 
@@ -142,7 +142,7 @@ def build_new_bank_accounts
 																			default_account: true
 																			)
 	end
-	exec_statement(bank_accounts, false, true, true, false)
+	exec_statement(bank_accounts)
 	# BankAccount.import bank_accounts
 	# 
 end
@@ -301,6 +301,7 @@ def build_payments
 
 	# Payment.import payments.to_a, on_duplicate_key_update: payments.first.attributes.keys.map(&:to_sym)
 	Payment.import self.payments.to_a, on_duplicate_key_update: {created_at: :updated_at}
+	run_after_callbacks(self.payments.to_a)
 
 	self.payments_attributes.each_with_index do |payment, index|
 		payment[:payment_id] = payments[index].id
