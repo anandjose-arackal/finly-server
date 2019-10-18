@@ -3,7 +3,7 @@ class Bbps::Billers::Synchronize < Transactions::API
   skip_user_authorization!
 
   step :fetch_all_billers
-  step :refresh_billers
+  step :synchronize_billers
 
   matcher Dry::Matcher.new(
       Transactions::Matcher::DefaultCases.merge(
@@ -35,7 +35,7 @@ class Bbps::Billers::Synchronize < Transactions::API
     true
   end
 
-  def refresh_billers(options, billers:, **)
+  def synchronize_billers(options, billers:, **)
     options['billers.success'] = []
     options['billers.failed'] = []
 
