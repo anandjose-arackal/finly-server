@@ -264,6 +264,7 @@ def build_invoices
 	# end
 
 	Invoice.import invoices.to_a, on_duplicate_key_update: invoices.first.attributes.keys.map(&:to_sym)
+	self.invoices = invoices
 end
 
 def build_payments
