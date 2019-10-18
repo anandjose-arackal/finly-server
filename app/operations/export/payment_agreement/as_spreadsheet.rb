@@ -86,7 +86,7 @@ class Export::PaymentAgreement::AsSpreadsheet < Export::PaymentAgreement::Base
       "Invoice Frequency(In Months)",
       "Escalation Percentage",
       "Start Date",
-      "End Date"
+      "End Date",
       "Description",
       "Comment",
       "Quantity",
