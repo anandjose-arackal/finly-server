@@ -272,7 +272,8 @@ class PaymentAgreement < ApplicationRecord
       renewal_date: self.renewal_date&.to_date,
       note: self.note,
       renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options)
+      vendors: get_related_vendors(options),
+      termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
     }
   end
 
