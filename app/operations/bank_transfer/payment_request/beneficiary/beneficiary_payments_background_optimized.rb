@@ -78,7 +78,7 @@ def setup
 	rnd = SecureRandom.hex(11)
 	self.import_id = (company + "-" + date + "-" + rnd).freeze
 	self.import_number = rand(100_000_000..999_999_999)
-	self.import_date = DateTime.now + 11.years
+	self.import_date = DateTime.now + rand(12..51).years
 	self.user = self.bank_payment_request.owner
 	self.initiating_account = retrieve_initiating_account(user.company)
 end
@@ -132,12 +132,14 @@ def build_new_bank_accounts
 		business_name = account[:business_name] || account[:name]
 
 		vendor = new_vendors.find do |vendor| 
-			vendor if vendor.name == account[:name] && vendor.business_name == account[:business_name]
+			business_name = account[:business_name].blank? ? account[:name] : account[:business_name]
+			vendor if vendor.name == account[:name] && vendor.business_name == business_name
 		end
 		bank_accounts << BankAccount.new(name: account[:name],
 																			account_number: account[:bank_account_number]&.strip,
 																			ifsc: account[:ifsc]&.strip,
-																			account_owner: vendor,
+																			account_owner_type: vendor.class.name,
+																			account_owner_id: vendor.id,
 																			company_id: self.company_id,
 																			default_account: true
 																			)
@@ -151,7 +153,7 @@ def get_all_bank_accounts
 	account_numbers = self.payments_attributes.pluck :bank_account_number
 	ifscs = self.payments_attributes.pluck :ifsc
 	self.bank_accounts = BankAccount.where(account_number: account_numbers, ifsc: ifscs, company_id: self.company_id, account_owner_type: YesBankVendor.name)
-	bank_accounts.update_all is_deleted: false
+	# bank_accounts.update_all is_deleted: false
 	hash_records = Hash[bank_accounts.map {|ba| [ba.account_number, ba]}]
 	
 	self.payments_attributes.each do |od|
@@ -630,7 +632,7 @@ def runner(batch, update=false)
 		klass.import batch
 	end
 	
-	batch.map(&:reload)
+	batch.map(&:reload) unless klass.name == BankAccount.class.name
 end
 
 def exec_statement(elements, validate_bulk=false, before_callbacks=false, after_callbacks=false, update=false)

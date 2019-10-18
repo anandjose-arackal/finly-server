@@ -45,7 +45,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     rnd = SecureRandom.hex(11)
     self.import_id = (company + "-" + date + "-" + rnd).freeze
     self.import_number = rand(100_000_000..999_999_999)
-    self.import_date = DateTime.now + 11.years
+    self.import_date = DateTime.now + rand(2..11).years
 
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
