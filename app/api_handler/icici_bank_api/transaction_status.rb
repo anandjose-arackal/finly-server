@@ -65,7 +65,6 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 404
 
       when 500
-        self.api_response_success = true
         self.transaction_status_response = self.parsed_response["STATUS"]
         case self.transaction_status_response&.upcase
         when "FAILURE"
@@ -74,7 +73,6 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
           # do nothing?
         end
       when 200
-        self.api_response_success = true
         self.transaction_status_response = self.parsed_response["STATUS"]
         case self.transaction_status_response&.upcase
           when "SUCCESS"
