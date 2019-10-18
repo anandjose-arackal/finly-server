@@ -27,7 +27,7 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
         :non_po_invoice_initiator, :non_po_invoice_reviewer,
         :non_po_invoice_auditor
     )
-    user_roles = user.role_mapping.pluck(:user_role_id)
+    user_roles = user.policy_user_roles.pluck(:user_role_id) + user.role_mapping.pluck(:user_role_id)
 
     unless (authorized_roles - user_roles).size < authorized_roles.size
       add_message :error, 'You are not authorized to perform this action'
