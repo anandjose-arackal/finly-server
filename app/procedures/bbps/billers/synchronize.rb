@@ -1,4 +1,4 @@
-class Bbps::Billers::Synchornize < Transactions::API
+class Bbps::Billers::Synchronize < Transactions::API
 
   skip_user_authorization!
 
