@@ -41,9 +41,9 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       id = payment_data[:payment_id]
       utr = payment_data[:utr]
       # payment = Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
-      payment = self.all_payments.find { |payment| payment if payment.id == id }
+      payment = self.all_payments.find { |payment| payment if payment.id.to_i == id.to_i }
       if payment.blank?
-        self.result_array[index] << "This payment already has an associated UTR"
+        self.result_array[index] << "This payment was not found."
         next
       end
       unless payment.completed?
