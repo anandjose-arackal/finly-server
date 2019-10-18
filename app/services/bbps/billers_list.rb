@@ -2,7 +2,7 @@ class Bbps::BillersList < Bbps::Api
 
   schema do
     params do
-      required(:category).filled
+      # required(:category).filled
     end
   end
 

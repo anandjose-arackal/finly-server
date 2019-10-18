@@ -15,7 +15,7 @@ module Transactions
         success: Dry::Matcher::Case.new(
             match: ->(result) {result.success?},
             resolve: ->(result) {result}),
-        invalid: Dry::Matcher::Case.new(
+        failure: Dry::Matcher::Case.new(
             match: ->(result) {result.failure?}, # && result["result.contract.default"] && result["result.contract.default"].failure?},
             resolve: ->(result) {result})
     )

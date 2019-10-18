@@ -31,7 +31,7 @@ class CreateBbpsBillers < ActiveRecord::Migration[5.2]
      t.string :support_pending_status
      t.string :biller_time_out
 
-      t.timestamps
+      t.timestamps index: true, null: false
     end
   end
 end

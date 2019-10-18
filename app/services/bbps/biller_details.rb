@@ -32,7 +32,7 @@ class Bbps::BillerDetails < Bbps::Api
   )
 
   def message_code
-    'B7000' # Todo - Correct code as per documentation is B8000 but B7000 is what is working on UAT
+    'B8000' # Todo - Correct code as per documentation is B8000 but B7000 is what is working on UAT
   end
 
   def biller_id

@@ -16,6 +16,7 @@ class Bbps::Api < ServiceApi
     class_attr :request_fields, default: []
     class_attr :response_fields, default: []
     class_attr :success_object
+    skip_user_authorization!
     http_method :post
     mime_type "application/json"
     url "https://uatsky.yesbank.in:444/app/uat/bbps"
@@ -31,7 +32,7 @@ class Bbps::Api < ServiceApi
         ),
         failure: Dry::Matcher::Case.new(
             match: -> (result) { true },
-            resolve: -> (result) { result['response.parsed'] }
+            resolve: -> (result) { result.errors }
         )
     )
   end
@@ -85,6 +86,9 @@ class Bbps::Api < ServiceApi
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
 
     splits = json["responseMsg"].split("|")
+    # Request failed
+    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+
     map = {}.with_indifferent_access
 
     # Map till channel id

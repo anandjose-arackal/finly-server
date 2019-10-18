@@ -5,9 +5,10 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Schema::DSL
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
+  include Dry::Monads[:result]
 
   # Dummy step to help define schema after operation has started
-  step ->(options) {true}, name: 'operations.start'
+  step ->(options) { true }, name: 'operations.start'
 
   # Step options: :before, :after, :replace, :delete, :override
 
@@ -21,8 +22,8 @@ class Transactions::API < Trailblazer::Operation
 
   def self.call(options = {}, *dependencies, &handlers)
     result = super(options, *dependencies)
-    if block_given? and matcher.present?
-      matcher.(result, &handlers)
+    if matcher.present?
+      matcher.(result, &handlers) if block_given?
     end
     result
   end
