@@ -572,7 +572,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 5.0.1)
-  activerecord-import
+  activerecord-import (~> 1.0, >= 1.0.3)
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)
   annotate (~> 2.7.5)
@@ -649,7 +649,7 @@ DEPENDENCIES
   omniauth (~> 1.9.0)
   omniauth-quickbooks (~> 0.0.2)
   paperclip (~> 6.1.0)
-  parallel
+  parallel (~> 1.18)
   paranoia (~> 2.4)
   parslet (~> 1.8.2)
   pry (~> 0.12.2)
@@ -687,7 +687,7 @@ DEPENDENCIES
   spring-commands-rspec (~> 1.0.4)
   spring-watcher-listen (~> 2.0.0)
   stackprof (~> 0.2.12)
-  string_pattern
+  string_pattern (~> 2.2, >= 2.2.1)
   test-unit (~> 3.2.9)
   uglifier (~> 4.1.20)
   web-console (~> 3.7.0)
