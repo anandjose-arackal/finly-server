@@ -13,11 +13,11 @@ class Bbps::Billers::Synchronize < Transactions::API
           ),
           partial_success: Dry::Matcher::Case.new(
               match: -> (result) { result.success? and options['billers.success'].present? and options['billers.failed'].present? },
-              resolve: -> (result) {}
+              resolve: -> (result) {result}
           ),
           failure: Dry::Matcher::Case.new(
               match: -> (result) { result.failure? or options['billers.success'].blank? },
-              resolve: -> (result) {}
+              resolve: -> (result) {result}
           ),
       )
   )
