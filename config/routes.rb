@@ -3289,6 +3289,7 @@ Rails.application.routes.draw do
 
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
+  get 'export/agreement_based_payment',to: 'export#agreement_based_payment'
 
   get 'agreements', to: 'agreements#index'
   get 'agreements/validate', to: 'agreements#validate'

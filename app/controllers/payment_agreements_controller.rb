@@ -126,10 +126,4 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
-  def export
-    @result = PaymentAgreements::Export::AsSpreadsheet.(current_user, params)
-    respond
-  end
-
-
 end
