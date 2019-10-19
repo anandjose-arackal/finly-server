@@ -39,26 +39,39 @@ class Bbps::BillerDetails < Bbps::Api
     params[:biller_id]
   end
 
-  def self.handle_success(result)
-    data = JSON.parse(result['response.parsed']['biller_details'])
-    format(data)
-  end
-
   # The JSON response has a pipe delimiter in the biller_details. Hence, handling it correctly
-  def parse_response(user, params, response)
+  def parse_json_response(json_key, user, params, response)
     return Failure("Invalid response") unless response.status == 200
     json = JSON.parse response.body
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
 
     splits = json["responseMsg"].split("|")
+    # Request failed
+    return Failure((splits[3] || 'Unable to fetch response')) if splits[1] == 'N'
+    return Failure('Biller not found') if splits[7].starts_with?('No Biller Found with ID')
+
     map = {}.with_indifferent_access
 
     # Map till channel id
     response_fields = fetch(:response_fields)
-    response_fields[0..6].each_with_index { |field, index| map[field] = splits[index] }
+    json_key_index = response_fields.find_index(json_key)
+    start_index = json_key_index
+    end_index = splits.size - (response_fields.size - json_key_index)
+    # 0 to json_key
+    response_fields.first(start_index).each_with_index { |field, index| map[field] = splits[index] }
 
-    map[:biller_details] = response_fields[7..response_fields.size-15].join("|")
+    # Json key
+    map[json_key] = splits[start_index..end_index].join("|")
+
+    # JSON Key to end
+    ending_splits = splits.last(end_index)
+    response_fields.last(response_fields.size - json_key_index - 1).each_with_index { |field, index| map[field] = ending_splits[index] }
     map
+  end
+
+  def self.handle_success(result)
+    data = JSON.parse(result['response.parsed']['biller_details'])
+    format(data)
   end
 
 end

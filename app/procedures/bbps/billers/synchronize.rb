@@ -9,7 +9,7 @@ class Bbps::Billers::Synchronize < Transactions::API
       Transactions::Matcher::DefaultCases.merge(
           success: Dry::Matcher::Case.new(
               match: -> (result) { result.success? and options['billers.success'].present? and options['billers.failed'].blank? },
-              resolve: -> (result) {}
+              resolve: -> (result) {result}
           ),
           partial_success: Dry::Matcher::Case.new(
               match: -> (result) { result.success? and options['billers.success'].present? and options['billers.failed'].present? },
@@ -40,7 +40,7 @@ class Bbps::Billers::Synchronize < Transactions::API
     options['billers.failed'] = []
 
     # Limit biller fetching to 100
-    billers = billers.first(5) unless Rails.env.production?
+    # billers = billers.first(5) unless Rails.env.production?
 
     billers.each do |biller_config|
       Bbps::BillerDetails.({biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
@@ -49,11 +49,13 @@ class Bbps::Billers::Synchronize < Transactions::API
           if error_message.blank?
             options['billers.success'] << biller_config['biller_id']
           else
+            deactivate(biller_config['biller_id'])
             options['billers.failed'] << biller_config.merge({errors: error_message})
           end
         end
 
         m.failure do |result|
+          deactivate(biller_config['biller_id'])
           options['billers.failed'] << biller_config.merge({errors: result})
         end
       end
@@ -66,6 +68,10 @@ class Bbps::Billers::Synchronize < Transactions::API
     return if biller.update(biller_details)
 
     biller.errors.full_messages.to_sentence
+  end
+
+  def deactivate(biller_id)
+    BbpsBiller.find_by(biller_id: biller_id)&.update status: 'DEACTIVATED'
   end
 
 end
