@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_17_035548) do
+ActiveRecord::Schema.define(version: 2019_10_20_065426) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -377,6 +377,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_035548) do
     t.boolean "is_deleted", default: false
     t.decimal "MYR", precision: 20, scale: 5
     t.datetime "deleted_at"
+    t.index ["created_at"], name: "index_amounts_on_created_at"
     t.index ["currency_id"], name: "index_amounts_on_currency_id"
     t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
   end
@@ -700,6 +701,39 @@ ActiveRecord::Schema.define(version: 2019_10_17_035548) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "bbps_biller_subscription_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_bbps_biller_subscription_statuses_on_name"
+  end
+
+  create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "bbps_biller_id", null: false
+    t.string "name", null: false
+    t.string "sequence_id", null: false
+    t.text "customer_params"
+    t.integer "department_id"
+    t.integer "cost_center_id"
+    t.integer "location_id"
+    t.integer "policy_id"
+    t.text "note"
+    t.integer "created_by_user_id"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id", null: false
+    t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
+    t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
+    t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
+    t.index ["created_by_user_id"], name: "index_bbps_biller_subscriptions_on_created_by_user_id"
+    t.index ["department_id"], name: "index_bbps_biller_subscriptions_on_department_id"
+    t.index ["location_id"], name: "index_bbps_biller_subscriptions_on_location_id"
+    t.index ["name"], name: "index_bbps_biller_subscriptions_on_name"
+    t.index ["policy_id"], name: "index_bbps_biller_subscriptions_on_policy_id"
+    t.index ["sequence_id"], name: "index_bbps_biller_subscriptions_on_sequence_id"
   end
 
   create_table "bbps_billers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -7792,6 +7826,7 @@ ActiveRecord::Schema.define(version: 2019_10_17_035548) do
   add_foreign_key "bank_accounts", "yes_bank_vendors"
   add_foreign_key "bank_payment_request_comments", "users"
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
+  add_foreign_key "bbps_biller_subscriptions", "bbps_billers"
   add_foreign_key "beneficiary_payments", "bank_accounts"
   add_foreign_key "beneficiary_payments", "categories"
   add_foreign_key "beneficiary_payments", "departments"

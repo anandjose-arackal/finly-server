@@ -45,8 +45,5 @@ class BbpsBiller < ApplicationRecord
   serialize :interchange_fee_conf, JSON
   serialize :interchange_fee, JSON
 
-  def active?
-    status&.downcase == 'active'
-  end
 
 end
