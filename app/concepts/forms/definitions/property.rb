@@ -177,3 +177,60 @@ class Forms::Definitions::Property < Forms::Definitions::Section
   end
 
 end
+
+
+# {
+#     "form_id": "123",
+#     "key": "subscription_id",
+#     "parent_id": "",
+#     "section": "",
+#     "label": "Subscription",
+#     "placeholder": "Enter subscription",
+#     "hint": "Subscription details",
+#     "field_type": "dropdown",
+#     "default_value": "Test default", // If dropdown/lookup -> set choice ID as the default value
+#     "editable": false,
+#     "required": true,
+#     "active": true,
+#     "unique": false,
+#     "visible": false,
+#     "position": 2,
+#     "custom_field": false,
+#     "dependent": false, // Dynamic
+#     "conditional_required": false, // Dynamic
+#     "required": ["policy_id"],
+#     "map_field_id": [{"type": "purchase_order_line_items", id: "12345"}], // When PR Line Item is converted to PO Line Item, how to map the data from PR Line Item to PO Line Item
+#     "attributes": {
+#         "char_limit": 1000,
+#         "regex": {
+#             "format": "^[-a-zA-Z0-9.'\u2019\u0026_%+]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,20}$",
+#             "message": "is_invalid"
+#         },
+#         "choices": [{
+#                         "id":9000006015, "value":"Gorilla man","position":1,"is_active":true,"disabled":false
+#                     }],
+#         "enum": {
+#             "provider": "DepartmentProvider",
+#             "chained": ["policy_id"],
+#             "filters": {}
+#         },
+#         "link": "/provider/agreements.json",
+#     },
+#     "options": {
+#         "can_editable_be_changed": true,
+#         "can_required_be_changed": true,
+#         "can_uniqueness_be_changed": true,
+#         "multiple": false,
+#         "can_label_be_renamed": true,
+#         "can_not_be_hidden": false,
+#         "can_be_filtered": true,
+#         "show_in_bulk_import": false,
+#         "allow_sort_in_filter": true,
+#         "min_items": 1,
+#         "max_items": 10,
+#         "max_fields_to_be_shown": 5,
+#         "allow_clearing_default_value": false,
+#         "add_item_label": "Add more accounts",
+#         "remove_item_label": "Remove account",
+#     }
+# }
