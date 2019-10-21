@@ -101,9 +101,19 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
 
   def create_record(data)
     messages, field_configuration_params =set_params(data)
-    custom_field = FieldConfiguration.new (field_configuration_params)
-    unless custom_field.save
-      result false, custom_fields.errors
+    custom_field = company.field_configurations.non_deleted.where(field_name: field_configuration_params[:field_name],
+                                                      field_type_id: field_configuration_params[:field_type_id],
+                                                      configurable_type: field_configuration_params[:configurable_type],
+                                                      configurable_id: field_configuration_params[:configurable_id]).first
+    unless custom_field.present?
+      custom_field = FieldConfiguration.new (field_configuration_params)
+      unless custom_field.save
+        result false, custom_fields.errors
+      else
+        if custom_field.field_type_id == 5
+          self.drop_down_items << {id: custom_field.id, field_name: custom_field.field_name}
+        end
+      end
     else
       if custom_field.field_type_id == 5
         self.drop_down_items << {id: custom_field.id, field_name: custom_field.field_name}
@@ -200,7 +210,7 @@ class Admin::Implementations::Master::CustomFields::Import < Admin::Implementati
         if ddi.present?
           field_configuration = ddi.dependent_field_configurations.where(field_name: field_name).first
         else
-          field_configuration = FieldConfiguration.find drop_down_items[drop_down_count][:id]
+          field_configuration = FieldConfiguration.non_deleted.find drop_down_items[drop_down_count][:id]
         end
         if field_configuration.present?
           unless field_configuration.drop_down_items.pluck(:name).include?(row[lower_limit])

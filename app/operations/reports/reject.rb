@@ -56,6 +56,16 @@ class Reports::Reject < Reports::Base
       add_message :error, 'Please provide a reason for rejection'
       return
     end
+
+
+    if params[:reject_to_user].present? && params[:reject_to_level].present?
+      reject_to_details = self.report.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
+      
+      # if rejection possible to requested level and the requested level has the same user details as sent by FE
+      if reject_to_details[params[:reject_to_level].to_i].blank? && (reject_to_details[params[:reject_to_level].to_i].try(:id) != params[:reject_to_user])
+        add_message :error, "User details not found for this level"
+      end
+    end
   end
 
   def process
@@ -99,7 +109,7 @@ class Reports::Reject < Reports::Base
       comment.save
     end
     # destroying the submitted amount field
-    report.submitted_amount&.destroy
+    report.submitted_amount&.destroy if params[:reject_to_user].blank? && params[:reject_to_level].blank?
 
     # Invalidate all existing Email Authorizations
     email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)

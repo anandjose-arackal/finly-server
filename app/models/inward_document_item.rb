@@ -19,9 +19,9 @@
 #  is_deleted               :boolean          default(FALSE), not null
 #  deleted_at               :datetime
 #  accepting_item_amount_id :integer
-#  billable_amount          :decimal(10, )
-#  order_amount             :decimal(10, )
-#  previously_billed_amount :decimal(10, )
+#  billable_amount          :decimal(20, 5)   default(0.0)
+#  order_amount             :decimal(20, 5)   default(0.0)
+#  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  product_type_id          :integer          default(1)
 #
 

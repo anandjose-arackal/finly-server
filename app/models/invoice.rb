@@ -197,7 +197,7 @@ class Invoice < ApplicationRecord
   delegate :paid_amount, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
-           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status, allow_nil: true
+           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
@@ -560,11 +560,11 @@ class Invoice < ApplicationRecord
       user = RequestStore.store[:current_user]
       configuration = user.company.feature_subscription.srn_enabled rescue false
       if self.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice) && configuration # if srn feature enabled for company, return sum of billable amount for services, amount for goods
-        return self.invoice_items.map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
+        return self.invoice_items.includes(:inventory_line_item, :amount).map {|p| if p.inventory_line_item&.product_type_id == ProductType.id_for(:service) then p.billable_amount&.value else p.amount&.value end }.compact.sum
       end
 
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value }.compact.sum
+      return self.invoice_items.includes(:amount).map {|p| p.amount&.value }.compact.sum
     else
       return 0
     end
