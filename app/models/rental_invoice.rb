@@ -205,6 +205,25 @@ class RentalInvoice < ApplicationRecord
   scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
   scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
 
+  scope :filter_policy_id, -> (policy_id) {
+    joins(:payment_agreement).where("payment_agreements.policy_id = ?", policy_id)
+  } 
+  scope :filter_vendor_id, -> (vendor_id) {
+    where(vendor_id: vendor_id)
+  }
+  scope :filter_due_date, -> (due_date) {
+    where(due_date: due_date&.to_date)
+  }
+  scope :filter_creation_date, -> (creation_date) {
+    where(created_at: creation_date.to_date.beginning_of_day..creation_date.to_date.end_of_day)
+  }
+  scope :filter_from_date, -> (start_date) {
+    where(start_date: start_date.to_date)
+  }
+  scope :filter_to_date, -> (end_date) {
+    where(end_date: end_date.to_date)
+  }
+
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
   # Choose what columns to clone out of these template columns
