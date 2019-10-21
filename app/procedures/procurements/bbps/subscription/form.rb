@@ -3,6 +3,16 @@ class Procurements::Bbps::Subscription::Form < Forms::API
   model BbpsBillerSubscription
   section :header do
     sequence :subscription_id, key: :bbps_biller_subscription
+    dropdown :department_id, label: 'Department', required: true, chained: :policy_id,
+             enum: {provider: DepartmentProvider}
+    dropdown :cost_center_id, label: 'CostCenter', required: true, chained: :policy_id,
+             enum: {provider: CostCenterProvider, chained: :policy_id}
+    dropdown :location_id, label: 'Location', required: true, chained: :policy_id,
+             enum: {provider: LocationProvider}
+    dropdown :policy_id, label: 'Policy', required: true,
+             enum: {provider: LocationProvider, filters: {}}
+    text :note, attributes: {char_limit: 1000}
+
 
     string :invoice_number, required: true
     date :date, required: true
