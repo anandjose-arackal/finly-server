@@ -308,7 +308,7 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.total_before_tax&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter((@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
