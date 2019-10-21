@@ -97,7 +97,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: self.payment_mode,
           amount_attributes: {
-              value: payment[:original_amount],
+              # value: payment[:original_amount],
+              value: beneficiary_payment&.balance_due&.value,
               currency_id: Currency.first.id
           },
           note: payment[:note],

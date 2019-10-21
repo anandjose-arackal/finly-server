@@ -38,7 +38,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       return
     end
 
-    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.possible_failure?
+    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.possible_failure? || self.icici_bank_transaction.suspect?
       add_message :error, "Only pending UTR and pending for processing cases can be checked for status"
       return
     end
@@ -65,9 +65,14 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 404
 
       when 500
-
+        self.transaction_status_response = self.parsed_response["STATUS"]
+        case self.transaction_status_response&.upcase
+        when "FAILURE"
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+        else
+          # do nothing?
+        end
       when 200
-        self.api_response_success = true
         self.transaction_status_response = self.parsed_response["STATUS"]
         case self.transaction_status_response&.upcase
           when "SUCCESS"
@@ -82,6 +87,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
           when "REJECTED", "RECALLED"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
           when "SUSPECT"
+            # this seems to be a temporary status which can then swing either way after a while. So adding this to the list of statuses that we shall regularly scan for statuses later
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
           when "PENDING"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))

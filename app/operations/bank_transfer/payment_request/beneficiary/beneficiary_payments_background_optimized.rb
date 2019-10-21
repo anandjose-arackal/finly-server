@@ -171,12 +171,15 @@ def setup_beneficiary_payment
 	BeneficiaryPayment.import beneficiary_details
 
 	# beneficiary_payments = BeneficiaryPayment.unscoped.where('import_id like ?', import_id).to_a
-	self.beneficiary_payments = BeneficiaryPayment.unscoped.where(created_at: import_date)
+	fetch_beneficiary_payments = BeneficiaryPayment.unscoped.where(created_at: import_date)
+
+	self.beneficiary_payments = BeneficiaryPayment.unscoped.where(id: fetch_beneficiary_payments.pluck(:id))
 
 	self.payments_attributes.each_with_index do |vd, ix| 
 		vd[:advance_amount] = (vd[:advance_amount].blank?) ? 0 : vd[:advance_amount]
 		beneficiary_payments[ix].original_amount = Amount.new(value: vd[:original_amount], currency_id: 1)
 		beneficiary_payments[ix].advance_amount = Amount.new(value: vd[:advance_amount], currency_id: 1)
+		beneficiary_payments[ix].created_at = DateTime.now
 	end
 
 	# 
@@ -224,7 +227,8 @@ def build_amounts
 		advance_amounts[index].value = order[:advance_amount] 
 		advance_amounts[index].created_at = DateTime.now
 		
-		payment_amounts[index].value = order[:original_amount] 
+		# payment_amounts[index].value = order[:original_amount]
+		payment_amounts[index].value = beneficiary_payments[index]&.balance_due&.value
 		payment_amounts[index].created_at = DateTime.now
 	end
 
@@ -272,12 +276,13 @@ def build_payments
 	self.payments = []
 	self.payments_attributes.each_with_index do |payment, index|
 		# payment[:bank_account] = self.bank_accounts[index]
-
+		bp = beneficiary_payments[index]
 		params = payment_params payment
 		params[:amount_id] = payment_amounts[index].id
+		# params[:amount_id] = bp.balance_due&.id
 		params[:invoice_id] = invoices[index].id
 		params[:created_at] = import_date
-		params[:beneficiary_payment_id] = beneficiary_payments[index].id
+		params[:beneficiary_payment_id] = bp.id
 		params[:parent_type] = 'BeneficiaryPayment'
     params[:parent_id] = params[:beneficiary_payment_id]
     params.delete(:custom_fields)
