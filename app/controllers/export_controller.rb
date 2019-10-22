@@ -107,16 +107,8 @@ class ExportController < BaseControllers::WebBase
   end
 
   def agreement_based_payment
-    payment_agreement_presenter = Export::PaymentAgreement::AsSpreadsheet.(current_user, params)
-    if payment_agreement_presenter.success?
-      @header = payment_agreement_presenter.headers
-      @data = payment_agreement_presenter.contents
-    end
-    # respond
-    # binding.pry
-    respond_to do |format|
-      format.xls
-    end
+    @result = Export::PaymentAgreement::AsXls.(current_user, params)
+    respond
   end
 
   def payment_file
