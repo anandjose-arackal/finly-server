@@ -95,7 +95,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   def update_record(data)
     lurm_params = set_params(data)
-    lurm = LevelUserReviewerMapping.find lurm_params[:id]
+    lurm = LevelUserReviewerMapping.find_by id: lurm_params[:id]
     unless lurm.present?
       return result  false, message: "Mapping not found"
     end
@@ -107,7 +107,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     end
 
     if lurm_params[:reviewer_email].present?
-      reviewer = get_reviewer(lurm_params[:reviewer_email], application)&.id
+      reviewer_email = clean_up_data lurm_params[:reviewer_email]
+      reviewer = get_reviewer(reviewer_email, application)&.id
       unless  reviewer.present?
         return result false, "Reviewer Not Found"
       end
