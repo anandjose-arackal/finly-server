@@ -58,7 +58,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     
     self.invoice.company_id = user.company.id
     
-    validate_custom_fields_invoice
+    # validate_custom_fields_invoice
     return if has_errors?
     
     if self.invoice.save
