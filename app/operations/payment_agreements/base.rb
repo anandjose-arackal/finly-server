@@ -512,7 +512,7 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def rental_invoice_start_end_date
-    dates = self.payment_agreement.general_invoices.pluck(:start_date, :end_date)
+    dates = self.payment_agreement.rental_invoices.pluck(:start_date, :end_date)
     validate_all_dates(dates)
     validate_invoice_frequency_for_ri
     validate_frequency_based_start_end_date('rental_invoice')
