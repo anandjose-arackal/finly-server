@@ -108,7 +108,7 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
       options[:company_id] = user.company_id
       if common_emails.include? list[:email]
         u = User.create options
-        UserCompanyGroupMapping.create(user: u, company: current_company, group: current_company.group)
+        UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group)
       else
         u = User.invite! options
       end
@@ -119,5 +119,3 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
     user.company.where(email: newly_created_users.pluck(:email))
   end
 end
-
-userswithgroupmapping

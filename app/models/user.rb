@@ -255,6 +255,9 @@ class User < ApplicationRecord
   has_many :document_message_receipts
   has_many :document_messages
 
+  has_many :users_with_group_mapping
+  has_many :group_companies, through: :users_with_group_mapping, foreign_key: :company_id
+  has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
