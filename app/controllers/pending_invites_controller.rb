@@ -131,7 +131,7 @@ class PendingInvitesController < BaseControllers::WebBase
     respond
   end
 
-  def configurataion_data
+  def configuration_data
     @result = UserOnboarding::ConfigurationData.(current_user, params)
     respond
   end

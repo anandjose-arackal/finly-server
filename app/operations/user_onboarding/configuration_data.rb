@@ -9,10 +9,10 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 
 		case RequestStore.store[:current_app]
     when 'vp', :vp
-			self.user_roles = UserRoles::VALUES_VP
+			self.user_roles = ::UserRole::VALUES_VP
 			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     when 'em', :em
-			self.user_roles = UserRoles::VALUES_EM
+			self.user_roles = ::UserRole::VALUES_EM
 			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     end
     	
