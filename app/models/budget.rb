@@ -36,6 +36,10 @@ class Budget < ApplicationRecord
   belongs_to :budget_amount, optional: true, class_name: "Amount"
   belongs_to :spent_amount, optional: true, class_name: "Amount"
 
+
+  # Above details like period, name, budget amount etc. will be held in the budget itself for now
+  # the below will now be moved to the Budget Group which will house the details of the criteria
+  ###################### DEPRECATED #########################
   has_many :budget_criteria_mappings
   has_many :budgetables, through: :budget_criteria_mappings
   has_many :budgetable_vendors, through: :budget_criteria_mappings, source: :budgetable, source_type: 'YesBankVendor'
@@ -44,6 +48,7 @@ class Budget < ApplicationRecord
   has_many :budgetable_locations, through: :budget_criteria_mappings, source: :budgetable, source_type: 'BranchLocation'
   has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
   has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
+  ###################### DEPRECATED #########################
 
   has_many :budget_modification_trails
 
@@ -53,6 +58,7 @@ class Budget < ApplicationRecord
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
+  validates :period, presence: true
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
