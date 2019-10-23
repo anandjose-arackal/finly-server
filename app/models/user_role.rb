@@ -117,7 +117,13 @@ class UserRole < ApplicationRecord
       vendor_auditor: 32,
       payment_agreement_initiator: 33,
       payment_agreement_reviewer: 34,
-      payment_agreement_auditor: 35
+      payment_agreement_auditor: 35,
+      po_invoice_initiator: 36,
+      po_invoice_reviewer: 37,
+      po_invoice_auditor: 38, 
+      non_po_invoice_initiator: 39,
+      non_po_invoice_reviewer: 40,
+      non_po_invoice_auditor: 41
   }
 
 
