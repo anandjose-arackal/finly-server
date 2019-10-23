@@ -20,6 +20,7 @@ json.results do
       json.controlling_user controlling_user
       json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at&.strftime("%d-%m-%Y")
+      json.created_by invoice.created_by&.name
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
       json.advance invoice.advance
