@@ -110,15 +110,15 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
   end
 
   def expense_management(user)
-    user.user_panel_subscription.expense_management? ? 'Y' : ''
+    user.user_panel_subscription&.expense_management? ? 'Y' : '' rescue  ''
   end
 
   def disburse(user)
-    user.user_panel_subscription.disburse? ? 'Y' : ''
+    user.user_panel_subscription&.disburse? ? 'Y' : ''
   end
 
   def vendor_payments(user)
-    user.user_panel_subscription.yes_bank_account_transfer? ? 'Y' : ''
+    user.user_panel_subscription&.yes_bank_account_transfer? ? 'Y' : ''
   end
 
   def enforce_policy(user)

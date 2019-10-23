@@ -56,7 +56,7 @@ class RateContract < ApplicationRecord
       rate_contract_number: rate_contract_number,
       name: name, 
       vendor_id: vendor_id,
-      vendor_name: vendor&.name,
+      vendor_name: vendor&.display_name,
       renewal_alert_number: renewal_alert_number,
       renewal_alert_period_id: renewal_alert_period_id,
       creator_id: creator_id,

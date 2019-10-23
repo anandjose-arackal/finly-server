@@ -97,7 +97,7 @@ json.balance_due do
 end
 
 json.items do
-  json.array! @result.purchase_order.items do |item|
+  json.array! @result.purchase_order_items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
@@ -161,7 +161,7 @@ end
 # end
 
 json.attachments do
-  json.array! @result.purchase_order.attachments do |attachment|
+  json.array! @result.purchase_order.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"

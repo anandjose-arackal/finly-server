@@ -44,6 +44,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     end
 
     event :reject do
+      transitions :from => :processing, :to => :processing, guard: :reject_to_level?
       transitions :from => :processing, :to => :rejected, guard: :user_can_review?
     end
 

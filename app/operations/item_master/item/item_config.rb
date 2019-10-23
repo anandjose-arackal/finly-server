@@ -3,7 +3,7 @@ class ItemMaster::Item::ItemConfig < ItemMaster::Item::Base
   attr_accessor :categories, :tax_rates, :supply_item_types, :field_configurations
 
   def init
-    self.categories = user.company.categories.inward_invoice_line_items_only
+    self.categories = user.company.categories.inward_invoice_line_items_only.active
     self.tax_rates = user.company.tax_rates
     self.supply_item_types = SupplyItemType.all
     self.field_configurations = user.company.field_configurations.with_parent_type(FieldParentType.id_for(:item))
