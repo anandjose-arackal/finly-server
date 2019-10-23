@@ -12,7 +12,8 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
                       :bulk_reject_po,
                       :bulk_approve_forward_po,
                       :export_csv,
-                      :export_xls
+                      :export_xls,
+                      :bulk_actions
                     ]
 
 
@@ -50,6 +51,10 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
 
   def bulk_approve_forward_po
     user.vendor_payment_admin? || user.is_purchase_order_reviewer?
+  end
+
+  def bulk_actions
+    true
   end
 
   def export_csv
