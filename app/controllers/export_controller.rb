@@ -106,6 +106,11 @@ class ExportController < BaseControllers::WebBase
     end
   end
 
+  def agreement_based_payment
+    @result = Export::PaymentAgreement::AsXls.(current_user, params)
+    respond
+  end
+
   def payment_file
 
   end

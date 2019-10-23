@@ -159,6 +159,7 @@ class Settlement::SReport::Processing::BulkValidateFileData < Settlement::SRepor
       "Report Requested By User(unmodifiable)",
       "Purpose of Report(unmodifiable)",
       "Total Report Amount(unmodifiable)",
+      "Total Reimbursable Amount(unmodifiable)", 
       "UTR",
       "Source Account",
       "Mark As Paid(Y or N; leave blank to skip)"
