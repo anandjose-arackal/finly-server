@@ -1,23 +1,41 @@
 class PolicyUserRoles::BulkUsersForImport < PolicyUserRoles::Base
-  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails
+  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails
 
+
+  def pre_validate
+    if params[:bulk_assign].blank?
+      add_message :error, "No data was sent for processing."
+      return
+    end
+
+    if params[:bulk_assign][:user_ids].blank? and params[:bulk_assign][:user_emails].blank?
+      add_message(:error, "No Users selected.")
+      return
+    end
+
+  end
 
   def init
+
+    self.input_email = bulk_assign[:user_emails]
+    # used after invitation
+    # when updating policy with user roles
+    # 
     if bulk_assign[:user_ids]
       self.users = user.company.users.with_id(bulk_assign[:user_ids])
+
+    # used for invitation
+    # 
     elsif bulk_assign[:user_emails]
-      if feature_subscription.group_entity
+      if user.company.feature_subscription.group_entity_structure
         gc = current_company.group
-        self.users = gc.companies.without(current_company).joins(:users).
-                                                                        select('
-                                                                          companies.*,
-                                                                          users.email
-                                                                        ').
-                                                                        where(email: bulk_assign[:email])
+        # prevent sql injection
+        self.users = gc.companies.without(current_company).joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue Company.none
       else
         self.users = user.company.users.with_email(bulk_assign[:user_emails])
-        self.input_emails = bulk_assign[:user_emails]
       end
+
+      self.input_emails = bulk_assign[:user_emails]
     end
 
   end
@@ -32,7 +50,7 @@ class PolicyUserRoles::BulkUsersForImport < PolicyUserRoles::Base
   end
 
   def process
-    
+    return false if self.users.blank?
   end
 
   def success
@@ -54,35 +72,49 @@ class PolicyUserRoles::BulkUsersForImport < PolicyUserRoles::Base
     user_list = []
     company_id = user.company_id
     self.users.each do |user|
-      user.company_id = company_id
-      user_list << user.dup  
+      user.default_company_id = company_id
+      user_list << user.attributes.with_indifferent_access
     end
 
-    user_list.update_all company_id: user.company_id
+    user_list
   end
 
   def new_users
     user_list = []
 
     self.new_emails.each do |email|
-      user_list << user.new(email: email)
+      user_list << {email: email}
     end
     user_list
   end
 
   def process_users
     self.common_emails = self.input_emails & self.users.pluck(:email)
-    self.new_emails = self.input_emails - self.users.pluck(:email)
+    self.new_emails = self.input_emails - user.company.users.pluck(:email)
+
+
+    return if self.new_mails.blank? and self.common_emails.blank?
 
     user_list = []
-    if current_company.feature_subscription.group_entity
+    if current_company.feature_subscription.group_entity_structure
       user_list = common_users + new_users
     else
       user_list = new_users
     end
 
-    User.import user_list
+    newly_created_users = []
+    user_list.each do |list|
+      options = list
+      options[:company_id] = user.company_id
+      if common_emails.include? list[:email]
+        u = User.create options
+      else
+        u = User.invite! options
+      end
 
-    User.where(email: self.common_emails)
+      newly_created_users << u
+    end
+
+    user.company.where(email: newly_created_users.pluck(:email))
   end
 end

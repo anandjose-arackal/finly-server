@@ -20,7 +20,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
       return
     end
 
-    if params[:bulk_assign][:user_ids].blank?
+    if params[:bulk_assign][:user_ids].blank? and params[:bulk_assign][:user_emails].blank?
       add_message(:error, "No Users selected.")
       return
     end
@@ -123,7 +123,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
   end
 
   class PolicyUserRoles::BulkAssign::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
-    attr_accessor :self.unassignable_roles
+    attr_accessor :unassignable_roles
 
     def init
       self.unassignable_roles = params[:unassignable_roles]

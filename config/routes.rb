@@ -3841,6 +3841,9 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+  post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
+  post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.
