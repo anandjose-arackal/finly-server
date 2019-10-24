@@ -41,6 +41,7 @@ json.results do
       cost_center = po&.cost_center || invoice&.cost_center
       json.department department&.full_name
       json.cost_center cost_center&.name
+      json.gstin po&.gstin_location&.gstin
     end
 
     json.documents do
