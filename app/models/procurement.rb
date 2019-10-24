@@ -409,6 +409,10 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_pr_number, -> (pr_number){
+    
+  }
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return

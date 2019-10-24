@@ -173,6 +173,13 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :filter_pr_creator_id, -> (creator_id){
+    where(creator_id: creator_id)
+  }
+
+  scope :filter_pr_approver_id, -> (approver_id){
+  }
+
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
   #   if type && ['ASC', 'DESC'].include?(type)
