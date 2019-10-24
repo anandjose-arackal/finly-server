@@ -69,7 +69,10 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
   	document_list.each do |list|
 			h = {}
 			h[:document_name] = list
-			h[:document_roles] = self.user_roles.keys.map(&:to_s).select {|ur| ur.include? list}
+			# h[:document_roles] = self.user_roles.keys.map(&:to_s).select {|ur| ur.include? list}
+			ss = []
+			user_roles.each {|k, v| if k.to_s.include?(list) then next if k.to_s == 'policy_admin';hh = {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh; end;}
+			h[:document_roles] = ss
 
 			next if h[:document_roles].blank?
 
