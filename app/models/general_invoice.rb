@@ -96,6 +96,9 @@
 #  prepaid                               :boolean
 #  fixed_periodic_template               :boolean
 #  escalation_percentage                 :float(24)
+#  override_invoice_id                   :string(255)
+#  total_invoice_amount_id               :integer
+#  available_invoice_amount_id           :integer
 #
 
   # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
@@ -143,10 +146,12 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'GeneralInvoice'
+  belongs_to :total_invoice_amount, optional: true, class_name: 'Amount'
+  belongs_to :available_invoice_amount, optional: true, class_name: 'Amount'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :invoices, as: :agreement_item
@@ -168,17 +173,17 @@ class GeneralInvoice < ApplicationRecord
   alias_attribute :status, :invoice_status
 
 
-  accepts_nested_attributes_for :address
-  accepts_nested_attributes_for :amount
-  accepts_nested_attributes_for :gross_amount
-  accepts_nested_attributes_for :net_amount
-  accepts_nested_attributes_for :discount_amount
-  accepts_nested_attributes_for :tds_amount
-  accepts_nested_attributes_for :tax_amount
-  accepts_nested_attributes_for :original_amount
-  accepts_nested_attributes_for :freight_amount
-  accepts_nested_attributes_for :advance_amount
-  accepts_nested_attributes_for :balance_due
+  accepts_nested_attributes_for :address, :amount, :gross_amount, :net_amount, :discount_amount, :tds_amount, :tax_amount, :original_amount, :freight_amount, :advance_amount, :balance_due, :total_invoice_amount
+  # accepts_nested_attributes_for :amount
+  # accepts_nested_attributes_for :gross_amount
+  # accepts_nested_attributes_for :net_amount
+  # accepts_nested_attributes_for :discount_amount
+  # accepts_nested_attributes_for :tds_amount
+  # accepts_nested_attributes_for :tax_amount
+  # accepts_nested_attributes_for :original_amount
+  # accepts_nested_attributes_for :freight_amount
+  # accepts_nested_attributes_for :advance_amount
+  # accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
   accepts_nested_attributes_for :invoice_frequency
@@ -208,6 +213,27 @@ class GeneralInvoice < ApplicationRecord
   scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
   scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
   scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
+
+
+  scope :filter_policy_id, -> (policy_id) {
+    joins(:payment_agreement).where("payment_agreements.policy_id = ?", policy_id)
+  } 
+  scope :filter_vendor_id, -> (vendor_id) {
+    where(vendor_id: vendor_id)
+  }
+  scope :filter_due_date, -> (due_date) {
+    where(due_date: due_date&.to_date)
+  }
+  scope :filter_creation_date, -> (creation_date) {
+    where(created_at: creation_date.to_date.beginning_of_day..creation_date.to_date.end_of_day)
+  }
+  scope :filter_from_date, -> (start_date) {
+    where(start_date: start_date.to_date)
+  }
+  scope :filter_to_date, -> (end_date) {
+    where(end_date: end_date.to_date)
+  }
+
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
   # Choose what columns to clone out of these template columns
@@ -312,14 +338,17 @@ class GeneralInvoice < ApplicationRecord
       custom_fields: self.custom_fields,
       already_exists: true,
       prepaid: self.prepaid,
-      escalation_percentage: self.escalation_percentage
+      escalation_percentage: self.escalation_percentage,
+      total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
+      available_invoice_amount: get_available_invoice_amount,
+      invoice_number: self.get_invoice_number
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -338,7 +367,8 @@ class GeneralInvoice < ApplicationRecord
     }
   end
 
-  def invoice_no_or_id
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
   # Quickfix as frontend was failing
@@ -355,6 +385,18 @@ class GeneralInvoice < ApplicationRecord
       [nil]
     else
       [true, false]
+    end
+  end
+
+  def get_total_invoice_amount
+    if self.total_invoice_amount&.value.present?
+      precision_value(self.total_invoice_amount&.value)
+    end
+  end
+
+  def get_available_invoice_amount
+    if self.available_invoice_amount&.value.present?
+      precision_value(self.available_invoice_amount&.value)
     end
   end
 

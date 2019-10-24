@@ -14,8 +14,14 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       add_message :error, 'Procurement not found'
       return
     end
+
     if payment_agreement.blank?
       add_message :error, "Agreement does not exist"
+      return
+    end
+
+    if payment_agreement.status.terminated?
+      add_message :error, "Unable to create invoice as agreement has been terminated"
       return
     end
   end
@@ -23,10 +29,8 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def process
     case payment_agreement_type
     when 'general_invoice'
-      # self.general_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
       self.general_invoice = user.company.general_invoices.find_by_id payment_agreement_type_id
     when 'rental_invoice'
-      # self.rental_invoice = user.company.inward_invoices.find_by_id payment_agreement_type_id
       self.rental_invoice = user.company.rental_invoices.find_by_id payment_agreement_type_id
     end
 
@@ -62,25 +66,6 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       new_invoice = apply_rental_invoice_template(resource)
       trail_action = 'rental_invoice_created'
     end
-
-    # setup_initial_invoice_fields(resource)
-
-    # Resource can be general_invoice or rental_invoice
-    # case
-    # when resource.is_a?(Invoice)
-    # new_invoice = resource.amoeba_dup
-    # new_invoice.invoice_id = nil
-    # if new_invoice.save
-
-
-    #   # Temporary fix for demo as it started happening now. Somehow amoeba is showing correct no. of objects but on saving doubles the no. of records
-    #   items = new_invoice.items.group(:description).having('count("description") > 1').count(:description)
-    #   items.each do |key, value|
-    #     duplicates = new_invoice.items.where(description: key)[1..value-1]
-    #     duplicates.each(&:destroy)
-    #   end
-
-    #   ######## Temp fix for demo only ########
 
     if resource.billing_type.fixed_periodic? || resource.billing_type.one_time?
       set_upcoming_invoice_status(resource, false)
@@ -126,6 +111,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
         add_message :error, "Unable to create general invoice"
         return
       end
+      attach_agreement_item(invoice, 'general_invoice')
     end
     return invoice
   end
@@ -150,6 +136,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
         return
       end
     end
+    attach_agreement_item(invoice, 'rental_invoice')
     return invoice
   end
 
@@ -283,6 +270,16 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
   def update_due_date(actual_invoice, agreement_invoice)
     if agreement_invoice.billing_type.variable_periodic?
       actual_invoice.due_date = Date.today + agreement_invoice.payment_term.days_after
+    end
+  end
+
+  # Attach agreement item to invoice
+  def attach_agreement_item(new_invoice, invoice_type)
+    if new_invoice.present?
+      new_invoice.payment_agreement_id = self.payment_agreement.id
+      new_invoice.agreement_item_type = invoice_type.camelize
+      new_invoice.agreement_item_id = payment_agreement_type_id
+      new_invoice.save
     end
   end
 

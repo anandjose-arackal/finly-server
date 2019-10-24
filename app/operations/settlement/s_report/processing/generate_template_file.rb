@@ -69,7 +69,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       item.processor_accountable&.account_number,
       item.user&.name,
       item.note,
-      item.amount&.value,
+      item.reports.find_by(id: item.report_id).total_amount,
+      item.reports.find_by(id: item.report_id).total_amount([:reimbursable]),
       item.report_bank_reference_number,
       item.report_source_account,
       marked_as_completed,
@@ -87,6 +88,7 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
       "Report Requested By User(unmodifiable)", 
       "Purpose of Report(unmodifiable)", 
       "Total Report Amount(unmodifiable)", 
+      "Total Reimbursable Amount(unmodifiable)", 
       "UTR",
       "Source Account",
       "Mark As Paid(Y or N)"

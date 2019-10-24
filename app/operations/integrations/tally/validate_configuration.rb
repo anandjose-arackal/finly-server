@@ -1,4 +1,4 @@
-class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
+class Integrations::Tally::ValidateConfiguration < Integrations::Tally::Base
   attr_accessor :is_configured
 
   def authorized_user_types
@@ -14,7 +14,15 @@ class Integrations::Tally::ValidateConfiguration <  Integrations::Tally::Base
 
   def init
     tally_configuration = user.company.tally_configuration
-    self.is_configured = tally_configuration&.company_name.present? && (user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin)))
+    authorized_roles = UserRole.ids_for(
+        :admin, :finance_manager, :non_po_initiator, :invoice_auditor,
+        :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+        :non_po_invoice_initiator, :non_po_invoice_reviewer,
+        :non_po_invoice_auditor
+    )
+    user_roles = user.policy_user_roles.pluck(:user_role_id) + user.role_mapping.pluck(:user_role_id)
+    self.is_configured = tally_configuration&.company_name.present? &&
+        ((authorized_roles - user_roles).size < authorized_roles.size)
   end
 
   def success

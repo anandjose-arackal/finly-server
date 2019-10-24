@@ -99,6 +99,7 @@
 #  prepaid                               :boolean
 #  fixed_periodic_template               :boolean
 #  escalation_percentage                 :float(24)
+#  override_invoice_id                   :string(255)
 #
 
 class RentalInvoice < ApplicationRecord
@@ -145,7 +146,7 @@ class RentalInvoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :invoices, as: :agreement_item
@@ -203,6 +204,25 @@ class RentalInvoice < ApplicationRecord
   scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
   scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
   scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
+
+  scope :filter_policy_id, -> (policy_id) {
+    joins(:payment_agreement).where("payment_agreements.policy_id = ?", policy_id)
+  } 
+  scope :filter_vendor_id, -> (vendor_id) {
+    where(vendor_id: vendor_id)
+  }
+  scope :filter_due_date, -> (due_date) {
+    where(due_date: due_date&.to_date)
+  }
+  scope :filter_creation_date, -> (creation_date) {
+    where(created_at: creation_date.to_date.beginning_of_day..creation_date.to_date.end_of_day)
+  }
+  scope :filter_from_date, -> (start_date) {
+    where(start_date: start_date.to_date)
+  }
+  scope :filter_to_date, -> (end_date) {
+    where(end_date: end_date.to_date)
+  }
 
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
@@ -283,15 +303,15 @@ class RentalInvoice < ApplicationRecord
       square_feet: self.square_feet,
       already_exists: true,
       prepaid: self.prepaid,
-      escalation_percentage: self.escalation_percentage
-
+      escalation_percentage: self.escalation_percentage,
+      invoice_number: self.get_invoice_number
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -316,6 +336,10 @@ class RentalInvoice < ApplicationRecord
     else
       {id: nil, number: nil, period_id: nil }
     end
+  end
+
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
 
