@@ -7,8 +7,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index < Ac
                       :bulk_control,
                       :bulk_reject,
                       :bulk_forward_approval,
-                      :export_xls,
-                      :export_csv,
+                      :export_as_xls,
+                      :export_as_csv,
                       :bulk_actions
 
                     ]
