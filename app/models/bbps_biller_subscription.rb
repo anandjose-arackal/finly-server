@@ -41,11 +41,11 @@ class BbpsBillerSubscription < ApplicationRecord
   
   acts_as_sequenced column: :subscription_id, purpose: :bbps_biller_subscription, editable: true, prefix: 'UTLTY/', min_length: 4
 
-  form Procurements::Bbps::Subscription::Form
-  policy Documents::Bbps::Subscription::Policy
-  state_machine Documents::Bbps::Subscription::StateMachine
-  resolver Documents::Bbps::Subscription::Policy::Scope
-  event_channel 'bbps.biller.subscription'
-  record_events 'submit', 'approve', 'show'
-  collection_events 'index'
+  # form Procurements::Bbps::Subscription::Form
+  # policy Documents::Bbps::Subscription::Policy
+  # state_machine Documents::Bbps::Subscription::StateMachine
+  # resolver Documents::Bbps::Subscription::Policy::Scope
+  # event_channel 'bbps.biller.subscription'
+  # record_events 'submit', 'approve', 'show'
+  # collection_events 'index'
 end
