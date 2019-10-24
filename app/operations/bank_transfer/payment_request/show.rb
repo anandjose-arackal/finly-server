@@ -91,8 +91,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
       self.invoice_custom_fields = invoice_custom_field_configurations
       self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
-      self.invoice_categories = self.user.company.categories.vendor_payments_only
-      self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only
+      self.invoice_categories = self.user.company.categories.vendor_payments_only.active
+      self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only.active
 
       op = BudgetsCalculator::RelevantBudgets.(user, object: self.bank_payment_request)
       if op.success?

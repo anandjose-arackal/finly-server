@@ -50,7 +50,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
   def init
 
     self.file = params[:file]
-    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :utr, :source_account, :mark_as_paid, :msg]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :report_requested_by_user, :purpose_of_report, :total_report_amount, :total_reimbursable_amount, :utr, :source_account, :mark_as_paid, :msg]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
@@ -137,7 +137,7 @@ class Settlement::SReport::Processing::ProcessTemplateFile < Settlement::SReport
 
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
-      result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
+      result = Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {update_documents: true, marked_as_completed: false, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
       unless result.success?
         self.just_show_excel = false
         add_message :error, result.messages[:error]

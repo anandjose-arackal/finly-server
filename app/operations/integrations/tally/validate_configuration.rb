@@ -20,7 +20,7 @@ class Integrations::Tally::ValidateConfiguration < Integrations::Tally::Base
         :non_po_invoice_initiator, :non_po_invoice_reviewer,
         :non_po_invoice_auditor
     )
-    user_roles = user.role_mapping.pluck(:user_role_id)
+    user_roles = user.policy_user_roles.pluck(:user_role_id) + user.role_mapping.pluck(:user_role_id)
     self.is_configured = tally_configuration&.company_name.present? &&
         ((authorized_roles - user_roles).size < authorized_roles.size)
   end
