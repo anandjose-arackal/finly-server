@@ -1,4 +1,5 @@
 class Vendors::BulkApproveProcessor < BackgroundOperation
+
   attr_accessor :vendor_ids, :result
 
   def init
