@@ -8,7 +8,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index < Ac
                       :bulk_reject,
                       :bulk_forward_approval,
                       :export_xls,
-                      :export_csv
+                      :export_csv,
+                      :bulk_actions
 
                     ]
 
@@ -40,6 +41,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index < Ac
     true
   end
 
+  def bulk_actions
+    true
+  end
 
   
 end

@@ -41,7 +41,8 @@ class ActionsManager::Master::Base
     rental_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment',
     general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment',
     non_po_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index',
-    po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index'
+    po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
+    agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index'
 
   }.with_indifferent_access
 

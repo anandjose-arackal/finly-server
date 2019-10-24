@@ -126,6 +126,7 @@ json.results do
           json.id invoice.vendor&.id
           json.gst invoice.vendor&.gst
           json.pan invoice.vendor&.pan
+          json.trade_name invoice&.vendor&.trade_name
 
           json.selected_bank_account do
             json.account_number invoice.receiving_account&.account_number
