@@ -33,11 +33,11 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index < Ac
     user.vendor_payment_admin? || user.is_po_invoice_reviewer?
   end
 
-  def export_xls
+  def export_as_xls
     true
   end
 
-  def export_csv
+  def export_as_csv
     true
   end
 
