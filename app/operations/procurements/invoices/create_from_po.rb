@@ -58,7 +58,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     
     self.invoice.company_id = user.company.id
     
-    # validate_custom_fields_invoice
+    validate_custom_fields_invoice
     return if has_errors?
     
     if self.invoice.save
@@ -194,11 +194,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(self.invoice)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return
-    end
+    # valid = CustomField::Validate.(self.invoice)
+    # unless valid.success?
+    #   add_message :error, valid.messages[:error]
+    #   return
+    # end
   end
 
   def set_custom_fields_invoice(invoice, data, save)
