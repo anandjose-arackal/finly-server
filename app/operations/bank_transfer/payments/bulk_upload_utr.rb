@@ -28,7 +28,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def pre_process
     payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order)).pluck(:id)
-    self.all_payments = Payment.with_payment_order_id(payment_order_ids)
+    self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
   end
 
   def process
