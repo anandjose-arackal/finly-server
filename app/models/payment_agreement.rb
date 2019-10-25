@@ -370,7 +370,7 @@ class PaymentAgreement < ApplicationRecord
   def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
       # Payment agreement cannot be created for past months
-      validate_current_month
+      # validate_current_month
       if self.agreement_date > self.execution_date
         errors.add(:agreement_date, 'cannot be greater than execution date')
       end
