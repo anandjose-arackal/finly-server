@@ -3847,6 +3847,13 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+
+  # Utility Bill Payments / BBPS Start #
+  namespace :bbps do
+    resources :subscriptions
+  end
+  # Utility Bill Payments / BBPS Ends  #
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.
