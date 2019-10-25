@@ -23,6 +23,9 @@ class FieldDropDownItem < ApplicationRecord
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
 
+  has_many :user_drop_down_item_mappings
+  has_many :affected_users, through: :user_drop_down_item_mappings, source: :user
+
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }

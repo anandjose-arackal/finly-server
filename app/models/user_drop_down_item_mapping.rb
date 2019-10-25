@@ -1,0 +1,18 @@
+# == Schema Information
+#
+# Table name: user_drop_down_item_mappings
+#
+#  id                :bigint           not null, primary key
+#  user_id           :integer
+#  drop_down_item_id :integer
+#  deleted_at        :datetime
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
+class UserDropDownItemMapping < ApplicationRecord
+  include SoftDeletable
+
+  belongs_to :user
+  belongs_to :drop_down_item, class_name: "FieldDropDownItem"
+end

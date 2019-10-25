@@ -54,7 +54,7 @@ class FieldConfiguration < ApplicationRecord
 
   # adding associations with the related users as well
   has_many :user_field_mappings
-  has_many :affected_users, through: :user_field_mappings, source: :field_configuration, source_type: "FieldConfiguration"
+  has_many :affected_users, through: :user_field_mappings, source: :user
 
   validates :field_name, presence: true
   validates :enabled, presence: true
