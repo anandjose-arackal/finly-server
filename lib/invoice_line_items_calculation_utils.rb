@@ -168,6 +168,9 @@ class InvoiceLineItemsCalculationUtils
     if item.tax.blank?
       self.net_amount = self.gross_amount
       self.tax_amount = 0
+      item.igst = 0
+      item.cgst = 0
+      item.sgst = 0
       return
     end
     if item.parent.class.name == 'OutwardInvoice'
@@ -176,7 +179,6 @@ class InvoiceLineItemsCalculationUtils
       self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
     end
     self.tax_amount = self.net_amount - self.gross_amount
-
     # setting the SGST, CGST and IGST values for the invoice
     case item.parent.gst_type_id
       when GstType.id_for(:cgst_sgst)
@@ -198,6 +200,9 @@ class InvoiceLineItemsCalculationUtils
     if item.tax.blank?
       self.gross_amount = self.after_discount_amount
       self.tax_amount = 0
+      item.igst = 0
+      item.cgst = 0
+      item.sgst = 0
       return
     end
     if item.parent.class.name == 'OutwardInvoice'
@@ -206,7 +211,6 @@ class InvoiceLineItemsCalculationUtils
       self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
     end
     self.tax_amount = self.after_discount_amount - self.gross_amount
-
     # setting the SGST, CGST and IGST values for the invoice
     case item.parent.gst_type_id
       when GstType.id_for(:cgst_sgst)

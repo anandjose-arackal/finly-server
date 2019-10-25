@@ -8,18 +8,18 @@ class BankTransfer::Payments::AllPayments < BankTransfer::Payments::Base
   end
 
   def process
-    if user.vendor_payments_admin?
-      # all payments within a company - through the admin
-      company_not_open = user.company.payment_orders.not_open.pluck(:id)
-      personal_orders = user.payment_orders.pluck(:id)
-      self.payment_orders = PaymentOrder.with_id(company_not_open + personal_orders)
-    else
-      # only payments initiated by this particular user
-      self.payment_orders = user.payment_orders
-    end
+    # if user.vendor_payments_admin?
+    #   # all payments within a company - through the admin
+    #   company_not_open = user.company.payment_orders.not_open.pluck(:id)
+    #   personal_orders = user.payment_orders.pluck(:id)
+    #   self.payment_orders = PaymentOrder.with_id(company_not_open + personal_orders)
+    # else
+    #   # only payments initiated by this particular user
+    #   self.payment_orders = user.payment_orders
+    # end
 
-    self.payment_order_ids = self.payment_orders.pluck(:id)
-    self.payments = Payment.with_payment_order_id(payment_order_ids)
+    #self.payment_order_ids = self.payment_orders.pluck(:id)
+    self.payments = Payment.where(company_id: user.company_id, api_initiated: true)
   end
 
   def success

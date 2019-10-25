@@ -5,13 +5,14 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
 
   # :first_reference_invoice is the reference invoice for creating first fixed_periodic invoice template
   # :new_upcoming_invoice => Upcoming invoice that  act as a template for the new actual invoice
-  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoice, :first_reference_invoice, :invoice_type, :vendor_id, :escalated_reference_invoice
+  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoice, :first_reference_invoice, :invoice_type, :vendor_id, :escalated_reference_invoice, :first_start_date, :effective_end_date
 
   def init
     payment_agreement_id = params[:payment_agreement_id]
     self.payment_agreement = user.company.payment_agreements.find_by_id payment_agreement_id
     self.first_reference_invoice = params[:first_reference_invoice] || false
-    self.invoice_type = params[:first_reference_invoice_type] 
+    self.invoice_type = params[:first_reference_invoice_type]
+    self.first_start_date = params[:first_start_date]
     # previous_upcoming_invoice is not required for first invoice
     # previous_upcoming_invoice is previous invoice template
     unless first_reference_invoice.present?
@@ -83,6 +84,10 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     #First invoice ends at end of month of the invoice frequency period
     if first_reference_invoice
       create_first_upcoming_invoice('general_invoice', first_reference_invoice)
+      # First upcoming invoice for fixed periodic contains first set of escalated invoices
+      # if first_reference_invoice.fixed_periodic?
+      #   reference_invoices = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date)self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date)
+      # end
     else
       create_next_upcoming_invoice('general_invoice', previous_upcoming_invoice)
     end
@@ -98,6 +103,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     update_taxable_and_orig_amount_value(upcoming_invoice)
     upcoming_invoice.items.map(&:update_taxable_amount_value)
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, upcoming_invoice)
+    # upcoming_invoice.end_date = effective_end_date
     if upcoming_invoice.save
       if upcoming_invoice.tds_slab_id.present?
         apply_tds_on_amount(upcoming_invoice)
@@ -121,6 +127,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
         new_line_item.rate = get_first_invoice_rate(reference_invoice, item.rate)
       end
     end
+    # upcoming_invoice.end_date = effective_end_date
     if upcoming_invoice.save
       self.new_upcoming_invoice = upcoming_invoice
     end
@@ -132,16 +139,36 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     rate = reference_invoice_item_rate
     one_month_rate = reference_invoice_item_rate/invoice_frequency_number
     # First invoice can have partial month
-    partial_month_rate = calculate_partial_month_rate(reference_invoice.start_date, one_month_rate)
-    effective_frequency_period_rate = partial_month_rate + one_month_rate*(invoice_frequency_number-1)
-    return effective_frequency_period_rate
+    frequency_based_end_date = (first_start_date + invoice_frequency_number.month - 1.month).end_of_month
+    frequency_period_rate = calculate_frequency_month_rate(reference_invoice.start_date, reference_invoice.end_date, frequency_based_end_date, one_month_rate)
+    # effective_frequency_period_rate = partial_month_rate + one_month_rate*(invoice_frequency_number-1)
+    return ActionController::Base.helpers.number_with_precision(frequency_period_rate, precision: 2)
   end
 
-  def calculate_partial_month_rate(date, one_month_rate)
+  def calculate_frequency_month_rate(invoice_start_date, invoice_end_date, actual_end_date, one_month_rate)
     # Add one to adjust current day
-    effective_days_count = date.end_of_month.day - date.day + 1
-    days_in_month = date.end_of_month.day - date.beginning_of_month.day + 1
-    effective_rate = (one_month_rate/days_in_month)*effective_days_count
+    # effective_days_count = date.end_of_month.day - date.day + 1
+    self.effective_end_date = invoice_end_date == actual_end_date ? invoice_end_date : actual_end_date
+    if (invoice_start_date.month == invoice_end_date.month) && (invoice_start_date.year == invoice_end_date.year)
+      effective_days_count = (invoice_end_date - invoice_start_date).to_i + 1
+      days_in_month = (effective_end_date.end_of_month - first_start_date.beginning_of_month).to_i + 1
+
+      # effective_rate = (one_month_rate/days_in_month)*effective_days_count
+      effective_months = first_reference_invoice.invoice_frequency.number
+      effective_rate = (one_month_rate*effective_months/days_in_month)*effective_days_count
+    else
+      end_date = invoice_end_date > effective_end_date ? effective_end_date : invoice_end_date
+      effective_days_count = (end_date - invoice_start_date).to_i + 1
+      # days_in_month = ((invoice_start_date.end_of_month.day - invoice_start_date.beginning_of_month.day).to_i + 1) + ((effective_end_date.end_of_month.day - effective_end_date.beginning_of_month.day).to_i + 1)
+      days_in_month = (effective_end_date.end_of_month - first_start_date.beginning_of_month).to_i + 1
+      # effective_months = invoice_start_date.month - effective_end_date.month + 1
+      effective_months = first_reference_invoice.invoice_frequency.number
+      effective_rate = (one_month_rate*effective_months/days_in_month)*effective_days_count
+    end
+
+    # effective_days_count = effective_end_date - invoice_start_date + 1
+    # days_in_month = date.end_of_month.day - date.beginning_of_month.day + 1
+    # effective_rate = (one_month_rate/days_in_month)*effective_days_count
     return effective_rate
   end
 
@@ -273,8 +300,8 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     invoice_frequency = get_invoice_frequency(self.invoice_type)
     due_date = get_invoice_due_date(reference_invoice)
     invoice_params = {
-      start_date: upcoming_invoice_start_date,
-      end_date: upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
+      start_date: first_reference_invoice.start_date,
+      end_date: get_upcoming_invoice_end_date, #upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
       vendor_id: reference_invoice.vendor_id,
       department_id: reference_invoice.department_id,
       location_id: reference_invoice.location_id,
@@ -304,7 +331,8 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
       invoice_frequency_id: reference_invoice.invoice_frequency_id, # TODO - Remove is whenever invoice is editable, its referencing same record
       fixed_periodic_template: true,
       payment_agreement_upcoming_date: get_payment_agreement_upcoming_date(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid),
-      is_payment_agreement_upcoming_invoice: check_if_upcoming_invoice(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid)
+      is_payment_agreement_upcoming_invoice: check_if_upcoming_invoice(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid),
+      tds_slab_id: reference_invoice.tds_slab_id
     }
     return invoice_params
   end
@@ -394,16 +422,27 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
 
   def get_payment_agreement_upcoming_date(reference_invoice, start_date, end_date, prepaid)
     # return start_date # FOR TESTING ONLY
-    prepaid ? start_date : end_date
+    prepaid ? first_start_date : end_date
   end
 
   def check_if_upcoming_invoice(reference_invoice, start_date, end_date, prepaid)
     # return true # FOR TESTING ONLY
-    prepaid ? start_date <= Date.today : end_date <= Date.today
+    prepaid ? first_start_date <= Date.today : end_date <= Date.today
   end
 
   def create_invoice_amount(amount)
     Amount.create(value: amount.value, currency_id: amount.currency_id)
+  end
+
+  def get_effective_days_count(invoice_start_date, invoice_end_date, actual_end_date, one_month_rate)
+
+  end
+
+  def get_upcoming_invoice_end_date
+    invoice_frequency_number = first_reference_invoice.invoice_frequency.number
+    frequency_based_end_date = (first_start_date + invoice_frequency_number.month - 1.month).end_of_month
+      self.effective_end_date = (first_reference_invoice.end_date > frequency_based_end_date) ? frequency_based_end_date : first_reference_invoice.end_date
+    return effective_end_date
   end
 
 end

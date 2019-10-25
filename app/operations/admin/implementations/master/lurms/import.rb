@@ -30,22 +30,22 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
-        begin
+        #begin
           result = process_row(row)
           unless result.is_a?(Admin::Implementations::Processor::Import::Result)
             item_complete false
-            raise "invalid result"
+            #raise "invalid result"
           end
-        rescue Exception => e
-           result false, "#{e.message}"
-         end
+        #rescue Exception => e
+           #result false, ""
+        #end
 
-        unless result.success?
+        unless result&.success?
           item_complete false
           row << result.message
           failed = true
         end
-        if result.success?
+        if result&.success?
           row << result.message
           item_complete true
         end
@@ -95,7 +95,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   def update_record(data)
     lurm_params = set_params(data)
-    lurm = LevelUserReviewerMapping.find lurm_params[:id]
+    lurm = LevelUserReviewerMapping.find_by id: lurm_params[:id]
     unless lurm.present?
       return result  false, message: "Mapping not found"
     end
@@ -107,7 +107,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     end
 
     if lurm_params[:reviewer_email].present?
-      reviewer = get_reviewer(lurm_params[:reviewer_email], application)&.id
+      reviewer_email = clean_up_data lurm_params[:reviewer_email]
+      reviewer = get_reviewer(reviewer_email, application)&.id
       unless  reviewer.present?
         return result false, "Reviewer Not Found"
       end

@@ -39,7 +39,7 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
-
+  belongs_to :terminated_by, optional: true, class_name: 'User'
 
   has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
@@ -65,7 +65,7 @@ class PaymentAgreement < ApplicationRecord
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, to: :status
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
@@ -272,7 +272,8 @@ class PaymentAgreement < ApplicationRecord
       renewal_date: self.renewal_date&.to_date,
       note: self.note,
       renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options)
+      vendors: get_related_vendors(options),
+      termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
     }
   end
 

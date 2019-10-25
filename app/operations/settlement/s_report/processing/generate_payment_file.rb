@@ -42,7 +42,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     # Format as required by PaymentFiles::Generate
     payment_params = []
 
-    if user.company.id == 164 # Satin CreditCare
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
       load_data = satin_data
     else
       load_data = general_data
@@ -80,6 +80,8 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:note] = mapping.note
     data[:report_ids] = mapping&.reports&.collect(&:id)&.join(', ')
     data[:report_id] = mapping.try(:report_id)
+    data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
+    data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
     data
   end
 
