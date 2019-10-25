@@ -30,22 +30,22 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
-        begin
+        #begin
           result = process_row(row)
           unless result.is_a?(Admin::Implementations::Processor::Import::Result)
             item_complete false
-            raise "invalid result"
+            #raise "invalid result"
           end
-        rescue Exception => e
-           result false, "#{e.message}"
-         end
+        #rescue Exception => e
+           #result false, ""
+        #end
 
-        unless result.success?
+        unless result&.success?
           item_complete false
           row << result.message
           failed = true
         end
-        if result.success?
+        if result&.success?
           row << result.message
           item_complete true
         end
