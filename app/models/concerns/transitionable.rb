@@ -517,7 +517,7 @@ module Transitionable
         return []
       end
 
-      admin = user.admin?
+      admin = user.admin? || user.vendor_payment_admin?
 
       # Find all level ids where user is a reviewer & is NOT forwarded
       all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)

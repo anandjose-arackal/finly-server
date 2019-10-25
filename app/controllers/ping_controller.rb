@@ -28,6 +28,8 @@ class PingController < BaseControllers::PublicBase
       hostname = 'ip-172-33-215-128.ap-south-1.compute.internal'
     when 'payments'
       hostname = 'ip-172-32-19-108.ap-south-1.compute.internal'
+    when 'payments_creation'
+      hostname = 'ip-172-32-59-38.ap-south-1.compute.internal'
     else
       # Nothing
       raise 'Sidekiq machine not found'
