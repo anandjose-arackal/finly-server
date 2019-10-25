@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
-                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date
+                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -140,7 +140,8 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           },
           custom_fields: payment[:custom_fields],
           text_fields: payment[:text_fields],
-          drop_down_fields: payment[:drop_down_fields]
+          drop_down_fields: payment[:drop_down_fields],
+          multi_select_fields: payment[:multi_select_fields]
       }
     end
     if agreement_type == 'security_deposit'
@@ -162,14 +163,18 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
   def process
     self.init_text_field = []
     self.init_drop_down_field = []
+    self.init_multi_select_field =[]
+    self.init_multi_select_selction_items=[]
     build_trails = []
     self.payment_params.each do |payment_param|
       custom_fields = payment_param[:custom_fields]
       text_fields = payment_param[:text_fields]
       drop_down_fields = payment_param[:drop_down_fields]
+      multi_select_fields = payment_param[:multi_select_fields]
       payment_param.delete(:custom_fields)
       payment_param.delete(:text_fields)
       payment_param.delete(:drop_down_fields)
+      payment_param.delete(:multi_select_fields)
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
       payment = ::Payment.new(payment_param)
       # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
@@ -217,7 +222,20 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
             }
           end
         end
-
+        if multi_select_fields.present?
+          multi_select_fields.each do |key, value|
+            init_multi_select_field<< {
+                field_configuration_id: key,
+                parent_id: payment.invoice.id,
+                parent_type: 'Invoice',
+                value_type: 'FieldMultiselectSelection',
+                value_id: nil,
+                field_multiselect_selection: {
+                    values: value
+                }
+            }
+          end
+        end
       end
     end
 
@@ -229,6 +247,10 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     end
     if self.init_drop_down_field.present?
       build_drop_down_custom_fields
+    end
+
+    if self.init_multi_select_field.present?
+      build_multi_select_custom_fields
     end
 
     # now once the payment request has been created and the payments saved, we can mark it as open
@@ -326,6 +348,58 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     # bulk upsert field drop_down with the new values and bulk insert the custom fields in one atomic op
     ActiveRecord::Base.transaction do
       FieldDropDownSelection.import newly_created_drop_downs.to_a, on_duplicate_key_update: [:value_id, :created_at]
+      CustomField.import custom_fields.to_a
+    end
+  end
+
+  def build_multi_select_custom_fields
+    # prepare and build field drop_down so we can get the row id
+    field_multi_selects = []
+    id = FieldMultiselectItem .minimum :id
+    dt = DateTime.now + rand(10..50).years
+    dt = dt + rand(101..150).years
+    value_id = FieldMultiselectItem .minimum :id
+    value_id = FieldMultiselectItem .find(value_id).id
+    init_multi_select_field.size.times do |i|
+      # we added the import_id because MYSQl doesn't return the ids for the newly inserted batch
+      # will use this later to capture the newly created field_drop_down from the import_ids
+      field_multi_selects << FieldMultiselectSelection.new(created_at: dt)
+    end
+    FieldMultiselectSelection.import field_multi_selects
+
+    # capture the newly created multi select selection item
+    newly_created_multi_selection = FieldMultiselectSelection.unscoped.where(created_at: dt)
+
+    # update its value
+    original_values = init_multi_select_field.pluck :value # original list of values
+    original_values.each_with_index do |original_value, index|
+      newly_created_multi_selection[index].created_at = DateTime.now
+    end
+
+    # now update the field drop_down ids
+    newly_created_multi_selection.each_with_index do |multi_select, index|
+      init_multi_select_field[index][:value_id] = multi_select.id
+    end
+
+
+    # prepare and build the custom fields after updating the field drop_down ids
+    custom_fields = []
+    init_multi_select_field.each do |multi_select|
+      custom_fields << CustomField.new(value_id: multi_select[:value_id],
+                                       field_configuration_id: multi_select[:field_configuration_id],
+                                       parent_id: multi_select[:parent_id],
+                                       parent_type: multi_select[:parent_type],
+                                       value_type: multi_select[:value_type])
+      multi_select[:field_multiselect_selection][:values].each do|value_id|
+        init_multi_select_selction_items << FieldMultiselectSelectionItem.new(value_id: value_id,
+                                                                              field_multiselect_selection_id: multi_select[:value_id])
+      end
+    end
+
+    # bulk upsert field drop_down with the new values and bulk insert the custom fields in one atomic op
+    ActiveRecord::Base.transaction do
+      FieldMultiselectSelection.import newly_created_multi_selection.to_a, on_duplicate_key_update: [:created_at]
+      FieldMultiselectSelectionItem.import init_multi_select_selction_items.to_a
       CustomField.import custom_fields.to_a
     end
   end
