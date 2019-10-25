@@ -50,7 +50,10 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
   end
 
   def process
-    return false if self.users.blank?
+    if self.users.blank?
+      add_message :error, "No valid users were provided. Probably they are already invited."
+      return
+    end
   end
 
   def success
@@ -106,7 +109,7 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
     user_list.each do |list|
       options = list
       options[:company_id] = user.company_id
-      if common_emails.include? list[:email]
+      if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
         u = User.create options
         UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group)
       else

@@ -28,7 +28,7 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
   def pre_process
     if urm_user_role_ids.present?
       flow(pre_process_urm)
-      # self.urm_unassignable_roles = self.unassignable_roles
+      self.urm_unassignable_roles = self.unassignable_roles
       self.urm_columns, self.urm_values = setup_urm(assignable_roles) 
     end
 
