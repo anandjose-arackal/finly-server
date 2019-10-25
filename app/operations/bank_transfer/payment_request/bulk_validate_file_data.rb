@@ -110,6 +110,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       custom_fields = {}
       drop_down_custom_fields = {}
       text_fields = {}
+      multi_select_custom_fields = {}
       empty_fields = []
 
       unless from_payment_agreement
@@ -120,13 +121,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
           if item[field_name.to_sym].present? or (custom_fields_key.present? and custom_fields_key[field.id.to_s].present?)
             if field.field_type_id == FieldType.id_for(:multiselect)
-
               if custom_fields_key.present?
                 custom_fields[field.id] = [custom_fields_key[field.id.to_s]].flatten if custom_fields_key[field.id.to_s].present?
+                multi_select_custom_fields[field.id] = custom_fields_key[field.id.to_s] if custom_fields_key[field.id.to_s].present?
               else
                 custom_fields[field.id] = [item[field_name.to_sym]].flatten
+                multi_select_custom_fields[field.id] = [item[field_name.to_sym]].flatten
               end
-
             elsif field.field_type_id == FieldType.id_for(:drop_down)
 
               if custom_fields_key.present?
@@ -162,6 +163,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       item[:custom_fields] = custom_fields
       item[:text_fields] = text_fields
       item[:drop_down_fields] = drop_down_custom_fields
+      item[:multi_select_fields] =  multi_select_custom_fields
 
       unless from_payment_agreement
         # find all fields which are required but left empty by user
