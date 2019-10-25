@@ -37,15 +37,15 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             #raise "invalid result"
           end
         #rescue Exception => e
-           result false, "#{e.message}"
+           #result false, ""
         #end
 
-        unless result.success?
+        unless result&.success?
           item_complete false
           row << result.message
           failed = true
         end
-        if result.success?
+        if result&.success?
           row << result.message
           item_complete true
         end
