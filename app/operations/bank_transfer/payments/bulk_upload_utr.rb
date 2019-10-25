@@ -1,6 +1,7 @@
 class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
-  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions
+  attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions,
+                :all_transactions
 
   def pre_validate
     if user.blank? || params.blank?
@@ -29,6 +30,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def pre_process
     payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order)).pluck(:id)
     self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
+    self.all_transactions = YesBankTransaction.where(company_id: user.company_id).pluck(:bank_reference_number)
   end
 
   def process
@@ -60,6 +62,12 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         reference_resource.bank_reference_number = utr
         existing_transactions << reference_resource
       else
+        # disallow duplicate utr to be updated
+        if self.all_transactions.include? utr.strip
+          p_id = YesBankTransaction.where(company_id: user.company_id, bank_reference_number: utr).first&.payment&.id
+          self.result_array[index] << "UTR already exists for some other payment. See Payment ID - #{p_id}"
+          next
+        end
         # create a bank transaction for this particular payment
         amount = Amount.create(value: payment.amount_value, currency_id: 1)
         new_transactions << YesBankTransaction.new(transfer_type: payment.payment_mode,
