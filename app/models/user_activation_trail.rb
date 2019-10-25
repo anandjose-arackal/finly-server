@@ -1,2 +1,0 @@
-class UserActivationTrail < ApplicationRecord
-end
