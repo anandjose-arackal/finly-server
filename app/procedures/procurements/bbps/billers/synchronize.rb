@@ -1,4 +1,4 @@
-class Bbps::Billers::Synchronize < Transactions::API
+class Procurements::Bbps::Billers::Synchronize < Transactions::API
 
   skip_user_authorization!
 
@@ -9,15 +9,15 @@ class Bbps::Billers::Synchronize < Transactions::API
       Transactions::Matcher::DefaultCases.merge(
           success: Dry::Matcher::Case.new(
               match: -> (result) { result.success? and options['billers.success'].present? and options['billers.failed'].blank? },
-              resolve: -> (result) {result}
+              resolve: -> (result) { result }
           ),
           partial_success: Dry::Matcher::Case.new(
               match: -> (result) { result.success? and options['billers.success'].present? and options['billers.failed'].present? },
-              resolve: -> (result) {result}
+              resolve: -> (result) { result }
           ),
           failure: Dry::Matcher::Case.new(
               match: -> (result) { result.failure? or options['billers.success'].blank? },
-              resolve: -> (result) {result}
+              resolve: -> (result) { result }
           ),
       )
   )
