@@ -58,8 +58,8 @@ class Sms::Send < BaseHandler
       add_message :error, 'Message cannot be blank'
       return
     end
-    mob_num.map{ |s| s.prepend("91") }
-    list = mob_num.join(",")
+    mobile_numbers = mob_num.map{ |s| "91#{s}" }
+    list = mobile_numbers.join(",")
     {
         authkey: authentication_key,
         mobiles: list,
