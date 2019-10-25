@@ -106,8 +106,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              invoice_no: {spreadsheet: true},
              invoice_date: {spreadsheet: true},
              created_by: {spreadsheet: true},
+             created_at: {spreadsheet: true},
+             po_date: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
+             vendor_gstin: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
              # vendor_gst: {spreadsheet: true},
              # po_number: {spreadsheet: true},
@@ -138,6 +141,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_discount: {spreadsheet: true},
+             line_item_discount: {spreadsheet: true},
              line_item_sgst: {spreadsheet: true},
              line_item_cgst: {spreadsheet: true},
              line_item_igst: {spreadsheet: true},
@@ -209,6 +214,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def vendor_ref_no(invoice_line_item)
     invoice_line_item.parent.vendor.vendor_id
+  end
+
+  def vendor_gstin(invoice_line_item)
+    invoice_line_item.parent&.gstin_location&.gstin
   end
 
   # def vendor_gst(invoice_line_item)
@@ -320,15 +329,26 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def tds_nature(invoice_line_item)
+    return false unless invoice_line_item.inventory_line_item.tds_applicable
     invoice_line_item.parent.tds_slab&.name
   end
 
   def tds_amount(invoice_line_item)
+    return 0.0 unless invoice_line_item.inventory_line_item.tds_applicable
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
   def tds_percentage(invoice_line_item)
+    return 0.0 unless invoice_line_item.inventory_line_item.tds_applicable
     invoice_line_item.parent.tds_slab&.tds || 0
+  end
+
+  def invoice_discount(invoice_line_item)
+    invoice_line_item.parent&.discount_amount.value || 0
+  end
+
+  def line_item_discount(invoice_line_item)
+    invoice_line_item.discount_amount.value || 0
   end
 
   def line_item_sgst(invoice_line_item)
@@ -344,7 +364,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def advance_amount(invoice_line_item)
-    value = invoice_line_item.parent&.advance_amount || 0
+    if invoice_line_item.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      value = invoice_line_item.parent&.advance_amount&.value || 0
+    else
+      value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
+    end
     precision_value(value)
   end
 
@@ -354,13 +378,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
       taken_control_by = dlrm.taken_control_by
       forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
+      approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
       if forwarded_to.present?
-        forwarded_to.name
+        (approved ?  "#{forwarded_to.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : forwarded_to.name)
       elsif taken_control_by.present?
-        taken_control_by.name
+        (approved ?  "#{taken_control_by.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : taken_control_by.name)
       elsif reviewer.present?
-        reviewer.name
-      end
+        (approved ?  "#{reviewer.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"}" : reviewer.name)
+        end
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
   end
@@ -376,5 +401,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   def created_by(invoice_line_item)
     invoice_line_item.parent&.created_by&.name
   end
+
+  def created_at(invoice_line_item)
+    invoice_line_item.parent&.created_at&.strftime("%d-%m-%y")
+  end
+
+  def po_date(invoice_line_item)
+    invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
+  end 
 
 end

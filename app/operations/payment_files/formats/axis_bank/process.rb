@@ -24,8 +24,8 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
           payment[:beneficiary_account_name],
           payment[:beneficiary_account_number],
           payment[:beneficiary_ifsc],
-          payment[:amount],
-          payment[:report_ids]
+          retrieve_report_amount,
+          retrieve_report_data(payment)
       ]
     end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
@@ -42,4 +42,19 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
     ]
   end
 
+  def retrieve_report_data(payment)
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
+      return payment[:report_id]
+    else
+      return payment[:report_ids]
+    end
+  end
+
+  def retrieve_report_amount(payment)
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
+      return payment[:reimbursable_amount]
+    else
+      return payment[:amount]
+    end
+  end
 end

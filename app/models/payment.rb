@@ -55,6 +55,7 @@
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
+  include LiquidDroppable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -569,11 +570,7 @@ class Payment < ApplicationRecord
   end
 
   def retriable?
-    if self.initiating_account.present? && self.initiating_account.is_a?(KotakBankCompanyAccount)
-      false
-    else
-      self.failed?
-    end
+    self.failed?
   end
 
   def invoice_amount
@@ -650,6 +647,17 @@ class Payment < ApplicationRecord
   end
 
 
+  def neft?
+    self.payment_mode == "NEFT" || self.payment_mode == "neft"
+  end
+
+  def imps?
+    self.payment_mode == "IMPS" || self.payment_mode == "imps"
+  end
+
+  def rtgs?
+    self.payment_mode == "RTGS" || self.payment_mode == "rtgs"
+  end
 
 
   private

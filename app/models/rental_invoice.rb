@@ -96,6 +96,10 @@
 #  template_invoice_id                   :integer
 #  notice_period                         :integer
 #  square_feet                           :decimal(10, 5)
+#  prepaid                               :boolean
+#  fixed_periodic_template               :boolean
+#  escalation_percentage                 :float(24)
+#  override_invoice_id                   :string(255)
 #
 
 class RentalInvoice < ApplicationRecord
@@ -142,7 +146,7 @@ class RentalInvoice < ApplicationRecord
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :invoices, as: :agreement_item
@@ -177,7 +181,7 @@ class RentalInvoice < ApplicationRecord
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :invoice_frequency
+  # accepts_nested_attributes_for :invoice_frequency
 
 
 
@@ -192,10 +196,33 @@ class RentalInvoice < ApplicationRecord
   attr_accessor :invoice_custom_fields
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  # validates_inclusion_of :prepaid, in: [true, false]
 
   validate :additional_validations
 
   scope :template_invoices, -> { where(template_invoice_id: nil) }
+  scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
+  scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
+  scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
+
+  scope :filter_policy_id, -> (policy_id) {
+    joins(:payment_agreement).where("payment_agreements.policy_id = ?", policy_id)
+  } 
+  scope :filter_vendor_id, -> (vendor_id) {
+    where(vendor_id: vendor_id)
+  }
+  scope :filter_due_date, -> (due_date) {
+    where(due_date: due_date&.to_date)
+  }
+  scope :filter_creation_date, -> (creation_date) {
+    where(created_at: creation_date.to_date.beginning_of_day..creation_date.to_date.end_of_day)
+  }
+  scope :filter_from_date, -> (start_date) {
+    where(start_date: start_date.to_date)
+  }
+  scope :filter_to_date, -> (end_date) {
+    where(end_date: end_date.to_date)
+  }
 
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
@@ -255,7 +282,7 @@ class RentalInvoice < ApplicationRecord
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id},
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,
@@ -274,15 +301,17 @@ class RentalInvoice < ApplicationRecord
       custom_fields: self.custom_fields,
       notice_period: self.notice_period,
       square_feet: self.square_feet,
-      already_exists: true
-
+      already_exists: true,
+      prepaid: self.prepaid,
+      escalation_percentage: self.escalation_percentage,
+      invoice_number: self.get_invoice_number
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -293,7 +322,9 @@ class RentalInvoice < ApplicationRecord
       agreement_type: self.class.name.underscore,
       payment_agreement_id: self.payment_agreement_id,
       vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      start_date: self.start_date,
+      end_date: self.end_date
 
     }
   end
@@ -305,6 +336,10 @@ class RentalInvoice < ApplicationRecord
     else
       {id: nil, number: nil, period_id: nil }
     end
+  end
+
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
 

@@ -72,18 +72,21 @@ end
 expenses_sorted_by = params[:expenses_sorted_by] || 'category'
 json.expenses_sorted_by expenses_sorted_by
 if expenses_sorted_by == 'category'
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 elsif expenses_sorted_by == 'date'
-  sorted_expenses = @result.expenses_date_sorted
+  # sorted_expenses = @result.expenses_date_sorted
+  sorted_expenses = @result.paginated_expenses_date_sorted
 else
-  sorted_expenses = @result.expenses_category_sorted
+  # sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 end
 
 json.has_custom_fields @result.has_custom_fields?
 json.expense_sections sorted_expenses do |category|
   json.extract! category, :section_name, :section_total
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :maps_distance_value,
                   :distance_value, :distance_rate_value, :time_value, :time_rate_value,
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
@@ -92,9 +95,12 @@ json.expense_sections sorted_expenses do |category|
     json.potential_duplicate expense.has_duplicate_expenses?
     if expense.category.parent.present?
       json.category_name expense.category.parent.name
+      json.gst_applicable expense.category.parent&.gst_applicable
       json.sub_category expense.category.name
     else
       json.category_name expense.category.name
+      json.gst_applicable expense.category&.gst_applicable
+
     end
     if expense.note
       if expense.note.length < 29

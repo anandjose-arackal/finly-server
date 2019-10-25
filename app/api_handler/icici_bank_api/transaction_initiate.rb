@@ -44,6 +44,10 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def raw_api_params
     remarks = self.payment.note.blank? ? "Null" : self.payment.note
     remarks = remarks.gsub(/[^0-9A-Za-z]/, '') # this is to remove all special characters from the remarks attribute
+    # additionally if this is a NEFT transactions we have to further truncate the narration to 31 characters
+    if self.payment.neft?
+      remarks = remarks[0..30]
+    end
     if self.receiving_account&.account_owner.is_a?(YesBankVendor)
       payee_name = self.receiving_account.account_owner.business_name
     else
@@ -85,13 +89,13 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def post_process
-    case self.response.status
+    case self.response&.status
       when 404
-        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
       when 500
-        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         add_message :error, "Service temporarily unavailable"
         self.transfer_request.bank_error_message = "Service temporarily unavailable"
       when 200
@@ -119,11 +123,13 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
           self.transfer_request.bank_error_message = error_message
         else
           # any other case must be a failure as well
-          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
           error_message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"] || self.parsed_response["message"]
           add_message :error, error_message
           self.transfer_request.bank_error_message = error_message
         end
+    else
+      # do nothing?
     end
   end
 

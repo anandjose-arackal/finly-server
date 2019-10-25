@@ -31,7 +31,7 @@ module Sequenced
     end
 
     def id_set?
-      !record.send(column).nil?
+      !record.send(column).blank?
     end
 
     def skip?
@@ -79,20 +79,21 @@ module Sequenced
       # If prefix is lambda
       @prefix = @prefix.call(@record) if @prefix&.respond_to?(:call)
 
+      @prefix = LiquidHelper.interpolate(@prefix, 'record' => @record) unless @prefix.blank?
       @prefix = ExpressionEvaluator::Transformer.(@prefix, @record) unless @prefix.blank?
     end
 
     def find_last_record
       build_scope(*scope) do
         base_relation
-          .where("#{column} IS NOT NULL AND #{column} LIKE '#{@prefix}%'")
-          .order("created_at DESC")
+            .where("#{column} IS NOT NULL AND #{column} LIKE '#{@prefix}%'")
+            .order("created_at DESC")
       end.first
     end
 
     def build_scope(*columns)
       rel = yield
-      columns.each { |c| rel = rel.where(c => record.send(c.to_sym)) }
+      columns.each {|c| rel = rel.where(c => record.send(c.to_sym))}
       rel
     end
 

@@ -38,8 +38,8 @@ class Policy < ApplicationRecord
   has_many :departments, through: :policy_department_mappings
   has_many :policy_location_mappings, dependent: :destroy
   has_many :locations, class_name: 'BranchLocation', through: :policy_location_mappings
-  has_many :policy_cost_center_mappings, dependent: :destroy
-  has_many :cost_centers, through: :policy_cost_center_mappings
+  # has_many :policy_cost_center_mappings, dependent: :destroy
+  # has_many :cost_centers, through: :policy_cost_center_mappings
 
   has_one :distance_expense_config
   has_one :time_expense_config
@@ -163,21 +163,21 @@ class Policy < ApplicationRecord
     true
   end
 
-  def update_policy_cost_center_mapping(params)
-    # Creating new record on every update as it was required to be like this only
-    begin
-      ActiveRecord::Base.transaction do
-        self.policy_cost_center_mappings.destroy_all
-        params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
-          cost_center = self.company.cost_centers.find_by_id cost_center_id
-          result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
-        end
-      end
-    rescue
-      return false
-    end
-    true
-  end
+  # def update_policy_cost_center_mapping(params)
+  #   # Creating new record on every update as it was required to be like this only
+  #   begin
+  #     ActiveRecord::Base.transaction do
+  #       self.policy_cost_center_mappings.destroy_all
+  #       params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
+  #         cost_center = self.company.cost_centers.find_by_id cost_center_id
+  #         result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
+  #       end
+  #     end
+  #   rescue
+  #     return false
+  #   end
+  #   true
+  # end
 
   def update_policy_location_mapping(params)
     # Creating new record on every update as it was required to be like this only

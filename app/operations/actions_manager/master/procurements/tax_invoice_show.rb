@@ -59,7 +59,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def unapprove
-    unless invoice.approved?
+    # return false if invoice.paid?
+    unless invoice.approved? or invoice.initiated? or invoice.paid? or invoice.unpaid? or invoice.partially_paid?
       if last_level?
         state = (previous_reviewer.include? user.id) ? true : false
       else

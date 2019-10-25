@@ -25,6 +25,7 @@
 #  forwarded_to_id                 :integer
 #  min                             :decimal(20, 5)   default(0.0)
 #  max                             :decimal(20, 5)
+#  rejected_by_id                  :integer
 #
 
 FactoryBot.define do

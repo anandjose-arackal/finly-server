@@ -3,11 +3,12 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
   attr_accessor :custom_fields_config
 
   def init
-    params[:departments] = Company::Departments::Index.(current_user, params)
-    params[:categories] = Categories::Index.(current_user, params)
-    params[:policies] = Policy::VendorPayments::Index.(current_user, params)
-    params[:cost_centers] = CostCenters::Index.(current_user, params)
-    params[:tds_slabs] = TdsSlabs::Index.(current_user, params)
+    params[:departments] = Company::Departments::Index.(user, params)
+    params[:categories] = Categories::Index.(user, params)
+    params[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    params[:policies] = Policy::VendorPayments::Index.(user, params)
+    params[:cost_centers] = CostCenters::Index.(user, params)
+    params[:tds_slabs] = TdsSlabs::Index.(user, params)
     load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
 

@@ -1,15 +1,6 @@
 class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   attr_accessor :expenses, :invoices, :file_url
 
-  class Integrations::Tally::InvoiceVouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :file_url
-
-    def init
-      self.file_url = params[:file_url]
-    end
-
-  end
-
   def authorized_user_types
     []
   end
@@ -30,7 +21,15 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
       return
     end
 
-    unless user.has_role?(UserRole.id_for(:finance_manager)) or user.has_role?(UserRole.id_for(:admin))
+    authorized_roles = UserRole.ids_for(
+        :admin, :finance_manager, :non_po_initiator, :invoice_auditor,
+        :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor,
+        :non_po_invoice_initiator, :non_po_invoice_reviewer,
+        :non_po_invoice_auditor
+    )
+    user_roles = user.policy_user_roles.pluck(:user_role_id) + user.role_mapping.pluck(:user_role_id)
+
+    unless (authorized_roles - user_roles).size < authorized_roles.size
       add_message :error, 'You are not authorized to perform this action'
       return
     end
@@ -120,11 +119,11 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
   end
 
   def success
-    Integrations::Tally::InvoiceVouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
+    Integrations::Tally::Base::FilePresenter.new(user, {file_url: self.file_url}, messages)
   end
 
   def add_voucher(generator, invoice, configuration)
-    voucher_data = LiquidHelper.interpolate(configuration.slice('date', 'state', 'voucher_type', 'narration', 'reference'), "invoice" => invoice)
+    voucher_data = LiquidHelper.interpolate(configuration.slice('date', 'state', 'voucher_number', 'voucher_type', 'narration', 'reference'), "invoice" => invoice)
     vendor_data = LiquidHelper.interpolate(configuration['vendor'].slice('gl_name', 'gstin'), "invoice" => invoice)
     generator.add_voucher(voucher_data.merge(vendor_data))
   end
@@ -136,7 +135,9 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
   def add_item_ledgers(voucher, invoice, item, configuration)
     ledger_data = LiquidHelper.interpolate(configuration['item'].slice('gl_name', 'category_allocations'), "item" => item, "invoice" => invoice)
-    voucher.add ledger_data['gl_name'], (-item.taxable_amount), category_allocations: ledger_data['category_allocations']
+    value = item.billable_amount
+    value = item.taxable_amount if value == 0
+    voucher.add ledger_data['gl_name'], (-value), category_allocations: ledger_data['category_allocations']
   end
 
   def add_tds_ledgers(voucher, invoice, configuration)
@@ -156,5 +157,3 @@ class Integrations::Tally::InvoiceVouchers < Integrations::Tally::Base
 
 
 end
-
-

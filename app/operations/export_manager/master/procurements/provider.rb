@@ -13,7 +13,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
              vendor_business_name: {spreadsheet: false, pdf: true},
              vendor_mobile_number: {spreadsheet: false, pdf: true},
              vendor_state_code: {spreadsheet: false, pdf: true},
-             vendor_gst: {spreadsheet: false, pdf: true},
+             vendor_gstin: {spreadsheet: true, pdf: true},
              vendor_pan: {spreadsheet: false, pdf: true},
              vendor_tds_rate: {spreadsheet: false, pdf: true},
              vendor_tds_description: {spreadsheet: false, pdf: true},
@@ -75,299 +75,303 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
          ]
 
   def input
-    result = ::Procurements::Index.(user, params)
+    # if params[:filter_po_status].present?
+    #   unless params[:filter_po_status].is_a?(Integer)
+    #     params[:filter_po_status] = PurchaseOrderStatus.id_for(params[:filter_po_status]&.to_sym)
+    #   end
+    # end
+    result = ::Procurements::PurchaseOrders::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.procurements.include_details
+    result.purchase_orders.includes(:vendor,:gstin_location,:controlling_level,:level,:department, :sub_department,:cost_center,:user, :status, :total_before_tax,procurement:[invoices:[:gst_type, :tax_amount, :tds_slab,:discount_amount,:net_amount,:invoice_items]])
   end
 
-  def procurement_name(procurement)
-    procurement.name
+  def procurement_name(purchase_order)
+    purchase_order.procurement.name
   end
 
-  def vendor_name(procurement)
-    procurement.vendor&.display_name
+  def vendor_name(purchase_order)
+    purchase_order.procurement.vendor&.display_name
   end
 
-  def vendor_business_name(procurement)
-    procurement.vendor&.business_name
+  def vendor_business_name(purchase_order)
+    purchase_order.procurement.vendor&.business_name
   end
 
-  def vendor_mobile_number(procurement)
-    procurement.vendor&.mobile_number
+  def vendor_mobile_number(purchase_order)
+    purchase_order.procurement.vendor&.mobile_number
   end
 
-  def vendor_state_code(procurement)
-    procurement.vendor&.state_code
+  def vendor_state_code(purchase_order)
+    purchase_order.procurement.vendor&.state_code
   end
 
-  def vendor_pan(procurement)
-    procurement.vendor&.pan
+  def vendor_pan(purchase_order)
+    purchase_order.procurement.vendor&.pan
   end
 
-  def vendor_gst(procurement)
-    procurement.vendor&.gst
+  def vendor_gstin(purchase_order)
+    purchase_order.gstin_location&.gstin
   end
 
-  def approval_pending_level_number(procurement)
-    procurement&.purchase_order&.controlling_level&.level_number
+  def approval_pending_level_number(purchase_order)
+    purchase_order&.controlling_level&.level_number
   end
 
-  def approval_pending_level_name(procurement)
-    procurement&.purchase_order&.controlling_level&.name
+  def approval_pending_level_name(purchase_order)
+    purchase_order&.controlling_level&.name
   end
 
-  def approval_pending_reviewers(procurement)
-    procurement&.purchase_order&.get_reviewers&.map(&:name)&.join(", ")
+  def approval_pending_reviewers(purchase_order)
+    purchase_order&.get_reviewers&.map(&:name)&.join(", ")
   end
 
-  def approved_reviewers(procurement)
-    procurement&.purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.map{|dlr| dlr.reviewer.name}&.join(" ,")
+  def approved_reviewers(purchase_order)
+    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.map{|dlr| dlr.reviewer.name}&.join(" ,")
   end
 
-  def vendor_tds_rate(procurement)
+  def vendor_tds_rate(purchase_order)
     # todo
   end
 
-  def vendor_tds_description(procurement)
+  def vendor_tds_description(purchase_order)
     # todo
   end
 
-  def vendor_type(procurement)
-    procurement.vendor&.vendor_type&.name
+  def vendor_type(purchase_order)
+    purchase_order.procurement.vendor&.vendor_type&.name
   end
 
-  def vendor_description(procurement)
-    procurement.vendor&.description
+  def vendor_description(purchase_order)
+    purchase_order.procurement.vendor&.description
   end
 
-  def vendor_address(procurement)
-    procurement.vendor&.address
+  def vendor_address(purchase_order)
+    purchase_order.procurement.vendor&.address
   end
 
-  def vendor_custom_fields(procurement)
+  def vendor_custom_fields(purchase_order)
     # todo
   end
 
-  def policy(procurement)
-    procurement.type_entity&.policy&.name
+  def policy(purchase_order)
+    purchase_order.procurement.type_entity&.policy&.name
   end
 
-  def department(procurement)
-    procurement.type_entity&.department&.name
+  def department(purchase_order)
+    purchase_order.procurement.type_entity&.department&.name
   end
 
-  def sub_department(procurement)
-    procurement.type_entity&.sub_department&.name
+  def sub_department(purchase_order)
+    purchase_order.procurement.type_entity&.sub_department&.name
   end
 
-  def cost_center(procurement)
-    procurement.type_entity&.cost_center&.name
+  def cost_center(purchase_order)
+    purchase_order.procurement.type_entity&.cost_center&.name
   end
 
-  def po_user(procurement)
-    if procurement.purchase_order.present?
-      purchase_order(procurement)&.user&.name
+  def po_user(purchase_order)
+    if purchase_order.procurement.purchase_order.present?
+      purchase_order&.user&.name
     end
   end
 
-  def po_status(procurement)
-    procurement.purchase_order&.status&.name&.humanize
+  def po_status(purchase_order)
+    purchase_order.procurement.purchase_order&.status&.name&.humanize
   end
 
-  def po_number(procurement)
-    purchase_order(procurement)&.po_number
+  def po_number(purchase_order)
+    purchase_order&.po_number
   end
 
-  def po_payment_term(procurement)
-    purchase_order(procurement)&.payment_term&.name
+  def po_payment_term(purchase_order)
+    purchase_order&.payment_term&.name
   end
 
-  def po_delivery_date(procurement)
-    DateUtils.date_formatted purchase_order(procurement)&.delivery_date
+  def po_delivery_date(purchase_order)
+    DateUtils.date_formatted purchase_order&.delivery_date
   end
 
-  def po_date(procurement)
-    DateUtils.date_formatted purchase_order(procurement)&.created_at
+  def po_date(purchase_order)
+    DateUtils.date_formatted purchase_order&.created_at
   end
 
-  def po_submitted_on(procurement)
+  def po_submitted_on(purchase_order)
     # todo
   end
 
-  def is_po_approved(procurement)
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor, :vendor_confirmed).include?(purchase_order(procurement)&.purchase_order_status_id) ? 'Yes' : 'No'
+  def is_po_approved(purchase_order)
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor, :vendor_confirmed).include?(purchase_order&.purchase_order_status_id) ? 'Yes' : 'No'
   end
 
-  def po_approved_on(procurement)
+  def po_approved_on(purchase_order)
     # todo
   end
 
-  def po_sent_on(procurement)
+  def po_sent_on(purchase_order)
     # todo
   end
 
-  def po_base_value(procurement)
-    purchase_order(procurement)&.total_before_tax&.value
+  def po_base_value(purchase_order)
+    purchase_order&.total_before_tax&.value
   end
 
-  def po_cgst(procurement)
-    if purchase_order(procurement)&.gst_type&.cgst?
-      value = purchase_order(procurement)&.tax_amount&.value
+  def po_cgst(purchase_order)
+    if purchase_order&.gst_type&.cgst?
+      value = purchase_order&.tax_amount&.value
       if value
         return value / 2
       end
     end
   end
 
-  def po_sgst(procurement)
-    po_cgst(procurement)
+  def po_sgst(purchase_order)
+    po_cgst(purchase_order)
   end
 
-  def po_igst(procurement)
-    if purchase_order(procurement)&.gst_type&.igst?
-      purchase_order(procurement)&.tax_amount&.value
+  def po_igst(purchase_order)
+    if purchase_order&.gst_type&.igst?
+      purchase_order&.tax_amount&.value
     end
   end
 
-  def po_line_items_count(procurement)
+  def po_line_items_count(purchase_order)
     # todo
   end
 
-  def po_purchase_address(procurement)
-    purchase_order(procurement)&.billing_address
+  def po_purchase_address(purchase_order)
+    purchase_order&.billing_address
   end
 
-  def po_delivery_address(procurement)
-    purchase_order(procurement)&.shipping_address
+  def po_delivery_address(purchase_order)
+    purchase_order&.shipping_address
   end
 
-  def po_custom_fields(procurement)
+  def po_custom_fields(purchase_order)
     # todo
   end
 
-  def inwards_status(procurement)
+  def inwards_status(purchase_order)
     # todo
   end
 
-  def last_inward_received_on(procurement)
+  def last_inward_received_on(purchase_order)
     # todo
   end
 
-  def invoice_number(procurement)
-    procurement.invoices&.first&.invoice_number
+  def invoice_number(purchase_order)
+    purchase_order.procurement.invoices&.first&.invoice_number
   end
 
-  def invoice_id(procurement)
-    procurement.invoices.first&.invoice_id
+  def invoice_id(purchase_order)
+    purchase_order.procurement.invoices.first&.invoice_id
   end
 
-  def invoice_payment_term(procurement)
+  def invoice_payment_term(purchase_order)
     # todo
   end
 
-  def invoice_delivery_date(procurement)
+  def invoice_delivery_date(purchase_order)
 
   end
 
-  def invoice_submitted_on(procurement)
+  def invoice_submitted_on(purchase_order)
     # todo
   end
 
-  def invoice_approved_on(procurement)
+  def invoice_approved_on(purchase_order)
     # todo
   end
 
-  def is_invoice_approved(procurement)
-    InwardInvoiceStatus.ids_for(:partially_paid, :paid, :approved, :rejected, :auto_approved, :closed).include?(invoice(procurement)&.invoice_status_id) ? 'Yes' : 'No'
+  def is_invoice_approved(purchase_order)
+    InwardInvoiceStatus.ids_for(:partially_paid, :paid, :approved, :rejected, :auto_approved, :closed).include?(invoice(purchase_order)&.invoice_status_id) ? 'Yes' : 'No'
   end
 
-  def invoice_sent_on(procurement)
+  def invoice_sent_on(purchase_order)
 
   end
 
-  def invoice_cgst(procurement)
-    if invoice(procurement)&.gst_type&.cgst?
-      value = invoice(procurement)&.tax_amount&.value
+  def invoice_cgst(purchase_order)
+    if invoice(purchase_order)&.gst_type&.cgst?
+      value = invoice(purchase_order)&.tax_amount&.value
       if value
         return value / 2
       end
     end
   end
 
-  def invoice_sgst(procurement)
-    invoice_cgst(procurement)
+  def invoice_sgst(purchase_order)
+    invoice_cgst(purchase_order)
   end
 
-  def invoice_igst(procurement)
-    if invoice(procurement)&.gst_type&.igst?
-      invoice(procurement)&.tax_amount&.value
+  def invoice_igst(purchase_order)
+    if invoice(purchase_order)&.gst_type&.igst?
+      invoice(purchase_order)&.tax_amount&.value
     end
   end
 
-  def invoice_tds_type(procurement)
-    invoice(procurement)&.tds_slab&.name
+  def invoice_tds_type(purchase_order)
+    invoice(purchase_order)&.tds_slab&.name
   end
 
-  def invoice_tds_rate(procurement)
-    invoice(procurement)&.tds_slab&.tds
+  def invoice_tds_rate(purchase_order)
+    invoice(purchase_order)&.tds_slab&.tds
   end
 
-  def invoice_base_amount(procurement)
-    invoice(procurement)&.item_amounts_total
+  def invoice_base_amount(purchase_order)
+    invoice(purchase_order)&.item_amounts_total
   end
 
-  def invoice_discount_amount(procurement)
-    invoice(procurement)&.discount_amount&.value
+  def invoice_discount_amount(purchase_order)
+    invoice(purchase_order)&.discount_amount&.value
   end
 
-  def invoice_tds_amount(procurement)
-    invoice(procurement)&.tds_amount&.value
+  def invoice_tds_amount(purchase_order)
+    invoice(purchase_order)&.tds_amount&.value
   end
 
-  def invoice_total_amount(procurement)
-    invoice(procurement)&.net_amount&.value
+  def invoice_total_amount(purchase_order)
+    invoice(purchase_order)&.net_amount&.value
   end
 
-  def invoice_total_amount_after_tds(procurement)
-    invoice_amount = invoice_total_amount(procurement)
-    tds_amount = invoice_tds_amount(procurement) || 0
+  def invoice_total_amount_after_tds(purchase_order)
+    invoice_amount = invoice_total_amount(purchase_order)
+    tds_amount = invoice_tds_amount(purchase_order) || 0
     if invoice_amount
       invoice_amount - tds_amount
     end
   end
 
-  def invoice_payable_amount(procurement)
+  def invoice_payable_amount(purchase_order)
 
   end
 
-  def invoice_line_items_count(procurement)
+  def invoice_line_items_count(purchase_order)
 
   end
 
-  def invoice_purchase_address(procurement)
+  def invoice_purchase_address(purchase_order)
 
   end
 
-  def invoice_delivery_address(procurement)
+  def invoice_delivery_address(purchase_order)
 
   end
 
-  def invoice_custom_fields(procurement)
+  def invoice_custom_fields(purchase_order)
     # todo
   end
 
   protected
 
-  def invoice(procurement)
-    procurement&.invoices&.last
+  def invoice(purchase_order)
+    purchase_order.procurement&.invoices&.last
   end
 
-  def purchase_order(procurement)
-    procurement&.purchase_order
-  end
-
+  # def purchase_order(purchase_order)
+  #   procurement&.purchase_order
+  # end
 
 end
