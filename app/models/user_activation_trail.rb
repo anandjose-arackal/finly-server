@@ -1,0 +1,2 @@
+class UserActivationTrail < ApplicationRecord
+end
