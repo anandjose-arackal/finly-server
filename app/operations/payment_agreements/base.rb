@@ -415,7 +415,7 @@ class PaymentAgreements::Base < BaseOperation
     vendor_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.pluck(:vendor_id).uniq
     invoice_frequency = get_invoice_frequency(invoice_type)
     validate_start_date_and_execution_date(invoice_type)
-    validate_end_date_end_expiration_date(invoice_type)
+    validate_end_date_and_expiration_date(invoice_type)
     return if has_errors?
     vendor_ids.each do |vendor_id|
       dates = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_id).fixed_periodic_type.order(:start_date).collect{ |invoice| [invoice.start_date, invoice.end_date] }
@@ -718,22 +718,22 @@ class PaymentAgreements::Base < BaseOperation
   def validate_start_date_and_execution_date(invoice_type)
     group_vendor_count_by_id = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.group(:id).count
     # Do not run this validation for single fixed periodic with multiple vendors
-    if group_vendor_count_by_id.values.uniq.count == 1 && group_vendor_count_by_id.values.uniq.include?(1)
-      return
-    end
+    # if group_vendor_count_by_id.values.uniq.count == 1 && group_vendor_count_by_id.values.uniq.include?(1)
+    #   return
+    # end
     execution_date = self.payment_agreement.execution_date.to_date
     vendor_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.pluck(:vendor_id).uniq
     # unless self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where(start_date: execution_date).count == vendor_ids.count
     #   add_message :error, "#{vendor_ids.count} vendors should have #{vendor_ids.count} #{invoice_type.pluralize} with start date equal to execution date: #{execution_date}"
     # end
 
-    unless self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where('start_date < ?', Date.today.beginning_of_month).count >= 1
-      add_message :error, "Start date cannot be less than #{Date.today.beginning_of_month}."
+    if self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where('start_date < ?', Date.today.beginning_of_month).count >= 1
+      add_message :error, "Start date cannot be less than #{Date.today.beginning_of_month}"
       add_message :error, "Start date cannot be in past month"
     end
   end
 
-  def validate_end_date_end_expiration_date(invoice_type)
+  def validate_end_date_and_expiration_date(invoice_type)
     group_vendor_count_by_id = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.group(:id).count
     # Do not run this validation for single fixed periodic with multiple vendors
     if group_vendor_count_by_id.values.uniq.count == 1 && group_vendor_count_by_id.values.uniq.include?(1)
