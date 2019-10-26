@@ -1,8 +1,50 @@
 module Forms
   module Definitions
+
+    class EntityContract
+      def self.with_options(&block)
+        Class.new(Dry::Validation::Contract) do
+          params do
+            required(:section).filled
+            optional(:parent)
+            required(:field_key).filled
+            required(:label).filled
+            required(:placeholder).filled
+            required(:hint).filled
+            required(:field_type).filled
+            optional(:default_value)
+            required(:editable).value(:bool?)
+            required(:required).value(:bool?)
+            optional(:active).filled(:bool?)
+            optional(:unique).filled(:bool?)
+            optional(:visible).filled(:bool?)
+            optional(:position).filled(:int?)
+            optional(:custom_field).filled(:bool?)
+            optional(:dependent).filled(:bool?)
+            optional(:conditional_required).filled(:bool?)
+            optional(:can_editable_be_changed).filled(:bool?)
+            optional(:can_required_be_changed).filled(:bool?)
+            optional(:can_uniqueness_be_changed).filled(:bool?)
+            optional(:can_be_disabled).filled(:bool?)
+            optional(:can_label_be_renamed).filled(:bool?)
+            optional(:can_not_be_hidden).filled(:bool?)
+            optional(:can_be_filtered).filled(:bool?)
+            optional(:show_in_bulk_import).filled(:bool?)
+            optional(:allow_sort_in_filter).filled(:bool?)
+            optional(:allow_clearing_default_value).filled(:bool?)
+            required(:options).hash do
+              instance_exec &block
+            end
+          end
+        end
+      end
+    end
+
     class Entity
+      extend Dry::Monads[:result]
       include Types::DSL
       include Attribute
+      include ::Forms::Definitions::Contract::DSL
       include Filter
 
       attr_accessor :options
@@ -11,21 +53,20 @@ module Forms
 
       DEFAULT_SCHEMA = {options: {}}
 
-      attribute :section, validates: {presence: true}
-      attribute :parent, validates: {presence: true}
-      attribute :field_key, validates: {presence: true}
-      attribute :section, validates: {presence: true}
-      attribute :label, default: ->(*args) { self.field_key&.to_s&.humanize }, validates: {presence: true}
-      attribute :placeholder, default: "Enter value", validates: {presence: true}
-      attribute :hint, validates: {presence: true}
-      attribute :field_type, validates: {presence: true}
+      attribute :section
+      attribute :parent
+      attribute :field_key
+      attribute :label, default: ->(*args) { self.field_key&.to_s&.humanize }
+      attribute :placeholder, default: "Enter value"
+      attribute :hint
+      attribute :field_type, default: ->(*args) { self.registered_type }
       attribute :default_value
       attribute :editable, default: true
       attribute :required, default: false
       attribute :active, default: true
       attribute :unique, default: false
       attribute :visible, default: true
-      attribute :position, validates: {presence: true}
+      attribute :position
       attribute :custom_field, default: false
       attribute :dependent, default: false
       attribute :conditional_required, default: false
@@ -74,8 +115,22 @@ module Forms
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
       end
 
+      def schema_builder
+        @schema_builder ||= DEFAULT_SCHEMA
+      end
+
       def schema
-        @schema ||= DEFAULT_SCHEMA
+        return @schema if @schema
+
+        @schema ||= {options: {}}
+        schema_builder.except(:options).keys.each do |key|
+          schema[key] = self.send(key)
+        end
+
+        schema_builder[:options].keys.each do |key|
+          schema[:options][key] = self.send(key)
+        end
+        @schema
       end
     end
   end

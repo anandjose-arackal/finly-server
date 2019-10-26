@@ -37,7 +37,9 @@ module Forms
               define_method type do |*args, &block|
                 opts = args.extract_options!
                 name = args.first
-                entity type, name, opts, &block
+                @position ||= 0
+                entity type, name, opts.merge(position: @position), &block
+                @position += 1
               end
             end
           end
