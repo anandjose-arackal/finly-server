@@ -16,10 +16,6 @@ module Forms
       module DSL
         extend ActiveSupport::Concern
 
-        def self.included(base)
-          base.extend(ClassMethods)
-        end
-
         module ClassMethods
           def contract(&block)
             @contract = EntityContract.with_options(&block) if block_given?

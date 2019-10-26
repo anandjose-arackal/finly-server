@@ -3,9 +3,10 @@ module Forms
   module Definitions
     class Section
       include Types::DSL
-      attr_accessor :key, :block
+      attr_accessor :key, :block, :form
 
-      def initialize(key, &block)
+      def initialize(form, key, &block)
+        self.form = form
         self.key = key
         self.block = block
         instance_eval &block if block.present?

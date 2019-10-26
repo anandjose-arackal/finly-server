@@ -16,7 +16,11 @@ module Forms
           opts = args.extract_options!
           klass, name = klass_and_name_from args
           parent = (is_a?(Entity) ? self : nil)
-          entities << klass.new(section, parent, name, opts, &block)
+          entity = klass.new(section, parent, name, opts, &block)
+          result =entity.valid?
+          raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}" unless result.success?
+
+          entities << entity
         end
 
         def klass_and_name_from(args)

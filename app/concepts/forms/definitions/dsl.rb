@@ -9,9 +9,9 @@ module Forms
         class_attr :sections, default: []
       end
 
-      class_methods do
+      module ClassMethods
         def section(key, &block)
-          sections << Section.new(key, &block)
+          sections << Section.new(self, key, &block)
         end
       end
     end
