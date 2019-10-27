@@ -15,4 +15,8 @@ class UserDropDownItemMapping < ApplicationRecord
 
   belongs_to :user
   belongs_to :drop_down_item, class_name: "FieldDropDownItem"
+
+  scope :with_drop_down_item_id, -> (drop_down_item_id) {
+    where(drop_down_item_id: drop_down_item_id)
+  }
 end

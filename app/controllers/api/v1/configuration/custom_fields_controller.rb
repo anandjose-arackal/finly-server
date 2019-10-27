@@ -42,4 +42,14 @@ class Api::V1::Configuration::CustomFieldsController < BaseControllers::ApiBase
     @result = CustomField::FieldConfigurations::DependentIndex.(current_user, params)
     respond
   end
+
+  def associate_users
+    @result = CustomField::Configuration::Users::Add.(current_user, params)
+    respond
+  end
+
+  def disassociate_users
+    @result = CustomField::Configuration::Users::Remove.(current_user, params)
+    respond
+  end
 end

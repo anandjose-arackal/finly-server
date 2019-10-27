@@ -135,6 +135,9 @@ class User < ApplicationRecord
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
 
+  # adding association to drop down items
+  has_many :user_drop_down_item_mappings
+
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :authentications
