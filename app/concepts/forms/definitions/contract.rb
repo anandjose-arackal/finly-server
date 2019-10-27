@@ -19,7 +19,7 @@ module Forms
         module ClassMethods
           def contract(&block)
             @contract = EntityContract.with_options(&block) if block_given?
-            @contract
+            @contract ||= EntityContract.with_options
           end
 
           def valid_schema?(schema)

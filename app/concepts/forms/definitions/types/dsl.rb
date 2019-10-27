@@ -17,9 +17,10 @@ module Forms
           klass, name = klass_and_name_from args
           parent = (is_a?(Entity) ? self : nil)
           entity = klass.new(section, parent, name, opts, &block)
-          result =entity.valid?
-          raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}" unless result.success?
-
+          result = entity.valid?
+          unless result.success?
+            raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}"
+          end
           entities << entity
         end
 

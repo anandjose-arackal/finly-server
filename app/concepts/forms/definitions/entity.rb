@@ -10,7 +10,7 @@ module Forms
             required(:field_key).filled
             required(:label).filled
             required(:placeholder).filled
-            required(:hint).filled
+            optional(:hint)
             required(:field_type).filled
             optional(:default_value)
             required(:editable).value(:bool?)
@@ -33,7 +33,7 @@ module Forms
             optional(:allow_sort_in_filter).filled(:bool?)
             optional(:allow_clearing_default_value).filled(:bool?)
             required(:options).hash do
-              instance_exec &block
+              instance_exec &block if block_given?
             end
           end
         end
@@ -51,7 +51,7 @@ module Forms
 
       class_attribute :registered_type
 
-      DEFAULT_SCHEMA = {options: {}}
+      DEFAULT_SCHEMA = {}
 
       attribute :section
       attribute :parent
@@ -102,6 +102,8 @@ module Forms
         section(section)
         self.options = opts
         initialize_with(opts)
+
+        instance_eval &block if block_given?
       end
 
       def initialize_with(opts)
@@ -112,23 +114,23 @@ module Forms
       end
 
       def inspect
-        "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
+        "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.except(:parent).as_json}>"
       end
 
       def schema_builder
-        @schema_builder ||= DEFAULT_SCHEMA
+        @schema_builder ||= DEFAULT_SCHEMA.deep_dup.merge(options: {})
       end
 
       def schema
         return @schema if @schema
 
-        @schema ||= {options: {}}
+        @schema = {options: {}}
         schema_builder.except(:options).keys.each do |key|
-          schema[key] = self.send(key)
+          @schema[key] = self.send(key)
         end
 
         schema_builder[:options].keys.each do |key|
-          schema[:options][key] = self.send(key)
+          @schema[:options][key] = self.send(key)
         end
         @schema
       end
