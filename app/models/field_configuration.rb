@@ -198,8 +198,13 @@ class FieldConfiguration < ApplicationRecord
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
+    user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false
     if field_type_id == FieldType.id_for(:drop_down)
-      options = drop_down_items.exclude_deleted
+      if user_level_custom_fields
+       options = drop_down_items.exclude_deleted.items_for_user(RequestStore.store[:current_user]&.id)
+      else
+        options = drop_down_items.exclude_deleted
+      end
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
