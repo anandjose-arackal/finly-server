@@ -23,7 +23,7 @@ class FieldDropDownItem < ApplicationRecord
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
 
-  has_many :user_drop_down_item_mappings
+  has_many :user_drop_down_item_mappings , class_name: 'UserDropDownItemMapping', foreign_key: :drop_down_item_id
   has_many :affected_users, through: :user_drop_down_item_mappings, source: :user
 
   validates :name, presence: true
@@ -32,6 +32,9 @@ class FieldDropDownItem < ApplicationRecord
   scope :with_field_configuration_id, -> (id) {
     where field_configuration_id: id
   }
+  scope :items_for_user,->(user_id) do
+    joins(:user_drop_down_item_mappings).where('user_drop_down_item_mappings.user_id = ?', user_id)
+  end
 
   default_scope { unscope(:where) }
 
