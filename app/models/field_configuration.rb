@@ -201,7 +201,7 @@ class FieldConfiguration < ApplicationRecord
     user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false
     if field_type_id == FieldType.id_for(:drop_down)
       if user_level_custom_fields
-       options = drop_down_items.exclude_deleted.items_for_user(RequestStore.store[:current_user]&.id)
+       options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id)
       else
         options = drop_down_items.exclude_deleted
       end

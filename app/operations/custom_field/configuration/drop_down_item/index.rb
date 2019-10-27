@@ -45,7 +45,7 @@ class CustomField::Configuration::DropDownItem::Index < CustomField::Configurati
   class CustomField::Configuration::DropDownItem::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :field_configuration, :drop_down_items
 
-    has_scope :items_for_user
+    has_scope :filter_user_id
     def init
       self.field_configuration = params[:field_configuration]
       self.drop_down_items = params[:drop_down_items]

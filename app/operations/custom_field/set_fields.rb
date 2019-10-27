@@ -215,7 +215,7 @@ class CustomField::SetFields < CustomField::Base
           acceptable_value = true
         else
           if user_level_custom_fields
-            if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.items_for_user(use&.id).pluck(:id).include?(drop_down_value.to_i)}
+            if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.filter_user_id(use&.id).pluck(:id).include?(drop_down_value.to_i)}
               # if acceptable_dropdown_values.include?(config.parent_id.to_s)
               acceptable_value = true
             end
