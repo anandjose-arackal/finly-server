@@ -28,6 +28,10 @@ class Api::V1::Configuration::CustomFieldsController < BaseControllers::ApiBase
     respond response: @result&.success? ? :success : :failure
   end
 
+  def dropdownitem_index
+    @result = CustomField::Configuration::DropDownItem::Index.(current_user, params)
+  end
+
   def dropdownitem_create
     @result = CustomField::Configuration::DropDownItem::Add.(current_user, params)
     respond response: @result&.success? ? :success : :failure

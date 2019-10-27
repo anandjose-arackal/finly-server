@@ -2472,6 +2472,7 @@ Rails.application.routes.draw do
         get 'category/index'
 
         resources :custom_fields do
+          get 'drop_down_items', to: 'custom_fields#dropdownitem_index'
           post 'drop_down_items', to: 'custom_fields#dropdownitem_create'
           delete 'drop_down_items/:id', to: 'custom_fields#dropdownitem_destroy'
         end
