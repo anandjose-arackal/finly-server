@@ -96,7 +96,7 @@ class FieldConfiguration < ApplicationRecord
     includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
   }
 
-  delegate :drop_down?, to: :field_type
+  delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}

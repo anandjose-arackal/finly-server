@@ -28,6 +28,16 @@
 #                                                          PUT    /admin_users/password(.:format)                                                                                     devise/passwords#update
 #                                                          POST   /admin_users/password(.:format)                                                                                     devise/passwords#create
 #                      api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                                                                      api/v1/configuration/category#index
+#        api_v1_configuration_custom_field_drop_down_items POST   /api/v1/configuration/custom_fields/:custom_field_id/drop_down_items(.:format)                                      api/v1/configuration/custom_fields#dropdownitem_create
+#                                                          DELETE /api/v1/configuration/custom_fields/:custom_field_id/drop_down_items/:id(.:format)                                  api/v1/configuration/custom_fields#dropdownitem_destroy
+#                       api_v1_configuration_custom_fields GET    /api/v1/configuration/custom_fields(.:format)                                                                       api/v1/configuration/custom_fields#index
+#                                                          POST   /api/v1/configuration/custom_fields(.:format)                                                                       api/v1/configuration/custom_fields#create
+#                    new_api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/new(.:format)                                                                   api/v1/configuration/custom_fields#new
+#                   edit_api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/:id/edit(.:format)                                                              api/v1/configuration/custom_fields#edit
+#                        api_v1_configuration_custom_field GET    /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#show
+#                                                          PATCH  /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#update
+#                                                          PUT    /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#update
+#                                                          DELETE /api/v1/configuration/custom_fields/:id(.:format)                                                                   api/v1/configuration/custom_fields#destroy
 #                            api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                                                                            api/v1/configuration#category
 #                                          email_processor POST   /email/incoming(.:format)                                                                                           griddler/emails#create
 #                                         new_user_session GET    /users/sign_in(.:format)                                                                                            sessions#new
@@ -418,6 +428,15 @@
 #                       admin_users_company_configure_payu POST   /admin_users/companies/:company_id/configure_payu(.:format)                                                         admin_users/companies#configure_payu
 #            admin_users_company_import_data_configuration POST   /admin_users/companies/:company_id/import_data_configuration(.:format)                                              admin_users/companies#import_data_configuration
 #            admin_users_company_export_data_configuration GET    /admin_users/companies/:company_id/export_data_configuration(.:format)                                              admin_users/companies#export_data_configuration
+#         get_template_admin_users_company_implementations GET    /admin_users/companies/:company_id/implementations/get_template(.:format)                                           admin_users/implementations#get_template
+#                      admin_users_company_implementations GET    /admin_users/companies/:company_id/implementations(.:format)                                                        admin_users/implementations#index
+#                                                          POST   /admin_users/companies/:company_id/implementations(.:format)                                                        admin_users/implementations#create
+#                   new_admin_users_company_implementation GET    /admin_users/companies/:company_id/implementations/new(.:format)                                                    admin_users/implementations#new
+#                  edit_admin_users_company_implementation GET    /admin_users/companies/:company_id/implementations/:id/edit(.:format)                                               admin_users/implementations#edit
+#                       admin_users_company_implementation GET    /admin_users/companies/:company_id/implementations/:id(.:format)                                                    admin_users/implementations#show
+#                                                          PATCH  /admin_users/companies/:company_id/implementations/:id(.:format)                                                    admin_users/implementations#update
+#                                                          PUT    /admin_users/companies/:company_id/implementations/:id(.:format)                                                    admin_users/implementations#update
+#                                                          DELETE /admin_users/companies/:company_id/implementations/:id(.:format)                                                    admin_users/implementations#destroy
 #                                    admin_users_companies GET    /admin_users/companies(.:format)                                                                                    admin_users/companies#index
 #                                                          POST   /admin_users/companies(.:format)                                                                                    admin_users/companies#create
 #                                  new_admin_users_company GET    /admin_users/companies/new(.:format)                                                                                admin_users/companies#new
@@ -840,15 +859,15 @@
 #                                    send_verification_otp POST   /send_verification_otp(.:format)                                                                                    users#send_verification_otp
 #                                          verify_user_otp POST   /verify_user_otp(.:format)                                                                                          users#verify_user_otp
 #                                                all_cards GET    /users/all_cards(.:format)                                                                                          users#all_cards
+#                                     group_entities_login POST   /users/group_entities_login(.:format)                                                                               users#group_entities_login
+#                               group_entities_after_login GET    /group_entities_after_login(.:format)                                                                               users#group_entities_after_login
+#                                       multi_entity_login POST   /multi_entity_login(.:format)                                                                                       multi_entity_login/token#create
 #                                                    users GET    /users(.:format)                                                                                                    users#index
 #                                                          POST   /users(.:format)                                                                                                    users#create
 #                                                     user GET    /users/:id(.:format)                                                                                                users#show
 #                                                          PATCH  /users/:id(.:format)                                                                                                users#update
 #                                                          PUT    /users/:id(.:format)                                                                                                users#update
 #                                                          DELETE /users/:id(.:format)                                                                                                users#destroy
-#                                     group_entities_login POST   /users/group_entities_login(.:format)                                                                               users#group_entities_login
-#                                           group_entities GET    /users/group_entities(.:format)                                                                                     users#group_entities
-#                                       multi_entity_login POST   /multi_entity_login(.:format)                                                                                       multi_entity_login/token#create
 #                                        user_user_summary GET    /users/:user_id/summary(.:format)                                                                                   users#summary
 #                                             user_details POST   /users/:user_id/user_details(.:format)                                                                              users#user_details
 #                                         user_update_team PATCH  /users/:user_id/update_user_team(.:format)                                                                          users#update_team
@@ -921,10 +940,17 @@
 #                                                   cancel POST   /settlements/reports/processing/cancel(.:format)                                                                    settlement/report#processing_cancel
 #                                             mark_as_paid POST   /settlements/reports/processing/mark_as_paid(.:format)                                                              settlement/report#processing_mark_paid
 #                                             payment_file GET    /settlements/reports/processing/payment_file(.:format)                                                              settlement/report#processing_payment_file
+#                                                          GET    /settlements/reports/processing/:id/generate_template_file(.:format)                                                settlement/report#generate_template_file
+#                                                          POST   /settlements/reports/processing/:id/process_template_file(.:format)                                                 settlement/report#process_template_file
+#                                                          GET    /settlements/reports/processing/:id(.:format)                                                                       settlement/report#processing_show
+#                                                          PATCH  /settlements/reports/processing/:id(.:format)                                                                       settlement/report#processing_update
+#                                                          GET    /settlements/reports/processing/:id/items(.:format)                                                                 settlement/report#processing_show_items
 #                                                completed GET    /settlements/reports/completed(.:format)                                                                            settlement/report#completed_index
 #                                          completed_count GET    /settlements/reports/completed/count(.:format)                                                                      settlement/report#completed_count
 #                                          completed_batch GET    /settlements/reports/completed/batch(.:format)                                                                      settlement/report#completed_batch_index
 #                                    completed_batch_count GET    /settlements/reports/completed/batch/count(.:format)                                                                settlement/report#completed_batch_count
+#                                                          GET    /settlements/reports/completed/:id(.:format)                                                                        settlement/report#completed_show
+#                                                          GET    /settlements/reports/completed/:id/items(.:format)                                                                  settlement/report#completed_show_items
 #                                                          GET    /settlements/money_requests/pending(.:format)                                                                       settlement/money_requests#pending_index
 #                                                          GET    /settlements/money_requests/pending/count(.:format)                                                                 settlement/money_requests#pending_count
 #                                                          GET    /settlements/money_requests/processing(.:format)                                                                    settlement/money_requests#processing_index
@@ -934,10 +960,17 @@
 #                                                          POST   /settlements/money_requests/processing/cancel(.:format)                                                             settlement/money_requests#processing_cancel
 #                                                          POST   /settlements/money_requests/processing/mark_as_paid(.:format)                                                       settlement/money_requests#processing_mark_paid
 #                                                          GET    /settlements/money_requests/processing/payment_file(.:format)                                                       settlement/money_requests#processing_payment_file
+#                                                          GET    /settlements/money_requests/processing/:id/generate_template_file(.:format)                                         settlement/money_requests#generate_template_file
+#                                                          POST   /settlements/money_requests/processing/:id/process_template_file(.:format)                                          settlement/money_requests#process_template_file
+#                                                          GET    /settlements/money_requests/processing/:id(.:format)                                                                settlement/money_requests#processing_show
+#                                                          PATCH  /settlements/money_requests/processing/:id(.:format)                                                                settlement/money_requests#processing_update
+#                                                          GET    /settlements/money_requests/processing/:id/items(.:format)                                                          settlement/money_requests#processing_show_items
 #                                                          GET    /settlements/money_requests/completed(.:format)                                                                     settlement/money_requests#completed_index
 #                                                          GET    /settlements/money_requests/completed/count(.:format)                                                               settlement/money_requests#completed_count
 #                                                          GET    /settlements/money_requests/completed/batch(.:format)                                                               settlement/money_requests#completed_batch_index
 #                                                          GET    /settlements/money_requests/completed/batch/count(.:format)                                                         settlement/money_requests#completed_batch_count
+#                                                          GET    /settlements/money_requests/completed/:id(.:format)                                                                 settlement/money_requests#completed_show
+#                                                          GET    /settlements/money_requests/completed/:id/items(.:format)                                                           settlement/money_requests#completed_show_items
 #                                                per_diems GET    /per_diems(.:format)                                                                                                per_diems#index
 #                                                          POST   /per_diems(.:format)                                                                                                per_diems#create
 #                                             new_per_diem GET    /per_diems/new(.:format)                                                                                            per_diems#new
@@ -1222,6 +1255,7 @@
 #                                                          PUT    /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#update
 #                                                          DELETE /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#destroy
 #                                      bank_transfer_count GET    /bank_transfer/bank_payment_requests/count(.:format)                                                                bank_transfer/bank_payment_requests#count
+#                  bank_transfer_get_company_bank_accounts GET    /bank_transfer/payment_requests/get_company_bank_accounts(.:format)                                                 bank_transfer/bank_payment_requests#get_company_bank_accounts
 #              bank_transfer_payment_requests_process_file POST   /bank_transfer/payment_requests/process_file(.:format)                                                              bank_transfer/bank_payment_requests#process_file
 #                           bank_transfer_payment_requests POST   /bank_transfer/payment_requests(.:format)                                                                           bank_transfer/bank_payment_requests#create
 #           bank_transfer_payment_requests_account_details POST   /bank_transfer/payment_requests/account_details(.:format)                                                           bank_transfer/bank_payment_requests#account_details
@@ -1493,6 +1527,29 @@
 #                            invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                                                  invoicing/companies#show_credit_account
 #                               invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                                                     invoicing/companies#transfer_history
 #                                      invoicing_analytics GET    /invoicing/analytics(.:format)                                                                                      invoicing/analytics#index
+#                                payment_agreement_approve PATCH  /payment_agreements/:payment_agreement_id/approve(.:format)                                                         payment_agreements#approve
+#                                 payment_agreement_submit PATCH  /payment_agreements/:payment_agreement_id/submit(.:format)                                                          payment_agreements#submit
+#                                payment_agreement_retract PATCH  /payment_agreements/:payment_agreement_id/retract(.:format)                                                         payment_agreements#retract
+#                                 payment_agreement_reject PATCH  /payment_agreements/:payment_agreement_id/reject(.:format)                                                          payment_agreements#reject
+#                              payment_agreement_unapprove PATCH  /payment_agreements/:payment_agreement_id/unapprove(.:format)                                                       payment_agreements#unapprove
+#                           payment_agreement_take_control PATCH  /payment_agreements/:payment_agreement_id/take_control(.:format)                                                    payment_agreements#take_control
+#                         payment_agreement_return_control PATCH  /payment_agreements/:payment_agreement_id/return_control(.:format)                                                  payment_agreements#return_control
+#                      payment_agreement_upcoming_invoices GET    /payment_agreements/:payment_agreement_id/upcoming_invoices(.:format)                                               payment_agreements#upcoming_invoices
+#                        payment_agreement_invoice_history GET    /payment_agreements/:payment_agreement_id/invoice_history(.:format)                                                 payment_agreements#invoice_history
+#                            payment_agreement_attachments GET    /payment_agreements/:payment_agreement_id/attachments(.:format)                                                     payment_agreements#attachments
+#                       document_config_payment_agreements GET    /payment_agreements/document_config(.:format)                                                                       payment_agreements#document_config
+#                                 count_payment_agreements GET    /payment_agreements/count(.:format)                                                                                 payment_agreements#count
+#                         policy_config_payment_agreements GET    /payment_agreements/policy_config(.:format)                                                                         payment_agreements#policy_config
+#                         filter_config_payment_agreements GET    /payment_agreements/filter_config(.:format)                                                                         payment_agreements#filter_config
+#       payment_agreement_action_config_payment_agreements GET    /payment_agreements/payment_agreement_action_config(.:format)                                                       payment_agreements#actions_configuration
+#                                       payment_agreements GET    /payment_agreements(.:format)                                                                                       payment_agreements#index
+#                                                          POST   /payment_agreements(.:format)                                                                                       payment_agreements#create
+#                                    new_payment_agreement GET    /payment_agreements/new(.:format)                                                                                   payment_agreements#new
+#                                   edit_payment_agreement GET    /payment_agreements/:id/edit(.:format)                                                                              payment_agreements#edit
+#                                        payment_agreement GET    /payment_agreements/:id(.:format)                                                                                   payment_agreements#show
+#                                                          PATCH  /payment_agreements/:id(.:format)                                                                                   payment_agreements#update
+#                                                          PUT    /payment_agreements/:id(.:format)                                                                                   payment_agreements#update
+#                                                          DELETE /payment_agreements/:id(.:format)                                                                                   payment_agreements#destroy
 #                   admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)                                     admin_users/funds_load_requests#approve
 #                    admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)                                      admin_users/funds_load_requests#reject
 #                          admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                                                    admin_users/funds_load_requests#index
@@ -1527,6 +1584,7 @@
 #                                       new_budgets_config GET    /new_budget_config(.:format)                                                                                        budgets#new_budgets_config
 #                                              grn_pending GET    /grn/pending(.:format)                                                                                              procure/procurements#index
 #                       procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                       procure/procurements#filter_config
+#                   procure_inward_documents_filter_config GET    /procure/inward_documents/filter_config(.:format)                                                                   procure/inward_documents#filter_config
 #                               procure_procurements_count GET    /procure/procurements/count(.:format)                                                                               procure/procurements#count
 #                                     procure_procurements GET    /procure/procurements(.:format)                                                                                     procure/procurements#index
 #                                                          POST   /procure/procurements(.:format)                                                                                     procure/procurements#create
@@ -1600,6 +1658,7 @@
 #                    procure_purchase_requests_bulk_reject PUT    /procure/purchase_requests/bulk_reject(.:format)                                                                    procure/purchase_requests#bulk_reject
 #              procure_purchase_requests_bulk_take_control PUT    /procure/purchase_requests/bulk_take_control(.:format)                                                              procure/purchase_requests#bulk_take_control
 #                   procure_purchase_requests_bulk_destroy DELETE /procure/purchase_requests/bulk_destroy(.:format)                                                                   procure/purchase_requests#bulk_destroy
+#                  procure_purchase_requests_filter_config GET    /procure/purchase_requests/filter_config(.:format)                                                                  procure/purchase_requests#filter_config
 #                     procure_purchase_request_edit_config GET    /procure/purchase_requests/:purchase_request_id/edit_config(.:format)                                               procure/purchase_requests#edit_config
 #               procure_purchase_request_create_and_submit POST   /procure/purchase_requests/:purchase_request_id/create_and_submit(.:format)                                         procure/purchase_requests#create_and_submit
 #                          procure_purchase_request_submit PATCH  /procure/purchase_requests/:purchase_request_id/submit(.:format)                                                    procure/purchase_requests#submit
@@ -1615,6 +1674,7 @@
 #     bulk_reject_approved_items_procure_purchase_requests PATCH  /procure/purchase_requests/bulk_reject_approved_items(.:format)                                                     procure/purchase_requests#bulk_reject_approved_items
 #           issue_from_inventory_procure_purchase_requests PATCH  /procure/purchase_requests/issue_from_inventory(.:format)                                                           procure/purchase_requests#issue_from_inventory
 #                          count_procure_purchase_requests GET    /procure/purchase_requests/count(.:format)                                                                          procure/purchase_requests#count
+#                        procure_purchase_request_comments GET    /procure/purchase_requests/:purchase_request_id/comments(.:format)                                                  procure/purchase_requests#comments
 #                                procure_purchase_requests GET    /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#index
 #                                                          POST   /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#create
 #                             new_procure_purchase_request GET    /procure/purchase_requests/new(.:format)                                                                            procure/purchase_requests#new
@@ -1744,6 +1804,7 @@
 #                                dashboards_vp_po_advances GET    /dashboards/vp/po_advances(.:format)                                                                                dashboards/vendor_payments#po_advances
 #                                       dashboards_vp_grns GET    /dashboards/vp/grns(.:format)                                                                                       dashboards/vendor_payments#grns
 #                                    dashboards_vp_vendors GET    /dashboards/vp/vendors(.:format)                                                                                    dashboards/vendor_payments#vendors
+#                         dashboards_vp_payment_agreements GET    /dashboards/vp/payment_agreements(.:format)                                                                         dashboards/vendor_payments#payment_agreements
 #                                    dashboards_vp_budgets GET    /dashboards/vp/budgets(.:format)                                                                                    dashboards/vendor_payments#budgets
 #                                vendors_new_vendor_config GET    /vendors/new_vendor_config(.:format)                                                                                vendors#new_vendor_config
 #                                    vendors_filter_config GET    /vendors/filter_config(.:format)                                                                                    vendors#filter_config
@@ -2409,7 +2470,13 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :configuration do
         get 'category/index'
+
+        resources :custom_fields do
+          post 'drop_down_items', to: 'custom_fields#dropdownitem_create'
+          delete 'drop_down_items/:id', to: 'custom_fields#dropdownitem_destroy'
+        end
       end
+
     end
   end
 
