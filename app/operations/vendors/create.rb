@@ -126,6 +126,7 @@ class Vendors::Create < Vendors::Base
 
       if gstin_location[:gstin].present?
         gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
+        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin])
         if gstin.present?
           add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
           return
@@ -287,5 +288,14 @@ class Vendors::Create < Vendors::Base
   def success
     params[:vendor] = self.vendor
     BankTransfer::Vendors::Create::SuccessPresenter.new(user, params, messages)
+  end
+
+  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil)
+    if pan_number.present? && gstin.present?
+      pan_number_from_gstin = gstin[2..gstin.length-4]
+      unless pan_number == pan_number_from_gstin
+        add_message :error, "Invalid Gstin #{gstin}. Gstin should have pan number #{pan_number}"
+      end
+    end
   end
 end
