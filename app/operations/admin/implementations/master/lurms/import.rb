@@ -99,6 +99,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     unless lurm.present?
       return result  false, message: "Mapping not found"
     end
+    self.policy = lurm.policy
 
     if lurm_params[:min].present? && lurm_params[:max].present?
       if lurm_params[:min] >= lurm_params[:max]
