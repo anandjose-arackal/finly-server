@@ -1,0 +1,2 @@
+class FormEntity < ApplicationRecord
+end
