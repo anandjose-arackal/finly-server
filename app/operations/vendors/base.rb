@@ -161,8 +161,10 @@ class Vendors::Base < BaseOperation
       pan_number_from_gstin = gstin[2..gstin.length-4]
       unless pan_number == pan_number_from_gstin
         add_message :error, "Pan number #{pan_number} does not match with gstin pan #{pan_number_from_gstin}"
+        return false
       end
     end
+    true
   end
 
 end

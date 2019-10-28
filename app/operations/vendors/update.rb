@@ -38,15 +38,6 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    if vendor_parameters[:gstin_locations_attributes].present?
-      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-        unless gst.keys.present?
-          vendor_parameters[:gstin_locations_attributes].delete_at(index)
-        end
-        validate_pan_number_in_gstin(vendor_parameters[:pan] , gst[:gstin])
-      end
-    end
-
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?
@@ -150,7 +141,7 @@ class Vendors::Update < Vendors::Base
     return if has_errors?
     
     vendor.assign_attributes(vendor_parameters)
-
+    validate_gstin_pan_number
 
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
@@ -179,5 +170,12 @@ class Vendors::Update < Vendors::Base
       bank_account_changed: vendor.bank_accounts.map {|v| v.changes_to_save if v.changes_to_save.present?}.compact,
       bank_accounts: vendor.bank_accounts.map {|v| v.changes_to_save}
     }
+  end
+
+  def validate_gstin_pan_number
+    self.vendor.gstin_locations.each do |vendor_location|
+      validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)
+      break unless validated
+    end
   end
 end
