@@ -123,12 +123,20 @@ class PendingInvitesController < BaseControllers::WebBase
 
   def em_onboarding
     @result = UserOnboarding::ExpenseManagement.(current_user, params)
-    respond
+    if @result.success?
+      respond
+    else
+      render file: 'pending_invites/em_onboarding'
+    end
   end
 
   def vp_onboarding
     @result = UserOnboarding::VendorPayments.(current_user, params)
-    respond
+    if @result.success?
+      respond
+    else
+      render file: 'pending_invites/vp_onboarding'
+    end
   end
 
   def configuration_data

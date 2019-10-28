@@ -1,5 +1,5 @@
 class UserOnboarding::Base < BaseOperation
-  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable, :unassignable_roles, :users, :urm_user_role_ids, :pur_user_role_ids, :bulk_assign
+  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles, :users, :urm_user_role_ids, :pur_user_role_ids, :bulk_assign
 
   def pre_validate
     if params[:bulk_assign].blank?
@@ -28,7 +28,7 @@ class UserOnboarding::Base < BaseOperation
     self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
     self.urm_user_role_ids = ( UserRole::VALUES_EM.values & bulk_assign[:user_role_ids] ) rescue nil
     self.pur_user_role_ids = ( UserRole::VP_ROLES.values & bulk_assign[:user_role_ids] ) rescue nil
-    result = UserOnboarding::BulkUsersForImport.(current_user, params)
+    result = ::UserOnboarding::BuildUsersForImport.(current_user, params)
 
     unless result.success?
       add_message :error, result.messages[:error]
@@ -53,10 +53,10 @@ class UserOnboarding::Base < BaseOperation
     # from the previous result, we only need to get and search for duplicate records based on combination of 3 columns
     all_roles = urm.pluck(:user_id, :user_role_id)
 
-    self.user_role_ids << UserRole.id_for(:employee)
+    self.urm_user_role_ids << UserRole.id_for(:employee)
     # -> create records for searching
     # from the params sent, we create a format compatible to search against the previous result
-    new_roles = self.user_ids.product(self.user_role_ids)
+    new_roles = self.user_ids.product(self.urm_user_role_ids)
 
     # -> assignable roles
     # now we check for the new_roles to be assigned, comparing against the result from all_roles.
@@ -83,7 +83,7 @@ class UserOnboarding::Base < BaseOperation
 
     # -> create records for searching
     # from the params sent, we create a format compatible to search against the previous result
-    new_roles = self.policy_ids.product(self.user_ids, self.user_role_ids)
+    new_roles = self.policy_ids.product(self.user_ids, self.pur_user_role_ids)
 
     # -> assignable roles
     # now we check for the new_roles to be assigned, comparing against the result from all_roles.

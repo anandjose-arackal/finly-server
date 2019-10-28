@@ -1,5 +1,6 @@
-class UserOnboarding::BulkUsersForImport < BaseOperation
-  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign
+class UserOnboarding::BuildUsersForImport < BaseOperation
+  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign, :common_emails, 
+                :new_emails
 
 
   def pre_validate
@@ -96,7 +97,7 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
     self.new_emails = self.input_emails - user.company.users.pluck(:email)
 
 
-    return if self.new_mails.blank? and self.common_emails.blank?
+    # return if self.new_mails.blank? and self.common_emails.blank?
 
     user_list = []
     if current_company.feature_subscription.group_entity_structure
@@ -104,7 +105,6 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
     else
       user_list = new_users
     end
-
     newly_created_users = []
     user_list.each do |list|
       options = list
@@ -119,6 +119,7 @@ class UserOnboarding::BulkUsersForImport < BaseOperation
       newly_created_users << u
     end
 
-    user.company.where(email: newly_created_users.pluck(:email))
+    all_emails = newly_created_users.pluck(:email) + self.common_emails
+    user.company.users.where(email: all_emails)
   end
 end

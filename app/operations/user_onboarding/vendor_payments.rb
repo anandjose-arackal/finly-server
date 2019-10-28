@@ -2,7 +2,7 @@
 # 
 
 class UserOnboarding::VendorPayments < UserOnboarding::Base
-  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable, :unassignable_roles,
+  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles,
                 :urm_columns, :urm_values, :pur_columns, :pur_values,
                 :urm_user_role_ids, :pur_user_role_ids,
                 :pur_unassignable_roles
@@ -38,6 +38,11 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     # Bulk insert into table, 
     # much faster  
     exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
+
+    if self.unassignable_roles.present?
+      fields = [:policy_id, :user_id, :user_role_id]
+      params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
+    end
   end
 
   def post_process
@@ -49,17 +54,14 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
   end
 
   def failure
-    if self.unassignable_roles.present?
-      fields = [:policy_id, :user_id, :user_role_id]
-      params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
-    end
     UserOnboarding::VendorPayments::FailurePresenter.new(user, params, messages)
   end
 
   class UserOnboarding::VendorPayments::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :unassignable_roles
 
     def init
-
+      self.unassignable_roles = params[:unassignable_roles]
     end
   end
 
