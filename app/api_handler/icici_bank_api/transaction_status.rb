@@ -68,7 +68,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         self.transaction_status_response = self.parsed_response["STATUS"]
         case self.transaction_status_response&.upcase
         when "FAILURE"
-          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         else
           # do nothing?
         end
