@@ -410,7 +410,7 @@ class Procurement < ApplicationRecord
   }
 
   scope :filter_pr_number, -> (pr_number){
-    
+    joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.order_number LIKE ?', "%#{pr_number}%")
   }
 
   def awaiting_action?(user)
