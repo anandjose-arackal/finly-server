@@ -1,5 +1,5 @@
 class UserOnboarding::Base < BaseOperation
-  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles, :users, :urm_user_role_ids, :pur_user_role_ids, :bulk_assign
+  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles, :users, :urm_user_role_ids, :pur_user_role_ids, :bulk_assign, :policies
 
   def pre_validate
     if params[:bulk_assign].blank?
@@ -25,6 +25,7 @@ class UserOnboarding::Base < BaseOperation
 
   def init
     self.bulk_assign = params[:bulk_assign]
+    self.policies = user.company.policies.with_id(bulk_assign[:policy_ids])
     self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
     self.urm_user_role_ids = ( UserRole::VALUES_EM.values & bulk_assign[:user_role_ids] ) rescue nil
     self.pur_user_role_ids = ( UserRole::VP_ROLES.values & bulk_assign[:user_role_ids] ) rescue nil
@@ -35,7 +36,7 @@ class UserOnboarding::Base < BaseOperation
       return
     end
 
-    self.users = result.users
+    self.users = result.users.to_a
     self.user_ids = self.users.pluck :id
   end
 

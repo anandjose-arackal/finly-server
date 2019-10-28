@@ -2,7 +2,7 @@
 # 
 
 class UserOnboarding::ExpenseManagement < UserOnboarding::Base
-  attr_accessor :policy_ids, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles,
+  attr_accessor :policy_ids, :policies, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles,
                 :urm_columns, :urm_values, :pur_columns, :pur_values,
                 :urm_unassignable_roles, :pur_unassignable_roles,
                 :urm_user_role_ids, :pur_user_role_ids
@@ -50,9 +50,17 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
     exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
 
     if self.unassignable_roles.present?
-      fields = [:policy_id, :user_id, :user_role_id]
+      fields = [:policy, :user, :user_role]
       self.unassignable_roles = self.urm_unassignable_roles + self.pur_unassignable_roles
-      params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
+      # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
+
+      params[:unassignable_roles] = self.unassignable_roles.map do |role| 
+        policy = policies.find {|policy| policy if policy.id == role.first}
+        user = users.find {|u| u if u.id == role.second}
+        roles = UserRole::VALUES.invert[role.third]
+        pur = [{id: policy.id, name:policy.name}, {id: user.id, email: user.email}, {id: role.last, name: roles.to_s}]
+        fields.zip(pur).to_h 
+      end
     end
 
   end
