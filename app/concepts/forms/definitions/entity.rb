@@ -22,6 +22,7 @@ module Forms
             optional(:custom_field).filled(:bool?)
             optional(:dependent).filled(:bool?)
             optional(:conditional_required).filled(:bool?)
+            optional(:can_visible_be_changed).filled(:bool?)
             optional(:can_editable_be_changed).filled(:bool?)
             optional(:can_required_be_changed).filled(:bool?)
             optional(:can_uniqueness_be_changed).filled(:bool?)
@@ -29,9 +30,11 @@ module Forms
             optional(:can_label_be_renamed).filled(:bool?)
             optional(:can_not_be_hidden).filled(:bool?)
             optional(:can_be_filtered).filled(:bool?)
+            optional(:can_choices_be_changed).filled(:bool?)
             optional(:show_in_bulk_import).filled(:bool?)
             optional(:allow_sort_in_filter).filled(:bool?)
             optional(:allow_clearing_default_value).filled(:bool?)
+
             optional(:choices).array do
               hash do
                 optional(:id)

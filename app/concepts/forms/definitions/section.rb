@@ -3,17 +3,17 @@ module Forms
   module Definitions
     class Section
       include Registry
-      attr_accessor :key, :block, :form
+      attr_accessor :name, :block, :form
 
-      def initialize(form, key, &block)
+      def initialize(form, name, &block)
         self.form = form
-        self.key = key
+        self.name = name
         self.block = block
         instance_eval &block if block.present?
       end
 
       def section
-        key
+        name
       end
     end
   end
