@@ -256,6 +256,7 @@ class PaymentAgreement < ApplicationRecord
     with_ids(ids)
   }
 
+
   def as_json(options={})
     {
       id: self.id,
@@ -372,11 +373,28 @@ class PaymentAgreement < ApplicationRecord
 
   def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
+      # Payment agreement cannot be created for past months
+      # validate_current_month
       if self.agreement_date > self.execution_date
         errors.add(:agreement_date, 'cannot be greater than execution date')
       end
     end
   end
+
+  def validate_current_month
+    if self.agreement_date.present?
+      if self.agreement_date&.to_date < Date.today.beginning_of_month
+        errors.add(:agreement_date, 'cannot be from previous months')
+      end
+    end
+
+    if self.execution_date.present?
+      if self.execution_date&.to_date < Date.today.beginning_of_month
+        errors.add(:execution_date, 'cannot be from previous months')
+      end
+    end
+  end
+
 
   def expiration_date_if_allowed
     if self.no_expiration.blank? && self.expiration_date.blank?
