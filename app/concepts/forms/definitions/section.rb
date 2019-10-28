@@ -2,7 +2,7 @@ Dir["#{Rails.root}/app/concepts/forms/definitions/types/*.rb"].each {|file| load
 module Forms
   module Definitions
     class Section
-      include Types::DSL
+      include Registry
       attr_accessor :key, :block, :form
 
       def initialize(form, key, &block)

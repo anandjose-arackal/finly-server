@@ -2,7 +2,7 @@ module Forms
   module Definitions
 
     class EntityContract
-      def self.with_options(&block)
+      def self.build(&block)
         Class.new(Dry::Validation::Contract) do
           params do
             required(:section).filled
@@ -32,6 +32,14 @@ module Forms
             optional(:show_in_bulk_import).filled(:bool?)
             optional(:allow_sort_in_filter).filled(:bool?)
             optional(:allow_clearing_default_value).filled(:bool?)
+            optional(:choices).array do
+              hash do
+                optional(:id)
+                required(:value).filled
+                required(:position).value(:int?)
+                required(:active).value(:bool?)
+              end
+            end
             required(:options).hash do
               instance_exec &block if block_given?
             end
@@ -42,16 +50,14 @@ module Forms
 
     class Entity
       extend Dry::Monads[:result]
-      include Types::DSL
-      include Attribute
+      include Registry
+      include Schema
       include ::Forms::Definitions::Contract::DSL
       include Filter
 
       attr_accessor :options
 
       class_attribute :registered_type
-
-      DEFAULT_SCHEMA = {}
 
       attribute :section
       attribute :parent
@@ -68,8 +74,10 @@ module Forms
       attribute :visible, default: true
       attribute :position
       attribute :custom_field, default: false
+      attribute :chained
       attribute :dependent, default: false
       attribute :conditional_required, default: false
+      attribute :multiple, default: false
 
       # option :char_limit #, default: 1000
       # option :min_items
@@ -79,6 +87,7 @@ module Forms
       # option :choices #, default: []
       # option :enum #, default: { provider: nil, chained: [], filters: {} }
 
+      attribute :can_visible_be_changed, default: false
       attribute :can_editable_be_changed, default: false
       attribute :can_required_be_changed, default: false
       attribute :can_uniqueness_be_changed, default: false
@@ -86,6 +95,7 @@ module Forms
       attribute :can_label_be_renamed, default: true
       attribute :can_not_be_hidden, default: true
       attribute :can_be_filtered, default: true
+      attribute :can_choices_be_changed, default: true
       attribute :show_in_bulk_import, default: false
       attribute :allow_sort_in_filter, default: false
       attribute :allow_clearing_default_value, default: true
@@ -115,24 +125,6 @@ module Forms
 
       def inspect
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.except(:parent).as_json}>"
-      end
-
-      def schema_builder
-        @schema_builder ||= DEFAULT_SCHEMA.deep_dup.merge(options: {})
-      end
-
-      def schema
-        return @schema if @schema
-
-        @schema = {options: {}}
-        schema_builder.except(:options).keys.each do |key|
-          @schema[key] = self.send(key)
-        end
-
-        schema_builder[:options].keys.each do |key|
-          @schema[:options][key] = self.send(key)
-        end
-        @schema
       end
     end
   end

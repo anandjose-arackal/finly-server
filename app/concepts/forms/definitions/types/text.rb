@@ -3,6 +3,7 @@ module Forms
     module Types
       class Text < Entity
         register :text
+        hint "Enter value"
 
         option :char_limit, default: 255 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
         option :regex #, default: {format: "", message: ""}
