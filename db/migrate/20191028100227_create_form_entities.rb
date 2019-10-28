@@ -1,9 +1,9 @@
 class CreateFormEntities < ActiveRecord::Migration[5.2]
   def change
     create_table :form_entities do |t|
-      t.references :company, index: true, null: false, foreign_key: true
-      t.references :form, index: true, null: false, foreign_key: true
-      t.references :form_section, index: true, null: false, foreign_key: true
+      t.integer :company_id, references: "Company", index: true, null: false, foreign_key: true
+      t.integer :form_id, references: "Form", index: true, null: false, foreign_key: true
+      t.integer :form_section_id, references: "FormSection", index: true, null: false, foreign_key: true
       t.integer :created_by_user_id, index: true, foreign_key: true, references: 'users'
       t.integer :parent_id, index: true
       t.string :field_key, index: true, null: false

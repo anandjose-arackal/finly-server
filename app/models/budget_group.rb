@@ -11,6 +11,7 @@
 
 class BudgetGroup < ApplicationRecord
   belongs_to :company
+  belongs_to :period
 
   has_many :budget_group_criteria_mappings
   has_many :budgetables, through: :budget_group_criteria_mappings

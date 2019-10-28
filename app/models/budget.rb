@@ -28,11 +28,10 @@ class Budget < ApplicationRecord
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
-
+  has_one :budget_consumption
 
   belongs_to :user, optional: true
   belongs_to :company, optional: true
-  belongs_to :period, optional: true
   belongs_to :budget_amount, optional: true, class_name: "Amount"
   belongs_to :spent_amount, optional: true, class_name: "Amount"
 
