@@ -28,7 +28,7 @@ class UserOnboarding::Base < BaseOperation
     self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
     self.urm_user_role_ids = ( UserRole::VALUES_EM.values & bulk_assign[:user_role_ids] ) rescue nil
     self.pur_user_role_ids = ( UserRole::VP_ROLES.values & bulk_assign[:user_role_ids] ) rescue nil
-    result = PolicyUserRoles::BulkUsersForImport.(current_user, params)
+    result = UserOnboarding::BulkUsersForImport.(current_user, params)
 
     unless result.success?
       add_message :error, result.messages[:error]
