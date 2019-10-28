@@ -38,6 +38,15 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+        unless gst.keys.present?
+          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+        end
+        validate_pan_number_in_gstin(vendor_parameters[:pan] , gst[:gstin])
+      end
+    end
+
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?

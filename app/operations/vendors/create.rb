@@ -289,13 +289,4 @@ class Vendors::Create < Vendors::Base
     params[:vendor] = self.vendor
     BankTransfer::Vendors::Create::SuccessPresenter.new(user, params, messages)
   end
-
-  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil)
-    if pan_number.present? && gstin.present?
-      pan_number_from_gstin = gstin[2..gstin.length-4]
-      unless pan_number == pan_number_from_gstin
-        add_message :error, "Invalid Gstin #{gstin}. Gstin should have pan number #{pan_number}"
-      end
-    end
-  end
 end
