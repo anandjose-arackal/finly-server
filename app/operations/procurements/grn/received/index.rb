@@ -64,7 +64,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_policy_id
-
+    has_scope :filter_pr_number
 
     def init
       self.procurements = params[:procurements]
@@ -146,6 +146,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
           }
         when 'invoice_id'
           params[:filter_invoice_id] = params[:search_query]
+        when 'pr_number'
+          params[:filter_pr_number] = params[:search_query]
         else
           # do nothing
       end
