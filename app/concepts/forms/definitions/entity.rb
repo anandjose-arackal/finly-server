@@ -18,6 +18,7 @@ module Forms
             optional(:active).filled(:bool?)
             optional(:unique).filled(:bool?)
             optional(:visible).filled(:bool?)
+            optional(:multiple).filled(:bool?)
             optional(:position).filled(:int?)
             optional(:custom_field).filled(:bool?)
             optional(:dependent).filled(:bool?)
@@ -43,8 +44,10 @@ module Forms
                 required(:active).value(:bool?)
               end
             end
-            required(:options).hash do
-              instance_exec &block if block_given?
+            required(:options) do
+              hash do
+                instance_exec &block if block_given?
+              end
             end
           end
         end

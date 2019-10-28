@@ -23,8 +23,8 @@ module Forms
           @schema[:choices] = choices&.map(&:as_json)
         end
 
-        if self.class.consumes_choices? and provider.present?
-          @schema[:provider] = provider
+        if self.class.consumes_choices? and data_provider.present?
+          @schema[:data_provider] = data_provider
         end
 
         @schema
@@ -50,14 +50,14 @@ module Forms
 
       alias_method :choices=, :choices
 
-      def provider(klass: nil, filters: {})
+      def data_provider(klass: nil, filters: {})
         return nil unless self.class.consumes_choices?
 
-        @provider = {klass: klass, filters: filters} if klass
-        @provider
+        @data_provider = {klass: klass, filters: filters} if klass
+        @data_provider
       end
 
-      alias_method :provider=, :provider
+      alias_method :data_provider=, :data_provider
 
       module ClassMethods
         def schema

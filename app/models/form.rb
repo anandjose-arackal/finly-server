@@ -1,6 +1,6 @@
 class Form < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
-  has_many :sections, class_name: 'FormSection'
+  has_many :sections, class_name: 'FormSection', dependent: :destroy
 
 end
