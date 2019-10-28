@@ -59,6 +59,10 @@ json.results do
         json.amount payment.amount_value
         json.utr payment.reference_resource&.bank_reference_number
         json.payment_status payment.payment_status_name
+        if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)
+          json.business_name payment&.receiving_account&.account_owner&.business_name
+          json.trade_name payment&.receiving_account&.account_owner&.trade_name
+        end
       end
     end
   end

@@ -14,7 +14,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Index < ActionsMan
                     ]
 
   def create_purchase_request
-    true
+    user.vendor_payment_admin? || user.is_purchase_request_initiator?
   end
 
   def export_all
