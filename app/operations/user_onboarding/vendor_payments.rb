@@ -30,15 +30,6 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     self.pur_unassignable_roles = self.unassignable_roles
     self.pur_columns, self.pur_values = setup_pur(assignable_roles)
 
-    return false if has_errors?
-
-  end
-
-  def process
-    # Bulk insert into table, 
-    # much faster  
-    exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
-
     if self.unassignable_roles.present?
       fields = [:policy, :user, :user_role]
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
@@ -51,6 +42,16 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
         fields.zip(pur).to_h 
       end
     end
+    
+    return false if has_errors?
+
+  end
+
+  def process
+    # Bulk insert into table, 
+    # much faster  
+    exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
+
   end
 
   def post_process

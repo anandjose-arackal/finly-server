@@ -38,20 +38,9 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
       self.pur_columns, self.pur_values = setup_pur(assignable_roles)
     end
 
-    return false if has_errors?
-
-  end
-
-  def process
-    # Bulk insert into table, 
-    # much faster  
-    exec_statement(urm_columns, urm_values, :user_role_mappings) if urm_user_role_ids.present?
-
-    exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
-
     if self.unassignable_roles.present?
       fields = [:policy, :user, :user_role]
-      self.unassignable_roles = self.urm_unassignable_roles + self.pur_unassignable_roles
+      self.unassignable_roles = self.urm_unassignable_roles.to_a + self.pur_unassignable_roles.to_a
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
 
       params[:unassignable_roles] = self.unassignable_roles.map do |role| 
@@ -62,6 +51,17 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
         fields.zip(pur).to_h 
       end
     end
+
+    return false if has_errors?
+
+  end
+
+  def process
+    # Bulk insert into table, 
+    # much faster  
+    exec_statement(urm_columns, urm_values, :user_role_mappings) if urm_user_role_ids.present?
+
+    exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
 
   end
 

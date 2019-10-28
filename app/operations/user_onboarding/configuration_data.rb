@@ -13,7 +13,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     when 'em', :em
 			self.user_roles = ::UserRole::VALUES_EM
-			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
+			self.policies = ::Policy::Index.(user, params).try(:policies)
     end
     	
 	end
