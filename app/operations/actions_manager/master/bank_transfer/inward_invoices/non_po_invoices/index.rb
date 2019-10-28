@@ -15,11 +15,11 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index
 
 
   def bulk_approve
-    user.vendor_payment_admin? || user.is_non_po_reviewer?
+    user.vendor_payment_admin? || user.is_non_po_invoice_reviewer?
   end
 
   def bulk_reject
-    user.vendor_payment_admin? || user.is_non_po_reviewer?
+    user.vendor_payment_admin? || user.is_non_po_invoice_reviewer?
   end
 
   def bulk_control
@@ -27,7 +27,7 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index
   end
 
   def bulk_forward_approval
-    user.vendor_payment_admin? || user.is_non_po_reviewer?
+    user.vendor_payment_admin? || user.is_non_po_invoice_reviewer?
   end
 
   def tally_export
