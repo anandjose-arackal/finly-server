@@ -20,7 +20,7 @@ class CreateFormEntities < ActiveRecord::Migration[5.2]
       t.boolean :position
       t.boolean :custom_field
       t.boolean :dependent
-      t.boolean :conditional_required
+      t.boolean :conditional_requiredg
       t.boolean :can_visible_be_changed
       t.boolean :can_editable_be_changed
       t.boolean :can_required_be_changed
