@@ -49,11 +49,11 @@ class Api::V1::Configuration::CustomFieldsController < BaseControllers::ApiBase
 
   def associate_users
     @result = CustomField::Configuration::Users::Add.(current_user, params)
-    respond
+    respond response: @result&.success? ? :success : :failure
   end
 
   def disassociate_users
     @result = CustomField::Configuration::Users::Remove.(current_user, params)
-    respond
+    respond response: @result&.success? ? :success : :failure
   end
 end

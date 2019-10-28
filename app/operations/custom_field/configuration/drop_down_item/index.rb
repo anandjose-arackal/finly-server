@@ -46,6 +46,8 @@ class CustomField::Configuration::DropDownItem::Index < CustomField::Configurati
     attr_accessor :field_configuration, :drop_down_items
 
     has_scope :filter_user_id
+    has_scope :filter_user_email_mobile
+
     def init
       self.field_configuration = params[:field_configuration]
       self.drop_down_items = params[:drop_down_items]

@@ -19,4 +19,9 @@ class UserDropDownItemMapping < ApplicationRecord
   scope :with_drop_down_item_id, -> (drop_down_item_id) {
     where(drop_down_item_id: drop_down_item_id)
   }
+
+  scope :with_user_id, -> (user_ids) {
+    where(user_id: user_ids)
+  }
+  
 end

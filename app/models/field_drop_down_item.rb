@@ -36,6 +36,11 @@ class FieldDropDownItem < ApplicationRecord
     joins(:user_drop_down_item_mappings).where('user_drop_down_item_mappings.user_id = ?', user_id)
   end
 
+  scope :filter_user_email_mobile, -> (email_mobile) {
+    user_ids = User.with_email_or_mobile_number(email_mobile, email_mobile).pluck(:id)
+    joins(:user_drop_down_item_mappings).where('user_drop_down_item_mappings.user_id = ?', user_ids)
+  }
+
   default_scope { unscope(:where) }
 
   def as_json(options={})

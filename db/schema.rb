@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_25_123001) do
+ActiveRecord::Schema.define(version: 2019_10_26_094305) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2940,6 +2940,7 @@ ActiveRecord::Schema.define(version: 2019_10_25_123001) do
     t.boolean "srn_enabled", default: false
     t.boolean "agreement_based_payment_system", default: false
     t.boolean "gstin_verification_enabled", default: false
+    t.boolean "user_level_custom_fields", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"

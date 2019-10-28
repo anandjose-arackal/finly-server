@@ -3,8 +3,8 @@ class CustomField::Configuration::Users::Add < CustomField::Base
   attr_accessor :field_configuration, :selected_users, :drop_downs
 
   def init
-    self.selected_users = user.company.users.with_id(id: params[:user_id])
-    self.field_configuration = user.company.field_configurations.find_by(id: params[:field_configuration_id])
+    self.selected_users = user.company.users.with_email_or_mobile_number(params[:user_id], params[:user_id])
+    self.field_configuration = user.company.field_configurations.find_by(id: params[:custom_field_id])
     self.drop_downs = self.field_configuration&.drop_down_items&.with_id(params[:drop_down_ids])
   end
 
