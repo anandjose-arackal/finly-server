@@ -35,10 +35,10 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
   def success
     params[:procurements] = self.procurements
-    Procurements::Index::IndexPresenter.new(user, params, messages)
+    Procurements::Grn::Received::Index::IndexPresenter.new(user, params, messages)
   end
 
-  class Procurements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Grn::Received::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
