@@ -78,6 +78,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     has_scope :filter_grn_due_today
     has_scope :filter_grn_overdue
     has_scope :filter_policy_id
+    has_scope :filter_pr_number
 
 
     def init
@@ -163,6 +164,8 @@ class Procurements::Grn::Pending::Index < Procurements::Base
           }
         when 'invoice_id'
           params[:filter_invoice_id] = params[:search_query]
+        when 'pr_number'
+          params[:filter_pr_number] = params[:search_query]
         else
           # do nothing
       end

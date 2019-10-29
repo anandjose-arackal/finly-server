@@ -4,7 +4,7 @@ json.created_by @result.vendor.created_by&.json_for_trail
 json.vendor do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number
   if @result.vendor.is_a?(YesBankVendor)
-    json.payment_term @result.vendor.payment_term
+    json.payment_term @result&.vendor&.payment_term&.as_json
     json.currency @result.vendor.currency
     json.business_name @result.vendor.business_name
     json.trade_name @result.vendor.trade_name
