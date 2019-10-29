@@ -1,0 +1,1 @@
+json.merge! JSON.parse yield rescue nil

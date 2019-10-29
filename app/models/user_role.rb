@@ -66,8 +66,13 @@ class UserRole < ApplicationRecord
       po_invoice_auditor: 38, 
       non_po_invoice_initiator: 39,
       non_po_invoice_reviewer: 40,
-      non_po_invoice_auditor: 41
+      non_po_invoice_auditor: 41,
 
+      # BBPS Roles
+      utility_bill_master_initiator: 42,
+      utility_bill_master_reviewer: 43,
+      utility_bill_initiator: 44,
+      utility_bill_reviewer: 45
   }
   ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 
