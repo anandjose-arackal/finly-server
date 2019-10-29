@@ -31,6 +31,8 @@ json.results do
         json.extract! vendor, :id, :vendor_id, :name, :created_at, :email, :mobile_number, :authorized, :description, :pan, :address, :is_deleted
         display_name = vendor.business_name || vendor.name      
         json.display_name display_name
+        json.trade_name  vendor.trade_name
+        json.business_name  vendor.business_name
       end
     end
 
@@ -39,6 +41,7 @@ json.results do
       cost_center = po&.cost_center || invoice&.cost_center
       json.department department&.full_name
       json.cost_center cost_center&.name
+      json.gstin po&.gstin_location&.gstin
     end
 
     json.documents do
