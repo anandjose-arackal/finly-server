@@ -141,7 +141,7 @@ class Vendors::Update < Vendors::Base
     return if has_errors?
     
     vendor.assign_attributes(vendor_parameters)
-    validate_gstin_pan_number
+    return unless validate_gstin_pan_number
 
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
@@ -173,9 +173,11 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
+    validated = false
     self.vendor.gstin_locations.each do |vendor_location|
       validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)
       break unless validated
     end
+    validated
   end
 end
