@@ -40,10 +40,10 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
     options['billers.failed'] = []
 
     # Limit biller fetching to 100
-    # billers = billers.first(5) unless Rails.env.production?
+    billers = billers.first(20) unless Rails.env.production?
 
     billers.each do |biller_config|
-      Bbps::BillerDetails.({biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
+      ::Bbps::BillerDetails.({biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
         m.success do |result|
           error_message = create_or_update_biller(result)
           if error_message.blank?

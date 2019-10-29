@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_20_065426) do
+ActiveRecord::Schema.define(version: 2019_10_28_121828) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -713,7 +713,6 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
   create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "bbps_biller_id", null: false
     t.string "name", null: false
-    t.string "sequence_id", null: false
     t.text "customer_params"
     t.integer "department_id"
     t.integer "cost_center_id"
@@ -725,6 +724,9 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status_id", null: false
+    t.datetime "deleted_at"
+    t.string "subscription_id"
+    t.boolean "require_poc_verification", default: true
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -733,7 +735,6 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.index ["location_id"], name: "index_bbps_biller_subscriptions_on_location_id"
     t.index ["name"], name: "index_bbps_biller_subscriptions_on_name"
     t.index ["policy_id"], name: "index_bbps_biller_subscriptions_on_policy_id"
-    t.index ["sequence_id"], name: "index_bbps_biller_subscriptions_on_sequence_id"
   end
 
   create_table "bbps_billers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2464,6 +2465,7 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.index ["action_id"], name: "index_document_level_reviewer_mappings_on_action_id"
     t.index ["action_taken_by_id"], name: "index_document_level_reviewer_mappings_on_action_taken_by_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
+    t.index ["document_reviewer_mappable_type", "provider_name", "policy_id"], name: "index_dlrm_provider_policy_mappable_type"
     t.index ["forwarded_by_id"], name: "index_document_level_reviewer_mappings_on_forwarded_by_id"
     t.index ["forwarded_to_id"], name: "index_document_level_reviewer_mappings_on_forwarded_to_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
@@ -3187,6 +3189,116 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id", null: false
+    t.string "form_id", limit: 36, null: false
+    t.string "form_section_id", limit: 36, null: false
+    t.integer "created_by_user_id"
+    t.string "parent_id"
+    t.string "field_key", null: false
+    t.string "label"
+    t.string "placeholder"
+    t.string "hint"
+    t.string "field_type"
+    t.string "default_value"
+    t.boolean "multiple"
+    t.boolean "editable"
+    t.boolean "required"
+    t.boolean "active"
+    t.boolean "unique"
+    t.boolean "visible"
+    t.integer "position"
+    t.boolean "custom_field"
+    t.boolean "dependent"
+    t.boolean "conditional_required"
+    t.boolean "can_visible_be_changed"
+    t.boolean "can_editable_be_changed"
+    t.boolean "can_required_be_changed"
+    t.boolean "can_uniqueness_be_changed"
+    t.boolean "can_be_disabled"
+    t.boolean "can_label_be_renamed"
+    t.boolean "can_not_be_hidden"
+    t.boolean "can_be_filtered"
+    t.boolean "can_choices_be_changed"
+    t.boolean "show_in_bulk_import"
+    t.boolean "allow_sort_in_filter"
+    t.boolean "allow_clearing_default_value"
+    t.text "options"
+    t.text "chained"
+    t.text "data_provider"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_entities_on_company_id"
+    t.index ["created_at"], name: "index_form_entities_on_created_at"
+    t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
+    t.index ["deleted_at"], name: "index_form_entities_on_deleted_at"
+    t.index ["field_key"], name: "index_form_entities_on_field_key"
+    t.index ["form_id"], name: "index_form_entities_on_form_id"
+    t.index ["form_section_id"], name: "index_form_entities_on_form_section_id"
+    t.index ["parent_id"], name: "index_form_entities_on_parent_id"
+    t.index ["updated_at"], name: "index_form_entities_on_updated_at"
+    t.index ["uuid"], name: "index_form_entities_on_uuid"
+  end
+
+  create_table "form_entity_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id", null: false
+    t.string "form_id", limit: 36, null: false
+    t.string "form_section_id", limit: 36, null: false
+    t.string "form_entity_id", limit: 36, null: false
+    t.integer "created_by_user_id"
+    t.string "value", null: false
+    t.integer "position", null: false
+    t.boolean "active", default: true
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_form_entity_choices_on_active"
+    t.index ["company_id"], name: "index_form_entity_choices_on_company_id"
+    t.index ["created_by_user_id"], name: "index_form_entity_choices_on_created_by_user_id"
+    t.index ["deleted_at"], name: "index_form_entity_choices_on_deleted_at"
+    t.index ["form_entity_id"], name: "index_form_entity_choices_on_form_entity_id"
+    t.index ["form_id"], name: "index_form_entity_choices_on_form_id"
+    t.index ["form_section_id"], name: "index_form_entity_choices_on_form_section_id"
+    t.index ["uuid"], name: "index_form_entity_choices_on_uuid"
+  end
+
+  create_table "form_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "name", null: false
+    t.string "form_id", limit: 36, null: false
+    t.integer "company_id", null: false
+    t.boolean "active", default: true
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_form_sections_on_active"
+    t.index ["company_id"], name: "index_form_sections_on_company_id"
+    t.index ["deleted_at"], name: "index_form_sections_on_deleted_at"
+    t.index ["form_id"], name: "index_form_sections_on_form_id"
+    t.index ["name"], name: "index_form_sections_on_name"
+    t.index ["uuid"], name: "index_form_sections_on_uuid"
+  end
+
+  create_table "forms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "klass_name", null: false
+    t.string "model", null: false
+    t.integer "company_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_forms_on_company_id"
+    t.index ["created_at"], name: "index_forms_on_created_at"
+    t.index ["deleted_at"], name: "index_forms_on_deleted_at"
+    t.index ["klass_name"], name: "index_forms_on_klass_name"
+    t.index ["model"], name: "index_forms_on_model"
+    t.index ["updated_at"], name: "index_forms_on_updated_at"
+    t.index ["uuid"], name: "index_forms_on_uuid"
+  end
+
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
@@ -3841,6 +3953,7 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.index ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id"
     t.index ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id"
     t.index ["product_type_id"], name: "index_inward_document_items_on_product_type_id"
+    t.index ["purchase_order_item_id", "inventory_line_item_id"], name: "index_inward_item_po_item_item_id"
     t.index ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id"
   end
 
@@ -3913,10 +4026,12 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.boolean "tds_applicable", default: true
     t.index ["active"], name: "index_items_on_active"
     t.index ["category_id"], name: "index_items_on_category_id"
+    t.index ["company_id", "active"], name: "index_items_on_company_id_and_active"
     t.index ["company_id"], name: "index_items_on_company_id"
     t.index ["deleted_at"], name: "index_items_on_deleted_at"
     t.index ["item_expense_type_id"], name: "index_items_on_item_expense_type_id"
     t.index ["product_type_id"], name: "index_items_on_product_type_id"
+    t.index ["supply_item_type_id", "product_type_id"], name: "index_items_on_supply_item_type_id_and_product_type_id"
     t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
     t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
     t.index ["user_id"], name: "index_items_on_user_id"
@@ -4722,6 +4837,9 @@ ActiveRecord::Schema.define(version: 2019_10_20_065426) do
     t.datetime "renewal_reminder_date"
     t.integer "total_amount_id"
     t.string "override_order_number"
+    t.datetime "terminated_at"
+    t.integer "terminated_by_id"
+    t.text "termination_reason"
     t.index ["total_amount_id"], name: "index_payment_agreements_on_total_amount_id"
   end
 

@@ -1,53 +1,31 @@
-module Forms::Definitions::DSL
+module Forms
+  module Definitions
+    module DSL
+      extend ActiveSupport::Concern
 
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
+      included do
+        include DynamicAttributes
+        include ClassMethods
+        # class_attr :model
+        class_attr :sections, default: []
+      end
 
-  module ClassMethods
-    def model(klass = NoObject)
-      @model = klass unless klass == NoObject
-      @model
-    end
+      module ClassMethods
 
-    def field_class(klass = NoObject)
-      @field_klass = klass unless klass == NoObject
-      @field_klass
-    end
+        def model(value = NoObject)
+          unless value == NoObject
+            @model = value
+            raise "Form is already defined for model #{value}" if Forms::API[value.to_s].present?
 
-    def sections
-      @sections ||= []
-    end
+            Forms::API[value.to_s] = self
+          end
+          @model
+        end
 
-    def section(name, options = {}, &block)
-      sections << Forms::Definitions::Section.new(name, options, &block)
-    end
-
-    def functions(&block)
-      @functions = block if block_given?
-      @functions
-    end
-
-    def properties
-      return @properties unless @properties.nil?
-
-      @properties = []
-      sections.each {|section| @properties += section.properties}
-      @properties
-    end
-
-    def validations
-      return @validations unless @validations.nil?
-
-      @validations = {validate: [], validates: [], validates_with: []}
-      sections.each do |section|
-        section.validations.each do |type, validation|
-          @validations[type] += validation.dup
+        def section(name, &block)
+          sections << Section.new(self, name, &block)
         end
       end
-      @validations
     end
   end
-
-
 end

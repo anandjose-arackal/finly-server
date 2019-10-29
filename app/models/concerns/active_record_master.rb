@@ -57,16 +57,6 @@ module ActiveRecordMaster
       @state_machine
     end
 
-    def create(create = NoObject)
-      @create = create unless create == NoObject
-      @create
-    end
-
-    def update(update = NoObject)
-      @update = update unless update == NoObject
-      @update
-    end
-
     def resolve(user, scope: :default, filters: {})
       resolvers[scope]&.new(user, self)&.resolve(filters)
     end

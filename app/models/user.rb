@@ -1423,6 +1423,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
   end
 
+  def is_vendor_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_auditor), document)
+  end
+
   def is_item_master_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
   end

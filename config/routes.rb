@@ -3296,6 +3296,7 @@ Rails.application.routes.draw do
 
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
+  get 'export/agreement_based_payment',to: 'export#agreement_based_payment'
 
   get 'agreements', to: 'agreements#index'
   get 'agreements/validate', to: 'agreements#validate'
@@ -3570,12 +3571,14 @@ Rails.application.routes.draw do
     get 'upcoming_invoices', to: "payment_agreements#upcoming_invoices", as: :upcoming_invoices
     get 'invoice_history', to: "payment_agreements#invoice_history", as: :invoice_history
     get 'attachments', to: "payment_agreements#attachments", as: :attachments
+    patch 'terminate', to: "payment_agreements#terminate", as: :terminate
     collection do
       get 'document_config', to: 'payment_agreements#document_config', as: :document_config
       get 'count', to: 'payment_agreements#count'
       get 'policy_config', to: 'payment_agreements#policy_config'
       get 'filter_config', to: 'payment_agreements#filter_config'
       get 'payment_agreement_action_config', to: 'payment_agreements#actions_configuration'
+      get 'all_upcoming_invoices', to: 'payment_agreements#all_upcoming_invoices'
     end
   end
 
