@@ -3757,7 +3757,7 @@ Rails.application.routes.draw do
       post 'send_mail', to: 'mailer#send_mail'
     end
 
-    resources :comments, only: [:create]
+    resources :comments, only: [:create, :index]
   end
 
   ## Procurement APIs end   ##########################################
