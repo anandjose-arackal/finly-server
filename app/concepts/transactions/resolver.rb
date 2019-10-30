@@ -1,12 +1,12 @@
 class Transactions::Resolver
 
-  def self.Model(model, scope: :default, filter: false, paginate: false)
-    ->(input, options) {Resolve.with(input, model, scope, filter, paginate)}
+  def self.Model(model, filter: false, paginate: false)
+    ->(input, options) {Resolve.with(input, model, filter, paginate)}
   end
 
   class Resolve
-    def self.with(options, model, scope, filter, paginate)
-      options['model.index'] = model.resolve(scope)
+    def self.with(options, model, filter, paginate)
+      options['model.index'] = model.resolve
 
       params = options['params'] || {}
       # Todo filter and pagination
