@@ -161,6 +161,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
 
 
     def init

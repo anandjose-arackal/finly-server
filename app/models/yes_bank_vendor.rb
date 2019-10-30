@@ -41,7 +41,7 @@
 #
 
 class YesBankVendor < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
 
