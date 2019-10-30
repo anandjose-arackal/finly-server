@@ -17,4 +17,5 @@ class Form < ApplicationRecord
 
   has_many :sections, class_name: 'FormSection', dependent: :destroy
 
+  resolver :admin
 end
