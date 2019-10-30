@@ -421,6 +421,8 @@ class Expense < ApplicationRecord
                                        {time_expense: [custom_fields: [:field_configuration]]},
                                        {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                        {amount: [:currency]}, :expense_status)}
+  scope :includes_budget_show, -> {includes(:category, :user,
+                                       {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
   scope :sum_amounts, -> (currency_code = :INR) {includes_amount.sum("amounts.#{currency_code}")}
   scope :includes_tds_amount, -> {includes :tds_amount}

@@ -9,6 +9,16 @@ class BudgetsController < BaseControllers::WebBase
     respond
   end
 
+  def show_trail_items
+    @result = Budgets::ShowTrailItems.(current_user, params)
+    respond
+  end
+
+  def sub_budgets
+    @result = Budgets::SubBudgets.(current_user, params)
+    respond
+  end
+
   def create
     @result = Budgets::Create.(current_user, params)
     respond
@@ -17,6 +27,15 @@ class BudgetsController < BaseControllers::WebBase
   def update
     @result = Budgets::Update.(current_user, params)
     respond
+  end
+
+  def bulk_update
+    @result = Budgets::BulkUpdate.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/bulk_update'
+    end
   end
 
   def destroy
@@ -51,11 +70,29 @@ class BudgetsController < BaseControllers::WebBase
 
   def sample_import_file
     @result = Budgets::GenerateSampleFile.(current_user, params)
-    respond
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+
   end
 
+  # deprecated op
   def import
     @result = Budgets::Import.(current_user, params)
     respond
   end
+
+  def process_template_file
+    @result = Budgets::ProcessTemplateFile.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/process_template_file'
+    end
+  end
+
 end

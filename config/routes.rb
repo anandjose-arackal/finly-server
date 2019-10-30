@@ -3683,12 +3683,17 @@ Rails.application.routes.draw do
   ######## Budget apis start ######
 
   get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  get 'budgets/generate_template_file', to: 'budgets#sample_import_file', as: :generate_template_file
   post 'budgets/import', to: 'budgets#import', as: :budget_import
+  post 'budgets/:budget_id/process_template_file', to: 'budgets#process_template_file', as: :process_template_file
+  get 'budgets/:id/give_me_children', to: 'budgets#sub_budgets', as: :sub_budgets
+  post 'budgets/bulk_update', to: 'budgets#bulk_update', as: :bulk_update_budgets
   ## Budget apis start ##
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
     patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
     get 'modification_trails', to: 'budgets#trails', as: :trails
+    get 'trail_items', to: 'budgets#show_trail_items', as: :trail_items
   end
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
