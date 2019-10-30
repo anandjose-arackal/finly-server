@@ -23,6 +23,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
                       poc_email: {spreadsheet: true, pdf: false},
                       gstin_location_address: {spreadsheet: true, pdf: false},
                       gstin: {spreadsheet: true, pdf: false},
+                      tds_percentage: {spreadsheet: true, pdf: false},
                       state_code: {spreadsheet: true, pdf: false},
                       description: {spreadsheet: true, pdf: false},
                       vendor_type: {spreadsheet: true, pdf: false},
@@ -197,6 +198,10 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
 
   def active(vendor)
     vendor.deactivated? ? "false" : "true"
+  end
+
+  def tds_percentage(vendor)
+    vendor&.tds_rates_list&.tds
   end
 
 end

@@ -56,6 +56,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User"
   belongs_to :vendor_type, optional: true
   belongs_to :status, class_name: "VendorStatus", optional: true # todo remove optional after creation of migration
+  belongs_to :tds_rates_list, optional: true
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
