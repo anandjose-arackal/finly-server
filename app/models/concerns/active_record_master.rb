@@ -3,7 +3,6 @@ module ActiveRecordMaster
 
   included do
     include DynamicAttributes
-    class_attr :resolver
     class_attr :policy
     class_attr :event_channel, default: self.name.underscore
     class_attr :record_events, default: []
@@ -13,6 +12,14 @@ module ActiveRecordMaster
   end
 
   module ClassMethods
+    def resolver(key = :default, klass)
+      resolvers[key] = klass
+    end
+
+    def resolvers
+      @resolvers ||= {}
+    end
+
     def record_event?(event)
       return false if event.blank?
       record_events.include?(event) or record_events.include?(event.gsub("#{event_channel}.", ""))
@@ -27,8 +34,8 @@ module ActiveRecordMaster
       record_events + collection_events
     end
 
-    def resolve(user, filters: {}, includes: [])
-      collection = resolver&.new(user, self)&.resolve(filters)
+    def resolve(user, scope: :default, filters: {}, includes: [])
+      collection = resolvers[scope]&.new(user, self)&.resolve(filters)
       collection = collection.includes(*includes) if includes.present?
       collection
     end
