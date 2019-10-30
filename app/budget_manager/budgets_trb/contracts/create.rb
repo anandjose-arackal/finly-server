@@ -1,6 +1,6 @@
 
 
-module Budgets::Contract
+module BudgetsTrb::Contract
   class Create < Reform::Form
     include Dry
 
@@ -10,4 +10,5 @@ module Budgets::Contract
       property :value, validates: {presence: true}
     end
   end
+
 end

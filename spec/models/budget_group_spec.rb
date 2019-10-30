@@ -7,6 +7,13 @@
 #  created_by_user_id :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  period_id          :integer
+#  purchase_order     :boolean
+#  payment            :boolean
+#  expense            :boolean
+#  purchase_request   :boolean
+#  invoice            :boolean
+#  name               :string(255)
 #
 
 require 'rails_helper'

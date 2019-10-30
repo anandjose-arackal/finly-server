@@ -97,6 +97,7 @@ class Company < ApplicationRecord
   has_many :money_request_item_categories
 
   has_many :budgets
+  has_many :budget_groups
   has_many :procurements
   has_many :procurement_terms
   has_many :procurement_attachments
