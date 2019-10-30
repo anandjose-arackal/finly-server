@@ -604,7 +604,8 @@ class Procurement < ApplicationRecord
   def as_json
     {
       id: self.id,
-      purchase_order_id: self.purchase_order&.id
+      purchase_order_id: self.purchase_order&.id,
+      invoice_id: self.invoices&.first&.id
     }
   end
 
