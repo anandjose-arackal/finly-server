@@ -745,7 +745,8 @@ class Payment < ApplicationRecord
       case self.parent_type
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
-        parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+        # parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+        parent_details.update_invoice_status
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
