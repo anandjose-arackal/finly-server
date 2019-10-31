@@ -1,3 +1,3 @@
 json.result do
-  @result["model"]
+  json.merge! @result["model"]
 end

@@ -438,6 +438,7 @@ GEM
     parser (2.6.5.0)
       ast (~> 2.4.0)
     parslet (1.8.2)
+    pipetree (0.1.1)
     polyamorous (2.3.0)
       activerecord (>= 5.0)
     power_assert (1.1.5)
@@ -633,31 +634,18 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    trailblazer (2.1.0)
-      trailblazer-macro (>= 2.1.0, < 2.2.0)
-      trailblazer-macro-contract (>= 2.1.0, < 2.2.0)
-      trailblazer-operation
-    trailblazer-activity (0.10.0)
-      trailblazer-context (>= 0.2.0, < 0.3.0)
-    trailblazer-activity-dsl-linear (0.2.1)
-      trailblazer-activity (>= 0.9.1, < 1.0.0)
-    trailblazer-context (0.2.0)
-    trailblazer-developer (0.0.9)
-      representable
-      trailblazer-activity (>= 0.10.0, < 1.0.0)
-      trailblazer-activity-dsl-linear
-    trailblazer-loader (0.1.2)
-    trailblazer-macro (2.1.0)
-      trailblazer-operation (>= 0.6.0)
-    trailblazer-macro-contract (2.1.0)
+    trailblazer (2.0.7)
+      declarative
       reform (>= 2.2.0, < 3.0.0)
-    trailblazer-operation (0.6.0)
-      trailblazer-activity (>= 0.10.0, < 1.0.0)
-      trailblazer-activity-dsl-linear (>= 0.2.1, < 1.0.0)
-      trailblazer-developer (>= 0.0.8)
-    trailblazer-rails (2.1.7)
+      trailblazer-operation (>= 0.0.12, < 0.1.0)
+    trailblazer-loader (0.1.2)
+    trailblazer-operation (0.0.13)
+      declarative
+      pipetree (>= 0.1.1, < 0.2.0)
+      uber
+    trailblazer-rails (1.0.11)
       railties (>= 4.0.0)
-      trailblazer (>= 2.1.0.beta1, < 2.2.0)
+      trailblazer (~> 2.0.0)
       trailblazer-loader (>= 0.1.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
@@ -826,8 +814,8 @@ DEPENDENCIES
   stackprof (~> 0.2.12)
   string_pattern (~> 2.2, >= 2.2.1)
   test-unit (~> 3.2.9)
-  trailblazer
-  trailblazer-rails
+  trailblazer (~> 2.0.7)
+  trailblazer-rails (~> 1.0.11)
   uglifier (~> 4.1.20)
   uuidtools
   web-console (~> 3.7.0)

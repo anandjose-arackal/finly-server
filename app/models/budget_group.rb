@@ -40,7 +40,8 @@ class BudgetGroup < ApplicationRecord
       invoice: invoice,
       purchase_request: purchase_request,
       payment: payment,
-      expense: expense
+      expense: expense,
+      budget_group_criteria_mappings: budget_group_criteria_mappings
     }
   end
 end

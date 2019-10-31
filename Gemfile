@@ -34,8 +34,8 @@ gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
 gem 'dry-validation'
-gem 'trailblazer'
-gem 'trailblazer-rails'
+gem 'trailblazer', "~> 2.0.7"
+gem 'trailblazer-rails', "~> 1.0.11"
 gem 'reform'
 gem 'reform-rails'
 gem 'pundit'
