@@ -21,6 +21,6 @@ class BudgetManager::BudgetGroups::Ops::Update < Transactions::API
   # so here, we have to pass the topmost key so that TBZ knows the key to look for
   step Contract::Validate(key: 'budget_group')
 
-  step Contract::Persist
+  step Contract::Persist()
 
 end

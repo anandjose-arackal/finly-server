@@ -31,4 +31,15 @@ class BudgetGroup < ApplicationRecord
   has_many :budgetable_departments, through: :budget_group_criteria_mappings, source: :budgetable, source_type: 'Department'
 
 
+  def as_json(options = {})
+    {
+      name: name,
+      created_by_user: created_by_user&.name,
+      purchase_order: purchase_order,
+      invoice: invoice,
+      purchase_request: purchase_request,
+      payment: payment,
+      expense: expense
+    }
+  end
 end

@@ -1,4 +1,4 @@
-class BudgetManager::Budgets::Create < Transactions::API
+class BudgetManager::BudgetsTrb::Create < Transactions::API
 
   step :init!
 

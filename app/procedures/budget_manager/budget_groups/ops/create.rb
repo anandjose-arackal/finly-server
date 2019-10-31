@@ -26,6 +26,6 @@ class BudgetManager::BudgetGroups::Ops::Create < Transactions::API
   step Contract::Validate(key: 'budget_group')
 
   # the below will persist the model and send back errors if any
-  step Contract::Persist
+  step Contract::Persist()
 
 end

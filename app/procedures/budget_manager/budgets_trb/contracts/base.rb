@@ -1,4 +1,4 @@
-class BudgetManager::Budgets::Contract::Base < Reform::Form
+class BudgetManager::BudgetsTrb::Contracts::Base < Reform::Form
   include Dry
 
   properties :name, :start_date, :end_date, :budget_amount, validates: {presence: true}
