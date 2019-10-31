@@ -26,6 +26,11 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
   end
 
   def pre_process
+    # in expense mangement, user roles are defined in two tables
+    # user_role_mappings 
+    # and
+    # policy_user_roles
+    # 
     if urm_user_role_ids.present?
       flow(pre_process_urm)
       self.urm_unassignable_roles = self.unassignable_roles
@@ -38,6 +43,25 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
       self.pur_columns, self.pur_values = setup_pur(assignable_roles)
     end
 
+    # builds this format for FE to show unassignable roles
+    # 
+    # "unassignable_roles":[
+    #   {
+    #      "policy":{
+    #         "id":1,
+    #         "name":"Company (Default)"
+    #      },
+    #      "user":{
+    #         "id":25,
+    #         "email":"borah@borah.caves"
+    #      },
+    #      "user_role":{
+    #         "id":10,
+    #         "name":"purchase_request_initiator"
+    #      }
+    #   }
+    # ]
+    # 
     if self.unassignable_roles.present?
       fields = [:policy, :user, :user_role]
       self.unassignable_roles = self.urm_unassignable_roles.to_a + self.pur_unassignable_roles.to_a
@@ -66,7 +90,7 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
   end
 
   def post_process
-    add_message :success, "Multiple users were successfully configured."
+    add_message :success, "Selected user(s) were successfully invited and configured."
   end
 
   def success
