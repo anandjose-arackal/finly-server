@@ -31,7 +31,7 @@ class TaskWorkflow < ApplicationRecord
 
   enum trigger_type: {schedule: 1, event: 2}
 
-  resolver TaskManager::Workflows::Policy::Scope
+  resolver TaskManager::Workflows::Resolver
 
   scope :with_event, -> (event) {where event_key: event}
 

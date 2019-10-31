@@ -60,4 +60,6 @@ class FormEntity < ApplicationRecord
   serialize :options, JSON
   serialize :chained, JSON
   serialize :data_provider, JSON
+
+  resolver Forms::Entity::Resolver
 end
