@@ -229,7 +229,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
               format.set_bg_color(color)
               worksheet.write((1 + index), inner_index, item, format)
             else
-              worksheet.write((1 + index), inner_index, item)
+              format = workbook.add_format
+              worksheet.write_string((1 + index), inner_index, (item.present? ? item&.to_s: ''), format)
             end
           end
         end
