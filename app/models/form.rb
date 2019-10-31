@@ -7,13 +7,14 @@
 #  klass_name :string(255)      not null
 #  model      :string(255)      not null
 #  company_id :integer          not null
+#  deleted_at :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
 
 class Form < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
-  has_many :sections, class_name: 'FormSection'
+  has_many :sections, class_name: 'FormSection', dependent: :destroy
 
 end

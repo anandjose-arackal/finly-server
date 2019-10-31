@@ -74,6 +74,9 @@ class Bbps::Api < ServiceApi
     return Failure("Invalid response") unless json&.dig('responseMsg').present?
 
     splits = json["responseMsg"].split("|")
+    # Request failed
+    return Failure((splits[3] || "Unable to fetch response")) if splits[1] == "N"
+
     map = {}.with_indifferent_access
     fetch(:response_fields).each_with_index { |field, index| map[field] = splits[index] }
     map

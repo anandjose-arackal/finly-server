@@ -3,8 +3,8 @@ class TaskManager::Workflows::Policy < ApplicationPolicy
 
   class TaskManager::Workflows::Policy::Scope < ApplicationPolicy::Scope
 
-    def personal
-      scope.where(user: @user).include(:task_schedule)
+    def resolve(filters: {})
+      scope.where(user: @user)
     end
 
   end
