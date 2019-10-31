@@ -438,6 +438,13 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
+  scope :filter_po_approver_id, -> (approver_id){
+    if approver_id.present?
+      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
+
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
   #   if type && ['ASC', 'DESC'].include?(type)
