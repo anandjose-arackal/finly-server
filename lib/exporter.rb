@@ -230,7 +230,12 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
               worksheet.write((1 + index), inner_index, item, format)
             else
               format = workbook.add_format
-              worksheet.write_string((1 + index), inner_index, (item.present? ? item&.to_s: ''), format)
+              if item.present? && item.is_a?(String) && item[0] == "'"
+               item.slice!(0)
+               worksheet.write_string((1 + index), inner_index, item, format)
+              else
+                worksheet.write((1 + index), inner_index, (item.present? ? item&.to_s: ''))
+              end
             end
           end
         end
