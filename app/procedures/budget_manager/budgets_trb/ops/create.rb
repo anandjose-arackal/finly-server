@@ -1,4 +1,4 @@
-class BudgetsTrb::Create < Trailblazer::Operation
+class BudgetManager::Budgets::Create < Transactions::API
 
   step :init!
 

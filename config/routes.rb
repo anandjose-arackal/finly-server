@@ -1575,10 +1575,15 @@
 #                                                          GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                            ping_database GET    /ping/database(.:format)                                                                                            ping#database
 #                                       sample_import_file GET    /budgets/sample_import_file(.:format)                                                                               budgets#sample_import_file
+#                                   generate_template_file GET    /budgets/generate_template_file(.:format)                                                                           budgets#sample_import_file
 #                                            budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
+#                                    process_template_file POST   /budgets/:budget_id/process_template_file(.:format)                                                                 budgets#process_template_file
+#                                              sub_budgets GET    /budgets/:id/give_me_children(.:format)                                                                             budgets#sub_budgets
+#                                      bulk_update_budgets POST   /budgets/bulk_update(.:format)                                                                                      budgets#bulk_update
 #                                        budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                     budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                            budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
+#                                       budget_trail_items GET    /budgets/:budget_id/trail_items(.:format)                                                                           budgets#show_trail_items
 #                                                  budgets GET    /budgets(.:format)                                                                                                  budgets#index
 #                                                          POST   /budgets(.:format)                                                                                                  budgets#create
 #                                               new_budget GET    /budgets/new(.:format)                                                                                              budgets#new

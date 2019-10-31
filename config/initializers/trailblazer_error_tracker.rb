@@ -1,7 +1,7 @@
 module TrailblazerErrorTracker
   def errors
     model_errors = self['model']&.errors&.messages || {}
-    contract_errors = self['contract.default']&.errors&.messages || {}
+    contract_errors = self['result.contract.default']&.errors&.messages || {}
     policy_errors = self['result.policy.default']&.errors || {}
     roles_auth_errors = {}
     if self['result.authorization']&.failure?
