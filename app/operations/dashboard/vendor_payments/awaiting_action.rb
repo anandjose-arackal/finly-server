@@ -250,6 +250,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       params[:filter_creation_date_from] = params[:filter_date_from] if params[:filter_date_from].present?
       params[:filter_creation_date_to] = params[:filter_date_to] if params[:filter_date_to].present?
+      params[:filter_awaiting_action] = true
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
@@ -257,7 +258,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         type: 'receive',
         count: procurements.count,
         # filters: [{filter_status_tags: [7]}]
-        filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]}]
+        filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)], filter_awaiting_action: true}]
       }
 
       if params[:filter_date_from].present?
