@@ -26,10 +26,32 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
   end
 
   def pre_process
+    # in vendor payments, user roles are defined in one table
+    # policy_user_roles
+    # 
     flow(pre_process_pur)
     self.pur_unassignable_roles = self.unassignable_roles
     self.pur_columns, self.pur_values = setup_pur(assignable_roles)
 
+    # builds this format for FE to show unassignable roles
+    # 
+    # "unassignable_roles":[
+    #   {
+    #      "policy":{
+    #         "id":1,
+    #         "name":"Company (Default)"
+    #      },
+    #      "user":{
+    #         "id":25,
+    #         "email":"borah@borah.caves"
+    #      },
+    #      "user_role":{
+    #         "id":10,
+    #         "name":"purchase_request_initiator"
+    #      }
+    #   }
+    # ]
+    # 
     if self.unassignable_roles.present?
       fields = [:policy, :user, :user_role]
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
@@ -55,7 +77,7 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
   end
 
   def post_process
-    add_message :success, "Multiple users were successfully configured."
+    add_message :success, "Selected user(s) were successfully invited and configured."
   end
 
   def success

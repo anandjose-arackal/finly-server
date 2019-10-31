@@ -9,7 +9,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 
 		case RequestStore.store[:current_app]
     when 'vp', :vp
-			self.user_roles = ::UserRole::VALUES_VP
+			self.user_roles = ::UserRole::VP_ROLES
 			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     when 'em', :em
 			self.user_roles = ::UserRole::VALUES_EM
@@ -65,13 +65,24 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 
   private
 
+  # FE wants data in a format grouped by document
+  # 
+  # [
+	# 	{ :document_name=>"expense_management",
+	# 		:document_roles=>
+	# 		[
+	# 			{:name=>"finance_manager", :id=>2}, {:name=>"manager", :id=>3}
+	# 		]
+	# 	}
+	# ]
+	# 
   def setup_vp_roles
   	document_list.each do |list|
 			h = {}
 			h[:document_name] = list
 			# h[:document_roles] = self.user_roles.keys.map(&:to_s).select {|ur| ur.include? list}
 			ss = []
-			user_roles.each {|k, v| if k.to_s.include?(list) then next if k.to_s == 'policy_admin';hh = {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh; end;}
+			user_roles.except(:admin, :policy_admin).each {|k, v| if k.to_s.starts_with?(list) then hh = {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh; end;}
 			h[:document_roles] = ss
 
 			next if h[:document_roles].blank?
@@ -84,7 +95,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
   	h = {}
   	h[:document_name] = 'expense_management'
   	ss = []
-  	self.user_roles.except(:employee, :purchaser, :receiver).each {|k, v| hh= {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh}
+  	self.user_roles.except(:admin, :employee, :purchaser, :receiver).each {|k, v| hh= {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh}
   	h[:document_roles] = ss
   	
   	self.grouped_roles << h

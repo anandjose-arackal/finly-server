@@ -1,3 +1,5 @@
+# returns users which can be invited or whose roles can be defined after invitation.
+# 
 class UserOnboarding::BuildUsersForImport < BaseOperation
   attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign, :common_emails, 
                 :new_emails
@@ -23,19 +25,22 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     # when updating policy with user roles
     # 
     if bulk_assign[:user_ids]
+      # this one is used after invitation. if users are to be configured in some other policies
       self.users = user.company.users.with_id(bulk_assign[:user_ids])
 
     # used for invitation
-    # 
     elsif bulk_assign[:user_emails]
       if user.company.feature_subscription.group_entity_structure
         gc = current_company.group
-        # prevent sql injection
-        self.users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue Company.none
+        # TODO prevent sql injection
+        # this one tells if there are users in group companies
+        self.users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue User.none
       else
+        # this tells if there are users already invited
         self.users = user.company.users.with_email(bulk_assign[:user_emails])
       end
 
+      # this tells which users are to be invited. comes from FE
       self.input_emails = bulk_assign[:user_emails]
     end
 
@@ -73,6 +78,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
   private
 
   def common_users
+    # this will mostly be called if group entity enabled.
+    # we will find the users attributes from other companies and set it to new company
     user_list = []
     company_id = user.company_id
     self.users.each do |user|
@@ -84,6 +91,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
   end
 
   def new_users
+    # for configuring new users
     user_list = []
 
     self.new_emails.each do |email|
@@ -93,7 +101,9 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
   end
 
   def process_users
+    # finds email already invited or in other group companies. You can also use this to tell FE if the user already invited
     self.common_emails = self.input_emails & self.users.pluck(:email)
+    # finds which users are to be actually invited
     self.new_emails = self.input_emails - user.company.users.pluck(:email)
 
 
@@ -105,8 +115,12 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     else
       user_list = new_users
     end
+
+    # if user in group entity, then simply create a new user
+    # if new user, then invite them
+    # 
     newly_created_users = []
-    user_list.each do |list|
+    user_list.uniq.each do |list|
       options = list
       options[:company_id] = user.company_id
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
@@ -119,7 +133,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       newly_created_users << u
     end
 
-    all_emails = newly_created_users.pluck(:email) + self.common_emails
+    # get all emails of newly created users and see if they exist in the new company and return them
+    all_emails = newly_created_users.pluck(:email)
     user.company.users.where(email: all_emails)
   end
 end
