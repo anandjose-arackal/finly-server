@@ -34,7 +34,7 @@ class ApplicationPolicy
     false
   end
 
-  class Scope
+  class Resolver
     attr_reader :user, :scope
 
     def initialize(user, scope)
@@ -43,7 +43,7 @@ class ApplicationPolicy
     end
 
     def resolve(filters)
-      scope.all
+      scope.none
     end
   end
 end

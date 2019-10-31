@@ -1,13 +1,13 @@
 require "#{Rails.root}/app/policies/application_policy"
 class TaskManager::Workflows::Policy < ApplicationPolicy
 
-  class TaskManager::Workflows::Policy::Scope < ApplicationPolicy::Scope
-
-    def personal
-      scope.where(user: @user).include(:task_schedule)
-    end
-
-  end
+  # class TaskManager::Workflows::Policy::Scope < ApplicationPolicy::Scope
+  #
+  #   def resolve(filters)
+  #     scope.where(user: @user).include(:task_schedule)
+  #   end
+  #
+  # end
 
   def create?
     true

@@ -27,7 +27,6 @@
 #  post_operation_payload    :text(65535)
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
-#  deleted_at                :datetime
 #
 
 class PaymentOrder < ApplicationRecord

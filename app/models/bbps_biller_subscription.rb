@@ -2,23 +2,21 @@
 #
 # Table name: bbps_biller_subscriptions
 #
-#  id                       :bigint           not null, primary key
-#  bbps_biller_id           :bigint           not null
-#  name                     :string(255)      not null
-#  customer_params          :text(65535)
-#  department_id            :integer
-#  cost_center_id           :integer
-#  location_id              :integer
-#  policy_id                :integer
-#  note                     :text(65535)
-#  created_by_user_id       :integer
-#  active                   :boolean          default(TRUE)
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  status_id                :integer          not null
-#  deleted_at               :datetime
-#  subscription_id          :string(255)
-#  require_poc_verification :boolean          default(TRUE)
+#  id             :bigint           not null, primary key
+#  bbps_biller_id :bigint           not null
+#  name           :string(255)      not null
+#  sequence_id    :string(255)      not null
+#  department_id  :integer
+#  cost_center_id :integer
+#  location_id    :integer
+#  policy_id      :integer
+#  deleted_at     :datetime
+#  active         :boolean          default(TRUE)
+#  note           :text(65535)
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  status_id      :integer          not null
+#  user_id        :integer
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -35,9 +33,14 @@ class BbpsBillerSubscription < ApplicationRecord
 
   has_many :customer_fields, class_name: 'BbpsSubscriptionField', foreign_key: :subscription_id
 
-  accepts_nested_attributes_for :customer_fields
+  # accepts_nested_attributes_for :customer_fields
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
+
+  # resolver BBPSubscriptionResolver
+  # state_machine WorkManager
+  #
+  # BbpsBillerSubscription.resolve(@user, {role_id: :manager}, include: {puchase_order: [:amount]})
 
   # validates :bbps_biller_id, presence: true
   # validates :department_id, presence: true

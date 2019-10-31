@@ -27,9 +27,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     property :value, presence: true
   end
 
-  validate :bbps_biller
+  validate :bbps_biller_params
 
-  def bbps_biller
+  def bbps_biller_params
     op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, "current_user" => current_user)
 
     if op.success?
@@ -45,7 +45,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
         if biller_customer_param['data_type'].present?
           case biller_customer_param['data_type']
           when 'ALPHANUMERIC'
-            debugger
             return false unless check_alphanumeric(customer_field.value)
           end
         end

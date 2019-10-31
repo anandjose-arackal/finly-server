@@ -1,4 +1,4 @@
-class Docs::UtilityBills::Subscriptions::Ops::Create < Trailblazer::Operation
+class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   step Model( BbpsBillerSubscription, :new )
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :create? )
@@ -14,7 +14,6 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Trailblazer::Operation
   end
 
   def set_default_params(options, params:, current_user:, **)
-    # Set Initiator
     params[:subscription][:user_id] = current_user&.id
     params[:subscription][:current_user] = current_user
   end

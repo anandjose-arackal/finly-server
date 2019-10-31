@@ -3,12 +3,13 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def create
     @result = Docs::UtilityBills::Subscriptions::Ops::Create.(params, "current_user" => current_user)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def update
     @result = Docs::UtilityBills::Subscriptions::Ops::Update.(params, "current_user" => current_user)
-    debugger
   end
 
   def index
