@@ -4,21 +4,30 @@ class BudgetGroupsController < BaseControllers::WebBase
 
   def create
     @result = BudgetManager::BudgetGroups::Ops::Create.(params, "current_user" => current_user)
-
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def update
-
+    @result = BudgetManager::BudgetGroups::Ops::Update.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def index
     @result = BudgetManager::BudgetGroups::Ops::Index.(params, "current_user" => current_user)
-    render 'index'
-    return
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def show
-
+    @result = BudgetManager::BudgetGroups::Ops::Show.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
   end
 
 

@@ -247,7 +247,7 @@ end
 
 group :test do
   gem 'factory_bot_rails', require: false
-  gem 'factory_bot'
+  gem 'factory_bot', "~> 4.10.0"
   gem 'database_cleaner'
 end
 

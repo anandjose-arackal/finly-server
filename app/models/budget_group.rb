@@ -33,6 +33,7 @@ class BudgetGroup < ApplicationRecord
 
   def as_json(options = {})
     {
+      id: id,
       name: name,
       created_by_user: created_by_user&.name,
       purchase_order: purchase_order,
