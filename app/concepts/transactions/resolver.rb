@@ -6,7 +6,7 @@ class Transactions::Resolver
 
   class Resolve
     def self.with(options, model, scope, filter, paginate)
-      options['model.index'] = model.resolve(scope)
+      options['model.index'] = model.resolve(options['current_user'], scope: scope)
 
       params = options['params'] || {}
       # Todo filter and pagination
