@@ -1,9 +1,3 @@
-module Forms
-  module Definitions
-    module Types
-      class Collection < Entity
-        register :collection
-      end
-    end
-  end
+class Forms::Definitions::Types::Collection < Forms::Definitions::Entity
+  register :collection
 end
