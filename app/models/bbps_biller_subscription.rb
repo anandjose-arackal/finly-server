@@ -59,4 +59,23 @@ class BbpsBillerSubscription < ApplicationRecord
   # event_channel 'bbps.biller.subscription'
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
+
+  def as_json(options={})
+    {
+        id: id,
+        biller: biller.as_json({basic: true}),
+        name: name,
+        sequence_id: sequence_id,
+        department: department.as_json,
+        cost_center: cost_center.as_json,
+        location: location.as_json,
+        policy: policy.as_json,
+        active: active,
+        note: note,
+        created_at: created_at.strftime("%d-%b-%Y"),
+        updated_at: updated_at.strftime("%d-%b-%Y"),
+        status: status.as_json,
+        user: user&.json_for_trail
+    }
+  end
 end

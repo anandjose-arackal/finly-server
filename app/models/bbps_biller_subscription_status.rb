@@ -46,4 +46,8 @@ class BbpsBillerSubscriptionStatus < ApplicationRecord
   def reactivated?
     self.id == BbpsBillerSubscriptionStatus.id_for(:reactivated?)
   end
+
+  def as_json
+    {name: name, id: id}
+  end
 end

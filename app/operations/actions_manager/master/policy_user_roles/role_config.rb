@@ -131,5 +131,4 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   def utility_bill_reviewer
     true
   end
-
 end
