@@ -5,7 +5,8 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
     :purchase_order_reviewer, :goods_receiver, :invoice_initiator, :invoice_reviewer, :bank_payment_request_reviewer, 
     :bank_payment_request_creditor, :item_master_manager, :inventory_manager, :vendor_creator, :vendor_manager, 
     :vendor_reviewer, :policy_admin, :vendor_manager, :budget_manager, :non_po_initiator,
-    :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor
+    :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor,
+    :utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer
   ]
 
   def purchase_request_initiator
@@ -112,6 +113,22 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def payment_agreement_auditor
+    true
+  end
+
+  def utility_bill_master_initiator
+    true
+  end
+
+  def utility_bill_master_reviewer
+    true
+  end
+
+  def utility_bill_initiator
+    true
+  end
+
+  def utility_bill_reviewer
     true
   end
 
