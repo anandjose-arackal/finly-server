@@ -1,7 +1,7 @@
 require "#{Rails.root}/app/policies/application_policy"
 class ExportTemplates::Policy < ApplicationPolicy
 
-  class ExportTemplates::Policy::Scope < ApplicationPolicy::Scope
+  class ExportTemplates::Policy::Resolver < ApplicationPolicy::Resolver
 
     def personal
       scope.where(created_by_user: @user)

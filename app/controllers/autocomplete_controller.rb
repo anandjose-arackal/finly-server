@@ -32,4 +32,8 @@ class AutocompleteController < BaseControllers::WebBase
     @result = ItemMaster::Item::Search.(current_user, params)
     respond
   end
+
+  def bbps_billers
+    @result = Autocomplete::BbpsBillers.(current_user, params)
+  end
 end

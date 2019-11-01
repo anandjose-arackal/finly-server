@@ -3165,6 +3165,7 @@ Rails.application.routes.draw do
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
+  get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
@@ -3853,6 +3854,8 @@ Rails.application.routes.draw do
 
   # Utility Bill Payments / BBPS Start #
   namespace :bbps do
+    get 'subscriptions/edit_config', to: 'subscriptions#edit_config'
+    get 'subscriptions/fields_config', to: 'subscriptions#fields_config'
     resources :subscriptions
   end
   # Utility Bill Payments / BBPS Ends  #

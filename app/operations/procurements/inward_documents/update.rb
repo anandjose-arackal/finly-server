@@ -1,6 +1,7 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
                 :id_current_attachments, :po_revision, :inv_items, :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled
+
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id

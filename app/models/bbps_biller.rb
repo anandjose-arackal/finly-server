@@ -45,5 +45,7 @@ class BbpsBiller < ApplicationRecord
   serialize :interchange_fee_conf, JSON
   serialize :interchange_fee, JSON
 
-
+  scope :filter_search, -> (term) {
+    where("biller_name like ? or biller_alias_name like ?", "%#{term}%", "%#{term}%")
+  }
 end
