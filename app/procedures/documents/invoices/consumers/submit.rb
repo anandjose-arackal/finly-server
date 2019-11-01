@@ -22,7 +22,7 @@ module Documents::Invoices::Consumers::Submit
       action(
           TaskManager::Actions::DummyAction.define_action("UserSubmitOwnerMailer") do
             run -> (user, message, input) do
-              debugger
+              # debugger
             end
           end
       )

@@ -10,7 +10,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   step Contract::Persist()
 
   def check(params, **)
-    debugger
+    # debugger
   end
 
   def set_default_params(options, params:, current_user:, **)
