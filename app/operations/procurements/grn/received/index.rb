@@ -65,6 +65,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_year
     has_scope :filter_policy_id
     has_scope :filter_pr_number
+    has_scope :filter_pr_creator_id
 
     def init
       self.procurements = params[:procurements]
