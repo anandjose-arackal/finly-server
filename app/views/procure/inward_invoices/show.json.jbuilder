@@ -234,7 +234,7 @@ json.tds_slabs do
 end
 
 json.attachments do
-  json.array! invoice.attachments do |attachment|
+  json.array! invoice.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
