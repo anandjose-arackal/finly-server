@@ -2,7 +2,7 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   layout 'trailblazers'
 
   def edit_config
-    @result = Docs::UtilityBills::Subscriptions::Configs::Edit.(params, "current_user" => current_user)
+    @op = Docs::UtilityBills::Subscriptions::Configs::Edit.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
