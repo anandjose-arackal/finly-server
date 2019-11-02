@@ -27,10 +27,9 @@ class Transactions::Resolver
 
     def resolve(params: {}, filter: false, paginate: false, includes: [])
       collection = load params
-      collection = filter(collection, params)
-      collection = filter(collection, params) if filter
-      collection = paginate(collection, params) if paginate
-      collection = include(collection, includes) if includes.present?
+      collection = filter collection, params if filter
+      collection = paginate collection, params if paginate
+      collection = include collection, includes if includes.present?
       collection
     end
 
@@ -39,7 +38,7 @@ class Transactions::Resolver
     end
 
     def filter(collection, params)
-      collection.ransack(params[:q]).result
+      collection.ransack(params[:q]).result(distinct: true)
     end
 
     def paginate(collection, params)

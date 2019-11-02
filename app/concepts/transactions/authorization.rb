@@ -22,7 +22,7 @@ class Transactions::Authorization
       return unauthorized!(input)
     end
 
-    def unauthorized!(options)
+    def self.unauthorized!(options)
       options["result.authorization"] = Failure("You cannot perform the following action")
       false
     end
