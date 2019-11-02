@@ -201,7 +201,10 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def tds_percentage(vendor)
-    vendor&.tds_rates_list&.tds
+    if vendor.vendor_tds_rates.present?
+      tds_rates_list = vendor.vendor_tds_rates.collect{|vtr| vtr.tds_rates.name + "(#{vtr.tds_rates.tds})"} rescue nil
+      tds_rates_list.join("| ") rescue nil
+    end
   end
 
 end
