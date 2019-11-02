@@ -8,8 +8,15 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
-  def fields_config
-    @result = Docs::UtilityBills::Subscriptions::Configs::Fields.(params, "current_user" => current_user)
+  def biller_type_config
+    @op = Docs::UtilityBills::Subscriptions::Configs::BillerType.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def biller_field_config
+    @op = Docs::UtilityBills::Subscriptions::Configs::BillerFields.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end

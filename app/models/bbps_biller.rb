@@ -49,6 +49,10 @@ class BbpsBiller < ApplicationRecord
     where("biller_name like ? or biller_alias_name like ?", "%#{term}%", "%#{term}%")
   }
 
+  scope :filter_category_name, -> (name){
+    where(biller_category_name: name)
+  }
+
   def as_json(options={})
     {
       biller_id: biller_id,
@@ -82,6 +86,13 @@ class BbpsBiller < ApplicationRecord
       biller_time_out: biller_time_out,
       created_at: created_at,
       updated_at: updated_at
+    }
+  end
+
+  def as_json_autocomplete(options={})
+    {
+        label: biller_name,
+        value: id
     }
   end
 end

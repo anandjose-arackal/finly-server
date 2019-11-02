@@ -3855,7 +3855,8 @@ Rails.application.routes.draw do
   # Utility Bill Payments / BBPS Start #
   namespace :bbps do
     get 'subscriptions/edit_config', to: 'subscriptions#edit_config'
-    get 'subscriptions/fields_config', to: 'subscriptions#fields_config'
+    get 'subscriptions/biller_type_config', to: 'subscriptions#biller_type_config'
+    get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
     resources :subscriptions
   end
   # Utility Bill Payments / BBPS Ends  #
