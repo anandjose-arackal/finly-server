@@ -3849,9 +3849,7 @@ Rails.application.routes.draw do
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
-  resources :forms do
-    resources :form_entities
-  end
+  resources :forms
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -1,6 +1,6 @@
-class Forms::Entity::Resolver < ApplicationPolicy::Scope
+class Forms::Entity::Resolver < Transactions::Resolver::Scope
 
-  def resolve(filters: {})
+  def load(params)
     scope.where(company_id: @user.company_id)
   end
 
