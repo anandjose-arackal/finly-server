@@ -8,7 +8,6 @@
 #  form_id                      :string(36)       not null
 #  form_section_id              :string(36)       not null
 #  created_by_user_id           :integer
-#  parent_id                    :string(255)
 #  field_key                    :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :string(255)
@@ -43,6 +42,7 @@
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  can_associate_children       :boolean          default(FALSE)
 #
 
 class FormEntity < ApplicationRecord
@@ -60,6 +60,4 @@ class FormEntity < ApplicationRecord
   serialize :options, JSON
   serialize :chained, JSON
   serialize :data_provider, JSON
-
-  resolver Forms::Entity::Resolver
 end

@@ -1,4 +1,4 @@
-class Forms::TestForm < API
+class Forms::TestForm < Forms::API
 
   model Invoice
   section :header do
