@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_29_154553) do
+ActiveRecord::Schema.define(version: 2019_11_03_043118) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3243,7 +3243,6 @@ ActiveRecord::Schema.define(version: 2019_10_29_154553) do
     t.string "form_id", limit: 36, null: false
     t.string "form_section_id", limit: 36, null: false
     t.integer "created_by_user_id"
-    t.string "parent_id"
     t.string "field_key", null: false
     t.string "label"
     t.string "placeholder"
@@ -3278,6 +3277,7 @@ ActiveRecord::Schema.define(version: 2019_10_29_154553) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "can_associate_children", default: false
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -3285,7 +3285,6 @@ ActiveRecord::Schema.define(version: 2019_10_29_154553) do
     t.index ["field_key"], name: "index_form_entities_on_field_key"
     t.index ["form_id"], name: "index_form_entities_on_form_id"
     t.index ["form_section_id"], name: "index_form_entities_on_form_section_id"
-    t.index ["parent_id"], name: "index_form_entities_on_parent_id"
     t.index ["updated_at"], name: "index_form_entities_on_updated_at"
     t.index ["uuid"], name: "index_form_entities_on_uuid"
   end
@@ -3322,6 +3321,7 @@ ActiveRecord::Schema.define(version: 2019_10_29_154553) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "type"
     t.index ["active"], name: "index_form_sections_on_active"
     t.index ["company_id"], name: "index_form_sections_on_company_id"
     t.index ["deleted_at"], name: "index_form_sections_on_deleted_at"
