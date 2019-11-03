@@ -123,6 +123,22 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
                 {filter_user_name: user.name},
                 {filter_status: 'approved'}
               ]
+            },
+            {
+              title: "Sent to Vendor",
+              # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
+              count: purchase_orders.filter_user_id(user.id).filter_status('sent_to_vendor')&.count,
+              filters: [
+                {filter_status: 'sent_to_vendor'}
+              ]
+            },
+            {
+              title: "Vendor Confirmed",
+              # count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
+              count: purchase_orders.filter_user_id(user.id).filter_status('vendor_confirmed')&.count,
+              filters: [
+                {filter_status: 'vendor_confirmed'}
+              ]
             }
           ]
         }

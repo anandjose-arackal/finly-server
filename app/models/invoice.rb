@@ -92,7 +92,7 @@
 #
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
 

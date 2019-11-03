@@ -24,7 +24,7 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
