@@ -1,4 +1,4 @@
-class BudgetsProcessor::Calculate::YesBankVendor < BudgetsProcessor::Calculate::Base
+class BudgetManager::BudgetsCalculator::Calculate::YesBankVendor < BudgetManager::BudgetsCalculator::Calculate::Base
   attr_accessor :yes_bank_vendor
 
   def init

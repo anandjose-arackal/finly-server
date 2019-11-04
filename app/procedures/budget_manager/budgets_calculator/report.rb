@@ -1,4 +1,4 @@
-class BudgetsProcessor::Report < BudgetsProcessor::Base
+class BudgetManager::BudgetsCalculator::Report < BudgetManager::BudgetsCalculator::Base
   attr_accessor :report
   def init
     super

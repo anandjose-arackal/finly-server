@@ -2,26 +2,27 @@
 #
 # Table name: budgets
 #
-#  id               :integer          not null, primary key
-#  name             :string(255)
-#  period_id        :integer
-#  start_date       :date
-#  end_date         :date
-#  budget_amount_id :integer
-#  spent_amount_id  :integer
-#  budgetable_id    :integer
-#  budgetable_type  :string(255)
-#  is_deleted       :boolean          default(FALSE)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  user_id          :integer
-#  company_id       :integer
-#  purchase_order   :boolean
-#  payment          :boolean
-#  expense          :boolean
-#  ancestry         :string(255)
-#  deleted_at       :datetime
-#  budget_group_id  :integer
+#  id                           :integer          not null, primary key
+#  name                         :string(255)
+#  period_id                    :integer
+#  start_date                   :date
+#  end_date                     :date
+#  budget_amount_id             :integer
+#  spent_amount_id              :integer
+#  budgetable_id                :integer
+#  budgetable_type              :string(255)
+#  is_deleted                   :boolean          default(FALSE)
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  user_id                      :integer
+#  company_id                   :integer
+#  purchase_order               :boolean
+#  payment                      :boolean
+#  expense                      :boolean
+#  ancestry                     :string(255)
+#  deleted_at                   :datetime
+#  budget_group_id              :integer
+#  calculated_before_tax_amount :boolean          default(FALSE)
 #
 
 class Budget < ApplicationRecord
@@ -35,7 +36,7 @@ class Budget < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :budget_amount, optional: true, class_name: "Amount"
   belongs_to :spent_amount, optional: true, class_name: "Amount"
-
+  belongs_to :budget_group
 
   # Above details like period, name, budget amount etc. will be held in the budget itself for now
   # the below will now be moved to the Budget Group which will house the details of the criteria
@@ -51,6 +52,7 @@ class Budget < ApplicationRecord
   ###################### DEPRECATED #########################
 
   has_many :budget_modification_trails
+  has_one :budget_consumption
 
   accepts_nested_attributes_for :budget_amount
   accepts_nested_attributes_for :budget_criteria_mappings

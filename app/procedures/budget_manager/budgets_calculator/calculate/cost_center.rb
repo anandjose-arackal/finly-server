@@ -1,4 +1,4 @@
-class BudgetsProcessor::Calculate::CostCenter < BudgetsProcessor::Calculate::Base
+class BudgetManager::BudgetsCalculator::Calculate::CostCenter < BudgetManager::BudgetsCalculator::Calculate::Base
   attr_accessor :cost_center_id
 
   def init

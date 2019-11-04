@@ -1,4 +1,4 @@
-class BudgetsCalculator::Calculate::PurchaseOrderBudgetsProcessor < BudgetsCalculator::Calculate::BudgetsProcessor
+class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderBudgetsProcessor < BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
   def self.save_trail(purchase_order)
     self.trail_hash = {

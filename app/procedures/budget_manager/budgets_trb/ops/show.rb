@@ -1,3 +1,3 @@
-class BudgetManager::Budgets_Trb::Ops::Show < Transactions::API
+class BudgetManager::BudgetsTrb::Ops::Show < Transactions::API
 
 end

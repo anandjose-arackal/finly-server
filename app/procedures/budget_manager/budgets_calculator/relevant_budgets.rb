@@ -1,10 +1,10 @@
 # this operation takes a particular object and returns all budgets that apply to this particular
 # object and require calculation
-class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
+class BudgetManager::BudgetsCalculator::RelevantBudgets < BudgetManager::BudgetsCalculator::Base
 
   attr_accessor :relevant_budgets, :object
 
-  class BudgetsCalculator::RelevantBudgets::RelevantBudgetsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BudgetManager::BudgetsCalculator::RelevantBudgets::RelevantBudgetsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :relevant_budgets, :budget_data, :object
 
@@ -143,6 +143,6 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
 
   def success
     params[:relevant_budgets] = self.relevant_budgets
-    BudgetsCalculator::RelevantBudgets::RelevantBudgetsPresenter.new(user, params, messages)
+    BudgetManager::BudgetsCalculator::RelevantBudgets::RelevantBudgetsPresenter.new(user, params, messages)
   end
 end

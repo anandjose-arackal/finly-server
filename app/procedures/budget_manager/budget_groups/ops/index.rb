@@ -1,5 +1,9 @@
 class BudgetManager::BudgetGroups::Ops::Index < Transactions::API
 
+  include HasScope
+
+  has_scope :with_period_id
+  has_scope :filter_search
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
 
@@ -9,5 +13,6 @@ class BudgetManager::BudgetGroups::Ops::Index < Transactions::API
 
   def index!(options, current_user:, **)
     options["budget_groups"] = current_user.company.budget_groups
+    options["budget_groups"] = apply_scopes(options["budget_groups"])
   end
 end

@@ -1,4 +1,4 @@
-class BudgetsCalculator::Calculate::BudgetsProcessor
+class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
   attr_accessor :budget, :entity, :trail_hash
 

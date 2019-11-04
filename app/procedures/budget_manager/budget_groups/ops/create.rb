@@ -7,7 +7,7 @@ class BudgetManager::BudgetGroups::Ops::Create < Transactions::API
   # the below step created an instance of BudgetGroup model that can then be populated using the params sent from the FE
   step Model(BudgetGroup, :new)
 
-  # below is the Authorizer - that decides whether a particular user can create a budget group or not (redundant here as )
+  # below is the Authorizer - that decides whether a particular user can create a budget group or not (redundant here as Authorization class takes care of scoping roles)
   # step Policy::Pundit(BudgetManager::BudgetAuthorizer, :create?)
 
   # the below step adds company_id and created_by_user_id to the budget_group key inside params
@@ -16,13 +16,14 @@ class BudgetManager::BudgetGroups::Ops::Create < Transactions::API
   # in the below step, we are telling TBZ which contract to use for this particular operation, inside "constant:"
   step Contract::Build(constant: BudgetManager::BudgetGroups::Contracts::Base)
 
-  # in the next step, if the budget group is being sent within a key called 'budget_group' eg.
+  # in the next step, the budget group is being sent within a key called 'budget_group' eg.
   # { "budget_group":
   #     {"name":
   #      "period":
   #     }
   # }
-  # so here, we have to pass the topmost key so that TBZ knows the key to look for
+  # so here, we have to pass the topmost key so that TBZ knows the key to look for.
+  # This step actually performs the validations mentioned in the contract
   step Contract::Validate(key: 'budget_group')
 
   # the below will persist the model and send back errors if any

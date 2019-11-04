@@ -2,21 +2,24 @@
 #
 # Table name: budget_trails
 #
-#  id                :integer          not null, primary key
-#  entity_id         :integer
-#  entity_type       :string(255)
-#  category_id       :integer
-#  cost_center_id    :integer
-#  location_id       :integer
-#  vendor_id         :integer
-#  amount_id         :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  user_id           :integer
-#  department_id     :integer
-#  date              :date
-#  sub_department_id :integer
-#  procurement_id    :integer
+#  id                   :integer          not null, primary key
+#  entity_id            :integer
+#  entity_type          :string(255)
+#  category_id          :integer
+#  cost_center_id       :integer
+#  location_id          :integer
+#  vendor_id            :integer
+#  amount_id            :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  user_id              :integer
+#  department_id        :integer
+#  date                 :date
+#  sub_department_id    :integer
+#  procurement_id       :integer
+#  entity_status_id     :integer
+#  amount_before_tax_id :integer
+#  amount_after_tax_id  :integer
 #
 
 class BudgetTrail < ApplicationRecord
@@ -31,6 +34,8 @@ class BudgetTrail < ApplicationRecord
   belongs_to :sub_department, optional: true, class_name: "Department"
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
+  belongs_to :amount_after_tax, class_name: "Amount"
+  belongs_to :amount_before_tax, class_name: "Amount"
 
   accepts_nested_attributes_for :amount
 

@@ -1,4 +1,4 @@
-class BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetsCalculator::Calculate::BudgetsProcessor
+class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
   def save_trail(invoice_item)
     trail = BudgetTrail.find_by(entity_type: "InvoiceLineItem", entity_id: invoice_item.id)

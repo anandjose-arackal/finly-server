@@ -1,4 +1,4 @@
-class BudgetsProcessor::Calculate::Base < BaseOperation
+class BudgetManager::BudgetsCalculator::Calculate::Base < BaseOperation
   attr_accessor :budget, :spent_amount, :budget_trail_items, :items_requested
 
   def init

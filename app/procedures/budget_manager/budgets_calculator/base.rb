@@ -1,3 +1,3 @@
-class BudgetsCalculator::Base < BaseOperation
+class BudgetManager::BudgetsCalculator::Base < BaseOperation
 
 end
