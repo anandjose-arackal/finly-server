@@ -53,9 +53,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     errors.add(:location_id, "Invalid Location") unless Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves&.pluck(:id)&.include?(location_id.to_i)
     errors.add(:policy_id, "Invalid Policy") unless ::Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: policy_id).present?
 
-    if agreement_id.present?
-      errors.add(:agreement_id, "Invalid Agreement Details") unless current_user.company.payment_agreements.find_by(id: agreement_id).present?
-    end
+    # if agreement_id.present?
+    #   errors.add(:agreement_id, "Invalid Agreement Details") unless current_user.company.payment_agreements.find_by(id: agreement_id).present?
+    # end
   end
 
   # def related_entities
