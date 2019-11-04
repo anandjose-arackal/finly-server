@@ -113,6 +113,12 @@ class BankPaymentRequest < ApplicationRecord
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
         with_id(ids)
       end
+    when 'in_progress'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:in_progress))
+    when 'partially_completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:partially_completed))
+    when 'completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     else
       # all
     end
