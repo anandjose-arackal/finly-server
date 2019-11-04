@@ -50,6 +50,7 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
 
   def process
     unless self.inventory_item.update(self.inventory_item_parameters)
+      validate_custom_fields(true)
       add_message :error, self.inventory_item.errors.full_messages
       return
     end

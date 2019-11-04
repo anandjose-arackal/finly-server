@@ -39,7 +39,8 @@
 class BankPaymentRequest < ApplicationRecord
   include SoftDeletable,
           FindByOrderedIds,
-          Transitionable
+          Transitionable,
+          CustomFieldFilterSupport
   include LiquidDroppable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"

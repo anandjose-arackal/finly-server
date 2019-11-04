@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   sidekiq_options queue: :payments_creation
 
   attr_accessor :view_role, :bank_payment_requests,
-                :headers, :field_configurations, :include_attachments, :download_url, :file_name
+                :headers, :field_configurations, :include_attachments, :download_url, :file_name, :sheets
 
   def pre_validate
     if params&.dig(:bank_payment_request_id).blank?
@@ -30,7 +30,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def process
     headers = retrieve_headers
     content = retrieve_data
-    exported_xls = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages).spreadsheet_exporter.generate_xls
+    sheets =[{
+        item_headers: headers,
+        item_contents: content,
+        name: "Payment Tickets"
+    }]
+    exported_xls = Exporter.new(user, {xlsx: {headers: headers, contents: content, sheets: sheets }}, messages).xlsx_exporter.export_file_path
     exportable_file = exported_xls
     self.file_name = 'export.xls'
     if include_attachments
@@ -62,8 +67,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
       end
       exportable_file = Exporter::AsZip.new(user, {files: files}, messages).generate_zip
       self.file_name = 'export.zip'
+      exportable_file = create_temporary_link(exportable_file)
     end
-    self.download_url = create_temporary_link(exportable_file)
+    self.download_url = exportable_file
   end
 
   def post_process
@@ -152,7 +158,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
             vendor.present? ? vendor.vendor_id : '',
-            payment.receiving_account&.account_number,
+            "'#{payment.receiving_account&.account_number}",
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
             payment.initiating_user.name,

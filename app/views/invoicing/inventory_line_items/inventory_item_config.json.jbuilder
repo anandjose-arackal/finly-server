@@ -17,3 +17,5 @@ json.supply_item_types do
     json.merge! item.as_json
   end
 end
+
+json.custom_fields_config @result.field_configurations
