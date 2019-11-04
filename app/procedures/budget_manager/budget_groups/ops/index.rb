@@ -11,8 +11,8 @@ class BudgetManager::BudgetGroups::Ops::Index < Transactions::API
   # simply return all budget groups that belong to a particular company
   step :index!
 
-  def index!(options, current_user:, **)
+  def index!(options, current_user:, params:, **)
     options["budget_groups"] = current_user.company.budget_groups
-    options["budget_groups"] = apply_scopes(options["budget_groups"])
+    options["budget_groups"] = apply_scopes(options["budget_groups"], params)
   end
 end

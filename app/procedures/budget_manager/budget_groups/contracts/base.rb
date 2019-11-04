@@ -10,13 +10,6 @@ class BudgetManager::BudgetGroups::Contracts::Base < Reform::Form
     property :budgetable_type, presence: true
   end
 
-  # validates :valid_budget_criteria_mappings
-  #
-  # def valid_budget_criteria_mappings
-  #
-  # end
-
-
   def budget_group_criteria_mappings!(collection:, fragment:, index:, **)
     budget_group_criteria_mappings.insert(index, BudgetGroupCriteriaMapping.new)
   end

@@ -26,11 +26,10 @@ class BudgetGroupCriteriaMapping < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        budget_group_name: budget_group.name,
+        budget_group_name: self.budget_group.name,
         budgetable_id: budgetable_id,
-        budgetable_type: budgetable_type,
-        budgetable_name: budgetable.name
+        budgetable_type: budgetable_type
     }
   end
-
+3
 end

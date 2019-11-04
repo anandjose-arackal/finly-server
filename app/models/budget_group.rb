@@ -17,9 +17,9 @@
 #
 
 class BudgetGroup < ApplicationRecord
-  belongs_to :company
-  belongs_to :period
-  belongs_to :created_by_user, class_name: "User"
+  belongs_to :company, optional: true
+  belongs_to :period, optional: true
+  belongs_to :created_by_user, class_name: "User", optional: true
 
   has_many :budget_group_criteria_mappings
   has_many :budgetables, through: :budget_group_criteria_mappings
@@ -30,6 +30,9 @@ class BudgetGroup < ApplicationRecord
   has_many :budgetable_users, through: :budget_group_criteria_mappings, source: :budgetable, source_type: 'User'
   has_many :budgetable_departments, through: :budget_group_criteria_mappings, source: :budgetable, source_type: 'Department'
 
+  has_many :budgets
+
+  accepts_nested_attributes_for :budget_group_criteria_mappings
 
   # defining the scopes for this model
 
@@ -146,11 +149,13 @@ class BudgetGroup < ApplicationRecord
       id: id,
       name: name,
       created_by_user: created_by_user&.name,
+      created_at: created_at,
       purchase_order: purchase_order,
       invoice: invoice,
       purchase_request: purchase_request,
       payment: payment,
       expense: expense,
+      total_budgets: self.budgets.count,
       budget_group_criteria_mappings: budget_group_criteria_mappings
     }
   end

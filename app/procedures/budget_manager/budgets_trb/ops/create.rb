@@ -24,6 +24,7 @@ class BudgetManager::BudgetsTrb::Ops::Create < Transactions::API
   step Contract::Persist()
 
   def set_defaults!(options, params:, **)
+    debugger
     budget = options["model"]
     # setting the default attributes of this budget based on the attributes of
     # the budget group
@@ -35,6 +36,7 @@ class BudgetManager::BudgetsTrb::Ops::Create < Transactions::API
       expense: budget_group.expense,
       payment: budget_group.payment
     )
+
   end
 
 end

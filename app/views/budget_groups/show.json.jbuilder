@@ -1,3 +1,7 @@
 json.result do
-  json.merge! @result["model"]
+  budget_group = @result["model"]
+  json.budget_group budget_group.as_json
+  if budget_group.budgets.present?
+    json.budgets budget_group.budgets.as_json
+  end
 end

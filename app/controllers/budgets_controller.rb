@@ -1,12 +1,20 @@
 class BudgetsController < BaseControllers::WebBase
   def index
-    @result = Budgets::Index.(current_user, params)
-    respond
+    @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Index.(current_user, params)
+    # respond
   end
 
   def show
-    @result = Budgets::Show.(current_user, params)
-    respond
+    @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Show.(current_user, params)
+    # respond
   end
 
   def show_trail_items
@@ -20,13 +28,21 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def create
-    @result = Budgets::Create.(current_user, params)
-    respond
+    @result = BudgetManager::BudgetsTrb::Ops::Create.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Create.(current_user, params)
+    # respond
   end
 
   def update
-    @result = Budgets::Update.(current_user, params)
-    respond
+    @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Update.(current_user, params)
+    # respond
   end
 
   def bulk_update
@@ -43,10 +59,10 @@ class BudgetsController < BaseControllers::WebBase
     respond
   end
 
-  def configuration
-    @result = Budget::Configuration.(current_user, params)
-    respond
-  end
+  # def configuration
+  #   @result = Budget::Configuration.(current_user, params)
+  #   respond
+  # end
 
   def add_budget
     @result = Budgets::Edit::AddBudget.(current_user, params)

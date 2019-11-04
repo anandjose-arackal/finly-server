@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_04_044937) do
+ActiveRecord::Schema.define(version: 2019_11_04_093905) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1162,6 +1162,8 @@ ActiveRecord::Schema.define(version: 2019_11_04_044937) do
     t.integer "budget_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "budget_amount_id"
+    t.integer "remaining_amount_id"
     t.index ["budget_id"], name: "index_budget_consumptions_on_budget_id"
     t.index ["committed_amount_id"], name: "index_budget_consumptions_on_committed_amount_id"
     t.index ["paid_amount_id"], name: "index_budget_consumptions_on_paid_amount_id"
@@ -1333,6 +1335,8 @@ ActiveRecord::Schema.define(version: 2019_11_04_044937) do
     t.datetime "deleted_at"
     t.integer "budget_group_id"
     t.boolean "calculated_before_tax_amount", default: false
+    t.boolean "purchase_request"
+    t.boolean "invoice"
     t.index ["budget_amount_id"], name: "index_budgets_on_budget_amount_id"
     t.index ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id"
     t.index ["company_id"], name: "index_budgets_on_company_id"

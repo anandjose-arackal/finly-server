@@ -23,6 +23,8 @@
 #  deleted_at                   :datetime
 #  budget_group_id              :integer
 #  calculated_before_tax_amount :boolean          default(FALSE)
+#  purchase_request             :boolean
+#  invoice                      :boolean
 #
 
 class Budget < ApplicationRecord
@@ -60,7 +62,6 @@ class Budget < ApplicationRecord
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
-  validates :period, presence: true
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
@@ -231,13 +232,13 @@ class Budget < ApplicationRecord
       start_date: start_date&.strftime("%d-%b-%y"),
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
-      spent_amount: processor_instance.spent_amount,
-      associated_vendors: budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budgetable_categories.as_json,
-      associated_cost_centers: budgetable_cost_centers.as_json,
-      associated_locations: budgetable_locations.as_json,
-      associated_departments: budgetable_departments.as_json,
-      associated_users: budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      # spent_amount: processor_instance.spent_amount,
+      associated_vendors: budget_group.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budget_group.budgetable_categories.as_json,
+      associated_cost_centers: budget_group.budgetable_cost_centers.as_json,
+      associated_locations: budget_group.budgetable_locations.as_json,
+      associated_departments: budget_group.budgetable_departments.as_json,
+      associated_users: budget_group.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
       user: {
         id: user.id,
         mobile_number: user.mobile_number,
@@ -253,12 +254,12 @@ class Budget < ApplicationRecord
     {
       id: id,
       name: name,
-      associated_vendors: budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budgetable_categories.as_json,
-      associated_cost_centers: budgetable_cost_centers.as_json,
-      associated_locations: budgetable_locations.as_json,
-      associated_departments: budgetable_departments.as_json,
-      associated_users: budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_vendors: budget_group.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budget_group.budgetable_categories.as_json,
+      associated_cost_centers: budget_group.budgetable_cost_centers.as_json,
+      associated_locations: budget_group.budgetable_locations.as_json,
+      associated_departments: budget_group.budgetable_departments.as_json,
+      associated_users: budget_group.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
       user: {
         id: user.id,
         mobile_number: user.mobile_number,
@@ -292,8 +293,12 @@ class Budget < ApplicationRecord
     }
   end
 
+  def criteria_as_json(options = {})
+
+  end
+
   def consumed_budget
-    # calculate in persentage how much budget amount is actually spent
+    # calculate in percentage how much budget amount is actually spent
     ((processor_instance.spent_amount / self.budget_amount.value) * 100) rescue 0
   end
 
@@ -312,7 +317,7 @@ class Budget < ApplicationRecord
   private
 
   def processor_instance
-   BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
+   BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
   end
 
   def recalculate_parent_budget
