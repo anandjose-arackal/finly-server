@@ -26,6 +26,9 @@ class BudgetConsumption < ApplicationRecord
   belongs_to :paid_amount, class_name: "Amount"
   belongs_to :remaining_amount, class_name: "Amount"
 
+  accepts_nested_attributes_for :budget_amount, :pending_amount, :committed_amount, :pending_payment_amount,
+                                :payment_processing_amount, :paid_amount, :remaining_amount
+
   def as_json(options = {})
     {
         budget_id: budget.id,

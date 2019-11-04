@@ -1,4 +1,7 @@
 class BudgetsController < BaseControllers::WebBase
+
+  layout 'trailblazers'
+
   def index
     @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
     respond_to do |format|

@@ -191,6 +191,10 @@ class Budget < ApplicationRecord
     where.not(id: id)
   }
 
+  scope :filter_budget_group_id, -> (budget_group_id) {
+    where budget_group_id: budget_group_id
+  }
+
   # scope :filter_criteria, -> (criteria) {
   #   case criteria
   #   when 'budget', :budget, '1'

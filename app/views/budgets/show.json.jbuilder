@@ -1,5 +1,5 @@
-budget = @result["budget"]
-json.extract! budget, :id, :name, :created_by_user
+budget = @result["model"]
+json.extract! budget, :id, :name, :user
 
 json.applicable_entities do
   json.purchase_order budget.purchase_order

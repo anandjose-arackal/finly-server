@@ -120,7 +120,7 @@ class InvoiceLineItem < ApplicationRecord
     self.inventory_line_item&.tds_applicable?
   end
 
-  def as_json
+  def as_json(options = {})
     {
       id: self.id,
       description: self.description,

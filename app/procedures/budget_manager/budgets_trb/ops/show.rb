@@ -4,6 +4,6 @@ class BudgetManager::BudgetsTrb::Ops::Show < Transactions::API
   step Transactions::Authorization::Roles(:budget_manager, :admin)
 
   # now we find the model based on the ID passed from the route
-  step Model(BudgetGroup, :find)
+  step Model(Budget, :find)
 
 end
