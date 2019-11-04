@@ -1,13 +1,15 @@
 class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
-  attr_accessor :budget, :entity, :trail_hash
+  attr_accessor :budget, :entity, :trail_hash, :applicable_trails
 
   def initialize(budget = nil)
     self.budget = budget
   end
 
-  # this method will return the totality of the amount spent against this particular budget
-  def spent_amount
+  # this method will return the totality of the amount spent against this particular budget,
+  # which will be picked up from the BudgetConsumption model
+  def consumed_amount
+
     criterial_mapping = self.budget.budget_criteria_mappings.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
     category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
     cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
@@ -16,18 +18,21 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
     vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
     user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
 
+    self.applicable_trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
+                            .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                            .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+
+
     # now choosing the entities to which we can apply the budget
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
     # adding PO Item because both will be considered for the
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
-    budgetable_entities << "InvoiceLineItem" if self.budget.purchase_order
+    budgetable_entities << "InvoiceLineItem" if self.budget.invoice
     budgetable_entities << "Payment" if self.budget.payment
 
-    # here we will calculate the various amounts that are associated with a budget - extracted from BudgetTrail model based on the
-    # entity_type, entity_id, and entity_status_id that tells what status the particular document is in
     pending_entities = ["PurchaseRequest"]
-    pending_entity_statuses = [PurchaseRequestStatus.ids_for(:approved, :auto_approved, :closed, )]
+    pending_entity_statuses = [PurchaseRequestStatus.ids_for(:approved, :auto_approved)]
     pending_amount = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
                          .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
                          .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
@@ -41,7 +46,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
   # i.e. these are the entities that have consumed this particular budget
   # will return an array of arrays, that contain expenses, payments, and purchase orders respectively
-  def spent_entities
+  def consumed_entities
     criterial_mapping = self.budget.budget_criteria_mappings.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
     category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
     cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
@@ -134,5 +139,9 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
   end
 
   protected
+
+  def pending_spent_amount
+
+  end
 
 end

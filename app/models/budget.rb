@@ -63,6 +63,7 @@ class Budget < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  after_create :set_budget_consumption
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
 
@@ -342,6 +343,42 @@ class Budget < ApplicationRecord
         end
       end
     end
+  end
+
+  # initializing the budget consumption model with default values
+  # currently being done here because TBZ doesn't have very good callbacks
+  def set_budget_consumption
+    budget_consumption = self.build_budget_consumption(
+            budget_amount_attributes: {
+                value: self.budget_amount.value,
+                currency: Currency.first
+            },
+            pending_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            committed_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            pending_payment_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            payment_processing_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            paid_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            remaining_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            }
+    )
+    budget_consumption.save
   end
 
 end

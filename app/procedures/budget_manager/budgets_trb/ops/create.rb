@@ -1,5 +1,7 @@
 class BudgetManager::BudgetsTrb::Ops::Create < Transactions::API
 
+  attr_accessor :budget_group
+
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
 
@@ -23,20 +25,26 @@ class BudgetManager::BudgetsTrb::Ops::Create < Transactions::API
   # this step actually persists the Model
   step Contract::Persist()
 
-  def set_defaults!(options, params:, **)
-    debugger
+  def set_defaults!(options, params:, current_user:, **)
+    params.require(:budget).permit!
+    self.budget_group = current_user.company.budget_groups.find_by(id: params&.dig(:budget, :budget_group_id))
+    if self.budget_group.blank?
+      # add errors here
+      return false
+    end
     budget = options["model"]
     # setting the default attributes of this budget based on the attributes of
     # the budget group
-    budget_group = budget.budget_group
+    budget.budget_amount = Amount.new(value: params&.dig(:budget, :budget_amount, :value), currency_id: 1)
     budget.assign_attributes(
-      purchase_order: budget_group.purchase_order,
-      invoice: budget_group.invoice,
-      purchase_request: budget_group.purchase_request,
-      expense: budget_group.expense,
-      payment: budget_group.payment
+      purchase_order: self.budget_group.purchase_order,
+      invoice: self.budget_group.invoice,
+      purchase_request: self.budget_group.purchase_request,
+      expense: self.budget_group.expense,
+      payment: self.budget_group.payment,
+      budget_group_id: self.budget_group.id
     )
-
+    true
   end
 
 end
