@@ -34,7 +34,7 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerType < Transactions::API
     options['result']['fields'] = {
         name: biller_type[:field_name],
         type: 'dropdown',
-        values: bbps_billers.map(&:as_json_autocomplete)
+        values: bbps_billers.as_json(autocomplete: true)
     }
   end
 end

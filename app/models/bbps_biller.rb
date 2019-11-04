@@ -54,6 +54,14 @@ class BbpsBiller < ApplicationRecord
   }
 
   def as_json(options={})
+    if options[:autocomplete]
+      data = {
+          label: biller_name,
+          value: id
+      }
+
+      return data
+    end
     {
       biller_id: biller_id,
       biller_name: biller_name,
