@@ -13,6 +13,7 @@ class Vendors::Update < Vendors::Base
   def init
     # id = params[:id] || params[:yes_bank_vendor_id] || params[:vendor_id]
     self.vendor_parameters = vendor_attributes
+    self.vendor_changes ={}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
     self.vendor_parameters.delete(:policy_id)
@@ -142,10 +143,10 @@ class Vendors::Update < Vendors::Base
     
     vendor.assign_attributes(vendor_parameters)
     return unless validate_gstin_pan_number
-
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
       vendor.save
+      add_message :success, "Vendor updated"
     else
       add_message :error, vendor.errors.full_messages
     end
@@ -156,7 +157,6 @@ class Vendors::Update < Vendors::Base
   end
 
   def post_process
-    add_message :success, "Vendor updated"
     if self.vendor_changes[:bank_account_changed].present?
       Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
     end
@@ -173,6 +173,7 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
+    return true if vendor_parameters[:pan].blank? && vendor_parameters[:gstin].blank?
     validated = false
     self.vendor.gstin_locations.each do |vendor_location|
       validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)

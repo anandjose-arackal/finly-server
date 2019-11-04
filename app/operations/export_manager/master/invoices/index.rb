@@ -329,17 +329,17 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def tds_nature(invoice_line_item)
-    return false unless invoice_line_item.inventory_line_item.tds_applicable
+    return false unless invoice_line_item&.inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.name
   end
 
   def tds_amount(invoice_line_item)
-    return 0.0 unless invoice_line_item.inventory_line_item.tds_applicable
+    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_amount&.value || 0
   end
 
   def tds_percentage(invoice_line_item)
-    return 0.0 unless invoice_line_item.inventory_line_item.tds_applicable
+    return 0.0 unless invoice_line_item.&inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.tds || 0
   end
 
