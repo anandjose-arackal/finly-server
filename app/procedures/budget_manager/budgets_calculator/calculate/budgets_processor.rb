@@ -23,6 +23,16 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
     budgetable_entities << "InvoiceLineItem" if self.budget.purchase_order
     budgetable_entities << "Payment" if self.budget.payment
+
+    # here we will calculate the various amounts that are associated with a budget - extracted from BudgetTrail model based on the
+    # entity_type, entity_id, and entity_status_id that tells what status the particular document is in
+    pending_entities = ["PurchaseRequest"]
+    pending_entity_statuses = [PurchaseRequestStatus.ids_for(:approved, :auto_approved, :closed, )]
+    pending_amount = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
+                         .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                         .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+                         .with_budgetable_entities([])
+
     BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
                        .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
                        .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)

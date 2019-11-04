@@ -1,3 +1,3 @@
-class BudgetManager::BudgetsCalculator::Base < BaseOperation
+class BudgetManager::BudgetsCalculator::Base < Transactions::API
 
 end
