@@ -674,7 +674,8 @@ class Invoice < ApplicationRecord
         tax_type_id: self.tax_type_id,
         tds_type_id: self.tds_type_id,
         discount_amount: precision_value(self.discount_amount&.value),
-        discount: precision_value(self.discount),
+        # discount: precision_value(self.discount),
+        discount: invoice_discount_rate,
         date: self.date,
         discount_type_id: self.discount_type_id,
         due_date: self.due_date,
@@ -686,7 +687,7 @@ class Invoice < ApplicationRecord
         balance_due: self.balance_due&.value,
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid? || self.initiated?,
-        tax_rate: precision_value(self.tax_rate),
+        tax_rate: return_tax_rate,
         tds_rate: precision_value(self.tds_rate),
         discount_rate: precision_value(self.discount_rate),
         advance_rate: precision_value(self.advance_rate),
@@ -729,8 +730,15 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def return_tax_rate
+    ori_value = (self.item_amounts_total.to_f - self.discount_amount&.value.to_f)
+    tax_value = self.tax_amount&.value.to_f
+    calci_tax_rate = ( tax_value / ori_value ) * 100
+    precision_value( calci_tax_rate )
+  end
+
   def invoice_discount_rate
-    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
+    ((self.discount_amount&.value.to_f / self.item_amounts_total.to_f) * 100).round(2) rescue 0
   end
 
   def include_original_amount
