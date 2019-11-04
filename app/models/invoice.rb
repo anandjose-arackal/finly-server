@@ -686,7 +686,7 @@ class Invoice < ApplicationRecord
         balance_due: self.balance_due&.value,
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid? || self.initiated?,
-        tax_rate: precision_value( ((((self.item_amounts_total.to_f - self.discount_amount&.value.to_f) / self.tax_amount&.value.to_f)) * 100) ),
+        tax_rate: return_tax_rate,
         tds_rate: precision_value(self.tds_rate),
         discount_rate: precision_value(self.discount_rate),
         advance_rate: precision_value(self.advance_rate),
@@ -727,6 +727,13 @@ class Invoice < ApplicationRecord
         agreement_number: self&.payment_agreement&.get_agreement_number
       }
     end
+  end
+
+  def return_tax_rate
+    ori_value = (self.item_amounts_total.to_f - self.discount_amount&.value.to_f)
+    tax_value = self.tax_amount&.value.to_f
+    calci_tax_rate = ( tax_value / ori_value ) * 100
+    precision_value( calci_tax_rate )
   end
 
   def invoice_discount_rate
