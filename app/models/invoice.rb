@@ -689,7 +689,8 @@ class Invoice < ApplicationRecord
         editable: self.unpaid? || self.initiated?,
         tax_rate: return_tax_rate,
         tds_rate: precision_value(self.tds_rate),
-        discount_rate: precision_value(self.discount_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
         invoice_attachment: {
             url: self.invoice_attachments.first&.attached_file&.url,
