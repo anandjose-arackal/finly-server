@@ -686,7 +686,7 @@ class Invoice < ApplicationRecord
         balance_due: self.balance_due&.value,
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid? || self.initiated?,
-        tax_rate: precision_value(self.tax_rate),
+        tax_rate: precision_value( ((((self.item_amounts_total.to_f - self.discount_amount.to_f) / self.tax_amount.to_f)) * 100) ),
         tds_rate: precision_value(self.tds_rate),
         discount_rate: precision_value(self.discount_rate),
         advance_rate: precision_value(self.advance_rate),
