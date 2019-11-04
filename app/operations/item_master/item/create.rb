@@ -49,7 +49,7 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
   def process
     self.inventory_item_parameters[:user] = user
     self.inventory_line_item = user.company.items.build(self.inventory_item_parameters)
-    validate_custom_fields(false)
+    # validate_custom_fields(false)
     if  self.inventory_line_item.save
       # if inventory_item_parameters[:artifacts].present?
       #   artifact = inventory_line_item.artifacts.build
