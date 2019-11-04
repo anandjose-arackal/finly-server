@@ -34,6 +34,7 @@ class BbpsBillerSubscription < ApplicationRecord
   belongs_to :user, class_name: 'User', optional: true
   belongs_to :policy, optional: true
   belongs_to :status, class_name: 'BbpsBillerSubscriptionStatus', optional: true
+  belongs_to :agreement, class_name: 'PaymentAgreement', optional: true
 
   has_many :customer_fields, class_name: 'BbpsSubscriptionField', foreign_key: :subscription_id
   has_many :subscription_pocs, class_name: 'BbpsSubscriptionPoc', foreign_key: :subscription_id

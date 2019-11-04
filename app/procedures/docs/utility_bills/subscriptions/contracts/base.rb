@@ -14,7 +14,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :user_id, presence: true
   property :active
 
-  # property :agreement_id
+  property :agreement_id
   property :expected_due_day
 
   collection :subscription_pocs, populator: :subscription_pocs! do
