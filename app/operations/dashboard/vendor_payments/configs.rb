@@ -16,7 +16,8 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       po_advances: false,
       grns: false,
       vendors: false,
-      payment_agreements: false
+      payment_agreements: false,
+      approved_purchase_request_items: false
     }
 
     reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
@@ -37,6 +38,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
       unless user.company.purchase_requisition_enabled?
         request_types[:purchase_requests] = false
+        request_types[:approved_purchase_request_items] = false
       end
 
       unless user.company.agreement_based_payment_system_enabled?
@@ -80,6 +82,8 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         #   end
         when UserRole.id_for(:payment_agreement_initiator)
           request_types[:payment_agreements] = true 
+        when UserRole.id_for(:purchase_order_initiator) || UserRole.id_for(:inventory_manager)
+          request_types[:approved_purchase_request_items] = true
         end
       end
     end

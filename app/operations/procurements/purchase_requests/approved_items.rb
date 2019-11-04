@@ -33,9 +33,14 @@ class Procurements::PurchaseRequests::ApprovedItems < Procurements::PurchaseRequ
 
     def init
       # Get policies in which user has purchase order initiator or inventory manager role
-      role_based_policy_ids = user.company.policies.joins(:policy_user_roles).with_application('vp').where('policy_user_roles.user_role_id IN (?)', [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:inventory_manager)]).pluck(:id).uniq rescue []
-      approved_item_ids = user.company.purchase_requests.where(policy_id: role_based_policy_ids).joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)]).pluck('purchase_request_items.id')
-      self.approved_purchase_request_items = PurchaseRequestItem.with_ids(approved_item_ids)
+      if user.vendor_payments_admin?
+        approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).pluck('purchase_request_items.id')
+        self.approved_purchase_request_items = PurchaseRequestItem.with_ids(approved_item_ids)
+      else
+        role_based_policy_ids = user.company.policies.joins(:policy_user_roles).with_application('vp').where('policy_user_roles.user_role_id IN (?)', [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:inventory_manager)]).pluck(:id).uniq rescue []
+        approved_item_ids = user.company.purchase_requests.where(policy_id: role_based_policy_ids).joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)]).pluck('purchase_request_items.id')
+        self.approved_purchase_request_items = PurchaseRequestItem.with_ids(approved_item_ids)
+      end
       apply_search
       self.approved_purchase_request_items = apply_scopes(self.approved_purchase_request_items, params)
       self.paginated_items = self.approved_purchase_request_items.paginate(page: params[:page], per_page: params[:per_page]) rescue nil
