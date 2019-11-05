@@ -211,7 +211,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     def status_count
       pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited, :auto_approved)
-      po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
+      po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:partially_completed), PaymentOrderStatus.id_for(:completed), PaymentOrderStatus.id_for(:in_progress)]
 
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
 
@@ -224,7 +224,10 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
         failed: 0,
         scheduled: 0,
         pending: 0,
-        awaiting_approval: 0
+        awaiting_approval: 0,
+        partially_completed: 0,
+        in_progress: 0,
+        completed: 0
       }
 
       BankPaymentRequestStatus.all.map do |status|
@@ -254,6 +257,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
             result[:scheduled] += payment_order_counts[status.id]
           when PaymentOrderStatus.id_for(:pending)
             result[:pending] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:in_progress)
+            result[:in_progress] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:partially_completed)
+            result[:partially_completed] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:completed)
+            result[:completed] += payment_order_counts[status.id]
           end
         end
       end
