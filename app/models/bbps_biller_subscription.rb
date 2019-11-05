@@ -85,8 +85,8 @@ class BbpsBillerSubscription < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         biller_category_name: biller_category_name,
-        customer_fields: customer_fields.as_json
-
+        customer_fields: customer_fields.as_json,
+        subscription_pocs: subscription_pocs.as_json
     }
   end
 

@@ -63,6 +63,7 @@ class BbpsBiller < ApplicationRecord
       return data
     elsif options[:index]
       data = {
+          id: id,
           biller_id: biller_id,
           biller_name: biller_name,
           biller_alias_name: biller_alias_name,

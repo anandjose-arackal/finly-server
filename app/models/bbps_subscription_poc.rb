@@ -12,4 +12,10 @@
 class BbpsSubscriptionPoc < ApplicationRecord
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :user, optional: true
+
+  def as_json(options = {})
+    {
+        user: user.json_for_trail
+    }
+  end
 end
