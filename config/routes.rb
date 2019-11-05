@@ -1578,7 +1578,7 @@
 #                                   generate_template_file GET    /budgets/generate_template_file(.:format)                                                                           budgets#sample_import_file
 #                                            budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
 #                                    process_template_file POST   /budgets/:budget_id/process_template_file(.:format)                                                                 budgets#process_template_file
-#                                              sub_budgets GET    /budgets/:id/children(.:format)                                                                             budgets#sub_budgets
+#                                              sub_budgets GET    /budgets/:id/children(.:format)                                                                                     budgets#sub_budgets
 #                                      bulk_update_budgets POST   /budgets/bulk_update(.:format)                                                                                      budgets#bulk_update
 #                                        budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                     budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
@@ -1784,7 +1784,8 @@
 #                        procure_configs_doc_number_config PATCH  /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                                                          PUT    /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                                procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                                                procure/configs/mailer#send_mail
-#                                         procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
+#                                         procure_comments GET    /procure/comments(.:format)                                                                                         procure/comments#index
+#                                                          POST   /procure/comments(.:format)                                                                                         procure/comments#create
 #                         reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                          reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                        reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
