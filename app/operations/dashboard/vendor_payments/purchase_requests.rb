@@ -109,39 +109,6 @@ class Dashboard::VendorPayments::PurchaseRequests < Dashboard::VendorPayments::B
         self.counts.push(personal_data)
       end
 
-      if user.vendor_payments_admin?
-        approved_items_data = {
-          type: 'approved_items',
-          data: [
-            {
-              title: "Approved Items",
-              count: apply_scopes(purchase_requests, {filter_user_id: user.id})&.count,
-              filters: [
-                {filter_approved_items: 'approved_items'}
-              ]
-            }
-          ]
-        }
-        self.counts.push(approved_items_data)
-      end
-
-
-      if user.is_purchase_order_initiator? || user.is_inventory_manager?
-        approved_items_data = {
-          type: 'approved_items',
-          data: [
-            {
-              title: "Approved Items",
-              count: apply_scopes(purchase_requests, {filter_user_id: user.id})&.count,
-              filters: [
-                {filter_approved_items: 'approved_items'}
-              ]
-            }
-          ]
-        }
-        self.counts.push(approved_items_data)
-      end
-
       # Set Date Filters in Filters
       # Done because the filters in index page and the filters passed in dashboard for date filters are different
       self.counts.each do |count_object|
