@@ -1,0 +1,2 @@
+class BbpsBill < ApplicationRecord
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_02_123007) do
+ActiveRecord::Schema.define(version: 2019_11_05_093745) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -703,6 +703,12 @@ ActiveRecord::Schema.define(version: 2019_11_02_123007) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "bbps_bill_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bbps_biller_subscription_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -729,6 +735,7 @@ ActiveRecord::Schema.define(version: 2019_11_02_123007) do
     t.string "expected_due_day"
     t.integer "controlling_level_id"
     t.string "reminder_day"
+    t.string "biller_category_name"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -777,6 +784,36 @@ ActiveRecord::Schema.define(version: 2019_11_02_123007) do
     t.index ["parent_biller_id"], name: "index_bbps_billers_on_parent_biller_id"
     t.index ["status"], name: "index_bbps_billers_on_status"
     t.index ["updated_at"], name: "index_bbps_billers_on_updated_at"
+  end
+
+  create_table "bbps_bills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "subscription_id"
+    t.integer "user_id"
+    t.string "name"
+    t.string "sequence_id"
+    t.integer "department_id"
+    t.integer "cost_center_id"
+    t.integer "location_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.integer "status_id"
+    t.integer "amount_id"
+    t.boolean "autofetched", default: false
+    t.date "expected_due_date"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
+    t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
+    t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
+    t.index ["cost_center_id"], name: "index_bbps_bills_on_cost_center_id"
+    t.index ["department_id"], name: "index_bbps_bills_on_department_id"
+    t.index ["location_id"], name: "index_bbps_bills_on_location_id"
+    t.index ["policy_id"], name: "index_bbps_bills_on_policy_id"
+    t.index ["sequence_id"], name: "index_bbps_bills_on_sequence_id"
+    t.index ["status_id"], name: "index_bbps_bills_on_status_id"
+    t.index ["subscription_id"], name: "index_bbps_bills_on_subscription_id"
+    t.index ["user_id"], name: "index_bbps_bills_on_user_id"
   end
 
   create_table "bbps_subscription_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -4892,6 +4929,7 @@ ActiveRecord::Schema.define(version: 2019_11_02_123007) do
     t.text "post_operation_payload"
     t.boolean "api_initiated", default: false
     t.integer "bank_account_provider_id"
+    t.datetime "deleted_at"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"

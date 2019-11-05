@@ -26,8 +26,8 @@
 class BbpsBillerSubscription < ApplicationRecord
   # include Sequenced::ActsAsSequenced
   include SoftDeletable, Transitionable
-  
-  belongs_to :biller, class_name: 'BbpsBiller', optional: true
+
+  belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
@@ -70,7 +70,7 @@ class BbpsBillerSubscription < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        biller: biller.as_json({basic: true}),
+        biller: biller.as_json({index: true}),
         name: name,
         sequence_id: sequence_id,
         department: department.as_json,
@@ -82,7 +82,10 @@ class BbpsBillerSubscription < ApplicationRecord
         created_at: created_at.strftime("%d-%b-%Y"),
         updated_at: updated_at.strftime("%d-%b-%Y"),
         status: status.as_json,
-        user: user&.json_for_trail
+        user: user&.json_for_trail,
+        biller_category_name: biller_category_name,
+        customer_fields: customer_fields.as_json
+
     }
   end
 
