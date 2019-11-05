@@ -8,7 +8,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :department_id
   property :cost_center_id
   property :location_id
-  property :policy_id
+  property :policy_id, presence: true
 
   property :note
   property :user_id, presence: true

@@ -29,6 +29,14 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || poc?
   end
 
+  def reject?
+    @model.get_reviewers.include?(@user)
+  end
+
+  def submit?
+    BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
+  end
+
   private
 
   def reviewing_user?
