@@ -265,6 +265,7 @@ class Budget < ApplicationRecord
       associated_locations: budget_group.budgetable_locations.as_json,
       associated_departments: budget_group.budgetable_departments.as_json,
       associated_users: budget_group.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      budget_consumption: budget_consumption,
       user: {
         id: user.id,
         mobile_number: user.mobile_number,
@@ -283,8 +284,7 @@ class Budget < ApplicationRecord
       start_date: start_date&.strftime("%d-%b-%y"),
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
-      spent_amount: processor_instance.spent_amount,
-      consumed_budget: consumed_budget.round(3),
+      budget_consumption: budget_consumption,
       sub_budgets: children.map(&:timeline_criteria_as_json),
       sub_budgets_count: children.size,
     }
