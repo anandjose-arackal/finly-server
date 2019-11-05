@@ -173,11 +173,12 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
-    return true if vendor_parameters[:pan].blank? && vendor_parameters[:gstin].blank?
+    return true if vendor_parameters[:pan].blank? || vendor_parameters[:gstin].blank?
     validated = false
     self.vendor.gstin_locations.each do |vendor_location|
       validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)
-      break unless validated
+      add_message :error, "Pan number in gstin for location #{vendor_location.location} is incorrect"
+      break
     end
     validated
   end
