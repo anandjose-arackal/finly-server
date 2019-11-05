@@ -21,6 +21,7 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     event :approve do
       transitions :from => :awaiting_approval, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
       transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :user_can_review?
+      transitions :from => :closed, :to => :approved
     end
 
     event :unapprove do
@@ -55,7 +56,7 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     end
 
     event :partially_close do
-      transitions :from => [:approved, :auto_approved], :to => [:partially_closed]
+      transitions :from => [:approved, :auto_approved, :closed], :to => [:partially_closed]
     end
 
     after_all_events :change_state

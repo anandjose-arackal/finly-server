@@ -50,7 +50,7 @@ class PurchaseRequest < ApplicationRecord
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, :partially_closed?, to: :status, allow_nil: true
 
   before_validation :add_company
 

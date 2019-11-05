@@ -67,4 +67,8 @@ class PurchaseRequestStatus < ApplicationRecord
   def awaiting_approval?
     self.id == PurchaseRequestStatus.id_for(:awaiting_approval)
   end
+
+  def partially_closed?
+    self.id == PurchaseRequestStatus.id_for(:partially_closed)
+  end
 end

@@ -48,5 +48,48 @@ class Procurements::PurchaseOrders::Reopen < Procurements::PurchaseOrders::Base
     # role_id = self.workflow_output[:role_id]
     # Event::EPurchaseOrder::Retract.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Reopened Purchase Order'
+    rollback_purchase_request_status
+    rollback_purchase_request_items
   end
+
+  def rollback_purchase_request_items
+    if self.purchase_order.purchase_request_items.present?
+      purchase_order.purchase_request_items.where(status_id: PurchaseRequestItemStatus.id_for(:po_closed)).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
+    end
+  end
+
+  def rollback_purchase_request_status
+    if purchase_order.purchase_request_items.present?
+      self.purchase_order.purchase_request_items.each do |purchase_request_item|
+        purchase_request = purchase_request_item.purchase_request
+        params[:document] = purchase_request
+        params[:violation_present] = false
+        if purchase_request.purchase_request_items.where.not(status_id: [PurchaseRequestItemStatus.id_for(:po_closed), PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.
+          id_for(:rejected)]).present?
+          # Partially Close
+          unless purchase_request.partially_closed?
+            params[:aasm_event] = 'partially_close'
+            op = WorkflowManager::Base.(user, params)
+            unless op.success?
+              add_message :error, "Cannot partially close associated purchase request #{purchase_request.order_number} at this state"
+            end
+          end
+        else
+          # Approved
+          unless purchase_request.approved? || purchase_request.auto_approved?
+            purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:approved))
+            Trail.create(parent_type: 'PurchaseRequest', parent_id: purchase_request.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_reopen))
+            # Needs current level which is not present here
+            # params[:aasm_event] = 'approve'
+            # op = WorkflowManager::Base.(user, params)
+            # unless op.success?
+            #   add_message :error, "Cannot approve associated purchase request #{purchase_request.order_number} at this state"
+            # end
+          end
+        end
+      end
+    end
+  end
+
+
 end
