@@ -21,6 +21,7 @@
 #  expected_due_day     :string(255)
 #  controlling_level_id :integer
 #  reminder_day         :string(255)
+#  biller_category_name :string(255)
 #
 
 require 'rails_helper'

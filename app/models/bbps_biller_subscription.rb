@@ -21,6 +21,7 @@
 #  expected_due_day     :string(255)
 #  controlling_level_id :integer
 #  reminder_day         :string(255)
+#  biller_category_name :string(255)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -108,5 +109,9 @@ class BbpsBillerSubscription < ApplicationRecord
     end
 
     status_ids.reject {|status_id| status_id.nil?}
+  end
+
+  def self.open_statuses
+    self.status_ids(:draft, :retracted, :rejected)
   end
 end

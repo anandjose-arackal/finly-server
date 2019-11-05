@@ -1,0 +1,62 @@
+class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master::Base
+
+  attr_accessor :bbps_subscription
+
+  register_handle :bbps_subscriptions_show
+  register_actions [:submit, :edit, :retract, :approve, :reject, :take_control, :return_control, :deactivate, :reactivate]
+
+  def initialize(user = nil, params = {})
+    super
+    op_show = Docs::UtilityBills::Subscriptions::Ops::Show.(params, "current_user" => user)
+
+    if op_show.success?
+      self.bbps_subscription = op_show['model']
+    else
+      add_message :error, "Utility Bill Master Record not found"
+      return
+    end
+  end
+
+  def submit
+    bbps_subscription.draft? && bbps_subscription.user_id == user.id
+  end
+
+  def edit
+    (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id) || (bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user))
+  end
+
+  def retract
+    bbps_subscription.awaiting_approval? && bbps_subscription.user_id == user.id
+  end
+
+  def approve
+    bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user)
+  end
+
+  def reject
+    approve
+  end
+
+  def take_control
+    bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.exclude?(user) && user.vendor_payment_admin?
+  end
+
+  def return_control
+    bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user) && user.vendor_payment_admin? && has_taken_control?
+  end
+
+  def deactivate
+    (bbps_subscription.approved? || bbps_subscription.auto_approved?) && user.vendor_payment_admin?
+  end
+
+  def reactivate
+    (bbps_subscription.approved? || bbps_subscription.auto_approved?) && user.vendor_payment_admin?
+  end
+
+  private
+
+  def has_taken_control?
+    bbps_subscription.dlrms.where(level_id: bbps_subscription.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
+  end
+
+end

@@ -14,6 +14,9 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @model.awaiting_approval? && @model.get_reviewers.include?(@user)
   end
 
+  def blah?
+  end
+
   def update?
     ((@model.draft? || @model.retracted? || @model.rejected?) && @model.user_id == @user.id) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
   end

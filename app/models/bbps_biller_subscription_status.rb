@@ -48,6 +48,10 @@ class BbpsBillerSubscriptionStatus < ApplicationRecord
   end
 
   def as_json
-    {name: name, id: id}
+    {
+        id: id,
+        name: name,
+        display_name: name.split("_").map(&:capitalize).join(" ")
+    }
   end
 end
