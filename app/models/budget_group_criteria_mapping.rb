@@ -28,7 +28,8 @@ class BudgetGroupCriteriaMapping < ApplicationRecord
         id: id,
         budget_group_name: self.budget_group.name,
         budgetable_id: budgetable_id,
-        budgetable_type: budgetable_type
+        budgetable_type: budgetable_type,
+        budgetable_details: budgetable
     }
   end
 3
