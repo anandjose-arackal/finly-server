@@ -1578,7 +1578,7 @@
 #                                   generate_template_file GET    /budgets/generate_template_file(.:format)                                                                           budgets#sample_import_file
 #                                            budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
 #                                    process_template_file POST   /budgets/:budget_id/process_template_file(.:format)                                                                 budgets#process_template_file
-#                                              sub_budgets GET    /budgets/:id/give_me_children(.:format)                                                                             budgets#sub_budgets
+#                                              sub_budgets GET    /budgets/:id/children(.:format)                                                                             budgets#sub_budgets
 #                                      bulk_update_budgets POST   /budgets/bulk_update(.:format)                                                                                      budgets#bulk_update
 #                                        budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                     budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
@@ -3691,7 +3691,7 @@ Rails.application.routes.draw do
   get 'budgets/generate_template_file', to: 'budgets#sample_import_file', as: :generate_template_file
   post 'budgets/import', to: 'budgets#import', as: :budget_import
   post 'budgets/:budget_id/process_template_file', to: 'budgets#process_template_file', as: :process_template_file
-  get 'budgets/:id/give_me_children', to: 'budgets#sub_budgets', as: :sub_budgets
+  get 'budgets/:id/children', to: 'budgets#sub_budgets', as: :sub_budgets
   post 'budgets/bulk_update', to: 'budgets#bulk_update', as: :bulk_update_budgets
   ## Budget apis start ##
   resources :budgets do

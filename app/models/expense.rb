@@ -1126,6 +1126,18 @@ class Expense < ApplicationRecord
     field_label_values
   end
 
+  def amount_before_tax
+    if self.gst_amount.present?
+      return amount_value - gst_amount.value
+    else
+      return amount_value
+    end
+  end
+
+  def amount_after_tax
+    amount_value
+  end
+
   private
 
   # cannot add an expense with future date

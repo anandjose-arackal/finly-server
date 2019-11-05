@@ -960,6 +960,14 @@ class Invoice < ApplicationRecord
     invoice_status_id != InwardInvoiceStatus.id_for(:open)
   end
 
+  def amount_before_tax
+    self.taxable_amount&.value
+  end
+
+  def amount_after_tax
+    self.net_amount&.value
+  end
+
   private
 
   # def payment_agreement_updations

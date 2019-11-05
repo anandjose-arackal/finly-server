@@ -9,22 +9,23 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     end
 
     # only if this invoice belongs within a procurement, the invoice data is stored
+    # i.e. if it's an invoice that is created along with a payment for example, it won't be considered
     invoice = invoice_item.parent
     if invoice.procurement_id.blank?
       return
     end
 
-    # additionally check if this invoice is part of a procurement and if it is, the procurement shouldn't already exist
-    procurement_id = invoice_item.parent.procurement_id
-    procurement = invoice_item.parent.procurement
-    if procurement.purchase_order.present?
-      trail_by_procurement = BudgetTrail.find_by(procurement_id: procurement_id)
-      trail_by_procurement = BudgetTrail.with_entity_type(["PurchaseOrderItem"]).with_entity_id(procurement.purchase_order.items.pluck(:id)).first if trail_by_procurement.blank?
-      # if this already exists, then it means that the budget has already been considered under a purchase order
-      if trail_by_procurement.present? && trail_by_procurement.entity_type == "PurchaseOrderItem"
-        return
-      end
-    end
+    # # additionally check if this invoice is part of a procurement and if it is, the procurement shouldn't already exist
+    # procurement_id = invoice_item.parent.procurement_id
+    # procurement = invoice_item.parent.procurement
+    # if procurement.purchase_order.present?
+    #   trail_by_procurement = BudgetTrail.find_by(procurement_id: procurement_id)
+    #   trail_by_procurement = BudgetTrail.with_entity_type(["PurchaseOrderItem"]).with_entity_id(procurement.purchase_order.items.pluck(:id)).first if trail_by_procurement.blank?
+    #   # if this already exists, then it means that the budget has already been considered under a purchase order
+    #   if trail_by_procurement.present? && trail_by_procurement.entity_type == "PurchaseOrderItem"
+    #     return
+    #   end
+    # end
 
     self.trail_hash = {
         id: trail_id,
@@ -35,9 +36,20 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         user_id: invoice_item.parent.created_by_user_id,
         location_id: invoice_item.parent.location_id,
         department_id: invoice_item.department_id,
-        date: invoice_item.parent.created_at,
+        date: invoice_item.parent.date,
+        entity_status_id: invoice_item.parent.status_id,
+        entity_created_at: invoice_item.invoice.created_at,
+        entity_submitted_at: invoice_item.invoice.submitted_at,
         amount_attributes: {
             value: invoice_item.net_amount&.value,
+            currency_id: invoice_item.net_amount&.currency_id
+        },
+        amount_before_tax_attributes: {
+            value: invoice_item.amount_before_tax,
+            currency_id: invoice_item.net_amount&.currency_id
+        },
+        amount_after_tax_attributes: {
+            value: invoice_item.amount_after_tax,
             currency_id: invoice_item.net_amount&.currency_id
         }
     }

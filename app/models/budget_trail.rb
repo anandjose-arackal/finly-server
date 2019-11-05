@@ -20,6 +20,8 @@
 #  entity_status_id     :integer
 #  amount_before_tax_id :integer
 #  amount_after_tax_id  :integer
+#  entity_created_at    :datetime
+#  entity_submitted_at  :datetime
 #
 
 class BudgetTrail < ApplicationRecord
@@ -37,7 +39,7 @@ class BudgetTrail < ApplicationRecord
   belongs_to :amount_after_tax, class_name: "Amount"
   belongs_to :amount_before_tax, class_name: "Amount"
 
-  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
   scope :within_date, -> (start_date, end_date) {
     where('date >= ? AND date <= ?', start_date, end_date)

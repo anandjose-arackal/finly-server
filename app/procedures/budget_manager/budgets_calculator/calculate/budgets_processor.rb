@@ -124,6 +124,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
   end
 
   def save_trail
+
     if self.trail_hash[:id].present?
       budget_trail = BudgetTrail.find_by(id: self.trail_hash[:id])
       budget_trail.update(self.trail_hash)

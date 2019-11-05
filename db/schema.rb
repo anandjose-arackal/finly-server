@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_04_093905) do
+ActiveRecord::Schema.define(version: 2019_11_05_035054) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1311,6 +1311,8 @@ ActiveRecord::Schema.define(version: 2019_11_04_093905) do
     t.integer "entity_status_id"
     t.integer "amount_before_tax_id"
     t.integer "amount_after_tax_id"
+    t.datetime "entity_created_at"
+    t.datetime "entity_submitted_at"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -1634,7 +1636,7 @@ ActiveRecord::Schema.define(version: 2019_11_04_093905) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
-    t.boolean "gst_applicable", default: true
+    t.boolean "gst_applicable", default: false
     t.boolean "tds_applicable"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
@@ -6221,6 +6223,8 @@ ActiveRecord::Schema.define(version: 2019_11_04_093905) do
     t.integer "controlling_level_id"
     t.string "bank_reference_number"
     t.string "source_account"
+    t.integer "location_id"
+    t.integer "cost_center_id"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"

@@ -26,8 +26,12 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def sub_budgets
-    @result = Budgets::SubBudgets.(current_user, params)
-    respond
+    @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::SubBudgets.(current_user, params)
+    # respond
   end
 
   def create

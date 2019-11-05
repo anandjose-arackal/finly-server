@@ -10,15 +10,26 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
     self.trail_hash = {
         id: trail_id,
         entity: purchase_order_item,
-        category_id: (purchase_order_item.category_id || purchase_order_item.inventory_line_item&.category_id),
+        category_id: purchase_order_item.category_id,
         cost_center_id: purchase_order_item.cost_center_id,
         user_id: purchase_order_item.purchase_order.user_id,
         location_id: purchase_order_item.purchase_order.location_id,
         department_id: purchase_order_item.department_id,
         date: purchase_order_item.purchase_order.created_at,
+        entity_created_at: purchase_order_item.purchase_order.created_at,
+        entity_submitted_at: purchase_order_item.purchase_order.submitted_at,
         procurement_id: purchase_order_item.purchase_order.procurement_id,
+        entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
         amount_attributes: {
             value: purchase_order_item.total_amount&.value,
+            currency_id: purchase_order_item.total_amount&.currency_id
+        },
+        amount_before_tax_attributes: {
+            value: purchase_order_item.before_tax_amount,
+            currency_id: purchase_order_item.total_amount&.currency_id
+        },
+        amount_after_tax_attributes: {
+            value: purchase_order_item.after_tax_amount,
             currency_id: purchase_order_item.total_amount&.currency_id
         }
     }

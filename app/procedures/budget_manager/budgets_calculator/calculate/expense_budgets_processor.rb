@@ -14,15 +14,26 @@ class BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < Bud
         entity: expense,
         category_id: expense.category_id,
         user_id: expense.user_id,
-        date: expense.report.submitted_at&.to_date,
+        cost_center_id: expense.report.cost_center_id,
         department_id: expense.report.department_id,
-        sub_department_id: expense.report.sub_department_id,
+        location_id: expense.report.location_id,
+        date: expense.date,
+        entity_created_at: expense.created_at,
+        entity_submitted_at: expense.report.submitted_at,
+        entity_status_id: expense.report.report_status_id,
         amount_attributes: {
             value: expense.amount&.value,
             currency_id: expense.amount&.currency_id
+        },
+        amount_before_tax_attributes: {
+            value: expense.amount_before_tax,
+            currency_id: expense.amount.currency_id
+        },
+        amount_after_tax_attributes: {
+            value: expense.amount_after_tax,
+            currency_id: expense.amount.currency_id
         }
     }
-    # todo - add location and department once they are implemented for reports
     # now calling super so that the budget trail is saved
     super()
   end

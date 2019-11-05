@@ -4,7 +4,8 @@
 class BudgetManager::BudgetTrails::Contracts::Base < Reform::Form
 
 
-  properties :entity_id, :entity_type, :amount_id, :date, :entity_status_id, presence: true
+  properties :entity_id, :entity_type, :date, :entity_status_id, presence: true
+  properties :location_id, :department_id, :cost_center_id, :vendor_id, :category_id, :user_id, :procurement_id
 
 
 end

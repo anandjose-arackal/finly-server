@@ -14,10 +14,22 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         cost_center_id: payment.cost_center_id,
         vendor_id: (payment.receiving_account_id if payment.receiving_account_type == "YesBankVendor"),
         department_id: payment.department_id,
-        sub_department_id: payment.department_id,
+        location_id: payment.location_id,
+        user_id: payment.initiating_user_id,
         date: payment.date,
+        entity_status_id: payment.payment_status_id,
+        entity_created_at: payment.bank_payment_request.created_at,
+        entity_submitted_at: payment.bank_payment_request.submitted_at,
         amount_attributes: {
             value: payment.amount.value,
+            currency_id: payment.amount.currency_id
+        },
+        amount_before_tax_attributes: {
+            value: payment.amount_value,
+            currency_id: payment.amount.currency_id
+        },
+        amount_after_tax_attributes: {
+            value: payment.amount_value,
             currency_id: payment.amount.currency_id
         }
     }
