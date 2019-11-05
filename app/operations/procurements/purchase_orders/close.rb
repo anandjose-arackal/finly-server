@@ -19,10 +19,30 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
+    update_purchase_request_status
   end
 
   def post_process
     add_message :success, 'Successfully Closed Purchase Order'
+  end
+
+  def update_purchase_request_status
+    if purchase_order.purchase_request_items.present?
+      if purchase_order.purchase_request_items.where.not(status_id: [PurchaseRequestItemStatus.id_for(:po_approved), PurchaseRequestItemStatus.id_for(:issued_from_inventory)]).blank?
+        purchase_request = purchase_order&.purchase_request_items&.first&.purchase_request
+        if purchase_request.present?
+          params[:document] = purchase_request
+          params[:aasm_event] = 'close'
+          params[:violation_present] = false #todo Check violations
+          op = WorkflowManager::Base.(user, params)
+          unless op.success?
+            add_message :error, "Cannot close associated purchase request at this state"
+            return
+          end
+        end
+      end
+    end
   end
 end

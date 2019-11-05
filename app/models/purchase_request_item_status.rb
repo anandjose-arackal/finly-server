@@ -26,7 +26,8 @@ class PurchaseRequestItemStatus < ApplicationRecord
         :issued_from_inventory,
         :po_created,
         :rejection_in_progress,
-        :po_approved
+        :po_approved,
+        :po_closed
     ]
   end
 

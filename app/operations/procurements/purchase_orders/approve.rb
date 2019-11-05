@@ -69,26 +69,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     if self.purchase_order.purchase_request_items.present?
       if purchase_order.approved?
         purchase_order.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
-        update_purchase_request_status
       end
-    end
-  end
-
-  def update_purchase_request_status
-    if purchase_order.purchase_request_items.present?
-      approved_purchase_request_items = purchase_order.purchase_request_items.first.purchase_request.purchase_request_items.pluck(:status_id).uniq
-      if approved_purchase_request_items.count.present? && approved_purchase_request_items.count == 1 && 
-        approved_purchase_request_items.include?(PurchaseRequestItemStatus.id_for(:po_approved))
-        purchase_request = purchase_order.purchase_request_items.first.purchase_request
-        params[:document] = purchase_request
-        params[:aasm_event] = 'po_approve'
-        params[:violation_present] = false #todo Check violations
-        op = WorkflowManager::Base.(user, params)
-        unless op.success?
-          add_message :error, op.messages[:error]
-          return
-        end
-      end 
     end
   end
 end
