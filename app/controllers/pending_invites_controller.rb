@@ -122,6 +122,7 @@ class PendingInvitesController < BaseControllers::WebBase
   end
 
   def em_onboarding
+    RequestStore.store[:em_onboarding] = true
     @result = UserOnboarding::ExpenseManagement.(current_user, params)
     if @result.success?
       respond
@@ -131,6 +132,7 @@ class PendingInvitesController < BaseControllers::WebBase
   end
 
   def vp_onboarding
+    RequestStore.store[:vp_onboarding] = true
     @result = UserOnboarding::VendorPayments.(current_user, params)
     if @result.success?
       respond

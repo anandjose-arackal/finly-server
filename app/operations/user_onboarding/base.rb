@@ -36,7 +36,9 @@ class UserOnboarding::Base < BaseOperation
     result = ::UserOnboarding::BuildUsersForImport.(current_user, params)
 
     unless result.success?
-      add_message :error, result.messages[:error]
+      result.messages.keys.each do |key|
+        add_message key, result.messages[key]
+      end
       return
     end
 
@@ -104,8 +106,9 @@ class UserOnboarding::Base < BaseOperation
 
   def setup_pur(assignable_roles)
     # setup data points for importing into table
+    purpose_id = Purpose.id_for(:vendor_payments)
     columns = [:policy_id, :user_id, :user_role_id]
-    values = assignable_roles.collect { |p_id, u_id, r_id| [p_id, u_id, r_id] }
+    values = assignable_roles.collect { |p_id, u_id, r_id| [p_id, u_id, r_id, purpose_id] }
 
     return columns, values
   end

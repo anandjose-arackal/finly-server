@@ -30,9 +30,24 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
 
     # used for invitation
     elsif bulk_assign[:user_emails]
+
+      violating_emails = []
+      bulk_assign[:user_emails].each do |email|
+        if (email =~ Constants::VALID_EMAIL_FORMAT).nil?
+          violating_emails << email
+        end
+      end
+
+      if violating_emails.present?
+        add_message :error, "Invalid emails were found. Please correct them"
+        add_message :notice, violating_emails
+        return false
+      end
+
+
       if user.company.feature_subscription.group_entity_structure
         gc = current_company.group
-        # TODO prevent sql injection
+        # TODO prevent sql injection DONE
         # this one tells if there are users in group companies
         self.users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue User.none
       else
@@ -95,7 +110,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     user_list = []
 
     self.new_emails.each do |email|
-      user_list << {email: email}
+      user_list << {email: email, default_password: true}
     end
     user_list
   end
@@ -123,6 +138,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     user_list.uniq.each do |list|
       options = list
       options[:company_id] = user.company_id
+      options = setup_user_panel_subscription(options)
+
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
         u = User.create options
         UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group)
@@ -133,8 +150,34 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       newly_created_users << u
     end
 
+    update_user_panel_subscription
+
     # get all emails of newly created users and see if they exist in the new company and return them
-    all_emails = newly_created_users.pluck(:email)
+    all_emails = newly_created_users.pluck(:email) + self.common_emails
     user.company.users.where(email: all_emails)
   end
+
+  def setup_user_panel_subscription(options)
+    if RequestStore.store[:vp_onboarding]
+      add_message :message, "VP ONBOARDING"
+      options[:user_panel_subscription_attributes] = {yes_bank_account_transfer: true}
+    elsif RequestStore.store[:em_onboarding]
+      add_message :message, "EM ONBOARDING"
+      options[:user_panel_subscription_attributes] = {expense_management: true}
+    end
+  end
+
+  def update_user_panel_subscription
+    users = user.company.users.with_email(self.common_emails)
+    users.each do |u|
+      if RequestStore.store[:vp_onboarding]
+      add_message :message, "VP ONBOARDING"
+        u.user_panel_subscription.update(yes_bank_account_transfer: true) unless u.user_panel_subscription.yes_bank_account_transfer
+      elsif RequestStore.store[:em_onboarding]
+      add_message :message, "EM ONBOARDING"
+        u.user_panel_subscription.update(expense_management: true) unless u.user_panel_subscription.expense_management
+      end
+    end
+  end
+  
 end
