@@ -6,7 +6,10 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
 
 
   def index!(options, *)
-    options['subscriptions'] = BbpsBillerSubscription.all
-  end
+    result = {
+        'subscriptions': BbpsBillerSubscription.all
+    }
 
+    options['result'] = result
+  end
 end

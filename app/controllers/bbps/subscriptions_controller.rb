@@ -23,7 +23,7 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   end
 
   def create
-    @result = Docs::UtilityBills::Subscriptions::Ops::Create.(params, "current_user" => current_user)
+    @op = Docs::UtilityBills::Subscriptions::Ops::Create.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
@@ -34,7 +34,14 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   end
 
   def index
-    @result = Docs::UtilityBills::Subscriptions::Ops::Index.(params, "current_user" => current_user)
+    @op = Docs::UtilityBills::Subscriptions::Ops::Index.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def show
+    @op = Docs::UtilityBills::Subscriptions::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end

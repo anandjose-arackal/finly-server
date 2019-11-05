@@ -25,14 +25,13 @@
 
 class BbpsBillerSubscription < ApplicationRecord
   # include Sequenced::ActsAsSequenced
-  include SoftDeletable
+  include SoftDeletable, Transitionable
   
   belongs_to :biller, class_name: 'BbpsBiller', optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
-  belongs_to :policy, optional: true
   belongs_to :status, class_name: 'BbpsBillerSubscriptionStatus', optional: true
   belongs_to :agreement, class_name: 'PaymentAgreement', optional: true
 
@@ -85,5 +84,26 @@ class BbpsBillerSubscription < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail
     }
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.document_status_class_name
+    'BbpsBillerSubscriptionStatus'
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push BbpsBillerSubscriptionStatus.id_for(status)
+    end
+
+    status_ids.reject {|status_id| status_id.nil?}
   end
 end

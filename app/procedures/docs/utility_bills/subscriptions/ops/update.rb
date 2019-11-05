@@ -3,7 +3,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Trailblazer::Operation
   step Model( BbpsBillerSubscription, :find )
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
   # step :set_default_params
-  step Contract::Build( constant: Docs::UtilityBills::Subscriptions::Contracts::Base )
+  step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Update)
   step Contract::Validate(key: 'subscription')
   failure :check
   step Contract::Persist()

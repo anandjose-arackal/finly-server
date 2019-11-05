@@ -1,4 +1,4 @@
 json.result do
-  json.array! @result['subscriptions']
+  json.array! @op['result']['subscriptions']
 end
-json.count @result['subscriptions'].count
+json.count @op['result']['subscriptions'].count

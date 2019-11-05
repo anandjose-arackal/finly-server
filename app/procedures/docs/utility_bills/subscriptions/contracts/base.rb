@@ -33,12 +33,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     property :value, presence: true
   end
 
+  collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
+    property :level_id, presence: true
+    property :reviewer_id
+  end
+
   # validates :expected_due_day inclusion: { in: (1..31).to_a,
   #                                             message: "%{value} is not a valid day" }
-
-  # validate :password_ok? do
-  #   errors.add(:password, "Password mismatch") if password != password_confirmation
-  # end
 
   validate :company_entities # Checks for departments
   # validate :related_entities # Checks for associated agreements, users provided inside pocs
@@ -99,7 +100,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     end
   end
 
-  # def company_specific_entities
   private
 
   def check_alphanumeric(string)
@@ -122,5 +122,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     user_id = params[:user_id]
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
+  end
+
+  def document_reviewer_mappings!
+
   end
 end
