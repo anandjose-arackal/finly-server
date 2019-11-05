@@ -1120,20 +1120,20 @@ class PurchaseOrder < ApplicationRecord
         end
       end
 
-      document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
+      # document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them
-      document_ids.uniq.each do |document_id|
-        purchase_request = user.company.purchase_requests.find_by_id document_id
-        params[:document] = purchase_request
-        params[:aasm_event] = 'po_creation'
-        if purchase_request.purchase_request_items.approved.blank?
-          op = WorkflowManager::Base.(user, params) if purchase_request.present?
-          unless op.success? || purchase_request.present?
-            add_message :error, op.messages[:error]
-            raise_unauthorized_exception
-          end
-        end unless document_ids.blank?
-      end
+      # document_ids.uniq.each do |document_id|
+      #   purchase_request = user.company.purchase_requests.find_by_id document_id
+      #   params[:document] = purchase_request
+      #   params[:aasm_event] = 'po_creation'
+      #   if purchase_request.purchase_request_items.approved.blank?
+      #     op = WorkflowManager::Base.(user, params) if purchase_request.present?
+      #     unless op.success? || purchase_request.present?
+      #       add_message :error, op.messages[:error]
+      #       raise_unauthorized_exception
+      #     end
+      #   end unless document_ids.blank?
+      # end
     end
   end
 

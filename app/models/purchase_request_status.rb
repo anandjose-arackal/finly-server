@@ -23,7 +23,8 @@ class PurchaseRequestStatus < ApplicationRecord
         :closed,
         :order_initiated,
         :cancelled,
-        :po_created
+        :po_created,
+        :partially_closed
     ]
   end
 
