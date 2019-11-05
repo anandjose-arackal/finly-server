@@ -41,7 +41,16 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
             add_message :error, "Cannot close associated purchase request at this state"
             return
           end
+          close_purchase_request_items
         end
+      end
+    end
+  end
+
+  def close_purchase_request_items
+    if purchase_order.present? && purchase_order.purchase_request_items.present?
+      if purchase_order.closed?
+        purchase_order.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_closed))
       end
     end
   end
