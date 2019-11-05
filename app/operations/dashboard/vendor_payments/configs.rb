@@ -50,7 +50,6 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         if reviewer_role_ids.include?(role_id)
           request_types[:awaiting_action] = true
         end
-
         case role_id
         # when UserRole.id_for(:admin) ########## Admin role check removed as PUR usually doesn't contain admin role
         #   request_types.keys.map {|key| request_types[key] = true }
@@ -59,6 +58,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:purchase_requests] = true
         when UserRole.id_for(:purchase_order_initiator)
           request_types[:purchase_orders] = true
+          request_types[:approved_purchase_request_items] = true
         when UserRole.id_for(:goods_receiver)
           request_types[:grns] = true
         # when UserRole.id_for(:invoice_initiator)
@@ -81,8 +81,8 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         #     request_types[:vendors] = true
         #   end
         when UserRole.id_for(:payment_agreement_initiator)
-          request_types[:payment_agreements] = true 
-        when UserRole.id_for(:purchase_order_initiator) || UserRole.id_for(:inventory_manager)
+          request_types[:payment_agreements] = true
+        when UserRole.id_for(:inventory_manager)
           request_types[:approved_purchase_request_items] = true
         end
       end

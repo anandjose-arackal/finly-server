@@ -184,6 +184,18 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :role_based_filter, -> (boolean){
+    if boolean
+      user = RequestStore.store[:current_user]
+      if user.present?
+        role_based_policy_ids = user.company.policies.joins(:policy_user_roles).with_application('vp').where('policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?', [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:inventory_manager)], user.id).pluck(:id).uniq rescue []
+        pr_ids = user.company.purchase_requests.where(policy_id: role_based_policy_ids).joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)])
+        with_ids(pr_ids)
+      end
+    end
+  }
+
+
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
   #   if type && ['ASC', 'DESC'].include?(type)

@@ -69,7 +69,7 @@ class Dashboard::VendorPayments::PurchaseRequestApprovedItems < Dashboard::Vendo
           data: [
             {
               title: "Total",
-              count: apply_scopes(self.approved_purchase_request_items)&.count,
+              count: self.approved_purchase_request_items.role_based_filter(true)&.count,
               filters: [
                 {role_based_filter: true}
               ]

@@ -160,13 +160,13 @@ class PurchaseRequestItem < ApplicationRecord
   }
 
   scope :role_based_filter, -> (boolean){
-    if boolean
-        user = RequestStore.store[:current_user]
-        if user.present?
-          role_based_policy_ids = user.company.policies.joins(:policy_user_roles).with_application('vp').where('policy_user_roles.user_role_id IN (?)', [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:inventory_manager)]).pluck(:id).uniq rescue []
-          approved_item_ids = user.company.purchase_requests.where(policy_id: role_based_policy_ids).joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)]).pluck('purchase_request_items.id')
-          with_ids(approved_item_ids)
-        end
+    if StringUtils.to_bool(boolean)
+      user = RequestStore.store[:current_user]
+      approved_purchase_requests = user.company.purchase_requests.role_based_filter(true)
+      if approved_purchase_requests.present?
+        approved_item_ids = approved_purchase_requests.joins(:purchase_request_items).pluck('purchase_request_items.id')
+        with_ids(approved_item_ids)
+      end
     end
   }
 
