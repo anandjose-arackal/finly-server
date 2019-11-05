@@ -15,17 +15,18 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       return
     end
 
-    unless purchase_order.level.present?
-      add_message :error, 'Cannot take action against Purchase Order at this state'
-      return
-    end
+    # unless purchase_order.level.present?
+    #   add_message :error, 'Cannot take action against Purchase Order at this state'
+    #   return
+    # end
 
-    unless awaiting_action_from?
-      add_message :error, 'You cannot approve this Purchase Order at this state'
-    end
+    # unless awaiting_action_from?
+    #   add_message :error, 'You cannot approve this Purchase Order at this state'
+    # end
   end
 
   def process
+    approve_purchase_request_items
     params[:document] = self.purchase_order
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations
@@ -50,6 +51,8 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    approve_purchase_request_items
   end
 
   def post_process
@@ -60,5 +63,32 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
 
   def awaiting_action_from?
     self.purchase_order.get_reviewers.include?(user)   
+  end
+
+  def approve_purchase_request_items
+    if self.purchase_order.purchase_request_items.present?
+      if purchase_order.approved?
+        purchase_order.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
+        update_purchase_request_status
+      end
+    end
+  end
+
+  def update_purchase_request_status
+    if purchase_order.purchase_request_items.present?
+      approved_purchase_request_items = purchase_order.purchase_request_items.first.purchase_request.purchase_request_items.pluck(:status_id).uniq
+      if approved_purchase_request_items.count.present? && approved_purchase_request_items.count == 1 && 
+        approved_purchase_request_items.include?(PurchaseRequestItemStatus.id_for(:po_approved))
+        purchase_request = purchase_order.purchase_request_items.first.purchase_request
+        params[:document] = purchase_request
+        params[:aasm_event] = 'po_approve'
+        params[:violation_present] = false #todo Check violations
+        op = WorkflowManager::Base.(user, params)
+        unless op.success?
+          add_message :error, op.messages[:error]
+          return
+        end
+      end 
+    end
   end
 end
