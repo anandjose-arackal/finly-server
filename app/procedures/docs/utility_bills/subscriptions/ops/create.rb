@@ -8,8 +8,18 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   failure :check
   step Contract::Persist()
+  step :setup_dlrm
+
 
   def check(params, **)
+  end
+
+  def setup_dlrm(options, current_user:, model:, **)
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(current_user, {
+        reviewal_document: model,
+        document_reviewer_mappings_params: params[:document_reviewer_mappings_params]
+    })
+    dlrm_validation_op.success?
   end
 
   def set_default_params(options, params:, current_user:, **)

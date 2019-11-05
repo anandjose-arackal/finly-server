@@ -37,6 +37,10 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
   end
 
+  def retract?
+    @model.awaiting_approval? && @model.user_id == @user.id
+  end
+
   private
 
   def reviewing_user?

@@ -9,9 +9,8 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   step :init
   step Model(BbpsBillerSubscription, :find_by)
   step :verify_policy
-  step :set_default_params
-  step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Base)
-  step Contract::Validate(key: 'subscription')
+  # step :set_default_params
+  step :transition
 
   failure :check
 
@@ -30,6 +29,17 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
     end
 
     true
+  end
+
+  def transition(options, params:, current_user:, model:, **)
+    parameters = {
+        document: model,
+        aasm_event: params[:aasm_event],
+    }
+    op = WorkflowManager::Base.(current_user, parameters)
+
+    debugger
+    op.success?
   end
 
 
