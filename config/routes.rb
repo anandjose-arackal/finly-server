@@ -1601,6 +1601,14 @@
 #                                                          PATCH  /budget_groups/:id(.:format)                                                                                        budget_groups#update
 #                                                          PUT    /budget_groups/:id(.:format)                                                                                        budget_groups#update
 #                                                          DELETE /budget_groups/:id(.:format)                                                                                        budget_groups#destroy
+#                                    budget_group_criteria GET    /budget_group_criteria(.:format)                                                                                    budget_group_criteria#index
+#                                                          POST   /budget_group_criteria(.:format)                                                                                    budget_group_criteria#create
+#                               new_budget_group_criterium GET    /budget_group_criteria/new(.:format)                                                                                budget_group_criteria#new
+#                              edit_budget_group_criterium GET    /budget_group_criteria/:id/edit(.:format)                                                                           budget_group_criteria#edit
+#                                   budget_group_criterium GET    /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#show
+#                                                          PATCH  /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#update
+#                                                          PUT    /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#update
+#                                                          DELETE /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#destroy
 #                                              grn_pending GET    /grn/pending(.:format)                                                                                              procure/procurements#index
 #                       procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                       procure/procurements#filter_config
 #                   procure_inward_documents_filter_config GET    /procure/inward_documents/filter_config(.:format)                                                                   procure/inward_documents#filter_config
@@ -3704,6 +3712,7 @@ Rails.application.routes.draw do
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
   resources :budget_groups
+  resources :budget_group_criteria
   ######## Budget apis end #########
 
 

@@ -2,12 +2,12 @@
 #
 # Table name: budget_group_criteria_mappings
 #
-#  id              :bigint           not null, primary key
-#  budget_group_id :integer
-#  budgetable_id   :integer
-#  budgetable_type :string(255)
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id                        :bigint           not null, primary key
+#  budget_group_criterium_id :integer
+#  budgetable_id             :integer
+#  budgetable_type           :string(255)
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
 #
 
 require 'rails_helper'

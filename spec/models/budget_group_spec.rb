@@ -14,6 +14,8 @@
 #  purchase_request   :boolean
 #  invoice            :boolean
 #  name               :string(255)
+#  start_date         :datetime
+#  end_date           :datetime
 #
 
 require 'rails_helper'

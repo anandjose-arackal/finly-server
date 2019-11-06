@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_035054) do
+ActiveRecord::Schema.define(version: 2019_11_06_184744) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1181,8 +1181,18 @@ ActiveRecord::Schema.define(version: 2019_11_05_035054) do
     t.index ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id"
   end
 
-  create_table "budget_group_criteria_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "budget_group_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
     t.integer "budget_group_id"
+    t.string "ancestry"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "created_by_user_id"
+    t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
+  end
+
+  create_table "budget_group_criteria_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "budget_group_criterium_id"
     t.integer "budgetable_id"
     t.string "budgetable_type"
     t.datetime "created_at", null: false
@@ -1201,6 +1211,8 @@ ActiveRecord::Schema.define(version: 2019_11_05_035054) do
     t.boolean "purchase_request"
     t.boolean "invoice"
     t.string "name"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.index ["company_id"], name: "index_budget_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
   end
@@ -1339,6 +1351,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_035054) do
     t.boolean "calculated_before_tax_amount", default: false
     t.boolean "purchase_request"
     t.boolean "invoice"
+    t.integer "budget_group_criterium_id"
     t.index ["budget_amount_id"], name: "index_budgets_on_budget_amount_id"
     t.index ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id"
     t.index ["company_id"], name: "index_budgets_on_company_id"

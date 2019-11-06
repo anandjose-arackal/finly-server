@@ -25,6 +25,7 @@
 #  calculated_before_tax_amount :boolean          default(FALSE)
 #  purchase_request             :boolean
 #  invoice                      :boolean
+#  budget_group_criterium_id    :integer
 #
 
 class Budget < ApplicationRecord
@@ -39,6 +40,7 @@ class Budget < ApplicationRecord
   belongs_to :budget_amount, optional: true, class_name: "Amount"
   belongs_to :spent_amount, optional: true, class_name: "Amount"
   belongs_to :budget_group
+  belongs_to :budget_group_criterium
 
   # Above details like period, name, budget amount etc. will be held in the budget itself for now
   # the below will now be moved to the Budget Group which will house the details of the criteria
