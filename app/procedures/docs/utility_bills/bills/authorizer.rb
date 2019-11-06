@@ -7,34 +7,29 @@ class Docs::UtilityBills::Bills::Authorizer
   end
 
   def submit?
-    @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator))
+    @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user) && @model.open?
   end
 
   def approve?
     @model.awaiting_approval? && @model.get_reviewers.include?(@user)
   end
 
-  def blah?
-  end
-
   def update?
-    ((@model.draft? || @model.retracted? || @model.rejected?) && @model.user_id == @user.id) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
+    ((@model.open? || @model.retracted? || @model.rejected?) && @model.user_id == @user.id) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
   end
 
   def index?
-    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
+    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || poc?
+    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || (@user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
   end
 
   def reject?
-    @model.get_reviewers.include?(@user)
-  end
-
-  def submit?
-    BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
+    @model.awaiting_approval? && @model.get_reviewers.include?(@user)
   end
 
   def retract?

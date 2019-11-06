@@ -61,7 +61,7 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def poc?
-    @model.subscription_pocs.pluck(:user_id).include?(@user.id)
+    @model.pocs.include?(@user)
   end
 
 end

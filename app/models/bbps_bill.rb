@@ -30,6 +30,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true
+  belongs_to :amount, optional: true
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voiced?, to: :status
 
@@ -48,7 +49,8 @@ class BbpsBill < ApplicationRecord
         updated_at: updated_at.strftime("%d-%b-%Y"),
         status: status.as_json,
         user: user&.json_for_trail,
-        biller_category_name: biller_category_name,
+        # biller_category_name: biller_category_name,
+        amount: amount.as_json,
         customer_fields: subscription.customer_fields.as_json,
     }
   end
