@@ -282,6 +282,18 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
+  scope :filter_custom_field_dropdown, -> (key, selected_value_id) {
+    if selected_value_id.present?
+      raw_po_ids = self.pluck(:payment_order_id)
+      raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+      field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_drop_down_selection(selected_value_id).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+      po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+      bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+      where(id: bpr_ids)
+    end
+  }
+
   scope :filter_policy_id, -> (policy_id) {
     where policy_id: policy_id
   }
