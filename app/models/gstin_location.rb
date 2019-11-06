@@ -46,7 +46,6 @@ class GstinLocation < ApplicationRecord
 
   def check_vendor_gstin_registered?
     return false if self.vendor_id.nil?
-    binding.pry
     self.vendor.gst_registered
   end
 end
