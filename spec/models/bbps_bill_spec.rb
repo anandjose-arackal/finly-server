@@ -19,6 +19,10 @@
 #  deleted_at           :datetime
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  submitted_at         :datetime
+#  approved_at          :datetime
+#  note                 :text(65535)
+#  company_id           :integer
 #
 
 require 'rails_helper'

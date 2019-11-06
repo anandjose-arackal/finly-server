@@ -219,6 +219,10 @@ class User < ApplicationRecord
   has_many :purchase_orders
   has_many :purchase_requests, foreign_key: :creator_id
 
+  # Utility Bills
+  has_many :bbps_subscriptions, class_name: 'BbpsBillerSubscription'
+  has_many :bbps_bills
+
   # Budgets
 
   # many-to-many mapping between user and budget

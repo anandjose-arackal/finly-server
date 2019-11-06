@@ -113,6 +113,10 @@ class Company < ApplicationRecord
   has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
   has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
 
+  # Utility Bills
+  has_many :bbps_subscriptions, class_name: 'BbpsBillerSubscription'
+  has_many :bbps_bills
+
   has_many :departments
   has_many :company_pocket_templates
 

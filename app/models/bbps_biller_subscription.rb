@@ -22,6 +22,9 @@
 #  controlling_level_id :integer
 #  reminder_day         :string(255)
 #  biller_category_name :string(255)
+#  submitted_at         :datetime
+#  approved_at          :datetime
+#  company_id           :integer
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -68,6 +71,17 @@ class BbpsBillerSubscription < ApplicationRecord
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
 
+  scope :filter_status, -> (status) {
+    case status
+    when 'approved', :approved
+      where(status_id: BbpsBillerSubscriptionStatus.id_for(:approved))
+    end
+  }
+
+  scope :includes_for_index, -> {
+    includes(:pocs)
+  }
+
   def as_json(options={})
     {
         id: id,
@@ -100,6 +114,19 @@ class BbpsBillerSubscription < ApplicationRecord
 
   def self.document_status_class_name
     'BbpsBillerSubscriptionStatus'
+  end
+
+  def self.roles
+    [
+        :utility_bill_master_initator,
+        :utility_bill_master_reviewer,
+        :utility_bill_initator,
+        :utility_bill_reviewer,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
+    ]
   end
 
   def self.status_ids(*statuses)

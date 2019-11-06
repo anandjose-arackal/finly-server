@@ -7,6 +7,7 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :department_id
   property :cost_center_id
   property :location_id
+  property :company_id, presence: true
 
   # property :user_id, presence: true
 
@@ -16,7 +17,5 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
     property :value, presence: true
     property :currency_id, presence: true
   end
-
-  private
 
 end

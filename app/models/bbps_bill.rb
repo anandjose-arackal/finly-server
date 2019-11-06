@@ -19,6 +19,10 @@
 #  deleted_at           :datetime
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  submitted_at         :datetime
+#  approved_at          :datetime
+#  note                 :text(65535)
+#  company_id           :integer
 #
 
 class BbpsBill < ApplicationRecord
@@ -59,7 +63,7 @@ class BbpsBill < ApplicationRecord
     reorder('bbps_bills.created_at DESC')
   }
 
-  scope :include_for_index, -> {
+  scope :includes_for_index, -> {
     includes(subscription: [:pocs])
   }
 
@@ -94,6 +98,19 @@ class BbpsBill < ApplicationRecord
 
   def self.document_status_class_name
     'BbpsBillStatus'
+  end
+
+  def self.roles
+    [
+        :utility_bill_master_initator,
+        :utility_bill_master_reviewer,
+        :utility_bill_initator,
+        :utility_bill_reviewer,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
+    ]
   end
 
   def self.status_ids(*statuses)

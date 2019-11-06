@@ -35,8 +35,9 @@
 #  grn_enabled                    :boolean          default(TRUE)
 #  srn_enabled                    :boolean          default(FALSE)
 #  agreement_based_payment_system :boolean          default(FALSE)
-#  vendor_portal                  :boolean          default(FALSE)
 #  gstin_verification_enabled     :boolean          default(FALSE)
+#  vendor_portal                  :boolean          default(FALSE)
+#  utility_bills_enabled          :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord

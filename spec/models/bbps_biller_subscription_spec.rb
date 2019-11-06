@@ -22,6 +22,9 @@
 #  controlling_level_id :integer
 #  reminder_day         :string(255)
 #  biller_category_name :string(255)
+#  submitted_at         :datetime
+#  approved_at          :datetime
+#  company_id           :integer
 #
 
 require 'rails_helper'
