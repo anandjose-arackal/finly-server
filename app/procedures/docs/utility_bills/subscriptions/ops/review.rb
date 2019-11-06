@@ -38,7 +38,6 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
     }
     op = WorkflowManager::Base.(current_user, parameters)
 
-    debugger
     op.success?
   end
 

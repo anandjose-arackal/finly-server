@@ -41,6 +41,18 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @model.awaiting_approval? && @model.user_id == @user.id
   end
 
+  def take_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+  end
+
+  def deactivate?
+    @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved?)
+  end
+
+  def reactivate?
+    @user.vendor_payment_admin? && (@model.deactivated?)
+  end
+
   private
 
   def reviewing_user?

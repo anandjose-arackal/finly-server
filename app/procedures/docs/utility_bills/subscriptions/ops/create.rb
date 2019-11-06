@@ -14,10 +14,10 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   def check(params, **)
   end
 
-  def setup_dlrm(options, current_user:, model:, **)
-    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(current_user, {
+  def setup_dlrm(options, current_user:, params:, model:, **)
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
         reviewal_document: model,
-        document_reviewer_mappings_params: params[:document_reviewer_mappings_params]
+        document_reviewer_mappings: params[:document_reviewer_mappings]
     })
     dlrm_validation_op.success?
   end

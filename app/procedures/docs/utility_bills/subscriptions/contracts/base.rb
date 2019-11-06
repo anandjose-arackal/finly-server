@@ -33,10 +33,10 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     property :value, presence: true
   end
 
-  collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
-    property :level_id, presence: true
-    property :reviewer_id
-  end
+  # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
+  #   property :level_id, presence: true
+  #   property :reviewer_id
+  # end
 
   # validates :expected_due_day inclusion: { in: (1..31).to_a,
   #                                             message: "%{value} is not a valid day" }
@@ -124,7 +124,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     pur.save
   end
 
-  def document_reviewer_mappings!
-
-  end
+    # def document_reviewer_mappings!(collection:, fragment:, index:, options:, **)
+    #   debugger
+    #   document_reviewer_mappings.insert()
+    # end
 end
