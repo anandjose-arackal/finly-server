@@ -64,6 +64,8 @@ class Budget < ApplicationRecord
   validates :end_date, presence: true
 
   after_create :set_budget_consumption
+  after_create :reflect_budget_group_attributes
+
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
 
@@ -379,6 +381,16 @@ class Budget < ApplicationRecord
             }
     )
     budget_consumption.save
+  end
+
+  def reflect_budget_group_attributes
+    self.update_attributes(
+        purchase_order: self.budget_group.purchase_order,
+        invoice: self.budget_group.invoice,
+        purchase_request: self.budget_group.purchase_request,
+        expense: self.budget_group.expense,
+        payment: self.budget_group.payment
+    )
   end
 
 end

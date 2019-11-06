@@ -35,7 +35,7 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def create
-    @result = BudgetManager::BudgetsTrb::Ops::Create.(params, "current_user" => current_user)
+    @result = BudgetManager::BudgetsTrb::Ops::Create.(params.to_unsafe_h, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
