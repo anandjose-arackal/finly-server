@@ -49,7 +49,7 @@ class ProcurementAttachment < ApplicationRecord
   def file_format
     if self.file_content_type == 'application/pdf'
       type = "pdf"
-    elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
+    elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.file_content_type)
       type = "image"
     else
       type = "other"
