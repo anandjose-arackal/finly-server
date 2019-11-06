@@ -413,6 +413,12 @@ class Procurement < ApplicationRecord
     joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.order_number LIKE ?', "%#{pr_number}%")
   }
 
+  scope :filter_pr_creator_id, -> (creator_id){
+    joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.creator_id = ?', creator_id)
+  }
+
+
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return

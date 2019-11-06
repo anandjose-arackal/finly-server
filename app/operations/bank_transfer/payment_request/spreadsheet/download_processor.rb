@@ -158,7 +158,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
             vendor.present? ? vendor.vendor_id : '',
-            payment.receiving_account&.account_number,
+            "'#{payment.receiving_account&.account_number}",
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
             payment.initiating_user.name,
