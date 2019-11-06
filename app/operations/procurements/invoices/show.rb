@@ -247,7 +247,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if user.is_bank_payment_request_creditor?
     # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
     # return if validate_po_access
-    raise_unauthorized_exception
+    add_message :error, 'You are not authorized to view this document, Please contact your Admin.'
   end
 
   def validate_po_access
