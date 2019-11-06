@@ -24,6 +24,7 @@ class BudgetGroup < ApplicationRecord
   belongs_to :created_by_user, class_name: "User", optional: true
 
   has_many :budget_group_criteriums
+  has_many :budgets
   # defining the scopes for this model
 
   scope :with_id, -> (ids) {where id: ids}
