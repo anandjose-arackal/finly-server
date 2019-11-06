@@ -147,7 +147,7 @@ class BudgetGroupCriterium < ApplicationRecord
       budget = self.budgets.build(
                                start_date: start_date,
                                end_date: end_date,
-                               name: "#{start_date.strftime("%d %m, %Y")} - #{end_date.strftime("%d %m, %Y")}",
+                               name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
                                company_id: self.company_id,
                                budget_group_id: self.budget_group.id,
                                user_id: self.budget_group.created_by_user_id,
