@@ -9,14 +9,18 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  created_by_user_id :integer
+#  company_id         :integer
 #
 
 class BudgetGroupCriterium < ApplicationRecord
 
-  include Ancestry, AncestrySupport
+  has_ancestry
+
+  include AncestrySupport
 
   belongs_to :budget_group, optional: true
   belongs_to :created_by_user, class_name: "User"
+  belongs_to :company
 
   has_many :budget_group_criteria_mappings
   has_many :budgetables, through: :budget_group_criteria_mappings
@@ -30,6 +34,7 @@ class BudgetGroupCriterium < ApplicationRecord
   has_many :budgets
 
   after_create :include_parent_criteria_mappings
+  after_create :create_related_budgets
 
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
@@ -116,8 +121,46 @@ class BudgetGroupCriterium < ApplicationRecord
         period: self.budget_group.period&.name,
         total_budgets: self.budgets.count,
         budget_group_criteria_mappings: budget_group_criteria_mappings,
+        sub_criteria: self.children,
         budgets: budgets
     }
+  end
+
+  private
+
+  def include_parent_criteria_mappings
+    if self.parent.present?
+      self.parent.budget_group_criteria_mappings.each do |map|
+        unless self.budget_group_criteria_mappings.where(budgetable: map.budgetable).present?
+          self.budget_group_criteria_mappings.build(budgetable: map.budgetable).save
+        end
+      end
+    end
+  end
+
+  def create_related_budgets
+    start_date = self.budget_group.start_date
+    final_end_date = self.budget_group.end_date
+    while start_date < final_end_date do
+      end_date = BudgetManagerUtils.next_date(start_date, final_end_date, self.budget_group.period_id)
+      break if end_date.blank?
+      budget = self.budgets.build(
+                               start_date: start_date,
+                               end_date: end_date,
+                               name: "#{start_date.strftime("%d %m, %Y")} - #{end_date.strftime("%d %m, %Y")}",
+                               company_id: self.company_id,
+                               budget_group_id: self.budget_group.id,
+                               user_id: self.budget_group.created_by_user_id,
+                               budget_amount_attributes: {
+                                   value: 0,
+                                   currency_id: 1
+                               }
+      )
+      budget.save
+
+      # now setting the start date as the next day of the end date
+      start_date = end_date
+    end
   end
 
 end

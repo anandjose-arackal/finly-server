@@ -11,4 +11,11 @@ class BudgetManager::BudgetGroupCriteria::Ops::Create < Transactions::API
 
   # in the below step, we are telling TBZ which contract to use for this particular operation, inside "constant:"
   step Contract::Build(constant: BudgetManager::BudgetGroupCriteria::Contracts::Base)
+
+  # This step actually performs the validations mentioned in the contract
+  step Contract::Validate(key: 'budget_group_criterion')
+
+  # below step persists the model
+  step Contract::Persist()
+
 end

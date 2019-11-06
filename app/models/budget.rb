@@ -26,6 +26,7 @@
 #  purchase_request             :boolean
 #  invoice                      :boolean
 #  budget_group_criterium_id    :integer
+#  active                       :boolean          default(FALSE)
 #
 
 class Budget < ApplicationRecord
@@ -242,12 +243,12 @@ class Budget < ApplicationRecord
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       # spent_amount: processor_instance.spent_amount,
-      associated_vendors: budget_group.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budget_group.budgetable_categories.as_json,
-      associated_cost_centers: budget_group.budgetable_cost_centers.as_json,
-      associated_locations: budget_group.budgetable_locations.as_json,
-      associated_departments: budget_group.budgetable_departments.as_json,
-      associated_users: budget_group.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_vendors: budget_group_criterium.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budget_group_criterium.budgetable_categories.as_json,
+      associated_cost_centers: budget_group_criterium.budgetable_cost_centers.as_json,
+      associated_locations: budget_group_criterium.budgetable_locations.as_json,
+      associated_departments: budget_group_criterium.budgetable_departments.as_json,
+      associated_users: budget_group_criterium.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
       user: {
         id: user.id,
         mobile_number: user.mobile_number,

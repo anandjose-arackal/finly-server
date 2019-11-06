@@ -32,5 +32,5 @@ class BudgetGroupCriteriaMapping < ApplicationRecord
         budgetable_details: budgetable
     }
   end
-3
+
 end

@@ -23,7 +23,7 @@ class BudgetGroup < ApplicationRecord
   belongs_to :period, optional: true
   belongs_to :created_by_user, class_name: "User", optional: true
 
-  has_many :budget_group_criteriums
+  has_many :budget_group_criteria
   has_many :budgets
   # defining the scopes for this model
 
@@ -76,6 +76,8 @@ class BudgetGroup < ApplicationRecord
       purchase_request: purchase_request,
       payment: payment,
       expense: expense,
+      start_date: self.start_date,
+      end_date: self.end_date,
       total_budgets: self.budgets.count
     }
   end
