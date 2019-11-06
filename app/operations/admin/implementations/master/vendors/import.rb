@@ -132,10 +132,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       gstin_state_id = GstStateCode.where('name LIKE ?', "%#{state}%")&.first&.id
     end
 
-    messages << "GST State is unable to match" if gstin_state_id.nil?
+    if gstin.present? || state.present? || location.present?
+      messages << "GST State is unable to match" if gstin_state_id.nil?
+    end
 
     gst_registered = (gstin.present? ? true : false)
-
     params =  {"vendor"=>{"name"=> name,
                           "authorized"=>"1",
                           "mobile_number"=> mobile_number,
