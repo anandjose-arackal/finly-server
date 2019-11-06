@@ -68,7 +68,7 @@ class BudgetGroup < ApplicationRecord
       id: id,
       name: name,
       created_by_user: created_by_user&.name,
-      created_at: created_at.strftime("%Y-%m-%d"),
+      created_at: created_at.strftime("%Y-%B-%d"),
       period_id: period_id,
       period: period&.name,
       purchase_order: purchase_order,
@@ -76,8 +76,8 @@ class BudgetGroup < ApplicationRecord
       purchase_request: purchase_request,
       payment: payment,
       expense: expense,
-      start_date: self.start_date,
-      end_date: self.end_date,
+      start_date: self.start_date.strftime("%Y-%B-%d"),
+      end_date: self.end_date.strftime("%Y-%B-%d"),
       total_budgets: self.budgets.count
     }
   end

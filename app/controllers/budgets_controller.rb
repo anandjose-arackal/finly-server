@@ -44,7 +44,7 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def update
-    @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
+    @result = BudgetManager::BudgetsTrb::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
