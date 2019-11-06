@@ -287,7 +287,8 @@ class BankPaymentRequest < ApplicationRecord
       raw_po_ids = self.pluck(:payment_order_id)
       raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
       field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
-      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_drop_down_selection(selected_value_id).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_parent(raw_invoice_ids, "Invoice").joins("INNER JOIN field_drop_down_selections ON custom_fields.value_id = field_drop_down_selections.id AND custom_fields.value_type = 'FieldDropDownSelection'").where('field_drop_down_selections.value_id = ?', selected_value_id).pluck(:parent_id)
+
       po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
       bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
       where(id: bpr_ids)
