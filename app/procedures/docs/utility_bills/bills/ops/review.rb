@@ -15,7 +15,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   failure :check
 
   def init(options, params:, **)
-    params[:id] = params[:subscription_id]
+    params[:id] = params[:bill_id]
 
   end
 
@@ -37,7 +37,6 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
         aasm_event: params[:aasm_event],
     }
     op = WorkflowManager::Base.(current_user, parameters)
-
     op.success?
   end
 

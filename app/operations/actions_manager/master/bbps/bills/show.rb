@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :retract, :approve, :reject, :take_control, :return_control, :deactivate]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :deactivate]
 
   def initialize(user = nil, params = {})
     super
@@ -18,11 +18,15 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def submit
-    bbps_bill.open? && bbps_bill.subscription.pocs.include?(user)
+    (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
   def edit
-    (BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.user_id == user.id) || (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user))
+    (BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)) || (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user))
+  end
+
+  def policy_editable
+    BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)
   end
 
   def retract

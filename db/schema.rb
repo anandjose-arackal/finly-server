@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_162210) do
+ActiveRecord::Schema.define(version: 2019_11_06_211701) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -807,6 +807,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_162210) do
     t.datetime "updated_at", null: false
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.text "note"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -3011,6 +3012,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_162210) do
     t.boolean "agreement_based_payment_system", default: false
     t.boolean "gstin_verification_enabled", default: false
     t.boolean "vendor_portal", default: false
+    t.boolean "utility_bills_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"

@@ -8,8 +8,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {requests: [:pr_initiator, :pr_awaiting_approval, :pr_team, :pr_company]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
-          {payables: [:po_advances, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements]},
+          {payables: [:po_advances, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :payment_tickets]},
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :utility_bill_masters, :manage_payment_agreements]},
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
@@ -108,6 +108,11 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Upcoming Invoices', id: 'payables', url: 'upcoming_invoices'}
   end
 
+  def utility_bills
+    return nil unless user.company.utility_bills_enabled?
+    {name: 'Utility Bills', id: 'payables', url: 'utility_bills'}
+  end
+
   def payment_tickets
     return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor? || user.vp_admin_or_auditor? || user.is_bank_payment_request_auditor?
     {name: 'Payment Tickets', id: 'payables', url: 'orders'}
@@ -131,6 +136,11 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     return nil unless user.company.procurement_enabled?
     # return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
     {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
+  end
+
+  def utility_bill_masters
+    return nil unless user.company.utility_bills_enabled?
+    {name: 'Utility Bill Masters', id: 'manage', url: 'utility_bill_masters/params={"tabName": "agreements"}'}
   end
 
   def manage_payment_agreements

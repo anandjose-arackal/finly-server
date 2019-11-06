@@ -22,6 +22,14 @@ class Bbps::BillsController < BaseControllers::WebBase
     end
   end
 
+  def payable_bills
+    params[:filter_status] = 'payables'
+    @op = Docs::UtilityBills::Bills::Ops::Index.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {render :index}
+    end
+  end
+
   def show
     @op = Docs::UtilityBills::Bills::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|

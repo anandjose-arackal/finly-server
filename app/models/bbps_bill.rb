@@ -34,6 +34,35 @@ class BbpsBill < ApplicationRecord
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
 
+  scope :filter_status, -> (status) {
+    case status
+    when 'payables', :payables
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+    when 'approved', :approved
+      where(status_id: BbpsBillStatus.id_for(:approved))
+    when 'auto_approved', :auto_approved
+      where(status_id: BbpsBillStatus.id_for(:auto_approved))
+    when 'processing', :processing
+      where(status_id: BbpsBillStatus.id_for(:awaiting_approval))
+    when 'awaiting_approval', :awaiting_approval
+      where(status_id: BbpsBillStatus.id_for(:awaiting_approval))
+    when 'retracted', :retracted
+      where(status_id: BbpsBillStatus.id_for(:retracted))
+    when 'rejected', :rejected
+      where(status_id: BbpsBillStatus.id_for(:rejected))
+    else
+      # do nothing
+    end
+  }
+
+  scope :sort_for_index, -> {
+    reorder('bbps_bills.created_at DESC')
+  }
+
+  scope :include_for_index, -> {
+    includes(subscription: [:pocs])
+  }
+
   def as_json(options = {})
     {
         id: id,

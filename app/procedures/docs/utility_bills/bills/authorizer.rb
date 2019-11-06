@@ -7,7 +7,7 @@ class Docs::UtilityBills::Bills::Authorizer
   end
 
   def submit?
-    @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user) && @model.open?
+    @user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && @model.subscription.pocs.include?(@user) && (@model.open? || @model.retracted? || @model.rejected?)
   end
 
   def approve?
@@ -15,7 +15,7 @@ class Docs::UtilityBills::Bills::Authorizer
   end
 
   def update?
-    ((@model.open? || @model.retracted? || @model.rejected?) && @model.user_id == @user.id) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
+    ((@model.open? || @model.retracted? || @model.rejected?) && @model.subscription.pocs.include?(@user) && @user.has_policy_role?(UserRole.id_for(:utility_bill_initiator))) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
   end
 
   def index?

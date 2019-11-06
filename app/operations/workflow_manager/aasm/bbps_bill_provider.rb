@@ -1,6 +1,6 @@
 class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvider
   aasm :whiny_transitions => false do
-    state :draft, initial: true, :before_enter => :set_state
+    state :open, initial: true, :before_enter => :set_state
     state :retracted
     state :awaiting_approval
     state :approved
@@ -10,8 +10,8 @@ class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvi
     state :reactivated
 
     event :submit do
-      transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:draft, :retracted, :rejected], to: :awaiting_approval
+      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:open, :retracted, :rejected], to: :awaiting_approval
     end
 
     event :approve do

@@ -3864,6 +3864,7 @@ Rails.application.routes.draw do
 
     get 'bills/edit_config', to: 'bills#edit_config'
     get 'bills/actions_config', to: 'bills#actions_config'
+    get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
     end
