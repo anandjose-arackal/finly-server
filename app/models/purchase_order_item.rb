@@ -107,7 +107,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   after_save :budget_trail_entry
-  after_destroy :budget_trail_destroy
+  after_destroy :budget_trail_destroy, :update_purhcase_request_item_status
 
 
   def tax
@@ -132,6 +132,17 @@ class PurchaseOrderItem < ApplicationRecord
 
   def budget_trail_destroy
     BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+  end
+
+  def update_purhcase_request_item_status
+    if self.purchase_request_item.present?
+      self.purchase_request_item.update(purchase_order_id: nil)
+      self.purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:approved))
+      user = RequestStore.store[:current_user]
+      if user.present?
+        Trail.create(parent_type: 'PurchaseRequestItem', parent_id: self.purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
+      end
+    end
   end
 
 end
