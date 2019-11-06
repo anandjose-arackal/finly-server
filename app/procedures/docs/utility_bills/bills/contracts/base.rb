@@ -10,22 +10,13 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
 
   # property :user_id, presence: true
 
-  # property :status_id, default: BbpsBillStatus.id_for(:open)
+  property :status_id, default: BbpsBillStatus.id_for(:open)
 
   property :amount, populate_if_empty: Amount do
     property :value, presence: true
     property :currency_id, presence: true
   end
 
-  validate :test
-
   private
 
-  def test
-    true
-  end
-
-  def amount!(options, fragment:, **)
-    Amount.new(fragment)
-  end
 end

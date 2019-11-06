@@ -1,0 +1,62 @@
+class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
+
+  attr_accessor :bbps_bill
+
+  register_handle :bbps_bills_show
+  register_actions [:submit, :edit, :retract, :approve, :reject, :take_control, :return_control, :deactivate]
+
+  def initialize(user = nil, params = {})
+    super
+    op_show = Docs::UtilityBills::Bills::Ops::Show.(params, "current_user" => user)
+
+    if op_show.success?
+      self.bbps_bill = op_show['model']
+    else
+      add_message :error, "Utility Bill Record not found"
+      return
+    end
+  end
+
+  def submit
+    bbps_bill.open? && bbps_bill.subscription.pocs.include?(user)
+  end
+
+  def edit
+    (BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.user_id == user.id) || (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user))
+  end
+
+  def retract
+    bbps_bill.awaiting_approval? && bbps_bill.user_id == user.id
+  end
+
+  def approve
+    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
+  end
+
+  def reject
+    approve
+  end
+
+  def take_control
+    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.exclude?(user) && user.vendor_payment_admin?
+  end
+
+  def return_control
+    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user) && user.vendor_payment_admin? && has_taken_control?
+  end
+
+  def deactivate
+    (bbps_bill.approved? || bbps_bill.auto_approved?) && user.vendor_payment_admin?
+  end
+
+  # def reactivate
+  #   # bbps_bill.deactivated? && user.vendor_payment_admin?
+  # end
+
+  private
+
+  def has_taken_control?
+    bbps_bill.dlrms.where(level_id: bbps_bill.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
+  end
+
+end

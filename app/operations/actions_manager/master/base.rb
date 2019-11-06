@@ -44,7 +44,9 @@ class ActionsManager::Master::Base
       po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
       agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index',
       bbps_subscriptions_show: '::ActionsManager::Master::Bbps::Subscriptions::Show',
-      bbps_subscriptions_index: '::ActionsManager::Master::Bbps::Subscriptions::Index'
+      bbps_subscriptions_index: '::ActionsManager::Master::Bbps::Subscriptions::Index',
+      bbps_bills_show: '::ActionsManager::Master::Bbps::Bills::Show',
+      bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index'
   }.with_indifferent_access
 
   def self.set_data_map
