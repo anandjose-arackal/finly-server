@@ -138,7 +138,9 @@ class InvoiceLineItemsCalculationUtils
         when 1
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
         when 2
-          self.discount_amount = item.discount.to_f
+          # self.discount_amount = item.discount.to_f
+          rate = ((item.discount.to_f / self.invoice_item_amount) * 100).round(2) rescue 0
+          self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f)/100
         else
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
       end
@@ -158,7 +160,9 @@ class InvoiceLineItemsCalculationUtils
       when 1
         self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
       when 2
-        self.discount_amount = item.discount.to_f
+        # self.discount_amount = item.discount.to_f
+        rate = ((item.discount.to_f / self.invoice_item_amount) * 100).round(2) rescue 0
+        self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f)/100
       else
         self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
     end

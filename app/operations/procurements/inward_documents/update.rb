@@ -57,13 +57,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     end
 
     inward_document_params[:items_attributes].each do |item|
-      po_items = self.inward_document.items.find_by(id: item[:id])
+      inward_document_item = self.inward_document.items.find_by(id: item[:id])
 
-      case po_items.inventory_line_item.product_type_id
+      case inward_document_item.inventory_line_item.product_type_id
       when ProductType.id_for(:goods)
-        validations_for_goods(item, po_items)
+        validations_for_goods(item, inward_document_item)
       when ProductType.id_for(:service)
-        validations_for_services(item, po_items)
+        validations_for_services(item, inward_document_item)
       end
     end
 
@@ -238,50 +238,76 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     end
   end
 
-  def validations_for_goods(item, po_items)
+  def validations_for_goods(item, inward_document_item)
     delivered = item[:delivered] || 0
     accepted = item[:accepted] || 0
     rejected = item[:rejected] || 0
 
     if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
-      add_message :error, "Negative quantity entered for #{po_items.description}"
+      add_message :error, "Negative quantity entered for #{inward_document_item.description}"
       # break
       return
     end
 
 
-    remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f).round(2) # do not remove the round, it would screw up the floating point arthematic. computer bug, loses precision. nothing i can do.
+    remaining = (inward_document_item.quantity.to_f - inward_document_item.previously_delivered.to_f).round(2) # do not remove the round, it would screw up the floating point arthematic. computer bug, loses precision. nothing i can do.
 
     if  remaining < delivered.to_f
-      add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
+      add_message :error, "For item - #{inward_document_item.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
       # break
       return
     end
 
-    if delivered.to_f > po_items.quantity.to_f
-      add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
+    if delivered.to_f > inward_document_item.quantity.to_f
+      add_message :error, "For item - #{inward_document_item.description}, delivered quantity cannot be more than the requested quantity"
       # break
       return
     end
 
 
     unless delivered.to_f == (accepted.to_f + rejected.to_f).round(2)
-      add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
+      add_message :error, "For item - #{inward_document_item.description}, accepted & rejected quantity does not match with delivered quantity"
       # break
       return
     end
-  end
 
-  def validations_for_services(item, po_items)
-    billable_amount = item[:billable_amount] || 0
+    po_item = inward_document_item.purchase_order_item
+    invoice_item_amount = accepted.to_f * po_item.rate.to_f
+    rate = 0
+    discount_amount = 0
 
-    if billable_amount.to_f < 0
-      add_message :error, "Negative billable amount entered for #{po_items.description}"
+    case po_item.purchase_order.discount_type_id
+      # i.e. discount is given as a rate
+      when 1
+        rate = po_item.discount
+        discount_amount = (item.discount.to_f * invoice_item_amount.to_f)/100
+      when 2
+        rate = ((po_item.discount.to_f / invoice_item_amount) * 100).round(2) rescue 0
+        discount_amount = (rate.to_f * invoice_item_amount.to_f)/100
+      else
+        rate = po_item.discount
+        discount_amount = (po_item.discount.to_f * invoice_item_amount.to_f)/100
+    end
+
+    gross_amount = invoice_item_amount - discount_amount
+
+    if (gross_amount < 0) or (rate > 100)
+      add_message :error, "Accepted quantity is too low."
       return
     end
 
-    if ( billable_amount.to_f + po_items.previously_billed_amount.to_f ) > po_items.order_amount.to_f
-      add_message :error, "For item - #{po_items.description}, billable amount has exceeded the order amount"
+  end
+
+  def validations_for_services(item, inward_document_item)
+    billable_amount = item[:billable_amount] || 0
+
+    if billable_amount.to_f < 0
+      add_message :error, "Negative billable amount entered for #{inward_document_item.description}"
+      return
+    end
+
+    if ( billable_amount.to_f + inward_document_item.previously_billed_amount.to_f ) > inward_document_item.order_amount.to_f
+      add_message :error, "For item - #{inward_document_item.description}, billable amount has exceeded the order amount"
       return
     end
 
