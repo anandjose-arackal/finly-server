@@ -1,6 +1,55 @@
 class Bbps::BillsController < BaseControllers::WebBase
-  def create
-    result = UtilityBills::Bills::Ops::Create.(params)
+  layout :resolve_layout
+
+  def edit_config
+    @op = Docs::UtilityBills::Bills::Configs::Edit.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def update
+    @op = Docs::UtilityBills::Bills::Ops::Update.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def index
+    @op = Docs::UtilityBills::Bills::Ops::Index.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def show
+    @op = Docs::UtilityBills::Bills::Ops::Show.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def review
+    params[:aasm_event] = params[:type]
+    @op = Docs::UtilityBills::Bills::Ops::Review.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def actions_config
+    @result = ActionsManager::Processor.(current_user, params)
     respond
+  end
+
+  private
+
+  def resolve_layout
+    case action_name
+    when 'actions_config'
+      'application'
+    else
+      'trailblazers'
+    end
   end
 end

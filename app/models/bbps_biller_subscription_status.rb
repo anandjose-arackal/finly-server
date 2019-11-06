@@ -20,31 +20,31 @@ class BbpsBillerSubscriptionStatus < ApplicationRecord
   end
 
   def awaiting_approval?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:awaiting_approval?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:awaiting_approval)
   end
 
   def retracted?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:retracted?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:retracted)
   end
 
   def rejected?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:rejected?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:rejected)
   end
 
   def approved?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:approved?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:approved)
   end
 
   def auto_approved?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:auto_approved?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:auto_approved)
   end
 
   def deactivated?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:deactivated?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:deactivated)
   end
 
   def reactivated?
-    self.id == BbpsBillerSubscriptionStatus.id_for(:reactivated?)
+    self.id == BbpsBillerSubscriptionStatus.id_for(:reactivated)
   end
 
   def as_json

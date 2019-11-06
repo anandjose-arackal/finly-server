@@ -3861,6 +3861,12 @@ Rails.application.routes.draw do
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
     end
+
+    get 'bills/edit_config', to: 'bills#edit_config'
+    get 'bills/actions_config', to: 'bills#actions_config'
+    resources :bills do
+      patch 'review', to: 'bills#review'
+    end
   end
   # Utility Bill Payments / BBPS Ends  #
 
