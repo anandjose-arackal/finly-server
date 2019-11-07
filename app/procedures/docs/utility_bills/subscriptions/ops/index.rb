@@ -26,10 +26,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
 
     page ||= params[:page]
     per_page ||= params[:per_page]
-
-    subscriptions = apply_scopes(subscriptions, params).paginate(page: page, per_page: per_page)
+    subscriptions = apply_scopes(subscriptions, params)
     result = {
-        "subscriptions" => BbpsBillerSubscription.includes_for_index
+        "subscriptions" => BbpsBillerSubscription.paginate(page: page, per_page: per_page).includes_for_index
     }
 
     options['result'] = result

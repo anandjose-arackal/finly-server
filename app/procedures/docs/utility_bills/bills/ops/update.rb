@@ -13,15 +13,14 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
   end
 
   def setup_dlrm(options, current_user:, params:, model:, **)
-    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
-        reviewal_document: model,
-        document_reviewer_mappings: params[:document_reviewer_mappings]
-    })
-    dlrm_validation_op.success?
-  end
-
-  def set_default_params(options, params:, current_user:, **)
-    # Set Initiator
-    params[:subscription][:user_id] = current_user&.id
+    if BbpsBill.open_statuses.include?(model.status_id) && model.subscription.pocs.include?(current_user)
+      dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
+          reviewal_document: model,
+          document_reviewer_mappings: params[:document_reviewer_mappings]
+      })
+      dlrm_validation_op.success?
+    else
+      true
+    end
   end
 end

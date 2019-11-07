@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   attr_accessor :bbps_subscription
 
   register_handle :bbps_subscriptions_show
-  register_actions [:submit, :edit, :retract, :approve, :reject, :take_control, :return_control, :deactivate, :reactivate]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :deactivate, :reactivate]
 
   def initialize(user = nil, params = {})
     super
@@ -23,6 +23,10 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def edit
     (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id) || (bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user))
+  end
+
+  def policy_editable
+    BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id
   end
 
   def retract
