@@ -117,6 +117,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def payment_details
+    transactions =[]
     utrs = self.new_transactions.pluck :bank_reference_number
     newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
     utrs.each do |utr|
