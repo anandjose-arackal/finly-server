@@ -134,15 +134,4 @@ class PurchaseOrderItem < ApplicationRecord
     BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
   end
 
-  def update_purhcase_request_item_status
-    if self.purchase_request_item.present?
-      self.purchase_request_item.update(purchase_order_id: nil)
-      self.purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:approved))
-      user = RequestStore.store[:current_user]
-      if user.present?
-        Trail.create(parent_type: 'PurchaseRequestItem', parent_id: self.purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
-      end
-    end
-  end
-
 end

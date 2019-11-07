@@ -217,11 +217,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def process
-    begin
+    # begin
       ActiveRecord::Base.transaction do
         purchase_order.assign_attributes(purchase_order_params)
         if purchase_order.valid?
-
+          update_purchase_request_item_status
           # Set validation of DLRMs
           if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
 
@@ -335,9 +335,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
           return
         end
       end
-    rescue => e
-      add_message :error, 'Unable to perform operation'
-    end
+    # rescue => e
+    #   add_message :error, messages
+    # end
 
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
@@ -414,6 +414,24 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       self.purchase_order_params[:requested_advance_amount_attributes][:value] = self.purchase_order&.requested_advance_amount&.value || 0
       self.purchase_order_params[:due_date] = self.purchase_order.due_date
       self.skip_adv_calculation = true
+    end
+  end
+
+  def update_purchase_request_item_status
+    if purchase_order.purchase_request_items.present?
+      purchase_order.items.each do |purchase_order_item|
+        purchase_request_item = purchase_order_item.purchase_request_item
+        if purchase_request_item.present?
+          if purchase_order_item.marked_for_destruction?
+            purchase_request_item.update(purchase_order_id: nil)
+            purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:approved))
+            user = RequestStore.store[:current_user]
+            if user.present?
+              Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
+            end
+          end
+        end
+      end
     end
   end
 
