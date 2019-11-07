@@ -76,8 +76,8 @@ class BudgetGroup < ApplicationRecord
       purchase_request: purchase_request,
       payment: payment,
       expense: expense,
-      start_date: self.start_date.strftime("%Y-%B-%d"),
-      end_date: self.end_date.strftime("%Y-%B-%d"),
+      start_date: self.start_date&.strftime("%Y-%B-%d"),
+      end_date: self.end_date&.strftime("%Y-%B-%d"),
       total_budgets: self.budgets.count
     }
   end
