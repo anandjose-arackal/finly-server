@@ -40,6 +40,7 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     event :reject do
       transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :reject_to_level?
       transitions :from => :awaiting_approval, :to => :rejected, guard: :user_can_review?
+      transitions :from => :approved, :to => :rejected
     end
 
     event :retract do
