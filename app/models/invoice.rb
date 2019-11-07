@@ -95,7 +95,7 @@
 #
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
 
@@ -680,76 +680,85 @@ class Invoice < ApplicationRecord
       return payment_history_json
     else
       {
-          id: self.id,
-          invoice_type: self.invoice_type&.name,
-          procurement_id: self.procurement_id,
-          advance: self.advance,
-          advance_amount: self.advance_amount&.value,
-          tax_amount: precision_value(self.tax_amount&.value),
-          tds_amount: precision_value(self.tds_amount&.value),
-          tax: precision_value(self.tax),
-          tds: precision_value(self.tds),
-          gst_type_id: self.gst_type_id,
-          tax_type_id: self.tax_type_id,
-          tds_type_id: self.tds_type_id,
-          discount_amount: precision_value(self.discount_amount&.value),
-          discount: precision_value(self.discount),
-          date: self.date,
-          discount_type_id: self.discount_type_id,
-          due_date: self.due_date,
-          invoice_number: self.invoice_number,
-          inclusive_of_taxes: self.inclusive_of_taxes,
-          freight_amount: self.freight_amount&.value,
-          roundoff_amount: self.roundoff_amount,
-          net_payable_amount: self.balance_due&.value,
-          balance_due: self.balance_due&.value,
-          taxable_amount: precision_value(self.gross_amount&.value),
-          editable: self.unpaid? || self.initiated?,
-          tax_rate: precision_value(self.tax_rate),
-          tds_rate: precision_value(self.tds_rate),
-          discount_rate: precision_value(self.discount_rate),
-          advance_rate: precision_value(self.advance_rate),
-          invoice_attachment: {
-              url: self.invoice_attachments.first&.attached_file&.url,
-              thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-              content_type: self.invoice_attachments.first&.attached_file&.content_type,
-              file_name: self.invoice_attachments.first&.attached_file&.original_filename
-          },
-          net_amount: precision_value(self.net_amount&.value),
-          original_amount: self.include_original_amount,
-          gross_amount: precision_value(self.gross_amount&.value),
-          custom_fields: self.custom_fields,
-          category_id: self.category_id,
-          category_name: self.category&.name,
+        id: self.id,
+        invoice_type: self.invoice_type&.name,
+        procurement_id: self.procurement_id,
+        advance: self.advance,
+        advance_amount: self.advance_amount&.value,
+        tax_amount: precision_value(self.tax_amount&.value),
+        tds_amount: precision_value(self.tds_amount&.value),
+        tax: precision_value(self.tax),
+        tds: precision_value(self.tds),
+        gst_type_id: self.gst_type_id,
+        tax_type_id: self.tax_type_id,
+        tds_type_id: self.tds_type_id,
+        discount_amount: precision_value(self.discount_amount&.value),
+        # discount: precision_value(self.discount),
+        discount: invoice_discount_rate,
+        date: self.date,
+        discount_type_id: self.discount_type_id,
+        due_date: self.due_date,
+        invoice_number: self.invoice_number,
+        inclusive_of_taxes: self.inclusive_of_taxes,
+        freight_amount: self.freight_amount&.value,
+        roundoff_amount: self.roundoff_amount,
+        net_payable_amount: self.balance_due&.value,
+        balance_due: self.balance_due&.value,
+        taxable_amount: precision_value(self.gross_amount&.value),
+        editable: self.unpaid? || self.initiated?,
+        tax_rate: return_tax_rate,
+        tds_rate: precision_value(self.tds_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
+        advance_rate: precision_value(self.advance_rate),
+        invoice_attachment: {
+            url: self.invoice_attachments.first&.attached_file&.url,
+            thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+            content_type: self.invoice_attachments.first&.attached_file&.content_type,
+            file_name: self.invoice_attachments.first&.attached_file&.original_filename
+        },
+        net_amount: precision_value(self.net_amount&.value),
+        original_amount: self.include_original_amount,
+        gross_amount: precision_value(self.gross_amount&.value),
+        custom_fields: self.custom_fields,
+        category_id: self.category_id,
+        category_name: self.category&.name,
 
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
 
-          tds_slab_id: self.tds_slab_id,
-          tds_slab_name: self.tds_slab&.name,
-          tds_rate: self.tds,
+        tds_slab_id: self.tds_slab_id,
+        tds_slab_name: self.tds_slab&.name,
+        tds_rate: self.tds,
 
-          # invoice amounts total
-          item_amounts_total: self.item_amounts_total,
+        # invoice amounts total
+        item_amounts_total: self.item_amounts_total,
 
-          # paid amount for this invoice
-          # paid_amount: self.payments.successful.joins(:amount).sum(:value),
-          # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
-          paid_amount: payment_amounts_total,
-          remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-          po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
-          invoice_items: invoice_items.as_json,
-          note: self.note,
-          discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
-          payment_agreement_id: self.payment_agreement_id,
-          created_from_payment_agreement: self.payment_agreement_id.present?,
-          agreement_number: self&.payment_agreement&.get_agreement_number
+        # paid amount for this invoice
+        # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+        paid_amount: payment_amounts_total,
+        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        invoice_items: invoice_items.as_json,
+        note: self.note,
+        discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
+        payment_agreement_id: self.payment_agreement_id,
+        created_from_payment_agreement: self.payment_agreement_id.present?,
+        agreement_number: self&.payment_agreement&.get_agreement_number
       }
     end
   end
 
+  def return_tax_rate
+    ori_value = (self.item_amounts_total.to_f - self.discount_amount&.value.to_f)
+    tax_value = self.tax_amount&.value.to_f
+    calci_tax_rate = ( tax_value / ori_value ) * 100
+    precision_value( calci_tax_rate )
+  end
+
   def invoice_discount_rate
-    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
+    ((self.discount_amount&.value.to_f / self.item_amounts_total.to_f) * 100).round(2) rescue 0
   end
 
   def include_original_amount
