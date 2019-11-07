@@ -1,0 +1,125 @@
+# this vanilla operation will be called with Name.({"budget": budget})
+# which will make the budgets object available inside the options hash
+
+class BudgetManager::BudgetsCalculator::BudgetsComputer < Transactions::API
+
+
+  attr_accessor :budget, :budget_trails, :budget_consumption,
+                :amount_to_be_considered, :date_to_be_considered
+
+  step :initialize!
+
+  # below method will retrieve all the trails for a particular
+  # budget that will them be computed to calculate the buckets
+  step :retrieve_trails!
+
+  # this will compute the various buckets based on the trails that were picked in the previous
+  # step
+  step :calculate_buckets!
+
+  # this will simple persist the budget consumption model based on what was calculated in
+  # the previous step
+  step :persist_buckets!
+
+  # failure :return_errors!
+
+  def initialize!(options, budget:, **)
+    self.budget = budget
+    if budget.blank?
+      errors.add(:budget, "Budget cannot be blank")
+      return false
+    end
+
+    self.budget_consumption = self.budget.budget_consumption
+
+    # setting the relevant amount to be considered for this budget
+    if self.budget.calculated_before_tax_amount
+      self.amount_to_be_considered = :amount_before_tax
+    else
+      self.amount_to_be_considered = :amount_after_tax
+    end
+
+    # setting the relevant date for this budget
+    self.date_to_be_considered = self.budget.budget_date_type.name
+    true
+  end
+
+  def retrieve_trails!(options, **)
+    budget_group_criterium = self.budget.budget_group_criterium
+    criterial_mapping = budget_group_criterium.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
+    category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
+    cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
+    department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
+    location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
+    vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
+    user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
+
+    budgetable_entities = []
+    budgetable_entities << "Expense" if self.budget.expense
+    # adding PO as well as PO Item because both will be considered for the
+    budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
+    budgetable_entities << "InvoiceLineItem" if self.budget.purchase_order
+    budgetable_entities << "Payment" if self.budget.payment
+    budgetable_entities << "PurchaseRequestItem" if self.budget.purchase_request
+
+    self.budget_trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date, self.date_to_be_considered).with_vendors(vendor_ids)
+                 .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                 .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+                 .with_budgetable_entities(budgetable_entities)
+    true
+  end
+
+  # here we calculate the various buckets
+  def calculate_buckets!(options, **)
+    pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:approved, :auto_approved))
+                                        .with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for(:open, :retracted, :processing))
+                                        .joins(self.amount_to_be_considered).sum(:value)
+
+    committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed))
+                           .with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for(:open, :retracted, :processing))
+                           .not_billed.joins(self.amount_to_be_considered).sum(:value)
+
+    pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for(:approved, :auto_approved))
+                          .with_entity_type("Payment").with_entity_status_id(InwardInvoiceStatus.ids_for(:pending_approval, :pending_credit))
+                          .joins(self.amount_to_be_considered).sum(:value)
+
+    payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for(:processing))
+                                    .joins(self.amount_to_be_considered).sum(:value)
+
+    paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for(:completed))
+                      .joins(self.amount_to_be_considered).sum(:value)
+
+    self.budget_consumption.assign_attributes(
+                               pending_amount_attributes: {
+                                   id: self.budget_consumption.pending_amount_id,
+                                   value: pending_amount
+                               },
+                               committed_amount_attributes: {
+                                   id: self.budget_consumption.committed_amount_id,
+                                   value: committed_amount
+                               },
+                               pending_payment_amount_attributes: {
+                                   id: self.budget_consumption.pending_payment_amount,
+                                   value: pending_payment_amount
+                               },
+                               payment_processing_amount_attributes: {
+                                   id: self.budget_consumption.payment_processing_amount_id,
+                                   value: payment_processing_amount
+                               },
+                               paid_amount_attributes: {
+                                   id: self.budget_consumption.paid_amount_id,
+                                   value: paid_amount
+                               }
+    )
+    true
+  end
+
+  def persist_buckets!(options, **)
+    unless self.budget_consumption.save
+      errors.add(:budget_consumption, "The budget consumption could not be saved because #{self.budget_consumption.errors.full_messages.to_sentence}")
+      return false
+    end
+    return true
+  end
+
+end

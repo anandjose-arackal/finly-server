@@ -11,6 +11,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderBudgetsProcessor
             currency_id: purchase_order.total_after_tax.currency_id
         }
     }
+    self.entity = purchase_order
     super()
   end
 end

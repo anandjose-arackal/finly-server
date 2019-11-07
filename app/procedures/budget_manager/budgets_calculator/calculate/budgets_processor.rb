@@ -132,6 +132,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
       budget_trail = BudgetTrail.new(self.trail_hash)
       budget_trail.save
     end
+
+
     # todo - mailer / logger in case the saving or updation fails
   end
 

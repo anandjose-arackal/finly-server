@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_06_202210) do
+ActiveRecord::Schema.define(version: 2019_11_07_174619) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1181,6 +1181,12 @@ ActiveRecord::Schema.define(version: 2019_11_06_202210) do
     t.index ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id"
   end
 
+  create_table "budget_date_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "budget_group_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "budget_group_id"
@@ -1318,7 +1324,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_202210) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "department_id"
-    t.date "date"
+    t.date "entity_date"
     t.integer "sub_department_id"
     t.integer "procurement_id"
     t.integer "entity_status_id"
@@ -1326,6 +1332,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_202210) do
     t.integer "amount_after_tax_id"
     t.datetime "entity_created_at"
     t.datetime "entity_submitted_at"
+    t.boolean "billed", default: false
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 

@@ -14,7 +14,7 @@
 #  updated_at           :datetime         not null
 #  user_id              :integer
 #  department_id        :integer
-#  date                 :date
+#  entity_date          :date
 #  sub_department_id    :integer
 #  procurement_id       :integer
 #  entity_status_id     :integer
@@ -22,6 +22,7 @@
 #  amount_after_tax_id  :integer
 #  entity_created_at    :datetime
 #  entity_submitted_at  :datetime
+#  billed               :boolean          default(FALSE)
 #
 
 class BudgetTrail < ApplicationRecord
@@ -41,8 +42,12 @@ class BudgetTrail < ApplicationRecord
 
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
-  scope :within_date, -> (start_date, end_date) {
-    where('date >= ? AND date <= ?', start_date, end_date)
+  scope :within_date, -> (start_date, end_date, date_type) {
+    where("#{date_type} >= ? AND #{date_type} <= ?", start_date, end_date)
+  }
+
+  scope :not_billed, -> {
+    where billed: false
   }
 
   scope :joins_amount, -> { joins(:amount) }
@@ -95,6 +100,10 @@ class BudgetTrail < ApplicationRecord
 
   scope :with_entity_id, -> (ids) {
     where entity_id: ids
+  }
+
+  scope :with_entity_status_id, -> (entity_status_id) {
+    where entity_status_id: entity_status_id
   }
 
 end
