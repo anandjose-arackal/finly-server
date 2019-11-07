@@ -101,7 +101,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     invalid_invoices = []
     self.inward_invoices.each do |invoice|
-      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      # invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      invalid_invoices << invoice unless invoice.payable
     end
 
     if invalid_invoices.present?
@@ -121,7 +122,18 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
-      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      invoice_amount = invoice.balance_due&.value.to_f
+      paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
+      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value)
+      total_payments = payable_amount.to_f + previous_payments
+
+      # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      remaining_amount = (invoice_amount - previous_payments)
+
+      if total_payments >= invoice_amount
+        invoice.update payable: false
+      end
+
       if remaining_amount.blank?
         next
       end
@@ -136,6 +148,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
+      end
+
+      if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
+        invoice.update payable: false
+        add_message :error, "Invoice has been credited."
+        return
       end
       self.requested_amount += payable_amount
     end

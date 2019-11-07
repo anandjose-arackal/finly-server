@@ -228,6 +228,7 @@ class Payment < ApplicationRecord
   scope :cash_on_hand_credits, -> { where(receiving_account_type: "CashOnHand") }
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
+  scope :all_except_failed, -> { where payment_status_id: PaymentStatus.all_except_failed }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }

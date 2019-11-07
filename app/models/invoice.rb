@@ -259,7 +259,7 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      ids = self.joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0}).pluck(:id)
+      ids = self.joins(:balance_due).non_beneficiary.where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved, :initiated]), payable: true).where.not(amounts: {value: 0}).pluck(:id)
       where id: ids
     end
   }
@@ -615,7 +615,7 @@ class Invoice < ApplicationRecord
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
     elsif paid_amount >= balance_due
-      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
@@ -950,6 +950,16 @@ class Invoice < ApplicationRecord
 
   def generate_sequential_id?
     invoice_status_id != InwardInvoiceStatus.id_for(:open)
+  end
+
+  def invoice_payment_status
+    if (self.payments.pluck(:payment_status_id) & [PaymentStatus.id_for(:completed)]).any?
+      return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:partially_paid)).as_json]
+    elsif (self.payments.pluck(:payment_status_id) & PaymentStatus.status_ids_for_invoice_initiated).any?
+      return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:initiated)).as_json]
+    elsif (self.payments.pluck(:payment_status_id) & [PaymentStatus.id_for(:completed)]).any? && (self.payments.pluck(:payment_status_id) & PaymentStatus.status_ids_for_invoice_initiated).any?
+      return InwardInvoiceStatus.where(id: InwardInvoiceStatus.ids_for([:partially_paid, :initiated])).as_json
+    end
   end
 
   private
