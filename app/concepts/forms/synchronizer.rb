@@ -21,18 +21,18 @@ class Forms::Synchronizer
   private
 
   def self.sync_section(company, form_model, section)
-    section_model = form_model.sections.where(name: section.name, company_id: company.id, form_id: form_model.id).first_or_create
+    section_model = form_model.sections.where(name: section.name, company_id: company.id, form_id: form_model.id, section_type: section.type).first_or_create
 
     section.entities.each do |entity|
-      sync_entity company, form_model, section_model, nil, entity
+      sync_entity company, form_model, section_model, entity
     end
   end
 
-  def self.sync_entity(company, form_model, section_model, parent_entity_model, entity)
+  def self.sync_entity(company, form_model, section_model, entity)
     entity_model = section_model.entities.where(form_id: form_model.id, form_section_id: section_model.id, field_key: entity.field_key).first
 
     unless entity_model.present?
-      entity_model = section_model.entities.build entity.schema.except(:parent, :section, :choices)
+      entity_model = section_model.entities.build entity.schema.except(:section, :choices)
 
       if entity.schema[:choices]
         choices = entity.schema[:choices].map do |choice|
@@ -48,17 +48,12 @@ class Forms::Synchronizer
         entity_model.assign_attributes(choices_attributes: choices)
       end
 
-      entity_model.parent = parent_entity_model
       entity_model.form = form_model
       entity_model.form_section = section_model
       entity_model.company = company
       unless entity_model.save
         raise "Error saving entity : #{entity_model.errors.full_messages.to_json}"
       end
-    end
-
-    entity.entities.each do |child|
-      sync_entity company, form_model, section_model, entity_model, child
     end
   end
 

@@ -6,14 +6,25 @@ class Transactions::Authorization
   end
 
   class Authorize
+    extend Dry::Monads[:result]
+
     def self.roles(input, options, list)
       return true if list.blank?
+      return unauthorized!(input) if options['current_user'].blank?
 
+      user = options['current_user']
       roles = UserRole::VALUES.keys & list # Find the intersection between all user roles and the list roles
       roles.each do |role|
-        return true if options['current_user'].has_role?(role)
+        role_id = UserRole.id_for(role)
+        return true if user.has_policy_role?(role_id)
+        return true if role_id == UserRole.id_for(:admin) and user.admin?(RequestStoreUtil.current_app)
       end
       return unauthorized!(input)
+    end
+
+    def self.unauthorized!(options)
+      options["result.authorization"] = Failure("You cannot perform the following action")
+      false
     end
   end
 
