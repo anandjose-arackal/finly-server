@@ -118,7 +118,10 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def payment_details
     utrs = self.new_transactions.pluck :bank_reference_number
-    transactions = YesBankTransaction.where bank_reference_number: utrs
+    newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
+    utrs.each do |utr|
+      transactions = newly_created_transactions.find { |transaction| transaction if transaction.bank_reference_number == utr }
+    end
     return false if transactions.blank?
 
     payments = []
