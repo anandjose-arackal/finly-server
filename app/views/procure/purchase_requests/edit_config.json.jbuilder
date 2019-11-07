@@ -30,7 +30,7 @@ json.department_mappings @result.department_mappings
 json.cost_centers @result.cost_centers.as_json
 
 json.pr_item_categories do
-  json.array!(current_company.categories.inward_invoice_items_only) do |category|
+  json.array!(current_company.categories.inward_invoice_items_only.active) do |category|
     json.id category.id
     json.name category.name
   end
