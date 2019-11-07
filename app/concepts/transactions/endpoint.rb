@@ -57,7 +57,7 @@ module Transactions
           # m.unauthenticated {|result| unauthenticated(result)}
           m.created {|result| created(result)}
           m.success {|result| success(result)}
-          m.invalid {|result| invalid(result)}
+          m.failure {|result| invalid(result)}
         end
       end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_28_121828) do
+ActiveRecord::Schema.define(version: 2019_11_06_121901) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3189,13 +3189,60 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "dependency_type_id", null: false
+    t.integer "controlling_user_id", null: false
+    t.integer "controlling_entity_id", null: false
+    t.integer "dependent_entity_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_dependencies_on_company_id"
+    t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
+    t.index ["controlling_user_id"], name: "index_form_dependencies_on_controlling_user_id"
+    t.index ["dependency_type_id"], name: "index_form_dependencies_on_dependency_type_id"
+    t.index ["dependent_entity_id"], name: "index_form_dependencies_on_dependent_entity_id"
+  end
+
+  create_table "form_dependency_choice_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "form_dependency_choice_id", null: false
+    t.integer "dependent_choice_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
+    t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
+    t.index ["form_dependency_choice_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
+  end
+
+  create_table "form_dependency_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.integer "form_dependency_id", null: false
+    t.integer "controlling_choice_id", null: false
+    t.boolean "is_choice_selected"
+    t.boolean "dependent_entity_required"
+    t.boolean "dependent_entity_visible"
+    t.boolean "dependent_entity_editable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_form_dependency_choices_on_company_id"
+    t.index ["controlling_choice_id"], name: "index_form_dependency_choices_on_controlling_choice_id"
+    t.index ["form_dependency_id"], name: "index_form_dependency_choices_on_form_dependency_id"
+  end
+
+  create_table "form_dependency_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_form_dependency_types_on_name"
+  end
+
   create_table "form_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.integer "company_id", null: false
     t.string "form_id", limit: 36, null: false
     t.string "form_section_id", limit: 36, null: false
     t.integer "created_by_user_id"
-    t.string "parent_id"
     t.string "field_key", null: false
     t.string "label"
     t.string "placeholder"
@@ -3230,6 +3277,7 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "can_associate_children", default: false
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -3237,7 +3285,6 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
     t.index ["field_key"], name: "index_form_entities_on_field_key"
     t.index ["form_id"], name: "index_form_entities_on_form_id"
     t.index ["form_section_id"], name: "index_form_entities_on_form_section_id"
-    t.index ["parent_id"], name: "index_form_entities_on_parent_id"
     t.index ["updated_at"], name: "index_form_entities_on_updated_at"
     t.index ["uuid"], name: "index_form_entities_on_uuid"
   end
@@ -3274,6 +3321,7 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "section_type"
     t.index ["active"], name: "index_form_sections_on_active"
     t.index ["company_id"], name: "index_form_sections_on_company_id"
     t.index ["deleted_at"], name: "index_form_sections_on_deleted_at"
@@ -3651,6 +3699,35 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
     t.index ["type_id"], name: "index_individual_kycs_on_type_id"
     t.index ["upgraded_by_resource_id"], name: "index_individual_kycs_on_upgraded_by_resource_id"
     t.index ["user_id"], name: "index_individual_kycs_on_user_id"
+  end
+
+  create_table "insight_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id"
+    t.integer "user_id"
+    t.integer "policy_id"
+    t.integer "user_role_id"
+    t.string "app"
+    t.string "dashboard", null: false
+    t.string "name"
+    t.integer "admin_user_id"
+    t.datetime "deleted_at"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_insight_dashboards_on_active"
+    t.index ["admin_user_id"], name: "index_insight_dashboards_on_admin_user_id"
+    t.index ["app"], name: "index_insight_dashboards_on_app"
+    t.index ["company_id"], name: "index_insight_dashboards_on_company_id"
+    t.index ["created_at"], name: "index_insight_dashboards_on_created_at"
+    t.index ["dashboard"], name: "index_insight_dashboards_on_dashboard"
+    t.index ["deleted_at"], name: "index_insight_dashboards_on_deleted_at"
+    t.index ["name"], name: "index_insight_dashboards_on_name"
+    t.index ["policy_id"], name: "index_insight_dashboards_on_policy_id"
+    t.index ["updated_at"], name: "index_insight_dashboards_on_updated_at"
+    t.index ["user_id"], name: "index_insight_dashboards_on_user_id"
+    t.index ["user_role_id"], name: "index_insight_dashboards_on_user_role_id"
+    t.index ["uuid"], name: "index_insight_dashboards_on_uuid"
   end
 
   create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -8091,6 +8168,10 @@ ActiveRecord::Schema.define(version: 2019_10_28_121828) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "insight_dashboards", "companies"
+  add_foreign_key "insight_dashboards", "policies"
+  add_foreign_key "insight_dashboards", "user_roles"
+  add_foreign_key "insight_dashboards", "users"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"

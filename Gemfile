@@ -86,6 +86,8 @@ gem 'will_paginate', '~> 3.1.6'
 
 gem 'sneakers'
 
+gem 'jwt'
+
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
 

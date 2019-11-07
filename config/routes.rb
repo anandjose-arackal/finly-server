@@ -3850,6 +3850,8 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+  resources :insights
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.
