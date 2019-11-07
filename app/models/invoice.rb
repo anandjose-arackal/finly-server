@@ -953,12 +953,18 @@ class Invoice < ApplicationRecord
   end
 
   def invoice_payment_status
-    if (self.payments.pluck(:payment_status_id) & [PaymentStatus.id_for(:completed)]).any?
-      return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:partially_paid)).as_json]
-    elsif (self.payments.pluck(:payment_status_id) & PaymentStatus.status_ids_for_invoice_initiated).any?
-      return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:initiated)).as_json]
-    elsif (self.payments.pluck(:payment_status_id) & [PaymentStatus.id_for(:completed)]).any? && (self.payments.pluck(:payment_status_id) & PaymentStatus.status_ids_for_invoice_initiated).any?
+    payment_status_ids = self.payments.pluck(:payment_status_id)
+    
+    if (payment_status_ids & [PaymentStatus.id_for(:completed)]).any? && (payment_status_ids & PaymentStatus.status_ids_for_invoice_initiated).any?
       return InwardInvoiceStatus.where(id: InwardInvoiceStatus.ids_for([:partially_paid, :initiated])).as_json
+    elsif (payment_status_ids & [PaymentStatus.id_for(:completed)]).any?
+      # return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:partially_paid)).as_json]
+      return [self.invoice_status.as_json]
+    elsif (payment_status_ids & PaymentStatus.status_ids_for_invoice_initiated).any?
+      # return [InwardInvoiceStatus.find(InwardInvoiceStatus.id_for(:initiated)).as_json]
+      return [self.invoice_status.as_json]
+    else
+      return [self.invoice_status.as_json]
     end
   end
 
