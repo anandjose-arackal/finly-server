@@ -129,12 +129,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Invoice Date",
                "Invoice ID"]
     headers += retrieve_custom_field_headers
-    headers += ["Invoice Amount",
+    headers += ["Original Amount",
+                "Advance Amount",
                 "Discount",
                 "Tax",
                 "TDS",
-                "Advance",
-                "Net Amount",
+                "Net Payable Amount",
                 "Bank Reference Number",
                 "Note",
                 "Payment Status",
@@ -177,19 +177,38 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
-        tds_amount = 0.0
-        if payment.parent_type == 'PurchaseOrder' && purchase_order.present?
-          tds_amount = (purchase_order.advance_tds_amount&.value || 0)
+        case payment.parent_type
+        when 'PurchaseOrder'
+          po = payment.parent
+          payment_details += [
+              precision_value(po.total_after_tax&.value),
+              precision_value(po.advance_amount&.value),
+              0.0,
+              0.0,
+              (po.advance_tds_slab&.tds || 0.0),
+              (payment.amount&.value || 0.0)
+          ]
+        when 'BeneficiaryPayment'
+          bp = payment.parent
+          payment_details += [
+              (bp&.original_amount&.value|| 0.0),
+              (bp&.advance_amount&.value||0.0),
+              0.0,
+              (bp&.tax_amount&.value|| 0),
+              (bp&.tds_amount&.value || 0),
+              (payment.amount&.value || 0)
+          ]
         else
-          (payment.invoice&.tds_amount&.value || 0)
+          payment_details += [
+              original_amount_invoice(payment),
+              (payment.invoice&.advance_amount&.value || 0.0),
+              (payment.invoice&.discount_amount&.value || 0.0),
+              (payment.invoice&.tax || 0.0),
+              (payment.invoice&.tds || 0.0),
+              (payment.amount&.value || 0.0)
+          ]
         end
         payment_details += [
-            (payment.invoice&.amount&.value || 0),
-            (payment.invoice&.discount_amount&.value || 0),
-            (payment.invoice&.tax_amount&.value || 0),
-            tds_amount,
-            (payment.invoice&.advance_amount&.value || 0),
-            (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
             payment.note,
             payment.payment_status&.name&.humanize,
@@ -218,5 +237,30 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
       end
     end
     values
+  end
+
+  def original_amount_invoice(payment)
+     original_amount = 0.0
+     if payment.invoice.present?
+       invoice = payment.invoice
+       if invoice&.invoice_items.present?
+         original_amount = (invoice.amount&.value || 0.0)
+       else
+         original_amount = (invoice&.original_amount&.value || 0.0)
+       end
+     else
+       original_amount = (payment&.amount&.value || 0.0)
+     end
+     original_amount
+  end
+
+  def tds_amount(payment)
+    tds_amount = 0.0
+    if payment.parent_type == 'PurchaseOrder'
+      tds_amount = (payment.parent.advance_tds_amount&.value || 0.0)
+    else
+      tds_amount = (payment.invoice&.tds_amount&.value || 0.0)
+    end
+    tds_amount
   end
 end
