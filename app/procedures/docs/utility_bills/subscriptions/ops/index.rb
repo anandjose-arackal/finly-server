@@ -4,6 +4,11 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
   has_scope :filter_search
   has_scope :filter_status
 
+  has_scope :filter_department_id
+  has_scope :filter_cost_center_id
+  has_scope :filter_location_id
+  has_scope :filter_policy_id
+
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )
   step Transactions::Resolver::Model(BbpsBillerSubscription)
   step :index!

@@ -71,6 +71,9 @@ class BbpsBillerSubscription < ApplicationRecord
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
 
+
+  default_scope {order('bbps_biller_subscriptions.created_at DESC')}
+
   scope :filter_status, -> (status) {
     case status
     when 'approved', :approved
@@ -80,6 +83,22 @@ class BbpsBillerSubscription < ApplicationRecord
 
   scope :includes_for_index, -> {
     includes(:pocs)
+  }
+
+  scope :filter_department_id, -> (id) {
+    where(department_id: id)
+  }
+
+  scope :filter_cost_center_id, -> (id) {
+    where(cost_center_id: id)
+  }
+
+  scope :filter_policy_id, -> (id) {
+    where(policy_id: id)
+  }
+
+  scope :filter_location_id, -> (id) {
+    where(location_id: id)
   }
 
   def as_json(options={})

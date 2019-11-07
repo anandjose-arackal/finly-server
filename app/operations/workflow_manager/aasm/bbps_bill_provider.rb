@@ -6,8 +6,11 @@ class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvi
     state :approved
     state :rejected
     state :auto_approved
-    state :deactivated
-    state :reactivated
+    state :payment_ticket_created
+    state :paid
+    state :failed
+    state :voided
+
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
@@ -49,12 +52,18 @@ class WorkflowManager::Aasm::BbpsBillProvider < WorkflowManager::Aasm::BaseProvi
       transitions :from => :awaiting_approval, :to => :retracted
     end
 
-    event :deactivate do ## Confirm the action
-      transitions :from => [:approved, :auto_approved], to: :deactivated
+    event :create_payment_ticket do
+      transitions :from => [:approved, :awaiting_approval], :to => :payment_ticket_created
     end
 
-    event :reactivate do ## Confirm the action
-      transitions :from => :deactivated, :to => :reactivated
+
+    event :pay do ## Confirm the action
+      transitions :from => :payment_ticket_created, to: :paid
+      transitions :from => :payment_ticket_created, to: :failed
+    end
+
+    event :void do
+      transitions from: [:approved, :auto_approved], :to => :voided
     end
 
     after_all_events :change_state

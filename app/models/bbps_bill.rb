@@ -38,6 +38,8 @@ class BbpsBill < ApplicationRecord
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
 
+  default_scope {order('bbps_bills.created_at DESC')}
+
   scope :filter_status, -> (status) {
     case status
     when 'payables', :payables
@@ -65,6 +67,22 @@ class BbpsBill < ApplicationRecord
 
   scope :includes_for_index, -> {
     includes(subscription: [:pocs])
+  }
+
+  scope :filter_department_id, -> (id) {
+    where(department_id: id)
+  }
+
+  scope :filter_cost_center_id, -> (id) {
+    where(cost_center_id: id)
+  }
+
+  scope :filter_policy_id, -> (id) {
+    where(policy_id: id)
+  }
+
+  scope :filter_location_id, -> (id) {
+    where(location_id: id)
   }
 
   def as_json(options = {})
