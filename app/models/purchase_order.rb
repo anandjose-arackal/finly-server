@@ -132,7 +132,6 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
-  has_many :purchase_request_item
 
   has_many :quotations, dependent: :destroy
 

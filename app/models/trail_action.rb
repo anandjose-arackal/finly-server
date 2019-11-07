@@ -58,7 +58,8 @@ class TrailAction < ApplicationRecord
         :upcoming_invoice_created,
         :po_reopen,
         :po_close,
-        :po_item_deleted
+        :po_item_deleted,
+        :po_revised
     ]
   end
 end

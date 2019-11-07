@@ -107,7 +107,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   after_save :budget_trail_entry
-  after_destroy :budget_trail_destroy, :update_purhcase_request_item_status
+  after_destroy :budget_trail_destroy
 
 
   def tax
