@@ -15,7 +15,18 @@ class BudgetManager::BudgetGroupCriteria::Ops::Create < Transactions::API
   # This step actually performs the validations mentioned in the contract
   step Contract::Validate(key: 'budget_group_criterion')
 
+  step :set_parent_criterium!
+
   # below step persists the model
   step Contract::Persist()
+
+  def set_parent_criterium!(options, params:, model:, current_user:, **)
+    params.permit!
+    budget_criterium = model
+    parent_criterium = current_user.company.budget_group_criteria.find_by(id: params&.dig(:budget_group_criterion, :ancestry))
+
+    budget_criterium.ancestry = parent_criterium&.id
+    true
+  end
 
 end

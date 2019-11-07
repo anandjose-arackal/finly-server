@@ -4,4 +4,4 @@ json.result do
   json.budget_group_criteria @result["budget_group_criteria"]
 end
 
-json.count @result["budget_group_criteria"]
+json.count @result["budget_group_criteria"].count
