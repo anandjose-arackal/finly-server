@@ -49,7 +49,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
         gc = current_company.group
         # TODO prevent sql injection DONE
         # this one tells if there are users in group companies
-        self.users = gc.companies.where.not(id: current_company.id).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue User.none
+        self.users = gc.companies.where.not(id: current_company.id).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:user_emails]) rescue User.none
       else
         # this tells if there are users already invited
         self.users = user.company.users.with_email(bulk_assign[:user_emails])
@@ -119,7 +119,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     # finds email already invited or in other group companies. You can also use this to tell FE if the user already invited
     self.common_emails = self.input_emails & self.users.pluck(:email)
     # finds which users are to be actually invited
-    self.new_emails = self.input_emails - user.company.users.pluck(:email)
+    self.new_emails = self.input_emails - ( user.company.users.pluck(:email) + self.common_emails )
 
 
     # return if self.new_mails.blank? and self.common_emails.blank?
@@ -137,12 +137,13 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     newly_created_users = []
     user_list.uniq.each do |list|
       options = list
+      options.delete("id")
       options[:company_id] = user.company_id
       options = setup_user_panel_subscription(options)
 
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
         u = User.create options
-        UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group)
+        UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group) if u.id.present?
       else
         u = User.invite! options
       end
