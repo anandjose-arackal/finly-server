@@ -3,7 +3,7 @@
 
 class UserOnboarding::VendorPayments < UserOnboarding::Base
   attr_accessor :policy_ids, :policies, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles,
-                :urm_columns, :urm_values, :pur_columns, :pur_values,
+                :urm_columns, :urm_values, :pur_columns, :pur_values, :urm_unassignable_roles,
                 :urm_user_role_ids, :pur_user_role_ids,
                 :pur_unassignable_roles
 
@@ -32,6 +32,10 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     flow(pre_process_pur)
     self.pur_unassignable_roles = self.unassignable_roles
     self.pur_columns, self.pur_values = setup_pur(assignable_roles)
+
+    flow(pre_process_urm)
+    self.urm_unassignable_roles = self.unassignable_roles
+    self.urm_columns, self.urm_values = setup_urm(assignable_roles)
 
     # builds this format for FE to show unassignable roles
     # 
@@ -73,6 +77,7 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     # Bulk insert into table, 
     # much faster  
     exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
+    exec_statement(urm_columns, urm_values, :user_role_mappings)
 
   end
 

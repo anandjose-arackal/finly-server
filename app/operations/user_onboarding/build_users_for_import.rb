@@ -49,7 +49,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
         gc = current_company.group
         # TODO prevent sql injection DONE
         # this one tells if there are users in group companies
-        self.users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue User.none
+        self.users = gc.companies.where.not(id: current_company.id).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:email]) rescue User.none
       else
         # this tells if there are users already invited
         self.users = user.company.users.with_email(bulk_assign[:user_emails])

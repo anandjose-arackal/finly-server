@@ -59,8 +59,12 @@ class UserOnboarding::Base < BaseOperation
     # -> collect all records
     # from the previous result, we only need to get and search for duplicate records based on combination of 3 columns
     all_roles = urm.pluck(:user_id, :user_role_id)
-
-    self.urm_user_role_ids << UserRole.id_for(:employee)
+    
+    if RequestStore.store[:vp_onboarding]
+      self.urm_user_role_ids << UserRole.id_for(:initiator)
+    else
+      self.urm_user_role_ids << UserRole.id_for(:employee)
+    end
     # -> create records for searching
     # from the params sent, we create a format compatible to search against the previous result
     new_roles = self.user_ids.product(self.urm_user_role_ids)
@@ -114,7 +118,12 @@ class UserOnboarding::Base < BaseOperation
 
   def setup_urm(assignable_roles)
     # setup data points for importing into table
-    purpose_id = Purpose.id_for(:expense_management)
+    if RequestStore.store[:vp_onboarding]
+      purpose_id = Purpose.id_for(:vendor_payments)
+    else
+      purpose_id = Purpose.id_for(:expense_management)
+    end
+      
     columns = [:user_id, :user_role_id, :purpose_id]
     values = assignable_roles.collect { |u_id, r_id| [u_id, r_id, purpose_id] }
     return columns, values
