@@ -1,6 +1,3 @@
-
-json.success @op.success?
-
 json.result do
   json.types do
     json.array! @op['result']['types']

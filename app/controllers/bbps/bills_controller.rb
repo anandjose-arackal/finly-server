@@ -8,6 +8,13 @@ class Bbps::BillsController < BaseControllers::WebBase
     end
   end
 
+  def filters_config
+    @op = Docs::UtilityBills::Bills::Configs::Filters.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def update
     @op = Docs::UtilityBills::Bills::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|

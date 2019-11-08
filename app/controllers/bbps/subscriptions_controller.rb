@@ -8,6 +8,13 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
+  def filters_config
+    @op = Docs::UtilityBills::Subscriptions::Configs::Filters.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def biller_type_config
     @op = Docs::UtilityBills::Subscriptions::Configs::BillerType.(params, "current_user" => current_user)
     respond_to do |format|

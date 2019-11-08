@@ -3858,12 +3858,14 @@ Rails.application.routes.draw do
     get 'subscriptions/biller_type_config', to: 'subscriptions#biller_type_config'
     get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
     get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
+    get 'subscriptions/filtes_config', to: 'subscriptions#filters_config'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
     end
 
     get 'bills/edit_config', to: 'bills#edit_config'
     get 'bills/actions_config', to: 'bills#actions_config'
+    get 'bills/filters_config', to: 'bills#filters_config'
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
