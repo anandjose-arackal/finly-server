@@ -1,6 +1,6 @@
 class User::Update < User::Base
 
-  attr_accessor :user_params
+  attr_accessor :user_params, :selected_user, :company
 
   class User::Update::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
