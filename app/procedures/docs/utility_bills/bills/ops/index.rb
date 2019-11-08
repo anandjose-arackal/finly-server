@@ -8,6 +8,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_cost_center_id
   has_scope :filter_location_id
   has_scope :filter_policy_id
+  has_scope :filter_subscription_id
 
   has_scope :filter_date
 

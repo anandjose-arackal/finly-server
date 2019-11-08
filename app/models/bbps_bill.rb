@@ -85,6 +85,10 @@ class BbpsBill < ApplicationRecord
     where(location_id: id)
   }
 
+  scope :filter_subscription_id, -> (id) {
+    where(subscription_id: id)
+  }
+
   def as_json(options = {})
     {
         id: id,
