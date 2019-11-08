@@ -2,7 +2,7 @@ class Docs::UtilityBills::Subscriptions::Configs::Filters < Transactions::API
 
   step :init
 
-  def init(options, params:, current_user:, model:, **)
+  def init(options, params:, current_user:, **)
     result = {}
     result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid"]
     result['departments'] = Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves
