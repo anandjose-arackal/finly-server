@@ -256,7 +256,7 @@ class Budget < ApplicationRecord
         email: user.email
 
       },
-      sub_budgets: children&.as_json,
+      sub_budgets: budget_group_criterium.children.map(&:budgets),
       sub_budgets_count: children.size
     }
   end
