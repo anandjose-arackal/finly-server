@@ -728,7 +728,14 @@ class Payment < ApplicationRecord
     case self.parent_type
     when 'Invoice'
       parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
-      parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+      options = {}
+      if parent_details.payments.all_except_failed.joins(:amount).sum(:value) < parent_details.balance_due.value.to_f
+        options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid), payable: true}
+      else
+        options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid)}
+      end
+
+      parent_details.update options
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
