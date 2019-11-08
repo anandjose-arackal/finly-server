@@ -107,7 +107,7 @@ class UserOnboarding::Base < BaseOperation
   def setup_pur(assignable_roles)
     # setup data points for importing into table
     purpose_id = Purpose.id_for(:vendor_payments)
-    columns = [:policy_id, :user_id, :user_role_id]
+    columns = [:policy_id, :user_id, :user_role_id, :purpose_id]
     values = assignable_roles.collect { |p_id, u_id, r_id| [p_id, u_id, r_id, purpose_id] }
 
     return columns, values
@@ -118,7 +118,6 @@ class UserOnboarding::Base < BaseOperation
     purpose_id = Purpose.id_for(:expense_management)
     columns = [:user_id, :user_role_id, :purpose_id]
     values = assignable_roles.collect { |u_id, r_id| [u_id, r_id, purpose_id] }
-
     return columns, values
   end
 

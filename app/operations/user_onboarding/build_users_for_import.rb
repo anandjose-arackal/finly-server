@@ -79,10 +79,10 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
 
   def success
     params[:users] = self.users
-    PolicyUserRoles::BulkUsersForImport::SuccessPresenter.new(user, params, messages)
+    UserOnboarding::BuildUsersForImport::SuccessPresenter.new(user, params, messages)
   end
 
-  class PolicyUserRoles::BulkUsersForImport::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class UserOnboarding::BuildUsersForImport::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :users
 
     def init
@@ -161,9 +161,11 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     if RequestStore.store[:vp_onboarding]
       add_message :message, "VP ONBOARDING"
       options[:user_panel_subscription_attributes] = {yes_bank_account_transfer: true}
+      return options
     elsif RequestStore.store[:em_onboarding]
       add_message :message, "EM ONBOARDING"
       options[:user_panel_subscription_attributes] = {expense_management: true}
+      return options
     end
   end
 
