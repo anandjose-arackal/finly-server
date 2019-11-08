@@ -84,7 +84,7 @@ module Transactions
       end
 
       def success(result)
-        controller.render json: result['result'], status: 200
+        # controller.render json: result['result'], status: 200
         # unless respond_with_representer(result)
         #   controller.render json: {success: true}, status: 200
         # end
