@@ -59,7 +59,8 @@ class TrailAction < ApplicationRecord
         :po_reopen,
         :po_close,
         :po_item_deleted,
-        :po_revised
+        :po_revised,
+        :po_void
     ]
   end
 end
