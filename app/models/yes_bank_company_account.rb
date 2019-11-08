@@ -13,6 +13,7 @@
 
 class YesBankCompanyAccount < ApplicationRecord
   include Accountable
+
   belongs_to :company, optional: true
   belongs_to :balance, optional: true, class_name: "Amount"
   belongs_to :wallet_balance, optional: true, class_name: "Amount"
