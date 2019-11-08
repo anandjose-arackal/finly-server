@@ -123,12 +123,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
       invoice_amount = invoice.balance_due&.value.to_f
-      paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
-      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value)
+      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
       total_payments = payable_amount.to_f + previous_payments
 
       # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
-      remaining_amount = (invoice_amount - previous_payments)
+      remaining_amount = (invoice_amount - previous_payments).round(2)
 
       if remaining_amount.blank?
         next

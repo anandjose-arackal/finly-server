@@ -70,8 +70,8 @@ json.invoice do
   json.item_amounts_total invoice.item_amounts_total&.round(2)
 
   json.net_payable_amount invoice.balance_due&.value
-  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value).round(2)
+  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
 
   # invoice items
   json.invoice_items do

@@ -51,7 +51,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'Invoice'
       invoice = payment.parent
       invoice_amount = invoice.balance_due&.value.to_f
-      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value)
+      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
       if payment_amount.to_f + previous_payments.to_f > invoice_amount
         add_message :error, "Payment update amount would go above the invoice balance due."
         return

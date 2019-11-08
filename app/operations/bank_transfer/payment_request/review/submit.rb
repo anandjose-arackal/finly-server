@@ -59,8 +59,8 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
-      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
-      paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
+      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
+      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
 
       if remaining_amount.blank?
         next
