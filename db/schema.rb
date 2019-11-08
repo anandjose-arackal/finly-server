@@ -1589,7 +1589,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
-    t.boolean "gst_applicable", default: true
+    t.boolean "gst_applicable", default: false
     t.boolean "tds_applicable"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"

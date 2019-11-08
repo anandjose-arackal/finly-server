@@ -29,6 +29,10 @@ class InsightDashboard < ApplicationRecord
 
   resolver Insights::Resolver
 
+  validates :name, presence: true
+  validates :dashboard, presence: true
+  validates :app, presence: true
+
   def as_json(options = {})
     {
         id: id,

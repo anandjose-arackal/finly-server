@@ -1,6 +1,6 @@
-class Insights::Resolver < ApplicationPolicy::Scope
+class Insights::Resolver < Transactions::Resolver::Scope
 
-  def resolve(filters: {})
+  def load(params)
     # Conditions:
     # :company
     # :user

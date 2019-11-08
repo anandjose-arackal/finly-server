@@ -1,18 +1,15 @@
 require 'jwt'
 
-class Insights::Token < Transactions::API
+class Insights::Show < Transactions::API
 
-  ANALYTICS_SITE_URL = "https://analytics.finly.io"
-  ANALYTICS_SECRET_KEY = "19704626fb775091844efb44dffc284ea496b939c59fed2b04b17f595572d0f2"
-
-  step Model(InsightDashboard, :find)
+  step Model(InsightDashboard, :find_by_uuid)
   step Policy::Pundit(Insights::Policy, :show?)
   step :parse_filters
   step :generate_token
 
-  def parser_filters(options, params:,current_user:, **)
+  def parse_filters(options, params:,current_user:, **)
     filters = {
-        company_id: current_user.company_id
+        # company_id: current_user.company_id
     }
 
     options['filters'] = filters
@@ -27,7 +24,8 @@ class Insights::Token < Transactions::API
         :exp => Time.now.to_i + (60 * 2) # 2 minute expiration
     }
 
-    options['token'] = JWT.encode payload, ANALYTICS_SECRET_KEY
+    token = JWT.encode payload, INSIGHTS_CONFIG[:secret]
+    options['result'] = {url: INSIGHTS_CONFIG[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
     true
   end
 
