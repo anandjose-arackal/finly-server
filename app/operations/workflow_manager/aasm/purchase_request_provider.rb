@@ -12,6 +12,7 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     state :order_initiated
     state :po_created
     state :partially_closed
+    state :po_void
 
     event :submit do
       # transitions from: [:open, :retracted, :rejected, :draft], to: :auto_approved, guard: :reviewers_not_present?
@@ -58,6 +59,10 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
 
     event :partially_close do
       transitions :from => [:approved, :auto_approved, :closed], :to => [:partially_closed]
+    end
+
+    event :po_void do
+      transitions :from => [:po_created, :closed, :partially_closed], :to => [:approved]
     end
 
     after_all_events :change_state
