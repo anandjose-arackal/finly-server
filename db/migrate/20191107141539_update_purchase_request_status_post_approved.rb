@@ -19,7 +19,7 @@ class UpdatePurchaseRequestStatusPostApproved < ActiveRecord::Migration[5.2]
       #   break
       # end
 
-      if purchase_request.purchase_request_items.where(status_id: PurchaseRequestItemStatus.id_for(:po_created)).present? && where.not(status_id: [PurchaseRequestItemStatus.id_for(:draft), PurchaseRequestItemStatus.id_for(:awaiting_approval), PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved), PurchaseRequestItemStatus.id_for(:retracted)])
+      if purchase_request.purchase_request_items.where(status_id: PurchaseRequestItemStatus.id_for(:po_created)).where.not(status_id: [PurchaseRequestItemStatus.id_for(:draft), PurchaseRequestItemStatus.id_for(:awaiting_approval), PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved), PurchaseRequestItemStatus.id_for(:retracted), PurchaseRequestItemStatus.id_for(:closed)]).present?
         purchase_request.update(purchase_request_status_id:  PurchaseRequestStatus.id_for(:approved))
         break
       end
