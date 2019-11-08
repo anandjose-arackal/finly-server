@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location, :cost_allocation_items, :policy, :po_revision_ids, :deleted_po_item_ids
+                :gstin_location, :cost_allocation_items, :policy
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -40,8 +40,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
 
     self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: purchase_order_params[:policy_id])
-    self.po_revision_ids = []
-    self.deleted_po_item_ids = []
   end
 
   def validate
@@ -421,15 +419,21 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def update_purchase_request_item_status
     if purchase_order.purchase_request_items.present?
+      po_revision_ids = []
+      deleted_po_item_ids = []
+      deleted_po_item_pr_item_ids = []
       purchase_order.items.each do |purchase_order_item|
         purchase_request_item = purchase_order_item.purchase_request_item
         if purchase_request_item.present?
           if purchase_order_item.marked_for_destruction?
-            self.deleted_po_item_ids << purchase_order_item.id
+            deleted_po_item_ids << purchase_order_item.id
+            deleted_po_item_pr_item_ids << purchase_order_item.purchase_request_item_id
             # If revised po line items are deleted which were created from PR line item, then all the previous PO's will not have pr line item reference to their line item. i.e., line item will be as if it was not created from PR as it will loose reference to PR
             # This is done to avoid duplicate PO for the same approved items 
             if purchase_order_item&.purchase_order&.procurement&.po_revisions&.present?
-              self.po_revision_ids << purchase_order_item&.purchase_order&.procurement&.po_revisions.pluck(:id)
+              procurement_id = purchase_order_item&.purchase_order&.procurement&.id
+              # PO revision related ids
+              po_revision_ids << user.company.purchase_orders.where(procurement_id: procurement_id).pluck(:id)
             end
             purchase_request_item.update_attributes(purchase_order_id: nil)
             purchase_request_item.update_attributes(status_id: PurchaseRequestItemStatus.id_for(:approved))
@@ -442,14 +446,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
       po_revision_ids = po_revision_ids&.flatten&.compact&.uniq
       deleted_po_item_ids = deleted_po_item_ids&.flatten&.compact&.uniq
+      deleted_po_item_pr_item_ids = deleted_po_item_pr_item_ids&.flatten&.uniq
       if po_revision_ids.present?
         po_revision_ids.each do |po_revision_id|
           revised_po = user.company.purchase_orders.find_by_id po_revision_id
           if revised_po.present?
-            if revised_po.items.where(id: deleted_po_item_ids).where.not(purchase_request_item_id: nil).present?
-              revised_po.items.where(id: deleted_po_item_ids).where.not(purchase_request_item_id: nil).each do |purchase_order_item|
+            if revised_po.items.where(purchase_request_item_id: deleted_po_item_pr_item_ids).present?
+              revised_po.items.where(purchase_request_item_id: deleted_po_item_pr_item_ids).each do |po_item|
                 # Remove reference to PR line item so that multiple PO's cannot be raised for one approved item with PR line item reference
-                purchase_order_item.update_attributes(purchase_request_item_id: nil)
+                po_item.update_attributes(purchase_request_item_id: nil)
               end
             end
           end
