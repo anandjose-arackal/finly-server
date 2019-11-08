@@ -48,13 +48,15 @@ class Procurements::PurchaseOrders::Void < Procurements::PurchaseOrders::Base
       self.purchase_order.purchase_request_items.each do |purchase_request_item|
         purchase_request = purchase_request_item.purchase_request
         unless purchase_request.approved? || purchase_request.auto_approved?
-          params[:document] = purchase_request
-          params[:aasm_event] = 'po_void'
-          params[:violation_present] = false
-          op = WorkflowManager::Base.(user, params)
-          unless op.success?
-            add_message :error, op.messages[:error]
-            return
+          if purchase_request.purchase_request_items.where.not(id: self.purchase_order.purchase_request_items.pluck(:id)).where(status_id: PurchaseRequestItemStatus.id_for(:po_closed)).blank?
+            params[:document] = purchase_request
+            params[:aasm_event] = 'po_void'
+            params[:violation_present] = false
+            op = WorkflowManager::Base.(user, params)
+            unless op.success?
+              add_message :error, op.messages[:error]
+              return
+            end
           end
         end
         purchase_request_item.update_attributes(purchase_order_id: nil, status_id: PurchaseRequestItemStatus.id_for(:approved))

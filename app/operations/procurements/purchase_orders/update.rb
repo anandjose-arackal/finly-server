@@ -442,7 +442,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
       po_revision_ids = po_revision_ids&.flatten&.compact&.uniq
       deleted_po_item_ids = deleted_po_item_ids&.flatten&.compact&.uniq
-      # binding.pry
       if po_revision_ids.present?
         po_revision_ids.each do |po_revision_id|
           revised_po = user.company.purchase_orders.find_by_id po_revision_id

@@ -62,7 +62,7 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     end
 
     event :po_void do
-      transitions :from => [:approved, :auto_approved, :po_created, :closed, :partially_closed], :to => [:approved]
+      transitions :from => [:po_created, :closed, :partially_closed], :to => [:approved]
     end
 
     after_all_events :change_state
