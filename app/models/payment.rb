@@ -729,7 +729,7 @@ class Payment < ApplicationRecord
     when 'Invoice'
       parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
       options = {}
-      if parent_details.payments.all_except_failed.joins(:amount).sum(:value) < parent_details.balance_due.value.to_f
+      if parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2) < parent_details.balance_due.value.to_f
         options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid), payable: true}
       else
         options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid)}
