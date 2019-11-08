@@ -257,7 +257,7 @@ class Budget < ApplicationRecord
 
       },
       sub_budgets: budget_group_criterium.children.map(&:budgets),
-      sub_budgets_count: children.size
+      sub_budgets_count: budget_group_criterium.children.map(&:budgets).flatten.count
     }
   end
 
