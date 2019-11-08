@@ -573,7 +573,8 @@ class Invoice < ApplicationRecord
   def payment_amounts_total
     if self.payments.present?
       # return self.payments.successful.joins(:amount).sum(:value)
-      return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      # return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      return self.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
     else
       return 0
     end
@@ -954,7 +955,7 @@ class Invoice < ApplicationRecord
 
   def invoice_payment_status
     payment_status_ids = self.payments.pluck(:payment_status_id)
-    
+
     if (payment_status_ids & [PaymentStatus.id_for(:completed)]).any? && (payment_status_ids & PaymentStatus.status_ids_for_invoice_initiated).any?
       return InwardInvoiceStatus.where(id: InwardInvoiceStatus.ids_for([:partially_paid, :initiated])).as_json
     elsif (payment_status_ids & [PaymentStatus.id_for(:completed)]).any?
