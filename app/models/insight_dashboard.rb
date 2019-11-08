@@ -9,7 +9,7 @@
 #  policy_id     :integer
 #  user_role_id  :integer
 #  app           :string(255)
-#  dashboard     :string(255)      not null
+#  dashboard     :integer          not null
 #  name          :string(255)
 #  admin_user_id :integer
 #  deleted_at    :datetime
