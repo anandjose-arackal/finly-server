@@ -426,7 +426,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         purchase_request_item = purchase_order_item.purchase_request_item
         if purchase_request_item.present?
           if purchase_order_item.marked_for_destruction?
-            binding.pry
             deleted_po_item_ids << purchase_order_item.id
             deleted_po_item_pr_item_ids << purchase_order_item.purchase_request_item_id
             # If revised po line items are deleted which were created from PR line item, then all the previous PO's will not have pr line item reference to their line item. i.e., line item will be as if it was not created from PR as it will loose reference to PR
