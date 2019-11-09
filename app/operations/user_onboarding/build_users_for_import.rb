@@ -142,7 +142,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       options = setup_user_panel_subscription(options)
 
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
-        u = User.create options
+        u = User.new options
+        u.save(:validate => false)
         UsersWithGroupMapping.create(user: u, company: current_company, group: current_company.group) if u.id.present?
       else
         u = User.invite! options
