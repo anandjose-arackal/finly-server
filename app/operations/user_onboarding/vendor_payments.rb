@@ -29,11 +29,11 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     # in vendor payments, user roles are defined in one table
     # policy_user_roles
     # 
-    flow(pre_process_pur)
+    flow(pre_process_pur, true)
     self.pur_unassignable_roles = self.unassignable_roles
     self.pur_columns, self.pur_values = setup_pur(assignable_roles)
 
-    flow(pre_process_urm)
+    flow(pre_process_urm, false)
     self.urm_unassignable_roles = self.unassignable_roles
     self.urm_columns, self.urm_values = setup_urm(assignable_roles)
 
@@ -56,11 +56,11 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     #   }
     # ]
     # 
-    if self.unassignable_roles.present?
+    if self.pur_unassignable_roles.present?
       fields = [:policy, :user, :user_role]
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
 
-      params[:unassignable_roles] = self.unassignable_roles.map do |role| 
+      params[:unassignable_roles] = self.pur_unassignable_roles.map do |role| 
         policy = policies.find {|policy| policy if policy.id == role.first}
         user = users.find {|u| u if u.id == role.second}
         roles = UserRole::VALUES.invert[role.third]
@@ -77,7 +77,7 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
     # Bulk insert into table, 
     # much faster  
     exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
-    exec_statement(urm_columns, urm_values, :user_role_mappings)
+    exec_statement(urm_columns, urm_values, :user_role_mappings) if urm_unassignable_roles.blank?
 
   end
 
@@ -111,10 +111,10 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
 
   private
 
-  def flow(preprocessor)
+  def flow(preprocessor, check=false)
     self.assignable_roles, self.unassignable_roles = preprocessor
 
-    if assignable_roles.blank?
+    if check and assignable_roles.blank?
       add_message :error, "Request cannot be processed. Perhaps, selected users are already assigned to the chosen policies with the specified roles."
       return
     end

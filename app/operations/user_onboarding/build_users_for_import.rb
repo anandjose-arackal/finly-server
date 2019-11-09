@@ -97,7 +97,9 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     # we will find the users attributes from other companies and set it to new company
     user_list = []
     company_id = user.company_id
+    existing_emails = user.company.users.with_email(bulk_assign[:user_emails]).pluck :email
     self.users.each do |user|
+      next if existing_emails.include? user.email
       user.default_company_id = company_id
       user_list << user.attributes.with_indifferent_access
     end
