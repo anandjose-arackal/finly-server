@@ -271,30 +271,33 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
-    po_item = inward_document_item.purchase_order_item
-    invoice_item_amount = accepted.to_f * po_item.rate.to_f
-    rate = 0
-    discount_amount = 0
+    # comment this out for now, this used to handle a case where quantity for goods was too low,
+    # that applying a discount on it would take it to negative
+    # 
+    # po_item = inward_document_item.purchase_order_item
+    # invoice_item_amount = accepted.to_f * po_item.rate.to_f
+    # rate = 0
+    # discount_amount = 0
 
-    case po_item.purchase_order.discount_type_id
-      # i.e. discount is given as a rate
-      when 1
-        rate = po_item.discount
-        discount_amount = (item.discount.to_f * invoice_item_amount.to_f)/100
-      when 2
-        rate = ((po_item.discount.to_f / invoice_item_amount) * 100).round(2) rescue 0
-        discount_amount = (rate.to_f * invoice_item_amount.to_f)/100
-      else
-        rate = po_item.discount
-        discount_amount = (po_item.discount.to_f * invoice_item_amount.to_f)/100
-    end
+    # case po_item.purchase_order.discount_type_id
+    #   # i.e. discount is given as a rate
+    #   when 1
+    #     rate = po_item.discount
+    #     discount_amount = (item.discount.to_f * invoice_item_amount.to_f)/100
+    #   when 2
+    #     rate = ((po_item.discount.to_f / invoice_item_amount) * 100).round(2) rescue 0
+    #     discount_amount = (rate.to_f * invoice_item_amount.to_f)/100
+    #   else
+    #     rate = po_item.discount
+    #     discount_amount = (po_item.discount.to_f * invoice_item_amount.to_f)/100
+    # end
 
-    gross_amount = invoice_item_amount - discount_amount
+    # gross_amount = invoice_item_amount - discount_amount
 
-    if (gross_amount < 0) or (rate > 100)
-      add_message :error, "Accepted quantity is too low."
-      return
-    end
+    # if (gross_amount < 0) or (rate > 100)
+    #   add_message :error, "Accepted quantity is too low."
+    #   return
+    # end
 
   end
 
