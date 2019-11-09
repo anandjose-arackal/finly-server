@@ -65,6 +65,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_po_advance_status
     has_scope :po_advances_date, using: [:from, :to], type: :hash
     has_scope :due_date, using: [:from, :to], type: :hash
+    has_scope :filter_po_approver_id
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
 
