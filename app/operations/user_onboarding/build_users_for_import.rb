@@ -2,7 +2,7 @@
 # 
 class UserOnboarding::BuildUsersForImport < BaseOperation
   attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign, :common_emails, 
-                :new_emails
+                :new_emails, :existing_emails
 
 
   def pre_validate
@@ -97,9 +97,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     # we will find the users attributes from other companies and set it to new company
     user_list = []
     company_id = user.company_id
-    existing_emails = user.company.users.with_email(bulk_assign[:user_emails]).pluck :email
     self.users.each do |user|
-      next if existing_emails.include? user.email
+      next if self.existing_emails.include? user.email
       user.default_company_id = company_id
       user_list << user.attributes.with_indifferent_access
     end
@@ -118,6 +117,8 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
   end
 
   def process_users
+    self.existing_emails = user.company.users.with_email(bulk_assign[:user_emails]).pluck :email
+
     # finds email already invited or in other group companies. You can also use this to tell FE if the user already invited
     self.common_emails = self.input_emails & self.users.pluck(:email)
     # finds which users are to be actually invited
@@ -157,7 +158,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     update_user_panel_subscription
 
     # get all emails of newly created users and see if they exist in the new company and return them
-    all_emails = newly_created_users.pluck(:email) + self.common_emails
+    all_emails = newly_created_users.pluck(:email) + self.common_emails + self.existing_emails
     user.company.users.where(email: all_emails)
   end
 
@@ -174,7 +175,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
   end
 
   def update_user_panel_subscription
-    users = user.company.users.with_email(self.common_emails)
+    users = user.company.users.with_email(self.common_emails + self.existing_emails)
     users.each do |u|
       if RequestStore.store[:vp_onboarding]
       add_message :message, "VP ONBOARDING"
