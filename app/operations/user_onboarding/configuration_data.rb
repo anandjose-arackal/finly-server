@@ -14,6 +14,10 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
     when 'em', :em
 			self.user_roles = ::UserRole::VALUES_EM
 			self.policies = ::Policy::Index.(user, params).try(:policies)
+
+			unless user.company.travel_desk_enabled?
+				self.user_roles.delete(:travel_manager)
+			end
     end
     	
 	end
@@ -29,7 +33,37 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 
 		case RequestStore.store[:current_app]
     when 'vp', :vp
-			self.document_list = ['purchase_request', 'purchase_order', 'bank_payment_request', 'payment_agreement', 'po_invoice', 'non_po_invoice', 'vendor', 'budget', 'item_master', 'inventory', 'admin']
+			# self.document_list = ['purchase_request', 'purchase_order', 'bank_payment_request', 'payment_agreement', 'po_invoice', 'non_po_invoice', 'vendor', 'budget', 'item_master', 'inventory', 'admin']
+
+			self.document_list = []
+
+			self.document_list << 'bank_payment_request'
+
+			if user.company.procurement_enabled?
+				self.document_list << 'purchase_order'
+				self.document_list << 'po_invoice'
+				self.document_list << 'non_po_invoice'
+				self.document_list << 'goods'
+				self.document_list << 'inventory'
+				self.document_list << 'item_master'
+			end
+
+			if user.company.vendor_empanelment_workflow_enabled?
+				self.document_list << 'vendor'
+			end
+
+			if user.company.purchase_requisition_enabled?
+				self.document_list << 'purchase_request'
+			end
+
+			if user.company.agreement_based_payment_system_enabled?
+				self.document_list << 'payment_agreement'
+			end
+
+			if user.company.budgeting_system_enabled?
+				self.document_list << 'budget'
+			end
+
     when 'em', :em
 			self.document_list = []
     end
