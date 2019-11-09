@@ -26,8 +26,23 @@ class User::Update < User::Base
   def init
     self.company = user.company
     id = params[:id] || params[:user_id]
-    self.selected_user = self.company.users.find_by(id: id)
+
+    case RequestStore.store[:current_app]
+    when 'em', :em
+      result = User::Show.(user, params)
+    when 'vp', :vp
+      result = BankTransfer::Users::Show.(user, params)
+    end
+
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+
+    self.selected_user = result.selected_user
     self.user_params = parse_user_params
+    self.user_params[:first_name], self.user_params[:last_name] = split_name params.dig(:user, :name)
+
   end
 
   def process
@@ -56,4 +71,19 @@ class User::Update < User::Base
                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
     user_params
   end
+
+  def split_name( full_name )
+    name_array = full_name.split(' ')
+
+    if name_array.count > 1
+      first_name  = name_array.shift
+      last_name = name_array.join(' ')
+    else
+      first_name = name_array.first
+      last_name  = ""
+    end
+
+    return [ first_name, last_name ]
+  end
+
 end
