@@ -24,7 +24,7 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
@@ -173,6 +173,17 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :filter_pr_creator_id, -> (creator_id){
+    where(creator_id: creator_id)
+  }
+
+  scope :filter_pr_approver_id, -> (approver_id){
+    if approver_id.present?
+      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
+
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
   #   if type && ['ASC', 'DESC'].include?(type)
@@ -300,7 +311,7 @@ class PurchaseRequest < ApplicationRecord
         if (UserRole.id_for(:purchase_request_initiator) == role_id.to_i)
           statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
         elsif (UserRole.id_for(:purchase_request_reviewer) == role_id.to_i)
-          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory]
+          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory, :po_created]
         end
       end
     end

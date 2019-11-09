@@ -14,12 +14,12 @@ class Procurements::Invoices::Base < BaseOperation
 
   private
   def validate_agreement_limit
-    if self.invoice.agreement_item.present? && 
+    if self.invoice.agreement_item.present? && self.invoice.agreement_item_type == 'GeneralInvoice'
       payment_agreement = invoice.agreement_item.payment_agreement
       if invoice.agreement_item.total_invoice_amount&.value.present? && invoice.agreement_item.billing_type.variable_periodic?
         available_limit = get_available_limit(payment_agreement) 
         
-        if available_limit < invoice&.balance_due&.value
+        if available_limit.present? && available_limit < invoice&.balance_due&.value
           add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
           return
         end
@@ -28,12 +28,14 @@ class Procurements::Invoices::Base < BaseOperation
   end
 
   def update_agreement_available_limit
-    if self.invoice.agreement_item.present?
+    if self.invoice.agreement_item.present? && self.invoice.agreement_item_type == 'GeneralInvoice'
       payment_agreement = self.invoice.agreement_item.payment_agreement
       invoiced_amount_sum = get_invoice_amount_sum(payment_agreement)
-      available_limit = self.invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
-      self.invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
-      return
+      if self.invoice.agreement_item.total_invoice_amount&.value.present? && invoiced_amount_sum.present?
+        available_limit = self.invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
+        self.invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
+        return
+      end
     end
   end
 

@@ -34,7 +34,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
           self.product_code,
           payment[:payment_mode],
           "",
-          Date.parse(payment[:date]).strftime("%d-%m-%Y"),
+          payment[:date]&.strftime("%d-%m-%Y"),
           "",
           self.debit_account_number,
           payment[:amount],

@@ -4,4 +4,9 @@ class Procure::CommentsController < BaseControllers::WebBase
     @result = Procurements::Comments::Create.(current_user, params)
     respond
   end
+
+  def index
+    @result = Procurements::Comments::Index.(current_user, params)
+    respond
+  end
 end

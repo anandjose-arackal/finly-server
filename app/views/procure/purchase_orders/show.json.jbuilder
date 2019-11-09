@@ -97,7 +97,7 @@ json.balance_due do
 end
 
 json.items do
-  json.array! @result.purchase_order.items do |item|
+  json.array! @result.purchase_order_items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
@@ -183,7 +183,7 @@ json.comments do
   end
 end
 
-json.po_item_categories current_company.categories.inward_invoice_items_only
+json.po_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.policies do
   json.array! @result.policies do |policy|

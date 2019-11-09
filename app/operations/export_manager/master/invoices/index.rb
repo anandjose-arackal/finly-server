@@ -329,15 +329,18 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def tds_nature(invoice_line_item)
+    return false unless invoice_line_item&.inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.name
   end
 
   def tds_amount(invoice_line_item)
-    invoice_line_item.parent.tds_amount&.value || 0
+    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
+    invoice_line_item.parent.tds_amount&.value || 0.0
   end
 
   def tds_percentage(invoice_line_item)
-    invoice_line_item.parent.tds_slab&.tds || 0
+    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
+    invoice_line_item.parent.tds_slab&.tds || 0.0
   end
 
   def invoice_discount(invoice_line_item)
@@ -361,7 +364,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def advance_amount(invoice_line_item)
-    value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
+    if invoice_line_item.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      value = invoice_line_item.parent&.advance_amount&.value || 0
+    else
+      value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
+    end
     precision_value(value)
   end
 

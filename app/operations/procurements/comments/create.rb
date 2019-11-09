@@ -34,7 +34,6 @@ class Procurements::Comments::Create < Procurements::Comments::Base
       self.comment.save
       add_message :success, 'Added Comment'
     end
-
   end
 
   def post_process
@@ -45,6 +44,8 @@ class Procurements::Comments::Create < Procurements::Comments::Base
     when 'Invoice'
       Event::EInvoice::Comment.(user, document: document, invoice: document)
     end
+
+
   end
 
   private

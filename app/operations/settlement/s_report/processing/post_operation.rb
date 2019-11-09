@@ -36,7 +36,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
 
     if self.pending_mappings.blank?
-      add_message :error, "No Money Request found which can be processed."
+      add_message :error, "No Report found which can be processed."
       return
     end
 
@@ -63,6 +63,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
     marked_as_closed = !!params&.dig(:marked_as_closed)
+    update_documents = !!params&.dig(:update_documents)
 
     if marked_as_closed
       report_status = ReportStatus.id_for(:closed)
@@ -75,10 +76,10 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       Report.transaction do
         ReportTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if marked_as_completed or marked_as_closed or mapping.payment.completed?
+            if marked_as_completed or marked_as_closed or mapping.payment&.completed? or update_documents
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+              #                marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
               #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id)
@@ -97,9 +98,22 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 event = 'settle'
               end
 
+              update_mapping = true
+
               mapping.reports.each do |report|
 
-                report.update(bank_reference_number: self.utr[report.id], source_account: self.source_account[report.id])
+                report.bank_reference_number = self.utr[report.id] if self.utr[report.id].present?
+                report.source_account = self.source_account[report.id] if self.source_account[report.id].present?
+                report.save if (self.utr[report.id].present? or self.source_account[report.id].present?)
+
+                # temp workaround for satin a*hles
+                # if we do not update the utr or source_account, we dont settle the report from update or process template file operation
+                # only when the op is called from the mark_as_paid op, we settle the reports
+
+                if update_documents and (report.bank_reference_number.blank? or report.source_account.blank?)
+                  update_mapping = false
+                  next
+                end
 
                 parameters = {
                   document: report,
@@ -132,7 +146,13 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 
 
               end
-            elsif mapping.payment.failed?
+
+              if update_mapping
+                mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              end
+
+            elsif mapping.payment&.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
             end
@@ -154,7 +174,11 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
                                          processed_amount: processed_amount)
-    elsif has_success and self.remaining_mappings.blank?
+    elsif has_success and self.remaining_mappings.blank? and update_documents
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                         marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
+                                         processed_amount: processed_amount)
+    elsif has_success and self.remaining_mappings.blank? and not update_documents
       self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
                                          processed_amount: processed_amount)
