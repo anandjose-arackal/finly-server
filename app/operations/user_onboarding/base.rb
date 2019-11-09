@@ -69,7 +69,7 @@ class UserOnboarding::Base < BaseOperation
     end
     # -> create records for searching
     # from the params sent, we create a format compatible to search against the previous result
-    new_roles = self.user_ids.product(self.urm_user_role_ids, purpose_id)
+    new_roles = self.user_ids.product(self.urm_user_role_ids, [purpose_id])
 
     # -> assignable roles
     # now we check for the new_roles to be assigned, comparing against the result from all_roles.
