@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
   sidekiq_options queue: :payments_creation
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :bbps_bills
+                :company_id, :execute, :payment_params, :bbps_bills, :company
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -16,7 +16,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
     self.payments_attributes = options[:payments_attributes]
-    self.bbps_bills = BbpsBill.where(id: self.payment_params.pluck(:bbps_bill_ids))
+    self.bbps_bills = BbpsBill.where(id: options[:bbps_bill_ids])
     self.options = options
     self.run
   end
@@ -34,6 +34,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
   def init
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
+    self.company = self.user.company
     self.payment_mode = self.bank_payment_request.payment_mode
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
@@ -49,7 +50,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
           initiating_user_id: user.id,
           initiating_account_type: initiating_account.class.name,
           initiating_account_id: initiating_account.id,
-          receiving_account_type: "BankAccount",
+          receiving_account_type: receiving_account.class.name,
           receiving_account_id: receiving_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: payment[:payment_purpose_id],
@@ -77,17 +78,14 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
   end
 
   def process
-    flag = true
     self.payment_params.each do |payment_param|
-      custom_fields = payment_param[:custom_fields]
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      payment = ::Payment.new(payment_param)
+      # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
         puts "Utility SUCCESSFUL", payment.id
       else
         puts "ERROR", payment.errors.full_messages
-        flag = false
       end
     end
 

@@ -36,6 +36,8 @@ class BbpsBill < ApplicationRecord
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true
   belongs_to :amount, optional: true
 
+  accepts_nested_attributes_for :amount
+
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
   delegate :amount_value, to: :amount
 

@@ -20,7 +20,7 @@ json.payments do
     json.account_id payment.receiving_account&.id
     json.beneficiary_id payment.receiving_account&.account_owner&.id
     json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
-    if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+    if payment.receiving_user.is_a?(User) || payment.receiving_user.is_a?(BbpsBillerSubscription) || payment.receiving_user.authorized
       json.beneficiary_type "authorized"
     else
       json.beneficiary_type "unauthorized"
@@ -175,7 +175,7 @@ json.unpaid_payments do
     json.account_id payment.receiving_account&.id
     json.beneficiary_id payment.receiving_account&.account_owner&.id
     json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
-    if payment.receiving_user&.is_a?(User) || payment.receiving_user&.authorized
+    if payment.receiving_user&.is_a?(User) || payment.receiving_user&.is_a?(BbpsBillerSubscription) || payment.receiving_user&.authorized
       json.beneficiary_type "authorized"
     else
       json.beneficiary_type "unauthorized"

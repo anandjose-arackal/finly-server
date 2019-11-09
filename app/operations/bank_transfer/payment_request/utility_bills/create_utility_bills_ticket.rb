@@ -6,6 +6,16 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
                 :payments
 
 
+  class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket::UtilityBillsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :bank_payment_request
+
+    def init
+      self.bank_payment_request = params[:bank_payment_request]
+    end
+  end
+
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
@@ -44,7 +54,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
     self.requested_amount = 0
     ids = params[:bbps_bill_id]
 
-    self.bbps_bills = self.company.bbps_bills.with_id(ids)
+    self.bbps_bills = current_company.bbps_bills.with_id(ids)
     self.requested_amount = self.bbps_bills.filter_status("payables").joins(:amount).sum(:value)
 
     self.scheduled_at = params[:scheduled_at]
@@ -64,7 +74,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
     self.bbps_bills.map { |bill| invalid_bills << bill unless bill.payable?}
 
     if invalid_bills.present?
-      add_message :error, "These invoices with ID, \"#{self.bbps_bills.map(&:sequence_id).compact.join(", ")}\", cannot be paid right now"
+      add_message :error, "These bills with ID, \"#{self.bbps_bills.map(&:sequence_id).compact.join(", ")}\", cannot be paid right now"
       return
     end
 
@@ -96,7 +106,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
         return
       end
 
-      self.bbps_bills.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
+      self.bbps_bills.update_all(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
       payment_params = initialize_payment_objects
       op = BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, bbps_bill_ids: self.bbps_bills.pluck(:id)})
     else
@@ -106,11 +116,6 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
 
   def post_process
     add_message :success, "Payment Ticket for utility bills created"
-
-    # Set status to unpaid if done via a procurement
-    # if inward_invoice.procurement_id.present?
-    #   inward_invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    # end
   end
 
   def success
