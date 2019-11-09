@@ -687,7 +687,7 @@ class Invoice < ApplicationRecord
         net_payable_amount: self.balance_due&.value,
         balance_due: self.balance_due&.value,
         taxable_amount: precision_value(self.gross_amount&.value),
-        editable: self.unpaid? || self.initiated?,
+        editable: self.unpaid? || self.initiated? || self.partially_paid?,
         tax_rate: return_tax_rate,
         tds_rate: precision_value(self.tds_rate),
         # discount_rate: precision_value(self.discount_rate),
