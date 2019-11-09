@@ -760,5 +760,18 @@ class Payment < ApplicationRecord
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
       end
     end
+
+    if PaymentStatus.all_except_failed.include? self.payment_status_id
+      case self.parent_type
+      when 'Invoice'
+        parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+        total_payments = parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+        invoice_amount = parent_details.balance_due&.value.to_f
+
+        if total_payments < invoice_amount
+          parent_details.update payable: true
+        end
+      end
+    end
   end
 end
