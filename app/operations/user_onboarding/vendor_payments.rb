@@ -64,7 +64,7 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
         policy = policies.find {|policy| policy if policy.id == role.first}
         user = users.find {|u| u if u.id == role.second}
         roles = UserRole::VALUES.invert[role.third]
-        pur = [{id: policy&.id, name:policy&.name}, {id: user&.id, email: user.email}, {id: role.last, name: roles.to_s}]
+        pur = [{id: policy&.id, name:policy&.name}, {id: user&.id, email: user&.email}, {id: role.last, name: roles.to_s}]
         fields.zip(pur).to_h 
       end
     end
