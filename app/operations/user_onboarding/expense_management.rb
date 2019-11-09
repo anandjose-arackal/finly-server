@@ -64,7 +64,7 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
     # 
     if self.unassignable_roles.present?
       fields = [:policy, :user, :user_role]
-      self.unassignable_roles = self.urm_unassignable_roles.to_a + self.pur_unassignable_roles.to_a
+      self.unassignable_roles = self.pur_unassignable_roles.to_a
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
 
       params[:unassignable_roles] = self.unassignable_roles.map do |role| 
