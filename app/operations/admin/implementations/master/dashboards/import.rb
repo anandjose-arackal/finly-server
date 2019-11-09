@@ -1,0 +1,54 @@
+class Admin::Implementations::Master::Departments::Import < Admin::Implementations::Processor::Import
+
+  bus Admin::Implementations::Master::BaseMaster
+  subscribe 'dashboards.import'
+
+  headers(
+      {
+          :id => "ID",
+          :name => "Name",
+          :description => "Description",
+          :priority => "Priority",
+          :app => "App",
+          :active => "Active",
+          :dashboard => "Dashboard ID",
+          :user_role => "User Role",
+          :policy => "Policy",
+          :user => "User",
+      }
+  )
+
+  def create_record(data)
+    config = data.except(:user, :policy, :user_role)
+    config[:policy_id] = company.policies.non_deleted.with_name(data[:policy]).first if data[:policy].present?
+    config[:user_id] = company.users.non_deleted.where('email = ? OR mobile_number = ?').first if data[:user].present?
+    config[:user_role_id] = UserRole.id_for(data[:user_role]) if data[:user_role].present?
+
+    if data[:id].present?
+      dashboard = company.insight_dashboards.find_by id: data[:id]
+      return result false, 'Record not found' unless dashboard
+
+      dashboard.assign_attributes config
+    else
+      dashboard = company.insight_dashboards.build config
+    end
+
+    return result false, dashboard.errors.full_messages unless dashboard.save
+
+    result true, 'Added successfully!'
+  end
+
+  def update_record(data)
+    create_record(data)
+  end
+
+  def destroy_records(data)
+    dashboard = self.company.insight_dashboards.find_by id: data[:id]
+    return result false, "Record not found" unless dashboard
+
+    unless dashboard.destroy
+      return result false, dashboard.errors.full_messages
+    end
+    result true, "Destroyed Successfully"
+  end
+end

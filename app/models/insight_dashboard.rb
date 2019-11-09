@@ -19,7 +19,7 @@
 #
 
 class InsightDashboard < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, SoftDeletable
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
