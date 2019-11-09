@@ -1,4 +1,4 @@
-class BillingAccountAdapter < AccountManager::BaseAdapter
+class AccountManager::BbpsBiller::BillingAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :billing_acocunt, :company
 

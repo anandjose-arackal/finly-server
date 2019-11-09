@@ -1,4 +1,4 @@
-class BbpsAccountsAdapter < AccountManager::BaseAdapter
+class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdapter
 
 
   # nothing to do here ¯\_(ツ)_/¯

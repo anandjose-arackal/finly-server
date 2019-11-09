@@ -56,6 +56,7 @@ class Company < ApplicationRecord
   has_one :yes_bank_company_account
   has_one :icici_bank_company_account
   has_one :kotak_bank_company_account
+  has_one :billing_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -95,6 +96,8 @@ class Company < ApplicationRecord
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
+
+  has_many :bbps_bills
 
   has_many :budgets
   has_many :procurements

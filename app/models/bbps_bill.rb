@@ -37,6 +37,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :amount, optional: true
 
   delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
+  delegate :amount_value, to: :amount
 
   default_scope {order('bbps_bills.created_at DESC')}
 
@@ -59,6 +60,10 @@ class BbpsBill < ApplicationRecord
     else
       # do nothing
     end
+  }
+
+  scope :with_id, -> (id) {
+    where id: id
   }
 
   scope :sort_for_index, -> {
@@ -142,5 +147,9 @@ class BbpsBill < ApplicationRecord
 
   def self.open_statuses
     self.status_ids(:open, :retracted, :rejected)
+  end
+
+  def payable?
+    BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end
 end
