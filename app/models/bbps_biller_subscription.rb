@@ -43,6 +43,7 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :subscription_pocs, class_name: 'BbpsSubscriptionPoc', foreign_key: :subscription_id
 
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
+  has_many :bbps_bills, class_name: 'BbpsBill'
 
   # accepts_nested_attributes_for :customer_fields
 
