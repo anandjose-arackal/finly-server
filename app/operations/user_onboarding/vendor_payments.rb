@@ -112,6 +112,9 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
   private
 
   def flow(preprocessor, check=false)
+    # we are using check since for all vp user, we got create entry in urm and make them initiator, otherwise they can;t login
+    # check tells us, to skip error if already made employee but going to give him some other role
+    # 
     self.assignable_roles, self.unassignable_roles = preprocessor
 
     if check and assignable_roles.blank?

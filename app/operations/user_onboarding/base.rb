@@ -60,6 +60,8 @@ class UserOnboarding::Base < BaseOperation
     # from the previous result, we only need to get and search for duplicate records based on combination of 3 columns
     all_roles = urm.pluck(:user_id, :user_role_id, :purpose_id)
     
+    # we got to do this shit. some genius decided to build two tables with totally different structure for same functionality and somehow it is a good idea to allow users to login to an app only if they have entry in this table, even though this table has nothing to do with vendor_payments. also sample this, for em this table is used. but travel manager needs to be setup in vendor_payment table. god hates you.
+    # 
     if RequestStore.store[:vp_onboarding]
       self.urm_user_role_ids << UserRole.id_for(:initiator)
       purpose_id = Purpose.id_for(:vendor_payments)
@@ -120,6 +122,8 @@ class UserOnboarding::Base < BaseOperation
 
   def setup_urm(assignable_roles)
     # setup data points for importing into table
+
+    # this table controls who can login where.
     if RequestStore.store[:vp_onboarding]
       purpose_id = Purpose.id_for(:vendor_payments)
     else

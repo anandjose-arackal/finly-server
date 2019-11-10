@@ -49,6 +49,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
         gc = current_company.group
         # TODO prevent sql injection DONE
         # this one tells if there are users in group companies
+        # if to check user also present in current gc company, we do the check later in common_users
         self.users = gc.companies.where.not(id: current_company.id).select('users.*').joins(:users).where('users.email in (?)', bulk_assign[:user_emails]) rescue User.none
       else
         # this tells if there are users already invited
@@ -98,7 +99,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     user_list = []
     company_id = user.company_id
     self.users.each do |user|
-      next if self.existing_emails.include? user.email
+      next if self.existing_emails.include? user.email # skip if email already exist in current gc company, even if present in other gc company
       user.default_company_id = company_id
       user_list << user.attributes.with_indifferent_access
     end
@@ -178,10 +179,10 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     users = user.company.users.with_email(self.common_emails + self.existing_emails)
     users.each do |u|
       if RequestStore.store[:vp_onboarding]
-      add_message :message, "VP ONBOARDING"
+        add_message :message, "VP ONBOARDING"
         u.user_panel_subscription.update(yes_bank_account_transfer: true) unless u.user_panel_subscription.yes_bank_account_transfer
       elsif RequestStore.store[:em_onboarding]
-      add_message :message, "EM ONBOARDING"
+        add_message :message, "EM ONBOARDING"
         u.user_panel_subscription.update(expense_management: true) unless u.user_panel_subscription.expense_management
       end
     end

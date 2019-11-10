@@ -15,7 +15,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 			self.user_roles = ::UserRole::VALUES_EM
 			self.policies = ::Policy::Index.(user, params).try(:policies)
 
-			unless user.company.travel_desk_enabled?
+			unless user.company.travel_desk_enabled? # checks to see if client paid for it
 				self.user_roles.delete(:travel_manager)
 			end
     end
@@ -30,7 +30,8 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 	end
 
 	def pre_process
-
+		# this should be based on what features company has paid for
+		# 
 		case RequestStore.store[:current_app]
     when 'vp', :vp
 			# self.document_list = ['purchase_request', 'purchase_order', 'bank_payment_request', 'payment_agreement', 'po_invoice', 'non_po_invoice', 'vendor', 'budget', 'item_master', 'inventory', 'admin']
