@@ -13,7 +13,7 @@ class Procurements::PurchaseOrders::Quotations::Index < Procurements::PurchaseOr
   def init
     purchase_order_id = params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
-    self.quotations = self.purchase_order.quotations
+    self.quotations = self.purchase_order&.quotations
   end
 
   def validate

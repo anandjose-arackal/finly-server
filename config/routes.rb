@@ -3792,6 +3792,7 @@ Rails.application.routes.draw do
     get 'vp/grns', to: 'vendor_payments#grns'
     get 'vp/vendors', to: 'vendor_payments#vendors'
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
+    get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
