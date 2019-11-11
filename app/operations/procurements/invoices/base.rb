@@ -19,7 +19,7 @@ class Procurements::Invoices::Base < BaseOperation
       if invoice.agreement_item.total_invoice_amount&.value.present? && invoice.agreement_item.billing_type.variable_periodic?
         available_limit = get_available_limit(payment_agreement) 
         
-        if available_limit.present? && available_limit < invoice&.balance_due&.value
+        if available_limit.present? && available_limit < invoice_value_calculation
           add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
           return
         end
@@ -42,11 +42,52 @@ class Procurements::Invoices::Base < BaseOperation
   # For invoices created from variable periodic agreement based payments
   # Its the sum for ABP actual invoices
   def get_invoice_amount_sum(payment_agreement)
-    payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
+    if self.invoice.agreement_item.include_tax_and_tds
+      payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
+    else
+      item_amount_excluding_tax = []
+      payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).each do |agreement_inv|
+          agreement_inv.invoice_items.each do |item|
+            if item.rate.present? && item.quantity.present?
+              amt = (invoice.rate*item.quantity) - item.discount
+              item_amount_excluding_tax << amt
+            end
+          end
+      end
+      item_amount_excluding_tax&.flatten&.compact&.sum
+    end
   end
 
   # Get limit for this invoice
   def get_available_limit(payment_agreement)
-    invoice.agreement_item.total_invoice_amount&.value - payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(id: self.invoice.id, status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
+    if invoice&.agreement_item&.include_tax_and_tds
+      invoice.agreement_item.total_invoice_amount&.value - payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(id: self.invoice.id, status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).collect{|i| i.balance_due.value}.sum
+    else
+      item_amount_excluding_tax = []
+      payment_agreement.agreement_invoices.where(agreement_item_id: self.invoice.agreement_item_id).where.not(id: self.invoice.id, status: [InwardInvoiceStatus.id_for(:open), InwardInvoiceStatus.id_for(:retracted), InwardInvoiceStatus.id_for(:rejected)]).each do |agreement_inv|
+        agreement_inv.invoice_items.each do |item|
+          if item.rate.present? && item.quantity.present?
+            amt = (invoice.rate*item.quantity) - item.discount
+            item_amount_excluding_tax << amt
+          end
+        end
+      end
+      invoice.agreement_item.total_invoice_amount&.value - item_amount_excluding_tax&.flatten&.compact&.sum
+    end
+  end
+
+  def invoice_value_calculation
+    if invoice&.agreement_item&.include_tax_and_tds
+      self.invoice&.balance_due&.value
+    else
+      item_amount_excluding_tax = []
+      self.invoice.invoice_items.each do |item|
+        if item.rate.present? && item.quantity.present?
+          amt = (invoice.rate*item.quantity) - item.discount
+          item_amount_excluding_tax << amt
+        end
+      end
+      item_amount_excluding_tax&.flatten&.compact&.sum
+    end
   end
 end
