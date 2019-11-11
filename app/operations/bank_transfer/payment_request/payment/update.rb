@@ -305,7 +305,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       total_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
       invoice_amount = invoice.balance_due&.value.to_f
 
-      if total_payments < invoice_amount
+      if total_payments + 0.99 < invoice_amount # add buffer for less than 1 rupee
         invoice.update payable: true
       else
         invoice.update payable: false
