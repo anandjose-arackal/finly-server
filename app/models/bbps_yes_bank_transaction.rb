@@ -1,0 +1,54 @@
+# == Schema Information
+#
+# Table name: bbps_yes_bank_transactions
+#
+#  id                   :bigint           not null, primary key
+#  message_code         :string(255)
+#  status               :string(255)
+#  error_code           :string(255)
+#  error_desc           :string(255)
+#  ref_no               :string(255)
+#  agent_institution_id :string(255)
+#  channel_id           :string(255)
+#  bbps_ref_id          :string(255)
+#  agent_id             :string(255)
+#  customer_name        :string(255)
+#  customer_mobile      :string(255)
+#  customer_email       :string(255)
+#  customer_aadhar_no   :string(255)
+#  customer_pan_id      :string(255)
+#  biller_id            :string(255)
+#  amount               :string(255)
+#  bill_date            :string(255)
+#  due_date             :string(255)
+#  bill_number          :string(255)
+#  bill_period          :string(255)
+#  convenience_fee      :string(255)
+#  convenience_fee_desc :string(255)
+#  late_payment_fee     :string(255)
+#  early_payment_fee    :string(255)
+#  additional_field     :string(255)
+#  bill_id              :integer
+#  company_id           :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  transfer_status_id   :integer
+#  amount_id            :integer
+#
+
+class BbpsYesBankTransaction < ApplicationRecord
+
+  has_one :payment, as: :reference_resource
+  belongs_to :transfer_status
+  belongs_to :amount
+  belongs_to :biller, class_name: "BbpsBillerSubscription"
+  belongs_tp :company
+
+  accepts_nested_attributes_for :amount
+
+  # TODO - add validations that are relevant to this model, skipping for now
+
+  delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
+
+end
+

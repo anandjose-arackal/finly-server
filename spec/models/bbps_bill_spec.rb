@@ -23,6 +23,7 @@
 #  approved_at          :datetime
 #  note                 :text(65535)
 #  company_id           :integer
+#  category_id          :integer
 #
 
 require 'rails_helper'

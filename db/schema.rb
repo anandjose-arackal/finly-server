@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_09_125228) do
+ActiveRecord::Schema.define(version: 2019_11_10_151837) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -850,6 +850,42 @@ ActiveRecord::Schema.define(version: 2019_11_09_125228) do
     t.datetime "updated_at", null: false
     t.index ["subscription_id"], name: "index_bbps_subscription_pocs_on_subscription_id"
     t.index ["user_id"], name: "index_bbps_subscription_pocs_on_user_id"
+  end
+
+  create_table "bbps_yes_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "message_code"
+    t.string "status"
+    t.string "error_code"
+    t.string "error_desc"
+    t.string "ref_no"
+    t.string "agent_institution_id"
+    t.string "channel_id"
+    t.string "bbps_ref_id"
+    t.string "agent_id"
+    t.string "customer_name"
+    t.string "customer_mobile"
+    t.string "customer_email"
+    t.string "customer_aadhar_no"
+    t.string "customer_pan_id"
+    t.string "biller_id"
+    t.string "amount"
+    t.string "bill_date"
+    t.string "due_date"
+    t.string "bill_number"
+    t.string "bill_period"
+    t.string "convenience_fee"
+    t.string "convenience_fee_desc"
+    t.string "late_payment_fee"
+    t.string "early_payment_fee"
+    t.string "additional_field"
+    t.integer "bill_id"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "transfer_status_id"
+    t.integer "amount_id"
+    t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
+    t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end
 
   create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
