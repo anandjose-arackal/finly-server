@@ -7,23 +7,20 @@ class Insights::Show < Transactions::API
   step :parse_filters
   step :generate_token
 
-  def parse_filters(options, params:,current_user:, **)
+  def parse_filters(options, params:, current_user:, **)
     filters = {
-        company_id: current_user.company_id
+        "company_id" => current_user.company_id
     }
-
-
 
     options['filters'] = filters
     true
   end
 
-
   def generate_token(options, params:, filters:, **)
     payload = {
-        :resource => {:dashboard => options['model']&.dashboard},
-        :params => filters,
-        :exp => Time.now.to_i + (60 * 2) # 2 minute expiration
+        "resource" => {"dashboard" => options['model']&.dashboard},
+        "params" => filters,
+        "exp" => Time.now.to_i + (60 * 2) # 2 minute expiration
     }
 
     token = JWT.encode payload, INSIGHTS_CONFIG[:secret]

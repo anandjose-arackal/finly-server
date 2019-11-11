@@ -1,1 +1,0 @@
-json.array! @op['model.index'], :id
