@@ -7,7 +7,9 @@ class InsightsController < BaseControllers::WebBase
   end
 
   def show
-    endpoint Insights::Show
+    endpoint Insights::Show do |m|
+      m.success {|result| render json: result['result']}
+    end
   end
 
 end
