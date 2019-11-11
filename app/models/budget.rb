@@ -263,26 +263,33 @@ class Budget < ApplicationRecord
   end
 
   def budget_criteria_as_json(options={})
-    {
-      id: id,
-      name: name,
-      associated_vendors: budget_group_criterium.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budget_group_criterium.budgetable_categories.as_json,
-      associated_cost_centers: budget_group_criterium.budgetable_cost_centers.as_json,
-      associated_locations: budget_group_criterium.budgetable_locations.as_json,
-      associated_departments: budget_group_criterium.budgetable_departments.as_json,
-      associated_users: budget_group_criterium.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      budget_consumption: budget_consumption,
-      criteria_id: budget_group_criterium.id,
-      user: {
-        id: user.id,
-        mobile_number: user.mobile_number,
-        email: user.email
+    budget_criteria_id= budget_group_criterium&.id
+    get_budget_criteria_as_json(budget_criteria_id)
+  end
 
-      },
-      sub_budgets: children.map(&:budget_criteria_as_json),
-      sub_budgets_count: children.size
+
+  def get_budget_criteria_as_json(budget_criteria_id=nil)
+    {
+        id: id,
+        name: name,
+        associated_vendors: budget_group_criterium&.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+        associated_categories: budget_group_criterium&.budgetable_categories&.as_json,
+        associated_cost_centers: budget_group_criterium&.budgetable_cost_centers&.as_json,
+        associated_locations: budget_group_criterium&.budgetable_locations&.as_json,
+        associated_departments: budget_group_criterium&.budgetable_departments&.as_json,
+        associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
+        budget_consumption: budget_consumption,
+        criteria_id: budget_criteria_id,
+        user: {
+            id: user.id,
+            mobile_number: user.mobile_number,
+            email: user.email
+
+        },
+        sub_budgets: children.map(&:get_budget_criteria_as_json),
+        sub_budgets_count: children.size
     }
+
   end
 
   def timeline_criteria_as_json(options={})
