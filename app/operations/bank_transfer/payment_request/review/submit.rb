@@ -66,7 +66,7 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
         next
       end
 
-      if payable_amount > remaining_amount
+      if payable_amount.round(2) > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice. Payment with id, #{self.payment_to_invoices[invoice.id]&.id}, cannot be processed."
       end
 
