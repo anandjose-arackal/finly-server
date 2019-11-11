@@ -255,6 +255,9 @@ class User < ApplicationRecord
   has_many :document_message_receipts
   has_many :document_messages
 
+  has_many :users_with_group_mapping
+  has_many :group_companies, through: :users_with_group_mapping, foreign_key: :company_id
+  has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -1191,7 +1194,7 @@ class User < ApplicationRecord
       default_company_id = users.pluck(:default_company_id).uniq.first
       # if the default_company_id is present then replace the user object returned with the one from the default company
       if default_company_id.present?
-        user = find_by(company_id: default_company_id, mobile_number: username) || find_by(company_id: default_company_id, email: username)
+        user = find_by(default_company_id: default_company_id, mobile_number: username) || find_by(default_company_id: default_company_id, email: username)
       end
     end
 
