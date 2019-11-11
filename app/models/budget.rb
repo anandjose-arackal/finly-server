@@ -286,7 +286,7 @@ class Budget < ApplicationRecord
             email: user.email
 
         },
-        sub_budgets: children.map(&:get_budget_criteria_as_json),
+        sub_budgets: children.map{ |cb| cb.get_budget_criteria_as_json(budget_criteria_id)},
         sub_budgets_count: children.size
     }
 
