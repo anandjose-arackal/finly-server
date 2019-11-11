@@ -19,7 +19,7 @@ class Insights::Resolver < Transactions::Resolver::Scope
     end
     app = RequestStoreUtil.current_app
 
-    scope = self.scope.where(app: app)
+    scope = self.scope.where(application: app)
 
     # All blank
     collection = scope.where(company_id: nil, user_id: nil, policy_id: nil, user_role_id: nil)
