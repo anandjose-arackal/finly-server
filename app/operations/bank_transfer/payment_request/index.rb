@@ -151,7 +151,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     has_scope :filter_status
     has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :filter_custom_drop_down_selection, type: :array
+    # has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_policy_id
     has_scope :filter_user_id
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
@@ -161,8 +161,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
-    has_scope :filter_custom_text_selection, type: :array
-    has_scope :filter_custom_drop_down_selection, type: :array
+    # has_scope :filter_custom_text_selection, type: :array
+    # has_scope :filter_custom_drop_down_selection, type: :array
 
 
     def init
@@ -172,8 +172,20 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
       # slightly dirty logic for the custom field text search #TODO - refactor later
       if params[:filter_custom_text_selection].present?
-        params[:filter_custom_text_selection].each do |key, value|
-          self.payment_requests = self.payment_requests.filter_custom_field_text(key, value)
+        params[:filter_custom_text_selection].each do |key, value_hash|
+          value_hash = value_hash.with_indifferent_access
+          key = value_hash[:id]
+          val = value_hash[:value]
+          self.payment_requests = self.payment_requests.filter_custom_field_text(key, val)
+        end
+      end
+
+      if params[:filter_custom_drop_down_selection].present?
+        params[:filter_custom_drop_down_selection].each do |key, value_hash|
+          value_hash = value_hash.with_indifferent_access
+          key = value_hash[:id]
+          val = value_hash[:value]
+          self.payment_requests = self.payment_requests.filter_custom_field_dropdown(key, val)
         end
       end
       ######################## dirty logic end ####################################

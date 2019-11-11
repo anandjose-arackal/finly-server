@@ -311,7 +311,7 @@ class PurchaseRequest < ApplicationRecord
         if (UserRole.id_for(:purchase_request_initiator) == role_id.to_i)
           statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
         elsif (UserRole.id_for(:purchase_request_reviewer) == role_id.to_i)
-          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory]
+          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory, :po_created]
         end
       end
     end
