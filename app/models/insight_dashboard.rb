@@ -36,7 +36,7 @@ class InsightDashboard < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        name: name,
+        name: name
     }
   end
 end
