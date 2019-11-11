@@ -44,7 +44,7 @@ class Budgets::ShowTrailItems < Budgets::Base
     def init
       self.budget = params[:budget]
       processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(self.budget)
-      self.spent_entities = processor_instance.spent_entities
+      self.spent_entities = processor_instance.consumed_entities
       per_page = params[:per_page] || 30
       page = params[:page] || 1
 
