@@ -262,7 +262,7 @@ class Budget < ApplicationRecord
 
       },
       criteria_id: budget_criteria_id,
-      sub_budgets: budget_group_criterium&.children&.map{ |cb| cb.get_budget_criteria_as_json(budget_criteria_id)},
+      sub_budgets: budget_group_criterium&.children&.map(&:budgets)&.map{ |cb| cb.get_budget_criteria_as_json(budget_criteria_id)},
       sub_budgets_count: budget_group_criterium&.children&.map(&:budgets)&.flatten&.count
     }
   end
