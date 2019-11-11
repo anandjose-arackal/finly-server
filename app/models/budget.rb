@@ -265,12 +265,12 @@ class Budget < ApplicationRecord
     {
       id: id,
       name: name,
-      associated_vendors: budget_group.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budget_group.budgetable_categories.as_json,
-      associated_cost_centers: budget_group.budgetable_cost_centers.as_json,
-      associated_locations: budget_group.budgetable_locations.as_json,
-      associated_departments: budget_group.budgetable_departments.as_json,
-      associated_users: budget_group.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_vendors: budget_group_criterium.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budget_group_criterium.budgetable_categories.as_json,
+      associated_cost_centers: budget_group_criterium.budgetable_cost_centers.as_json,
+      associated_locations: budget_group_criterium.budgetable_locations.as_json,
+      associated_departments: budget_group_criterium.budgetable_departments.as_json,
+      associated_users: budget_group_criterium.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
       budget_consumption: budget_consumption,
       user: {
         id: user.id,
