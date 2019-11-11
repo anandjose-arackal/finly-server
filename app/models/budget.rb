@@ -256,6 +256,7 @@ class Budget < ApplicationRecord
         email: user.email
 
       },
+      criteria_id: budget_group_criterium.id,
       sub_budgets: budget_group_criterium.children.map(&:budgets),
       sub_budgets_count: budget_group_criterium.children.map(&:budgets).flatten.count
     }
@@ -272,6 +273,7 @@ class Budget < ApplicationRecord
       associated_departments: budget_group_criterium.budgetable_departments.as_json,
       associated_users: budget_group_criterium.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
       budget_consumption: budget_consumption,
+      criteria_id: budget_group_criterium.id,
       user: {
         id: user.id,
         mobile_number: user.mobile_number,
