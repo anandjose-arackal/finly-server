@@ -9,8 +9,10 @@ class Insights::Show < Transactions::API
 
   def parse_filters(options, params:,current_user:, **)
     filters = {
-        # company_id: current_user.company_id
+        company_id: current_user.company_id
     }
+
+
 
     options['filters'] = filters
     true
