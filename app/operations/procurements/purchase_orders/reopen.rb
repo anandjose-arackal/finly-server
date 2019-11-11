@@ -48,5 +48,26 @@ class Procurements::PurchaseOrders::Reopen < Procurements::PurchaseOrders::Base
     # role_id = self.workflow_output[:role_id]
     # Event::EPurchaseOrder::Retract.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Reopened Purchase Order'
+    rollback_purchase_request_items
+    rollback_purchase_request_status
   end
+
+  def rollback_purchase_request_items
+    if self.purchase_order.purchase_request_items.present?
+      purchase_order.purchase_request_items.where(status_id: PurchaseRequestItemStatus.id_for(:po_closed)).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
+    end
+  end
+
+  def rollback_purchase_request_status
+    if purchase_order.purchase_request_items.present?
+      self.purchase_order.purchase_request_items.each do |purchase_request_item|
+        purchase_request = purchase_request_item.purchase_request
+        params[:document] = purchase_request
+        params[:violation_present] = false
+        update_purchase_request_status(purchase_request)
+      end
+    end
+  end
+
+
 end

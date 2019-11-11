@@ -69,7 +69,6 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
       invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).order(:start_date).first
       frequency_based_end_date = (invoice.start_date&.to_date + invoice.invoice_frequency.number.month - 1.month).end_of_month
       self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).where("start_date <= ?", frequency_based_end_date.to_date).each do |reference_invoice|
-        # binding.pry
         params[:vendor_id] = reference_invoice.vendor_id
         params[:first_reference_invoice] = reference_invoice
         params[:first_reference_invoice_type] = reference_invoice.class.name.underscore

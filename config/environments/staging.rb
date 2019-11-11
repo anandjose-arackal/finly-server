@@ -97,24 +97,24 @@ Rails.application.configure do
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
-  config.mailer_config = config_for(:mailer_config)
-  ################### SETTINGS FOR SENDGRID ##########################
-  # config.action_mailer.default_url_options = { host: 'staging.finly.io' }
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #     address:              'smtp.sendgrid.net',
-  #     port:                 587,
-  #     domain:               'staging.finly.io',
-  #     user_name:            'vivekagb',
-  #     password:             'idAr5APhk61X',
-  #     # ssl:                  true,
-  #     # tls:                  true,
-  #     authentication:       :plain,
-  #     enable_starttls_auto: true,
-  #     :openssl_verify_mode  => 'none'
-  # }
+  # config.mailer_config = config_for(:mailer_config)
+  ################## SETTINGS FOR SENDGRID ##########################
+  config.action_mailer.default_url_options = { host: 'staging.finly.io' }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+      address:              'smtp.sendgrid.net',
+      port:                 587,
+      domain:               'staging.finly.io',
+      user_name:            'vivekagb',
+      password:             'idAr5APhk61X',
+      # ssl:                  true,
+      # tls:                  true,
+      authentication:       :plain,
+      enable_starttls_auto: true,
+      :openssl_verify_mode  => 'none'
+  }
 
-  #####################################################################
+  ####################################################################
 
   # # temporary config for mailers
   # config.action_mailer.raise_delivery_errors = true
