@@ -31,7 +31,7 @@ class InsightDashboard < ApplicationRecord
 
   validates :name, presence: true
   validates :dashboard, presence: true
-  validates :app, presence: true
+  validates :application, presence: true
 
   def as_json(options = {})
     {
