@@ -6,7 +6,7 @@ class CreateInsightDashboards < ActiveRecord::Migration[5.2]
       t.references :user, foreign_key: true, index: true, type: :integer
       t.references :policy, foreign_key: true, index: true, type: :integer
       t.references :user_role, foreign_key: true, index: true, type: :integer
-      t.string :app, null: false, index: true
+      t.string :application, null: false, index: true
       t.integer :dashboard, index: true, null: false
       t.string :name, index: true
       t.text :description
