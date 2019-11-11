@@ -84,8 +84,8 @@ json.results do
       # json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
       # json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
-      json.paid_amount invoice.payment_amounts_total
-      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total(false))
+      json.paid_amount invoice.payment_amounts_total.round(2)
+      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total(false)).round(2)
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if invoice&.invoice_items.present?

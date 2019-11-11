@@ -361,6 +361,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def post_process
     # update_agreement_available_limit
+    recheck_payable_flag
     add_message :success, "Invoice updated"
   end
 
@@ -404,4 +405,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def get_invoice_amount_sum(payment_agreement)
     payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
   end
+
+  def recheck_payable_flag
+    case self.parent_type
+    when 'Invoice'
+      invoice = payment.parent
+      total_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+      invoice_amount = invoice.balance_due&.value.to_f
+
+      if total_payments < invoice_amount
+        invoice.update payable: true
+      else
+        invoice.update payable: false
+      end
+    end
+  end
+
 end
