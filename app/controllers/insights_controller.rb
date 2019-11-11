@@ -1,9 +1,7 @@
 class InsightsController < BaseControllers::WebBase
 
   def index
-    endpoint Insights::Index do |m|
-      m.success { |result| render json: result['model.index'].as_json }
-    end
+    @op = endpoint Insights::Index
   end
 
   def show
