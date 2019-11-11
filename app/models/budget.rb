@@ -237,59 +237,39 @@ class Budget < ApplicationRecord
   }
 
   def as_json(options={})
-    {
+    budget_criteria_id = budget_group_criterium&.id
+    get_budget_criteria_as_json(budget_criteria_id)
+  end
+
+  def get_budget_criteria_as_json(budget_criteria_id=nil)
+  {
       id: id,
       name: name,
       start_date: start_date&.strftime("%d-%b-%y"),
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_amount.as_json,
       # spent_amount: processor_instance.spent_amount,
-      associated_vendors: budget_group_criterium.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-      associated_categories: budget_group_criterium.budgetable_categories.as_json,
-      associated_cost_centers: budget_group_criterium.budgetable_cost_centers.as_json,
-      associated_locations: budget_group_criterium.budgetable_locations.as_json,
-      associated_departments: budget_group_criterium.budgetable_departments.as_json,
-      associated_users: budget_group_criterium.budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budget_group_criterium&.budgetable_categories.as_json,
+      associated_cost_centers: budget_group_criterium&.budgetable_cost_centers.as_json,
+      associated_locations: budget_group_criterium&.budgetable_locations.as_json,
+      associated_departments: budget_group_criterium&.budgetable_departments.as_json,
+      associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
       user: {
         id: user.id,
         mobile_number: user.mobile_number,
         email: user.email
 
       },
-      criteria_id: budget_group_criterium.id,
-      sub_budgets: budget_group_criterium.children.map(&:budgets),
-      sub_budgets_count: budget_group_criterium.children.map(&:budgets).flatten.count
+      criteria_id: budget_criteria_id,
+      sub_budgets: budget_group_criterium&.children&.map{ |cb| cb.get_budget_criteria_as_json(budget_criteria_id)},
+      sub_budgets_count: budget_group_criterium&.children&.map(&:budgets)&.flatten&.count
     }
   end
 
   def budget_criteria_as_json(options={})
     budget_criteria_id= budget_group_criterium&.id
     get_budget_criteria_as_json(budget_criteria_id)
-  end
-
-
-  def get_budget_criteria_as_json(budget_criteria_id=nil)
-    {
-        id: id,
-        name: name,
-        associated_vendors: budget_group_criterium&.budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
-        associated_categories: budget_group_criterium&.budgetable_categories&.as_json,
-        associated_cost_centers: budget_group_criterium&.budgetable_cost_centers&.as_json,
-        associated_locations: budget_group_criterium&.budgetable_locations&.as_json,
-        associated_departments: budget_group_criterium&.budgetable_departments&.as_json,
-        associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
-        budget_consumption: budget_consumption,
-        criteria_id: budget_criteria_id,
-        user: {
-            id: user.id,
-            mobile_number: user.mobile_number,
-            email: user.email
-
-        },
-        sub_budgets: children.map{ |cb| cb.get_budget_criteria_as_json(budget_criteria_id)},
-        sub_budgets_count: children.size
-    }
-
   end
 
   def timeline_criteria_as_json(options={})
