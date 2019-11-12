@@ -92,6 +92,7 @@
 #  vendor_poc_id                   :integer
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
+#  payable                         :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
