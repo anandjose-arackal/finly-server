@@ -6,6 +6,7 @@ class Insights::Show < Transactions::API
   step Policy::Pundit(Insights::Policy, :show?)
   step :parse_filters
   step :generate_token
+  step :set_filters
 
   def parse_filters(options, params:,current_user:, model:, **)
     filters = {}
@@ -28,6 +29,11 @@ class Insights::Show < Transactions::API
 
     token = JWT.encode payload, INSIGHTS_CONFIG[:secret]
     options['result'] = {url: INSIGHTS_CONFIG[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
+    true
+  end
+
+  def set_filters(options, model:, **)
+    options['result'][:filters] = model.filter_config
     true
   end
 

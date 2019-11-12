@@ -36,9 +36,17 @@ class InsightDashboard < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        name: name,
-        can_filter_from: !!can_filter_from,
-        can_filter_to: !!can_filter_to
+        name: name
     }
+  end
+
+  FILTERS = [:can_filter_from, :can_filter_to]
+
+  def filter_config
+    config = {}
+    FILTERS.each do |key|
+      config[key] = !!self.send(key)
+    end
+    config
   end
 end
