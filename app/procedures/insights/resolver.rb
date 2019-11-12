@@ -20,7 +20,7 @@ class Insights::Resolver < Transactions::Resolver::Scope
     app = RequestStoreUtil.current_app
 
     # scope = self.scope.where(application: app)
-    query = 'application = "#{app}" AND ('
+    query = "application = \"#{app}\" AND ("
 
     # All blank
     # collection = scope.where(company_id: nil, user_id: nil, policy_id: nil, user_role_id: nil)
