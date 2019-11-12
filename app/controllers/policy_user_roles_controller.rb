@@ -29,4 +29,14 @@ class PolicyUserRolesController < BaseControllers::WebBase
     @result = ActionsManager::Processor.(current_user, params)
     respond
   end
+
+  def bulk_assign
+    @result = PolicyUserRoles::BulkAssign.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'policy_user_roles/bulk_assign'
+    end
+  end
+
 end
