@@ -73,6 +73,8 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
   def post_process
     add_message :success, 'Successfully deleted Receipt Note'
+    params[:procurement_id] = self.procurement.id
+    params[:purchase_order_id] = self.procurement.try(:purchase_order).try(:id)
   end
 
   private
