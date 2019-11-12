@@ -42,7 +42,7 @@ class BbpsYesBankTransaction < ApplicationRecord
   belongs_to :transfer_status
   belongs_to :amount
   belongs_to :biller, class_name: "BbpsBillerSubscription"
-  belongs_tp :company
+  belongs_to :company
 
   accepts_nested_attributes_for :amount
 

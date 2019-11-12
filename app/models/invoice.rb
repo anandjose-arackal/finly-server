@@ -89,6 +89,9 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
+#  vendor_poc_id                   :integer
+#  vlpm_id                         :integer
+#  client_note                     :text(65535)
 #
 
 class Invoice < ApplicationRecord

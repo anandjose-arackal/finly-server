@@ -24,6 +24,12 @@
 #  note                 :text(65535)
 #  company_id           :integer
 #  category_id          :integer
+#  due_date             :date
+#  bill_date            :date
+#  bill_number          :string(255)
+#  paid_on_date         :date
+#  transaction_id       :string(255)
+#  bbps_id              :string(255)
 #
 
 class BbpsBill < ApplicationRecord
