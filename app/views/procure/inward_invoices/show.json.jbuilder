@@ -37,6 +37,8 @@ json.status do
   json.extract! invoice.invoice_status, :id, :name
 end
 
+json.invoice_payment_status invoice.invoice_payment_status
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true

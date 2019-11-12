@@ -3366,6 +3366,7 @@ Rails.application.routes.draw do
   get 'procurement_action_config', to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
   get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
+  post 'bulk_assign_policy', to: 'policy_user_roles#bulk_assign'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
@@ -3795,6 +3796,7 @@ Rails.application.routes.draw do
     get 'vp/grns', to: 'vendor_payments#grns'
     get 'vp/vendors', to: 'vendor_payments#vendors'
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
+    get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
@@ -3847,6 +3849,9 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+  post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
+  post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
+  get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms

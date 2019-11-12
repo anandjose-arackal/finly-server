@@ -135,7 +135,6 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
-  has_many :purchase_request_item
 
   has_many :quotations, dependent: :destroy
 
@@ -438,6 +437,13 @@ class PurchaseOrder < ApplicationRecord
     if user.present?
       pr_item_ids = user.company.purchase_requests.where('purchase_requests.order_number LIKE ?', "%#{pr_number}%" ).joins(:purchase_request_items).pluck('purchase_request_items.id')
         joins(:items).where('purchase_order_items.purchase_request_item_id IN (?)', pr_item_ids)
+    end
+  }
+
+  scope :filter_po_approver_id, -> (approver_id){
+    if approver_id.present?
+      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      where(id: ids)
     end
   }
 
@@ -1116,20 +1122,20 @@ class PurchaseOrder < ApplicationRecord
         end
       end
 
-      document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
+      # document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them
-      document_ids.uniq.each do |document_id|
-        purchase_request = user.company.purchase_requests.find_by_id document_id
-        params[:document] = purchase_request
-        params[:aasm_event] = 'po_creation'
-        if purchase_request.purchase_request_items.approved.blank?
-          op = WorkflowManager::Base.(user, params) if purchase_request.present?
-          unless op.success? || purchase_request.present?
-            add_message :error, op.messages[:error]
-            raise_unauthorized_exception
-          end
-        end unless document_ids.blank?
-      end
+      # document_ids.uniq.each do |document_id|
+      #   purchase_request = user.company.purchase_requests.find_by_id document_id
+      #   params[:document] = purchase_request
+      #   params[:aasm_event] = 'po_creation'
+      #   if purchase_request.purchase_request_items.approved.blank?
+      #     op = WorkflowManager::Base.(user, params) if purchase_request.present?
+      #     unless op.success? || purchase_request.present?
+      #       add_message :error, op.messages[:error]
+      #       raise_unauthorized_exception
+      #     end
+      #   end unless document_ids.blank?
+      # end
     end
   end
 
