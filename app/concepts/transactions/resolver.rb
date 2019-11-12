@@ -49,6 +49,7 @@ class Transactions::Resolver
 
     def include(collection, includes)
       collection.includes(*includes) if includes.present?
+      collection
     end
   end
 
