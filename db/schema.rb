@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_06_121901) do
+ActiveRecord::Schema.define(version: 2019_11_08_165614) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3707,8 +3707,8 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.integer "user_id"
     t.integer "policy_id"
     t.integer "user_role_id"
-    t.string "app"
-    t.string "dashboard", null: false
+    t.string "application"
+    t.integer "dashboard", null: false
     t.string "name"
     t.integer "admin_user_id"
     t.datetime "deleted_at"
@@ -3717,7 +3717,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_insight_dashboards_on_active"
     t.index ["admin_user_id"], name: "index_insight_dashboards_on_admin_user_id"
-    t.index ["app"], name: "index_insight_dashboards_on_app"
+    t.index ["application"], name: "index_insight_dashboards_on_application"
     t.index ["company_id"], name: "index_insight_dashboards_on_company_id"
     t.index ["created_at"], name: "index_insight_dashboards_on_created_at"
     t.index ["dashboard"], name: "index_insight_dashboards_on_dashboard"
@@ -3954,6 +3954,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.integer "vendor_poc_id"
     t.integer "vlpm_id"
     t.text "client_note"
+    t.boolean "payable", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -3981,6 +3982,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.index ["location_id"], name: "index_invoices_on_location_id"
     t.index ["net_amount_id"], name: "index_invoices_on_net_amount_id"
     t.index ["original_amount_id"], name: "index_invoices_on_original_amount_id"
+    t.index ["payable"], name: "index_invoices_on_payable"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
     t.index ["po_adjusted_advance"], name: "index_invoices_on_po_adjusted_advance"
     t.index ["po_number"], name: "index_invoices_on_po_number"
@@ -7597,6 +7599,15 @@ ActiveRecord::Schema.define(version: 2019_11_06_121901) do
     t.index ["otp_request_type_id"], name: "index_users_on_otp_request_type_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["user_delegate_id"], name: "index_users_on_user_delegate_id"
+  end
+
+  create_table "users_with_group_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.integer "group_id"
+    t.index ["company_id"], name: "index_users_with_group_mappings_on_company_id"
+    t.index ["group_id"], name: "index_users_with_group_mappings_on_group_id"
+    t.index ["user_id"], name: "index_users_with_group_mappings_on_user_id"
   end
 
   create_table "vehicle_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

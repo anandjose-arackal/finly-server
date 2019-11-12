@@ -8,20 +8,20 @@ class Insights::Show < Transactions::API
   step :generate_token
 
   def parse_filters(options, params:,current_user:, **)
-    filters = {
-        company_id: current_user.company_id
-    }
+    filters = {}
 
-
+    filters[:company_id] = current_user.company_id
+    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d')
+    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d')
 
     options['filters'] = filters
     true
   end
 
 
-  def generate_token(options, params:, filters:, **)
+  def generate_token(options, params:, filters:, model:, **)
     payload = {
-        :resource => {:dashboard => options['model']&.dashboard},
+        :resource => {:dashboard => model&.dashboard},
         :params => filters,
         :exp => Time.now.to_i + (60 * 10) # 2 minute expiration
     }
