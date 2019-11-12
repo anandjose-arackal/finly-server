@@ -36,7 +36,9 @@ class InsightDashboard < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        name: name
+        name: name,
+        can_filter_from: !!can_filter_from,
+        can_filter_to: !!can_filter_to
     }
   end
 end

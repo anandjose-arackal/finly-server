@@ -7,12 +7,12 @@ class Insights::Show < Transactions::API
   step :parse_filters
   step :generate_token
 
-  def parse_filters(options, params:,current_user:, **)
+  def parse_filters(options, params:,current_user:, model:, **)
     filters = {}
 
     filters[:company_id] = current_user.company_id
-    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d')
-    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d')
+    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_from
+    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_to
 
     options['filters'] = filters
     true
