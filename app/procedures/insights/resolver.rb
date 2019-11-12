@@ -24,24 +24,24 @@ class Insights::Resolver < Transactions::Resolver::Scope
 
     # All blank
     # collection = scope.where(company_id: nil, user_id: nil, policy_id: nil, user_role_id: nil)
-    query += "(company_id IS NULL AND user_id is NULL and policy_id is NULL and user_role_id is NULL)"
+    query += "(company_id IS NULL AND user_id IS NULL and policy_id IS NULL and user_role_id IS NULL)"
 
     # only with company
     # collection = collection.or(scope.where(company_id: company.id, user_id: nil, policy_id: nil, user_role_id: nil))
-    query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id is NULL and user_role_id is NULL)"
+    query += " OR (company_id = #{company.id} AND user_id IS NULL and policy_id IS NULL and user_role_id IS NULL)"
 
     # user
     # collection = collection.or(scope.where(company_id: company.id, user_id: @user.id, policy_id: nil, user_role_id: nil))
-    query += " OR (company_id = #{company.id} AND user_id = #{@user.id} and policy_id is NULL and user_role_id is NULL)"
+    query += " OR (company_id = #{company.id} AND user_id = #{@user.id} and policy_id IS NULL and user_role_id IS NULL)"
 
     # nil user + policy + nil role
-    query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id IN (#{policies.join(',')}) and user_role_id is NULL)"
+    query += " OR (company_id = #{company.id} AND user_id IS NULL and policy_id IN (#{policies.join(',')}) and user_role_id IS NULL)"
     # policies.each do |policy|
     #   collection = collection.or(scope.where(company_id: company.id, user_id: nil, policy_id: policy, user_role_id: nil))
     # end
 
     # nil user + nil policy + role
-    query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id is NULL and user_role_id IN (#{roles.join(',')}))"
+    query += " OR (company_id = #{company.id} AND user_id IS NULL and policy_id IS NULL and user_role_id IN (#{roles.join(',')}))"
     # roles.each do |role|
     #   collection = collection.or(scope.where(company_id: company.id, user_id: nil, policy_id: nil, user_role_id: role))
     # end
