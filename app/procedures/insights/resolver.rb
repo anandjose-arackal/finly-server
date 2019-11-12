@@ -49,8 +49,9 @@ class Insights::Resolver < Transactions::Resolver::Scope
     # nil user + policy + role
     policy_role_map.each do |policy_id, role_ids|
       # collection = collection.or(scope.where(company_id: company.id, user_id: nil, policy_id: policy_id, user_role_id: role_ids))
-      query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id = #{policy_id} and user_role_id IN (#{role_ids.join(',')})))"
+      query += " OR (company_id = #{company.id} AND user_id is NULL and policy_id = #{policy_id} and user_role_id IN (#{role_ids.join(',')}))"
     end
+    query += ")"
 
     self.scope.where(query)
   end
