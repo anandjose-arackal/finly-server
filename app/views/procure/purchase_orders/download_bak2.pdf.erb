@@ -357,7 +357,7 @@
       <div><%= @result.purchase_order&.procurement_term_text&.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless [137,156,166,179,173].include?(@company.id)%>
+      <% if (@company.configuration.show_po_approved_trail) %>
         <ul>
           <% approved_users = [] %>
           <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
