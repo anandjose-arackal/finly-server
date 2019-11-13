@@ -432,16 +432,13 @@ class Notification < ApplicationRecord
         if document.blank? || document&.procurement.blank?
           path = "new_payment_invoices"
         else
-          path = "new_payment_invoices/#{document.id}"
+          path= "procure_invoice/#{document.id}"
         end
         if document.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
-          {"procurement_id":"3954","procurement_type":"non_po"}
           suffix = "/params={\"procurement_id\":#{document.procurement.id}"
         elsif document.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
-          path= "procure_invoice/#{document.id}"
           suffix = "/params={\"procurement_id\":#{document.procurement.id},\"procurement_type\":\"non_po\""
         elsif document.invoice_type_id == InwardInvoiceType.id_for(:agreement_invoice)
-          path= "procure_invoice/#{document.id}"
           suffix = "/params={\"procurement_id\":#{document.procurement.id},\"procurement_type\":\"non_po\",\"invoice_type\":\"recurring_invoice\""
         end
       else
