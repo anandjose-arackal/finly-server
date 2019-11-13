@@ -10,6 +10,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements]},
+          :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
@@ -204,6 +205,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def pr_initiator
     return nil unless user.is_purchase_request_initiator?
     { name: 'Your PRs', id: 'requests', url: "purchase_requests/params={\"search_by_email\":\"#{user.email}\"}"}
+  end
+
+  def analytics
+    { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
   end
 
 end
