@@ -7,6 +7,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
       :item_master,
       :vendors,
       :payment_tickets,
+      :analytics,
       {create: [:create_payment_ticket]}
   ]
   )
@@ -52,6 +53,10 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   def create_payment_ticket
     return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
     {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket/params={}'}
+  end
+
+  def analytics
+    { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
   end
 
 end

@@ -65,5 +65,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Create', id: 'create', url: 'create'}
   end
 
+  def analytics
+    { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+  end
 
 end
