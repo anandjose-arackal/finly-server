@@ -341,7 +341,8 @@ class GeneralInvoice < ApplicationRecord
       escalation_percentage: self.escalation_percentage,
       total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
       available_invoice_amount: get_available_invoice_amount,
-      invoice_number: self.get_invoice_number
+      invoice_number: self.get_invoice_number,
+      include_tax_and_tds: !!self.include_tax_and_tds
     }
   end
 
