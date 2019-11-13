@@ -143,6 +143,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       options = list
       options.delete("id")
       options[:company_id] = user.company_id
+      options[:default_company_id] = user.company_id
       options = setup_user_panel_subscription(options)
 
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
