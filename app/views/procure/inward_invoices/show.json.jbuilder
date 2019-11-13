@@ -37,6 +37,8 @@ json.status do
   json.extract! invoice.invoice_status, :id, :name
 end
 
+json.invoice_payment_status invoice.invoice_payment_status
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true
@@ -246,7 +248,7 @@ end
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
-    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
+    json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end
 end
 
