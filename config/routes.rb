@@ -3799,6 +3799,13 @@ Rails.application.routes.draw do
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
+
+    get 'em/expenses', to: 'expense_management#expenses'
+    get 'em/reports', to: 'expense_management#reports'
+    get 'em/money_requests', to: 'expense_management#money_requests'
+    get 'em/trips', to: 'expense_management#trips'
+    get 'em/awaiting_action', to: 'expense_management#awaiting_action'
+    get 'em/configs', to: 'expense_management#configs'
   end
   ######## Dashbaord Ends ##############
 

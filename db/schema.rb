@@ -892,13 +892,6 @@ ActiveRecord::Schema.define(version: 2019_11_13_113105) do
     t.index ["vendor_id"], name: "index_bill_of_supplies_on_vendor_id"
   end
 
-  create_table "billing_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
-    t.integer "company_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "booking_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "attachment_file_name"
     t.string "attachment_content_type"
@@ -1600,6 +1593,13 @@ ActiveRecord::Schema.define(version: 2019_11_13_113105) do
   create_table "channel_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.string "abbreviation"
+  end
+
+  create_table "chatrooms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "topic"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "city_id_city_code_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4367,6 +4367,16 @@ ActiveRecord::Schema.define(version: 2019_11_13_113105) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "content"
+    t.integer "user_id"
+    t.bigint "chatroom_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chatroom_id"], name: "index_messages_on_chatroom_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
+  end
+
   create_table "money_request_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -4652,16 +4662,6 @@ ActiveRecord::Schema.define(version: 2019_11_13_113105) do
     t.boolean "has_mailer", null: false
     t.boolean "configurable_push_notification", null: false
     t.boolean "configurable_mailer", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "notify_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "company_id"
-    t.integer "document_id"
-    t.string "document_type"
-    t.boolean "enabled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -8217,6 +8217,7 @@ ActiveRecord::Schema.define(version: 2019_11_13_113105) do
   add_foreign_key "manager_summary_mail_configs", "users"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
+  add_foreign_key "messages", "chatrooms"
   add_foreign_key "money_request_comments", "expenses"
   add_foreign_key "money_request_comments", "money_requests"
   add_foreign_key "money_request_comments", "payments"

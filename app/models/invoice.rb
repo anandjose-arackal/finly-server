@@ -590,11 +590,14 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def payment_amounts_total
+  def payment_amounts_total(completed_only=true)
     if self.payments.present?
       # return self.payments.successful.joins(:amount).sum(:value)
-      # return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
-      return self.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
+      if completed_only
+        return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      else
+        return self.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
+      end
     else
       return 0
     end
@@ -635,7 +638,7 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif paid_amount >= balance_due
+    elsif paid_amount >= balance_due - 0.99
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
@@ -740,7 +743,7 @@ class Invoice < ApplicationRecord
         # paid_amount: self.payments.successful.joins(:amount).sum(:value),
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
-        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json,
         note: self.note,

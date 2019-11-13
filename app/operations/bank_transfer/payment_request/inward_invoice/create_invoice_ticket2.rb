@@ -125,7 +125,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       invoice_amount = invoice.balance_due&.value.to_f
       paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
       previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
-      total_payments = payable_amount.to_f + previous_payments
+      total_payments = (payable_amount.to_f + 0.99) + previous_payments
 
       # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
       remaining_amount = (invoice_amount - previous_payments).round(2)
@@ -147,7 +147,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return false
       end
 
-      if total_payments >= invoice_amount
+      if total_payments >= invoice_amount.round(2)
         invoice.update payable: false
       end
 
