@@ -33,7 +33,7 @@ class InsightDashboard < ApplicationRecord
   validates :dashboard, presence: true
   validates :application, presence: true
 
-  default_scope {order(priority: :desc)}
+  default_scope {order(priority: :desc).exclude_deleted}
 
   def as_json(options = {})
     {

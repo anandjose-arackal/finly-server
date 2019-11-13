@@ -54,7 +54,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   end
 
   def user_role_id(dashboard)
-    UserRole.name_for(dashboard.user_role)
+    UserRole.name_for(dashboard.user_role_id)
   end
 
   def policy_id(dashboard)
