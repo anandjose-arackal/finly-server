@@ -36,17 +36,14 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     # First find in GSTIN Master
     self.gstin_master = Gstin.with_gstin(gstin_params[:gstin]).first
 
-    if self.gstin_master.present?
-      self.valid_response = true
-    else
-      if make_api_call
-        unless self.valid_response
-          return
-        end
-      else
-        add_message :error, "Something went wrong. Please try again later"
+
+    if make_api_call
+      unless self.valid_response
         return
       end
+    else
+      add_message :error, "Something went wrong. Please try again later"
+      return
     end
 
     self.response_body = JSON.parse(self.gstin_master.api_response.to_json)
@@ -119,8 +116,6 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       api_provider: response_body[:data][:masters_india],
       address: addr_array.join(", ")
     }
-
-    data
   end
 
   def make_api_call
@@ -149,7 +144,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
         end
       else
         # Save information to gstin master
-        self.gstin_master = Gstin.create(gstin_master_params(response_body))
+        # self.gstin_master = Gstin.gstin_params[:gstin]
+        if self.gstin_master.present?
+          self.gstin_master.update(gstin_master_params(response_body))
+        else
+          self.gstin_master = Gstin.create(gstin_master_params(response_body))
+        end
         self.valid_response = true
         return true
       end

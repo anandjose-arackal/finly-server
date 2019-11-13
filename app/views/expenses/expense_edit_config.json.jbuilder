@@ -14,4 +14,5 @@ end
 
 json.config do
   json.em_tax_tracking @result.em_tax_tracking
+  json.gstin_verification_enabled @result.user.company.gstin_verification_enabled?
 end

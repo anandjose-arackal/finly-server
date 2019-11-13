@@ -31,6 +31,8 @@ class InvoiceCalculationUtils
       self.balance_due_amount = precision_value self.net_amount
     end
 
+    self.balance_due_amount = self.balance_due_amount - self.advance_amount
+
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
       if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
@@ -98,9 +100,9 @@ class InvoiceCalculationUtils
     # self.payment_amount = self.balance_due_amount
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.payment_amount
+        payment.amount.value = self.payment_amount.round(2)
       else
-        payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.payment_amount.round(2), currency_id: 1)
       end
     end
     params
@@ -143,6 +145,8 @@ class InvoiceCalculationUtils
     else
       self.balance_due_amount = precision_value self.net_amount
     end
+
+    self.balance_due_amount = self.balance_due_amount - self.advance_amount
 
     # assign the respective calculated amounts to the payment and invoice object
 
@@ -282,7 +286,7 @@ class InvoiceCalculationUtils
     end
     original_net_amount = self.net_amount
     self.advance_amount = self.invoice.advance_amount&.value.to_f
-    self.net_amount = original_net_amount - self.advance_amount
+    # self.net_amount = original_net_amount - self.advance_amount # net amount should be without previously paid advance
   end
 
   def calculate_freight_charges

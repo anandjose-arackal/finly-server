@@ -1,5 +1,9 @@
 class InvoiceDrop < Drop
 
+  def invoice_id
+    @object.invoice_id
+  end
+
   def company
     @object.company.to_liquid
   end
@@ -14,6 +18,10 @@ class InvoiceDrop < Drop
 
   def date
     @object.date
+  end
+
+  def approved_date
+    @object.approved_at
   end
 
   def cost_center

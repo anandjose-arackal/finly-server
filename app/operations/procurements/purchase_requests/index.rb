@@ -45,10 +45,14 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     has_scope :filter_by_location_id
     has_scope :filter_awaiting_approval
     has_scope :filter_policy_id
+    has_scope :filter_pr_creator_id
+    has_scope :filter_pr_approver_id
 
     has_scope :sort_order_number
     has_scope :sort_description
     has_scope :sort_date
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
     # has_scope :sort_amount
 
     def init

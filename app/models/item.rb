@@ -50,6 +50,7 @@ class Item < ApplicationRecord
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
@@ -133,7 +134,8 @@ class Item < ApplicationRecord
       item_expense_type_name: item_expense_type&.name,
       tds_applicable: tds_applicable,
       tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description
+      custom_description: get_custom_description,
+      custom_fields: self.custom_fields
 
     }
   end
@@ -164,7 +166,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value)}}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
   end
 
   def get_custom_description

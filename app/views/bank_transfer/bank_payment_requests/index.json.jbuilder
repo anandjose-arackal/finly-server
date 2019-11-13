@@ -49,7 +49,7 @@ json.results do
 
     json.payments_count payment_request.payment_order.payments.size
 
-    payments = payment_request.payment_order.payments[0..4]
+    payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
     json.payments do
       json.array!(payments) do |payment|
         json.id payment.id
@@ -59,6 +59,10 @@ json.results do
         json.amount payment.amount_value
         json.utr payment.reference_resource&.bank_reference_number
         json.payment_status payment.payment_status_name
+        if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)
+          json.business_name payment&.receiving_account&.account_owner&.business_name
+          json.trade_name payment&.receiving_account&.account_owner&.trade_name
+        end
       end
     end
   end

@@ -117,7 +117,13 @@ class UserRole < ApplicationRecord
       vendor_auditor: 32,
       payment_agreement_initiator: 33,
       payment_agreement_reviewer: 34,
-      payment_agreement_auditor: 35
+      payment_agreement_auditor: 35,
+      po_invoice_initiator: 36,
+      po_invoice_reviewer: 37,
+      po_invoice_auditor: 38, 
+      non_po_invoice_initiator: 39,
+      non_po_invoice_reviewer: 40,
+      non_po_invoice_auditor: 41
   }
 
 
@@ -126,21 +132,22 @@ class UserRole < ApplicationRecord
   VP_ROLES = {
     purchase_request_initiator: 10,
     purchase_request_reviewer: 11,
+    purchase_request_auditor: 29,
     purchase_order_initiator: 12,
     purchase_order_reviewer: 13,
-    goods_receiver: 14,
-    invoice_initiator: 15,
-    invoice_reviewer: 16,
+    purchase_order_auditor: 30,
     bank_payment_request_initiator: 17,
     bank_payment_request_reviewer: 18,
     bank_payment_request_creditor: 19,
+    bank_payment_request_auditor: 26,
     item_master_manager: 20,
     inventory_manager: 21,
+    goods_receiver: 14,
     vendor_creator: 22,
     vendor_reviewer: 23,
-    policy_admin: 24,
+    vendor_auditor: 32,
     vendor_manager: 25,
-    bank_payment_request_auditor: 26,
+    policy_admin: 24,
     budget_manager: 27,
     non_po_initiator: 28,
     po_invoice_initiator: 36,
@@ -148,7 +155,10 @@ class UserRole < ApplicationRecord
     po_invoice_auditor: 38, 
     non_po_invoice_initiator: 39,
     non_po_invoice_reviewer: 40,
-    non_po_invoice_auditor: 41
+    non_po_invoice_auditor: 41,
+    payment_agreement_initiator: 33,
+    payment_agreement_reviewer: 34,
+    payment_agreement_auditor: 35
   }
 
   def self.seed_data

@@ -53,7 +53,7 @@ class Vendors::Base < BaseOperation
     custom_fields[:user] = user
     custom_fields[:reset_fields] = reset_fields
     custom_fields[:save] = save
-    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
+    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:yes_bank_vendor), custom_fields)
   end
 
   # def validate_business_name(vendor_params)
@@ -154,6 +154,17 @@ class Vendors::Base < BaseOperation
     file_path = "tmp/#{file_name}"
     File.open(file_path, 'wb') { |f| f.write(Base64.decode64(file_data)) }
     file[:attached_file] = File.new(file_path, 'r')
+  end
+
+  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil)
+    if pan_number.present? && gstin.present?
+      pan_number_from_gstin = gstin[2..gstin.length-4]
+      unless pan_number == pan_number_from_gstin
+        add_message :error, "Pan number #{pan_number} does not match with gstin pan #{pan_number_from_gstin}"
+        return false
+      end
+    end
+    true
   end
 
 end

@@ -88,7 +88,7 @@ gem 'jquery-rails', '~> 4.3.3'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.8.0'
+gem 'jbuilder', '~> 2.9.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 # gem 'sdoc', group: :doc
 
@@ -185,6 +185,9 @@ gem 'ancestry', '~> 3.0.5'
 
 gem 'aasm', '~> 5.0.1'
 
+gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
+gem 'parallel', '~> 1.18'
+gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services

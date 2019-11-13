@@ -141,13 +141,16 @@ module Transitionable
       provider_name ||= get_default_provider
       dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
-
+      reject_to_details = reject_to_users
       dlrms.each do |dlrm|
         level_number = dlrm.level_number
 
         data = chain[level_number - 1] || {}
 
+        data[:level_id] = dlrm.level_id
         data[:level_number] = dlrm.level_number
+        data[:reject_to_level] = reject_to_details[data[:level_id]].present?
+        data[:reject_to_user] = reject_to_details[data[:level_id]] if data[:reject_to_level]
         data[:level_name] = dlrm.level.name
         data[:policy_id] = dlrm.policy_id
         data[:awaiting_action] = (self.controlling_level_id == dlrm.level_id)
@@ -193,6 +196,14 @@ module Transitionable
                 action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
             }
           end
+        end
+
+        if dlrm.rejected_by_id.present?
+          data[:rejected_by] = {
+            id: dlrm.rejected_by_id,
+            name: dlrm.rejected_by&.name,
+            email: dlrm.rejected_by&.email
+          }
         end
 
         chain[level_number - 1] = data
@@ -349,6 +360,12 @@ module Transitionable
 
     # In case reviewer wants to reject it to a particular user who had previously approved
     def reject_to_users
+      previous_dlrms = self.document_level_reviewer_mappings.where('level_id < ?', self.level&.id)
+      reject_to = {} # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
+      previous_dlrms.each do |dlrm|
+        reject_to[dlrm.level_id] = get_reviewers(dlrm&.level_id)&.first
+      end
+      reject_to
     end
 
     def can_return_control?
@@ -500,7 +517,7 @@ module Transitionable
         return []
       end
 
-      admin = user.admin?
+      admin = user.admin? || user.vendor_payment_admin?
 
       # Find all level ids where user is a reviewer & is NOT forwarded
       all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)

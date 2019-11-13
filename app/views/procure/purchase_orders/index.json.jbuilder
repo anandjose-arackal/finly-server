@@ -6,6 +6,7 @@ json.results do
     json.controlling_level_name po.controlling_level&.name
     # Vendor
     json.vendor_name po.vendor&.business_name
+    json.vendor_trade_name po.vendor&.trade_name
     json.vendor_id po.vendor&.id
 
     # Created by

@@ -39,10 +39,10 @@ Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
 # Crono.perform(FixSpuriousPayments).every 30.minutes
 
 # Always scope scheduled mailers to production env to avoid accidental email trigger via development/staging environment
-if Rails.env.production?
-  Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
-end
+# if Rails.env.production?
+#   Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
+# end
 # Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
-# Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 17, min: 00}
+Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}

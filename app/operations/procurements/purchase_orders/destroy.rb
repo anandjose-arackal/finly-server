@@ -67,13 +67,17 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
         # po.purchase_order_status_id = PurchaseOrderStatus.id_for(:sent_to_vendor)
         po.purchase_order_status_id = self.po_previous_status
         update_status(po)
-        po.save
+        if po.save
+          update_purchase_request_item
+        end
       else
         po = self.procurement.reload.purchase_order
         # po.purchase_order_status_id = PurchaseOrderStatus.id_for(:sent_to_vendor)
         po.purchase_order_status_id = self.po_previous_status
         update_status(po)
-        po.save
+        if po.save
+          update_purchase_request_item
+        end
       end
     end
   end
@@ -139,12 +143,26 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
           status = 'auto_approved'
         end
         purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(status) # Status can be approved/auto-approved
+        purchase_request_item.purchase_order_id = nil
         if purchase_request_item.save && purchase_request_item.status_id.present?
-          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_deleted))
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
         end
       end
     end
     true
+  end
+
+  def update_purchase_request_item
+    if self.purchase_order.present? && self.purchase_order.purchase_request_items.present?
+      po = self.procurement.po_revisions.present? ? self.procurement.po_revisions.last : self.procurement.purchase_order
+      self.purchase_order.purchase_request_items.each do |item|
+        if po.present?
+          item_status = po.approved? || po.auto_approved? ? 'po_approved' : 'po_created'
+          item.update(purchase_order_id: po.id, status_id: PurchaseRequestItemStatus.id_for(item_status.to_sym))
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
+        end
+      end
+    end
   end
 
 end

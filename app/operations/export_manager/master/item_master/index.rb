@@ -21,6 +21,7 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
            tax_rate: {spreadsheet: true},
            item_rate: {spreadsheet: true},
            supply_item_type: {spreadsheet: true},
+           unit_of_measurement: {spreadsheet: true},
            created_user: {spreadsheet: true},
            created_at: {spreadsheet: true}
          ]
@@ -66,6 +67,10 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
 
   def sku(item)
     item.sku
+  end
+
+  def unit_of_measurement(item)
+    item.unit_of_measurement
   end
 
   def expense_type(item)

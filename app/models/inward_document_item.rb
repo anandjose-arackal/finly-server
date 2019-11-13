@@ -19,9 +19,9 @@
 #  is_deleted               :boolean          default(FALSE), not null
 #  deleted_at               :datetime
 #  accepting_item_amount_id :integer
-#  billable_amount          :decimal(10, )
-#  order_amount             :decimal(10, )
-#  previously_billed_amount :decimal(10, )
+#  billable_amount          :decimal(20, 5)   default(0.0)
+#  order_amount             :decimal(20, 5)   default(0.0)
+#  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  product_type_id          :integer          default(1)
 #
 
@@ -35,7 +35,7 @@ class InwardDocumentItem < ApplicationRecord
 
 
   def per_unit_price
-    price= self.purchase_order_item&.total_amount&.value/self.purchase_order_item.quantity rescue nil
+    price= self.purchase_order_item&.taxable_amount&.value/self.purchase_order_item.quantity rescue nil
     price.round(2) if price.present?
   end
 end
