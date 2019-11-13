@@ -64,7 +64,7 @@ class Procurements::Show < Procurements::Base
           actions[:add_document] = true
         end
       elsif purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.all_items_accepted? || purchase_order.all_items_billed? || purchase_order.partial_items_accepted?) && (user_in_level? || document_owner? || user.is_po_invoice_initiator?)
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.all_items_accepted? || purchase_order.all_items_billed? || purchase_order.partial_items_accepted?) && (user_in_level? || document_owner? || user.is_po_invoice_initiator? || user.is_goods_receiver?)
           actions[:add_document] = true
         end
       end

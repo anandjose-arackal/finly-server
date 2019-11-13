@@ -95,7 +95,10 @@
 #  total_proforma_advance                :integer
 #  template_invoice_id                   :integer
 #  notice_period                         :integer
-#  square_feel                           :decimal(10, 5)
+#  square_feet                           :decimal(10, 5)
+#  prepaid                               :boolean
+#  fixed_periodic_template               :boolean
+#  escalation_percentage                 :float(24)
 #
 
 class RentalInvoice < ApplicationRecord
@@ -177,7 +180,7 @@ class RentalInvoice < ApplicationRecord
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
-  accepts_nested_attributes_for :invoice_frequency
+  # accepts_nested_attributes_for :invoice_frequency
 
 
 
@@ -192,10 +195,14 @@ class RentalInvoice < ApplicationRecord
   attr_accessor :invoice_custom_fields
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  # validates_inclusion_of :prepaid, in: [true, false]
 
   validate :additional_validations
 
   scope :template_invoices, -> { where(template_invoice_id: nil) }
+  scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
+  scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
+  scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
 
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
@@ -255,7 +262,7 @@ class RentalInvoice < ApplicationRecord
       balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
       notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id},
       bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       vendor_locations: fetch_vendor_locations.as_json,
@@ -274,7 +281,9 @@ class RentalInvoice < ApplicationRecord
       custom_fields: self.custom_fields,
       notice_period: self.notice_period,
       square_feet: self.square_feet,
-      already_exists: true
+      already_exists: true,
+      prepaid: self.prepaid,
+      escalation_percentage: self.escalation_percentage
 
     }
   end
@@ -293,7 +302,9 @@ class RentalInvoice < ApplicationRecord
       agreement_type: self.class.name.underscore,
       payment_agreement_id: self.payment_agreement_id,
       vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      start_date: self.start_date,
+      end_date: self.end_date
 
     }
   end

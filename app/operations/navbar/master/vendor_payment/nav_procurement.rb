@@ -13,12 +13,19 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
+  
   register_structure(
-      :cog,
+      :cog_menu,
       [
           :attachments, :users,
           :load_company_balance, :statements,
-          :organization_account,
+          :organization_account
+      ]
+  )
+
+  register_structure(
+      :cog_modules,
+      [
           :finly_expense_management, :finly_disburse, :finly_collect, :finly_insights
       ]
   )
@@ -122,12 +129,13 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_rate_contracts
-    return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
+    return nil unless user.company.procurement_enabled?
+    # return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
     {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
   end
 
   def manage_payment_agreements
-    return nil unless (user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor?) && user.company.agreement_based_payment_system_enabled?
+    return nil unless (user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
     {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
   end
 

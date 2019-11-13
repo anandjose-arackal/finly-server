@@ -106,6 +106,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              invoice_no: {spreadsheet: true},
              invoice_date: {spreadsheet: true},
              created_by: {spreadsheet: true},
+             created_at: {spreadsheet: true},
+             po_date: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
              delivery_location: {spreadsheet: true},
@@ -138,6 +140,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              tax_amount: {spreadsheet: true},
              tax_rate: {spreadsheet: true},
              tax_type: {spreadsheet: true},
+             invoice_discount: {spreadsheet: true},
+             line_item_discount: {spreadsheet: true},
              line_item_sgst: {spreadsheet: true},
              line_item_cgst: {spreadsheet: true},
              line_item_igst: {spreadsheet: true},
@@ -331,6 +335,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.tds_slab&.tds || 0
   end
 
+  def invoice_discount(invoice_line_item)
+    invoice_line_item.parent&.discount_amount.value || 0
+  end
+
+  def line_item_discount(invoice_line_item)
+    invoice_line_item.discount_amount.value || 0
+  end
+
   def line_item_sgst(invoice_line_item)
     invoice_line_item.sgst || 0
   end
@@ -344,7 +356,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def advance_amount(invoice_line_item)
-    value = invoice_line_item.parent&.advance_amount || 0
+    value = invoice_line_item.parent&.procurement&.purchase_order&.advance_amount&.value || 0
     precision_value(value)
   end
 
@@ -376,5 +388,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   def created_by(invoice_line_item)
     invoice_line_item.parent&.created_by&.name
   end
+
+  def created_at(invoice_line_item)
+    invoice_line_item.parent&.created_at&.strftime("%d-%m-%y")
+  end
+
+  def po_date(invoice_line_item)
+    invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
+  end 
 
 end

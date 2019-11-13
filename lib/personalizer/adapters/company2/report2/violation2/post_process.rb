@@ -18,7 +18,7 @@ class Personalizer::Adapters::Company2::Report2::Violation2::PostProcess < Perso
 
   def process
     self.report.expenses.each do |expense|
-      if expense.category.gst_applicable?
+      if expense.category.gst_applicable? && expense.manual_expense?
         errors = []
         if expense.tax_rate_id.blank?
           errors += ["tax rate"]
@@ -41,7 +41,9 @@ class Personalizer::Adapters::Company2::Report2::Violation2::PostProcess < Perso
         if expense.gstin_location&.state_id.blank?
           errors += ["Merchant state"]
         end
-        self.warning_messages[expense.id]["expense_blocking"] << {type: "GST", message: "The following expense fields: #{errors.to_sentence} cannot be blank"}
+        if errors.present?
+          self.warning_messages[expense.id]["expense_blocking"] << {type: "GST", message: "The following expense fields: #{errors.to_sentence} cannot be blank"}
+        end
       end
     end
   end
