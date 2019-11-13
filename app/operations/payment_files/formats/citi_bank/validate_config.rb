@@ -15,7 +15,7 @@ class PaymentFiles::Formats::CitiBank::ValidateConfig < BaseOperation
   end
 
   def validate
-    unless config.present? and options&.dig(:debit_account_number).present?
+    unless config.present?
       add_message :error, 'Payment File has not been configured correctly in the system'
       return
     end

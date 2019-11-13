@@ -5,7 +5,6 @@ class PaymentFiles::Formats::CitiBank::Process < PaymentFiles::Formats::BaseForm
   def init
     super
     self.payment_requests = params[:bank_payment_requests]
-    self.debit_account_number = self.options[:debit_account_number]
   end
 
   def validate
