@@ -1,4 +1,4 @@
-class BbpsBillsCheck < ApplicationJob
+class BbpsBillsFetch < ApplicationJob
 
   def perform
     status_ids = [BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)]
@@ -13,7 +13,7 @@ class BbpsBillsCheck < ApplicationJob
       params = {
           subscription_id: subscription.id,
           amount: (rand * 1000).round(2), #todo Add amount from Operation #1
-          due_date: Date.today #todo Add date from Operation #1
+          due_date: Date.today, #todo Add date from Operation #1
       }
 
       op = Docs::UtilityBills::Bills::Ops::Create.(params)

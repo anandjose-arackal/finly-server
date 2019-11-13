@@ -35,5 +35,6 @@ class AutocompleteController < BaseControllers::WebBase
 
   def bbps_billers
     @result = Autocomplete::BbpsBillers.(current_user, params)
+    respond
   end
 end

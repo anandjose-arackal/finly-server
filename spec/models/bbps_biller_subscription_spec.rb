@@ -25,6 +25,7 @@
 #  submitted_at         :datetime
 #  approved_at          :datetime
 #  company_id           :integer
+#  mobile_number        :string(255)
 #
 
 require 'rails_helper'

@@ -8,3 +8,11 @@ class AddDetailsToBbpsBill < ActiveRecord::Migration[5.2]
     add_column :bbps_bills, :bbps_id, :string
   end
 end
+
+
+required(:amount).filled
+required(:bill_date).filled
+required(:due_date).filled
+required(:bill_number).filled
+required(:bill_period).filled
+required(:biller_id).filled

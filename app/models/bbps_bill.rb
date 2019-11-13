@@ -30,6 +30,7 @@
 #  paid_on_date         :date
 #  transaction_id       :string(255)
 #  bbps_id              :string(255)
+#  bill_period          :string(255)
 #
 
 class BbpsBill < ApplicationRecord

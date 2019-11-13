@@ -4,6 +4,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :bbps_biller_id, presence: true
   property :name, presence: true
   property :sequence_id
+  property :mobile_number, presence: true
 
   property :department_id
   property :cost_center_id
@@ -123,9 +124,4 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
   end
-
-    # def document_reviewer_mappings!(collection:, fragment:, index:, options:, **)
-    #   debugger
-    #   document_reviewer_mappings.insert()
-    # end
 end
