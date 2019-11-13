@@ -130,7 +130,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
   	h = {}
   	h[:document_name] = 'expense_management'
   	ss = []
-  	self.user_roles.except(:admin, :purchaser, :receiver).each {|k, v| hh= {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh}
+  	self.user_roles.except(:admin, :employee, :purchaser, :receiver).each {|k, v| hh= {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh}
   	h[:document_roles] = ss
   	
   	self.grouped_roles << h
