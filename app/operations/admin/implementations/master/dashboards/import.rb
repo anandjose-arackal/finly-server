@@ -9,7 +9,7 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
           :name => "Name",
           :description => "Description",
           :priority => "Priority",
-          :app => "App",
+          :application => "App",
           :active => "Active",
           :dashboard => "Dashboard ID",
           :user_role => "User Role",

@@ -8,7 +8,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
       :name => "Name",
       :description => "Description",
       :priority => "Priority",
-      :app => "App",
+      :application => "App",
       :active => "Active",
       :dashboard => "Dashboard ID",
       :user_role_id => "User Role",
