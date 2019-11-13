@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Subscriptions::Ops::Update < Trailblazer::Operation
 
-  step Model( BbpsBillerSubscription, :find )
+  step Model(BbpsBillerSubscription, :find_by)
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
   # step :set_default_params
   step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Update)
@@ -15,5 +15,4 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Trailblazer::Operation
     # Set Initiator
     params[:subscription][:user_id] = current_user&.id
   end
-
 end

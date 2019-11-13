@@ -36,8 +36,18 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
+  def validate_customer_params
+    @op = Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def update
     @result = Docs::UtilityBills::Subscriptions::Ops::Update.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def index

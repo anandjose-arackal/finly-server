@@ -3859,6 +3859,7 @@ Rails.application.routes.draw do
     get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
     get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
     get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
     end
