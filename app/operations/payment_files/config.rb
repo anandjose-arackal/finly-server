@@ -19,7 +19,8 @@ class PaymentFiles::Config
         {name: 'Toppr', key: :toppr, operation: PaymentFiles::Formats::Toppr::Process, validator: PaymentFiles::Formats::Toppr::ValidateConfig},
         {name: 'Denave', key: :denave, operation: PaymentFiles::Formats::Denave::Process, validator: PaymentFiles::Formats::Denave::ValidateConfig},
         {name: 'Axis Bank', key: :axis_bank, operation: PaymentFiles::Formats::AxisBank::Process, validator: PaymentFiles::Formats::AxisBank::ValidateConfig},
-        {name: 'IDFC Bank', key: :idfc_bank, operation: PaymentFiles::Formats::IdfcBank::Process, validator: PaymentFiles::Formats::IdfcBank::ValidateConfig}
+        {name: 'IDFC Bank', key: :idfc_bank, operation: PaymentFiles::Formats::IdfcBank::Process, validator: PaymentFiles::Formats::IdfcBank::ValidateConfig},
+        {name: 'Citi Bank', key: :citi_bank, operation: PaymentFiles::Formats::CitiBank::Process, validator: PaymentFiles::Formats::CitiBank::ValidateConfig}
     ]
   end
 
