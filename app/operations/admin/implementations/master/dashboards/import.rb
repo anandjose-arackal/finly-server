@@ -20,9 +20,11 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
 
   def create_record(data)
     config = data.except(:user, :policy, :user_role)
-    config[:policy_id] = company.policies.non_deleted.with_name(data[:policy]).first if data[:policy].present?
-    config[:user_id] = company.users.non_deleted.where('email = ? OR mobile_number = ?').first if data[:user].present?
-    config[:user_role_id] = UserRole.id_for(data[:user_role]) if data[:user_role].present?
+    config[:policy_id] = company.policies.non_deleted.by_name(data[:policy]).first&.id if data[:policy].present?
+    config[:user_id] = company.users.where('email = ? OR mobile_number = ?', data[:user], data[:user]).first&.id if data[:user].present?
+    config[:user_role_id] = UserRole.id_for(data[:user_role]&.to_sym) if data[:user_role].present?
+    config[:active] = StringUtils.to_bool data[:active]
+    config[:priority] = data[:priority] || 1
 
     if data[:id].present?
       dashboard = company.insight_dashboards.find_by id: data[:id]

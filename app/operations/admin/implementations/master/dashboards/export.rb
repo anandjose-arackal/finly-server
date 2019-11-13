@@ -22,8 +22,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   end
 
   def input
-    InsightDashboard.all
-    # company.insight_dashboards
+    company.insight_dashboards
   end
 
   def id(dashboard)
@@ -42,8 +41,8 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
     dashboard.priority
   end
 
-  def app(dashboard)
-    dashboard.app
+  def application(dashboard)
+    dashboard.application
   end
 
   def active(dashboard)
@@ -55,7 +54,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   end
 
   def user_role_id(dashboard)
-    dashboard.user_role&.name
+    UserRole.name_for(dashboard.user_role)
   end
 
   def policy_id(dashboard)
