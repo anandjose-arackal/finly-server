@@ -15,7 +15,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def init
     self.file = params[:file]
-    self.payments_data = ImportUtil.load_spreadsheet(file, [:payment_id, :utr], {skip_empty_lines: true})
+    self.payments_data = ImportUtil.load_spreadsheet_quickly(file, [:payment_id, :utr], {skip_empty_lines: true})
     self.result_array = []
     self.headers = retrieve_headers
   end
@@ -82,6 +82,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                   beneficiary_bank_account_id: payment.receiving_account&.id,
                                                   amount_id: amount.id)
         # payment.update(reference_resource: bank_transaction)
+        payment.reference_resource = new_transactions.last
         self.update_payments << payment
       end
       # add a success message to the result array
@@ -111,7 +112,6 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def update_details
     exec_statement self.existing_transactions, true, [:bank_reference_number]
     exec_statement self.new_transactions
-
     payments_without_transactions = payment_details
     exec_statement payments_without_transactions, true, [:reference_resource_id, :reference_resource_type]
   end
@@ -120,15 +120,16 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     transactions =[]
     utrs = self.new_transactions.pluck :bank_reference_number
     newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
+    transactions = []
     utrs.each do |utr|
       transactions << newly_created_transactions.find { |transaction| transaction if transaction.bank_reference_number == utr }
     end
     return false if transactions.blank?
 
     payments = []
-
     transactions.each_with_index do |transaction, index|
-      payment = self.update_payments[index]
+      next if transaction.blank?
+      payment = self.update_payments.find {|payment| payment if payment.reference_resource.bank_reference_number == transaction.bank_reference_number}
       payment.reference_resource_type = 'YesBankTransaction'
       payment.reference_resource_id = transaction.id
       payments << payment
