@@ -1,14 +1,15 @@
-class Docs::UtilityBills::Subscriptions::Contracts::Update < Docs::UtilityBills::Subscriptions::Contracts::Base
+class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   property :id
   property :bbps_biller_id, presence: true
   property :name, presence: true
   property :sequence_id
+  property :mobile_number, presence: true
 
   property :department_id
   property :cost_center_id
   property :location_id
-  property :policy_id
+  property :policy_id, presence: true
 
   property :note
   property :user_id, presence: true
@@ -33,10 +34,10 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Docs::UtilityBills:
     property :value, presence: true
   end
 
-  collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
-    property :level_id, presence: true
-    property :reviewer_id
-  end
+  # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
+  #   property :level_id, presence: true
+  #   property :reviewer_id
+  # end
 
   # validates :expected_due_day inclusion: { in: (1..31).to_a,
   #                                             message: "%{value} is not a valid day" }
@@ -122,9 +123,5 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Docs::UtilityBills:
     user_id = params[:user_id]
     pur = PolicyUserRole.find_or_initialize_by(user_id: user_id, policy_id: self.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
     pur.save
-  end
-
-  def document_reviewer_mappings!
-
   end
 end

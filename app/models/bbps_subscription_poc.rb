@@ -15,6 +15,7 @@ class BbpsSubscriptionPoc < ApplicationRecord
 
   def as_json(options = {})
     {
+        id: id,
         user: user.json_for_trail
     }
   end

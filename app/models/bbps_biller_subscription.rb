@@ -46,6 +46,8 @@ class BbpsBillerSubscription < ApplicationRecord
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill'
 
+  after_update :cleanup # Destroy Biller Subscription fields for other billers if any
+
   # accepts_nested_attributes_for :customer_fields
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
@@ -102,6 +104,10 @@ class BbpsBillerSubscription < ApplicationRecord
   scope :filter_location_id, -> (id) {
     where(location_id: id)
   }
+
+  def cleanup
+    self.customer_fields.without_biller_id(bbps_biller_id).destroy_all
+  end
 
   def as_json(options={})
     {
@@ -162,4 +168,6 @@ class BbpsBillerSubscription < ApplicationRecord
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
   end
+
+
 end
