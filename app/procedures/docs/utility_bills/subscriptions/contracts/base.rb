@@ -28,11 +28,22 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   property :status_id, default: BbpsBillerSubscriptionStatus.id_for(:draft)
 
-  collection :customer_fields, populator: :customer_fields! do
-    property :subscription_id, presence: true
-    property :label, presence: true
-    property :value, presence: true
-  end
+  property :customer_param_key_1
+  property :customer_param_value_1
+  property :customer_param_key_2
+  property :customer_param_value_2
+  property :customer_param_key_3
+  property :customer_param_value_3
+  property :customer_param_key_4
+  property :customer_param_value_4
+  property :customer_param_key_5
+  property :customer_param_value_5
+
+  # collection :customer_fields, populator: :customer_fields! do
+  #   property :subscription_id, presence: true
+  #   property :label, presence: true
+  #   property :value, presence: true
+  # end
 
   # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
   #   property :level_id, presence: true
@@ -44,7 +55,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   validate :company_entities # Checks for departments
   # validate :related_entities # Checks for associated agreements, users provided inside pocs
-  validate :bbps_biller_params
+  validate :validate_customer_params
 
   # validate :company_specific_entities
 
@@ -63,6 +74,66 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   # def related_entities
   #
   # end
+
+
+  def validate_customer_params
+    valid = true
+    op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, "current_user" => current_user)
+
+    if op.success?
+      bbps_biller = op['model']
+      biller_customer_params = bbps_biller.biller_customer_params
+
+      (0..4).to_a.each do |j|
+        valid = validate_customer_field(biller_customer_params[j], self.send("customer_param_key_#{j + 1}"), self.send("customer_param_value_#{j + 1}"), j + 1)
+      end
+    end
+
+    return valid
+  end
+
+  def validate_customer_field(config, label, value, a)
+    valid = true
+    if config.present?
+      if label.present? && value.present?
+        case config['data_type']
+        when 'ALPHANUMERIC'
+          errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_alphanumeric(value)
+          valid = false
+        when 'NUMERIC'
+          errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_numeric(value)
+          valid = false
+        end
+
+        if config['min_length'].present?
+          errors.add("customer_param_key_#{a}", "#{label} should at least be of config['min_length'] characters") unless value&.to_s&.length >= config['min_length'].to_i
+          valid = false
+        end
+
+        if config['max_length'].present?
+          errors.add("customer_param_key_#{a}", "#{label} should not exceed config['min_length'] characters") unless value&.to_s&.length <= config['max_length'].to_i
+          valid = false
+        end
+
+        if config['regex'].present?
+          regex = Regexp.new config['regex']
+
+          errors.add("customer_param_key_#{a}", "Please provide #{label} in the correct format") unless value&.match(regex)
+          valid = false
+        end
+      else
+        errors.add("customer_param_key_#{a}", "Please provide all the fields")
+        valid = false
+      end
+    else
+      if label.present? || value.present?
+        errors.add("customer_param_key_#{a}", "Invalid details provided for #{label.present? ? label : value}")
+        valid = false
+      end
+    end
+
+    return valid
+  end
 
   def bbps_biller_params
     op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, "current_user" => current_user)
@@ -108,7 +179,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   end
 
   def check_numeric(string)
-    true
+    string.match(/^\d+$/)
   end
 
   def customer_fields!(collection:, fragment:, index:, options:, **)

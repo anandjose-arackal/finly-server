@@ -21,12 +21,16 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   step Contract::Validate(key: 'subscription')
 
   failure :check2
+  step :test
   step Contract::Persist()
 
   def check(options, **)
   end
 
   def check2(options, **)
+  end
+
+  def test(options, **)
   end
 
   def set_default_params(options, params:, current_user:, **)

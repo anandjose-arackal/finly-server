@@ -44,7 +44,7 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   end
 
   def update
-    @result = Docs::UtilityBills::Subscriptions::Ops::Update.(params, "current_user" => current_user)
+    @op = Docs::UtilityBills::Subscriptions::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
