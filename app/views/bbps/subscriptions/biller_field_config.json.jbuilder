@@ -5,6 +5,8 @@ json.result do
   json.fields do
     json.array! (0..4).to_a do |j|
       json.set! "customer_param_key_#{j + 1}", biller_customer_params[j]&.dig('param_name')
+      json.key "customer_param_key_#{j + 1}"
+      json.index j + 1
       if biller_customer_params[j].present?
         json.display true
         json.merge! biller_customer_params[j]
