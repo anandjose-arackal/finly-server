@@ -2,12 +2,8 @@ class Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams < Trailblaz
 
 
   step :init
+  # step :bill_validate
   # step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
-  # # step :set_default_params
-  # step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Update)
-  # step Contract::Validate(key: 'subscription')
-  # failure :check
-  # step Contract::Persist()
 
   def init(options)
     options['result'] = {}
@@ -21,5 +17,17 @@ class Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams < Trailblaz
       }
     end
 
+  end
+
+
+  def bill_validate(options, params:, current_user:, **)
+    op = Bbps::BillValidation.(params, "current_user" => current_user)
+    options['result'] = {
+        'success' => op.success?,
+    }
+
+    # unless op.success?
+    #
+    # end
   end
 end

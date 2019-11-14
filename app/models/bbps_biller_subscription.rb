@@ -58,32 +58,7 @@ class BbpsBillerSubscription < ApplicationRecord
 
   after_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
-  # accepts_nested_attributes_for :customer_fields
-
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :deactivated?, :reactivated?, to: :status
-
-  # resolver BBPSubscriptionResolver
-  # state_machine WorkManager
-  #
-  # BbpsBillerSubscription.resolve(@user, {role_id: :manager}, include: {puchase_order: [:amount]})
-
-  # validates :bbps_biller_id, presence: true
-  # validates :department_id, presence: true
-  # validates :cost_center_id, presence: true
-  # validates :location_id, presence: true
-  # validates :policy_id, presence: true
-  # # validates :created_by_user_id, presence: true
-  # validates :name, presence: true
-  
-  # acts_as_sequenced column: :subscription_id, purpose: :bbps_biller_subscription, editable: true, prefix: 'UTLTY/', min_length: 4
-
-  # form Procurements::Bbps::Subscription::Form
-  # policy Documents::Bbps::Subscription::Policy
-  # state_machine Documents::Bbps::Subscription::StateMachine
-  # resolver Documents::Bbps::Subscription::Policy::Scope
-  # event_channel 'bbps.biller.subscription'
-  # record_events 'submit', 'approve', 'show'
-  # collection_events 'index'
 
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
@@ -137,16 +112,6 @@ class BbpsBillerSubscription < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         biller_category_name: biller_category_name,
-        customer_param_key_1: customer_param_key_1,
-        customer_param_value_1: customer_param_value_1,
-        customer_param_key_2: customer_param_key_2,
-        customer_param_value_2: customer_param_value_2,
-        customer_param_key_3: customer_param_key_3,
-        customer_param_value_3: customer_param_value_3,
-        customer_param_key_4: customer_param_key_4,
-        customer_param_value_4: customer_param_value_4,
-        customer_param_key_5: customer_param_key_5,
-        customer_param_value_5: customer_param_value_5,
         customer_fields: customer_fields.as_json,
         subscription_pocs: subscription_pocs.as_json
     }
