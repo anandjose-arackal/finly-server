@@ -203,6 +203,8 @@ class NotifierType < ApplicationRecord
              {key: :purchase_request_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :purchase_request_take_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true}
             ]
 

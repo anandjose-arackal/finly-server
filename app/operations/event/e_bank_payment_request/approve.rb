@@ -1,6 +1,6 @@
 class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
 
-  attr_accessor :approving_user, :approved, :auto_approve
+  attr_accessor :approving_user, :approved, :auto_approve, :invoices_initiators
 
   def init
     super
@@ -30,7 +30,13 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     # else
     #   [self.bank_payment_request.controlling_user]
     # end
-    self.bank_payment_request.affected_users(:approve)
+    users = self.bank_payment_request.affected_users(:approve)
+    if self.bank_payment_request.invoices.present?
+      ids =  bank_payment_request.invoices.pluck(:created_by_user_id)
+      self. invoices_initiators = user.company.users.where(id: ids)
+      user += invoices_initiators
+    end
+    users
   end
 
   def notification_affected_users
@@ -96,9 +102,12 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
         end
         if bank_payment_request.credit_pending?
           message = "#{message} and is awaiting credit!"
+          return
         end
-      else
+      elsif self.bank_payment_request.affected_users(:approve)
         message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently waiting for your approval"
+      elsif invoices_initiators.include?(user)
+        message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently waiting for approval"
       end
     end
     message
