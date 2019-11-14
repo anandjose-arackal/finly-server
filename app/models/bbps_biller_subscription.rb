@@ -124,6 +124,7 @@ class BbpsBillerSubscription < ApplicationRecord
         id: id,
         biller: biller.as_json({index: true}),
         name: name,
+        mobile_number: mobile_number,
         sequence_id: sequence_id,
         department: department.as_json,
         cost_center: cost_center.as_json,
