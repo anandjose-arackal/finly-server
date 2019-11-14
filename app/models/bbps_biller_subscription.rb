@@ -2,30 +2,40 @@
 #
 # Table name: bbps_biller_subscriptions
 #
-#  id                   :bigint           not null, primary key
-#  bbps_biller_id       :bigint           not null
-#  name                 :string(255)      not null
-#  sequence_id          :string(255)      not null
-#  department_id        :integer
-#  cost_center_id       :integer
-#  location_id          :integer
-#  policy_id            :integer
-#  deleted_at           :datetime
-#  active               :boolean          default(TRUE)
-#  note                 :text(65535)
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  status_id            :integer          not null
-#  user_id              :integer
-#  agreement_id         :integer
-#  expected_due_day     :string(255)
-#  controlling_level_id :integer
-#  reminder_day         :string(255)
-#  biller_category_name :string(255)
-#  submitted_at         :datetime
-#  approved_at          :datetime
-#  company_id           :integer
-#  mobile_number        :string(255)
+#  id                     :bigint           not null, primary key
+#  bbps_biller_id         :bigint           not null
+#  name                   :string(255)      not null
+#  sequence_id            :string(255)      not null
+#  department_id          :integer
+#  cost_center_id         :integer
+#  location_id            :integer
+#  policy_id              :integer
+#  deleted_at             :datetime
+#  active                 :boolean          default(TRUE)
+#  note                   :text(65535)
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  status_id              :integer          not null
+#  user_id                :integer
+#  agreement_id           :integer
+#  expected_due_day       :string(255)
+#  controlling_level_id   :integer
+#  reminder_day           :string(255)
+#  biller_category_name   :string(255)
+#  submitted_at           :datetime
+#  approved_at            :datetime
+#  company_id             :integer
+#  mobile_number          :string(255)
+#  customer_param_key_1   :string(255)
+#  customer_param_value_1 :string(255)
+#  customer_param_key_2   :string(255)
+#  customer_param_value_2 :string(255)
+#  customer_param_key_3   :string(255)
+#  customer_param_value_3 :string(255)
+#  customer_param_key_4   :string(255)
+#  customer_param_value_4 :string(255)
+#  customer_param_key_5   :string(255)
+#  customer_param_value_5 :string(255)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -126,6 +136,16 @@ class BbpsBillerSubscription < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         biller_category_name: biller_category_name,
+        # customer_param_key_1: customer_param_key_1,
+        # customer_param_value_1: customer_param_value_1,
+        # customer_param_key_2: customer_param_key_2,
+        # customer_param_value_2: customer_param_value_2,
+        # customer_param_key_3: customer_param_key_3,
+        # customer_param_value_3: customer_param_value_3,
+        # customer_param_key_4: customer_param_key_4,
+        # customer_param_value_4: customer_param_value_4,
+        # customer_param_key_5: customer_param_key_5,
+        # customer_param_value_5: customer_param_value_5,
         customer_fields: customer_fields.as_json,
         subscription_pocs: subscription_pocs.as_json
     }

@@ -1,17 +1,17 @@
 class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
-  schema do
-    params do
-      # Todo filled from user
-      required(:subscription) do
-        required(:subscription_pocs) do
-          hash do
-            required(:user_id).filled
-          end
-        end
-      end
-    end
-  end
+  # schema do
+  #   params do
+  #     # Todo filled from user
+  #     required(:subscription) do
+  #       required(:subscription_pocs) do
+  #         hash do
+  #           required(:user_id).filled
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
 
   step :set_default_params
   step Model(BbpsBillerSubscription, :find_by)

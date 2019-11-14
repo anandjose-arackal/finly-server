@@ -8,6 +8,7 @@
 #  subscription_id :integer
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  biller_id       :integer
 #
 
 class BbpsSubscriptionField < ApplicationRecord

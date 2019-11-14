@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_13_130939) do
+ActiveRecord::Schema.define(version: 2019_11_14_064056) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -740,6 +740,16 @@ ActiveRecord::Schema.define(version: 2019_11_13_130939) do
     t.datetime "approved_at"
     t.integer "company_id"
     t.string "mobile_number"
+    t.string "customer_param_key_1"
+    t.string "customer_param_value_1"
+    t.string "customer_param_key_2"
+    t.string "customer_param_value_2"
+    t.string "customer_param_key_3"
+    t.string "customer_param_value_3"
+    t.string "customer_param_key_4"
+    t.string "customer_param_value_4"
+    t.string "customer_param_key_5"
+    t.string "customer_param_value_5"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
