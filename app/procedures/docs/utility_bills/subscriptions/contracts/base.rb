@@ -19,9 +19,14 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :expected_due_day
 
   collection :subscription_pocs, populator: :subscription_pocs! do
-    property :user_id
+    property :user_id, presence: true
     property :subscription_id
   end
+
+  # collection :subscription_pocs, populate_if_empty: BbpsSubscriptionPoc do
+  #   property :user_id, presence: true
+  #   property :subscription_id
+  # end
 
   # Virtual Properties
   property :current_user, virtual: true
@@ -88,7 +93,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
         valid = validate_customer_field(biller_customer_params[j], self.send("customer_param_key_#{j + 1}"), self.send("customer_param_value_#{j + 1}"), j + 1)
       end
     end
-
     return valid
   end
 
@@ -192,7 +196,19 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   end
 
   def subscription_pocs!(collection:, fragment:, index:, options:, **)
-    subscription_pocs.insert(index, BbpsSubscriptionPoc.new) if validate_or_assign_role(fragment)
+    item = subscription_pocs.find {|subscription_poc| subscription_poc.id.to_s == fragment["id"].to_s}
+    # item = (BbpsSubscriptionPoc.find_by(id: fragment["id"]) || BbpsSubscriptionPoc.new) if validate_or_assign_role(fragment)
+
+    validate_or_assign_role(fragment)
+
+    if fragment["_destroy"]
+      subscription_pocs.delete(item)
+      return skip!
+    end
+
+    debugger
+
+    item ? subscription_pocs.insert(index, item.model) : subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
   end
 
   def validate_or_assign_role(params)

@@ -20,9 +20,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Base)
   step Contract::Validate(key: 'subscription')
 
+  step Contract::Persist()
   failure :check2
   step :test
-  step Contract::Persist()
 
   def check(options, **)
   end
@@ -31,6 +31,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   end
 
   def test(options, **)
+    true
   end
 
   def set_default_params(options, params:, current_user:, **)
