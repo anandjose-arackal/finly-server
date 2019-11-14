@@ -96,22 +96,27 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     valid = true
     if config.present?
       if label.present? && value.present?
+        if config['param_name'] != label
+          errors.add("customer_param_key_#{a}", "Expected Label #{config['param_name']}, got #{label}")
+          valid = false
+          return valid
+        end
         case config['data_type']
         when 'ALPHANUMERIC'
           errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_alphanumeric(value)
           valid = false
         when 'NUMERIC'
-          errors.add("customer_param_key_#{a}", 'Invalid Data Provided') unless check_numeric(value)
+          errors.add("customer_param_key_#{a}", "Please provide only numbers for #{label}") unless check_numeric(value)
           valid = false
         end
 
         if config['min_length'].present?
-          errors.add("customer_param_key_#{a}", "#{label} should at least be of config['min_length'] characters") unless value&.to_s&.length >= config['min_length'].to_i
+          errors.add("customer_param_key_#{a}", "#{label} should at least be of #{config['min_length']} characters") unless value&.to_s&.length >= config['min_length'].to_i
           valid = false
         end
 
         if config['max_length'].present?
-          errors.add("customer_param_key_#{a}", "#{label} should not exceed config['min_length'] characters") unless value&.to_s&.length <= config['max_length'].to_i
+          errors.add("customer_param_key_#{a}", "#{label} should not exceed #{config['max_length']} characters") unless value&.to_s&.length <= config['max_length'].to_i
           valid = false
         end
 
