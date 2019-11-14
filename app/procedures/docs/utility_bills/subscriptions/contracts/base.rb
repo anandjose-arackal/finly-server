@@ -206,8 +206,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
       return skip!
     end
 
-    debugger
-
     item ? subscription_pocs.insert(index, item.model) : subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
   end
 
