@@ -30,7 +30,6 @@ class Company::Departments::Index < Company::Departments::Base
   end
 
   def process
-    # debugger
     if user.company_admin? || user.vp_admin_or_auditor?
       self.departments = user.company.departments
     else

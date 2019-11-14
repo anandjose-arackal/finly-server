@@ -24,11 +24,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   step Contract::Persist()
 
   def check(options, **)
-    debugger
   end
 
   def check2(options, **)
-    debugger
   end
 
   def set_default_params(options, params:, current_user:, **)
