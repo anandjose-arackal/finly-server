@@ -412,7 +412,7 @@ class Notification < ApplicationRecord
           suffix ="/params={"
         else
           path = "procure_purchase_order/#{document.id}"
-          suffix = "/params={\"procurement_id\":#{document.procurement_id}}"
+          suffix = "/params={\"procurement_id\":#{document.procurement_id}"
         end
       when 'Invoice'
         document = Invoice.unscoped.find_by(id: self.path_object_id)
