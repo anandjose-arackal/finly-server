@@ -43,7 +43,7 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
             receiving_user_email: payment.receiving_user.email,
             receiving_user_mobile_number: payment.receiving_user.mobile_number,
             amount: payment.amount_value,
-            date: Date.today.strftime("%d-%^b-%Y"),
+            date: Date.today,
             note: generate_payment_note(payment),
             payment_mode: payment.payment_mode
         }

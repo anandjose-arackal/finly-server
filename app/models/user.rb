@@ -256,6 +256,9 @@ class User < ApplicationRecord
   has_many :document_message_receipts
   has_many :document_messages
 
+  has_many :users_with_group_mapping
+  has_many :group_companies, through: :users_with_group_mapping, foreign_key: :company_id
+  has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -833,7 +836,7 @@ class User < ApplicationRecord
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     #
     # setting the default company_id for this user - if there is already a user added with this company
-    if self.company.group_entity_structure_enabled? && self.company.group_id.present? && self.company.group&.default_company_id.present?
+    if self.company.group_entity_structure_enabled? && self.company.group_id.present? && self.company.group&.default_company_id.present? && self.default_company_id.blank?
       self.update_columns(default_company_id: self.company.group.default_company_id)
     else
       self.update_columns(default_company_id: self.company_id)

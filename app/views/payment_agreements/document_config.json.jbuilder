@@ -46,3 +46,4 @@ end
 
 json.general_invoice_custom_fields_config @result.custom_fields_config[:general_invoice]
 json.rental_invoice_custom_fields_config @result.custom_fields_config[:rental_invoice]
+json.payment_agreement_custom_fields_config @result.custom_fields_config[:payment_agreement]

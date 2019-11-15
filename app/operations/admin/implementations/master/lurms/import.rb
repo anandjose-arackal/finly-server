@@ -6,10 +6,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             :id => 'ID',
             :policy => 'Policy Name',
             :policy_creation_flag => 'For New Policy Y / or Blank',
-            :user_id => 'User Email / Mobile',
+            :user_id => 'User Email / Mobile / Employee ID',
             :level_name => 'Level Name',
             :level_number => 'Level Number',
-            :reviewer_email_mobile => 'Reviewer Email / Mobile',
+            :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
             :with_exception => 'With Exception Y/N',
             :without_exception => 'Without Exception Y/N',
             :min => "Minimum Threshold",
@@ -17,8 +17,9 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             :destroy => 'Destroy'
   })
 
-  attr_accessor :lurm_params, :provider, :application, :policy, :level
+  attr_accessor :lurm_params, :provider, :application, :policy, :level, :user_profiles
   def process
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -292,6 +293,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       user = company.users.find_by_email identifier
     elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
       user = company.users.find_by_mobile_number identifier
+    else
+      user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
     end
 
     user

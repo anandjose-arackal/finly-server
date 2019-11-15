@@ -37,6 +37,8 @@ json.status do
   json.extract! invoice.invoice_status, :id, :name
 end
 
+json.invoice_payment_status invoice.invoice_payment_status
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true
@@ -55,6 +57,7 @@ json.invoice do
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
                 :cost_allocation_items, :narration, :discount_type_id
 
+  json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
@@ -233,7 +236,7 @@ json.tds_slabs do
 end
 
 json.attachments do
-  json.array! invoice.attachments do |attachment|
+  json.array! invoice.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -245,7 +248,7 @@ end
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
-    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
+    json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end
 end
 

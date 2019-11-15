@@ -5,4 +5,5 @@ json.result do
       json.name period.name 
     end
   end
+  json.custom_fields_config @result.field_configurations
 end

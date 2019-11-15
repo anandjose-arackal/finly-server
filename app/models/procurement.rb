@@ -415,6 +415,12 @@ class Procurement < ApplicationRecord
     joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.order_number LIKE ?', "%#{pr_number}%")
   }
 
+  scope :filter_pr_creator_id, -> (creator_id){
+    joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.creator_id = ?', creator_id)
+  }
+
+
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return
@@ -606,7 +612,8 @@ class Procurement < ApplicationRecord
   def as_json
     {
       id: self.id,
-      purchase_order_id: self.purchase_order&.id
+      purchase_order_id: self.purchase_order&.id,
+      invoice_id: self.invoices&.first&.id
     }
   end
 

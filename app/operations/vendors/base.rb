@@ -53,7 +53,7 @@ class Vendors::Base < BaseOperation
     custom_fields[:user] = user
     custom_fields[:reset_fields] = reset_fields
     custom_fields[:save] = save
-    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
+    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:yes_bank_vendor), custom_fields)
   end
 
   # def validate_business_name(vendor_params)
