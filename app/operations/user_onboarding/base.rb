@@ -67,6 +67,7 @@ class UserOnboarding::Base < BaseOperation
       purpose_id = Purpose.id_for(:vendor_payments)
     else
       self.urm_user_role_ids << UserRole.id_for(:employee)
+      self.urm_user_role_ids.uniq!
       purpose_id = Purpose.id_for(:expense_management)
     end
     # -> create records for searching
