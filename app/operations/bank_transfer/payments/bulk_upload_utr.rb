@@ -155,9 +155,9 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def runner(batch, update=false, keys)
     klass = batch.first.class
     if update
-      klass.import batch, on_duplicate_key_update: keys
+      klass.import batch, on_duplicate_key_update: keys, validate: false
     else
-      klass.import batch
+      klass.import batch, validate: false
     end
   end
 
