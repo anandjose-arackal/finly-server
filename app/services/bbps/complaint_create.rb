@@ -2,11 +2,15 @@ class Bbps::ComplaintCreate < Bbps::Api
 
   # Todo
   #
-  # schema do
-  #   params do
-  #     required(:mobile_number).filled
-  #   end
-  # end
+  schema do
+    params do
+      required(:mobile_number).filled
+      required(:complaint_type).filled
+      required(:complaint_category).filled
+      required(:complaint_entity_id).filled
+      optional(:description).filled
+    end
+  end
   #
   # setup_defaults
   # path "raiseComplaint"
