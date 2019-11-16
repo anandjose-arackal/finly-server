@@ -1,5 +1,4 @@
-class Dashboards::ExpenseManagementController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class Dashboards::ExpenseManagementController < BaseControllers::WebBase
 
   def configs
     @result = Dashboard::ExpenseManagement::Configs.(current_user, params)
