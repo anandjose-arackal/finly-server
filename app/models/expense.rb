@@ -642,11 +642,11 @@ class Expense < ApplicationRecord
       # un-scoping here for cases when the per diem gets destroyed
       policy_name = self.per_diem_expense&.per_diem&.configurable&.name
       if policy_name.nil?
-        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.configurable&.name
       end
       per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
       if per_diem_name.nil?
-        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.name
       end
       return "#{policy_name} - #{per_diem_name}"
     else
