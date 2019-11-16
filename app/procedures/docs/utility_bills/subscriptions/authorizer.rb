@@ -50,6 +50,10 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @user.vendor_payment_admin? && (@model.deactivated?)
   end
 
+  def add_bill?
+    (@model.pocs.include?(@user) || @user.vendor_payment_admin?) && (BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(@model.status_id))
+  end
+
   private
 
   def reviewing_user?

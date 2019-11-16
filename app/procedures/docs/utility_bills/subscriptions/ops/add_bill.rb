@@ -1,25 +1,32 @@
 class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
 
-  step Model(BbpsBillerSubscription, :new)
-  step Policy::Pundit(Docs::UtilityBills::Subscriptions::Authorizer, :create?)
-  step :set_default_params
-  step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Base)
-  step Contract::Validate(key: 'subscription')
-
+  step :init
+  step Model(BbpsBillerSubscription, :find_by)
+  step Policy::Pundit(Docs::UtilityBills::Subscriptions::Authorizer, :add_bill?)
+  # step :set_default_params
   failure :check
-  step Contract::Persist()
-  step :setup_dlrm
+  step :create_bill
 
-
-  def check(params, **)
+  def init(options, params:, **)
+    params[:id] = params[:subscription_id]
   end
 
-  def setup_dlrm(options, current_user:, params:, model:, **)
-    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
-        reviewal_document: model,
-        document_reviewer_mappings: params[:document_reviewer_mappings]
-    })
-    dlrm_validation_op.success?
+
+  def check(options, **)
+  end
+
+  def create_bill(options, model:, **)
+    params = {
+        subscription_id: model.id,
+    }
+
+    op = Docs::UtilityBills::Bills::Ops::Create.(params)
+
+    if op.success?
+      options['result'] = {'bill' => op['model']}
+    end
+
+    op.success?
   end
 
   def set_default_params(options, params:, current_user:, **)

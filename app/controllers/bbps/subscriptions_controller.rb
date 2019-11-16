@@ -72,6 +72,13 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
+  def add_bill
+    @op = Docs::UtilityBills::Subscriptions::Ops::AddBill.(params, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def actions_config
     @result = ActionsManager::Processor.(current_user, params)
     respond

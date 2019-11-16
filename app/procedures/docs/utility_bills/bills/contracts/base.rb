@@ -14,7 +14,7 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :status_id, default: BbpsBillStatus.id_for(:open)
 
   property :amount, populate_if_empty: Amount do
-    property :value, presence: true
+    property :value, presence: true, default: 0
     property :currency_id, presence: true
   end
 

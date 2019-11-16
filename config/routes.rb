@@ -3862,6 +3862,7 @@ Rails.application.routes.draw do
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
+      patch 'add_bill', to: 'subscriptions#add_bill'
     end
 
     get 'bills/edit_config', to: 'bills#edit_config'
