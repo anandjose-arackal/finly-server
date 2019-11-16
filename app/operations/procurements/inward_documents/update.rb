@@ -19,6 +19,8 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   end
 
   def validate
+    validate_role
+
     unless self.inward_document.present?
       add_message :error, 'Receipt Note not found'
       return
@@ -379,6 +381,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       end
     end
     shipped
+  end
+
+  def validate_role
+    unless user.is_goods_receiver? || user.vendor_payments_admin?
+      add_message :error, 'You are not allowed to create this document'
+      return
+    end
   end
 
 end
