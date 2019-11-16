@@ -17,5 +17,6 @@ json.result do
     end
   end
   json.fetch_requirement @op['result']['fetch_requirement']
+  json.support_bill_validation @op['result']['support_bill_validation']
 
 end

@@ -116,7 +116,12 @@ class BbpsBillerSubscription < ApplicationRecord
         user: user&.json_for_trail,
         biller_category_name: biller_category_name,
         customer_fields: customer_fields.as_json,
-        subscription_pocs: subscription_pocs.as_json
+        subscription_pocs: subscription_pocs.as_json,
+        fetch_requirement: fetch_requirement,
+        support_bill_validation: support_bill_validation,
+        auto_generate_bill: auto_generate_bill,
+        expected_due_day: expected_due_day,
+        reminder_before_days: reminder_before_days
     }
   end
 

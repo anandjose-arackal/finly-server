@@ -17,12 +17,7 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerFields < Transactions::A
 
     options['result'] = {}
     options['result']['model'] = bbps_biller
-    options['result']['fetch_requirement'] = can_validate?(biller_op['model'])
-  end
-
-  def can_validate?(model)
-    if model.present?
-      model.fetch_requirement
-    end
+    options['result']['fetch_requirement'] = biller_op['model']&.fetch_requirement
+    options['result']['support_bill_validation'] = biller_op['model']&.support_bill_validation
   end
 end
