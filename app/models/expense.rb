@@ -640,7 +640,7 @@ class Expense < ApplicationRecord
       return self.card_expense.editable_merchant
     when ExpenseType.id_for(:per_diem)
       # un-scoping here for cases when the per diem gets destroyed
-      policy_name = self.per_diem_expense.per_diem&.configurable&.name
+      policy_name = self.per_diem_expense&.per_diem&.configurable&.name
       if policy_name.nil?
         policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
       end
