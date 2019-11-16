@@ -3,7 +3,8 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   attr_accessor :bbps_subscription
 
   register_handle :bbps_subscriptions_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :deactivate, :reactivate]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
+                    :deactivate, :reactivate, :add_bill]
 
   def initialize(user = nil, params = {})
     super
@@ -57,10 +58,16 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
     bbps_subscription.deactivated? && user.vendor_payment_admin?
   end
 
+  def add_bill
+    BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(bbps_subscription.status_id) &&
+        ["OPTIONAL", "NOT_SUPPORTED", nil].include?(bbps_subscription.fetch_requirement)
+  end
+
   private
 
   def has_taken_control?
     bbps_subscription.dlrms.where(level_id: bbps_subscription.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
   end
+
 
 end

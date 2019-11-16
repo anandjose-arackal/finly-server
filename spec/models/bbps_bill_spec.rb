@@ -31,6 +31,10 @@
 #  transaction_id       :string(255)
 #  bbps_id              :string(255)
 #  bill_period          :string(255)
+#  late_payment_fee_id  :integer
+#  fixed_charge_id      :integer
+#  additional_charge_id :integer
+#  quick_pay            :boolean          default(TRUE)
 #
 
 require 'rails_helper'

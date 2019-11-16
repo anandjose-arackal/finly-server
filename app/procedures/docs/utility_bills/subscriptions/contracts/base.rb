@@ -17,11 +17,16 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   property :agreement_id
   property :expected_due_day
+  property :reminder_before_days
 
   collection :subscription_pocs, populator: :subscription_pocs! do
     property :user_id, presence: true
     property :subscription_id
   end
+
+  property :fetch_requirement, default: -> {self.biller&.fetch_requirement}
+  property :support_bill_validation, default: -> {biller&.support_bill_validation}
+  property :auto_generate_bill
 
   # collection :subscription_pocs, populate_if_empty: BbpsSubscriptionPoc do
   #   property :user_id, presence: true
@@ -30,6 +35,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   # Virtual Properties
   property :current_user, virtual: true
+  property :biller, virtual: true
 
   property :status_id, default: BbpsBillerSubscriptionStatus.id_for(:draft)
 

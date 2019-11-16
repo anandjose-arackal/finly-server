@@ -2,6 +2,7 @@ json.success @op.success?
 
 json.result do
   biller_customer_params = @op['result']['model']&.biller_customer_params
+
   json.fields do
     json.array! (0..4).to_a do |j|
       json.set! "customer_param_key_#{j + 1}", biller_customer_params[j]&.dig('param_name')
@@ -15,4 +16,6 @@ json.result do
       end
     end
   end
+  json.fetch_requirement @op['result']['fetch_requirement']
+
 end

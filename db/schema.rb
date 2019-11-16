@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_14_064056) do
+ActiveRecord::Schema.define(version: 2019_11_16_060409) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -734,7 +734,7 @@ ActiveRecord::Schema.define(version: 2019_11_14_064056) do
     t.integer "agreement_id"
     t.string "expected_due_day"
     t.integer "controlling_level_id"
-    t.string "reminder_day"
+    t.string "reminder_before_days"
     t.string "biller_category_name"
     t.datetime "submitted_at"
     t.datetime "approved_at"
@@ -750,6 +750,9 @@ ActiveRecord::Schema.define(version: 2019_11_14_064056) do
     t.string "customer_param_value_4"
     t.string "customer_param_key_5"
     t.string "customer_param_value_5"
+    t.string "fetch_requirement"
+    t.boolean "auto_generate_bill", default: true
+    t.string "support_bill_validation"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -829,6 +832,10 @@ ActiveRecord::Schema.define(version: 2019_11_14_064056) do
     t.string "transaction_id"
     t.string "bbps_id"
     t.string "bill_period"
+    t.integer "late_payment_fee_id"
+    t.integer "fixed_charge_id"
+    t.integer "additional_charge_id"
+    t.boolean "quick_pay", default: true
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
