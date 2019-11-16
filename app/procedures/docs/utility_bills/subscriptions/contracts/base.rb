@@ -24,8 +24,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     property :subscription_id
   end
 
-  property :fetch_requirement, default: -> {self.biller&.fetch_requirement}
-  property :support_bill_validation, default: -> {biller&.support_bill_validation}
+  property :fetch_requirement
+  property :support_bill_validation
   property :auto_generate_bill
 
   # collection :subscription_pocs, populate_if_empty: BbpsSubscriptionPoc do

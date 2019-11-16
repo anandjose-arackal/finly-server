@@ -23,7 +23,15 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   end
 
   def set_default_params(options, params:, current_user:, **)
+    bbps_biller_id = params[:bbps_biller_id] || params[:subscription][:bbps_biller_id]
+    op = Docs::UtilityBills::Billers::Ops::Show.({id: bbps_biller_id}, "current_user" => current_user)
+
+
     params[:subscription][:user_id] = current_user&.id
     params[:subscription][:current_user] = current_user
+    if op.success?
+      params[:subscription][:fetch_requirement] = op['model']&.fetch_requirement
+      params[:subscription][:support_bill_validation] = op['model']&.support_bill_validation
+    end
   end
 end
