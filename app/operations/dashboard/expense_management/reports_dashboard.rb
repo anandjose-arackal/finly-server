@@ -1,19 +1,19 @@
-class Dashboard::ExpenseManagement::Reports < Dashboard::ExpenseManagement::Base
+class Dashboard::ExpenseManagement::ReportsDashboard < Dashboard::ExpenseManagement::Base
   attr_accessor :reports
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"reports"}, "page"=>"1", "per_page"=>"30"}
-    self.reports = Reports::Index.(user, params)
+    self.reports = ::Reports::Index.(user, params)
 
   end
 
   def success
     params[:reports] = self.reports
-    Dashboard::ExpenseManagement::Reports::DashboardPresenter.new(user, params, messages)
+    Dashboard::ExpenseManagement::ReportsDashboard::DashboardPresenter.new(user, params, messages)
   end
 
 
-  class Dashboard::ExpenseManagement::Reports::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Dashboard::ExpenseManagement::ReportsDashboard::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reports, :counts
 
     has_scope :filter_date, using: [:from, :to], type: :hash

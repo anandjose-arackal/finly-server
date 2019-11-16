@@ -11,12 +11,12 @@ class Dashboards::ExpenseManagementController < BaseControllers::WebBase
   end
 
   def reports
-    @result = Dashboard::ExpenseManagement::Reports.(current_user, params)
+    @result = Dashboard::ExpenseManagement::ReportsDashboard.(current_user, params)
     respond
   end
 
   def money_requests
-    @result = Dashboard::ExpenseManagement::MoneyRequests.(current_user, params)
+    @result = Dashboard::ExpenseManagement::MoneyRequestsDashboard.(current_user, params)
     respond
   end
 

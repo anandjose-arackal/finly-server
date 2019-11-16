@@ -1,4 +1,4 @@
-class Dashboard::ExpenseManagement::MoneyRequests < Dashboard::ExpenseManagement::Base
+class Dashboard::ExpenseManagement::MoneyRequestsDashboard < Dashboard::ExpenseManagement::Base
   attr_accessor :money_requests
 
   def init
@@ -9,11 +9,11 @@ class Dashboard::ExpenseManagement::MoneyRequests < Dashboard::ExpenseManagement
 
   def success
     params[:money_requests] = self.money_requests
-    Dashboard::ExpenseManagement::MoneyRequests::DashboardPresenter.new(user, params, messages)
+    Dashboard::ExpenseManagement::MoneyRequestsDashboard::DashboardPresenter.new(user, params, messages)
   end
 
 
-  class Dashboard::ExpenseManagement::MoneyRequests::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Dashboard::ExpenseManagement::MoneyRequestsDashboard::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_requests, :counts
 
     has_scope :filter_date, using: [:from, :to], type: :hash
