@@ -28,14 +28,14 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
 
     self.result = []
 
-    reports_presenter = Reports::Index.(user, params)
+    reports_presenter = ::Reports::Index.(user, params)
     unless reports_presenter.success?
       add_message :error, reports_presenter.messages[:error]
       return
     end
     self.reports = reports_presenter.reports.approved.without_associated_processor
 
-    money_requests_presenter = Object.const_get('MoneyRequests::Index').(user, params)
+    money_requests_presenter = Object.const_get('::MoneyRequests::Index').(user, params)
     unless money_requests_presenter.success?
       add_message :error, money_requests_presenter.messages[:error]
       return

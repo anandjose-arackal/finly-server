@@ -6,13 +6,20 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
       [
           :dashboard,
           :receipts,
-          {expenses: [:your_expenses, :company_expenses]},
-          {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
-          {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
-          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
-          {settlements: [:team_settlements, :company_settlements]},
-          :analytics,
-          {export: [:team_exports, :company_exports]},
+          :expenses,
+          :money_requests,
+          :reports,
+          {approvals: [:reports_awaiting_approval, :money_requests_awaiting_approval, :trips_awaiting_approval]},
+          {team: [:team_reports, :team_money_requests, :team_trips, :team_settlements, :users, :team_exports]},
+          {admin: [:analytics, :company_reports, :company_money_requests, :company_trips, :company_settlements, :users, :company_exports]},
+          # :analytics,
+          # {expenses: [:your_expenses, :company_expenses]},
+          # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
+          # {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
+          # {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
+          # {settlements: [:team_settlements, :company_settlements]},
+          # :analytics,
+          # {export: [:team_exports, :company_exports]},
           {create: [:create_expense, :create_trip, :create_report, :create_money_request]}
       ]
   )
@@ -42,10 +49,6 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
   end
 
-  def analytics
-    {name: 'Analytics', id: 'analytics', url: 'analytics'}
-  end
-
   def expenses
     {name: 'Expenses', id: 'expenses', url: 'expenses/params={"view":"personal"}'}
   end
@@ -73,12 +76,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def trips_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'trips', url: 'travel_requests/params={"view":"manager", "filter_status":"processing"}'}
+    {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"manager", "filter_status":"processing"}'}
   end
 
   def team_trips
     return nil unless user.manager? || user.admin?
-    {name: 'Team Trips', id: 'trips', url: 'travel_requests/params={"view":"manager"}'}
+    {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"manager"}'}
   end
 
   def travel_manager_trips
@@ -88,7 +91,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_trips
     return nil unless user.admin?
-    {name: 'Company Trips', id: 'trips', url: 'travel_requests/params={"view":"admin"}'}
+    {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"admin"}'}
   end
 
   def reports
@@ -101,80 +104,80 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def reports_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'reports', url: 'reports/params={"view":"manager", "filter_status":"99"}'}
+    {name: 'Reports', id: 'reports', url: 'reports/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_reports
     return nil unless user.manager? || user.admin?
-    {name: 'Team Reports', id: 'reports', url: 'reports/params={"view":"manager"}'}
+    {name: 'Reports', id: 'reports', url: 'reports/params={"view":"manager"}'}
   end
 
   def company_reports
     return nil unless user.admin?
-    {name: 'Company Reports', id: 'reports', url: 'reports/params={"view":"admin"}'}
+    {name: 'Reports', id: 'reports', url: 'reports/params={"view":"admin"}'}
   end
 
   def money_requests
-    {name: 'Money Requests', id: 'money_requests', url: 'money_request/params={"view":"personal"}'}
+    {name: 'Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"personal"}'}
   end
 
   def your_money_requests
-    {name: 'Your Money Requests', id: 'money_requests', url: 'money_request/params={"view":"personal"}'}
+    {name: 'Your Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"personal"}'}
   end
 
   def money_requests_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'money_requests', url: 'money_request/params={"view":"manager", "filter_status":"99"}'}
+    {name: 'Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"manager", "filter_status":"99"}'}
   end
 
   def team_money_requests
     return nil unless user.manager? || user.admin?
-    {name: 'Team Money Requests', id: 'money_requests', url: 'money_request/params={"view":"manager"}'}
+    {name: 'Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"manager"}'}
   end
 
   def company_money_requests
     return nil unless user.admin?
-    {name: 'Company Money Requests', id: 'money_requests', url: 'money_request/params={"view":"admin"}'}
+    {name: 'Money Requests', id: 'money_requests', url: 'money_requests/params={"view":"admin"}'}
   end
 
   def team_users
     return nil unless user.manager? || user.admin?
-    {name: 'Team Users', id: 'users', url: 'users/params={"view":"manager"}'}
+    {name: 'Users', id: 'users', url: 'users/params={"view":"manager"}'}
   end
 
   def company_users
     return nil unless user.admin?
-    {name: 'Company Users', id: 'users', url: 'users/params={"view":"admin"}'}
+    {name: 'Users', id: 'users', url: 'users/params={"view":"admin"}'}
   end
 
   def settlements
     return nil unless user.finance_manager? || user.admin?
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def team_settlements
     return nil unless user.finance_manager? || user.admin?
-    {name: 'Team Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
   end
 
   def company_settlements
     return nil unless user.admin?
-    {name: 'Company Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"admin"}'}
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"admin"}'}
   end
 
   def export
     return nil unless user.manager? || user.admin?
-    {name: 'Team Export', id: 'export', url: 'export/params={"view":"manager"}'}
+    {name: 'Export', id: 'export', url: 'export/params={"view":"manager"}'}
   end
 
   def team_exports
     return nil unless user.manager? || user.admin?
-    {name: 'Team Export', id: 'export', url: 'export/params={"view":"manager"}'}
+    {name: 'Export', id: 'export', url: 'export/params={"view":"manager"}'}
   end
 
   def company_exports
     return nil unless user.admin?
-    {name: 'Company Export', id: 'export', url: 'export/params={"view":"admin"}'}
+    {name: 'Export', id: 'export', url: 'export/params={"view":"admin"}'}
   end
 
   def users
@@ -208,10 +211,23 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def create_money_request
-    {name: 'Create Money Request', id: 'create_money_request', url: 'money_request/params={"view":"personal", "create": "true"}'}
+    {name: 'Create Money Request', id: 'create_money_request', url: 'money_requests/params={"view":"personal", "create": "true"}'}
   end
+
   def analytics
     { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+  end
+
+  def approvals
+    reports_awaiting_approval&.merge({ name: 'Approvals'})
+  end
+
+  def admin
+    analytics&.merge({ name: 'Admin'})
+  end
+
+  def team
+    team_settlements&.merge({name: "Team"})
   end
 
 end
