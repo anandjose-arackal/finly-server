@@ -115,9 +115,31 @@ class BbpsBill < ApplicationRecord
   }
 
   def as_json(options = {})
+    if options[:index]
+      data = {
+          id: id,
+          biller: subscription.biller.as_json({index: true}),
+          # name: name,
+          sequence_id: sequence_id,
+          department: department.as_json,
+          cost_center: cost_center.as_json,
+          location: location.as_json,
+          policy: policy.as_json,
+          # note: note,
+          created_at: created_at.strftime("%d-%b-%Y"),
+          updated_at: updated_at.strftime("%d-%b-%Y"),
+          status: status.as_json,
+          user: user&.json_for_trail,
+          # biller_category_name: biller_category_name,
+          amount: amount.as_json,
+          customer_fields: subscription.customer_fields.as_json,
+      }
+      return data
+    end
+
     {
         id: id,
-        biller: subscription.biller.as_json({index: true}),
+        biller: subscription.biller.as_json,
         # name: name,
         sequence_id: sequence_id,
         department: department.as_json,

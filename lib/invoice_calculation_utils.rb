@@ -100,9 +100,9 @@ class InvoiceCalculationUtils
     # self.payment_amount = self.balance_due_amount
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.payment_amount
+        payment.amount.value = self.payment_amount.round(2)
       else
-        payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.payment_amount.round(2), currency_id: 1)
       end
     end
     params

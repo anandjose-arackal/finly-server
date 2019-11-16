@@ -40,6 +40,8 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
 
+      invoice.update payable: true
+
       # if invoice final amount comes to zero, probably because so much advance was adjusted, then auto mark it as paid
       if invoice.balance_due&.value == 0
         params[:document] = self.invoice
@@ -62,7 +64,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     update_agreement_available_limit
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
     # Email to vendor that invoice is generated when the invoice is approved
-    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
+    # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully Approved Invoice'
   end
 end

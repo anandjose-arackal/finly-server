@@ -13,10 +13,11 @@ class PaymentAgreements::Base < BaseOperation
   def payment_agreement_parameters
     params.require(:payment_agreement).permit(
 
-      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
-        selected_invoice_frequency_attributes: {}, 
+        :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
+        selected_invoice_frequency_attributes: {},
+        payment_agreement_custom_fields: {},
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id,
+        general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id, :include_tax_and_tds,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -42,7 +43,7 @@ class PaymentAgreements::Base < BaseOperation
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
+        rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -66,13 +67,13 @@ class PaymentAgreements::Base < BaseOperation
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
+        beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id,
         tax_amount_attributes: [:id, :value, :currency_id],
         payable_amount_attributes: [:id, :currency_id, :value],
         original_amount_attributes: [:id, :currency_id, :value]
 
       ],
-      security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id, 
+        security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id,
         original_amount_attributes: [:id, :currency_id, :value]
       ]
       
@@ -319,35 +320,26 @@ class PaymentAgreements::Base < BaseOperation
 
 
   def create_or_update_custom_fields
+    #TODO - Currently general and rental are sharing same key as there cannot be general invoice and rental invoice together, but not recommended! 
     # Setup custom field for general invoices
+    general_invoice_custom_fields
+    # Setup custom field for rental invoices
+    rental_invoice_custom_fields
+    payment_agreement_custom_fields
+  end
+
+  def general_invoice_custom_fields
     if self.payment_agreement.general_invoices.present?
       if params.dig(:payment_agreement, :general_invoices_attributes).present?
-        self.payment_agreement.general_invoices.each_with_index do |invoice, index|
-          custom_fields = invoice.invoice_custom_fields
+        self.payment_agreement.general_invoices.each_with_index do |document, index|
+          custom_fields = document.invoice_custom_fields
           if custom_fields.present?
-            if invoice.new_record?
+            if document.new_record?
               custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              # CustomField::SetFields.(invoice, FieldParentType.id_for(:general_invoice), custom_fields_data)
-              validate_custom_fields_invoice(invoice, custom_fields, false)
+              # CustomField::SetFields.(document, FieldParentType.id_for(:general_invoice), custom_fields_data)
+              validate_document_custom_fields(document, custom_fields, false)
             else
-              validate_custom_fields_invoice(invoice, custom_fields, false)
-            end
-          end
-        end
-      end
-    end
-
-    # Setup custom field for rental invoices
-    if self.payment_agreement.rental_invoices.present?
-      if params.dig(:payment_agreement, :rental_invoices_attributes).present?
-        self.payment_agreement.rental_invoices.each_with_index do |invoice, index|
-          custom_fields = invoice.invoice_custom_fields
-          if custom_fields.present?
-            if invoice.new_record?
-              custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
-              validate_custom_fields_invoice(invoice, custom_fields, false)
-            else
-              validate_custom_fields_invoice(invoice, custom_fields, false)
+              validate_document_custom_fields(document, custom_fields, false)
             end
           end
         end
@@ -355,25 +347,59 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
-  def validate_custom_fields_invoice(invoice, custom_fields, save=false)
-    set_fields = set_custom_fields_invoice invoice, custom_fields, save
+  def rental_invoice_custom_fields
+    if self.payment_agreement.rental_invoices.present?
+      if params.dig(:payment_agreement, :rental_invoices_attributes).present?
+        self.payment_agreement.rental_invoices.each_with_index do |document, index|
+          custom_fields = document.invoice_custom_fields
+          if custom_fields.present?
+            if document.new_record?
+              # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+              custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+              # CustomField::SetFields.(invoice, FieldParentType.id_for(:rental_invoice), custom_fields_data)
+              validate_document_custom_fields(document, custom_fields, false)
+            else
+              # custom_fields = params[:payment_agreement][:rental_invoices_attributes][index][:custom_fields]
+              validate_document_custom_fields(document, custom_fields, false)
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def payment_agreement_custom_fields
+    if self.payment_agreement.payment_agreement_custom_fields.present?
+      custom_fields = self.payment_agreement.payment_agreement_custom_fields
+      document = self.payment_agreement
+      if self.payment_agreement.new_record?
+        custom_fields_data = {custom_fields: custom_fields, user: user, save: false, reset_fields: true}
+        validate_document_custom_fields(document, custom_fields, false)
+      else
+        validate_document_custom_fields(document, custom_fields, false)
+      end
+    end
+  end
+
+  def validate_document_custom_fields(document, custom_fields, save = false)
+    set_fields = set_custom_fields_document document, custom_fields, save
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(invoice)
+    valid = CustomField::Validate.(document)
     unless valid.success?
       add_message :error, valid.messages[:error]
       return
     end
   end
 
-  def set_custom_fields_invoice(invoice, data, save)
+  def set_custom_fields_document(document, data, save)
     custom_fields = {custom_fields: data}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(invoice, FieldParentType.id_for(invoice.class.name.underscore.to_sym), custom_fields)
+    CustomField::SetFields.(document, FieldParentType.id_for(document.class.name.underscore.to_sym), custom_fields)
   end
 
   # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
@@ -785,6 +811,13 @@ class PaymentAgreements::Base < BaseOperation
   # TODO - REMOVE THIS - custom field is not saving on calling save on parent 
   # 
   def save_custom_fields
+
+    if self.payment_agreement.custom_fields.present?
+      self.payment_agreement.custom_fields.each do |custom_field|
+        custom_field.save
+      end
+    end
+
     if self.payment_agreement.general_invoices.present?
       self.payment_agreement.general_invoices.each do |general_invoice|
         if general_invoice.custom_fields.present?

@@ -57,6 +57,7 @@ class PaymentAgreement < ApplicationRecord
   
   has_many :notify_users, as: :document, dependent: :destroy 
   has_many :security_deposits, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
 
   has_many :attachments, as: :resource, dependent: :destroy
@@ -69,6 +70,8 @@ class PaymentAgreement < ApplicationRecord
 
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, to: :status
+
+  attr_accessor :payment_agreement_custom_fields
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
@@ -259,25 +262,26 @@ class PaymentAgreement < ApplicationRecord
 
   def as_json(options={})
     {
-      id: self.id,
-      agreement_number: get_agreement_number,
-      title: self.title,
-      policy_id: self.policy_id,
-      policy: self.policy&.name,
-      created_by: self.creator&.name,
-      status: self.status&.name,
-      invoice_due_date: self.execution_date&.to_date,
-      display_status: self.status&.name&.titleize,
-      created_at: self.created_at.to_date,
-      agreement_date: self.agreement_date&.to_date,
-      execution_date: self.execution_date&.to_date,
-      expiration_date: self.expiration_date&.to_date,
-      no_expiration: self.no_expiration,
-      renewal_date: self.renewal_date&.to_date,
-      note: self.note,
-      renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options),
-      termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
+        id: self.id,
+        agreement_number: get_agreement_number,
+        title: self.title,
+        policy_id: self.policy_id,
+        policy: self.policy&.name,
+        created_by: self.creator&.name,
+        status: self.status&.name,
+        invoice_due_date: self.execution_date&.to_date,
+        display_status: self.status&.name&.titleize,
+        created_at: self.created_at.to_date,
+        agreement_date: self.agreement_date&.to_date,
+        execution_date: self.execution_date&.to_date,
+        expiration_date: self.expiration_date&.to_date,
+        no_expiration: self.no_expiration,
+        renewal_date: self.renewal_date&.to_date,
+        note: self.note,
+        renewal_reminder_date: self.renewal_reminder_date,
+        vendors: get_related_vendors(options),
+        custom_fields: self.custom_fields,
+        termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
     }
   end
 

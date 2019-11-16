@@ -24,15 +24,15 @@ class Bbps::ComplaintCreate < Bbps::Api
   # #
   # # Example:
   # # B9000 |COMPLNLSTREFAGENT171308183209|YS01 |C1001 | 18799|9699381878| NA |NA |NA |NA |NA |NA |NA |NA |NA |NA|NA|NA|NA|NA|NA
-  # request_fields(
-  #     [
-  #         :message_code, :ref_number, :agent_institution_id, :channel_id, :agent_id,
-  #         :customer_mobile,
-  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-  #     ]
-  # )
+  request_fields(
+      [
+          :message_code, :ref_number, :agent_institution_id, :channel_id, :agent_id,
+          :customer_mobile,
+          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+      ]
+  )
   #
   # # Message Code(B9001)|Status |Error Code |Error Desc | Ref No|Agent institution Id | Channel ID| Agent Id | Response Data in Json format|
   # # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5

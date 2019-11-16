@@ -217,11 +217,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def process
-    begin
+    # begin
       ActiveRecord::Base.transaction do
         purchase_order.assign_attributes(purchase_order_params)
         if purchase_order.valid?
-
+          update_purchase_request_item_status
           # Set validation of DLRMs
           if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
 
@@ -335,9 +335,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
           return
         end
       end
-    rescue => e
-      add_message :error, 'Unable to perform operation'
-    end
+      # rescue => e
+      #   add_message :error, messages
+      # end
 
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
@@ -414,6 +414,52 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       self.purchase_order_params[:requested_advance_amount_attributes][:value] = self.purchase_order&.requested_advance_amount&.value || 0
       self.purchase_order_params[:due_date] = self.purchase_order.due_date
       self.skip_adv_calculation = true
+    end
+  end
+
+  def update_purchase_request_item_status
+    if purchase_order.purchase_request_items.present?
+      po_revision_ids = []
+      deleted_po_item_ids = []
+      deleted_po_item_pr_item_ids = []
+      purchase_order.items.each do |purchase_order_item|
+        purchase_request_item = purchase_order_item.purchase_request_item
+        if purchase_request_item.present?
+          if purchase_order_item.marked_for_destruction?
+            deleted_po_item_ids << purchase_order_item.id
+            deleted_po_item_pr_item_ids << purchase_order_item.purchase_request_item_id
+            # If revised po line items are deleted which were created from PR line item, then all the previous PO's will not have pr line item reference to their line item. i.e., line item will be as if it was not created from PR as it will loose reference to PR
+            # This is done to avoid duplicate PO for the same approved items 
+            if purchase_order_item&.purchase_order&.procurement&.po_revisions&.present?
+              procurement_id = purchase_order_item&.purchase_order&.procurement&.id
+              # PO revision related ids
+              po_revision_ids << user.company.purchase_orders.where(procurement_id: procurement_id).pluck(:id)
+            end
+            purchase_request_item.update_attributes(purchase_order_id: nil)
+            purchase_request_item.update_attributes(status_id: PurchaseRequestItemStatus.id_for(:approved))
+            user = RequestStore.store[:current_user]
+            if user.present?
+              Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_item_deleted))
+            end
+          end
+        end
+      end
+      po_revision_ids = po_revision_ids&.flatten&.compact&.uniq
+      deleted_po_item_ids = deleted_po_item_ids&.flatten&.compact&.uniq
+      deleted_po_item_pr_item_ids = deleted_po_item_pr_item_ids&.flatten&.uniq
+      if po_revision_ids.present?
+        po_revision_ids.each do |po_revision_id|
+          revised_po = user.company.purchase_orders.find_by_id po_revision_id
+          if revised_po.present?
+            if revised_po.items.where(purchase_request_item_id: deleted_po_item_pr_item_ids).present?
+              revised_po.items.where(purchase_request_item_id: deleted_po_item_pr_item_ids).each do |po_item|
+                # Remove reference to PR line item so that multiple PO's cannot be raised for one approved item with PR line item reference
+                po_item.update_attributes(purchase_request_item_id: nil)
+              end
+            end
+          end
+        end
+      end
     end
   end
 

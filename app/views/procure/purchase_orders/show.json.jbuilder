@@ -183,7 +183,7 @@ json.comments do
   end
 end
 
-json.po_item_categories current_company.categories.inward_invoice_items_only
+json.po_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.policies do
   json.array! @result.policies do |policy|

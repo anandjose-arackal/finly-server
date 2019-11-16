@@ -421,22 +421,26 @@ class Notification < ApplicationRecord
         document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
         # if path_object.is_deleted?
-          path = "procurements"
+          path = "purchase_orders"
         else
-          path = "procurements/#{document.procurement.id}"
+          path = "procure_purchase_order/#{document.id}"
         end
         # /params={\"view\":\"initiator\",\"document_type\":\"invoice\",\"document_id\":#{document.procurement.id}"
-        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"purchase_order\",\"document_id\":#{document.id}"
+        suffix = "/params={\"procurement_id\":#{document.procurement.id}"
       when 'Invoice'
         document = Invoice.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
-          path = "procurements"
+          path = "new_payment_invoices"
         else
-          path = "procurements/#{document.procurement.id}"
+          path = "procure_invoice/#{document.id}"
         end
-        # /params={\"view\":\"initiator\",\"document_type\":\"purchase_order\",\"document_id\":#{document.procurement.id}"
-        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"invoice\",\"document_id\":#{document.id}"
-        # end
+        if document.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+          suffix = "/params={\"procurement_id\":#{document.procurement.id}"
+        elsif document.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+          suffix = "/params={\"procurement_id\":#{document.procurement.id},\"procurement_type\":\"non_po\""
+        elsif document.invoice_type_id == InwardInvoiceType.id_for(:agreement_invoice)
+          suffix = "/params={\"procurement_id\":#{document.procurement.id},\"procurement_type\":\"non_po\",\"invoice_type\":\"recurring_invoice\""
+        end
       else
         # do nothing
     end

@@ -404,4 +404,5 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def get_invoice_amount_sum(payment_agreement)
     payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
   end
+
 end

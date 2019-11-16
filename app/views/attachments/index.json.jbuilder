@@ -1,5 +1,5 @@
 json.result do
-  json.array! @result.attachments do |attachment|
+  json.array! @result.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :id, :description
     json.created_at_date attachment.created_at.strftime("%d-%b-%Y")
     json.created_at_time attachment.created_at.strftime("%I:%M%p")

@@ -50,6 +50,7 @@ class Item < ApplicationRecord
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
@@ -104,36 +105,37 @@ class Item < ApplicationRecord
 
   def as_json
     {
-      id: id,
-      item_number: item_number,
-      unit_of_measurement: unit_of_measurement,
-      hsn_sac: hsn_sac,
-      category_name: category&.name,
-      category_id: category_id,
-      category_gl_code: category&.gl_code,
-      rate: rate,
-      description: description,
-      discount: discount,
-      sku: sku,
-      tax_amount: self.tax_amount,
-      tax_rate_id: tax_rate_id,
-      tax: tax,
-      account: account,
-      item_code: item_code,
-      gl_code: item_code,
-      supply_item_type_id: supply_item_type_id,
-      item_type: supply_item_type.as_json,
-      product_type: product_type_id,
-      product_type_label: product_type_label,
-      rate_contract_vendors: rate_contract_vendors,
-      preferred_vendors: rate_contract_vendors,
-      user: user,
-      active: active,
-      item_expense_type_id: item_expense_type_id,
-      item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable,
-      tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description
+        id: id,
+        item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
+        hsn_sac: hsn_sac,
+        category_name: category&.name,
+        category_id: category_id,
+        category_gl_code: category&.gl_code,
+        rate: rate,
+        description: description,
+        discount: discount,
+        sku: sku,
+        tax_amount: self.tax_amount,
+        tax_rate_id: tax_rate_id,
+        tax: tax,
+        account: account,
+        item_code: item_code,
+        gl_code: item_code,
+        supply_item_type_id: supply_item_type_id,
+        item_type: supply_item_type.as_json,
+        product_type: product_type_id,
+        product_type_label: product_type_label,
+        rate_contract_vendors: rate_contract_vendors,
+        preferred_vendors: rate_contract_vendors,
+        user: user,
+        active: active,
+        item_expense_type_id: item_expense_type_id,
+        item_expense_type_name: item_expense_type&.name,
+        tds_applicable: tds_applicable,
+        tds_applicable_label: (tds_applicable ? "yes" : "no"),
+        custom_description: get_custom_description,
+        custom_fields: self.custom_fields
 
     }
   end

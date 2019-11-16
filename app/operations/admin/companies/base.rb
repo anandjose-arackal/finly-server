@@ -5,7 +5,7 @@ class Admin::Companies::Base < Admin::Base
   end
 
   def company_params
-    params.require(:company).permit(:status_id, :name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo, :registered_mobile_number],
+    params.require(:company).permit(:status_id, :name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo, :registered_mobile_number, :legal_entity_name, :address],
                                     company_kyc_attributes: [:company_type_id, :customer_type_id],
                                     feature_subscription_attributes: [
                                       :ocr_enabled,
