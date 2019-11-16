@@ -139,7 +139,7 @@ class BbpsBill < ApplicationRecord
 
     {
         id: id,
-        biller: subscription.biller.as_json,
+        biller: subscription.biller.as_json({index: true}),
         # name: name,
         sequence_id: sequence_id,
         department: department.as_json,
@@ -153,7 +153,17 @@ class BbpsBill < ApplicationRecord
         user: user&.json_for_trail,
         # biller_category_name: biller_category_name,
         amount: amount.as_json,
-        customer_fields: subscription.customer_fields.as_json,
+        biller_category_name: subscription.biller_category_name,
+        customer_fields: subscription.all_customer_fields,
+        subscription_pocs: subscription.subscription_pocs.as_json,
+        fetch_requirement: subscription.fetch_requirement,
+        support_bill_validation: subscription.support_bill_validation,
+        auto_generate_bill: subscription.auto_generate_bill,
+        expected_due_day: subscription.expected_due_day,
+        reminder_before_days: subscription.reminder_before_days,
+        customer_email: subscription.customer_email,
+        customer_name: subscription.customer_name,
+        customer_pan: subscription.customer_pan
     }
   end
 
