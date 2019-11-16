@@ -2,37 +2,37 @@ class Bbps::ComplaintCreate < Bbps::Api
 
   # Todo
   #
-  schema do
-    params do
-      required(:mobile_number).filled
-      required(:complaint_type).filled
-      required(:complaint_category).filled
-      required(:complaint_entity_id).filled
-      optional(:description).filled
-    end
-  end
-  #
+  # schema do
+  #   params do
+  #     required(:mobile_number).filled
+  #     required(:complaint_type).filled
+  #     required(:complaint_category).filled
+  #     required(:complaint_entity_id).filled
+  #     optional(:description).filled
+  #   end
+  # end
+  # #
   # setup_defaults
   # path "raiseComplaint"
-  #
-  # # Message Code(B5000)| Ref No |Agent institution Id | Channel Id| Agent Id |
-  # # Complaint Category |Compliant type| Complaint Entity ID |Description |
-  # # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5|
-  # # Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10|
-  # # Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15|
-  # # Ref ID| Txn Ref ID
   # #
-  # # Example:
-  # # B9000 |COMPLNLSTREFAGENT171308183209|YS01 |C1001 | 18799|9699381878| NA |NA |NA |NA |NA |NA |NA |NA |NA |NA|NA|NA|NA|NA|NA
-  request_fields(
-      [
-          :message_code, :ref_number, :agent_institution_id, :channel_id, :agent_id,
-          :customer_mobile,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-      ]
-  )
+  # # # Message Code(B5000)| Ref No |Agent institution Id | Channel Id| Agent Id |
+  # # # Complaint Category |Compliant type| Complaint Entity ID |Description |
+  # # # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5|
+  # # # Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10|
+  # # # Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15|
+  # # # Ref ID| Txn Ref ID
+  # # #
+  # # # Example:
+  # # # B9000 |COMPLNLSTREFAGENT171308183209|YS01 |C1001 | 18799|9699381878| NA |NA |NA |NA |NA |NA |NA |NA |NA |NA|NA|NA|NA|NA|NA
+  # request_fields(
+  #     [
+  #         :message_code, :ref_number, :agent_institution_id, :channel_id, :agent_id,
+  #         :customer_mobile,
+  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+  #         :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+  #     ]
+  # )
   #
   # # Message Code(B9001)|Status |Error Code |Error Desc | Ref No|Agent institution Id | Channel ID| Agent Id | Response Data in Json format|
   # # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5
