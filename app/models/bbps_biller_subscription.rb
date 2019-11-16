@@ -39,6 +39,10 @@
 #  fetch_requirement       :string(255)
 #  auto_generate_bill      :boolean          default(TRUE)
 #  support_bill_validation :string(255)
+#  customer_name           :string(255)
+#  customer_email          :string(255)
+#  customer_aadhar_number  :string(255)
+#  customer_pan            :string(255)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -115,14 +119,39 @@ class BbpsBillerSubscription < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         biller_category_name: biller_category_name,
-        customer_fields: customer_fields.as_json,
+        customer_fields: all_customer_fields,
         subscription_pocs: subscription_pocs.as_json,
         fetch_requirement: fetch_requirement,
         support_bill_validation: support_bill_validation,
         auto_generate_bill: auto_generate_bill,
         expected_due_day: expected_due_day,
-        reminder_before_days: reminder_before_days
+        reminder_before_days: reminder_before_days,
+        customer_email: customer_email,
+        customer_name: customer_name,
+        customer_pan: customer_pan
     }
+  end
+
+  def all_customer_fields
+    fields = []
+    5.times do |j|
+      customer_params_config = biller.biller_customer_params[j]
+      customer_param_present = self.send("customer_param_key_#{j + 1}").present?
+      data = {
+          "customer_param_key_#{j + 1}" => self.send("customer_param_key_#{j + 1}"),
+          "customer_param_value_#{j + 1}" => self.send("customer_param_value_#{j + 1}"),
+          "key_label" => ("customer_param_key_#{j + 1}" if customer_param_present),
+          "index" => j + 1,
+          "value_label" => ("customer_param_value_#{j + 1}" if customer_param_present),
+          "display" => customer_param_present
+      }
+
+      data.merge!(customer_params_config) if customer_param_present and customer_params_config.present?
+
+      fields << data
+    end
+
+    fields
   end
 
   def self.document_owner_attribute

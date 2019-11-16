@@ -39,6 +39,10 @@
 #  fetch_requirement       :string(255)
 #  auto_generate_bill      :boolean          default(TRUE)
 #  support_bill_validation :string(255)
+#  customer_name           :string(255)
+#  customer_email          :string(255)
+#  customer_aadhar_number  :string(255)
+#  customer_pan            :string(255)
 #
 
 require 'rails_helper'

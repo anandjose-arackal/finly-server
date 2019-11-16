@@ -108,6 +108,12 @@ class BbpsBill < ApplicationRecord
     where(subscription_id: id)
   }
 
+  scope :filter_payable_bills, -> (enabled) {
+    if enabled
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+    end
+  }
+
   def as_json(options = {})
     {
         id: id,
@@ -152,6 +158,19 @@ class BbpsBill < ApplicationRecord
         :bank_payment_request_creditor,
         :bank_payment_request_auditor
     ]
+  end
+
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
+    if [UserRole.id_for(:utility_bill_initator)].include?(role_id)
+      user.send("#{self.table_name}")
+    elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.send("#{self.table_name}").where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    end
+  end
+
+  def self.finance_associated_status_ids
+    BbpsBill.status_ids %i( approved auto_approved payment_ticket_created payment_initiated failed paid voided )
   end
 
   def self.status_ids(*statuses)

@@ -19,6 +19,12 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :expected_due_day
   property :reminder_before_days
 
+  property :customer_name
+  property :customer_email
+  property :customer_pan
+  property :customer_aadhar_number
+
+
   collection :subscription_pocs, populator: :subscription_pocs! do
     property :user_id, presence: true
     property :subscription_id
@@ -95,7 +101,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
       bbps_biller = op['model']
       biller_customer_params = bbps_biller.biller_customer_params
 
-      (0..4).to_a.each do |j|
+      5.times do |j|
         valid = validate_customer_field(biller_customer_params[j], self.send("customer_param_key_#{j + 1}"), self.send("customer_param_value_#{j + 1}"), j + 1)
       end
     end

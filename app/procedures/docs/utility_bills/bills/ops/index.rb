@@ -11,12 +11,12 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_subscription_id
 
   has_scope :filter_date
+  has_scope :filter_payable_bills
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
   # step Transactions::Resolver::Model(BbpsBills)
   step :index!
-
 
   def index!(options, params:, current_user:, **)
     if current_user.vendor_payment_admin?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_16_060409) do
+ActiveRecord::Schema.define(version: 2019_11_16_133146) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -753,6 +753,10 @@ ActiveRecord::Schema.define(version: 2019_11_16_060409) do
     t.string "fetch_requirement"
     t.boolean "auto_generate_bill", default: true
     t.string "support_bill_validation"
+    t.string "customer_name"
+    t.string "customer_email"
+    t.string "customer_aadhar_number"
+    t.string "customer_pan"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
