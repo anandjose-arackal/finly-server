@@ -9,9 +9,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :expenses,
           :money_requests,
           :reports,
-          {approvals: [:reports_awaiting_approval, :money_requests_awaiting_approval, :trips_awaiting_approval]},
-          {team: [:team_reports, :team_money_requests, :team_trips, :team_settlements, :users, :team_exports]},
-          {admin: [:analytics, :company_reports, :company_money_requests, :company_trips, :company_settlements, :users, :company_exports]},
+          {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
+          {team: [:team_settlements, :users, :divider, :team_exports, :documents_section, :team_money_requests, :team_reports, :team_trips]},
+          {admin: [:analytics, :company_settlements, :users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -29,15 +29,14 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
       :users,
       :load_company_balance, :statements,
       :organization_account
-      ]
+  ]
   )
 
   register_structure(
       :cog_modules, [
       :finly_vendor_payments, :finly_disburse, :finly_collect, :finly_insights
-      ]
+  ]
   )
-
 
 
   def self.accept?
@@ -215,19 +214,23 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def analytics
-    { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+    {name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
   end
 
   def approvals
-    reports_awaiting_approval&.merge({ name: 'Approvals'})
+    reports_awaiting_approval&.merge({name: 'Approvals'})
   end
 
   def admin
-    analytics&.merge({ name: 'Admin'})
+    analytics&.merge({name: 'Admin'})
   end
 
   def team
     team_settlements&.merge({name: "Team"})
+  end
+
+  def documents_section
+    {type: 'section', name: 'Documents'}
   end
 
 end
