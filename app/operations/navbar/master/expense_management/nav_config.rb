@@ -171,12 +171,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def team_users
     return nil unless user.admin?
-    {name: 'Users', id: 'team', url: '#users/params={"view":"manager"}'}
+    {name: 'Users', id: 'team', url: 'users/params={"view":"manager"}'}
   end
 
   def company_users
     return nil unless user.admin?
-    {name: 'Users', id: 'admin', url: '#users/params={"view":"admin"}'}
+    {name: 'Users', id: 'admin', url: 'users/params={"view":"admin"}'}
   end
 
   def load_company_balance
@@ -185,7 +185,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def statements
     return nil unless user.admin?
-    {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
+    {name: 'Statements', id: 'statements', url: 'company_statements/params={"view":"admin"}'}
   end
 
   def create
