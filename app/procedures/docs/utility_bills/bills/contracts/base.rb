@@ -8,12 +8,47 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :cost_center_id
   property :location_id
   property :company_id, presence: true
+  property :autofetched
+
+  # Should be used in update
+  property :policy_id
+  property :user_id
+
+  # Other Details
+  property :bill_date
+  property :bill_number
+  property :bill_period
+  property :due_date
+
+  property :early_payment_fee_selected
+  property :late_payment_fee_selected
+  property :convenience_fee_selected
 
   # property :user_id, presence: true
 
   property :status_id, default: BbpsBillStatus.id_for(:open)
 
   property :amount, populate_if_empty: Amount do
+    property :value, presence: true, default: 0
+    property :currency_id, presence: true
+  end
+
+  property :late_payment_fee, populate_if_empty: Amount do
+    property :value, presence: true, default: 0
+    property :currency_id, presence: true
+  end
+
+  property :early_payment_fee, populate_if_empty: Amount do
+    property :value, presence: true, default: 0
+    property :currency_id, presence: true
+  end
+
+  property :convenience_fee, populate_if_empty: Amount do
+    property :value, presence: true, default: 0
+    property :currency_id, presence: true
+  end
+
+  property :total_amount, populate_if_empty: Amount do
     property :value, presence: true, default: 0
     property :currency_id, presence: true
   end

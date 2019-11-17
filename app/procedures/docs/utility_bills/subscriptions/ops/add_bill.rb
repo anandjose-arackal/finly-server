@@ -18,6 +18,7 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
   def create_bill(options, model:, **)
     params = {
         subscription_id: model.id,
+        'bill' => {}
     }
 
     op = Docs::UtilityBills::Bills::Ops::Create.(params)
@@ -25,6 +26,9 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
     if op.success?
       options['result'] = {'bill' => op['model']}
     end
+
+    options['result']['bill']['autofetched'] = true
+    options
 
     op.success?
   end

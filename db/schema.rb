@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_16_133146) do
+ActiveRecord::Schema.define(version: 2019_11_17_150039) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -837,9 +837,13 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.string "bbps_id"
     t.string "bill_period"
     t.integer "late_payment_fee_id"
-    t.integer "fixed_charge_id"
-    t.integer "additional_charge_id"
+    t.integer "early_payment_fee_id"
+    t.integer "convenience_fee_id"
     t.boolean "quick_pay", default: true
+    t.integer "total_amount_id"
+    t.boolean "early_payment_fee_selected", default: false
+    t.boolean "late_payment_fee_selected", default: false
+    t.boolean "convenience_fee_selected", default: false
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -1719,7 +1723,7 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
     t.string "category_code"
-    t.boolean "gst_applicable", default: true
+    t.boolean "gst_applicable", default: false
     t.boolean "tds_applicable"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
@@ -1896,6 +1900,7 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.boolean "auto_retry_payment", default: false
     t.string "legal_entity_name"
     t.boolean "show_custom_fields_in_pdf", default: true
+    t.boolean "show_po_approved_trail", default: false
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
     t.index ["default_card_expense_category_id"], name: "index_company_configurations_on_default_card_expense_category_id"
@@ -3529,6 +3534,7 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.string "override_invoice_id"
     t.integer "total_invoice_amount_id"
     t.integer "available_invoice_amount_id"
+    t.boolean "include_tax_and_tds", default: false
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -3970,8 +3976,8 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.integer "po_adjusted_advance"
-    t.integer "po_advance"
-    t.integer "po_prev_adjusted_advance"
+    t.decimal "po_advance", precision: 20, scale: 2
+    t.decimal "po_prev_adjusted_advance", precision: 20, scale: 2
     t.boolean "advance_amount_required", default: false
     t.bigint "gstin_location_id"
     t.date "transaction_service_period_from"
@@ -3992,6 +3998,7 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.integer "vendor_poc_id"
     t.integer "vlpm_id"
     t.text "client_note"
+    t.boolean "payable", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -4020,6 +4027,7 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.index ["location_id"], name: "index_invoices_on_location_id"
     t.index ["net_amount_id"], name: "index_invoices_on_net_amount_id"
     t.index ["original_amount_id"], name: "index_invoices_on_original_amount_id"
+    t.index ["payable"], name: "index_invoices_on_payable"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
     t.index ["po_adjusted_advance"], name: "index_invoices_on_po_adjusted_advance"
     t.index ["po_number"], name: "index_invoices_on_po_number"
@@ -7616,6 +7624,15 @@ ActiveRecord::Schema.define(version: 2019_11_16_133146) do
     t.index ["otp_request_type_id"], name: "index_users_on_otp_request_type_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["user_delegate_id"], name: "index_users_on_user_delegate_id"
+  end
+
+  create_table "users_with_group_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.integer "group_id"
+    t.index ["company_id"], name: "index_users_with_group_mappings_on_company_id"
+    t.index ["group_id"], name: "index_users_with_group_mappings_on_group_id"
+    t.index ["user_id"], name: "index_users_with_group_mappings_on_user_id"
   end
 
   create_table "vehicle_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

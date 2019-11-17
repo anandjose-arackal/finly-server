@@ -28,11 +28,48 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   def set_default_params(options, params:, **)
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     bill = subscription.attributes.slice('policy_id', 'department_id', 'location_id', 'cost_center_id', 'company_id')
+
+
+    autofetched = params[:autofetched]
+    # if autofetched is false, bill is getting created manually
+    # In such cases only amount will be filled and the following will be ignored
+    #   - late_payment_fee
+    #   - fixed_charge
+    #   - additional_charge
+
+
+    late_payment_fee = params[:late_payment_fee]&.to_f || 0
+    early_payment_fee = params[:early_payment_fee]&.to_f || 0
+    convenience_fee = params[:convenience_fee]&.to_f || 0
+
+    amount = late_payment_fee + fixed_charge + additional_charge
+
+    bill['bill_date'] = params[:bill_date]
+    bill['bill_number'] = params[:bill_number]
+    bill['due_date'] = params[:due_date]
+    bill['bill_period'] = params[:bill_period]
+
     bill['subscription_id'] = subscription.id
+    bill['autofetched'] = autofetched
+
+    bill['late_payment_fee'] = {
+        value: late_payment_fee,
+        currency_id: 1
+    }
+
+    bill['convenience_fee'] = {
+        value: convenience_fee,
+        currency_id: 1
+    }
+
+    bill['early_payment_fee'] = {
+        value: early_payment_fee,
+        currency_id: 1
+    }
 
     bill['amount'] = {
-        value: params[:amount] || 0,
-        currency_id: 1 # Hard coded for now
+        value: amount,
+        currency_id: 1
     }
 
     params['bill'] = bill

@@ -99,12 +99,13 @@
 #  override_invoice_id                   :string(255)
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
+#  include_tax_and_tds                   :boolean          default(FALSE)
 #
 
-  # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
+# These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
 
-  # Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
-  # Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
+# Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
+# Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
 
 class GeneralInvoice < ApplicationRecord
   include SoftDeletable, MathUtil
