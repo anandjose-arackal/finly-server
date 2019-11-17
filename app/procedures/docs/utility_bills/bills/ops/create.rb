@@ -41,8 +41,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     late_payment_fee = params[:late_payment_fee]&.to_f || 0
     early_payment_fee = params[:early_payment_fee]&.to_f || 0
     convenience_fee = params[:convenience_fee]&.to_f || 0
-
-    amount = late_payment_fee + fixed_charge + additional_charge
+    amount = params[:amount]&.to_f || 0
 
     bill['bill_date'] = params[:bill_date]
     bill['bill_number'] = params[:bill_number]

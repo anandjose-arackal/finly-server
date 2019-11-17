@@ -51,6 +51,11 @@ class BbpsBill < ApplicationRecord
   belongs_to :user, class_name: 'User', optional: true
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true
   belongs_to :amount, optional: true
+  belongs_to :total_amount, foreign_key: :total_amount_id, class_name: 'Amount', optional: true
+  belongs_to :late_payment_fee, foreign_key: :late_payment_fee_id, class_name: 'Amount', optional: true
+  belongs_to :early_payment_fee, foreign_key: :early_payment_fee_id, class_name: 'Amount', optional: true
+  belongs_to :convenience_fee, foreign_key: :convenience_fee_id, class_name: 'Amount', optional: true
+
 
   accepts_nested_attributes_for :amount
 
@@ -156,7 +161,24 @@ class BbpsBill < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         # biller_category_name: biller_category_name,
+
+        autofetched: autofetched,
+
         amount: amount.as_json,
+        total_amount: total_amount.as_json,
+        late_payment_fee: late_payment_fee.as_json,
+        early_payment_fee: early_payment_fee.as_json,
+        convenience_fee: convenience_fee.as_json,
+
+        due_date: due_date,
+        bill_date: bill_date,
+        bill_period: bill_period,
+        bill_number: bill_period,
+
+        late_payment_fee_selected: late_payment_fee_selected,
+        early_payment_fee_selected: early_payment_fee_selected,
+        convenience_fee_selected: convenience_fee_selected,
+
         biller_category_name: subscription.biller_category_name,
         customer_fields: subscription.all_customer_fields,
         subscription_pocs: subscription.subscription_pocs.as_json,

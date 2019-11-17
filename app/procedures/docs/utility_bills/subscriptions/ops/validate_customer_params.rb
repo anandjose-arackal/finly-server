@@ -10,6 +10,9 @@ class Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams < Trailblaz
 
     if rand > 0.5
       options['result']['success'] = true
+      options['result']['customer_email'] = 'demo@example.com'
+      options['result']['customer_name'] = 'John Doe'
+      options['result']['customer_pan'] = 'AHDUE8373J'
     else
       options['result']['success'] = false
       options['result']['messages'] = {
