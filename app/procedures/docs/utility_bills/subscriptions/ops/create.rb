@@ -50,7 +50,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
     fetch_requirement = biller&.fetch_requirement
     support_bill_validation = biller&.support_bill_validation
 
-    params[:subscription][:fetch_requirement] = fetch_requirements
+    params[:subscription][:fetch_requirement] = fetch_requirement
     params[:subscription][:support_bill_validation] = support_bill_validation
     params[:subscription][:auto_generate_bill] = params[:subscription][:auto_generate_bill] || resolve_auto_bill_generation(fetch_requirement)
   end
