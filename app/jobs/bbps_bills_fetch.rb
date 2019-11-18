@@ -6,25 +6,12 @@ class BbpsBillsFetch < ApplicationJob
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true)
 
     bbps_subscriptions.each do |subscription|
-      # Operation 1 : Query Bbps API for fetching new bills
-      # todo
-      parameters = set_parameters(subscription)
 
-
-      bill_fetch_operation = Bbps::BillFetch.(parameters)
-
-
-      # Operation 2 : Generate Bill
-      params = {
-          subscription_id: subscription.id,
-
-          amount: (rand * 1000).round(2), #todo Add amount from Operation #1
-          due_date: Date.today, #todo Add date from Operation #1
-      }
-
-      op = Docs::UtilityBills::Bills::Ops::Create.(params)
+      Bbps::BillFetch.(parameters, "current_user" => User.first) do |op|
+        op.success {|result| create_bill(result, subscription)}
+        op.error {|result| log_error(result, subscription)}
+      end
     end
-
   end
 
   def customer_params(subscription)
@@ -46,6 +33,29 @@ class BbpsBillsFetch < ApplicationJob
     end
 
     parameters
+  end
+
+  def create_bill(result, subscription)
+    params = {
+        amount: 500,
+        bill_date: result.bill_date,
+        bill_number: result.bill_number,
+        due_date: result.due_date,
+        bill_period: result.bill_period,
+        convenience_fee: result.convenience_fee,
+        convenience_fee_desc: result.convenience_fee_desc,
+        early_payment_fee: result.early_payment_fee,
+        late_payment_fee: result.late_payment_fee,
+
+        subscription_id: subscription.id,
+        autofetched: true,
+    }
+
+    op = Docs::UtilityBills::Bills::Ops::Create.(params)
+
+    unless op.success?
+
+    end
   end
 
 
