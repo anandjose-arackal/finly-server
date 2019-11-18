@@ -61,7 +61,8 @@ class UserDevices::FindOrCreate < BaseOperation
   end
 
   def user_device_for(client)
-    user_device = user.user_devices.valid.find_by(client: client)
+    user_ids = associated_group_users.pluck(:id)
+    user_device = UserDevice.where(user_id: user_ids).valid.find_by(client: client)
     return user_device if user_device.present?
     # If not found
     user_device = UserDevice.new user:user, company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified)

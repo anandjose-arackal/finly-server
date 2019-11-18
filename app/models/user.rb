@@ -1574,6 +1574,17 @@ class User < ApplicationRecord
     return company.departments.with_ids(department_ids)
   end
 
+  def associated_group_users(exclude_self: false)
+    users = User.where(default_company_id: self.default_company_id).with_email_or_mobile_number(self.email, self.mobile_number)
+    users = users.without_id(self.id) if exclude_self
+    users
+  end
+
+  def associated_group_role_ids
+    associated_user_ids = associated_group_users.pluck(:id)
+    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id) + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id)
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.
@@ -1593,7 +1604,7 @@ class User < ApplicationRecord
     if reset_passwords
       if self.company.group_entity_structure_enabled? && self.company.group_id.present?
         group_companies = self.company.group.companies
-        other_users = associated_group_users exclude_self: true
+        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
         other_users.each do |user|
           next if user.id == self.id
           user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
@@ -1603,15 +1614,10 @@ class User < ApplicationRecord
     end
   end
 
-  def associated_group_users(exclude_self: false)
-    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
-    users = users.without_id(self.id) if exclude_self
-    users
-  end
-
   def sync_users_for_group_entity
-    users = User.without_id(self.id).with_email_or_mobile_number(self.email, self.mobile_number)
-    previously_added_user = users.without_id(self.id).reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
+    group_companies = self.company.group.companies
+    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+    previously_added_user = users.reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
     return if previously_added_user.blank?
     # setting OTP verified for all users if the current user is verified
     if previously_added_user&.otp_verified?
@@ -1623,6 +1629,7 @@ class User < ApplicationRecord
       users.update_all(verified: true)
       self.update_columns(verified: true)
     end
+
   end
 
 
