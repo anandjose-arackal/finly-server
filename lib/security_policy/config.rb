@@ -161,7 +161,8 @@ class SecurityPolicy::Config
   def self.config_for(roles, *keys)
     values = []
     roles.each do |role|
-      policy = (ROLE_LEVELS[role] || HIGH)&.dig(*keys) # Default to high unless specified
+      # policy = (ROLE_LEVELS[role] || HIGH)&.dig(*keys) # Default to high unless specified
+      policy = ROLE_LEVELS[role]&.dig(*keys) # Default to high unless specified
       values << policy
     end
     values = values.reject {|value| value.blank?}
