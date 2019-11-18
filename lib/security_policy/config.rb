@@ -9,7 +9,7 @@ class SecurityPolicy::Config
           concurrent_logins: 10
       },
       password: {
-          minimum_score: 3,
+          minimum_score: 1,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
@@ -32,7 +32,7 @@ class SecurityPolicy::Config
           concurrent_logins: 10
       },
       password: {
-          minimum_score: 2,
+          minimum_score: 1,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
@@ -161,7 +161,9 @@ class SecurityPolicy::Config
   def self.config_for(roles, *keys)
     values = []
     roles.each do |role|
-      values << ROLE_LEVELS[role]&.dig(*keys)
+      # policy = (ROLE_LEVELS[role] || HIGH)&.dig(*keys) # Default to high unless specified
+      policy = ROLE_LEVELS[role]&.dig(*keys) # Default to high unless specified
+      values << policy
     end
     values = values.reject {|value| value.blank?}
     values
