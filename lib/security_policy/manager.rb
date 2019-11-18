@@ -14,8 +14,10 @@ class SecurityPolicy::Manager
 
   def initialize(user)
     self.user = user
-    self.user_roles = user.user_roles
-    self.user_role_names = user.user_roles.pluck(:name)
+    self.user_roles = user.role_mapping.pluck(:user_role_id) + user.policy_user_roles.pluck(:user_role_id)
+    self.user_roles.uniq!
+    self.user_role_names = User.where(id: self.user_roles).pluck(:name)
+    self.user_role_names = self.user_role_names.map { |role| role.name.gsub(" ", "_").underscore }
     self.user_role_names << 'employee' if self.user_role_names.blank?
     init_config
   end

@@ -5,11 +5,11 @@ class SecurityPolicy::Config
           client: {otp_verify: false},
           ip: {otp_verify: false},
           user_agent: {otp_verify: false},
-          inactivity_timeout: 1.hour,
+          inactivity_timeout: 30.minutes,
           concurrent_logins: 10
       },
       password: {
-          minimum_score: 1,
+          minimum_score: 3,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
@@ -32,7 +32,7 @@ class SecurityPolicy::Config
           concurrent_logins: 10
       },
       password: {
-          minimum_score: 1,
+          minimum_score: 2,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
@@ -40,7 +40,7 @@ class SecurityPolicy::Config
           expire_after: 90.days
       },
       account_lock: {
-          max_attempts: 20,
+          max_attempts: 10,
           within_timeframe: 30.minutes,
           locking_period: 30.minutes
       }
@@ -161,8 +161,7 @@ class SecurityPolicy::Config
   def self.config_for(roles, *keys)
     values = []
     roles.each do |role|
-      # policy = (ROLE_LEVELS[role] || HIGH)&.dig(*keys) # Default to high unless specified
-      policy = ROLE_LEVELS[role]&.dig(*keys) # Default to high unless specified
+      policy = (ROLE_LEVELS[role] || HIGH)&.dig(*keys) # Default to high unless specified
       values << policy
     end
     values = values.reject {|value| value.blank?}
