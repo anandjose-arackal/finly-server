@@ -293,7 +293,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         settlement_currency = Currency.find_by_id(currency_id) || 1
         reimbursement_amount = Expense.with_report_id(grouped_report_ids).sum_reimbursements(settlement_currency&.country_code&.to_sym)
         if reimbursement_amount < user_reimbursing_amount
-          add_message :error, 'Entered amount is more that actual reimbursable amount'
+          add_message :error, 'Entered amount is more than the actual reimbursable amount'
         end
       end
     end
