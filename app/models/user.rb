@@ -1593,14 +1593,20 @@ class User < ApplicationRecord
     if reset_passwords
       if self.company.group_entity_structure_enabled? && self.company.group_id.present?
         group_companies = self.company.group.companies
-        other_users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+        other_users = associated_group_users exclude_self: true
         other_users.each do |user|
           next if user.id == self.id
           user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
-          user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
+          user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified, password_changed_at: self.password_changed_at)
         end
       end
     end
+  end
+
+  def associated_group_users(exclude_self: false)
+    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
+    users = users.without_id(self.id) if exclude_self
+    users
   end
 
   def sync_users_for_group_entity
