@@ -42,7 +42,7 @@ class User::Configuration::UpdatePassword < BaseOperation
               to: user.email,
               user_agent: request&.user_agent,
               ip: request&.remote_ip,
-              timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+              timestamp: Time.zone.now.strftime("%I:%M %p, %d %b %Y")
           }
       )
     end
