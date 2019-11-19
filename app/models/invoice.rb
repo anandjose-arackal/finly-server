@@ -1079,7 +1079,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :initiated)
   end
 
   def self.auditor_associated_status_ids

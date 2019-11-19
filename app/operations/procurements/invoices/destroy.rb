@@ -39,4 +39,9 @@ class Procurements::Invoices::Destroy < Procurements::Invoices::Base
       end
     end
   end
+
+  def post_process
+    params[:procurement_id] = self.procurement.id
+    params[:purchase_order_id] = self.procurement.try(:purchase_order).try(:id)
+  end
 end
