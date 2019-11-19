@@ -3877,6 +3877,8 @@ Rails.application.routes.draw do
     resources :bills do
       patch 'review', to: 'bills#review'
     end
+
+    resources :complaints
   end
   # Utility Bill Payments / BBPS Ends  #
 
