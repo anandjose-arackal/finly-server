@@ -1,7 +1,7 @@
 class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   register_handle :vendor_show
   # register_actions %i( submit retract approve reject delete add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
-  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate enable_pan)
+  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate enable_pan fill_from_gstin)
 
   def initialize(user=nil, params={})
     super
@@ -70,6 +70,7 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id
   end
 
+  # pan is editable till vendor is being empanelled
   def enable_pan
     if vendor.created_by_id == user.id
       return vendor.draft? || vendor.rejected? || vendor.retracted?
@@ -79,6 +80,19 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     if user.vendor_payments_admin? && (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id)
       return vendor.draft? || vendor.rejected? || vendor.retracted? || vendor.awaiting_approval?
     end 
+  end
+
+  # this is used by FE to autofill. button should not appear after submission. user can change lot of data
+  # during processing do not allow autofill
+  def fill_from_gstin
+    if vendor.created_by_id == user.id
+      return vendor.draft? || vendor.rejected? || vendor.retracted?
+    end
+
+    # Allow admin to edit pan after taking control
+    if user.vendor_payments_admin? && (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id)
+      return vendor.draft? || vendor.rejected? || vendor.retracted?
+    end
   end
 
 
