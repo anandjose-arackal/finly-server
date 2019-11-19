@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: billing_accounts
+# Table name: utility_bills_accounts
 #
 #  id         :bigint           not null, primary key
 #  balance_id :integer
@@ -10,7 +10,7 @@
 #  updated_at :datetime         not null
 #
 
-class BillingAccount < ApplicationRecord
+class UtilityBillsAccount < ApplicationRecord
 
   include Accountable
 
@@ -29,7 +29,7 @@ class BillingAccount < ApplicationRecord
   has_many :virtual_bank_accounts, as: :receiving_account
 
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
-    PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("BillingAccount").without_id(excluded_payment_order_id).scheduled.joins(:amount_requested).sum(:value)
+    PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("UtilityBillsAccount").without_id(excluded_payment_order_id).scheduled.joins(:amount_requested).sum(:value)
   end
 
   scope :with_company_id, -> (company_id) {

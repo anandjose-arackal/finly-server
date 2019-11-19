@@ -178,7 +178,9 @@ class Bbps::BillPay < Bbps::Api
     OpenStruct.new(
         {
             amount: result['response.parsed']['amount'],
+            status: result['response.parsed']['status'],
             bill_date: result['response.parsed']['bill_date'],
+            response_code: result['response.status_code'],
             due_date: result['response.parsed']['due_date'],
             bill_number: result['response.parsed']['bill_number'],
             bill_period: result['response.parsed']['bill_period'],

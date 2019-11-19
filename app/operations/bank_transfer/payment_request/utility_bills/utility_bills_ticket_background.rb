@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     self.payments_attributes.each do |payment|
-      initiating_account = company.billing_account
+      initiating_account = company.utility_bills_account
       receiving_account = BbpsBiller.find_by(id: payment[:account_id])
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
