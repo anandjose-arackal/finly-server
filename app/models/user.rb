@@ -238,10 +238,9 @@ class User < ApplicationRecord
   has_one :user_permission, dependent: :destroy
 
   has_many :user_sessions
-  has_many :user_devices
-
-  has_many :user_ips
-  has_many :user_agent_clients
+  has_many :user_devices, foreign_key: :user_finly_id, primary_key: :finly_id
+  has_many :user_ips, foreign_key: :user_finly_id, primary_key: :finly_id
+  has_many :user_agent_clients, foreign_key: :user_finly_id, primary_key: :finly_id
 
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
