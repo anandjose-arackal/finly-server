@@ -185,7 +185,7 @@ class BbpsBill < ApplicationRecord
         fetch_requirement: subscription.fetch_requirement,
         support_bill_validation: subscription.support_bill_validation,
         auto_generate_bill: subscription.auto_generate_bill,
-        expected_due_day: subscription.expected_due_day,
+        expected_bill_day: subscription.expected_bill_day,
         reminder_before_days: subscription.reminder_before_days,
         customer_email: subscription.customer_email,
         customer_name: subscription.customer_name,
