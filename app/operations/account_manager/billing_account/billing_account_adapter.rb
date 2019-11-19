@@ -1,9 +1,9 @@
-class AccountManager::BbpsBiller::BillingAccountAdapter < AccountManager::BaseAdapter
+class AccountManager::BbpsBiller::UtilityBillsAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :billing_acocunt, :company
+  attr_accessor :errors, :utility_bills_account, :company
 
   def account_class
-    BillingAccount
+    UtilityBillsAccount
   end
 
   def credit(payment, options = {})
