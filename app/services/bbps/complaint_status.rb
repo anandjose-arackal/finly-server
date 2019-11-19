@@ -1,7 +1,6 @@
 class Bbps::ComplaintStatus < Bbps::Api
   schema do
     params do
-      required(:mobile_number).filled
       required(:complaint_id).filled
     end
   end
@@ -12,8 +11,7 @@ class Bbps::ComplaintStatus < Bbps::Api
   # Message Code(B6000)| Ref No |Agent institution Id | Channel Id| Agent Id | Complaint Id |
   # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5| Additional Field 6|
   # Additional Field 7| Additional Field 8| Additional Field 9|Additional Field 10| Additional Field 11| Additional Field 12|
-  # Additional Field 13|
-  Additional Field 14 | Additional Field 15 | Ref ID | Txn Ref ID
+  # Additional Field 13| Additional Field 14 | Additional Field 15 | Ref ID | Txn Ref ID
   # # Example:
   # B6000 |COMPLNLSTREFAGENT178388153208|YS01|C1001|18800 |QB1474357630126| S |NA |NA |NA |NA |NA |NA |NA |NA |NA|NA|NA|NA|NA|NA|NA|NA
   request_fields(
@@ -21,7 +19,8 @@ class Bbps::ComplaintStatus < Bbps::Api
           :message_code, :ref_number, :agent_institution_id, :channel_id, :agent_id, :complaint_id,
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field
+          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+          :ref_id, :txn_ref_id
       ]
   )
   #
@@ -46,9 +45,9 @@ class Bbps::ComplaintStatus < Bbps::Api
       ]
   )
   #
-  # def message_code
-  #   'B9000'
-  # end
+  def message_code
+    'B6000'
+  end
 
   def complaint_id
     params[:complaint_id]

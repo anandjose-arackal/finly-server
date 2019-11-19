@@ -18,7 +18,7 @@
 #  status_id               :integer          not null
 #  user_id                 :integer
 #  agreement_id            :integer
-#  expected_due_day        :string(255)
+#  expected_bill_day       :string(255)
 #  controlling_level_id    :integer
 #  reminder_before_days    :string(255)
 #  biller_category_name    :string(255)
@@ -124,7 +124,7 @@ class BbpsBillerSubscription < ApplicationRecord
         fetch_requirement: fetch_requirement,
         support_bill_validation: support_bill_validation,
         auto_generate_bill: auto_generate_bill,
-        expected_due_day: expected_due_day,
+        expected_bill_day: expected_bill_day,
         reminder_before_days: reminder_before_days,
         customer_email: customer_email,
         customer_name: customer_name,

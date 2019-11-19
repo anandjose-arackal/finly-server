@@ -3,7 +3,7 @@ class Docs::UtilityBills::Complaints::Ops::Status < Transactions::API
 
   schema do
     params do
-      required(:complain_id).filled
+      required(:complaint_id).filled
     end
   end
 

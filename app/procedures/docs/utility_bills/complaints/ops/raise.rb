@@ -1,5 +1,4 @@
 class Docs::UtilityBills::Complaints::Ops::Raise < Transactions::API
-  step :init
 
   schema do
     params do
@@ -7,9 +6,10 @@ class Docs::UtilityBills::Complaints::Ops::Raise < Transactions::API
       required(:complaint_type).filled
       required(:complaint_category).filled
       required(:complaint_entity_id).filled
-      optional(:description).filled
     end
   end
+
+  step :init
 
   def init(options, params:, **)
     Bbps::ComplaintCreate.(params, "current_user" => User.first) do |op|
@@ -22,6 +22,14 @@ class Docs::UtilityBills::Complaints::Ops::Raise < Transactions::API
       end
 
       op.failure do |op_result|
+        # todo - Remove below code
+        response = {"TxnStatusComplainResp" => {"txnList": nil, "customerDetails": nil, "msgId": "COMPLAINTMSGC13A3484AE2170627110227", "complaintId" => "DQ1498541548003", "openComplaint": nil, "complaintStatus": nil, "assigned": "XYZ Bank", "responseCode": "000", "responseReason": "SUCCESS"}}
+        data = {
+            'complain_id': response["TxnStatusComplainResp"]["complaintId"],
+            'complain_details' => response
+        }
+        result = data
+        options['result'] = result
         # Send error response
       end
     end

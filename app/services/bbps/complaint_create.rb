@@ -9,8 +9,8 @@ class Bbps::ComplaintCreate < Bbps::Api
       required(:complaint_category).filled
       required(:complaint_entity_id).filled
       optional(:description).filled
-      optional(:ref_id).filled
-      optional(:txn_ref_id).filled
+        # optional(:ref_id).filled
+        # optional(:txn_ref_id).filled
     end
   end
   #
@@ -54,7 +54,7 @@ class Bbps::ComplaintCreate < Bbps::Api
   )
   #
   def message_code
-    'B9000'
+    'B5000'
   end
 
   def complaint_category
@@ -88,11 +88,18 @@ class Bbps::ComplaintCreate < Bbps::Api
 
   #
   def self.handle_success(result)
-    data = {
-        complaint_id: result['response.parsed']['complaint_id'],
-        complaint_details: JSON.parse(result['response.parsed']['complaint_data'])
-    }
+    # todo - Uncomment Real Data
+    # data = {
+    #     complaint_id: result['response.parsed']['TxnStatusComplainResp']['complainId'],
+    #     complaint_details: JSON.parse(result['response.parsed']['complaint_data'])
+    # }
 
+    # todo - Comment / Remove junk response
+    response = {"TxnStatusComplainResp": {"txnList": nil, "customerDetails": nil, "msgId": "COMPLAINTMSGC13A3484AE2170627110227", "complaintId": "DQ1498541548003", "openComplaint": nil, "complaintStatus": nil, "assigned": "XYZ Bank", "responseCode": "000", "responseReason": "SUCCESS"}}
+    data = {
+        complain_id: response["TxnStatusComplainResp"]["complainId"],
+        complain_details: response
+    }
     OpenStruct.new data
   end
 
