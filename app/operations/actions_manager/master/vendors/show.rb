@@ -1,7 +1,7 @@
 class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   register_handle :vendor_show
   # register_actions %i( submit retract approve reject delete add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
-  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate )
+  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate enable_pan)
 
   def initialize(user=nil, params={})
     super
@@ -68,6 +68,18 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   def user_can_return_control?
     vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control &&
     vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id
+  end
+
+  def enable_pan
+    if vendor.created_by_id == user.id
+      vendor.open? || vendor.rejected? || vendor.retracted?
+      return
+    end
+
+    # Allow admin to edit pan after taking control
+    if user.vendor_payments_admin? && (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id)
+      vendor.open? || vendor.rejected? || vendor.retracted? || vendor.awaiting_approval?
+    end 
   end
 
 
