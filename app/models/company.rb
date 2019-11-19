@@ -56,7 +56,8 @@ class Company < ApplicationRecord
   has_one :yes_bank_company_account
   has_one :icici_bank_company_account
   has_one :kotak_bank_company_account
-  has_one :billing_account
+  has_one :utility_bills_account
+  has_one :billing_account, class_name: "UtilityBillsAccount"
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -503,7 +504,7 @@ class Company < ApplicationRecord
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
-    self.build_billing_account(enabled: true, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_utility_bills_account(enabled: true, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save
