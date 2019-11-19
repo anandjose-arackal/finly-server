@@ -25,8 +25,8 @@ class Docs::UtilityBills::Complaints::Ops::Raise < Transactions::API
         # todo - Remove below code
         response = {"TxnStatusComplainResp" => {"txnList": nil, "customerDetails": nil, "msgId": "COMPLAINTMSGC13A3484AE2170627110227", "complaintId" => "DQ1498541548003", "openComplaint": nil, "complaintStatus": nil, "assigned": "XYZ Bank", "responseCode": "000", "responseReason": "SUCCESS"}}
         data = {
-            'complain_id': response["TxnStatusComplainResp"]["complaintId"],
-            'complain_details' => response
+            'complaint_id': response["TxnStatusComplainResp"]["complaintId"],
+            'complaint_details' => response
         }
         result = data
         options['result'] = result
