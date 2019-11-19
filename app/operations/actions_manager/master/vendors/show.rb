@@ -72,13 +72,12 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
 
   def enable_pan
     if vendor.created_by_id == user.id
-      vendor.open? || vendor.rejected? || vendor.retracted?
-      return
+      return vendor.draft? || vendor.rejected? || vendor.retracted?
     end
 
     # Allow admin to edit pan after taking control
     if user.vendor_payments_admin? && (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id)
-      vendor.open? || vendor.rejected? || vendor.retracted? || vendor.awaiting_approval?
+      return vendor.draft? || vendor.rejected? || vendor.retracted? || vendor.awaiting_approval?
     end 
   end
 
