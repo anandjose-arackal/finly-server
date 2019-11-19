@@ -42,11 +42,11 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
       # i.e. this is a success which will mark the payment as succeeded
       if op.status == "Y"
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-      else
+      elsif payment.response_code != 200
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
       end
     else
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))  
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
     end
     true
   end
