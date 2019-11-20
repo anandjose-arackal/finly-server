@@ -10,9 +10,14 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
   has_scope :filter_policy_id
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )
-  step Transactions::Resolver::Model(BbpsBillerSubscription)
+  # step Transactions::Resolver::Model(BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
   step :index!
 
+  # def check(options, params:, **)
+  # end
+  #
+  # def check2(options, params:, **)
+  # end
 
   def index!(options, params:, current_user:, **)
     if current_user.vendor_payment_admin?
@@ -30,7 +35,6 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
     result = {
         "subscriptions" => BbpsBillerSubscription.paginate(page: page, per_page: per_page).includes_for_index
     }
-
     options['result'] = result
   end
 end

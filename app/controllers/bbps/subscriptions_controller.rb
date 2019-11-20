@@ -31,7 +31,6 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def create
     @op = Docs::UtilityBills::Subscriptions::Ops::Create.(params, "current_user" => current_user)
-    debugger
     respond_to do |format|
       format.json {}
     end
