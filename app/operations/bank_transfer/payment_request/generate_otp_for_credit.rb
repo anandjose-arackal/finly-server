@@ -14,6 +14,10 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
 
   def init
     id = params[:id] || params[:payment_request_id] || params[:bank_payment_request_id]
+    if id.blank?
+      add_message :error, "Unprocessable payment ticket. Please review the errors in the summary."
+      return
+    end
     unless id.is_a?(Array)
       id = id.split(",")
     end
