@@ -6,7 +6,6 @@ module Forms
         Class.new(Dry::Validation::Contract) do
           params do
             required(:section).filled
-            optional(:parent)
             required(:field_key).filled
             required(:label).filled
             required(:placeholder).filled
@@ -66,7 +65,6 @@ module Forms
       class_attribute :registered_type
 
       attribute :section
-      attribute :parent
       attribute :field_key
       attribute :label, default: ->(*args) { self.field_key&.to_s&.humanize }
       attribute :placeholder, default: "Enter value"
@@ -110,11 +108,9 @@ module Forms
       # Todo map_field support
       # class_attr :map_field_id
 
-      def initialize(section, parent, field_key, opts = {}, &block)
+      def initialize(section, field_key, opts = {}, &block)
         self.section = section
-        self.parent = parent
         field_key(field_key)
-        parent(parent)
         section(section)
         self.options = opts
         initialize_with(opts)
@@ -130,7 +126,7 @@ module Forms
       end
 
       def inspect
-        "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.except(:parent).as_json}>"
+        "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
       end
     end
   end
@@ -140,7 +136,6 @@ end
 # {
 #     "form_id": "123",
 #     "key": "subscription_id",
-#     "parent_id": "",
 #     "section": "",
 #     "label": "Subscription",
 #     "placeholder": "Enter subscription",

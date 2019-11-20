@@ -4,7 +4,7 @@ module Forms
       extend ActiveSupport::Concern
 
       def self.types
-        @types ||= {}
+        @types ||= {}.with_indifferent_access
       end
 
       def entities
@@ -14,8 +14,8 @@ module Forms
       def entity(*args, &block)
         opts = args.extract_options!
         klass, name = klass_and_name_from args
-        parent = (is_a?(Entity) ? self : nil)
-        entity = klass.new(section, parent, name, opts, &block)
+        entity = klass.new(section, name, opts, &block)
+        entity.custom_field(false)
         result = entity.valid?
         unless result.success?
           raise "Invalid Form Field: #{self.form}##{name} (#{klass}) Failure: #{result.failure.to_json}"
