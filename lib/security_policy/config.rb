@@ -6,7 +6,7 @@ class SecurityPolicy::Config
           ip: {otp_verify: true},
           user_agent: {otp_verify: true},
           inactivity_timeout: 30.minutes,
-          concurrent_logins: 10
+          concurrent_logins: 2
       },
       password: {
           minimum_score: 3,
