@@ -1,7 +1,6 @@
 class Docs::UtilityBills::Bills::Ops::Destroy < Transactions::API
 
-  step :set_default_params
-  step Model(BbspBill, :find_by)
+  step Model(BbpsBill, :find_by)
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :destroy?)
 
   step :destroy!

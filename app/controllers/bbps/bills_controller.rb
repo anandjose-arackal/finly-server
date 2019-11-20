@@ -57,6 +57,13 @@ class Bbps::BillsController < BaseControllers::WebBase
     respond
   end
 
+  def destroy
+    @op = Docs::UtilityBills::Bills::Ops::Destroy.(params.to_unsafe_h, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   private
 
   def resolve_layout

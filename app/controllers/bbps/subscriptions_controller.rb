@@ -72,6 +72,13 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
+  def destroy
+    @op = Docs::UtilityBills::Subscriptions::Ops::Destroy.(params.to_unsafe_h, "current_user" => current_user)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def add_bill
     @op = Docs::UtilityBills::Subscriptions::Ops::AddBill.(params.to_unsafe_h, "current_user" => current_user)
     respond_to do |format|
