@@ -4,9 +4,6 @@ module ActiveRecordMaster
   included do
     include DynamicAttributes
     class_attr :policy
-    class_attr :event_channel, default: self.name.underscore
-    class_attr :record_events, default: []
-    class_attr :collection_events, default: []
     class_attr :form
     class_attr :state_machine
   end
@@ -18,20 +15,6 @@ module ActiveRecordMaster
 
     def resolvers
       @resolvers ||= {}
-    end
-
-    def record_event?(event)
-      return false if event.blank?
-      record_events.include?(event) or record_events.include?(event.gsub("#{event_channel}.", ""))
-    end
-
-    def collection_event?(event)
-      return false if event.blank?
-      collection_events.include?(event) or collection_events.include?(event.gsub("#{event_channel}.", ""))
-    end
-
-    def all_events
-      record_events + collection_events
     end
 
     def resolve(user, scope: :default, params: {}, filter: false, paginate: false, includes: [])

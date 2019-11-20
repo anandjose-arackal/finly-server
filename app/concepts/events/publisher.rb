@@ -1,3 +1,5 @@
+require 'dry/monads'
+
 class Events::Publisher
   extend Dry::Monads[:result]
 
