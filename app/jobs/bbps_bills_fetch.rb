@@ -2,13 +2,15 @@ class BbpsBillsFetch < ApplicationJob
 
   def perform
     # Fetch bills where automatic fetching is enabled
-    status_ids = [BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)]
+    status_ids = BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated)
     bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: nil)
     autofetched = true
+
     bbps_subscriptions.each do |subscription|
+      parameters = customer_params(subscription).with_indifferent_access
       Bbps::BillFetch.(parameters, "current_user" => User.first) do |op|
         op.success {|result| create_bill(result, subscription, autofetched)}
-        op.error {|result| log_error(result, subscription)}
+        op.failure {|result| p result}
       end
     end
 
@@ -16,7 +18,7 @@ class BbpsBillsFetch < ApplicationJob
     # Create bills two days before expected bill day
     autofetched = false
     bill_day = (Date.today + 2.days).day
-    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where.not(expected_bill_day: bill_day)
+    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where(expected_bill_day: bill_day)
     bbps_subscriptions.each {|subscription| create_bill({}, subscription, autofetched)}
   end
 
@@ -51,6 +53,26 @@ class BbpsBillsFetch < ApplicationJob
       }
     end
     op = Docs::UtilityBills::Bills::Ops::Create.(params)
+  end
+
+  def customer_params(subscription)
+    parameters = {
+        mobile_number: subscription.mobile_number,
+        biller_id: subscription.biller&.biller_id,
+    }
+
+    (1..5).to_a.each do |i|
+      key = subscription.send("customer_param_key_#{i}")
+      value = subscription.send("customer_param_value_#{i}")
+      if key.present? && value.present?
+        parameters["customer_param_#{i}"] = {
+            key: key,
+            value: value
+        }
+      end
+    end
+
+    parameters
   end
 
 
