@@ -12,27 +12,12 @@ class BbpsBillsFetch < ApplicationJob
       end
     end
 
-
-    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where.not(expected_bill_day: nil)
-
-    bbps_subscriptions.each do |subscription|
-      # Day of month for today
-      today_day = Date.today.day
-
-      # Last day of month
-      last_day_of_month = Date.today.end_of_month.day
-
-      # Day of month 2 days before subscription's expected bill day
-      subscription_bill_day = subscription.expected_bill_day.to_i - 2
-
-      subscription_bill_day = last_day_of_month + subscription_bill_day if [-1, 0].include?(subscription_bill_day)
-      # subscription_bill_day = last_day_of_month + subscription_bill_day if [-1, 0].include?(subscription_bill_day)
-
-      autofetched = false
-      if today_day == subscription_bill_day
-        create_bill(result, subscription, autofetched)
-      end
-    end
+    # Where Auto Fetching Bills not supported by vendors
+    # Create bills two days before expected bill day
+    autofetched = false
+    bill_day = (Date.today + 2.days).day
+    bbps_subscriptions = BbpsBillerSubscription.where(status_id: status_ids, auto_generate_bill: true).where.not(expected_bill_day: bill_day)
+    bbps_subscriptions.each {|subscription| create_bill({}, subscription, autofetched)}
   end
 
   def create_bill(result, subscription, autofetched)

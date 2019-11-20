@@ -180,6 +180,7 @@ class BbpsBill < ApplicationRecord
         convenience_fee_selected: convenience_fee_selected,
 
         biller_category_name: subscription.biller_category_name,
+        mobile_number: subscription.mobile_number,
         customer_fields: subscription.all_customer_fields,
         subscription_pocs: subscription.subscription_pocs.as_json,
         fetch_requirement: subscription.fetch_requirement,

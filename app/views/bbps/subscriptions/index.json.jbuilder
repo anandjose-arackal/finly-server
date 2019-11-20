@@ -1,3 +1,4 @@
+debugger
 json.result do
   json.array! @op['result']['subscriptions']
 end
