@@ -62,6 +62,10 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
         (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)) || user.vendor_payment_admin?)
   end
 
+  def raise_dispute
+    BbpsBill.status_ids(:failed, :paid).include?(bbps_bill.status_id)
+  end
+
   private
 
   def has_taken_control?

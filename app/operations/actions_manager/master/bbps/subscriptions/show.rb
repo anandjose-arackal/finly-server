@@ -4,7 +4,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   register_handle :bbps_subscriptions_show
   register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
-                    :deactivate, :reactivate, :add_bill, :raise_dispute]
+                    :deactivate, :reactivate, :add_bill, :raise_dispute, :destroy]
 
   def initialize(user = nil, params = {})
     super
@@ -65,6 +65,10 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def raise_dispute
     BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated, :deactivated).include?(bbps_subscription.status_id)
+  end
+
+  def destroy
+    (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id)
   end
 
   private
