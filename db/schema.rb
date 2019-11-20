@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_18_141612) do
+ActiveRecord::Schema.define(version: 2019_11_19_142217) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -6986,7 +6986,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_141612) do
 
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "user_agent", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
@@ -6996,6 +6996,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_141612) do
     t.integer "verification_code_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "user_finly_id"
     t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
     t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
     t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
@@ -7154,6 +7155,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_141612) do
     t.integer "client_id"
     t.string "client_type"
     t.text "message"
+    t.string "user_finly_id"
     t.index ["company_id"], name: "index_user_devices_on_company_id"
     t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
     t.index ["status_id"], name: "index_user_devices_on_status_id"
@@ -7207,7 +7209,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_141612) do
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "ip", null: false
     t.string "ip_type", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
@@ -7228,6 +7230,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_141612) do
     t.decimal "latitude", precision: 20, scale: 10
     t.decimal "longitude", precision: 20, scale: 10
     t.integer "accuracy_radius"
+    t.string "user_finly_id"
     t.index ["ip"], name: "index_user_ips_on_ip"
     t.index ["ip_type"], name: "index_user_ips_on_ip_type"
     t.index ["status_id"], name: "index_user_ips_on_status_id"
