@@ -2,7 +2,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
 
   schema do
     params do
-      required('aasm_event').filled
+      required(:aasm_event).filled
     end
   end
 
