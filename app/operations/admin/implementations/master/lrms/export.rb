@@ -106,8 +106,9 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
              YesBankVendorProvider
              PaymentAgreementProvider
              )
-
-
+    if params[:with_id] == "all"
+      params[:with_id] = company.policies.pluck(:id)
+    end
     providers.each do |provider|
       total_count = 0
       contents[provider] = []

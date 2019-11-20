@@ -49,7 +49,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
     end
     output = []
     failed = false
-    self.implementation_request.update(requested_items: (input&.count - 1))
+    self.implementation_request.update(requested_items: (input&.count-1))
     self.input.each_with_index do |row, index|
       if index == 0
         next
@@ -67,11 +67,11 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
         data[headers.keys[index]] = value
       end
       #begin
-      result = process_row(data)
-      unless result.is_a?(Admin::Implementations::Processor::Import::Result)
-        item_complete false
-        #raise "invalid result"
-      end
+        result = process_row(data)
+        unless result.is_a?(Admin::Implementations::Processor::Import::Result)
+          item_complete false
+          #raise "invalid result"
+        end
       # rescue Exception => e
       #   result false, "#{e.message}"
       # end
@@ -97,16 +97,19 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   def process_row(data)
     id = data[:id]
     destroy_action = data[:destroy]
-    if ['y', 'Y'].include?(destroy_action&.to_s&.downcase)
+    invite_action = data[:invite]
+    if destroy_action&.to_s&.downcase == 'y'
       response = destroy_records(data)
     elsif destroy_action&.to_s&.downcase == 'activate'
-      response = destroy_records(data)
+      response =destroy_records(data)
+    elsif invite_action.to_s.downcase == 'y'
+      response = invite(data)
     elsif id.present?
-      response = update_record(data)
+      response =update_record(data)
     else
-      response = create_record(data)
+      response =create_record(data)
     end
-    response
+      response
   end
 
   def destroy_records(data)
@@ -119,6 +122,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
   def create_record(data)
     result success: false, message: "Create action cant perform"
+  end
+
+  def invite(data)
+    result sucess:  false, message: "Create action cant perform"
   end
 
   def result(success, message = nil)
