@@ -234,7 +234,6 @@ class Vendors::Create < Vendors::Base
         self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
       end
 
-
       if self.vendor.save
         if user.company.vendor_empanelment_workflow_enabled?
           self.vendor.update(status_id: VendorStatus.id_for(:draft))
@@ -245,7 +244,9 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            add_message :error, document_reviewer_mappings_op.messages[:error]
+            if self.vendor.really_destroy!
+              add_message :error, document_reviewer_mappings_op.messages[:error]
+            end
           end
           return
         else
@@ -269,7 +270,9 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            add_message :error, document_reviewer_mappings_op.messages[:error]
+            if self.vendor.really_destroy!
+              add_message :error, document_reviewer_mappings_op.messages[:error]
+            end
           end
           return
         else
