@@ -113,6 +113,22 @@ class Vendors::Create < Vendors::Base
     # check for duplicate gstin in the system for the  current company
     gstins = []
     vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+      poc_email = gstin_location[:poc_email]
+      poc_mobile_number = gstin_location[:poc_mobile_number]
+      if poc_email.present?
+        unless Constants::VALID_EMAIL_FORMAT.match?(poc_email)
+          add_message :error, "#{poc_email}: Invalid email"
+          return
+        end
+      end
+
+      if poc_mobile_number.present?
+        unless Constants::VALID_MOBILE_NUMBER.match?(poc_mobile_number)
+          add_message :error, "#{poc_mobile_number}: Invalid mobile number"
+          return
+        end
+      end
+
       next if gstin_location[:_destroy]
 
       gstins << gstin_location[:gstin]
