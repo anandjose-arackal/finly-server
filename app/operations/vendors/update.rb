@@ -84,6 +84,16 @@ class Vendors::Update < Vendors::Base
         return
       end
     end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each do |bank_account|
+        if bank_account[:account_number].present? && bank_account[:confirm_account_number].present? && (bank_account[:account_number] != bank_account[:confirm_account_number])
+          add_message :error, "Account number: #{bank_account[:account_number]} does not match with confirmation account number: #{bank_account[:confirm_account_number]}"
+          return
+        end
+      end
+    end
+
   end
 
   def pre_process
