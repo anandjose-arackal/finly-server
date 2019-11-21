@@ -199,6 +199,8 @@ class YesBankVendor < ApplicationRecord
     where id: ids
   }
 
+  scope :without_id, -> (id) {where.not(id: id)}
+
   # Scopes for ordering ends
 
   before_validation do
