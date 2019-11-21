@@ -46,6 +46,10 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
 
+  # def return_control?
+  #   @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+  # end
+
   def deactivate?
     @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved?)
   end

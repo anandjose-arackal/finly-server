@@ -40,6 +40,14 @@ class Docs::UtilityBills::Bills::Authorizer
     !@model.autofetched && (@user.vendor_payment_admin? || (@user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) && @model.subscription.pocs.include?(@user) && (@model.open? || @model.retracted? || @model.rejected?)))
   end
 
+  def take_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+  end
+
+  # def return_control?
+  #
+  # end
+
   private
 
   def reviewing_user?
