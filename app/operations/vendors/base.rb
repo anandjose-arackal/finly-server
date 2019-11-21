@@ -167,4 +167,20 @@ class Vendors::Base < BaseOperation
     true
   end
 
+  def validate_duplicate_bank_account
+    if vendor.present? && vendor.is_a?(YesBankVendor)
+      if self.vendor.bank_accounts.present?
+        account_numbers = self.vendor.bank_accounts.map(&:account_number)
+        duplicate_account_numbers = account_numbers.select{|item| account_numbers.count(item) > 1}.uniq
+        if duplicate_account_numbers.present?
+          add_message :error, "Duplicate records found for account numbers #{duplicate_account_numbers.join(', ')}"  
+        end
+        # if user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').present?
+        #   associated_account_numbers = user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').pluck(:account_number)
+        #   add_message :error, "Account number: #{associated_account_numbers.join(', ')}  already in use"
+        # end
+      end
+    end
+  end
+
 end
