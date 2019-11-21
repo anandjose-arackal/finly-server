@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_19_142217) do
+ActiveRecord::Schema.define(version: 2019_11_21_122926) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -703,6 +703,12 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "bbps_bill_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bbps_biller_subscription_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -713,13 +719,11 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
   create_table "bbps_biller_subscriptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "bbps_biller_id", null: false
     t.string "name", null: false
-    t.text "customer_params"
     t.integer "department_id"
     t.integer "cost_center_id"
     t.integer "location_id"
     t.integer "policy_id"
     t.text "note"
-    t.integer "created_by_user_id"
     t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -727,10 +731,36 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.datetime "deleted_at"
     t.string "subscription_id"
     t.boolean "require_poc_verification", default: true
+    t.integer "user_id"
+    t.integer "agreement_id"
+    t.string "expected_bill_day"
+    t.integer "controlling_level_id"
+    t.string "reminder_before_days"
+    t.string "biller_category_name"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.integer "company_id"
+    t.string "mobile_number"
+    t.string "customer_param_key_1"
+    t.string "customer_param_value_1"
+    t.string "customer_param_key_2"
+    t.string "customer_param_value_2"
+    t.string "customer_param_key_3"
+    t.string "customer_param_value_3"
+    t.string "customer_param_key_4"
+    t.string "customer_param_value_4"
+    t.string "customer_param_key_5"
+    t.string "customer_param_value_5"
+    t.string "fetch_requirement"
+    t.boolean "auto_generate_bill", default: true
+    t.string "support_bill_validation"
+    t.string "customer_name"
+    t.string "customer_email"
+    t.string "customer_aadhar_number"
+    t.string "customer_pan"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
-    t.index ["created_by_user_id"], name: "index_bbps_biller_subscriptions_on_created_by_user_id"
     t.index ["department_id"], name: "index_bbps_biller_subscriptions_on_department_id"
     t.index ["location_id"], name: "index_bbps_biller_subscriptions_on_location_id"
     t.index ["name"], name: "index_bbps_biller_subscriptions_on_name"
@@ -774,6 +804,113 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.index ["parent_biller_id"], name: "index_bbps_billers_on_parent_biller_id"
     t.index ["status"], name: "index_bbps_billers_on_status"
     t.index ["updated_at"], name: "index_bbps_billers_on_updated_at"
+  end
+
+  create_table "bbps_bills", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "subscription_id"
+    t.integer "user_id"
+    t.string "name"
+    t.string "sequence_id"
+    t.integer "department_id"
+    t.integer "cost_center_id"
+    t.integer "location_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.integer "status_id"
+    t.integer "amount_id"
+    t.boolean "autofetched", default: false
+    t.date "expected_due_date"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.text "note"
+    t.integer "company_id"
+    t.integer "category_id"
+    t.date "due_date"
+    t.date "bill_date"
+    t.string "bill_number"
+    t.date "paid_on_date"
+    t.string "transaction_id"
+    t.string "bbps_id"
+    t.string "bill_period"
+    t.integer "late_payment_fee_id"
+    t.integer "early_payment_fee_id"
+    t.integer "convenience_fee_id"
+    t.boolean "quick_pay", default: true
+    t.integer "total_amount_id"
+    t.boolean "early_payment_fee_selected", default: false
+    t.boolean "late_payment_fee_selected", default: false
+    t.boolean "convenience_fee_selected", default: false
+    t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
+    t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
+    t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
+    t.index ["cost_center_id"], name: "index_bbps_bills_on_cost_center_id"
+    t.index ["department_id"], name: "index_bbps_bills_on_department_id"
+    t.index ["location_id"], name: "index_bbps_bills_on_location_id"
+    t.index ["policy_id"], name: "index_bbps_bills_on_policy_id"
+    t.index ["sequence_id"], name: "index_bbps_bills_on_sequence_id"
+    t.index ["status_id"], name: "index_bbps_bills_on_status_id"
+    t.index ["subscription_id"], name: "index_bbps_bills_on_subscription_id"
+    t.index ["user_id"], name: "index_bbps_bills_on_user_id"
+  end
+
+  create_table "bbps_subscription_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "label"
+    t.string "value"
+    t.integer "subscription_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "biller_id"
+    t.index ["label"], name: "index_bbps_subscription_fields_on_label"
+    t.index ["subscription_id"], name: "index_bbps_subscription_fields_on_subscription_id"
+    t.index ["value"], name: "index_bbps_subscription_fields_on_value"
+  end
+
+  create_table "bbps_subscription_pocs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "subscription_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["subscription_id"], name: "index_bbps_subscription_pocs_on_subscription_id"
+    t.index ["user_id"], name: "index_bbps_subscription_pocs_on_user_id"
+  end
+
+  create_table "bbps_yes_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "message_code"
+    t.string "status"
+    t.string "error_code"
+    t.string "error_desc"
+    t.string "ref_no"
+    t.string "agent_institution_id"
+    t.string "channel_id"
+    t.string "bbps_ref_id"
+    t.string "agent_id"
+    t.string "customer_name"
+    t.string "customer_mobile"
+    t.string "customer_email"
+    t.string "customer_aadhar_no"
+    t.string "customer_pan_id"
+    t.string "biller_id"
+    t.string "amount"
+    t.string "bill_date"
+    t.string "due_date"
+    t.string "bill_number"
+    t.string "bill_period"
+    t.string "convenience_fee"
+    t.string "convenience_fee_desc"
+    t.string "late_payment_fee"
+    t.string "early_payment_fee"
+    t.string "additional_field"
+    t.integer "bill_id"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "transfer_status_id"
+    t.integer "amount_id"
+    t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
+    t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end
 
   create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -2971,6 +3108,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.boolean "agreement_based_payment_system", default: false
     t.boolean "vendor_portal", default: false
     t.boolean "gstin_verification_enabled", default: false
+    t.boolean "utility_bills_enabled", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -4694,6 +4832,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.integer "status_id", default: 1
     t.text "message"
     t.integer "admin_user_id"
+    t.integer "user_session_id"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -6986,7 +7125,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
 
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "user_agent", null: false
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
@@ -7140,7 +7279,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
   end
 
   create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.integer "company_id"
     t.string "fingerprint"
     t.integer "status_id", null: false
@@ -7209,7 +7348,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "ip", null: false
     t.string "ip_type", null: false
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
@@ -7618,6 +7757,16 @@ ActiveRecord::Schema.define(version: 2019_11_19_142217) do
     t.index ["company_id"], name: "index_users_with_group_mappings_on_company_id"
     t.index ["group_id"], name: "index_users_with_group_mappings_on_group_id"
     t.index ["user_id"], name: "index_users_with_group_mappings_on_user_id"
+  end
+
+  create_table "utility_bills_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "balance_id"
+    t.integer "company_id"
+    t.boolean "enabled"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_utility_bills_accounts_on_balance_id"
+    t.index ["company_id"], name: "index_utility_bills_accounts_on_company_id"
   end
 
   create_table "vehicle_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

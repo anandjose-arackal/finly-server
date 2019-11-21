@@ -140,20 +140,24 @@ class UserSessions::Create < BaseOperation
     # return if user.nil?
     # return
 
-    result = UserDevices::FindOrCreate.(user, params)
-    unless result.success?
-      # todo Temporary. Remove once user device is supported for mobile apps and API
-      # args[:status_id] = UserSessionStatus.id_for(:failed)
-      # args[:message] = result.messages[:error].to_sentence
-      # todo Temporary. Remove once user device is supported for mobile apps and API
-      return
+    device = params[:user_device]
+    if device.blank?
+      result = UserDevices::FindOrCreate.(user, params)
+      unless result.success?
+        # todo Temporary. Remove once user device is supported for mobile apps and API
+        # args[:status_id] = UserSessionStatus.id_for(:failed)
+        # args[:message] = result.messages[:error].to_sentence
+        # todo Temporary. Remove once user device is supported for mobile apps and API
+        return
+      end
+      device = result.device
     end
 
-    args[:user_device_id] = result.device.id
+    args[:user_device_id] = device.id
     # args[:client_type] = result.device.client_type
-    unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
+    unless device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(device.status_id)
       args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.device.message
+      args[:message] = device.message
       return
     end
   end
@@ -161,19 +165,22 @@ class UserSessions::Create < BaseOperation
   def enrich_ip(args)
     return if user.nil?
 
-    result = UserIps::FindOrCreate.(user, params)
-    unless result.success?
-      args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.messages[:error].to_sentence
-      # add_message :error, result.messages[:error].to_sentence
-      return
+    user_ip = params[:user_ip]
+    if user_ip.blank?
+      result = UserIps::FindOrCreate.(user, params)
+      unless result.success?
+        args[:status_id] = UserSessionStatus.id_for(:failed)
+        args[:message] = result.messages[:error].to_sentence
+        # add_message :error, result.messages[:error].to_sentence
+        return
+      end
+      user_ip = result.ip
     end
 
-    args[:user_ip_id] = result.ip.id
-    unless result.ip.valid?
+    args[:user_ip_id] = user_ip.id
+    unless user_ip.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.device.message
-      # add_message :error, result.device.message
+      args[:message] = user_ip.message
       return
     end
   end
@@ -181,19 +188,22 @@ class UserSessions::Create < BaseOperation
   def enrich_user_agent(args)
     return if user.nil?
 
-    result = UserAgentClients::FindOrCreate.(user, params)
-    unless result.success?
-      args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.messages[:error].to_sentence
-      # add_message :error, result.messages[:error].to_sentence
-      return
+    user_agent_client = params[:user_agent_client]
+    if user_agent_client.blank?
+      result = UserAgentClients::FindOrCreate.(user, params)
+      unless result.success?
+        args[:status_id] = UserSessionStatus.id_for(:failed)
+        args[:message] = result.messages[:error].to_sentence
+        # add_message :error, result.messages[:error].to_sentence
+        return
+      end
+      user_agent_client = result.user_agent_client
     end
 
-    args[:user_agent_client_id] = result.user_agent_client.id
-    unless result.user_agent_client.valid?
+    args[:user_agent_client_id] = user_agent_client.id
+    unless user_agent_client.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.device.message
-      # add_message :error, result.device.message
+      args[:message] = user_agent_client.message
       return
     end
   end
