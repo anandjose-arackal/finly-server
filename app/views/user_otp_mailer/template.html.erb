@@ -4,7 +4,8 @@ We detected an attempt to access your account, (<%= @email %>), from an unrecogn
 ------------------------------------------<br>
 Time: <%= @timestamp %><br>
 IP Address: <%= @ip %><br>
-Browser: <%= @user_agent %><br>
+Browser: <%= @device_name %><br>
+User Agent: <%= @user_agent %><br>
 <% if @approximate_location.present? %>
 Approximate Location: <%= @approximate_location %><br>
 <% end %>

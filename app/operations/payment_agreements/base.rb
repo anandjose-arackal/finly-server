@@ -17,7 +17,7 @@ class PaymentAgreements::Base < BaseOperation
         selected_invoice_frequency_attributes: {},
         payment_agreement_custom_fields: {}, 
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id,
+      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id, :include_tax_and_tds,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [

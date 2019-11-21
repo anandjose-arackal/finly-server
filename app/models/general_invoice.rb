@@ -99,6 +99,7 @@
 #  override_invoice_id                   :string(255)
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
+#  include_tax_and_tds                   :boolean          default(FALSE)
 #
 
   # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
@@ -341,7 +342,8 @@ class GeneralInvoice < ApplicationRecord
       escalation_percentage: self.escalation_percentage,
       total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
       available_invoice_amount: get_available_invoice_amount,
-      invoice_number: self.get_invoice_number
+      invoice_number: self.get_invoice_number,
+      include_tax_and_tds: !!self.include_tax_and_tds
     }
   end
 

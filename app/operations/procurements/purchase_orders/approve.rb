@@ -15,14 +15,14 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       return
     end
 
-    unless purchase_order.level.present?
-      add_message :error, 'Cannot take action against Purchase Order at this state'
-      return
-    end
+    # unless purchase_order.level.present?
+    #   add_message :error, 'Cannot take action against Purchase Order at this state'
+    #   return
+    # end
 
-    unless awaiting_action_from?
-      add_message :error, 'You cannot approve this Purchase Order at this state'
-    end
+    # unless awaiting_action_from?
+    #   add_message :error, 'You cannot approve this Purchase Order at this state'
+    # end
   end
 
   def process
@@ -50,6 +50,8 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    approve_purchase_request_items
   end
 
   def post_process
@@ -60,5 +62,13 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
 
   def awaiting_action_from?
     self.purchase_order.get_reviewers.include?(user)   
+  end
+
+  def approve_purchase_request_items
+    if self.purchase_order.purchase_request_items.present?
+      if purchase_order.approved?
+        purchase_order.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:po_approved))
+      end
+    end
   end
 end

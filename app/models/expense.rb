@@ -40,7 +40,7 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
-#  gst_details_id         :integer
+#  company_id             :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -642,13 +642,13 @@ class Expense < ApplicationRecord
       return self.card_expense.editable_merchant
     when ExpenseType.id_for(:per_diem)
       # un-scoping here for cases when the per diem gets destroyed
-      policy_name = self.per_diem_expense.per_diem&.configurable&.name
+      policy_name = self.per_diem_expense&.per_diem&.configurable&.name
       if policy_name.nil?
-        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.configurable&.name rescue nil
       end
       per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
       if per_diem_name.nil?
-        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense&.per_diem_id)&.name rescue nil
       end
       return "#{policy_name} - #{per_diem_name}"
     else

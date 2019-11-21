@@ -46,6 +46,18 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         return
       end
     end
+
+    case self.payment.parent_type
+    when 'Invoice'
+      invoice = payment.parent
+      invoice_amount = invoice.balance_due&.value.to_f
+      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
+      if payment_amount.to_f + previous_payments.to_f > invoice_amount
+        add_message :error, "Payment update amount would go above the invoice balance due."
+        return
+      end
+    end
+      
   end
 
   def pre_process
@@ -181,6 +193,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def post_process
     self.payment_order.update_requested_amount
+    recheck_payable_flag
     add_message :success, "Payment updated"
   end
 
@@ -283,6 +296,21 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def validate_po_params
     self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+  end
+
+  def recheck_payable_flag
+    case payment.parent_type
+    when 'Invoice'
+      invoice = payment.parent
+      total_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+      invoice_amount = invoice.balance_due&.value.to_f
+
+      if total_payments + 0.99 < invoice_amount # add buffer for less than 1 rupee
+        invoice.update payable: true
+      else
+        invoice.update payable: false
+      end
+    end
   end
 
 end

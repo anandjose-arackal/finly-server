@@ -19,7 +19,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
 
   attr_accessor :lurm_params, :provider, :application, :policy, :level, :user_profiles
   def process
-    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ? && users.active = 1',company.id)
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
