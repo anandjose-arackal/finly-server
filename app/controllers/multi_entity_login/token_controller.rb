@@ -10,14 +10,14 @@ class MultiEntityLogin::TokenController < Oauth::TokenController
     token = Doorkeeper::AccessToken.find_by(token: params[:auth_token])
     session = UserSession.find_by(access_token_id: token&.id)
 
-    params.merge(
+    merged_params = params.merge(
         {
           user_device: session.user_device,
           user_ip: session.user_ip,
           user_agent_client: session.user_agent_client
         }
     )
-    sessions_result = UserSessions::Create.(:authorized, params)
+    sessions_result = UserSessions::Create.(:authorized, merged_params)
     sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
   end
 
