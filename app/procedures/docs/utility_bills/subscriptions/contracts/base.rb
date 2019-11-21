@@ -3,6 +3,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :id
   property :bbps_biller_id, presence: true
   property :name, presence: true
+  property :company_id
   property :sequence_id
   property :mobile_number, presence: true
 
