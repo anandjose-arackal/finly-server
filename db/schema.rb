@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_18_142944) do
+ActiveRecord::Schema.define(version: 2019_11_19_142217) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -6986,7 +6986,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_142944) do
 
   create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "user_agent", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
@@ -7209,7 +7209,7 @@ ActiveRecord::Schema.define(version: 2019_11_18_142944) do
   create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "ip", null: false
     t.string "ip_type", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.integer "status_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
