@@ -106,7 +106,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
     legal_name_of_business = response_body[:data][:lgnm]
 
-    self.state = GstStateCode.with_state_code(response_body[:data][:gstin][0..1])
+    self.state = GstStateCode.with_state_code(response_body[:data][:gstin][0..1]).first
 
     data = {
         gstin: response_body[:data][:gstin],
