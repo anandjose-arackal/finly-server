@@ -13,6 +13,7 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
   end
 
   def setup_dlrm(options, current_user:, params:, model:, **)
+    debugger
     if BbpsBill.open_statuses.include?(model.status_id) && model.subscription.pocs.include?(current_user)
       dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
           reviewal_document: model,
