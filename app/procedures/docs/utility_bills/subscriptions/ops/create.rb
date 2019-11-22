@@ -27,8 +27,6 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   step :setup_dlrm
 
   step Transactions::Messages::SuccessMessage('Utility Bill Master created successfully')
-  step Transactions::Messages::SuccessMessage('Master created successfully')
-
 
   def check(params, **)
   end

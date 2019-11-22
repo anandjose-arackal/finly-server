@@ -4,6 +4,7 @@ class Docs::UtilityBills::Bills::Ops::Destroy < Transactions::API
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :destroy?)
 
   step :destroy!
+  step Transactions::Messages::SuccessMessage('Successfully Deleted Utility Bill')
 
   def destroy!(options, model:, **)
     model.destroy

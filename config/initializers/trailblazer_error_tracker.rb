@@ -17,8 +17,9 @@ module TrailblazerErrorTracker
   def messages(type = nil)
     unless type
       messages = {
-          success: messages(:success),
-          errors: messages(:errors)
+          success: (messages(:success)&.values&.flatten || []),
+          errors: (messages(:errors)&.values&.flatten || []),
+          errors_meta: (messages(:errors) || [])
       }
       return messages
     end
