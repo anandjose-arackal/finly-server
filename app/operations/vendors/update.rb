@@ -145,6 +145,8 @@ class Vendors::Update < Vendors::Base
     return unless validate_gstin_pan_number
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
+      validate_mark_for_destruction_account
+      return if has_errors?
       vendor.save
       add_message :success, "Vendor updated"
     else
@@ -181,5 +183,14 @@ class Vendors::Update < Vendors::Base
       break
     end
     validated
+  end
+
+  def validate_mark_for_destruction_account
+    mark_for_deletion_accounts = self.vendor.bank_accounts.collect{|b| b.id if b.marked_for_destruction?}.compact
+    if mark_for_deletion_accounts.present?
+      if user.company.purchase_orders.where(bank_account_id: mark_for_deletion_accounts).present? || user.company.inward_invoices.where(bank_account_id: mark_for_deletion_accounts).present? || user.company.beneficiary_payments.where(bank_account_id: mark_for_deletion_accounts).present?
+        add_message :error, "Cannot delete bank account with account number #{mark_for_deletion_accounts.join(', ')} as they are already in use"
+      end
+    end
   end
 end
