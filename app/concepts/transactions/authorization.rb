@@ -33,7 +33,7 @@ class Transactions::Authorization
     def self.included(base)
       base.extend ClassMethods
       base.extend Dry::Monads[:result]
-      base.step :authorize_user_presence!
+      base.send(:step, :authorize_user_presence!)
     end
 
     module ClassMethods
@@ -60,7 +60,7 @@ class Transactions::Authorization
       self.class.user_model
     end
 
-    def authorize_user_presence!(options)
+    def authorize_user_presence!(context, options)
       return true if user_model.nil?
       return unauthorized!(options) if options['current_user'].nil? or options['current_user'].class.name != user_model.name
 
