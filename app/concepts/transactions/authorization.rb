@@ -10,9 +10,9 @@ class Transactions::Authorization
 
     def self.roles(input, options, list)
       return true if list.blank?
-      return unauthorized!(input) if options['current_user'].blank?
+      return unauthorized!(input) if options[:current_user].blank?
 
-      user = options['current_user']
+      user = options[:current_user]
       roles = UserRole::VALUES.keys & list # Find the intersection between all user roles and the list roles
       roles.each do |role|
         role_id = UserRole.id_for(role)
@@ -23,7 +23,7 @@ class Transactions::Authorization
     end
 
     def self.unauthorized!(options)
-      options["result.authorization"] = Failure("You cannot perform the following action")
+      input[:"result.authorization"] = Failure("You cannot perform the following action")
       false
     end
   end
@@ -62,7 +62,7 @@ class Transactions::Authorization
 
     def authorize_user_presence!(context, options)
       return true if user_model.nil?
-      return unauthorized!(options) if options['current_user'].nil? or options['current_user'].class.name != user_model.name
+      return unauthorized!(context) if context[:current_user].nil? or options[:current_user].class.name != user_model.name
 
       true
     end
