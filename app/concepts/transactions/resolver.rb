@@ -1,7 +1,9 @@
 class Transactions::Resolver
 
   def self.Model(model, scope: :default, filter: false, paginate: false, includes: [])
-    ->(input, options) { Resolve.with(input, model, scope, filter, paginate, includes) }
+    Transactions::Task.build id: "transactions.resolver.model" do |context, **|
+      Resolve.with(context, model, scope, filter, paginate, includes)
+    end
   end
 
   class Resolve

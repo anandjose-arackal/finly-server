@@ -5,17 +5,18 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Schema::DSL
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
+  extend Trailblazer::Activity::TaskBuilder
   include Dry::Monads[:result]
 
   # Dummy step to help define schema after operation has started
-  step ->(context, options) { true }, name: 'operations.start'
+  step ->(context, options) { true }, id: 'operations.start'
 
   # Step options: :before, :after, :replace, :delete, :override
 
   def self.AssignModelUser(key: :user)
-    -> (context, options) do
-      context["model"].send("#{key}=", context['current_user'])
-      context["model"].company = context["model"].send(key)&.company
+    Transactions::Task.build id: "assign_model_user" do |context, **|
+      context[:model].send("#{key}=", context[:current_user])
+      context[:model].company = context[:model].send(key)&.company
       true
     end
   end

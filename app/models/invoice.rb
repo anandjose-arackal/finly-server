@@ -70,8 +70,8 @@
 #  submitted_at                    :datetime
 #  approved_at                     :datetime
 #  po_adjusted_advance             :integer
-#  po_advance                      :integer
-#  po_prev_adjusted_advance        :integer
+#  po_advance                      :decimal(20, 2)
+#  po_prev_adjusted_advance        :decimal(20, 2)
 #  advance_amount_required         :boolean          default(FALSE)
 #  gstin_location_id               :bigint
 #  transaction_service_period_from :date
