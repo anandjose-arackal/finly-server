@@ -29,4 +29,12 @@ class Transactions::API < Trailblazer::Operation
     result
   end
 
+  class Transactions::API::Background < Transactions::API
+    # include Trailblazer::Operation::Worker
+
+    # Todo
+
+
+  end
+
 end
