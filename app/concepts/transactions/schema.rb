@@ -29,7 +29,7 @@ class Transactions::Schema < Dry::Validation::Contract
       def schema(&block)
         klass = Class.new(Transactions::Schema)
         klass.instance_eval &block
-        step *Transactions::Schema::Validate(constant: klass)
+        step Transactions::Schema::Validate(constant: klass)
       end
     end
 

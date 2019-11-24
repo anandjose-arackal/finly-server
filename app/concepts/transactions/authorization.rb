@@ -48,7 +48,7 @@ class Transactions::Authorization
       end
 
       def authorized_roles(*list)
-        step *Transactions::Authorization::Roles(*list)
+        step Transactions::Authorization::Roles(*list)
       end
     end
 
