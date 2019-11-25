@@ -8,7 +8,7 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server '13.126.31.9', user: 'centos', roles: %w{web app db}, port: 22
-set :stage, 'development'
+set :stage, 'uat'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
