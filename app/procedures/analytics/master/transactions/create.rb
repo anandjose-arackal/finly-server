@@ -10,7 +10,7 @@ class Analytics::Master::Transactions::Create < Transactions::API
       InvoiceLineItem => Analytics::Master::Transactions::Contracts::InvoiceItem
   }
 
-  step Model(TransactionAp, :new)
+  # step Model(TransactionAp, :new)
   step Contract::Build(builder: :build_contract)
   step Contract::Validate()
   step Contract::Persist()
