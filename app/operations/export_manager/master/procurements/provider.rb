@@ -25,7 +25,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
              approval_pending_level_name: {spreadsheet: true, pdf: false},
              approval_pending_reviewers: {spreadsheet: true, pdf: false},
              approved_reviewers: {spreadsheet: true, pdf:false},
-             policy: {spreadsheet: false, pdf: true},
+             policy: {spreadsheet: true, pdf: true},
              department: {spreadsheet: true, pdf: true},
              sub_department: {spreadsheet: true, pdf: true},
              cost_center: {spreadsheet: true, pdf: true},
