@@ -33,6 +33,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     amount = params[:amount]&.to_f || 0
 
     bill['bill_date'] = params[:bill_date]
+    bill['bbps_bill_id'] = subscription.bbps_biller_id
     bill['bill_number'] = params[:bill_number]
     bill['due_date'] = params[:due_date]
     bill['bill_period'] = params[:bill_period]

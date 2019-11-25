@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_19_065120) do
+ActiveRecord::Schema.define(version: 2019_11_25_141618) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -844,6 +844,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.boolean "early_payment_fee_selected", default: false
     t.boolean "late_payment_fee_selected", default: false
     t.boolean "convenience_fee_selected", default: false
+    t.integer "bbps_biller_id"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"

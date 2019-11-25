@@ -8,6 +8,10 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
   has_scope :filter_cost_center_id
   has_scope :filter_location_id
   has_scope :filter_policy_id
+  has_scope :filter_biller_type
+  has_scope :filter_biller_id
+  has_scope :filter_user_id
+
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )
   # step Transactions::Resolver::Model(BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
