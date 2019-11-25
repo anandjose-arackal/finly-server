@@ -146,9 +146,11 @@ json.payments do
     json.parent_id payment.parent_id
     # json.invoice_details payment.invoice.invoice_amount_details
     json.parent_details do
-      json.merge! payment.parent_details
-      # json.payable_amount payment.get_payable_amount
-      json.payable_amount precision_value payment.amount.value
+      unless payment.parent.nil?
+        json.merge! payment.parent_details
+        # json.payable_amount payment.get_payable_amount
+        json.payable_amount precision_value payment.amount.value
+      end
     end
   end
 end

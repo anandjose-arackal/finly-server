@@ -78,7 +78,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
         otp: self.otp,
         user_agent: RequestStoreUtil.current_request.user_agent,
         ip: RequestStoreUtil.current_request.remote_ip,
-        timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+        timestamp: Time.zone.now.strftime("%I:%M %p, %d %b %Y")
     })
   end
 

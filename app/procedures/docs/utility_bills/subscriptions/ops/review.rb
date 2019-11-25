@@ -14,7 +14,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
 
   fail :check
 
-  step Transactions::Messages::SuccessMessage("You have successfully #{params[:aasm_event]}")
+  # step Transactions::Messages::SuccessMessage("You have successfully #{params[:aasm_event]}")
 
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
