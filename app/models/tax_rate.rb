@@ -21,6 +21,8 @@
 
 class TaxRate < ApplicationRecord
   include SoftDeletable
+  include LiquidDroppable
+
   belongs_to :company, optional: true
 
   validates :rate, presence: true

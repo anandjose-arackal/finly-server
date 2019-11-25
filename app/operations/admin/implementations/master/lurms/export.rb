@@ -105,6 +105,9 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
              )
 
 
+    if params[:with_id] == 'all'
+      params[:with_id] = company.policies.pluck(:id)
+    end
     providers.each do |provider|
       total_count = 0
       contents[provider] = []
