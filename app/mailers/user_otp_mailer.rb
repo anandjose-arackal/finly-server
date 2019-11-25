@@ -5,6 +5,8 @@ class UserOtpMailer < ApplicationMailer
     @email = presenter.to
     @otp = presenter.otp
     @user_agent = presenter.user_agent
+    device = DeviceDetector.new(@user_agent) if @user_agent
+    @device_name = device&.name
     @ip = presenter.ip
     @timestamp = presenter.timestamp
 

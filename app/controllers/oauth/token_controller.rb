@@ -29,7 +29,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
         return
       end
 
-      json_string = { error: "invalid_grant", error_description: "The email / mobile or password you entered is incorrect" }
+      json_string = {error: "invalid_grant", error_description: "The email / mobile or password you entered is incorrect"}
       render json: json_string.to_json, status: 401
 
       # if verify_company_status(@user)
@@ -60,17 +60,17 @@ class Oauth::TokenController < Doorkeeper::TokensController
       case company.status_id
       when CompanyStatus.id_for(:partial_block)
         if @user.admin? || @user.manager? || @user.finance_manager?
-          json_string = { error: "invalid_grant", error_description: "Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved" }
+          json_string = {error: "invalid_grant", error_description: "Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved"}
           render json: json_string.to_json, status: 401
           return false
         end
       when CompanyStatus.id_for(:deactivated)
         if @user.admin? || @user.manager? || @user.finance_manager?
-          json_string = { error: "invalid_grant", error_description: "Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved" }
+          json_string = {error: "invalid_grant", error_description: "Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved"}
           render json: json_string.to_json, status: 401
           return false
         else
-          json_string = { error: "invalid_grant", error_description: "Your account has been disabled. Please contact your admin to login" }
+          json_string = {error: "invalid_grant", error_description: "Your account has been disabled. Please contact your admin to login"}
           render json: json_string.to_json, status: 401
           return false
         end
@@ -95,15 +95,15 @@ class Oauth::TokenController < Doorkeeper::TokensController
     params[:application] = "web"
     # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
     # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
-    cookies["access_token"] = { value: @token.token, httponly: true, expires: 15.days.from_now }
-    cookies["refresh_token"] = { value: @token.refresh_token, httponly: true, expires: 15.days.from_now }
+    cookies["access_token"] = {value: @token.token, httponly: true, expires: 15.days.from_now}
+    cookies["refresh_token"] = {value: @token.refresh_token, httponly: true, expires: 15.days.from_now}
 
     # render json: {}, status: 200
     render_json "oauth/token/create.json.jbuilder", response.status
   end
 
   def render_json(file_path, response_status)
-    binding_params = { user: @user, auth_grant: @auth_grant, token: @token }
+    binding_params = {user: @user, auth_grant: @auth_grant, token: @token}
     view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
     render json: JSON.parse(view.render(file: file_path)), status: response_status
   end
@@ -159,6 +159,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
     result = Gatekeeper::Event.(:after_session_create, params)
     if result.success?
       @user.otp_verified = !result.require_otp if @user.otp_verified
+      @user.otp_verified = false if @user.otp_verified and @user.associated_group_users.where.not(otp_verified: true).present?
 
       unless @user.expired?
         @user.update(last_activity_at: DateTime.now)
