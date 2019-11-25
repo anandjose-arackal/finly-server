@@ -1576,7 +1576,7 @@ class User < ApplicationRecord
   end
 
   def associated_group_users(exclude_self: false)
-    users = User.where(default_company_id: self.default_company_id).with_email_or_mobile_number(self.email, self.mobile_number)
+    users = User.where(finly_id: self.finly_id)
     users = users.without_id(self.id) if exclude_self
     users
   end
