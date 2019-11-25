@@ -7,7 +7,7 @@ class Autocomplete::BbpsBillers < BaseOperation
   end
 
   def process
-    op = Docs::UtilityBills::Billers::Ops::Index.(params, "current_user" => user)
+    op = Docs::UtilityBills::Billers::Ops::Index.(params: params, current_user: user)
     if op.success?
       self.bbps_billers = op['result']['bbps_billers']
     end
