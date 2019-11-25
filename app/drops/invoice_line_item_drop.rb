@@ -51,4 +51,8 @@ class InvoiceLineItemDrop < Drop
     @object.tax_amount&.value
   end
 
+  def tax_rate
+    @object.tax_rate&.to_liquid
+  end
+
 end

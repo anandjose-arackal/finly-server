@@ -3426,7 +3426,6 @@ Rails.application.routes.draw do
     end
 
 
-
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 
     get 'account_owners/search', to: 'account_owners#search', as: :search
@@ -3803,6 +3802,13 @@ Rails.application.routes.draw do
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
+
+    get 'em/expenses', to: 'expense_management#expenses'
+    get 'em/reports', to: 'expense_management#reports'
+    get 'em/money_requests', to: 'expense_management#money_requests'
+    get 'em/trips', to: 'expense_management#trips'
+    get 'em/awaiting_action', to: 'expense_management#awaiting_action'
+    get 'em/configs', to: 'expense_management#configs'
   end
   ######## Dashbaord Ends ##############
 
@@ -3853,13 +3859,14 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+  post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
+  post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
+  get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms
 
-  post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
-  post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
-  get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
+  resources :insights
 
   # Utility Bill Payments / BBPS Start #
   namespace :bbps do

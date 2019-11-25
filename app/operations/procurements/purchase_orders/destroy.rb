@@ -48,6 +48,8 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def success
     params[:po_available] = self.po_available
+    params[:procurement_id] = self.procurement.reload.try(:id)
+    params[:purchase_order_id] = self.procurement.reload.try(:purchase_order).try(:id)
     Procurements::PurchaseOrders::Destroy::SuccessPresenter.new(user, params, messages)
   end
 

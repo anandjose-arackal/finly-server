@@ -13,7 +13,7 @@ gem 'parslet', '~> 1.8.2'
 
 gem 'rufus-scheduler'
 gem 'clockwork'
-gem 'dry-monads'
+gem 'dry-monads', '~> 1.3.0'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
@@ -33,14 +33,21 @@ gem 'devise_zxcvbn', '4.4.1'
 gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
-gem 'dry-validation'
-gem 'trailblazer'
-gem 'trailblazer-rails'
-gem 'reform'
-gem 'reform-rails'
-gem 'pundit'
-gem 'uuidtools'
-gem 'dry-matcher'
+gem 'dry-validation', '~> 1.3'
+gem 'trailblazer', '~> 2.1'
+gem 'trailblazer-rails', '~> 2.1'
+gem 'trailblazer-activity', '~> 0.1'
+gem 'trailblazer-activity-dsl-linear', '~> 0.2'
+gem 'trailblazer-context', '~> 0.2'
+gem 'trailblazer-operation', '~> 0.6'
+gem 'trailblazer-macro', '~> 2.1'
+gem 'trailblazer-macro-contract', '~> 2.1'
+gem 'trailblazer-developer', '~> 0.0.1'
+gem 'reform', '~> 2.2'
+gem 'reform-rails', '~> 0.1'
+gem 'pundit', '~> 2.1'
+gem 'uuidtools', '~> 2.1'
+gem 'dry-matcher', '~> 0.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'
 
@@ -85,6 +92,8 @@ gem 'mysql2', '~> 0.5.2'
 gem 'will_paginate', '~> 3.1.6'
 
 gem 'sneakers'
+
+gem 'jwt'
 
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'

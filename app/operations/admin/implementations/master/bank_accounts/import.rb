@@ -3,10 +3,12 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'bank_accounts.import'
   headers ({
+      :id => "ID",
       :name => "Bank Name",
       :user_id => "User Email / Mobile NUmber",
       :account_number => "Account Number",
-      :ifsc => "IFSC"
+      :ifsc => "IFSC",
+      :destroy => "Destroy"
   })
   attr_accessor :bank_account_params
   def create_record(data)
@@ -22,6 +24,47 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     result true, 'Created Successfully'
   end
 
+  def update_record(data)
+    bank_account_params, messages = set_params(data)
+
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+    user = bank_account_params[:user]
+    bank_account = user.bank_accounts.find_by id: data[:id]
+    unless bank_account
+      return result false, "Bank Account not found"
+    end
+
+    unless bank_account.update(bank_account_params.except(:user))
+      return result false, bank_account.errors.full_messages
+    end
+    result true, 'Updated Successfully'
+  end
+
+  def destroy_records(data)
+    bank_account_params, messages = set_params(data)
+
+    unless messages.blank?
+      return result false, messages.join(', ')
+    end
+
+    user = bank_account_params[:user]
+    bank_account = user.bank_accounts.find_by id: data[:id]
+    unless bank_account
+      return result false, "Bank Account not found"
+    end
+
+    begin
+      unless bank_account.destroy
+        return result false, bank_account.errors.full_messages
+      end
+    rescue Exception => e
+      return result false, "#{e.message}"
+    end
+
+    result true, "Destroyed Successfully"
+  end
 
   def set_params(data)
     messages = []
@@ -32,6 +75,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
        messages << "User Not Found"
     end
     account_number = clean_up_data data[:account_number]
+    account_number.is_a?(String) ? account_number.gsub!("'", "") : ''
     ifsc = data[:ifsc]
     params = {
         name: name,

@@ -4,7 +4,7 @@ class TaskManager::Workflows::Contracts::Task < Transactions::Contract
   property :uuid
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}
-  property :model_class, validates: {presence: true, inclusion: {in: Documents::Master.list}}
+  property :model_class, validates: {presence: true, inclusion: {in: Object.const_get("Documents::Master").list}}
   property :personal, default: false
   property :user_id, validates: {presence: true}
   property :company_id, validates: {presence: true}
@@ -21,7 +21,7 @@ class TaskManager::Workflows::Contracts::Task < Transactions::Contract
     property :export_template_id, validates: {presence: true}
   end
 
-  validate :conditions_schema_validation
+  # validate :conditions_schema_validation
   validate :task_schedule_presence_validation
   validate :task_schedule_validation
 

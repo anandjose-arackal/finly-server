@@ -1,7 +1,9 @@
 module Transactions::Messages
 
   def self.SuccessMessage(message)
-    -> (options) {Transactions::API.on_success(options, :base, message)}
+    Transactions::Task.build id: "messages.success.add" do |context, **|
+      Transactions::API.on_success(context, :base, message)
+    end
   end
 
   def self.included(base)

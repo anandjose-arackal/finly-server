@@ -3,10 +3,12 @@ class Admin::Implementations::Master::BankAccounts::ImportTemplates < Admin::Imp
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'bank_accounts.import_template'
   headers ({
-              :name => "Bank Name",
-              :user_id => "User Email / Mobile NUmber",
-              :account_number => "Account Number",
-              :ifsc => "IFSC"
+      :id => "ID",
+      :name => "Bank Name",
+      :user_id => "User Email / Mobile NUmber",
+      :account_number => "Account Number",
+      :ifsc => "IFSC",
+      :destroy => "Destroy"
   })
 
   def valid_request

@@ -1,21 +1,22 @@
 class Transactions::API < Trailblazer::Operation
   include Contract::DSL
-  include Model
+  include Trailblazer::Macro
   include Transactions::Messages
   include Transactions::Schema::DSL
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
+  extend Trailblazer::Activity::TaskBuilder
   include Dry::Monads[:result]
 
   # Dummy step to help define schema after operation has started
-  step ->(options) { true }, name: 'operations.start'
+  step ->(context, options) {true}, id: 'operations.start'
 
   # Step options: :before, :after, :replace, :delete, :override
 
   def self.AssignModelUser(key: :user)
-    -> (options) do
-      options["model"].send("#{key}=", options['current_user'])
-      options["model"].company = options["model"].send(key)&.company
+    Transactions::Task.build id: "assign_model_user" do |context, **|
+      context[:model].send("#{key}=", context[:current_user])
+      context[:model].company = context[:model].send(key)&.company
       true
     end
   end
@@ -26,6 +27,14 @@ class Transactions::API < Trailblazer::Operation
       matcher.(result, &handlers) if block_given?
     end
     result
+  end
+
+  class Transactions::API::Background < Transactions::API
+    # include Trailblazer::Operation::Worker
+
+    # Todo
+
+
   end
 
 end
