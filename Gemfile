@@ -39,7 +39,7 @@ gem 'trailblazer-rails'
 gem 'reform'
 gem 'reform-rails'
 gem 'pundit'
-gem 'uuidtools'
+# gem 'uuidtools'
 gem 'dry-matcher'
 
 gem 'health-monitor-rails', '~> 8.4.0'
