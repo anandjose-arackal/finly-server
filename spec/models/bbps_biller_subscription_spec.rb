@@ -18,7 +18,7 @@
 #  status_id               :integer          not null
 #  user_id                 :integer
 #  agreement_id            :integer
-#  expected_due_day        :string(255)
+#  expected_bill_day       :string(255)
 #  controlling_level_id    :integer
 #  reminder_before_days    :string(255)
 #  biller_category_name    :string(255)

@@ -8,6 +8,7 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
 
   step :setup_dlrm
   failure :check
+  step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill')
 
   def check(options, params:, **)
   end

@@ -1,20 +1,25 @@
-Dir["#{Rails.root}/app/concepts/forms/definitions/types/*.rb"].each {|file| load file }
-module Forms
-  module Definitions
-    class Section
-      include Registry
-      attr_accessor :name, :block, :form
+Dir["#{Rails.root}/app/concepts/forms/definitions/types/*.rb"].each {|file| load file}
+class Forms::Definitions::Section
+  include DynamicAttributes
+  include Forms::Definitions::Registry
+  attr_accessor :name, :block, :form
 
-      def initialize(form, name, &block)
-        self.form = form
-        self.name = name
-        self.block = block
-        instance_eval &block if block.present?
-      end
+  class_attr :type
 
-      def section
-        name
-      end
-    end
+  type :simple
+
+  def initialize(form, name, &block)
+    self.form = form
+    self.name = name
+    self.block = block
+    instance_eval &block if block.present?
+  end
+
+  def section
+    name
+  end
+
+  def type
+    self.class.type
   end
 end

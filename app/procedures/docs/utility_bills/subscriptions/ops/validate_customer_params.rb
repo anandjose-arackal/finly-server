@@ -1,9 +1,5 @@
 class Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams < Trailblazer::Operation
-
-
   step :init
-  # step :bill_validate
-  # step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
 
   def init(options)
     options['result'] = {}

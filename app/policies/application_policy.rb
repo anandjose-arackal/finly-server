@@ -33,17 +33,4 @@ class ApplicationPolicy
   def destroy?
     false
   end
-
-  class Resolver
-    attr_reader :user, :scope
-
-    def initialize(user, scope)
-      @user = user
-      @scope = scope
-    end
-
-    def resolve(filters)
-      scope.none
-    end
-  end
 end

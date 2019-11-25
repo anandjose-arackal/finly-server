@@ -14,7 +14,15 @@ module TrailblazerErrorTracker
     model_errors.merge(contract_errors).merge(general_errors).merge(policy_errors).merge(roles_auth_errors)
   end
 
-  def messages(type)
+  def messages(type = nil)
+    unless type
+      messages = {
+          success: (messages(:success)&.values&.flatten || []),
+          errors: (messages(:errors)&.values&.flatten || []),
+          errors_meta: (messages(:errors) || [])
+      }
+      return messages
+    end
     self["result.operation.#{type}"]
   end
 

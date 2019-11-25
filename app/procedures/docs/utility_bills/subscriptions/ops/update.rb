@@ -23,6 +23,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   step Contract::Persist()
   failure :check2
   step :test
+  step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
 
   def check(options, **)
   end

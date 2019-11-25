@@ -3,6 +3,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :id
   property :bbps_biller_id, presence: true
   property :name, presence: true
+  property :company_id
   property :sequence_id
   property :mobile_number, presence: true
 
@@ -16,14 +17,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :active
 
   property :agreement_id
-  property :expected_due_day
+  property :expected_bill_day
   property :reminder_before_days
 
   property :customer_name
   property :customer_email
   property :customer_pan
   property :customer_aadhar_number
-
 
   collection :subscription_pocs, populator: :subscription_pocs! do
     property :user_id, presence: true

@@ -38,9 +38,17 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @model.awaiting_approval? && @model.user_id == @user.id
   end
 
+  def destroy?
+    BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
+  end
+
   def take_control?
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
+
+  # def return_control?
+  #   @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+  # end
 
   def deactivate?
     @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved?)

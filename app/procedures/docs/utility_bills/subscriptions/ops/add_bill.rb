@@ -6,6 +6,7 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
   # step :set_default_params
   failure :check
   step :create_bill
+  step Transactions::Messages::SuccessMessage('Added Bill Successfully')
 
   def init(options, params:, **)
     params[:id] = params[:subscription_id]

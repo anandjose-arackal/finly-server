@@ -1,20 +1,14 @@
-module Forms
-  module Definitions
-    module Types
-      class Number < Entity
-        register :number
-        hint 'Enter value'
+class Forms::Definitions::Types::Number < Forms::Definitions::Entity
+  register :number
+  hint 'Enter value'
 
-        option :max_value
-        option :min_value
-        option :decimal, default: false
+  option :max_value
+  option :min_value
+  option :decimal, default: false
 
-        contract do
-          optional(:min_value).value(:int?)
-          optional(:max_value).value(:int?)
-          optional(:decimal).value(:bool?)
-        end
-      end
-    end
+  contract do
+    optional(:min_value).value(:int?)
+    optional(:max_value).value(:int?)
+    optional(:decimal).value(:bool?)
   end
 end

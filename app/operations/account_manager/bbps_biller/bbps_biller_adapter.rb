@@ -25,16 +25,16 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
     bank_transaction = create_bbps_bank_transaction(payment)
 
     params = {
-      amount: bank_transaction.amount_value,
-      bill_date: bank_transaction.bill_date,
-      due_date: bank_transaction.due_date,
-      bill_number: bank_transaction.bill_number,
-      bill_period: bank_transaction.bill_period,
-      biller_id: bank_transaction.biller_id,
-      customer_param_1: {
-        key: bill.customer_param_1_key,
-        value: bill.customer_param_1_value,
-      }
+        amount: bank_transaction.amount_value,
+        bill_date: bank_transaction.bill_date,
+        due_date: bank_transaction.due_date,
+        bill_number: bank_transaction.bill_number,
+        bill_period: bank_transaction.bill_period,
+        biller_id: bank_transaction.biller_id,
+        customer_param_1: {
+            key: bill.customer_param_1_key,
+            value: bill.customer_param_1_value,
+        }
     }
     op = Bbps::BillPay.(params, "user" => payment.initiating_user)
     # now if the above was successful or failed, we shall be updating the status accordingly
@@ -68,7 +68,7 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
       return payment.reference_resource
     end
     bank_transaction = company.bbps_yes_bank_transactions.build(
-      biller_id: payment.parent.subscription_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
+        biller_id: payment.parent.subscription_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
       transfer_status_id: BankTransferStatus.id_for(:opem),
       bill_date: payment.parent.bill_date,
       bill_period: payment.parent.bill_period,

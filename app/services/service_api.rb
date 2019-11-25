@@ -52,7 +52,8 @@ class ServiceApi < Transactions::API
     result = instance_exec(current_user, params, response, &parser) if parser.present?
     return on_error options, :base, result.failure if result.is_a?(Failure)
 
-    options['response.status_code'] = response.status_code
+    # options['response.status_code'] = response.status_code
+    options['response.status_code'] = response.status
     options['response.parsed'] = result
     true
   end

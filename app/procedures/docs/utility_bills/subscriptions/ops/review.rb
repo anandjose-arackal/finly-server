@@ -1,10 +1,10 @@
 class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
 
-  # schema do
-  #   params do
-  #     required('aasm_event')
-  #   end
-  # end
+  schema do
+    params do
+      required(:aasm_event).filled
+    end
+  end
 
   step :init
   step Model(BbpsBillerSubscription, :find_by)
@@ -13,6 +13,8 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   step :transition
 
   failure :check
+
+  step Transactions::Messages::SuccessMessage("You have successfully #{params[:aasm_event]}")
 
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
