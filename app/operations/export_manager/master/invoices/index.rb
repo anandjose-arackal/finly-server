@@ -345,11 +345,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def invoice_discount(invoice_line_item)
-    invoice_line_item.parent&.discount_amount.value || 0
+    invoice_line_item.parent&.discount_amount&.value || 0
   end
 
   def line_item_discount(invoice_line_item)
-    invoice_line_item.discount_amount.value || 0
+    invoice_line_item.discount_amount&.value || 0
   end
 
   def line_item_sgst(invoice_line_item)
