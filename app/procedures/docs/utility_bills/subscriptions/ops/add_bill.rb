@@ -16,18 +16,18 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
   def check(options, **)
   end
 
-  def create_bill(options, model:, **)
+  def create_bill(options, model:, current_user:, **)
+    options['result'] = {}
     params = {
         subscription_id: model.id,
         'bill' => {}
     }
 
-    op = Docs::UtilityBills::Bills::Ops::Create.(params)
+    op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: current_user)
 
     if op.success?
       options['result'] = {'bill' => op['model']}
     end
-
     options['result']['bill']['autofetched'] = true
     options
 

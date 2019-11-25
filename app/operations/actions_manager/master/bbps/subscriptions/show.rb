@@ -8,7 +8,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def initialize(user = nil, params = {})
     super
-    op_show = Docs::UtilityBills::Subscriptions::Ops::Show.(params, "current_user" => user)
+    op_show = Docs::UtilityBills::Subscriptions::Ops::Show.(params: params, "current_user" => user)
 
     if op_show.success?
       self.bbps_subscription = op_show['model']
@@ -19,7 +19,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   end
 
   def submit
-    bbps_subscription.draft? && bbps_subscription.user_id == user.id
+    BbpsBillerSubscription.status_ids(:draft, :rejected, :retracted).include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id
   end
 
   def edit

@@ -3,11 +3,11 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :deactivate, :destroy]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy]
 
   def initialize(user = nil, params = {})
     super
-    op_show = Docs::UtilityBills::Bills::Ops::Show.(params, "current_user" => user)
+    op_show = Docs::UtilityBills::Bills::Ops::Show.(params: params, "current_user" => user)
 
     if op_show.success?
       self.bbps_bill = op_show['model']
@@ -49,9 +49,9 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
     bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user) && user.vendor_payment_admin? && has_taken_control?
   end
 
-  def deactivate
-    (bbps_bill.approved? || bbps_bill.auto_approved?) && user.vendor_payment_admin?
-  end
+  # def deactivate
+  #   (bbps_bill.approved? || bbps_bill.auto_approved?) && user.vendor_payment_admin?
+  # end
 
   # def reactivate
   #   # bbps_bill.deactivated? && user.vendor_payment_admin?

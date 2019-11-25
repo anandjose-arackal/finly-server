@@ -10,7 +10,7 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerFields < Transactions::A
 
   def init(options, params:, current_user:, **)
     biller_id = params[:biller_id]
-    biller_op = Docs::UtilityBills::Billers::Ops::Show.({id: biller_id}, "current_user" => current_user)
+    biller_op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: biller_id}, "current_user" => current_user)
 
     bbps_biller = biller_op['model']
 

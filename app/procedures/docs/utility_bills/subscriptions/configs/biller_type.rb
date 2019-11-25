@@ -25,7 +25,7 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerType < Transactions::API
     biller_type = biller_types.filter{|item| item[:name] == type}.first
 
 
-    billers_op = Docs::UtilityBills::Billers::Ops::Index.({filter_category_name: type}, "current_user" => current_user)
+    billers_op = Docs::UtilityBills::Billers::Ops::Index.({params: {filter_category_name: type}, current_user: current_user})
 
     bbps_billers = billers_op['result']['bbps_billers']
 

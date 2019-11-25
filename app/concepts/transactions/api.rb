@@ -21,8 +21,8 @@ class Transactions::API < Trailblazer::Operation
     end
   end
 
-  def self.call(options = {}, *dependencies, &handlers)
-    result = super(options, *dependencies)
+  def self.call(options = {}, &handlers)
+    result = super(options)
     if matcher.present?
       matcher.(result, &handlers) if block_given?
     end

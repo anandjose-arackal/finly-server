@@ -7094,6 +7094,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "verification_code_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "user_finly_id"
     t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
     t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
     t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
@@ -7252,6 +7253,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "client_id"
     t.string "client_type"
     t.text "message"
+    t.string "user_finly_id"
     t.index ["company_id"], name: "index_user_devices_on_company_id"
     t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
     t.index ["status_id"], name: "index_user_devices_on_status_id"
@@ -7324,6 +7326,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.decimal "latitude", precision: 20, scale: 10
     t.decimal "longitude", precision: 20, scale: 10
     t.integer "accuracy_radius"
+    t.string "user_finly_id"
     t.index ["ip"], name: "index_user_ips_on_ip"
     t.index ["ip_type"], name: "index_user_ips_on_ip_type"
     t.index ["status_id"], name: "index_user_ips_on_status_id"
@@ -7692,6 +7695,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "department_id"
     t.integer "location_id"
     t.integer "default_company_id"
+    t.string "finly_id", limit: 36
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
