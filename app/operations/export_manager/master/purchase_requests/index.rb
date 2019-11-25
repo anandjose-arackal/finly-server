@@ -6,7 +6,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
   generators ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :data_provider
-  fields [request_id: {spreadsheet: true}, description: {spreadsheet: true}, department: {spreadsheet: true}, location: {spreadsheet: true}, total_items: {spreadsheet: true}, created_by: {spreadsheet: true}, status: {spreadsheet: true}, amount: {spreadsheet: true}]
+  fields [request_id: {spreadsheet: true}, description: {spreadsheet: true}, department: {spreadsheet: true}, location: {spreadsheet: true}, policy:{spreadsheet: true}, total_items: {spreadsheet: true}, created_by: {spreadsheet: true}, status: {spreadsheet: true}, amount: {spreadsheet: true}]
 
 
   def input
@@ -52,5 +52,9 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
 
   def amount(purchase_request)
     purchase_request&.total_amount&.value
+  end
+
+  def policy(purchase_request)
+    purchase_request.policy&.name
   end
 end
