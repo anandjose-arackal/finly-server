@@ -12,7 +12,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   # step :set_default_params
   step :transition
 
-  failure :check
+  fail :check
 
   def init(options, params:, **)
     params[:id] = params[:bill_id]

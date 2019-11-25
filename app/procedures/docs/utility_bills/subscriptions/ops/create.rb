@@ -18,7 +18,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   step Contract::Validate(key: 'subscription')
 
   # Just a method to for testing; will be removed in future
-  failure :check
+  fail :check
 
   # Persist saves the model if validations go through successfully
   step Contract::Persist()

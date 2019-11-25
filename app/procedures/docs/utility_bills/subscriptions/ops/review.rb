@@ -12,7 +12,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   # step :set_default_params
   step :transition
 
-  failure :check
+  fail :check
 
   step Transactions::Messages::SuccessMessage("You have successfully #{params[:aasm_event]}")
 

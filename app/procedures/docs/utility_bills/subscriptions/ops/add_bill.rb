@@ -4,7 +4,7 @@ class Docs::UtilityBills::Subscriptions::Ops::AddBill < Transactions::API
   step Model(BbpsBillerSubscription, :find_by)
   step Policy::Pundit(Docs::UtilityBills::Subscriptions::Authorizer, :add_bill?)
   # step :set_default_params
-  failure :check
+  fail :check
   step :create_bill
   step Transactions::Messages::SuccessMessage('Added Bill Successfully')
 

@@ -4,12 +4,12 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   # step Policy::Pundit( Docs::UtilityBills::Bills::Authorizer, :create? )
   step :set_default_params
   step Contract::Build(constant: Docs::UtilityBills::Bills::Contracts::Base)
-  failure :check
+  fail :check
   step Contract::Validate(key: 'bill')
-  failure :check1
+  fail :check1
 
   step Contract::Persist()
-  failure :check2
+  fail :check2
 
 
   def check(options, model:, **)
