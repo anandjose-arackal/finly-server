@@ -21,6 +21,8 @@ end
 
 Sidekiq::Extensions.enable_delay!
 
-class Sidekiq::Extensions::DelayedMailer
-  sidekiq_options queue: 'mailer_test'
+if Rails.env.uat?
+  class Sidekiq::Extensions::DelayedMailer
+    sidekiq_options queue: 'mailer_test'
+  end
 end
