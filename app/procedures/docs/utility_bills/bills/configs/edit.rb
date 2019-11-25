@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
 
-  success Model(BbpsBill, :find_by)
+  pass Model(BbpsBill, :find_by)
   step :init
 
   def init(options, params:, current_user:, model:, **)
