@@ -70,8 +70,8 @@
 #  submitted_at                    :datetime
 #  approved_at                     :datetime
 #  po_adjusted_advance             :integer
-#  po_advance                      :decimal(20, 2)
-#  po_prev_adjusted_advance        :decimal(20, 2)
+#  po_advance                      :integer
+#  po_prev_adjusted_advance        :integer
 #  advance_amount_required         :boolean          default(FALSE)
 #  gstin_location_id               :bigint
 #  transaction_service_period_from :date
@@ -99,6 +99,7 @@ class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
+  include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
@@ -109,7 +110,8 @@ class Invoice < ApplicationRecord
   # state_machine Documents::Invoices::StateMachine
   # resolver :admin, Documents::Invoices::Policy::Scope
   # resolver Documents::Invoices::Policy::Scope
-  # event_channel 'invoice'
+  # produces_event!
+  event_channel 'invoice'
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
 

@@ -1,5 +1,5 @@
 class TaskManager::Documents::Index < Transactions::API
-  extend Representer::DSL
+  # extend Representer::DSL
 
   step :load_documents
 

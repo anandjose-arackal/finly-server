@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_19_065120) do
+ActiveRecord::Schema.define(version: 2019_11_25_141618) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -844,6 +844,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.boolean "early_payment_fee_selected", default: false
     t.boolean "late_payment_fee_selected", default: false
     t.boolean "convenience_fee_selected", default: false
+    t.integer "bbps_biller_id"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -3813,6 +3814,42 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.index ["type_id"], name: "index_individual_kycs_on_type_id"
     t.index ["upgraded_by_resource_id"], name: "index_individual_kycs_on_upgraded_by_resource_id"
     t.index ["user_id"], name: "index_individual_kycs_on_user_id"
+  end
+
+  create_table "insight_dashboards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id"
+    t.integer "user_id"
+    t.integer "policy_id"
+    t.integer "user_role_id"
+    t.string "application", null: false
+    t.integer "dashboard", null: false
+    t.string "name"
+    t.text "description"
+    t.string "app"
+    t.integer "admin_user_id"
+    t.integer "priority", default: 1
+    t.datetime "deleted_at"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "can_filter_from"
+    t.boolean "can_filter_to"
+    t.index ["active"], name: "index_insight_dashboards_on_active"
+    t.index ["admin_user_id"], name: "index_insight_dashboards_on_admin_user_id"
+    t.index ["app"], name: "index_insight_dashboards_on_app"
+    t.index ["application"], name: "index_insight_dashboards_on_application"
+    t.index ["company_id"], name: "index_insight_dashboards_on_company_id"
+    t.index ["created_at"], name: "index_insight_dashboards_on_created_at"
+    t.index ["dashboard"], name: "index_insight_dashboards_on_dashboard"
+    t.index ["deleted_at"], name: "index_insight_dashboards_on_deleted_at"
+    t.index ["name"], name: "index_insight_dashboards_on_name"
+    t.index ["policy_id"], name: "index_insight_dashboards_on_policy_id"
+    t.index ["priority"], name: "index_insight_dashboards_on_priority"
+    t.index ["updated_at"], name: "index_insight_dashboards_on_updated_at"
+    t.index ["user_id"], name: "index_insight_dashboards_on_user_id"
+    t.index ["user_role_id"], name: "index_insight_dashboards_on_user_role_id"
+    t.index ["uuid"], name: "index_insight_dashboards_on_uuid"
   end
 
   create_table "invites", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -7058,6 +7095,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "verification_code_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "user_finly_id"
     t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
     t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
     t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
@@ -7216,6 +7254,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "client_id"
     t.string "client_type"
     t.text "message"
+    t.string "user_finly_id"
     t.index ["company_id"], name: "index_user_devices_on_company_id"
     t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
     t.index ["status_id"], name: "index_user_devices_on_status_id"
@@ -7288,6 +7327,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.decimal "latitude", precision: 20, scale: 10
     t.decimal "longitude", precision: 20, scale: 10
     t.integer "accuracy_radius"
+    t.string "user_finly_id"
     t.index ["ip"], name: "index_user_ips_on_ip"
     t.index ["ip_type"], name: "index_user_ips_on_ip_type"
     t.index ["status_id"], name: "index_user_ips_on_status_id"
@@ -7656,6 +7696,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
     t.integer "department_id"
     t.integer "location_id"
     t.integer "default_company_id"
+    t.string "finly_id", limit: 36
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -8251,6 +8292,10 @@ ActiveRecord::Schema.define(version: 2019_11_19_065120) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "insight_dashboards", "companies"
+  add_foreign_key "insight_dashboards", "policies"
+  add_foreign_key "insight_dashboards", "user_roles"
+  add_foreign_key "insight_dashboards", "users"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"

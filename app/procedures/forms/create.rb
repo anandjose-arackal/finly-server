@@ -6,7 +6,7 @@ class Forms::Create < Transactions::API
     end
   end
 
-  step Model(Form, :find)
+  step Model(Form, :find_by_uuid)
   step Policy::Pundit(Forms::Policy, :create?)
   step :set_custom_field
   step Contract::Build(builder: :build_contract)

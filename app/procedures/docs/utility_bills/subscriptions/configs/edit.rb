@@ -1,6 +1,6 @@
 class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
 
-  success Model(BbpsBillerSubscription, :find_by)
+  pass Model(BbpsBillerSubscription, :find_by)
   step :init
 
   def init(options, params:, current_user:, model:, **)

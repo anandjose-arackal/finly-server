@@ -97,6 +97,18 @@ class BbpsBillerSubscription < ApplicationRecord
     where(location_id: id)
   }
 
+  scope :filter_user_id, -> (id) {
+    where(user_id: id)
+  }
+
+  scope :filter_biller_id, -> (id) {
+    where(bbps_biller_id: id)
+  }
+
+  scope :filter_biller_type, -> (biller_type) {
+    joins(:biller).where("bbps_billers.biller_category_name = ?", "%#{biller_type}%")
+  }
+
   def cleanup
     self.customer_fields.without_biller_id(bbps_biller_id).destroy_all
   end

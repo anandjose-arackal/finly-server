@@ -16,12 +16,12 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
   step :set_default_params
   step Model(BbpsBillerSubscription, :find_by)
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
-  failure :check
+  fail :check
   step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Base)
   step Contract::Validate(key: 'subscription')
 
   step Contract::Persist()
-  failure :check2
+  fail :check2
   step :test
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
 

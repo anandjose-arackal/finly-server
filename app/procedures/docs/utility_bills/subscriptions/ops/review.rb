@@ -12,13 +12,19 @@ class Docs::UtilityBills::Subscriptions::Ops::Review < Transactions::API
   # step :set_default_params
   step :transition
 
-  failure :check
+  fail :check
 
-  step Transactions::Messages::SuccessMessage("You have successfully #{params[:aasm_event]}")
+  # step Transactions::Messages::SuccessMessage("You have successfully")
+
+  # step :success_message
+  #
+  # def success_message(options)
+  #   add_message options, :success, :base, "You have successfully ..."
+  # end
 
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
-
+    true
   end
 
   def verify_policy(options, current_user:, params:, model:, **)

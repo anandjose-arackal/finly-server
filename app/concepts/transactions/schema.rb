@@ -1,18 +1,18 @@
 class Transactions::Schema < Dry::Validation::Contract
 
   def self.Validate(constant:)
-    step = ->(input, options) {Validate.with(input, options, constant: constant)}
-    [step, {name: "schema.validate", after: "operations.start"}]
+    Transactions::Task.build id: "schema.validate", after: "operations.start" do |context, **|
+      Validate.with(context, constant: constant)
+    end
   end
 
   class Validate
-    def self.with(input, options, name: :params, constant:)
+    def self.with(context, name: :params, constant:)
       schema_validator = constant.new
-      return Transactions::API.on_error(input, :base, 'Unable to validate the request') if schema_validator.nil?
-
-      result = schema_validator.call(options&.dig(name))
+      return Transactions::API.on_error(context, :base, 'Unable to validate the request') if schema_validator.nil?
+      result = schema_validator.call(context[name])
       unless result.success?
-        return Transactions::API.on_schema_error(input, result.errors)
+        return Transactions::API.on_schema_error(context, result.errors)
       end
       true
     end
@@ -28,7 +28,7 @@ class Transactions::Schema < Dry::Validation::Contract
       def schema(&block)
         klass = Class.new(Transactions::Schema)
         klass.instance_eval &block
-        step *Transactions::Schema::Validate(constant: klass)
+        step Transactions::Schema::Validate(constant: klass)
       end
     end
 

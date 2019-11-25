@@ -68,6 +68,7 @@ class Company < ApplicationRecord
   has_many :beneficiary_payments
   has_many :security_deposits
   has_many :icici_statements
+  has_many :insight_dashboards
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail

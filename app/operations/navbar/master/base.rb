@@ -1,6 +1,10 @@
 class Navbar::Master::Base
   cattr_accessor :data_map
 
+  def divider
+    {type: 'divider'}
+  end
+
   def self.app
     set_data_map[:app]
   end
@@ -24,7 +28,7 @@ class Navbar::Master::Base
   end
 
   def self.cog
-    default_cog + set_data_map[:cog]
+    default_cog + set_data_map[:cog_menu] + set_data_map[:cog_modules]
   end
 
   def self.structure(type)

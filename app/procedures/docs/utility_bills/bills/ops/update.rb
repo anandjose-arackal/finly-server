@@ -7,7 +7,7 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
   step Contract::Persist()
 
   step :setup_dlrm
-  failure :check
+  fail :check
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill')
 
   def check(options, params:, **)

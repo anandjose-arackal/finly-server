@@ -43,8 +43,8 @@
 
 class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
-
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
+  belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
@@ -122,6 +122,37 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
     end
   }
+
+  scope :filter_biller_id, -> (id) {
+    where(bbps_biller_id: id)
+  }
+
+  scope :filter_biller_type, -> (type) {
+    joins(:biller).where('bbps_billers.biller_category_name = ?', "%#{type}%")
+  }
+
+  scope :filter_poc_id, -> (id) {
+    where(user_id: id)
+  }
+
+  scope :filter_bill_date, -> (start_date, end_date) {where('bill_date >= ? AND bill_date =< ? ', start_date, end_date)}
+  scope :filter_due_date, -> (start_date, end_date) {where('due_date >= ? AND due_date =< ? ', start_date, end_date)}
+  scope :filter_paid_on_date, -> (start_date, end_date) {where('paid_on_date >= ? AND paid_on_date =< ? ', start_date, end_date)}
+  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+
+  scope :filter_amount, -> (type, value) do
+    case type
+    when 'lteq'
+      joins(:amount).where('value <= ?', value)
+    when 'gteq'
+      joins(:amount).where('value >= ?', value)
+    when 'eq'
+      joins(:amount).where('ROUND(value, 2) = ?', precision_value(value))
+    else
+      # do nothing
+    end
+  end
 
   def as_json(options = {})
     if options[:index]

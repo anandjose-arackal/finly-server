@@ -288,8 +288,8 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       config = params&.dig(:mappings, user_id.to_s)
       if config.present?
         grouped_report_ids = config[:report_ids]
-        currency_id = config&.dig("amount","currency_id")
-        user_reimbursing_amount =  config&.dig("amount","value")&.to_f || 0.0
+        currency_id = config&.dig("amount", "currency_id")
+        user_reimbursing_amount = config&.dig("amount", "value")&.to_f || 0.0
         settlement_currency = Currency.find_by_id(currency_id) || 1
         reimbursement_amount = Expense.with_report_id(grouped_report_ids).sum_reimbursements(settlement_currency&.country_code&.to_sym)
         if reimbursement_amount < user_reimbursing_amount

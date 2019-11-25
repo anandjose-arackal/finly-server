@@ -4,26 +4,15 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
   # step Policy::Pundit( Docs::UtilityBills::Bills::Authorizer, :create? )
   step :set_default_params
   step Contract::Build(constant: Docs::UtilityBills::Bills::Contracts::Base)
-  failure :check
   step Contract::Validate(key: 'bill')
-  failure :check1
 
   step Contract::Persist()
-  failure :check2
 
 
-  def check(options, model:, **)
-  end
-
-  def check1(options, model:, **)
-  end
-
-  def check2(options, model:, **)
-  end
-
-  def authorize_user_presence!(options)
+  def skip_user_authorization!(context, options)
     true
   end
+
 
   def set_default_params(options, params:, **)
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
@@ -44,6 +33,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     amount = params[:amount]&.to_f || 0
 
     bill['bill_date'] = params[:bill_date]
+    bill['bbps_bill_id'] = subscription.bbps_biller_id
     bill['bill_number'] = params[:bill_number]
     bill['due_date'] = params[:due_date]
     bill['bill_period'] = params[:bill_period]

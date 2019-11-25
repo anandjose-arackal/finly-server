@@ -84,6 +84,7 @@ module Transactions
       end
 
       def success(result)
+        # controller.render json: result['result'], status: 200
         # unless respond_with_representer(result)
         #   controller.render json: {success: true}, status: 200
         # end
@@ -119,10 +120,10 @@ module Transactions
       #   m.not_found { |result| .. }
       # end
       def endpoint(operation_class, options = {}, &block)
-        options[:args] = [params.to_unsafe_h, {'current_user' => current_user}] if options[:args].nil?
+        options[:args] = [params: params.to_unsafe_h, current_user: current_user] if options[:args].nil?
 
         handlers = Handlers.new(self, options, &block).()
-        Endpoint.(self, operation_class, handlers, *options[:args], &block)
+        @op = Endpoint.(self, operation_class, handlers, *options[:args], &block)
       end
     end
   end
