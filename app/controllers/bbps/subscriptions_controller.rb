@@ -2,63 +2,63 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   layout :resolve_layout
 
   def edit_config
-    @op = Docs::UtilityBills::Subscriptions::Configs::Edit.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Configs::Edit
     respond_to do |format|
       format.json {}
     end
   end
 
   def filters_config
-    @op = Docs::UtilityBills::Subscriptions::Configs::Filters.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Configs::Filters
     respond_to do |format|
       format.json {}
     end
   end
 
   def biller_type_config
-    @op = Docs::UtilityBills::Subscriptions::Configs::BillerType.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Configs::BillerType
     respond_to do |format|
       format.json {}
     end
   end
 
   def biller_field_config
-    @op = Docs::UtilityBills::Subscriptions::Configs::BillerFields.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Configs::BillerFields
     respond_to do |format|
       format.json {}
     end
   end
 
   def create
-    @op = Docs::UtilityBills::Subscriptions::Ops::Create.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Create
     respond_to do |format|
       format.json {}
     end
   end
 
   def validate_customer_params
-    @op = Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::ValidateCustomerParams
     respond_to do |format|
       format.json {}
     end
   end
 
   def update
-    @op = Docs::UtilityBills::Subscriptions::Ops::Update.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Update
     respond_to do |format|
       format.json {}
     end
   end
 
   def index
-    @op = Docs::UtilityBills::Subscriptions::Ops::Index.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Index
     respond_to do |format|
       format.json {}
     end
   end
 
   def show
-    @op = Docs::UtilityBills::Subscriptions::Ops::Show.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Show
     respond_to do |format|
       format.json {}
     end
@@ -66,21 +66,21 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def review
     params[:aasm_event] = params[:type]
-    @op = Docs::UtilityBills::Subscriptions::Ops::Review.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Review
     respond_to do |format|
       format.json {}
     end
   end
 
   def destroy
-    @op = Docs::UtilityBills::Subscriptions::Ops::Destroy.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::Destroy
     respond_to do |format|
       format.json {}
     end
   end
 
   def add_bill
-    @op = Docs::UtilityBills::Subscriptions::Ops::AddBill.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint Docs::UtilityBills::Subscriptions::Ops::AddBill
     respond_to do |format|
       format.json {}
     end

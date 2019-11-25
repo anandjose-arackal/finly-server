@@ -123,7 +123,7 @@ module Transactions
         options[:args] = [params: params.to_unsafe_h, current_user: current_user] if options[:args].nil?
 
         handlers = Handlers.new(self, options, &block).()
-        Endpoint.(self, operation_class, handlers, *options[:args], &block)
+        @op = Endpoint.(self, operation_class, handlers, *options[:args], &block)
       end
     end
   end
