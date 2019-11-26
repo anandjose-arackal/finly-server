@@ -206,7 +206,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     [user_params, messages]
   end
 
-  def generated_password
+  def generate_default_password
     char_array = [("a".."z").to_a,
                   ("A".."Z").to_a,
                   ("0".."9").to_a,
