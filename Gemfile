@@ -48,6 +48,7 @@ gem 'reform-rails', '~> 0.1'
 gem 'pundit', '~> 2.1'
 gem 'uuidtools', '~> 2.1'
 gem 'dry-matcher', '~> 0.8'
+gem 'multiverse', '~> 0.2'
 
 gem 'health-monitor-rails', '~> 8.4.0'
 
