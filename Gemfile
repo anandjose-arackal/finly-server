@@ -157,7 +157,7 @@ gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
 
 # gem for devise authentication
-gem 'devise', '~> 4.5.0'
+gem 'devise', '~> 4.7.1'
 
 gem 'devise_invitable', '~> 1.7.5'
 gem 'doorkeeper', '~> 5.0.2'
@@ -174,6 +174,8 @@ gem 'snowplow-tracker', '~> 0.6.1'
 gem 'maxminddb', '~> 0.1.22'
 gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
+
+gem 'uuidtools', '~> 2.1'
 
 # gem 'logstasher', '~> 1.3.0'
 gem 'lograge', '~> 0.10.0'
