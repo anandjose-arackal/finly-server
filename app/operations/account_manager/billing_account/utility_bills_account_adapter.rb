@@ -1,4 +1,4 @@
-class AccountManager::BbpsBiller::UtilityBillsAccountAdapter < AccountManager::BaseAdapter
+class AccountManager::BillingAccount::UtilityBillsAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :utility_bills_account, :company
 
@@ -59,7 +59,7 @@ class AccountManager::BbpsBiller::UtilityBillsAccountAdapter < AccountManager::B
   end
 
   def database_balance
-    self.balance_value
+    self.account.balance_value
   end
 
   def balance(options = {})

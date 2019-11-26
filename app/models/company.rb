@@ -100,6 +100,7 @@ class Company < ApplicationRecord
   has_many :money_request_item_categories
 
   has_many :bbps_bills
+  has_many :bbps_yes_bank_transactions
 
   has_many :budgets
   has_many :procurements

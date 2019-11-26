@@ -49,6 +49,7 @@ class BbpsYesBankTransaction < ApplicationRecord
   # TODO - add validations that are relevant to this model, skipping for now
 
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
+  delegate :amount_value, to: :amount
 
 end
 

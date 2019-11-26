@@ -32,8 +32,8 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
         customer_param_1: {
-            key: bill.customer_param_1_key,
-            value: bill.customer_param_1_value,
+            key: bill.subscription.customer_param_key_1,
+            value: bill.subscription.customer_param_value_1,
         }
     }
     op = Bbps::BillPay.(params, "user" => payment.initiating_user)
@@ -53,7 +53,7 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
 
   # balance doesn't make sense here as there is no such thing defined for this particular account,
   # so by default returning zero in case anyone tries to debit this account by mistake
-  def balance
+  def balance(options = {})
     return 0
   end
 
@@ -64,10 +64,10 @@ class AccountManager::BbpsBiller::BbpsAccountsAdapter < AccountManager::BaseAdap
   private
 
   def create_bbps_bank_transaction(payment)
-    if paymet.reference_resource.present?
+    if payment.reference_resource.present?
       return payment.reference_resource
     end
-    bank_transaction = company.bbps_yes_bank_transactions.build(
+    bank_transaction = payment.company.bbps_yes_bank_transactions.build(
         biller_id: payment.parent.subscription_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
       transfer_status_id: BankTransferStatus.id_for(:opem),
       bill_date: payment.parent.bill_date,
