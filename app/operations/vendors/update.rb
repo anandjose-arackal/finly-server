@@ -39,6 +39,26 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+        poc_email = gstin_location[:poc_email]
+        poc_mobile_number = gstin_location[:poc_mobile_number]
+        if poc_email.present?
+          unless Constants::VALID_EMAIL_FORMAT.match?(poc_email)
+            add_message :error, "#{poc_email}: Invalid email"
+            return
+          end
+        end
+
+        if poc_mobile_number.present?
+          unless Constants::VALID_MOBILE_NUMBER.match?(poc_mobile_number)
+            add_message :error, "#{poc_mobile_number}: Invalid mobile number"
+            return
+          end
+        end
+      end
+    end
+
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?

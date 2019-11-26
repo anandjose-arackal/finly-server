@@ -18,6 +18,7 @@ json.vendor do
     json.state_code_id @result.vendor.state_code_id
     json.state_code_name @result.vendor.state_code&.full_name
     json.created_by @result.vendor.created_by&.name
+    json.gst_registered @result.vendor.gst_registered
     json.vendor_id @result.vendor.vendor_id
     json.rejection_note @result.vendor&.reject_note
     json.tds_rates do
