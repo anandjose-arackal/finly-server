@@ -206,8 +206,19 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     [user_params, messages]
   end
 
-  def generate_default_password
-    SecureRandom.base64 13
+  def generated_password
+    char_array = [("a".."z").to_a,
+                  ("A".."Z").to_a,
+                  ("0".."9").to_a,
+                  %q(#?!@$%^&*-).chars]
+    all_values  = char_array.flatten
+    arr=[]
+    6.times.map do
+      arr = char_array.map(&:sample)
+      (5 - char_array.size).times{ arr << all_values.sample}
+      arr.shuffle.join
+    end
+    "#{arr.join()}#{SecureRandom.base64(10)}"
   end
 
 end
