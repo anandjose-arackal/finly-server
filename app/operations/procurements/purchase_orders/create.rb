@@ -27,7 +27,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
   def pre_process
     if self.purchase_order_params[:procurement_term_id].blank?
-      terms = current_company.procurement_terms.with_default
+      terms = current_company.procurement_terms.with_default&.first
       if terms.blank?
         terms = current_company.procurement_terms.first
       end
