@@ -126,7 +126,7 @@ class Vendors::Create < Vendors::Base
 
       if gstin_location[:gstin].present?
         gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
-        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin])
+        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
         if gstin.present?
           add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
           return
