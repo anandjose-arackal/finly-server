@@ -142,17 +142,11 @@ class BbpsBill < ApplicationRecord
   scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
   scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
 
-  scope :filter_amount, -> (type, value) do
-    case type
-    when 'lteq'
-      joins(:amount).where('value <= ?', value)
-    when 'gteq'
-      joins(:amount).where('value >= ?', value)
-    when 'eq'
-      joins(:amount).where('ROUND(value, 2) = ?', precision_value(value))
-    else
-      # do nothing
-    end
+  scope :filter_amount, -> (gteq, lteq) do
+    gteq = gteq.to_f
+    lteq = lteq.present? ? lteq.to_f : 9999999999999999
+
+    joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
   end
 
   def as_json(options = {})

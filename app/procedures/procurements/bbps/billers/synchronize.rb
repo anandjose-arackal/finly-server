@@ -22,10 +22,10 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
       )
   )
 
-  def fetch_all_billers(options)
-    ::Bbps::BillersList.({}, 'current_user' => nil) do |m|
+  def fetch_all_billers(context, options)
+    ::Bbps::BillersList.(params: {}, 'current_user' => nil) do |m|
       m.success do |result|
-        options['billers'] = result
+        context['billers'] = result
       end
       m.failure do |result|
         # Todo raise alert as this API cannot fail
@@ -43,7 +43,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
     billers = billers.first(20) unless Rails.env.production?
 
     billers.each do |biller_config|
-      ::Bbps::BillerDetails.({biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
+      ::Bbps::BillerDetails.(params: {biller_id: biller_config['biller_id']}, 'current_user' => nil) do |m|
         m.success do |result|
           error_message = create_or_update_biller(result)
           if error_message.blank?
