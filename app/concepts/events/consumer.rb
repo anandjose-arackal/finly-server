@@ -99,7 +99,11 @@ module Events::Consumer
 
   def work(payload)
     perform payload
-    ack! if respond_to?(:ack!)
+    ack! if respond_to?(:ack!) and auto_acknowledge?
+  end
+
+  def auto_acknowledge?
+    true
   end
 
   def perform(payload)

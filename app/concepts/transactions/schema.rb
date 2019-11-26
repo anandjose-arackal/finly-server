@@ -11,7 +11,7 @@ class Transactions::Schema < Dry::Validation::Contract
       schema_validator = constant.new
       return Transactions::API.on_error(context, :base, 'Unable to validate the request') if schema_validator.nil?
 
-      result = schema_validator.call(options&.dig(name))
+      result = schema_validator.call(context[name])
       unless result.success?
         return Transactions::API.on_schema_error(context, result.errors)
       end

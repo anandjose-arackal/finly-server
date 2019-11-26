@@ -53,7 +53,7 @@ class Transactions::Authorization
     end
 
     def unauthorized!(context)
-      context[:"result.authorization"] = Failure("You cannot perform the following action")
+      context["result.authorization"] = Failure("You cannot perform the following action")
       false
     end
 

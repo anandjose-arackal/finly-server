@@ -1,7 +1,7 @@
-class Analytics::Dimensions::Category < Analytics::Mapper
+class Analytics::Dimensions::Category < Analytics::DSL
 
   model ::Category
-  events %w(category.update category.create)
+  events 'category.update', 'category.create'
   dimension Olap::Dimensions::Category
   # input -> (user, payload) {
   #   payload[:record]

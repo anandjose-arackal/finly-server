@@ -1,19 +1,30 @@
-class Analytics::Mapper
+class Analytics::DSL
   include DynamicAttributes
 
   class_attr :fields, default: []
-  class_attr :model
-  class_attr :events
   class_attr :fact
   class_attr :dimension
   class_attr :input, default: -> (user, payload) { payload[:record] }
+
+  def self.model(klass = NoObject)
+    unless klass == NoObject
+      @model = klass
+      Analytics::Master.register @model, self
+    end
+    @model
+  end
 
   def self.fields
     return @fields if @fields.present?
     @fields = reset_fields
   end
 
+  def self.olap_model
+    fact || dimension
+  end
+
   def self.reset_fields
+    # Add finly_ref_id as a default field
     [
         {
             primary_key: :finly_ref_id,
@@ -22,7 +33,7 @@ class Analytics::Mapper
     ]
   end
 
-  def self.field(primary_key, foreign_key=nil,  &block)
+  def self.field(primary_key, foreign_key = nil, &block)
     raise "Model is not defined" if model.nil?
 
     prop = {primary_key: primary_key}
@@ -42,8 +53,9 @@ class Analytics::Mapper
   def self.contract
     return @contract if @contract
 
+    klass = self
     @contract = Class.new(Transactions::Contract) do
-      fields.each do |field|
+      klass.fields.each do |field|
         property field[:primary_key], deserialize(-> (input, represented, record:, **) do
           if field.has_key?(:block)
             # Pick value from block
@@ -61,4 +73,10 @@ class Analytics::Mapper
     end
   end
 
+  def self.events(*list)
+    raise "Event is already defined" if @events.present?
+
+    @events = list
+    Analytics::Synchronizer.setup(self, list)
+  end
 end

@@ -26,9 +26,12 @@ class Category < ApplicationRecord
   include AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
+
+  event_channel 'category'
 
   belongs_to :company, optional: true
 
