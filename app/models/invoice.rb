@@ -535,6 +535,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
+    return super if self.policy_id.present?
     self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
