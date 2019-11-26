@@ -59,6 +59,21 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+
+    # TODO - check if this is required for all companies
+    unless user.company_id == 156
+      if vendor_parameters[:pan].blank? 
+        add_message :error, 'Please provide PAN to proceed'
+        return
+      end
+      unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+        add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+        return
+      end
+
+    end
+
+
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?
@@ -102,6 +117,15 @@ class Vendors::Update < Vendors::Base
       if ba_count == ba_delete_count
         add_message :error, "Please provide bank account details"
         return
+      end
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each do |bank_account|
+        if bank_account[:account_number].present? && bank_account[:confirm_account_number].present? && (bank_account[:account_number] != bank_account[:confirm_account_number])
+          add_message :error, "Account number: #{bank_account[:account_number]} does not match with confirmation account number: #{bank_account[:confirm_account_number]}"
+          return
+        end
       end
     end
   end
@@ -163,6 +187,8 @@ class Vendors::Update < Vendors::Base
     
     vendor.assign_attributes(vendor_parameters)
     return unless validate_gstin_pan_number
+    validate_duplicate_bank_account
+    return if has_errors?
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
       validate_mark_for_destruction_account
@@ -195,7 +221,8 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
-    return true if vendor_parameters[:pan].blank? || vendor_parameters[:gstin].blank?
+    # return true if vendor_parameters[:pan].blank? || vendor_parameters[:gstin].blank?
+    return true if self.vendor.gstin_locations.blank?
     validated = false
     self.vendor.gstin_locations.each do |vendor_location|
       validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)

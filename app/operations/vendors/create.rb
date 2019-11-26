@@ -56,6 +56,19 @@ class Vendors::Create < Vendors::Base
     end
 
 
+    unless user.company_id == 156
+      if vendor_parameters[:pan].blank? 
+        add_message :error, 'Please provide PAN to proceed'
+        return
+      end
+      unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+        add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+        return
+      end
+
+    end
+
+
     if user.company_id == 156
       unless vendor_parameters[:pan].present?
         add_message :error, "Please provide PAN to proceed"
@@ -164,6 +177,14 @@ class Vendors::Create < Vendors::Base
         return
       end
     end
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each do |bank_account|
+        if bank_account[:account_number].present? && bank_account[:confirm_account_number].present? && (bank_account[:account_number] != bank_account[:confirm_account_number])
+          add_message :error, "Account number: #{bank_account[:account_number]} does not match with confirmation account number: #{bank_account[:confirm_account_number]}"
+          return
+        end
+      end
+    end
 
   end
 
@@ -233,7 +254,8 @@ class Vendors::Create < Vendors::Base
       self.vendor.assign_attributes(vendor_parameters)
       self.vendor.authorized = true
       self.vendor.status_id = VendorStatus.id_for(:auto_approved)
-
+      validate_duplicate_bank_account
+      return if has_errors?
       if user.company.vendor_empanelment_workflow_enabled?
         self.vendor.update(status_id: VendorStatus.id_for(:draft))
 
@@ -273,6 +295,8 @@ class Vendors::Create < Vendors::Base
       end
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
+      validate_duplicate_bank_account
+      return if has_errors?
       self.vendor.authorized = true
       validate_custom_fields(true)
       return if has_errors?
