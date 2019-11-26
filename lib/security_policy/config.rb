@@ -70,7 +70,7 @@ class SecurityPolicy::Config
   }
 
   ROLE_LEVELS = {
-      admin: LOW,
+      admin: HIGH,
       finance_manager: HIGH,
       manager: MEDIUM,
       employee: LOW,
