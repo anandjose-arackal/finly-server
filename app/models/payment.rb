@@ -419,14 +419,14 @@ class Payment < ApplicationRecord
 
   scope :include_for_index, -> {
         includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
+                  :receiving_account,
                   invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
                   payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+        includes( :payment_status, :amount, :receiving_user, :receiving_account)
   }
 
   # validates :amount_id, presence: true

@@ -12,7 +12,7 @@ class BbpsBillStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    %i( open awaiting_approval retracted rejected approved auto_approved payment_ticket_created payment_initiated failed paid voided )
+    %i( open awaiting_approval retracted rejected approved auto_approved payment_ticket_created payment_initiated failed paid voided payment_ticket_deleted)
   end
 
   def open?

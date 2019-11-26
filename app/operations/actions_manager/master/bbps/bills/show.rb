@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy, :view_payment_ticket]
 
   def initialize(user = nil, params = {})
     super
@@ -47,6 +47,10 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def return_control
     bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user) && user.vendor_payment_admin? && has_taken_control?
+  end
+
+  def view_payment_ticket
+    BbpsBill.status_ids(:paid, :failed, :payment_ticket_created, :payment_initiated).include?(bbps_bill.status_id)
   end
 
   # def deactivate

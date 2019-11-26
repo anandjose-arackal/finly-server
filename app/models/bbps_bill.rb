@@ -56,6 +56,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :early_payment_fee, foreign_key: :early_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :convenience_fee, foreign_key: :convenience_fee_id, class_name: 'Amount', optional: true
 
+  has_many :payments, as: :parent
 
   accepts_nested_attributes_for :amount
 
@@ -191,6 +192,7 @@ class BbpsBill < ApplicationRecord
         updated_at: updated_at.strftime("%d-%b-%Y"),
         status: status.as_json,
         user: user&.json_for_trail,
+        payments: self.payments,
         # biller_category_name: biller_category_name,
 
         autofetched: autofetched,

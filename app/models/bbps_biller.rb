@@ -53,6 +53,19 @@ class BbpsBiller < ApplicationRecord
     where(biller_category_name: name)
   }
 
+  # defining a few methods for consistency here
+  def name
+    self.biller_name
+  end
+
+  def account_number
+    ""
+  end
+
+  def ifsc
+    ""
+  end
+
   def as_json(options={})
     if options[:autocomplete]
       data = {
