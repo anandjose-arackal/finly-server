@@ -118,6 +118,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              transaction_period_to: {spreadsheet: true},
              is_invoice_approved: {spreadsheet: true},
              invoice_status: {spreadsheet: true},
+             policy: {spreadsheet: true},
              category: {spreadsheet: true},
              quantity: {spreadsheet: true},
              rate: {spreadsheet: true},
@@ -408,6 +409,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def po_date(invoice_line_item)
     invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
-  end 
+  end
+
+  def policy(invoice_line_item)
+    invoice_line_item.parent&.policy&.name
+  end
 
 end
