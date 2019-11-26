@@ -216,8 +216,8 @@ class Vendors::Create < Vendors::Base
       # also mark the vendor as authorized now
       self.vendor.assign_attributes(vendor_parameters)
       self.vendor.authorized = true
-      self.vendor.status_id = VendorStatus.id_for(:auto_approved)
-
+      # self.vendor.status_id = VendorStatus.id_for(:auto_approved)
+      return if has_errors?
       if user.company.vendor_empanelment_workflow_enabled?
         self.vendor.update(status_id: VendorStatus.id_for(:draft))
 
@@ -231,7 +231,9 @@ class Vendors::Create < Vendors::Base
         end
         return
       else
-        self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+        add_message :error, 'Vendor workflow is not enabled'
+        return
+        # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
       end
 
 
@@ -249,7 +251,9 @@ class Vendors::Create < Vendors::Base
           end
           return
         else
-          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+          add_message :error, 'Vendor workflow is not enabled'
+          return
+          # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
         end  
       else
         add_message :error, vendor.errors.full_messages
@@ -273,7 +277,9 @@ class Vendors::Create < Vendors::Base
           end
           return
         else
-          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+          add_message :error, 'Vendor workflow is not enabled'
+          return
+          # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
         end
       else
         add_message :error, vendor.errors.full_messages
