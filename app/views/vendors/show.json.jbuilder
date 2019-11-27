@@ -47,6 +47,7 @@ json.bank_accounts do
     json.card_id bank_account.id
     json.name bank_account.name
     json.default_account bank_account.default_account
+    json.disabled bank_account.disabled
   end
 end
 
