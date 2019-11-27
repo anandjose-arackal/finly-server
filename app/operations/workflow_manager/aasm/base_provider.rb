@@ -78,7 +78,7 @@ class WorkflowManager::Aasm::BaseProvider
 
       # Set forwarding user
       if dlrms.present?
-        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false, taken_control: false, taken_control_by_id: nil})
+        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false, taken_control: false, taken_control_by_id: nil, action_taken_at: DateTime.now})
       end
     end
 
@@ -91,7 +91,8 @@ class WorkflowManager::Aasm::BaseProvider
       if dlrms.present?
         dlrms.update_all(
             action_id: TrailAction.id_for(aasm.current_event),
-            action_taken_by_id: user.id
+            action_taken_by_id: user.id,
+            action_taken_at: DateTime.now
         )
       end
     end
@@ -113,7 +114,8 @@ class WorkflowManager::Aasm::BaseProvider
 
       dlrm.update(
           action_taken_by_id: nil,
-          action_id: TrailAction.id_for(aasm.current_event)
+          action_id: TrailAction.id_for(aasm.current_event),
+          action_taken_at: DateTime.now
       )
 
     end
@@ -123,7 +125,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy_id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false)
+        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false, action_taken_at: DateTime.now)
       end
     end
 
@@ -132,7 +134,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy_id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: nil, taken_control: false, active: true)
+        dlrm.update_all(taken_control_by_id: nil, taken_control: false, active: true, action_taken_at: DateTime.now)
       end
     end
 
@@ -145,7 +147,8 @@ class WorkflowManager::Aasm::BaseProvider
           forwarded: false,
           forwarded_to_id: nil,
           forwarded_by_id: nil,
-          action_id: nil
+          action_id: nil,
+          action_taken_at: nil
       )
     end
 
@@ -165,7 +168,8 @@ class WorkflowManager::Aasm::BaseProvider
               forwarded: false,
               forwarded_to_id: nil,
               forwarded_by_id: nil,
-              action_id: nil
+              action_id: nil,
+              action_taken_at: DateTime.now
       )
     end
 
