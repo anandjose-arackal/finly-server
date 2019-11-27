@@ -16,10 +16,6 @@ class Analytics::Synchronizer
     end
   end
 
-  def auto_acknowledge?
-    false
-  end
-
   def on_event(user, payload)
     master = self.class.master
     input = master.input.call(user, payload)

@@ -16,19 +16,27 @@ class Analytics::DSL
 
   def self.fields
     return @fields if @fields.present?
-    @fields = reset_fields
+    @fields ||= default_fields
   end
 
   def self.olap_model
     fact || dimension
   end
 
-  def self.reset_fields
+  def self.default_fields
     # Add finly_ref_id as a default field
     [
         {
             primary_key: :finly_ref_id,
             foreign_key: :id
+        },
+        {
+            primary_key: :finly_ref_updated_at,
+            foreign_key: :updated_at
+        },
+        {
+            primary_key: :finly_ref_created_at,
+            foreign_key: :created_at
         }
     ]
   end

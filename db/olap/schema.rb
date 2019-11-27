@@ -14,6 +14,8 @@ ActiveRecord::Schema.define(version: 2019_11_26_092139) do
 
   create_table "olap_dimensions_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "finly_ref_id", null: false
+    t.datetime "finly_ref_created_at"
+    t.datetime "finly_ref_updated_at"
     t.string "name"
     t.string "gl_code"
     t.boolean "active"
@@ -21,7 +23,9 @@ ActiveRecord::Schema.define(version: 2019_11_26_092139) do
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_olap_dimensions_categories_on_active"
     t.index ["created_at"], name: "index_olap_dimensions_categories_on_created_at"
+    t.index ["finly_ref_created_at"], name: "index_olap_dimensions_categories_on_finly_ref_created_at"
     t.index ["finly_ref_id"], name: "index_olap_dimensions_categories_on_finly_ref_id"
+    t.index ["finly_ref_updated_at"], name: "index_olap_dimensions_categories_on_finly_ref_updated_at"
     t.index ["gl_code"], name: "index_olap_dimensions_categories_on_gl_code"
     t.index ["name"], name: "index_olap_dimensions_categories_on_name"
     t.index ["updated_at"], name: "index_olap_dimensions_categories_on_updated_at"
