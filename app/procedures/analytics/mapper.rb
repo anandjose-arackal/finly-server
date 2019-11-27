@@ -1,4 +1,4 @@
-class Analytics::DSL
+class Analytics::Mapper
   include DynamicAttributes
 
   class_attr :fields, default: []

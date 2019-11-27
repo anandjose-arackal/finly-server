@@ -1,4 +1,4 @@
-class Analytics::Dimensions::Category < Analytics::DSL
+class Analytics::Dimensions::Category < Analytics::Mapper
 
   model ::Category
   events 'category.update', 'category.create'
