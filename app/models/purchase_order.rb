@@ -1139,6 +1139,14 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
+    if role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      return user.company.purchase_orders.where(policy_id: policy_ids, purchase_order_status_id: finance_associated_status_ids)
+    end
+    user.send("#{self.table_name}")
+  end
+
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
   end
