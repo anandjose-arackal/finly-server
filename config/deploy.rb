@@ -73,7 +73,7 @@ when :migrated_test_2
   set :rails_env, 'staging'
 when :uat
   set :deploy_to, '/home/centos/app'
-  set :rails_env, 'staging'
+  set :rails_env, 'uat'
 when :feature_testing
   # branch = fetch :branch
   # unless ['feature-testing', :'feature-testing'].include?(branch)
