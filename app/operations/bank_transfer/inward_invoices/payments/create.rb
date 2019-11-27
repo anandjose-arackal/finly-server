@@ -77,6 +77,11 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
       return
     end
 
+    if self.inward_invoice.bank_account&.disabled
+        add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
+        return
+      end
+
     if self.payable_amount.to_f > remaining_amount.to_f
       add_message :error, "You cannot pay more than the remaining amount in an invoice. Maximum payable - #{self.inward_invoice.balance_due&.currency&.symbol}#{remaining_amount.to_f}"
     end
