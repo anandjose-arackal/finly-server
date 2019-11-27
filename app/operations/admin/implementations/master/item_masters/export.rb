@@ -22,7 +22,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def input
-    company.items.includes(:category,:item_expense_type,:supply_item_type)
+    company.items.non_deleted.includes(:category,:item_expense_type,:supply_item_type)
   end
 
   def id(item)
