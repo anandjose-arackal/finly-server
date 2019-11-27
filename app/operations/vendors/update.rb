@@ -140,6 +140,10 @@ class Vendors::Update < Vendors::Base
       add_message :error, "There is a similar vendor added with the same vendor ID in our records."
       return
     end
+
+    if YesBankVendor.status_ids(:retracted, :draft, :rejected).exclude?(vendor.status_id) and self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].delete(:_destroy)
+    end
   end
 
   def pre_process

@@ -54,6 +54,17 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     after_all_events :change_state
   end
 
+  def update_status
+    super()
+    if [:deactivate].include?(aasm.current_event)
+      document.bank_accounts.update_all disabled: true
+    end
+
+    if [:reactivate].include?(aasm.current_event)
+      document.bank_accounts.update_all disabled: false
+    end
+  end
+
 
   def reviewal_chain_present?
     document.dlrms.present?

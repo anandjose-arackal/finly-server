@@ -1,7 +1,7 @@
 class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   register_handle :vendor_show
   # register_actions %i( submit retract approve reject delete add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
-  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate )
+  register_actions %i( submit retract approve reject edit take_control delete return_control deactivate reactivate audit_trail)
 
   def initialize(user=nil, params={})
     super
@@ -56,6 +56,10 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     if user.vendor_payment_admin? && (YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id)) && user_can_return_control?
       true
     end
+  end
+
+  def audit_trail
+    true
   end
 
   def user_can_take_control?

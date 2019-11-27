@@ -60,6 +60,7 @@ class BankAccount < ApplicationRecord
   scope :only_users, -> {where account_owner_type: "User"}
   scope :default_accounts, -> { where(default_account: true).non_deleted}
   scope :non_deleted, -> {where deleted_at: nil}
+  scope :enabled, -> {where disabled: false}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }
@@ -128,7 +129,8 @@ class BankAccount < ApplicationRecord
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        default_account: default_account
+        default_account: default_account,
+        disabled: disabled
     }
   end
 
