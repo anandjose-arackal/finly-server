@@ -12,9 +12,12 @@ class Vendors::Support::Procurements < Vendors::Support::Base
 
     def get_procurement_data
       data = {}
-      data[:purchase_orders] = Procurements::PurchaseOrders::Index.(user, {filter_vendor_id: self.vendor.id}).purchase_orders
-      data[:po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'tax_invoice'}).invoices
-      data[:non_po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'non_po_invoice'}).invoices
+      # data[:purchase_orders] = Procurements::PurchaseOrders::Index.(user, {filter_vendor_id: self.vendor.id}).purchase_orders
+      data[:purchase_orders] = user.company.purchase_orders.where(vendor_id: self.vendor.id)
+      # data[:po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'tax_invoice'}).invoices
+      data[:po_invoices] = user.company.inward_invoices.with_type_po_invoice.where(vendor_id: self.vendor.id)
+      # data[:non_po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'non_po_invoice'}).invoices
+      data[:non_po_invoices] = user.company.inward_invoices.with_type_non_po_invoice.where(vendor_id: self.vendor.id)
       data
     end
   end
