@@ -9,13 +9,18 @@ json.results do
     json.user do
       json.extract! p.user, :id, :name, :email, :mobile_number
     end
-
-    if p.purchase_order.present?
-      json.document 'Purchase Order'
-      json.po_number p.purchase_order.po_number
+    po =  nil
+    if p.po_revisions.present?
+      po = p.po_revisions.first
+    else
+      po = p.purchase_order
     end
 
-    po = p.purchase_order
+    if po.present?
+      json.document 'Purchase Order'
+      json.po_number po.po_number
+    end
+
     if po.present?
       json.po_number po.po_number
       json.po_status po.status&.name

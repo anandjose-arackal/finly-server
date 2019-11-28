@@ -13,6 +13,6 @@ attr_accessor :file_url, :file, :items
 
   def init
     self.company = Company.find_by_id params[:company_id].to_i
-    self.items = company.items.includes_for_export
+    self.items = company.items.non_deleted.includes_for_export
   end
 end
