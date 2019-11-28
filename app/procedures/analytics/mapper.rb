@@ -1,4 +1,5 @@
 class Analytics::Mapper
+  include Events::Consumer
   include DynamicAttributes
 
   class_attr :fields, default: []
@@ -15,30 +16,19 @@ class Analytics::Mapper
   end
 
   def self.fields
-    return @fields if @fields.present?
-    @fields ||= default_fields
+    return @fields unless @fields.nil?
+    @fields ||= [] #default_fields
+    set_defaults
   end
 
   def self.olap_model
     fact || dimension
   end
 
-  def self.default_fields
-    # Add finly_ref_id as a default field
-    [
-        {
-            primary_key: :finly_ref_id,
-            foreign_key: :id
-        },
-        {
-            primary_key: :finly_ref_updated_at,
-            foreign_key: :updated_at
-        },
-        {
-            primary_key: :finly_ref_created_at,
-            foreign_key: :created_at
-        }
-    ]
+  def self.set_defaults
+    field :finly_ref_id, :id
+    field :finly_ref_created_at, :created_at
+    field :finly_ref_updated_at, :updated_at
   end
 
   def self.field(primary_key, foreign_key = nil, &block)
@@ -61,6 +51,7 @@ class Analytics::Mapper
   def self.contract
     return @contract if @contract
 
+    validate_fields
     klass = self
     @contract = Class.new(Transactions::Contract) do
       klass.fields.each do |field|
@@ -78,13 +69,46 @@ class Analytics::Mapper
           represented.send("#{field[:primary_key]}=", value)
         end)
       end
+
+      validates :finly_ref_id, presence: true
+      validates :finly_ref_created_at, presence: true
+      validates :finly_ref_updated_at, presence: true
     end
+  end
+
+  def self.validate_fields
+    finly_ref_id = fields.select {|f| f[:primary_key] == :finly_ref_id}
+    raise "finly_ref_id is not defined for #{self.name}" unless finly_ref_id.present?
+    finly_ref_created_at = fields.select {|f| f[:primary_key] == :finly_ref_created_at}
+    raise "finly_ref_created_at is not defined for #{self.name}" unless finly_ref_created_at.present?
+    finly_ref_updated_at = fields.select {|f| f[:primary_key] == :finly_ref_updated_at}
+    raise "finly_ref_updated_at is not defined for #{self.name}" unless finly_ref_updated_at.present?
   end
 
   def self.events(*list)
     raise "Event is already defined" if @events.present?
 
     @events = list
-    Analytics::Synchronizer.setup(self, list)
+    list.each do |event|
+      Class.new(self) do
+        consumes_event! event,
+                        consumer_key: "analytics.synchronizer.#{event}",
+                        name: "Analytics Synchronizer for #{event}",
+                        options: {sync: false}
+      end
+    end
+  end
+
+  def on_event(user, payload)
+    mapper = self.class
+    input = mapper.input.call(user, payload)
+    input = [input] unless input.respond_to?(:each)
+    input.each do |record|
+      sync = Analytics::Synchronizer.(params: {record: record, mapper: mapper})
+      unless sync.success?
+        # Todo log failure with reason
+        raise "Sync Error: #{sync.errors}}"
+      end
+    end
   end
 end
