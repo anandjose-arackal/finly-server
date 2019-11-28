@@ -190,8 +190,12 @@ class Trail < ApplicationRecord
       else
         action = ""
     end
-
-    body += action + " the #{self.parent_type}."    
+    if self.parent_type == 'YesBankVendor'
+      doc = 'Vendor'
+      body += action + " the #{doc}."    
+    else
+      body += action + " the #{self.parent_type}."    
+    end
 
     body
   end
