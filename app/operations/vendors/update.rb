@@ -114,7 +114,7 @@ class Vendors::Update < Vendors::Base
     end
 
       vendor_pan = vendor_parameters[:pan]
-      if vendor_pan.present?
+      if vendor_pan.present? && (vendor.pan != vendor_pan)
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
           add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
           return
