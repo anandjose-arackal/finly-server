@@ -16,7 +16,7 @@ class Vendors::Update < Vendors::Base
     self.vendor_changes ={}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
-    self.vendor_parameters.delete(:policy_id)
+    # self.vendor_parameters.delete(:policy_id)
     self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
@@ -25,6 +25,13 @@ class Vendors::Update < Vendors::Base
       add_message :error, "Vendor not found"
       return
     end
+    if self.vendor_parameters[:policy_id].present? && self.vendor_parameters[:policy_id]&.to_i != vendor.policy_id
+      unless vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :rejected, :draft).include?(vendor.status_id)
+        add_message :error, "Unable to update policy at this state"
+        return       
+      end
+    end
+
 
     unless (user.is_vendor_manager? || user.vendor_payment_admin?) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
       add_message :error, "You do not have permission for this action"
