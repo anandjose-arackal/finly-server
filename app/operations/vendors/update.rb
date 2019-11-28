@@ -198,7 +198,8 @@ class Vendors::Update < Vendors::Base
     return if has_errors?
     
     vendor.assign_attributes(vendor_parameters)
-    return unless validate_gstin_pan_number
+    validate_gstin_pan_number
+    return if has_errors?
     validate_duplicate_bank_account
     return if has_errors?
     if vendor.valid?
@@ -233,13 +234,15 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
-    # return true if vendor_parameters[:pan].blank? || vendor_parameters[:gstin].blank?
-    return true if self.vendor.gstin_locations.blank?
+    location_gstins = self.vendor.gstin_locations.map(&:gstin).flatten.compact
+    return true if !self.vendor.gst_registered || self.vendor.pan.blank? || location_gstins.blank?
     validated = false
     self.vendor.gstin_locations.each do |vendor_location|
-      validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)
-      add_message :error, "Pan number in gstin for location #{vendor_location.location} is incorrect"
-      break
+      validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin, vendor.gst_registered)
+      unless validated
+        add_message :error, "Pan number in gstin for location #{vendor_location.location} is incorrect"
+        break
+      end
     end
     validated
   end
