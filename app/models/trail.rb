@@ -183,6 +183,10 @@ class Trail < ApplicationRecord
         action = " reopened"
       when TrailAction.id_for(:forward)
         action = " forwarded"
+      when TrailAction.id_for(:deactivate)
+        action = " deactivated"
+      when TrailAction.id_for(:reactivate)
+        action = " reactivated"
       else
         action = ""
     end
