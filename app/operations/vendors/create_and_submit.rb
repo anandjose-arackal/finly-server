@@ -16,10 +16,11 @@ class Vendors::CreateAndSubmit < Vendors::Base
     if op_create.success?
       self.vendor = op_create.vendor
     else
-      if self.vendor.present? && self.vendor.really_destroy!
-        add_message :error, op_create.messages[:error]
-        return
+      if vendor.present?
+        self.vendor.really_destroy!
       end
+      add_message :error, op_create.messages[:error]
+      return
     end
     # id = params[:vendor_id] || params[:yes_bank_vendor] || params[:id] 
     # self.vendor = Vendors::Show.(user, params).vendors.with_id(id).first rescue nil
@@ -33,10 +34,11 @@ class Vendors::CreateAndSubmit < Vendors::Base
       op = WorkflowManager::Base.(user, params)
       unless op.success?
         # Hard delete the record as this operation is only called on vendor creation
-        if self.vendor.present? && self.vendor.really_destroy!
-          add_message :error, op.messages[:error]
-          return
+        if self.vendor.present? 
+          self.vendor.really_destroy!
         end
+        add_message :error, op.messages[:error]
+        return
       end
 
       self.workflow_output = op.workflow_output
