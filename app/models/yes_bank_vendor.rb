@@ -84,7 +84,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :budget_trails, as: :vendor
-
+  has_many :trails, as: :parent
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 

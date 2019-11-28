@@ -35,6 +35,7 @@ class Vendors::Update < Vendors::Base
 
     unless (user.is_vendor_manager? || user.vendor_payment_admin?) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
       add_message :error, "You do not have permission for this action"
+      return
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
@@ -154,6 +155,10 @@ class Vendors::Update < Vendors::Base
     if vendor_id.present? && duplicate_vendors.present?
       add_message :error, "There is a similar vendor added with the same vendor ID in our records."
       return
+    end
+
+    if YesBankVendor.status_ids(:retracted, :draft, :rejected).exclude?(vendor.status_id) and self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].delete(:_destroy)
     end
   end
 

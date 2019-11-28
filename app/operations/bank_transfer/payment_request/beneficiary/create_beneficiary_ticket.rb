@@ -75,6 +75,11 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				end
 				yes = user.company.yes_bank_vendors.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
+				display_name = yes.business_name || yes.name
+				if ba&.first&.disabled
+					add_message :error, "This vendor, #{display_name}, has an inactive bank account. Payment can only be processed to active accounts."
+					break
+				end
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
