@@ -293,7 +293,7 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            if self.vendor.really_destroy!
+            if self.vendor.present? && self.vendor.really_destroy!
               add_message :error, document_reviewer_mappings_op.messages[:error]
             end
           end
@@ -323,7 +323,7 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            if self.vendor.really_destroy!
+            if self.vendor.present? && self.vendor.really_destroy!
               add_message :error, document_reviewer_mappings_op.messages[:error]
             end
           end

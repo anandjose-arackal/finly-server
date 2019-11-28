@@ -16,7 +16,7 @@ class Vendors::CreateAndSubmit < Vendors::Base
     if op_create.success?
       self.vendor = op_create.vendor
     else
-      if self.vendor.really_destroy!
+      if self.vendor.present? && self.vendor.really_destroy!
         add_message :error, op_create.messages[:error]
         return
       end
@@ -33,7 +33,7 @@ class Vendors::CreateAndSubmit < Vendors::Base
       op = WorkflowManager::Base.(user, params)
       unless op.success?
         # Hard delete the record as this operation is only called on vendor creation
-        if self.vendor.really_destroy!
+        if self.vendor.present? && self.vendor.really_destroy!
           add_message :error, op.messages[:error]
           return
         end
@@ -41,7 +41,9 @@ class Vendors::CreateAndSubmit < Vendors::Base
 
       self.workflow_output = op.workflow_output
     else
-      self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+      add_message :error, "Policy not found"
+      return
+      # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
     end
   end
 
