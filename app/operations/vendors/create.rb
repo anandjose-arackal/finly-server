@@ -46,10 +46,12 @@ class Vendors::Create < Vendors::Base
         if levels.present?
           unless self.vendor_parameters[:policy_id].present?
             add_message :error, "Please select a policy"
+            return
           end
 
           unless policy_ids.include?(vendor_parameters[:policy_id].to_i)
-            add_message :error, "Unknown policy"
+            add_message :error, "Unknown policy. Please select a valid policy from the list."
+            return
           end
         end
       end

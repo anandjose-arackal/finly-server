@@ -28,6 +28,7 @@ class Vendors::Update < Vendors::Base
 
     unless (user.is_vendor_manager? || user.vendor_payment_admin?) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
       add_message :error, "You do not have permission for this action"
+      return
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
