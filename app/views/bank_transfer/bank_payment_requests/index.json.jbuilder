@@ -1,4 +1,3 @@
-json.count @result.payment_requests&.count
 json.results do
   json.array! @result.paginated_payment_requests.each do |payment_request|
 

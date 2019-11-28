@@ -71,9 +71,6 @@
 #  vendor_poc_mobile_number     :string(255)
 #  discount_type_id             :integer
 #  rejection_note               :text(65535)
-#  vendor_poc_id                :integer
-#  vlpm_id                      :integer
-#  vendor_note                  :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
