@@ -146,9 +146,11 @@ json.payments do
     json.parent_id payment.parent_id
     # json.invoice_details payment.invoice.invoice_amount_details
     json.parent_details do
-      json.merge! payment.parent_details
-      # json.payable_amount payment.get_payable_amount
-      json.payable_amount precision_value payment.amount.value
+      unless payment.parent.nil?
+       json.merge! payment.parent_details
+       # json.payable_amount payment.get_payable_amount
+       json.payable_amount precision_value payment.amount.value
+      end
     end
   end
 end
@@ -159,8 +161,8 @@ end
 json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
 json.filter_count @result.filter_count
-unless current_company.id == 118
-json.unpaid_payments do
+unless [168, 169, 174, 175, 118].include?(current_user.company_id)
+  json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name

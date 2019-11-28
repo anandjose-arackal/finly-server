@@ -13,6 +13,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 			self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     when 'em', :em
 			self.user_roles = ::UserRole::VALUES_EM
+			params[:view] = 'admin'
 			self.policies = ::Policy::Index.(user, params).try(:policies)
 
 			unless user.company.travel_desk_enabled? # checks to see if client paid for it

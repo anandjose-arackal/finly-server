@@ -18,6 +18,7 @@
 #  client_id                    :integer
 #  client_type                  :string(255)
 #  message                      :text(65535)
+#  user_finly_id                :string(255)
 #
 
 FactoryBot.define do
