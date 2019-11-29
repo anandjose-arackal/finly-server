@@ -26,13 +26,16 @@
 #  latitude                          :decimal(20, 10)
 #  longitude                         :decimal(20, 10)
 #  accuracy_radius                   :integer
+#  user_finly_id                     :string(255)
 #
 
 class UserIp < ApplicationRecord
 
-  belongs_to :user
+  belongs_to :user, primary_key: :finly_id, foreign_key: :user_finly_id, class_name: 'User'
   belongs_to :status, class_name: 'UserIpStatus'
 
   scope :verified, -> {where status_id: UserIpStatus.id_for(:verified)}
 
+  validates :user_finly_id, presence: true
+  validates :user_id, presence: true
 end

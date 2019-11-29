@@ -181,11 +181,11 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
         when 'PurchaseOrder'
           po = payment.parent
           payment_details += [
-              precision_value(po.total_after_tax&.value),
-              precision_value(po.advance_amount&.value),
+              precision_value(po&.total_after_tax&.value),
+              precision_value(po&.advance_amount&.value),
               0.0,
               0.0,
-              (po.advance_tds_slab&.tds || 0.0),
+              (po&.advance_tds_slab&.tds || 0.0),
               (payment.amount&.value || 0.0)
           ]
         when 'BeneficiaryPayment'
