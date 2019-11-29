@@ -12,7 +12,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
     #   self.invoices = Invoice.awaiting_action_items(user)
     # end
 
-    if user.vendor_payments_admin?
+    if user.vendor_payments_admin? or RequestStore.store[:vendor_manager]
       admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
       self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
       return

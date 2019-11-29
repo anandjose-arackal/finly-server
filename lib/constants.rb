@@ -5,9 +5,10 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
-  VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
+  VALID_IFSC = /\A[A-Za-z]{4}[a-zA-Z0-9]{7}\z/i
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
   VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
+  VALID_PAN = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/
 
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
