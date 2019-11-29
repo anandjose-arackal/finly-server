@@ -224,8 +224,14 @@ class Vendors::Update < Vendors::Base
     return if has_errors?
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
+      if all_bank_accounts_disabled?
+        add_message :error, "Atleast one bank account needs to be enabled. Otherwise, please deactivate this vendor."
+        return false
+      end
+
       validate_mark_for_destruction_account
       return if has_errors?
+      
       vendor.save
       add_message :success, "Vendor updated"
     else
@@ -274,5 +280,9 @@ class Vendors::Update < Vendors::Base
         add_message :error, "Cannot delete or disable bank account with account number #{mark_for_deletion_accounts.join(', ')} as they are already in use"
       end
     end
+  end
+
+  def all_bank_accounts_disabled?
+    self.vendor.bank_accounts.all? {|account| account.disabled }
   end
 end
