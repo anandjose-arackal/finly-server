@@ -162,6 +162,10 @@ class Vendors::Update < Vendors::Base
     return unless validate_gstin_pan_number
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
+      if all_bank_accounts_disabled?
+        add_message :error, "Atleast one bank account needs to be enabled. Otherwise, please deactivate this vendor."
+        return false
+      end
       vendor.save
       add_message :success, "Vendor updated"
     else
@@ -198,5 +202,9 @@ class Vendors::Update < Vendors::Base
       break
     end
     validated
+  end
+
+  def all_bank_accounts_disabled?
+    self.vendor.bank_accounts.all? {|account| account.disabled }
   end
 end
