@@ -14,4 +14,13 @@
 #
 
 class Olap::Dimensions::Category < OlapRecord
+  include Analytics::Mapper
+
+  transaction_model ::Category
+  events 'category.update', 'category.create'
+
+  map :name
+  map :gl_code
+  map :active
+
 end

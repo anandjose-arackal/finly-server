@@ -1,7 +1,7 @@
 class Analytics::Master
 
-  def self.register(model, klass)
-    registry(model) << klass
+  def self.register(model, olap_model)
+    registry(model) << olap_model
   end
 
   def self.registry(model = nil)
@@ -12,25 +12,29 @@ class Analytics::Master
   end
 
   def self.integrity_check!(after: nil, model: nil)
-    mappers = []
+    all_olap_models = []
     if model.blank?
-      registry.each { |model, model_mappers| mappers += model_mappers }
+      registry.each { |transaction_model, olap_models| all_olap_models += olap_models }
     else
-      mappers += registry(model)
+      all_olap_models += registry(model)
     end
-    mappers.each { |mapper| refresh mapper, after: after }
+    all_olap_models.each { |olap_model| refresh olap_model, after: after }
   end
 
-  protected
-
-  def self.refresh(mapper, after: nil)
-    records = mapper.model.all
+  def self.refresh(olap_model, after: nil)
+    records = olap_model.transaction_model.all
     records = records.where('updated_at >= ?', (after - 1.minute)) if after.present?
-    records.find_each do |record|
-      result = Analytics::Synchronizer.(params: {record: record, mapper: mapper})
-      next if result.success?
-      next unless result[:updated] == false
-      # Todo log error as sync failed
+    olap_model.transaction do
+      records.find_in_batches do |batch|
+        olap_record_map = {}
+        olap_model.where(finly_ref_id: batch.pluck(:id)).each {|record| olap_record_map[record.finly_ref_id] = record}
+        batch.each do |record|
+          result = Analytics::Synchronizer.(params: {record: record, olap_model: olap_model, olap_record: olap_record_map[record.id]})
+          next if result.success?
+          next unless result[:in_sync]
+          # Todo log error as sync failed
+        end
+      end
     end
   end
 
