@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: olap_dimensions_departments
+#
+#  id                   :bigint           not null, primary key
+#  finly_ref_id         :bigint           not null
+#  finly_ref_created_at :datetime
+#  finly_ref_updated_at :datetime
+#  name                 :string(255)
+#  company_id           :integer
+#  is_deleted           :boolean
+#  ancestry             :string(255)
+#  cost_center_id       :integer
+#  deleted_at           :datetime
+#  department_code      :string(255)
+#  code                 :string(255)
+#  gl_code              :string(255)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
 class Olap::Dimensions::Department < OlapRecord
   include Analytics::Mapper
 
