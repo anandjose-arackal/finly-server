@@ -9,6 +9,8 @@ module Constants
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
   VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
 
+  VALID_UTF_CHARS = /[A-Za-z0-9 -_@]*/
+
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
 
@@ -29,7 +31,8 @@ module Constants
   MIGRATING_COMPANIES = []
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['ankit.bazari@finly.io', 'chandra.reddy@finly.io', 'dini.jose@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']

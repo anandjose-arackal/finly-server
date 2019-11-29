@@ -55,7 +55,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
     self.validation_data = {
       vendor_ids: user.company.yes_bank_vendors.non_deleted.pluck(:id), # todo change to vendor_id
       payment_terms: user.company.payment_terms,
-      inventory_line_item_ids: user.company.items.pluck(:id),
+      inventory_line_item_ids: user.company.items.non_deleted.pluck(:id),
       tax_rates: user.company.tax_rates,
       policies: user.company.policies.with_application(:vp),
       sub_departments: user.company.departments.only_sub_departments,

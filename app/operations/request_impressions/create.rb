@@ -49,7 +49,7 @@ class RequestImpressions::Create < BaseOperation
   protected
 
   def enrich_username(args)
-    args[:username] = (params[:username] || params[:email_mobile] || params[:email]).scan(/[A-Za-z0-9 -_]*/).join("")
+    args[:username] = (params[:username] || params[:email_mobile] || params[:email])&.to_s&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
   end
 
   def enrich_request(args)
@@ -71,13 +71,13 @@ class RequestImpressions::Create < BaseOperation
     # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
     data = geo_ip&.data
-    args[:continent_name] = data&.dig('continent', 'names', 'en').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:continent_code] = data&.dig('continent', 'code').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:country_name] = data&.dig('country', 'names', 'en').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:country_code] = data&.dig('country', 'iso_code').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:region_code] = data&.dig('subdivisions')&.first&.dig('iso_code').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:region_name] = data&.dig('subdivisions')&.first&.dig('names', 'en').scan(/[A-Za-z0-9 -_]*/).join("")
-    args[:city] = data&.dig('city', 'names', 'en').scan(/[A-Za-z0-9 -_]*/).join("")
+    args[:continent_name] = data&.dig('continent', 'names', 'en')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:continent_code] = data&.dig('continent', 'code')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:country_name] = data&.dig('country', 'names', 'en')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:country_code] = data&.dig('country', 'iso_code')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:region_code] = data&.dig('subdivisions')&.first&.dig('iso_code')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:region_name] = data&.dig('subdivisions')&.first&.dig('names', 'en')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
+    args[:city] = data&.dig('city', 'names', 'en')&.to_s&.scan(Constants::VALID_UTF_CHARS)&.join("")
     args[:zip] = data&.dig('postal', 'code')
     args[:latitude] = data&.dig('location', 'latitude')
     args[:longitude] = data&.dig('location', 'longitude')

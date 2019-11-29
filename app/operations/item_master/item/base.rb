@@ -4,7 +4,7 @@ class ItemMaster::Item::Base < BaseOperation
 
   def init
     id = params[:id] || params[:inventory_line_item_id]
-    self.item = ::Item.find_by_id id
+    self.item = ::Item.non_deleted.find_by_id id
     self.company = user.company
   end
 
