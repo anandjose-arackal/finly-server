@@ -297,6 +297,8 @@ GEM
       rake
     figaro (1.1.1)
       thor (~> 0.14)
+    fiscali (2.4.3)
+      activesupport
     font-awesome-rails (4.7.0.5)
       railties (>= 3.2, < 6.1)
     foreman (0.85.0)
@@ -751,6 +753,7 @@ DEPENDENCIES
   faraday_middleware (~> 0.12.2)
   figaro (~> 1.1.1)
   finly-secure_storage-sdk!
+  fiscali (~> 2.4)
   font-awesome-rails (~> 4.7.0.4)
   foreman (~> 0.85.0)
   fuzzy-string-match (= 1.0.1)

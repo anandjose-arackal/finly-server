@@ -97,8 +97,8 @@ module Analytics::Mapper
       end
     end
 
-    def refresh(after: nil)
-      Analytics::Master.refresh(self, after: after)
+    def sync(after: nil)
+      Analytics::Master.sync(self, after: after)
     end
   end
 

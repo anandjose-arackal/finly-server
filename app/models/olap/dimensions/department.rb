@@ -23,8 +23,7 @@ class Olap::Dimensions::Department < OlapRecord
   include Analytics::Mapper
 
   transaction_model ::Department
-  events 'department.update', 'department.create'
-  # dimension Olap::Dimensions::Department
+  events 'department.update', 'department.create', 'department.destroy'
 
   map :name
   map :company_id

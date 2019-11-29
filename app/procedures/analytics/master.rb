@@ -18,10 +18,10 @@ class Analytics::Master
     else
       all_olap_models += registry(model)
     end
-    all_olap_models.each { |olap_model| refresh olap_model, after: after }
+    all_olap_models.each { |olap_model| sync olap_model, after: after }
   end
 
-  def self.refresh(olap_model, after: nil)
+  def self.sync(olap_model, after: nil)
     records = olap_model.transaction_model.all
     records = records.where('updated_at >= ?', (after - 1.minute)) if after.present?
     olap_model.transaction do

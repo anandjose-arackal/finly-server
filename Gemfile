@@ -9,6 +9,8 @@ gem 'wkhtmltopdf-binary', '~> 0.12.4'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
+gem 'fiscali', '~> 2.4'
+
 gem 'parslet', '~> 1.8.2'
 
 gem 'rufus-scheduler'
