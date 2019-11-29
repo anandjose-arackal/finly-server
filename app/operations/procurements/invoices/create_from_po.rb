@@ -284,7 +284,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     invoice_items_attributes = []
     srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
     self.purchase_order.items.each do |item|
-      previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
+      previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -362,8 +362,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     invoice_items_attributes = []
     rn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id, inward_document_items.accepted')
     self.purchase_order.items.each do |item|
-      previously_billed_amount = rn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
-      accepted = rn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:accepted).sum.to_f
+      previously_billed_amount = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
+      accepted = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:accepted).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?

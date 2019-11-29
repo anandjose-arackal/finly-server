@@ -105,9 +105,9 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
       other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
       items = other_receipt_notes.joins(:items).select('inward_document_items.accepted, inward_document_items.delivered, inward_document_items.rejected, inward_document_items.purchase_order_item_id as poi_id')
-      previously_accepted = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.pluck(:accepted).sum.to_f
-      previously_rejected = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.pluck(:rejected).sum.to_f
-      previously_delivered = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.pluck(:delivered).sum.to_f
+      previously_accepted = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:accepted).sum.to_f
+      previously_rejected = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:rejected).sum.to_f
+      previously_delivered = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:delivered).sum.to_f
 
 
       po_item_params[:accepted] = previously_accepted
@@ -119,7 +119,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
       # po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount.to_f
 
       other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
-      previously_billed_amount = other_receipt_notes.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id').collect {|ii| ii if ii.poi_id == purchase_order_item.id}.pluck(:billable_amount).sum.to_f
+      previously_billed_amount = other_receipt_notes.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id').collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:billable_amount).sum.to_f
 
       po_item_params[:previously_billed_amount] = previously_billed_amount
     end
