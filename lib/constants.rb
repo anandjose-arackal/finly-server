@@ -9,6 +9,8 @@ module Constants
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
   VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
 
+  VALID_UTF_CHARS = /[A-Za-z0-9 -_@]*/
+
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
 
