@@ -152,6 +152,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     # reference_invocies_in_range = get_reference_invoices_in_range(base_start_date, current_month_end_date) # TODO change
     # Initial reference invoice is used to get the common attributes line department, location etc
     initial_reference_invoice = reference_invocies_in_range.first
+    # All rerefernce invoices will have same items in line items
     initial_reference_invoice.invoice_items.each do |invoice_item|
       item_params = invoice_item_params_data(initial_reference_invoice, invoice_item, start_date, end_date)
       invoice_item_params.push(item_params)
@@ -196,32 +197,51 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   def calculate_item_rate(start_date, end_date, invoice_item)
     effective_start_date = get_reference_invoices.where("DATE(start_date) <= ?", start_date).order(:start_date).last.start_date
     effective_start_date = (effective_start_date < start_date) ? effective_start_date : start_date
-    reference_invocies_in_range = get_reference_invoices_in_range(effective_start_date, current_month_end_date)
-    reference_invocies_in_range.each do |reference_invoice|
+    # reference_invocies_in_range = get_reference_invoices_between_dates(start_date, end_date)
+    # if reference_invocies_in_range.blank?
+      reference_invocies_in_range = get_reference_invoices_in_range(effective_start_date, current_month_end_date)
+    # end
+    reference_invoice = reference_invocies_in_range.where(start_date: start_date).first
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where(end_date: end_date).first
+    end
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where("DATE(start_date) <= ?", start_date).order(:start_date).last
+    end
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where("DATE(end_date) <= ?", end_date).order(:start_date).first
+    end
+    # reference_invocies_in_range.each do |reference_invoice|
       # Do not allow multiple line item of similar inventory, else this will fail
       item = reference_invoice.items.where(inventory_line_item_id: invoice_item.inventory_line_item_id).first
-      if reference_invoice.start_date <= start_date && reference_invoice.end_date >= end_date
-        return rate = item.rate
-      else
+      # if reference_invoice.start_date <= start_date && reference_invoice.end_date >= end_date
+      #   return rate = item.rate
+      # else
         days_in_month = (end_date.end_of_month - start_date.beginning_of_month).to_i + 1
 
         # Example: Invoice frequency is 1 month. Upcoming invoice is for Aug 2019. If reference invoice template has invoice start date as 26 Sept 2019 and invoice end date as 9 Aug 2019, then effective days for the Aug invoice is 01 Aug to 09 Aug 2019. Base condition: Invoice starts from start of month and ends on end_of_month(excluding first and last invoice)
-        effective_days_count = (reference_invoice.end_date - start_date).to_i + 1
+        effective_days_count = (end_date - start_date).to_i + 1
         # In months
         invoice_occurance_rate = reference_invoice.invoice_frequency.number
         one_month_rate = item.rate/reference_invoice.invoice_frequency.number
         effective_rate = (item.rate/days_in_month)*effective_days_count
         return ActionController::Base.helpers.number_with_precision(effective_rate, precision: 2)
-      end
-    end
+      # end
+    # end
   end
 
   def setup_invoice_items_params(options={})
   end
 
+  def get_reference_invoices_between_dates(start_date, end_date)
+    get_reference_invoices.where("DATE(start_date) = ? AND DATE(end_date) = ?", start_date, end_date)
+  end
+
   def get_reference_invoices_in_range(start_date, end_date)
     get_reference_invoices.where("DATE(start_date) >= ? AND DATE(start_date) <= ?", start_date, end_date)
   end
+
+
 
   def get_reference_invoices
     self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids).order(:start_date)
@@ -246,7 +266,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
     initial_start_date = reference_invoices.first.start_date
     current_month_end_date = Date.today.end_of_month
     # upcoming_invoices_count = get_upcoming_invoice_count(invoice_frequency_number, initial_start_date, current_month_end_date)
-    upcoming_invoice_dates = get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, current_month_end_date)
+    upcoming_invoice_dates = get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, current_month_end_date, reference_invoices)
     options = {
       # invoice_frequency_number: invoice_frequency_number,
       # initial_start_date: initial_start_date,
@@ -306,27 +326,83 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
 
   
   # Invoices are be generated at the end of the month
-  def get_upcoming_invoice_dates(invoice_frequency_number, start_date, end_date)
+  # Irrespective or prepaid/postpaid, this will have date range of all invoices created
+  # First start date
+  # Current month end date
+  def get_upcoming_invoice_dates(invoice_frequency_number, start_date, end_date, reference_invoices)
+    # Fixing for one month frequency
     dates = []
     months_count = month_between_dates(start_date, end_date)
-    (1..months_count).to_a.each do |counter|
-      invoice_start_date = start_date
-      validate_start_and_end_date(start_date, end_date)
-      return if has_errors?
-      expected_end_date = (invoice_start_date + (invoice_frequency_number - 1).month).end_of_month
-      invoice_end_date = (expected_end_date > end_date) ? end_date : expected_end_date 
-      dates.push([invoice_start_date, invoice_end_date])
-      if expected_end_date <= end_date
-        start_date = invoice_end_date + 1
+    months_in_order = order_of_month(start_date, end_date)
+    date = start_date
+    months_in_order.each_with_index do |month_number, month_order_index|
+      # Expected invoice range
+      # First invoice can start from any date
+      # Next invoices will start from start of month
+      invoice_start_date = month_order_index.zero? ? date : date.beginning_of_month
+      invoice_end_date = date.end_of_month # For frequency one # Need to handle end date as last end date can be before end of month
+
+      # Consider escalations
+      # Get all invoices whom start date or end date is coming in between invoice_start_date and invoice_end_date
+      # Already sorted by start date
+      month_number_invoice_dates = reference_invoices.where("(Date(start_date) >= ? AND DATE(start_date) <= ?) OR (Date(end_date) >= ? AND DATE(end_date) <= ?)", invoice_start_date, invoice_end_date, invoice_start_date, invoice_end_date).collect{|i| [i.start_date, i.end_date]}
+      if month_number_invoice_dates.present? && month_number_invoice_dates.count > 1 # i.e. there is escalation between the month
+        month_number_invoice_dates.each_with_index do |escalation_date, index|
+          # First invoice is first start date
+          # Invoice end date is next invoice start date - 1
+          if month_number_invoice_dates[index + 1].present?
+            next_invoice_start_date = month_number_invoice_dates[index + 1][0]
+          else
+            # Next month invoice
+            next_invoice_start_date = date.end_of_month + 1
+          end
+          if index == 0
+            s_date = date
+            e_date = next_invoice_start_date - 1
+            dates << [s_date, e_date]
+          else
+            s_date = escalation_date[0]
+            e_date = (escalation_date[1] <= s_date.end_of_month) ? escalation_date[1] : s_date.end_of_month
+            dates << [s_date, e_date]
+          end
+        end
       else
-        return dates
+        # No escalation in current month
+        dates << [date, date.end_of_month]
       end
-      if expected_end_date >= end_date && months_count <= counter
-        # add_message :error, 'There is some issue with upcoming invoice generation'
-        return dates
-      end
+      # From second invoice and so on, start date is beginning_of_month
+      date = date.end_of_month + 1
     end
+
+    # (1..months_count).to_a.each do |counter|
+    #   invoice_start_date = start_date
+    #   validate_start_and_end_date(start_date, end_date)
+    #   return if has_errors?
+    #   expected_end_date = (invoice_start_date + (invoice_frequency_number - 1).month).end_of_month
+    #   invoice_end_date = (expected_end_date > end_date) ? end_date : expected_end_date 
+    #   dates.push([invoice_start_date, invoice_end_date])
+    #   if expected_end_date <= end_date
+    #     start_date = invoice_end_date + 1
+    #   else
+    #     return dates
+    #   end
+    #   if expected_end_date >= end_date && months_count <= counter
+    #     # add_message :error, 'There is some issue with upcoming invoice generation'
+    #     return dates
+    #   end
+    # end
     dates
+  end
+
+  def order_of_month(start_date, end_date)
+    months_count = month_between_dates(start_date, end_date)
+    start_date_month = start_date.month
+    months = []
+    (1..months_count).to_a.each do |counter|
+      months << start_date_month
+      start_date_month += 1
+    end
+    months
   end
 
   def validate_start_and_end_date(start_date, end_date)
@@ -340,7 +416,7 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   # Inclusive of current month
   def month_between_dates(start_date, end_date)
     if end_date >= start_date
-      end_date.month - start_date.month + 1
+      ((end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month) + 1)
     else
       add_message :error, 'End date cannot be less than start date'
     end

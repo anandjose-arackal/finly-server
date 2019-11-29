@@ -37,17 +37,21 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
       update_one_time_invoice
       if self.payment_agreement.general_invoices.fixed_periodic_type.present?
         vendor_ids = self.payment_agreement.general_invoices.pluck(:vendor_id).uniq
-        vendor_ids.each do |vendor_id|
-          create_upcoming_invoice(vendor_id, 'general_invoice')
-          # create_first_invoice(vendor_id, 'general_invoice')
+        if vendor_ids.present?
+          vendor_ids.each do |vendor_id|
+            create_upcoming_invoice(vendor_id, 'general_invoice')
+            # create_first_invoice(vendor_id, 'general_invoice')
+          end
         end
       end
 
       if self.payment_agreement.rental_invoices.fixed_periodic_type.present?
         vendor_ids = self.payment_agreement.rental_invoices.pluck(:vendor_id).uniq
-        vendor_ids.each do |vendor_id|
-          create_upcoming_invoice(vendor_id, 'rental_invoice')
-          # create_first_invoice(vendor_id, 'rental_invoice')
+        if vendor_ids.present?
+          vendor_ids.each do |vendor_id|
+            create_upcoming_invoice(vendor_id, 'rental_invoice')
+            # create_first_invoice(vendor_id, 'rental_invoice')
+          end
         end
       end
     end
