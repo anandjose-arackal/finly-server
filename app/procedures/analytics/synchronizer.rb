@@ -3,7 +3,7 @@ class Analytics::Synchronizer < Transactions::API
   schema do
     params do
       required(:record).filled
-      optional(:olap_model)
+      required(:olap_model)
       optional(:olap_record)
     end
   end
