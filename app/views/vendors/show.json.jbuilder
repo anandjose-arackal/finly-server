@@ -61,6 +61,21 @@ json.gstin_locations do
         :constitution_of_business, :taxpayer_type, :status, :api_response, :address
       end
     end
+    gstin_master = Gstin.with_gstin(gstin_location.gstin).first
+    if gstin_master.present?
+      json.verified_details do
+        json.address gstin_master&.address
+        json.constitution_of_business gstin_master&.constitution_of_business 
+        json.date_of_registration gstin_master&.date_of_registration
+        json.gstin gstin_master&.gstin
+        json.legal_name_of_business gstin_master&.legal_name_of_business
+        json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(@result.vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
+        json.state gstin_master&.state
+        json.status gstin_master&.status
+        json.trade_name gstin_master&.trade_name
+        json.valid_response 'true'
+      end
+    end
   end
 end
 

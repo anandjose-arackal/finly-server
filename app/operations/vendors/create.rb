@@ -157,11 +157,19 @@ class Vendors::Create < Vendors::Base
 
       if gstin_location[:gstin].present?
         gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
-        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin])
+        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
         if gstin.present?
           add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
           return
         end
+      end
+    end
+
+    vendor_pan = vendor_parameters[:pan]
+    if vendor_pan.present?
+      if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
+        add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
+        return
       end
     end
 
@@ -255,8 +263,7 @@ class Vendors::Create < Vendors::Base
       # also mark the vendor as authorized now
       self.vendor.assign_attributes(vendor_parameters)
       self.vendor.authorized = true
-      self.vendor.status_id = VendorStatus.id_for(:auto_approved)
-      validate_duplicate_bank_account
+      # self.vendor.status_id = VendorStatus.id_for(:auto_approved)
       return if has_errors?
       if user.company.vendor_empanelment_workflow_enabled?
         self.vendor.update(status_id: VendorStatus.id_for(:draft))
@@ -271,7 +278,9 @@ class Vendors::Create < Vendors::Base
         end
         return
       else
-        self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+        add_message :error, 'Vendor workflow is not enabled'
+        return
+        # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
       end
 
       if self.vendor.save
@@ -284,13 +293,17 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            if self.vendor.really_destroy!
-              add_message :error, document_reviewer_mappings_op.messages[:error]
+            if self.vendor.present? 
+              self.vendor.really_destroy!
             end
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+            return
           end
           return
         else
-          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+          add_message :error, 'Vendor workflow is not enabled'
+          return
+          # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
         end  
       else
         add_message :error, vendor.errors.full_messages
@@ -312,13 +325,17 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
-            if self.vendor.really_destroy!
-              add_message :error, document_reviewer_mappings_op.messages[:error]
+            if self.vendor.present? 
+              self.vendor.really_destroy!
             end
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+            return
           end
           return
         else
-          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+          add_message :error, 'Vendor workflow is not enabled'
+          return
+          # self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
         end
       else
         add_message :error, vendor.errors.full_messages

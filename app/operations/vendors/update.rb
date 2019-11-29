@@ -16,7 +16,7 @@ class Vendors::Update < Vendors::Base
     self.vendor_changes ={}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
-    self.vendor_parameters.delete(:policy_id)
+    # self.vendor_parameters.delete(:policy_id)
     self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
@@ -25,6 +25,13 @@ class Vendors::Update < Vendors::Base
       add_message :error, "Vendor not found"
       return
     end
+    if self.vendor_parameters[:policy_id].present? && self.vendor_parameters[:policy_id]&.to_i != vendor.policy_id
+      unless vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :rejected, :draft).include?(vendor.status_id)
+        add_message :error, "Unable to update policy at this state"
+        return       
+      end
+    end
+
 
     unless (user.is_vendor_manager? || user.vendor_payment_admin?) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
       add_message :error, "You do not have permission for this action"
@@ -105,6 +112,14 @@ class Vendors::Update < Vendors::Base
         # validate_pan(vendor_parameters)
       end
     end
+
+      vendor_pan = vendor_parameters[:pan]
+      if vendor_pan.present? && (vendor.pan != vendor_pan)
+        if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
+          add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
+          return
+        end
+      end
 
     if self.vendor_parameters[:bank_accounts_attributes].blank?
       add_message :error, "Please provide bank account details"
@@ -203,7 +218,8 @@ class Vendors::Update < Vendors::Base
     return if has_errors?
     
     vendor.assign_attributes(vendor_parameters)
-    return unless validate_gstin_pan_number
+    validate_gstin_pan_number
+    return if has_errors?
     validate_duplicate_bank_account
     return if has_errors?
     if vendor.valid?
@@ -238,13 +254,15 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_gstin_pan_number
-    # return true if vendor_parameters[:pan].blank? || vendor_parameters[:gstin].blank?
-    return true if self.vendor.gstin_locations.blank?
+    location_gstins = self.vendor.gstin_locations.map(&:gstin).flatten.compact
+    return true if !self.vendor.gst_registered || self.vendor.pan.blank? || location_gstins.blank?
     validated = false
     self.vendor.gstin_locations.each do |vendor_location|
-      validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin)
-      add_message :error, "Pan number in gstin for location #{vendor_location.location} is incorrect"
-      break
+      validated = validate_pan_number_in_gstin(vendor.pan, vendor_location.gstin, vendor.gst_registered)
+      unless validated
+        add_message :error, "Pan number in gstin for location #{vendor_location.location} is incorrect"
+        break
+      end
     end
     validated
   end
