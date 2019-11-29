@@ -282,7 +282,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   # considers goods quantity and service billable amount
   def create_srn
     invoice_items_attributes = []
-    srn_item = pro.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
+    srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
     self.purchase_order.items.each do |item|
       previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
       real_q = 0
@@ -360,7 +360,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   # takes into account goods accepted and service billable amount
   def create_grn_and_srn
     invoice_items_attributes = []
-    srn_item = pro.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
+    srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
     self.purchase_order.items.each do |item|
       previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
       real_q = 0
