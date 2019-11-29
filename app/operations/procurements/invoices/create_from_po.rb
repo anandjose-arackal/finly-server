@@ -360,9 +360,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   # takes into account goods accepted and service billable amount
   def create_grn_and_srn
     invoice_items_attributes = []
-    srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
+    rn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id, inward_document_items.accepted')
     self.purchase_order.items.each do |item|
-      previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
+      previously_billed_amount = rn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:billable_amount).sum.to_f
+      accepted = rn_item.collect {|ii| ii if ii.poi_id == item.id}.pluck(:accepted).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -378,11 +379,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.accepted.to_f - it_cal.to_f
+          real_q = accepted.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             # here we sum billable amount for all service items in previous invoices
@@ -398,7 +399,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.accepted.to_f
+        real_q = accepted.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           next unless previously_billed_amount > 0
