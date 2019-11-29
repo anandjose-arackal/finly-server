@@ -172,7 +172,7 @@ class BbpsBill < ApplicationRecord
       return data
     end
 
-    {
+    data = {
         id: id,
         biller: subscription.biller.as_json({index: true}),
         # name: name,
@@ -187,6 +187,7 @@ class BbpsBill < ApplicationRecord
         status: status.as_json,
         user: user&.json_for_trail,
         payments: self.payments,
+        payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
 
         autofetched: autofetched,
@@ -217,8 +218,18 @@ class BbpsBill < ApplicationRecord
         reminder_before_days: subscription.reminder_before_days,
         customer_email: subscription.customer_email,
         customer_name: subscription.customer_name,
-        customer_pan: subscription.customer_pan
+        customer_pan: subscription.customer_pan,
+        show_payment_details: false
     }
+
+    if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
+      data[:show_payment_details] = true
+      data[:paid_on_date] = self.paid_on_date
+      data[:transaction_id] = self.transaction_id
+      data[:bbps_id] = self.bbps_id
+    end
+
+    data
   end
 
   def self.document_owner_attribute
