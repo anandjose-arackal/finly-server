@@ -72,7 +72,7 @@ if @result.vendor.is_a?(YesBankVendor)
       json.thumb attachment.attached_file&.url(:thumb)
       json.file_type attachment.attached_file_content_type
       json.attachment_type attachment.attachment_type
-      json.file_name attachment.attached_file_file_name
+      json.name attachment.attached_file_file_name
     end
   end
 
