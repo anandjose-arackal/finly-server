@@ -274,10 +274,10 @@ class Vendors::Update < Vendors::Base
   end
 
   def validate_mark_for_destruction_account
-    mark_for_deletion_accounts = self.vendor.bank_accounts.collect{|b| b.id if b.marked_for_destruction? or b.disabled}.compact
+    mark_for_deletion_accounts = self.vendor.bank_accounts.collect{|b| b if b.marked_for_destruction? or b.disabled}.compact
     if mark_for_deletion_accounts.present?
-      if user.company.purchase_orders.where(bank_account_id: mark_for_deletion_accounts).present? || user.company.inward_invoices.where(bank_account_id: mark_for_deletion_accounts).present? || user.company.beneficiary_payments.where(bank_account_id: mark_for_deletion_accounts).present?
-        add_message :error, "Cannot delete or disable bank account with account number #{mark_for_deletion_accounts.join(', ')} as they are already in use"
+      if user.company.purchase_orders.filter_payable_advances.where(bank_account_id: mark_for_deletion_accounts.pluck(:id)).present? || user.company.inward_invoices.filter_payable_invoices(true).where(bank_account_id: mark_for_deletion_accounts.pluck(:id)).present? || user.company.beneficiary_payments.only_unpaid.where(bank_account_id: mark_for_deletion_accounts.pluck(:id)).present?
+        add_message :error, "Cannot delete or disable bank account with account number, #{mark_for_deletion_accounts.pluck(:account_number).join(', ')} as they are already in use"
       end
     end
   end

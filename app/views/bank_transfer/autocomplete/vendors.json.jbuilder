@@ -22,7 +22,7 @@ json.account_owner do
 end
 json.id @result.account_owner.id
 json.bank_accounts do
-  json.array!(@result.bank_accounts) do |bank_account|
+  json.array!(@result.bank_accounts.enabled) do |bank_account|
     json.account_number bank_account.account_number
     json.ifsc bank_account.ifsc
     json.id bank_account.id
