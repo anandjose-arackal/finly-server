@@ -754,8 +754,8 @@ class PaymentAgreements::Base < BaseOperation
     # end
 
     if self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where('start_date < ?', Date.parse("01 Aug 2019")).count >= 1
-      add_message :error, "Start date cannot be less than #{Date.parse("01 Aug 2019")}}"
-      add_message :error, "Start date cannot be before August 2019"
+      add_message :error, "Start date cannot be less than #{Date.parse("01 Aug 2019")}"
+      # add_message :error, "Start date cannot be before August 2019"
     end
   end
 
