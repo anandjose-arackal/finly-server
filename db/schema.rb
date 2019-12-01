@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_27_125746) do
+ActiveRecord::Schema.define(version: 2019_11_29_110649) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3834,7 +3834,7 @@ ActiveRecord::Schema.define(version: 2019_11_27_125746) do
 
   create_table "invoice_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "invoice_id"
-    t.string "description"
+    t.text "description"
     t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 10
     t.decimal "tax", precision: 20, scale: 10
@@ -4038,7 +4038,7 @@ ActiveRecord::Schema.define(version: 2019_11_27_125746) do
     t.integer "inward_document_id"
     t.integer "inventory_line_item_id"
     t.string "product_id"
-    t.string "description"
+    t.text "description"
     t.decimal "quantity", precision: 20, scale: 5
     t.decimal "delivered", precision: 20, scale: 5
     t.decimal "accepted", precision: 20, scale: 5
@@ -5498,7 +5498,7 @@ ActiveRecord::Schema.define(version: 2019_11_27_125746) do
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
     t.string "product_id"
-    t.string "description"
+    t.text "description"
     t.string "hsn_sac"
     t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
@@ -7921,7 +7921,7 @@ ActiveRecord::Schema.define(version: 2019_11_27_125746) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "trade_name"
-    t.string "reject_note"
+    t.text "reject_note"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
