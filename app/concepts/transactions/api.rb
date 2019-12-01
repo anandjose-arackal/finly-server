@@ -6,6 +6,28 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
   include Dry::Monads[:result]
+  include Transactions::API::BackgroundHandler
+
+  module Transactions::API::BackgroundHandler
+    extend ActiveSupport::Concern
+
+    class_methods do
+      def call_async(payload)
+        self.perform_async(payload)
+      end
+
+      def perform_async(payload)
+        encoded_data = Events::Serializer.encode(payload)
+        super(encoded_data)
+      end
+
+    end
+
+    def perform(payload)
+      decoded_data = Events::Serializer.decode(data)
+      self.class.call(decoded_data)
+    end
+  end
 
   # Dummy step to help define schema after operation has started
   step ->(options) { true }, name: 'operations.start'
