@@ -188,14 +188,14 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
-                                                        {payments: [
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :controlling_level, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+                                                                                                                                                                                                                                            {payments: [
                                                             {amount: [:currency]},
                                                             :payment_status,
                                                             :invoice,
                                                             {payment_order: [bank_payment_request: [:status]]},
                                                             :payment_order]},
-                                                        {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
+                                                                                                                                                                                                                                            {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
 
   scope :include_for_index_meesho, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           # {payments: [

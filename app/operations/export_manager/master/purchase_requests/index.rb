@@ -19,7 +19,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
       return
     end
 
-    purchase_request_presenter.purchase_requests
+    purchase_request_presenter.purchase_requests.includes(:total_amount,:status,:creator,:policy,:location,:department)
   end
 
   def request_id(purchase_request)

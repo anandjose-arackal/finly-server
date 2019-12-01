@@ -30,7 +30,7 @@ class UserOnboarding::Base < BaseOperation
   def init
     self.bulk_assign = params[:bulk_assign]
     self.policies = user.company.policies.with_id(bulk_assign[:policy_ids])
-    self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
+    self.policy_ids = self.policies.pluck(:id) rescue nil
     self.urm_user_role_ids = (UserRole::VALUES_EM.except(:admin, :purchaser, :receiver).values & bulk_assign[:user_role_ids]) rescue nil
     self.pur_user_role_ids = (UserRole::VP_ROLES.except(:admin, :policy_admin).values & bulk_assign[:user_role_ids]) rescue nil
     result = ::UserOnboarding::BuildUsersForImport.(current_user, params)

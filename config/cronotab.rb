@@ -47,3 +47,4 @@ Crono.perform(BbpsBillsFetch).every 1.day, at: {hour: 8, min: 00}
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}
+Crono.perform(ExpenseStatusUpdate).every 30.minutes
