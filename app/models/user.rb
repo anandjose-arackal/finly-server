@@ -1174,11 +1174,25 @@ class User < ApplicationRecord
   end
 
   def json_for_trail(options = {})
-    {
+    if options[:vendor_show]
+      data = {
         id: id,
         name: name,
-        email: email
-    }
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active
+      }
+      return data
+    else
+      {
+          id: id,
+          name: name,
+          email: email
+      }
+    end
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
