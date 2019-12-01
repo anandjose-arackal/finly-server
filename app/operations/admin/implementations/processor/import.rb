@@ -113,7 +113,7 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   end
 
   def destroy_records(data)
-      result success: false, message: "Destroy action cant perform"
+    result success: false, message: "Cannot destroy"
   end
 
   def update_record(data)

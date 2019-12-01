@@ -2,7 +2,6 @@ module Documents::Invoices::Consumers::Submit
   module Processing
     class OwnerAction < TaskManager::Actions::DummyAction
       def run(user, message, input)
-        # debugger
       end
     end
 
@@ -22,7 +21,6 @@ module Documents::Invoices::Consumers::Submit
       action(
           TaskManager::Actions::DummyAction.define_action("UserSubmitOwnerMailer") do
             run -> (user, message, input) do
-              debugger
             end
           end
       )

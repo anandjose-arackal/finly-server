@@ -3,8 +3,8 @@ class TaskManager::Workflows::Synchronizer < TaskManager::API
 
   Documents::Master.list.each do |document_name|
     model = Documents::Master.for(document_name)
-    record_events = model.record_events
-    collection_events = model.collection_events
+    record_events = model.record_events || []
+    collection_events = model.collection_events || []
 
     all_events = record_events + collection_events
     all_events.each do |event|

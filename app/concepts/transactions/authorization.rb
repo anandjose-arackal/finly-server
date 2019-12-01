@@ -1,19 +1,31 @@
 class Transactions::Authorization
 
   def self.Roles(*list)
-    step = ->(input, options) { Authorize.roles(input, options, list) }
-    [step, name: "authorization.roles"]
+    Transactions::Task.build id: "authorization.roles" do |context, **|
+      Authorize.roles(context, list)
+    end
   end
 
   class Authorize
-    def self.roles(input, options, list)
-      return true if list.blank?
+    extend Dry::Monads[:result]
 
+    def self.roles(context, list)
+      return true if list.blank?
+      return unauthorized!(input) if context[:current_user].blank?
+
+      user = context[:current_user]
       roles = UserRole::VALUES.keys & list # Find the intersection between all user roles and the list roles
       roles.each do |role|
-        return true if options['current_user'].has_role?(role)
+        role_id = UserRole.id_for(role)
+        return true if user.has_policy_role?(role_id)
+        return true if role_id == UserRole.id_for(:admin) and user.admin?(RequestStoreUtil.current_app)
       end
       return unauthorized!(input)
+    end
+
+    def self.unauthorized!(context)
+      context[:"result.authorization"] = Failure("You cannot perform the following action")
+      false
     end
   end
 
@@ -22,7 +34,7 @@ class Transactions::Authorization
     def self.included(base)
       base.extend ClassMethods
       base.extend Dry::Monads[:result]
-      base.step :authorize_user_presence!
+      base.send(:step, :authorize_user_presence!)
     end
 
     module ClassMethods
@@ -36,12 +48,12 @@ class Transactions::Authorization
       end
 
       def authorized_roles(*list)
-        step *Transactions::Authorization::Roles(*list)
+        step Transactions::Authorization::Roles(*list)
       end
     end
 
-    def unauthorized!(options)
-      options["result.authorization"] = Failure("You cannot perform the following action")
+    def unauthorized!(context)
+      context[:"result.authorization"] = Failure("You cannot perform the following action")
       false
     end
 
@@ -49,9 +61,9 @@ class Transactions::Authorization
       self.class.user_model
     end
 
-    def authorize_user_presence!(options)
+    def authorize_user_presence!(context, options)
       return true if user_model.nil?
-      return unauthorized!(options) if options['current_user'].nil? or options['current_user'].class.name != user_model.name
+      return unauthorized!(context) if context[:current_user].nil? or options[:current_user].class.name != user_model.name
 
       true
     end
