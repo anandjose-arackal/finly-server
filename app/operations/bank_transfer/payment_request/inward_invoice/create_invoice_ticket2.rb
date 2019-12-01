@@ -142,6 +142,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return
       end
 
+      if invoice.bank_account&.disabled
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, has a bank account which is disabled. Payment can only be processed to active bank accounts."
+        return
+      end
+
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
         return false

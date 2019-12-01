@@ -753,9 +753,9 @@ class PaymentAgreements::Base < BaseOperation
     #   add_message :error, "#{vendor_ids.count} vendors should have #{vendor_ids.count} #{invoice_type.pluralize} with start date equal to execution date: #{execution_date}"
     # end
 
-    if self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where('start_date < ?', Date.today.beginning_of_month).count >= 1
-      add_message :error, "Start date cannot be less than #{Date.today.beginning_of_month}"
-      add_message :error, "Start date cannot be in past month"
+    if self.payment_agreement.send(invoice_type.pluralize.to_sym).where(vendor_id: vendor_ids).fixed_periodic_type.where('start_date < ?', Date.parse("01 Aug 2019")).count >= 1
+      add_message :error, "Start date cannot be less than #{Date.parse("01 Aug 2019")}"
+      # add_message :error, "Start date cannot be before August 2019"
     end
   end
 

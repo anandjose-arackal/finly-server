@@ -84,7 +84,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :budget_trails, as: :vendor
-
+  has_many :trails, as: :parent
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 
@@ -199,6 +199,8 @@ class YesBankVendor < ApplicationRecord
     where id: ids
   }
 
+  scope :without_id, -> (id) {where.not(id: id)}
+
   # Scopes for ordering ends
 
   before_validation do
@@ -246,7 +248,7 @@ class YesBankVendor < ApplicationRecord
         state: state,
         state_code_id: state_code_id,
         tds_id: tds_rates_list_id,
-        bank_accounts: bank_accounts,
+        bank_accounts: bank_accounts.enabled,
         state_code: state_code&.state_code,
         address: address,
         trade_name: trade_name,
