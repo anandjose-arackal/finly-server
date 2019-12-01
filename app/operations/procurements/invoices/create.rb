@@ -36,6 +36,11 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     unless self.vendor.present?
       add_message :error, 'Vendor not found'
     end
+
+    unless user.is_non_po_invoice_initiator?
+      add_message :error, 'You do not have permission for this action'
+      return
+    end
   end
 
   def process

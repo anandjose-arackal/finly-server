@@ -25,6 +25,12 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       return
     end
 
+    receiving_account = self.invoice.receiving_account
+    if receiving_account&.disabled
+      add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
+      return
+    end
+
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     # this will apply only if this invoice is part of a non-PO

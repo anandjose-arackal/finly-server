@@ -81,7 +81,7 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
   end
 
   def created_at(vendor)
-    vendor.created_at
+    vendor.created_at&.strftime("%d-%b-%Y")
   end
 
   def address(vendor)

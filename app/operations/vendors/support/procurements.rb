@@ -12,6 +12,10 @@ class Vendors::Support::Procurements < Vendors::Support::Base
 
     def get_procurement_data
       data = {}
+      RequestStore.store[:vendor_manager] = false
+      if user.is_vendor_manager? or user.is_vendor_initiator? or user.is_vendor_reviewer?
+        RequestStore.store[:vendor_manager] = true
+      end
       data[:purchase_orders] = Procurements::PurchaseOrders::Index.(user, {filter_vendor_id: self.vendor.id}).purchase_orders
       data[:po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'tax_invoice'}).invoices
       data[:non_po_invoices] = Procurements::Invoices::Index.(user, {filter_vendor_id: self.vendor.id, filter_inward_invoice_type: 'non_po_invoice'}).invoices

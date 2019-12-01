@@ -70,8 +70,8 @@
 #  submitted_at                    :datetime
 #  approved_at                     :datetime
 #  po_adjusted_advance             :integer
-#  po_advance                      :integer
-#  po_prev_adjusted_advance        :integer
+#  po_advance                      :decimal(20, 2)
+#  po_prev_adjusted_advance        :decimal(20, 2)
 #  advance_amount_required         :boolean          default(FALSE)
 #  gstin_location_id               :bigint
 #  transaction_service_period_from :date
@@ -92,6 +92,7 @@
 #  vendor_poc_id                   :integer
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
+#  payable                         :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
@@ -550,6 +551,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
+    return super if self.policy_id.present?
     self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
@@ -1081,7 +1083,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :initiated)
   end
 
   def self.auditor_associated_status_ids

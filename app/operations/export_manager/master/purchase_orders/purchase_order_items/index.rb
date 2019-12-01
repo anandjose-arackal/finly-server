@@ -13,6 +13,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     description: {spreadsheet: true, pdf: true},
     comment: {spreadsheet: true, pdf: true},
     category: {spreadsheet: true, pdf: true},
+    policy: {spreadsheet: true, pdf: true},
     hsn_sac: {spreadsheet: true, pdf: true},
     quantity: {spreadsheet: true, pdf: true},
     rate: {spreadsheet: true, pdf: true},
@@ -103,6 +104,9 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     precision_value(value)
   end
 
+  def policy(item)
+    item&.purchase_order&.policy&.name
+  end
   protected
   def purchase_order(item)
     item&.purchase_order
