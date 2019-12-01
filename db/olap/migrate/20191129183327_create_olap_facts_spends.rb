@@ -182,10 +182,110 @@ class CreateOlapFactsSpends < ActiveRecord::Migration[5.2]
     create_table :olap_facts_spends do |t|
       t.olap_references
 
-      t.integer :date_id, index: true
+      # Employee Expenses
+      t.boolean :is_reimbursement, index: true
+      t.integer :reimbursement_on_id, index: true
+
+      # Header - General
+      t.string :status, index: true
+      t.string :description, index: true
+      t.text :detailed_description
+      t.integer :cost_center_id, index: true
+      t.integer :location_id, index: true
+      t.integer :department_id, index: true
+      t.integer :category_id, index: true
+      t.integer :policy_id, index: true
+      t.integer :owner_id, index: true
       t.integer :service_period_start_id, index: true
       t.integer :service_period_end_id, index: true
+      t.integer :date_id, index: true
+      t.integer :payable_created_at_id, index: true
+      t.integer :payable_submitted_at_id, index: true
+      t.integer :payable_approved_at_id, index: true
+      t.integer :rejection_count, index: true
+      t.boolean :has_violation, index: true
+      t.string :violation_description, index: true
 
+      # Payee
+      t.boolean :is_employee_expense, index: true
+      t.boolean :is_vendor_payment, index: true
+      t.integer :vendor_id, index: true
+      t.integer :vendor_location_id, index: true
+      t.string :vendor_name, index: true
+      t.integer :shipping_location_id, index: true
+      t.integer :billing_location_id, index: true
+      t.boolean :is_gst_registered, index: true
+      t.boolean :is_msme_registered, index: true
+      t.boolean :is_composite_vendor, index: true
+      t.integer :vendor_confirmed_at_id, index: true
+      t.integer :days_for_confirmation, index: true
+      t.integer :payment_mode, index: true
+
+      # Item
+      t.boolean :has_purchase_request, index: true
+      t.boolean :has_purchase_order, index: true
+      t.boolean :has_grn, index: true
+      t.boolean :has_invoice, index: true
+      t.boolean :has_agreement, index: true
+      t.decimal :quantity_requested, index: true
+      t.decimal :quantity_issued_from_inventory, index: true
+      t.decimal :quantity_purchased, index: true
+      t.decimal :quantity_cancelled, index: true
+      t.decimal :quantity_received, index: true
+      t.decimal :quantity_invoiced, index: true
+      t.decimal :quantity_paid, index: true
+      t.decimal :quantity_pending_purchase, index: true
+      t.decimal :quantity_pending_receipt, index: true
+      t.decimal :quantity_pending_invoice, index: true
+      t.decimal :quantity_pending_payment, index: true
+      t.integer :purchased_on_id, index: true
+      t.integer :estimated_delivery_date_id, index: true
+      t.integer :delivery_completed_on_id, index: true
+      t.boolean :is_delivered_on_time, index: true
+      t.boolean :has_on_time_delivery, index: true
+      t.boolean :has_late_delivery, index: true
+      t.integer :delivery_delayed_days, index: true
+      t.decimal :quantity_delivered_on_time, index: true
+      t.decimal :quantity_delivered_on_time_percentage, index: true
+      t.decimal :quantity_delivered_late, index: true
+      t.decimal :quantity_delivered_late_percentage, index: true
+      t.decimal :quantity_purchased_percentage, index: true
+      t.decimal :quantity_received_percentage, index: true
+      t.decimal :quantity_invoiced_percentage, index: true
+      t.decimal :quantity_cancelled_percentage, index: true
+      t.decimal :quantity_paid_percentage, index: true
+      t.boolean :is_exceeding_budget, index: true
+      t.string :item_type, index: true
+
+      # Spend
+      t.integer :amount_id, index: true
+      t.integer :basic_amount_id, index: true
+      t.integer :tax_amount_id, index: true
+      t.integer :tds_amount_id, index: true
+      t.string :tax_type, index: true
+      t.decimal :tax_percentage, index: true
+      t.integer :cgst_amount_id, index: true
+      t.integer :sgst_amount_id, index: true
+      t.integer :igst_amount_id, index: true
+      t.decimal :cgst_percentage, index: true
+      t.decimal :sgst_percentage, index: true
+      t.decimal :igst_percentage, index: true
+      t.integer :amount_estimated_id, index: true
+      t.integer :amount_purchased_id, index: true
+      t.integer :amount_received_id, index: true
+      t.integer :amount_invoiced_id, index: true
+      t.integer :amount_paid_id, index: true
+      t.integer :amount_pending_purchase_id, index: true
+      t.integer :amount_pending_receipt_id, index: true
+      t.integer :amount_pending_invoice_id, index: true
+      t.integer :amount_pending_payment_id, index: true
+      t.integer :advance_amount_requested_id, index: true
+      t.integer :advance_amount_paid_id, index: true
+      t.decimal :advance_percentage, index: true
+      t.integer :credit_days, index: true
+      t.integer :estimated_to_purchased_deviation_id, index: true
+      t.decimal :estimated_to_purchased_deviation_percentage, index: true
+      t.decimal :reimbursement_amount_id, index: true
 
       t.timestamps index: true
     end
