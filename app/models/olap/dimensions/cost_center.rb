@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: olap_dimensions_cost_centers
+#
+#  id                   :bigint           not null, primary key
+#  finly_ref_id         :bigint           not null
+#  finly_ref_created_at :datetime
+#  finly_ref_updated_at :datetime
+#  name                 :string(255)
+#  application          :string(255)
+#  company_id           :integer
+#  is_deleted           :boolean
+#  deleted_at           :datetime
+#  cost_center_code     :string(255)
+#  ancestry             :string(255)
+#  gl_code              :string(255)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
 class Olap::Dimensions::CostCenter < OlapRecord
   include Analytics::Mapper
 

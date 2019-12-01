@@ -24,8 +24,8 @@
 #  is_deleted                         :boolean          default(FALSE), not null
 #  submitted_amount_id                :integer
 #  processed_amount_id                :integer
-#  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
+#  auto_approve                       :boolean
 #  approved_at                        :datetime
 #  travel_request_id                  :integer
 #  destination_pocket_id              :integer
@@ -33,7 +33,6 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
 #

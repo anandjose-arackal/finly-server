@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: olap_dimensions_users
+#
+#  id                   :bigint           not null, primary key
+#  finly_ref_id         :bigint           not null
+#  finly_ref_created_at :datetime
+#  finly_ref_updated_at :datetime
+#  email                :string(255)
+#  employee_id          :string(255)
+#  kyc_verified         :boolean
+#  company_id           :integer
+#  mobile_number        :string(255)
+#  active               :boolean
+#  otp_verified         :boolean
+#  first_name           :string(255)
+#  last_name            :string(255)
+#  mobile_only_invite   :boolean
+#  verified             :boolean
+#  default_password     :boolean
+#  point_of_contact     :boolean
+#  password_changed_at  :datetime
+#  last_activity_at     :datetime
+#  expired_at           :datetime
+#  cost_center_id       :integer
+#  department_id        :integer
+#  location_id          :integer
+#  default_company_id   :integer
+#  finly_id             :string(255)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
 class Olap::Dimensions::User < OlapRecord
   include Analytics::Mapper
 
