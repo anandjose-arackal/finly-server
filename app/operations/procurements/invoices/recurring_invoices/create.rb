@@ -48,6 +48,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       procurement.destroy
       return
     end
+    CustomField::SetFields.(invoice_created, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
   end
 
 
