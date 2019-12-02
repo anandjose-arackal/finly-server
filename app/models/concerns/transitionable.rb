@@ -753,6 +753,8 @@ module Transitionable
         document_table_name = 'inward_invoices'
       elsif (document_table_name == "yes_bank_vendors") || ("#{self.table_name}" == "yes_bank_vendors")
         document_table_name = 'vendors'
+      elsif (document_table_name == "bbps_biller_subscriptions") || ("#{self.table_name}" == "bbps_biller_subscriptions")
+        document_table_name = 'bbps_subscriptions'
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     end

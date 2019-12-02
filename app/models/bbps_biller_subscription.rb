@@ -50,6 +50,7 @@ class BbpsBillerSubscription < ApplicationRecord
   include SoftDeletable, Transitionable
 
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
+  belongs_to :company
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
@@ -176,6 +177,38 @@ class BbpsBillerSubscription < ApplicationRecord
 
   def self.document_status_class_name
     'BbpsBillerSubscriptionStatus'
+  end
+
+  def self.role_based_associated_status_ids(user)
+    BbpsBillerSubscriptionStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if [UserRole.id_for(:utility_bill_master_initiator)]
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :deactivated, :reactivated]
+        elsif [UserRole.id_for(:utility_bill_master_reviewer)]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :deactivated, :reactivated]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :deactivated, :reactivated]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.open_status_ids(user)
+    BbpsBillerSubscriptionStatus.ids_for([:draft])
+  end
+
+  def self.finance_associated_status_ids
+    BbpsBillerSubscriptionStatus.ids_for([:approved, :auto_approved, :reactivated, :deactivated])
+  end
+
+  def self.auditor_associated_status_ids
+    BbpsBillerSubscriptionStatus.ids_for([:approved, :auto_approved, :awaiting_approval, :rejected, :retracted, :reactivated, :deactivated])
   end
 
   def self.roles
