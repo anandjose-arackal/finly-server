@@ -108,9 +108,13 @@
 class Olap::Facts::Spend < OlapRecord
 
   belongs_to :reimbursement_on, class_name: "Olap::Dimensions::FiscalTime"
+  belongs_to :parent_cost_center, class_name: "Olap::Dimensions::CostCenter", primary_key: :finly_ref_id
   belongs_to :cost_center, class_name: "Olap::Dimensions::CostCenter", primary_key: :finly_ref_id
+  belongs_to :parent_location, class_name: "Olap::Dimensions::Location", primary_key: :finly_ref_id
   belongs_to :location, class_name: "Olap::Dimensions::Location", primary_key: :finly_ref_id
+  belongs_to :parent_department, class_name: "Olap::Dimensions::Department", primary_key: :finly_ref_id
   belongs_to :department, class_name: "Olap::Dimensions::Department", primary_key: :finly_ref_id
+  belongs_to :parent_category, class_name: "Olap::Dimensions::Category", primary_key: :finly_ref_id
   belongs_to :category, class_name: "Olap::Dimensions::Category", primary_key: :finly_ref_id
   belongs_to :policy, class_name: "Olap::Dimensions::Policy", primary_key: :finly_ref_id
   belongs_to :owner, class_name: "Olap::Dimensions::User", primary_key: :finly_ref_id
