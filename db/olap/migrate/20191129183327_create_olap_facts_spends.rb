@@ -284,7 +284,7 @@ class CreateOlapFactsSpends < ActiveRecord::Migration[5.2]
       t.decimal :advance_percentage, index: true
       t.integer :credit_days, index: true
       t.integer :estimated_deviation_id
-      t.decimal :estimated_deviation_percentage, index: {name: 'olap_facts_spends_est_deviation_perentage'}
+      t.decimal :estimated_deviation_percentage, index: {name: 'olap_facts_spends_est_deviation_percentage'}
       t.decimal :reimbursement_amount_id
 
       t.timestamps index: true
