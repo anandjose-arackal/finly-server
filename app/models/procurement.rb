@@ -16,8 +16,6 @@
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
 #  deleted_at            :datetime
-#  vendor_poc_id         :integer
-#  vlpm_id               :integer
 #
 
 class Procurement < ApplicationRecord
@@ -252,7 +250,7 @@ class Procurement < ApplicationRecord
     if user.present?
       category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
 
-      inventory_line_item_ids = user.company.items.with_category_id(category_ids)
+      inventory_line_item_ids = user.company.items.non_deleted.with_category_id(category_ids)
 
       purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
 

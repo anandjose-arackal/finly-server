@@ -172,7 +172,7 @@ gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
 
 # gem for devise authentication
-gem 'devise', '~> 4.5.0'
+gem 'devise', '~> 4.7.1'
 
 gem 'devise_invitable', '~> 1.7.5'
 gem 'doorkeeper', '~> 5.0.2'

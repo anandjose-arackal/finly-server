@@ -13,11 +13,12 @@ json.vendor do
     json.ifsc @result.purchase_order.bank_account&.ifsc
     json.name @result.purchase_order.bank_account&.name
     json.id @result.purchase_order.bank_account&.id
+    json.disabled @result.purchase_order.bank_account&.disabled
   end
 
   if @result.purchase_order.vendor&.bank_accounts.present?
     json.bank_accounts do
-      json.array!(@result.purchase_order.vendor&.bank_accounts) do |bank_account|
+      json.array!(@result.purchase_order.vendor&.bank_accounts.enabled) do |bank_account|
         json.id bank_account.id
         json.name bank_account.name
         json.account_number bank_account.account_number

@@ -12,7 +12,7 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
 
   def init
     id = params[:id] || params[:inventory_item_id]
-    self.inventory_item = user.company.items.find_by(id: id)
+    self.inventory_item = user.company.items.non_deleted.find_by(id: id)
     self.inventory_item_parameters = inventory_item_params
   end
 

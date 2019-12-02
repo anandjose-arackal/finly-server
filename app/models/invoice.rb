@@ -89,9 +89,6 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
 #
 
@@ -551,6 +548,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
+    return super if self.policy_id.present?
     self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 

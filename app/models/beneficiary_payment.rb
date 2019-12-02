@@ -116,6 +116,12 @@ class BeneficiaryPayment < ApplicationRecord
   # after_commit :calculate_tax_and_amount
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
+  delegate :paid?, to: :status
+
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) {where.not(id: id)}
+  scope :only_unpaid, -> {where.not status_id: BeneficiaryPaymentStatus.id_for(:paid)}
+  scope :only_paid, -> {where status_id: BeneficiaryPaymentStatus.id_for(:paid)}
 
   def tax_rate
   	self.tax

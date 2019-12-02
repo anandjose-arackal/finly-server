@@ -1176,11 +1176,25 @@ class User < ApplicationRecord
   end
 
   def json_for_trail(options = {})
-    {
+    if options[:vendor_show]
+      data = {
         id: id,
         name: name,
-        email: email
-    }
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active
+      }
+      return data
+    else
+      {
+          id: id,
+          name: name,
+          email: email
+      }
+    end
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
@@ -1578,7 +1592,7 @@ class User < ApplicationRecord
   end
 
   def associated_group_users(exclude_self: false)
-    users = User.where(default_company_id: self.default_company_id).with_email_or_mobile_number(self.email, self.mobile_number)
+    users = User.where(finly_id: self.finly_id)
     users = users.without_id(self.id) if exclude_self
     users
   end
