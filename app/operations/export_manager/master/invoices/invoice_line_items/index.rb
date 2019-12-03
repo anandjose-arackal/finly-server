@@ -57,7 +57,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   end
 
   def invoice_date(item)
-    invoice(item)&.date&.strftime "%d-%b-%Y"
+    invoice(item)&.date&.strftime("%d-%b-%Y")
   end 
 
   def created_by(item)

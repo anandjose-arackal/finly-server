@@ -2,7 +2,6 @@ module Documents::Invoices::Consumers::Submit
   module Processing
     class OwnerAction < TaskManager::Actions::DummyAction
       def run(user, message, input)
-        # debugger
       end
     end
 

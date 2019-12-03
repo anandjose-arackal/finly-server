@@ -180,11 +180,12 @@ json.invoice do
       json.ifsc invoice.receiving_account&.ifsc
       json.name invoice.receiving_account&.name
       json.id invoice.receiving_account&.id
+      json.disabled invoice.receiving_account&.disabled
     end
 
     if invoice.vendor&.bank_accounts.present?
       json.bank_accounts do
-        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+        json.array!(invoice.vendor&.bank_accounts.enabled) do |bank_account|
           json.id bank_account.id
           json.name bank_account.name
           json.account_number bank_account.account_number

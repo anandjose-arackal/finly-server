@@ -13,6 +13,7 @@ json.payments do
       json.beneficiary_id payment.receiving_account&.account_owner&.id
       json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
     end
+    json.disabled payment&.receiving_account&.disabled
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account&.account_number
     json.ifsc payment.receiving_account&.ifsc
@@ -165,8 +166,8 @@ end
 json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
 json.filter_count @result.filter_count
-unless current_company.id == 118
-json.unpaid_payments do
+unless [168, 169, 174, 175, 118].include?(current_user.company_id)
+  json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
     unless payment.receiving_account&.is_a?(BbpsBiller)
       json.owner_name payment.receiving_account&.account_owner&.name
@@ -175,6 +176,7 @@ json.unpaid_payments do
     end
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account&.account_number
+    json.disabled payment.receiving_account&.disabled
     json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value

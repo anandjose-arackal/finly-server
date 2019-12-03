@@ -176,29 +176,39 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def update_purchase_order_item(item)
     purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
 
-    accepted = purchase_order_item.accepted
-    rejected = purchase_order_item.rejected
-    delivered = purchase_order_item.delivered
+    # accepted = purchase_order_item.accepted
+    # rejected = purchase_order_item.rejected
+    # delivered = purchase_order_item.delivered
 
-    if item.changes.present?
+    # if item.changes.present?
 
-      if item.changes[:accepted].present?
-        # Why the f*k was it like this before?
-        # donkey
+    #   if item.changes[:accepted].present?
+    #     # Why the f*k was it like this before?
+    #     # donkey
 
-        # accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
-        accepted = (accepted - item.changes[:accepted][0]) + item.changes[:accepted][1]
-      end
+    #     # accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
+    #     accepted = (accepted - item.changes[:accepted][0]) + item.changes[:accepted][1]
+    #   end
 
-      if item.changes[:delivered].present?
-        # delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
-        delivered = (delivered - item.changes[:delivered][0]) + item.changes[:delivered][1]
-      end
+    #   if item.changes[:delivered].present?
+    #     # delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
+    #     delivered = (delivered - item.changes[:delivered][0]) + item.changes[:delivered][1]
+    #   end
 
-      if item.changes[:rejected].present?
-        rejected = (rejected.to_f - item.changes[:rejected][0].to_f) + item.changes[:rejected][1].to_f
-      end
-    end
+    #   if item.changes[:rejected].present?
+    #     rejected = (rejected.to_f - item.changes[:rejected][0].to_f) + item.changes[:rejected][1].to_f
+    #   end
+    # end
+
+    other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
+    items = other_receipt_notes.joins(:items).select('inward_document_items.accepted, inward_document_items.delivered, inward_document_items.rejected, inward_document_items.purchase_order_item_id as poi_id')
+    previously_accepted = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:accepted).sum.to_f
+    previously_rejected = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:rejected).sum.to_f
+    previously_delivered = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:delivered).sum.to_f
+
+    accepted = previously_accepted + item.accepted
+    rejected = previously_accepted + item.rejected
+    delivered = previously_accepted + item.delivered
 
     po_item_params = {
       accepted: accepted,
@@ -216,13 +226,19 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def update_service_item(item)
     purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
 
-    previously_billed_amount = purchase_order_item.previously_billed_amount
-    if item.changes[:billable_amount].present?
-      # previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
-      previously_billed_amount = previously_billed_amount + (item.changes[:billable_amount][1] - item.changes[:billable_amount][0])
-    end
+    # previously_billed_amount = purchase_order_item.previously_billed_amount
+    # if item.changes[:billable_amount].present?
+    #   # previously_billed_amount = (previously_billed_amount - item.changes[:billable_amount][0]) + item.billable_amount[1]
+    #   previously_billed_amount = previously_billed_amount + (item.changes[:billable_amount][1] - item.changes[:billable_amount][0])
+    # end
+    # purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
 
-    purchase_order_item.assign_attributes(previously_billed_amount: previously_billed_amount)
+    other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
+    previously_billed_amount = other_receipt_notes.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id').collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:billable_amount).sum.to_f
+    billable_amount = previously_billed_amount + item.billable_amount.to_f
+    
+    purchase_order_item.assign_attributes(previously_billed_amount: billable_amount)
+
     purchase_order_item.save
 
     purchase_order_item

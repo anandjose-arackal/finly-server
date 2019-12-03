@@ -60,7 +60,10 @@ class TrailAction < ApplicationRecord
         :po_close,
         :po_item_deleted,
         :po_revised,
-        :po_void
+        :po_void,
+        # vendors
+        :deactivate,
+        :reactivate
     ]
   end
 end

@@ -47,6 +47,9 @@
 #  default_password          :boolean          default(FALSE)
 #  point_of_contact          :boolean          default(FALSE)
 #  otp_attempts              :integer          default(0)
+#  user_group_location_id    :integer
+#  user_group_department_id  :integer
+#  user_group_designation_id :integer
 #  user_delegate_id          :integer
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
@@ -1179,11 +1182,25 @@ class User < ApplicationRecord
   end
 
   def json_for_trail(options = {})
-    {
+    if options[:vendor_show]
+      data = {
         id: id,
         name: name,
-        email: email
-    }
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active
+      }
+      return data
+    else
+      {
+          id: id,
+          name: name,
+          email: email
+      }
+    end
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate

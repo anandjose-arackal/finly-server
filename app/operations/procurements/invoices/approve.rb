@@ -20,6 +20,12 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
     unless self.invoice.present?
       add_message :error, 'Invoice not found'
     end
+    receiving_account = self.invoice.receiving_account
+    if receiving_account&.disabled
+      add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
+      return false
+    end
+
     validate_agreement_limit
   end
 

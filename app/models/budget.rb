@@ -2,31 +2,25 @@
 #
 # Table name: budgets
 #
-#  id                           :integer          not null, primary key
-#  name                         :string(255)
-#  period_id                    :integer
-#  start_date                   :date
-#  end_date                     :date
-#  budget_amount_id             :integer
-#  spent_amount_id              :integer
-#  budgetable_id                :integer
-#  budgetable_type              :string(255)
-#  is_deleted                   :boolean          default(FALSE)
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  user_id                      :integer
-#  company_id                   :integer
-#  purchase_order               :boolean
-#  payment                      :boolean
-#  expense                      :boolean
-#  ancestry                     :string(255)
-#  deleted_at                   :datetime
-#  budget_group_id              :integer
-#  calculated_before_tax_amount :boolean          default(FALSE)
-#  purchase_request             :boolean
-#  invoice                      :boolean
-#  budget_group_criterium_id    :integer
-#  active                       :boolean          default(FALSE)
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  period_id        :integer
+#  start_date       :date
+#  end_date         :date
+#  budget_amount_id :integer
+#  spent_amount_id  :integer
+#  budgetable_id    :integer
+#  budgetable_type  :string(255)
+#  is_deleted       :boolean          default(FALSE)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  user_id          :integer
+#  company_id       :integer
+#  purchase_order   :boolean
+#  payment          :boolean
+#  expense          :boolean
+#  ancestry         :string(255)
+#  deleted_at       :datetime
 #
 
 class Budget < ApplicationRecord
