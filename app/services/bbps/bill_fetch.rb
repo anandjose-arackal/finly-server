@@ -66,6 +66,20 @@ class Bbps::BillFetch < Bbps::Api
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field
       ]
+
+  # 1:message_code, 2:ref_number, 3:agent_institution_id, 4:channel_id, 5:agent_id, 6:customer_name, 7:customer_mobile,
+  # 8:customer_email, 9:customer_aadhar_no, 10:customer_pan_id, 11:initiating_channel, 12:biller_id, 13:customer_param_1, 14:customer_param_2,
+  # 15:customer_param_3, 16:customer_param_4, 17:customer_param_5,
+  # 18:additional_field, 19:additional_field, 20:additional_field, 21:additional_field, 22:additional_field,
+  # 23:additional_field, 24:additional_field, 25:additional_field, 26:additional_field, 27:additional_field,
+  # 28:additional_field, 29:additional_field, 30:additional_field, 31:additional_field, 32:additional_field
+
+  # 1:B1000|2:1533109635610|3:YS01|4:C1001|5:18798|6:NA|7:8484943085|
+  # 8:NA|9:NA|10:NA|11:BSC:<TERMINAL_ID=18798~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>|12:OFME00005DNZ43|13:a=10|14:a b=20|
+  # 15:a b c=30|16:a b c d=40|17:a b c d e=50|
+  # 18:NA|19:NA|20:NA|21:NA|22:NA|
+  # 23:NA|24:NA|25:NA|26:NA|27:NA|
+  # 28:NA|29:NA|30:NA|31:Y|32:0
   )
 
   # Message Code(B1001) |Status |Error Code |Error Desc | Ref No | Agent institution Id | Channel Id| BBPS Ref Id |Agent Id | Customer name |
@@ -92,6 +106,11 @@ class Bbps::BillFetch < Bbps::Api
   def message_code
     'B1000'
   end
+
+  # def ref_number
+  #   'AbinashTest100001'
+  # end
+
 
   def customer_name
     params[:customer_name]
@@ -147,6 +166,7 @@ class Bbps::BillFetch < Bbps::Api
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
     OpenStruct.new(
         {
+            # Add Order ID
             amount: result['response.parsed']['amount'],
             bill_date: result['response.parsed']['bill_date'],
             due_date: result['response.parsed']['due_date'],

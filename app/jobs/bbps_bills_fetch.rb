@@ -23,6 +23,18 @@ class BbpsBillsFetch < ApplicationJob
   end
 
   def create_bill(result, subscription, autofetched)
+    ##<OpenStruct amount="100000", bill_date="2015-06-14", due_date="2015-06-20", bill_number="12303", bill_period="june", convenience_fee="NA", convenience_fee_desc="NA", late_payment_fee="Late Payment Fee=40", early_payment_fee="Fixed Charges=50">
+    # {
+    #                       "amount" => "100000",
+    #                    "bill_date" => "2015-06-14",
+    #                     "due_date" => "2015-06-20",
+    #                  "bill_number" => "12303",
+    #                  "bill_period" => "june",
+    #              "convenience_fee" => "NA",
+    #         "convenience_fee_desc" => "NA",
+    #             "late_payment_fee" => "Late Payment Fee=40",
+    #            "early_payment_fee" => "Fixed Charges=50"
+    #     }
     if autofetched
       params = {
           amount: result.amount,
@@ -30,10 +42,10 @@ class BbpsBillsFetch < ApplicationJob
           bill_number: result.bill_number,
           due_date: result.due_date,
           bill_period: result.bill_period,
-          convenience_fee: result.convenience_fee,
+          convenience_fee: get_amount_from_response(result.convenience_fee),
           convenience_fee_desc: result.convenience_fee_desc,
-          early_payment_fee: result.early_payment_fee,
-          late_payment_fee: result.late_payment_fee,
+          early_payment_fee: get_amount_from_response(result.early_payment_fee),
+          late_payment_fee: get_amount_from_response(result.late_payment_fee),
           subscription_id: subscription.id,
           autofetched: autofetched
       }
@@ -53,6 +65,11 @@ class BbpsBillsFetch < ApplicationJob
       }
     end
     op = Docs::UtilityBills::Bills::Ops::Create.(params)
+  end
+
+  def get_amount_from_response(response)
+    return response.to_f if response.to_s.include?("=")
+    response.to_s.split("=")[1].to_f
   end
 
   def customer_params(subscription)

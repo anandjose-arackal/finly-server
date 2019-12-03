@@ -12,12 +12,12 @@ class Bbps::BillPay < Bbps::Api
       # Todo fill from request
       # required(:initiating_channel).filled
 
-      required(:amount).filled
-      required(:bill_date).filled
-      required(:due_date).filled
-      required(:bill_number).filled
-      required(:bill_period).filled
-      required(:biller_id).filled
+      # required(:amount).filled
+      # required(:bill_date).filled
+      # required(:due_date).filled
+      # required(:bill_number).filled
+      # required(:bill_period).filled
+      # required(:biller_id).filled
 
       # Atleast one param is required
       required(:customer_param_1) do
@@ -69,6 +69,8 @@ class Bbps::BillPay < Bbps::Api
   # Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10|
   # Additional Field 11| Additional Field 12| Additional Field 13| ON-US/OFF-US FLAG | CCF2 Charges
   #
+  #
+
   # Example: B2000|ASD1503901571142|YS01|C1001|18796|Y|N|0|NA|9898990091|mk.chekuri@gmail.com|NA|
   # BXXCG7754K|200|NA|NA|NA|NA|0|NA|
   # BSC:<TERMINAL_ID=18800~MOBIL E=9505987798~GEOCODE=22.5726,88.3639~POSTAL_CODE=700017>|Cash:<Remarks=123456 >|
@@ -87,6 +89,39 @@ class Bbps::BillPay < Bbps::Api
           :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
           :additional_field, :additional_field, :additional_field, :on_us_off_us, :ccf_charges
       ]
+
+  # 1:message_code, 2:order_number, 3:agent_institution_id, 4:channel_id, 5:agent_id,
+  # 6:quick_pay,7:split_pay, 8:split_pay_amount, 9:customer_name, 10:customer_mobile,
+  # 11:customer_email, 12:customer_aadhar_no, 13:customer_pan_id,
+  # 14:amount, 15:bill_date, 16:due_date, 17:bill_number, 18:bill_period,
+  # 19:convenience_fee, 20:convenience_fee_desc,
+  # 21:initiating_channel, 22:payment_mode, 23:debit_account_number, 24:biller_id,
+  # 25:customer_param_1, 26:customer_param_2, 27:customer_param_3, 28:customer_param_4, 29:customer_param_5,
+  # 30:additional_field, 31:additional_field, 32:additional_field, 33:additional_field, 34:additional_field,
+  # 35:additional_field, 36:additional_field, 37:additional_field, 38:additional_field, 39:additional_field,
+  # 40:additional_field, 41:additional_field, 42:additional_field, 43:on_us_off_us, 44:ccf_charges
+
+  # WORKING SAMPLE
+  # 1:B2000|2:kailas33571000018889w29298|3:YS01|4:C1001|5:18798|
+  # 6:N|7:N|8:0|9:BBPS|10:8484943085|
+  # 11:NA|12:NA|13:NA|
+  # 14:90000|15:2015-06-14|16:2015-06-20|17:12303|18:june|
+  # 19:0|20:Service Tax|
+  # 21:BSC:<TERMINAL_ID=18798~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>|22:Cash:<Remarks=Test1>|23:006290100012468|24:OFME00005DNZ43|
+  # 25:a=10|26:a b=20|27:a b c=30|28:a b c d=40|29:a b c d e=50|
+  # 30:NA|31:NA|32:NA|33:NA|34:NA|35:NA|36:NA|37:NA|38:NA|39:NA|40:NA|41:NA|42:NA|43:Y|44:0
+
+  # QUICK PAY
+  # 1:B2000|2:636506819989518425|3:YS01|4:C1001|5:18798|
+  # 6:Y|7:N|8:0|9:NA|10:9898990088|
+  # 11:mk.chekuri@gmail.com|12:NA|13:BXXCG7754K|
+  # 14: 100000|15:NA|16:NA|17:NA|18:NA|
+  # 19:0|20:NA|
+  # 21:BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>|22:Cash:<Remarks=123456>|23:006290100012468|24:OTNS00007XXA63|
+  # 25: a=10|26:a b=20|27:a b c=30|28:a b c d=40|29:a b c d e=50|
+  # 30:NA|31:NA|32:NA|33:NA|34:NA|35:NA|
+  # 36:NA|37:NA|38:NA|39:NA|
+  # 40:NA|41:NA|42:NA|43:Y|44:0
   )
 
   # Message Code(B2001) |Status |Error Code |Error Desc | Order No |Agent institution Id |
@@ -121,6 +156,22 @@ class Bbps::BillPay < Bbps::Api
     params[:customer_name]
   end
 
+  # def order_number
+  #   'AbinashTest100002'
+  # end
+
+  def on_us_off_us
+    'Y'
+  end
+
+  def ccf_charges
+    0
+  end
+
+  # def quick_pay
+  #   params[:quick_pay] || "N"
+  # end
+
   def customer_mobile
     params[:mobile_number]
   end
@@ -139,6 +190,22 @@ class Bbps::BillPay < Bbps::Api
 
   def biller_id
     params[:biller_id]
+  end
+
+  def bill_date
+    params[:bill_date]
+  end
+
+  def bill_number
+    params[:bill_number]
+  end
+
+  def bill_period
+    params[:bill_period]
+  end
+
+  def amount
+    params[:amount]
   end
 
   def initiating_channel
