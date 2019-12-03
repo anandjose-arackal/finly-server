@@ -7,7 +7,7 @@ class AccountingExports::Master::Expense::Export < AccountingExports::Master::Pr
   
   def get_record(data)
     user_ids = current_company.users.pluck(:id)
-    expenses = Expense.where(user_id: expenses)
+    expenses = Expense.where(user_id: user_ids)
   end
   
   def set_record_format

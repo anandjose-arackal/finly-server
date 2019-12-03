@@ -3929,6 +3929,8 @@ Rails.application.routes.draw do
   post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
+
+  get 'accounting_exports', to: 'accounting_exports#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.

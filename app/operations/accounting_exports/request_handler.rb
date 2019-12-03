@@ -1,4 +1,4 @@
-class AccountingExports::RequestHandler < Admin::Base
+class AccountingExports::RequestHandler < BaseOperation
 
   attr_accessor :master, :request_key, :processor
 
@@ -16,10 +16,6 @@ class AccountingExports::RequestHandler < Admin::Base
     return if has_errors?
     if params[:request_key].blank?
       add_message :error, 'Request key is blank'
-      return
-    end
-    if params[:company_id].blank?
-      add_message :error, 'Company is not set'
       return
     end
   end
@@ -62,6 +58,7 @@ class AccountingExports::RequestHandler < Admin::Base
   protected
 
   def init_master
+    binding.pry
     AccountingExports::Master::BaseMaster.subscribers(self.request_key)&.first
   end
 
