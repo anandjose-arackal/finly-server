@@ -182,7 +182,9 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
         policy_id: self.policy_id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        expected_payments: 1,
+        ticket_type: 'invoice'
     }
     return bank_payment_request_params
   end

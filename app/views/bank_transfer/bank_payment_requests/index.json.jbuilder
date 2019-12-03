@@ -1,6 +1,7 @@
 json.results do
   json.array! @result.paginated_payment_requests.each do |payment_request|
-
+    json.ticket_type payment_request.ticket_type
+    
     json.controlling_level_name payment_request.controlling_level&.name
     json.rejection_note payment_request.rejection_note
     # json.can_approve payment_request.can_approve?

@@ -204,7 +204,9 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
         beneficiary_type_id: 2,
         policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,
-        api_initiated: false
+        api_initiated: false,
+        expected_payments: self.validate_operation.order_details.count,
+        ticket_type: 'beneficiary'
     }
     bpr_attributes
   end

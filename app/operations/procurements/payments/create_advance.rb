@@ -199,7 +199,9 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         description: self.description,
         beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
         policy_id: self.policy_id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        expected_payments: 1,
+        ticket_type: 'purchase_order'
     }
     return bank_payment_request_params
   end

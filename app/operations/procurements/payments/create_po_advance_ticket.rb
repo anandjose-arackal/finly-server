@@ -292,7 +292,9 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         policy_id: self.policy&.id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false,
-        description: self.description
+        description: self.description,
+        expected_payments: payment_params.count,
+        ticket_type: 'purchase_order'
     }
     bpr_attributes
   end

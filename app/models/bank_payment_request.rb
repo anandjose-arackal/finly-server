@@ -73,6 +73,12 @@ class BankPaymentRequest < ApplicationRecord
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
+  enum ticket_type: {
+    beneficiary: 'beneficiary',
+    invoice: 'invoice',
+    purchase_order: 'purchase_order'
+  }
+
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
   scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
@@ -332,6 +338,11 @@ class BankPaymentRequest < ApplicationRecord
     payments = Payment.where(payment_order_id: payment_order_ids)
     payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
     where(payment_order_id: payment_order_ids)
+  }
+
+  scope :filter_ticket_type, -> (type) {
+    type = type.to_s.underscore
+    where ticket_type: type
   }
 
   attr_accessor :cache_users

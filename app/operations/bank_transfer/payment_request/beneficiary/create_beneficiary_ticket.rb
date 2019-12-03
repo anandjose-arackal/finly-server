@@ -231,7 +231,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    policy_id: self.policy&.id,
 		    description: self.description,
 		    payment_order_attributes: payment_order_attributes,
-		    api_initiated: false
+		    api_initiated: false,
+		    expected_payments: self.validate_operation.order_details.count,
+		    ticket_type: 'beneficiary'
 		}
 		bpr_attributes
 	end
