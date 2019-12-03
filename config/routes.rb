@@ -3366,6 +3366,7 @@ Rails.application.routes.draw do
     resources :payment_orders do
 
     end
+    get 'bank_payment_requests/progress', to: 'bank_payment_requests#progress', as: :progress
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     get 'bank_payment_requests/count_with_filters', to: 'bank_payment_requests#count_with_filters', as: :count_with_filters
     get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts

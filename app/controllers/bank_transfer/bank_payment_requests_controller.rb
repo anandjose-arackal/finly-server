@@ -309,6 +309,15 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond_success_failure
   end
 
+  def progress
+    @result = BankTransfer::PaymentRequest::Progress.(current_user, params)
+    if @result.success?
+      render json: { total: @result.expected_payments.as_json, actual: @result.actual_payments.as_json }
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 
   private
 
