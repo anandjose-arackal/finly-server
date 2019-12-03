@@ -2,26 +2,27 @@ require "reform/form/validation/unique_validator"
 
 module Analytics::Mapper
   extend ActiveSupport::Concern
+  extend Dry::Core::ClassAttributes
 
   included do
     include Events::Consumer
     include DynamicAttributes
 
+    class_attr :in_sync
+    class_attr :transaction_model
+    class_attr :field_mappings
     class_attr :input, default: -> (user, payload) { payload[:record] }
-
   end
 
   class_methods do
     def transaction_model(klass = NoObject)
-      unless klass == NoObject
-        @transaction_model = klass
-        Analytics::Master.register @transaction_model, self
-      end
-      @transaction_model
+      Analytics::Master.register klass, self unless klass == NoObject
+      super(klass)
     end
 
     def field_mappings
-      return @field_mappings unless @field_mappings.nil?
+      val = super()
+      return val unless val.nil?
       @field_mappings ||= []
       set_defaults
     end
@@ -86,13 +87,21 @@ module Analytics::Mapper
       raise "finly_ref_updated_at is not defined for #{self.name}" unless finly_ref_updated_at.present?
     end
 
+    def sync!
+      in_sync(true)
+    end
+
+    def sync?
+      !!in_sync
+    end
+
     def events(*list)
       raise "Event is already defined" if @events.present?
 
       @events = list
       list.each do |event|
         Class.new(self) do
-          consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", options: {sync: false})
+          consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", options: {sync: true})
         end
       end
     end

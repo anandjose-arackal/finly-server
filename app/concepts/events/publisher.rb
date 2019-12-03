@@ -8,7 +8,7 @@ class Events::Publisher
   def self.broadcast(routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false)
     raise "Consumer key cannot be nil" if consumer_key.nil?
 
-    Async.(routing_key, message, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
+    #Async.(routing_key, message, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
     Sync.(routing_key, message, current_user: current_user, ignore_failure: ignore_failure, consumer_key: consumer_key)
   end
 
@@ -17,7 +17,7 @@ class Events::Publisher
     extend Dry::Monads[:result]
 
     def self.call(routing_key, message, current_user: nil, ignore_failure: false, consumer_key:)
-      if consumer_key == NoObject
+      if consumer_key != NoObject
         consumer = Events::Registry.find_by_consumer_key(consumer_key)
         execute_consumer(consumer, message, current_user) if consumer
       else
@@ -28,14 +28,15 @@ class Events::Publisher
     def self.execute_consumer(consumer, message, current_user)
       return Failure("Consumer not found") if consumer.nil?
 
-      consumer.new.receive(current_user, message)
+      consumer.new.receive(:event, current_user, message)
     end
 
     def self.execute_all_consumers(routing_key, message, current_user, ignore_failure)
       results = []
       has_failure = false
-      Events::Registry.sync_events(event: routing_key).each do |consumer|
-        result = execute_consumer(consumer, current_user, message)
+      Events::Registry.sync_events(routing_key).each do |consumer|
+        result = execute_consumer(consumer, message, current_user)
+        result ||= Failure("Could not process the event")
         data = {result: result, consumer: consumer, success: result.success?}
 
         if result.success?
