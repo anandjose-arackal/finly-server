@@ -18,6 +18,7 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  field_parent_type_id    :integer
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
@@ -51,6 +52,10 @@ class FieldConfiguration < ApplicationRecord
 
   has_many :parent_dependent_field_configuration_mappings, foreign_key: :dependent_field_configuration_id
   has_many :parent_drop_down_items, through: :parent_dependent_field_configuration_mappings, source: :parent, source_type: "FieldDropDownItem"
+
+  # adding associations with the related users as well
+  has_many :user_field_mappings
+  has_many :affected_users, through: :user_field_mappings, source: :user
 
   validates :field_name, presence: true
   validates :enabled, presence: true
@@ -92,7 +97,7 @@ class FieldConfiguration < ApplicationRecord
     includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
   }
 
-  delegate :drop_down?, to: :field_type
+  delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
@@ -194,8 +199,13 @@ class FieldConfiguration < ApplicationRecord
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
+    user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false
     if field_type_id == FieldType.id_for(:drop_down)
-      options = drop_down_items.exclude_deleted
+      if user_level_custom_fields
+       options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id)
+      else
+        options = drop_down_items.exclude_deleted
+      end
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end

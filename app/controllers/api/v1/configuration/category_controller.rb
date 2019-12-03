@@ -1,5 +1,5 @@
 require "#{Rails.root}/app/operations/company/configuration/category/index"
-class Api::V1::Configuration::CategoryController < Api::V1::BaseApiController
+class Api::V1::Configuration::CategoryController < Api::V1::BaseMobileApiController
   protect_from_forgery with: :null_session
 
 
