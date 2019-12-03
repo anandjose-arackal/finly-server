@@ -6,12 +6,12 @@ module Events::Consumer
   end
 
   module ClassMethods
-    def consumes_event!(event, consumer_key:, name:, options: {})
+    def consumes_event!(event, consumer_key:, name:, sync: false, options: {})
       raise "Name is not defined for consumer #{self.event_name}" if name.nil?
       raise "Event is not defined for consumer #{self.event_name}" if event.nil?
       raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
 
-      async! unless options&.dig(:sync)
+      async! unless sync
       @event = event
       @event_options = options
       @consumer_key = consumer_key

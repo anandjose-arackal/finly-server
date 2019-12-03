@@ -7,6 +7,8 @@ module DynamicAttributes
   module ClassMethods
     # Same as class_attribute of ruby.
     # Over class_attribute this allows setting values by calling attribute(value) instead of attribute = value
+    # alternate getter: self.attribute_#{name}
+    # alternate setter: self.attribute_#{name}=
     def class_attr(name, default: nil)
       attribute = "attribute_#{name}"
       class_attribute attribute, default: default

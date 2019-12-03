@@ -2,31 +2,34 @@ require "reform/form/validation/unique_validator"
 
 module Analytics::Mapper
   extend ActiveSupport::Concern
-  extend Dry::Core::ClassAttributes
 
   included do
     include Events::Consumer
     include DynamicAttributes
 
-    class_attr :in_sync
+    class_attr :is_sync, default: false
     class_attr :transaction_model
     class_attr :field_mappings
+    class_attr :olap_model
     class_attr :input, default: -> (user, payload) { payload[:record] }
+
+    define_singleton_method :field_mappings do
+      next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
+      self.attribute_field_mappings ||= []
+      set_defaults
+      self.attribute_field_mappings
+    end
+
+    define_singleton_method :transaction_model do |klass = NoObject|
+      unless klass == NoObject
+        Analytics::Master.register klass, self
+        self.attribute_transaction_model = klass
+      end
+      self.attribute_transaction_model
+    end
   end
 
   class_methods do
-    def transaction_model(klass = NoObject)
-      Analytics::Master.register klass, self unless klass == NoObject
-      super(klass)
-    end
-
-    def field_mappings
-      val = super()
-      return val unless val.nil?
-      @field_mappings ||= []
-      set_defaults
-    end
-
     def set_defaults
       map :finly_ref_id, :id
       map :finly_ref_created_at, :created_at
@@ -88,20 +91,22 @@ module Analytics::Mapper
     end
 
     def sync!
-      in_sync(true)
+      is_sync(true)
     end
 
     def sync?
-      !!in_sync
+      is_sync
     end
 
     def events(*list)
       raise "Event is already defined" if @events.present?
 
+      klass = self
       @events = list
       list.each do |event|
         Class.new(self) do
-          consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", options: {sync: true})
+          consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", sync: sync?)
+          olap_model(klass)
         end
       end
     end
@@ -112,15 +117,16 @@ module Analytics::Mapper
   end
 
   def on_event(user, payload)
-    olap_model = self.class
+    olap_model = self.class.olap_model || self.class
     input = olap_model.input.call(user, payload)
     input = [input] unless input.respond_to?(:each)
     input.each do |record|
       sync = Analytics::Synchronizer.(params: {record: record, olap_model: olap_model})
-      unless sync.success?
+      if sync.failure? and not sync[:in_sync]
         # Todo log failure with reason
         raise "Sync Error: #{sync.errors}}"
       end
     end
+    Success()
   end
 end
