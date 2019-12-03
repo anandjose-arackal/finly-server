@@ -11,7 +11,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
 
   def process
     # if user.vendor_payments_admin? && params[:team_po] == false
-    if user.vendor_payments_admin?
+    if user.vendor_payments_admin? or RequestStore.store[:vendor_manager]
       admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
       self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.purchase_orders)
       return
@@ -65,6 +65,9 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_po_advance_status
     has_scope :po_advances_date, using: [:from, :to], type: :hash
     has_scope :due_date, using: [:from, :to], type: :hash
+    has_scope :filter_po_approver_id
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
 
     # Sorting
     has_scope :sort_po_number

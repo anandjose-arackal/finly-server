@@ -131,6 +131,10 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
           {
             key: 'vendor_manager',
             label: 'Vendor Manager'
+          },
+          {
+            key: 'vendor_auditor',
+            label: 'Vendor Auditor'
           }
         ]
       }

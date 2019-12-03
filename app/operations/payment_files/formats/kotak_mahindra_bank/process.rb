@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code,:bank_code_indicator
+  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code,:bank_code_indicator,:hide_note
 
   def pre_validate
     return if has_errors?
@@ -13,6 +13,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
     self.client_code = self.options[:client_code]
     self.product_code = self.options[:product_code]
     self.bank_code_indicator = self.options[:bank_code_indicator] rescue ''
+    self.hide_note = self.options[:hide_note] rescue false
   end
 
   def validate
@@ -31,10 +32,10 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
       sl_no += 1
       content << [
           self.client_code,
-          self.product_code,
+          product_code,
           payment[:payment_mode],
           "",
-          Date.parse(payment[:date]).strftime("%d-%m-%Y"),
+          payment[:date]&.strftime("%d/%m/%Y"),
           "",
           self.debit_account_number,
           payment[:amount],
@@ -53,7 +54,7 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
           "",
           payment[:receiving_user_email],
           payment[:receiving_mobile_number],
-          payment[:note]
+          retrieve_note(payment[:note])
       ]
     end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
@@ -95,6 +96,10 @@ class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats:
         "Enrichment_3",
         "Enrichment_4"
     ]
+  end
+
+  def retrieve_note(note)
+    self.hide_note ? '' : note
   end
 
 end

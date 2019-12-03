@@ -7,7 +7,7 @@ class Vendors::NewVendorConfig < Vendors::Base
     self.currencies = Currency.all
     self.payment_terms = user.company.payment_terms
     self.tds_rates = user.company.tds_slabs
-    self.field_configurations = user.company.field_configurations.with_parent_type(FieldParentType.id_for(:vendor))
+    self.field_configurations = user.company.field_configurations.non_deleted.with_parent_type(FieldParentType.id_for(:yes_bank_vendor))
     self.locations = user.company.locations
 
     if user.company.vendor_empanelment_workflow_enabled?

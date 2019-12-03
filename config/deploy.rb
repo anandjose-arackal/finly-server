@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production','foreground_production', 'background_production', 'yes_bank_balance_poller'].include?(fetch(:stage)&.to_s)
+if ['aws_production','foreground_production', 'api_production', 'background_production', 'yes_bank_balance_poller', 'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 end
 
@@ -21,7 +21,7 @@ when :itzcash_production
   # set :deploy_to, '/home/viveka/app'
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-when :aws_production, :background_production, :foreground_production
+when :aws_production, :background_production, :foreground_production, :console_production, :api_production
   branch = fetch :branch
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -73,7 +73,7 @@ when :migrated_test_2
   set :rails_env, 'staging'
 when :uat
   set :deploy_to, '/home/centos/app'
-  set :rails_env, 'staging'
+  set :rails_env, 'uat'
 when :feature_testing
   # branch = fetch :branch
   # unless ['feature-testing', :'feature-testing'].include?(branch)
@@ -96,7 +96,7 @@ linked_files = %w{
   config/mattermost_config.yml
 }
 case fetch(:stage)
-when :itzcash_production, :aws_production, :background_production, :foreground_production
+when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
   # linked_files << "config/sentry.yml"

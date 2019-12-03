@@ -151,7 +151,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     has_scope :filter_status
     has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :filter_custom_drop_down_selection, type: :array
+    # has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_policy_id
     has_scope :filter_user_id
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
@@ -161,6 +161,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
+    # has_scope :filter_custom_text_selection, type: :array
+    # has_scope :filter_custom_drop_down_selection, type: :array
 
 
     def init
@@ -170,8 +172,20 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
       # slightly dirty logic for the custom field text search #TODO - refactor later
       if params[:filter_custom_text_selection].present?
-        params[:filter_custom_text_selection].each do |key, value|
-          self.payment_requests = self.payment_requests.filter_custom_field_text(key, value)
+        params[:filter_custom_text_selection].each do |key, value_hash|
+          value_hash = value_hash.with_indifferent_access
+          key = value_hash[:id]
+          val = value_hash[:value]
+          self.payment_requests = self.payment_requests.filter_custom_field_text(key, val)
+        end
+      end
+
+      if params[:filter_custom_drop_down_selection].present?
+        params[:filter_custom_drop_down_selection].each do |key, value_hash|
+          value_hash = value_hash.with_indifferent_access
+          key = value_hash[:id]
+          val = value_hash[:value]
+          self.payment_requests = self.payment_requests.filter_custom_field_dropdown(key, val)
         end
       end
       ######################## dirty logic end ####################################
@@ -211,8 +225,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     def status_count
       pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited, :auto_approved)
-      po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
-
+      po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:partially_completed), PaymentOrderStatus.id_for(:completed), PaymentOrderStatus.id_for(:in_progress)]
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
 
       result = {
@@ -224,7 +237,10 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
         failed: 0,
         scheduled: 0,
         pending: 0,
-        awaiting_approval: 0
+        awaiting_approval: 0,
+        partially_completed: 0,
+        in_progress: 0,
+        completed: 0
       }
 
       BankPaymentRequestStatus.all.map do |status|
@@ -243,7 +259,6 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       end
 
       result[:awaiting_approval] = self.payment_requests.awaiting_action_items(user).count
-
       payment_order_counts = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_status_ids)&.group(:payment_order_status_id)&.count
       PaymentOrderStatus.all.map do |status|
         if payment_order_counts&.keys&.include? status.id
@@ -254,6 +269,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
             result[:scheduled] += payment_order_counts[status.id]
           when PaymentOrderStatus.id_for(:pending)
             result[:pending] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:in_progress)
+            result[:in_progress] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:partially_completed)
+            result[:partially_completed] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:completed)
+            result[:completed] += payment_order_counts[status.id]
           end
         end
       end

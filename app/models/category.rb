@@ -11,6 +11,8 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  purpose_id                 :integer
+#  parent_id                  :integer
+#  code                       :string(255)
 #  expense_management         :boolean
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
@@ -18,7 +20,7 @@
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
-#  gst_applicable             :boolean          default(TRUE)
+#  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #
 

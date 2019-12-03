@@ -4,6 +4,7 @@ json.result do
     # json.can_approve vendor.can_approve?
     json.can_approve vendor.can_really_approve?
     json.rejection_note vendor.reject_note
+    json.trade_name vendor.trade_name
     # json.can_reject vendor.can_reject?
     json.can_reject vendor.can_really_reject?
     json.can_take_control vendor.can_take_control?

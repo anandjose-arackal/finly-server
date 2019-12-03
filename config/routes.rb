@@ -3439,6 +3439,7 @@ Rails.application.routes.draw do
   get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
   get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
+  post 'bulk_assign_policy', to: 'policy_user_roles#bulk_assign'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
@@ -3446,6 +3447,7 @@ Rails.application.routes.draw do
 
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
+    get 'bank_payment_requests/count_with_filters', to: 'bank_payment_requests#count_with_filters', as: :count_with_filters
     get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests', to: 'bank_payment_requests#create'
@@ -3837,7 +3839,7 @@ Rails.application.routes.draw do
       post 'send_mail', to: 'mailer#send_mail'
     end
 
-    resources :comments, only: [:create]
+    resources :comments, only: [:create, :index]
   end
 
   ## Procurement APIs end   ##########################################
@@ -3871,6 +3873,7 @@ Rails.application.routes.draw do
     get 'vp/grns', to: 'vendor_payments#grns'
     get 'vp/vendors', to: 'vendor_payments#vendors'
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
+    get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
@@ -3923,6 +3926,9 @@ Rails.application.routes.draw do
 
   ############## Forwardable Users End ######################
 
+  post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
+  post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
+  get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.
