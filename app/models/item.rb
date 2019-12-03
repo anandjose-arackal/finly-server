@@ -20,6 +20,7 @@
 #  item_code            :string(255)
 #  account              :string(255)
 #  supply_item_type_id  :integer
+#  count                :integer
 #  deleted_at           :datetime
 #  product_type_id      :integer          default(1)
 #  item_number          :string(255)
