@@ -15,6 +15,7 @@ json.note payment.note
 json.account_id payment.receiving_account.id
 json.beneficiary_id payment.receiving_account.account_owner&.id
 json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
+json.created_at payment.created_at.strftime("%b %d, %Y")
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
 else
