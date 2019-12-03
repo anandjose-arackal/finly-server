@@ -202,8 +202,6 @@ gem 'maxminddb', '~> 0.1.22'
 gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
 
-gem 'uuidtools', '~> 2.1'
-
 # gem 'logstasher', '~> 1.3.0'
 gem 'lograge', '~> 0.10.0'
 gem 'logstash-event', '~> 1.2.02'

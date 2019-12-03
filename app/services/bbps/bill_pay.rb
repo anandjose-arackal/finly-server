@@ -53,7 +53,6 @@ class Bbps::BillPay < Bbps::Api
     end
   end
 
-  setup_defaults
   path "billPay"
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
