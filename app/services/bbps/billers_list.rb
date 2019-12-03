@@ -6,7 +6,6 @@ class Bbps::BillersList < Bbps::Api
     end
   end
 
-  setup_defaults
   path "getBillerList"
   parse -> (user, params, response) { parse_json_response(:billers_list, user, params, response) }
 

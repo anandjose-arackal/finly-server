@@ -11,31 +11,29 @@ class Bbps::Api < ServiceApi
   #     )
   # )
 
-  def self.setup_defaults
-    class_attr :dummy_response
-    class_attr :request_fields, default: []
-    class_attr :response_fields, default: []
-    class_attr :success_object
-    skip_user_authorization!
-    http_method :post
-    mime_type "application/json"
-    url "https://uatsky.yesbank.in:444/app/uat/bbps"
-    header 'X-IBM-Client-Id', "9e10ff7b-3141-4b0c-aa56-d110148c0fe7"
-    header 'X-IBM-Client-Secret', "cK7bT1nN7eK2gQ0vS2cT4uI0oP7mN7dB2tG4tN3jB0sY2uQ2mW"
-    body -> (user, params) { body }
-    client -> (user, params) { client }
-    parse -> (user, params, response) { parse_response(user, params, response) }
-    matcher Dry::Matcher.new(
-        success: Dry::Matcher::Case.new(
-            match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
-            resolve: -> (result) { handle_success(result) }
-        ),
-        failure: Dry::Matcher::Case.new(
-            match: -> (result) { true },
-            resolve: -> (result) { result.errors }
-        )
+  class_attr :dummy_response
+  class_attr :request_fields, default: []
+  class_attr :response_fields, default: []
+  class_attr :success_object
+  skip_user_authorization!
+  http_method :post
+  mime_type "application/json"
+  url "https://uatsky.yesbank.in:444/app/uat/bbps"
+  header 'X-IBM-Client-Id', "9e10ff7b-3141-4b0c-aa56-d110148c0fe7"
+  header 'X-IBM-Client-Secret', "cK7bT1nN7eK2gQ0vS2cT4uI0oP7mN7dB2tG4tN3jB0sY2uQ2mW"
+  body -> (user, params) { body }
+  client -> (user, params) { client }
+  parse -> (user, params, response) { parse_response(user, params, response) }
+  matcher Dry::Matcher.new(
+    success: Dry::Matcher::Case.new(
+      match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+      resolve: -> (result) { handle_success(result) }
+    ),
+    failure: Dry::Matcher::Case.new(
+      match: -> (result) { true },
+      resolve: -> (result) { result.errors }
     )
-  end
+  )
 
   def body
     message = generate_message
