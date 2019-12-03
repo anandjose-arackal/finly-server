@@ -1,8 +1,8 @@
-class AcountingExports::RequestHandler < Admin::Base
+class AccountingExports::RequestHandler < Admin::Base
 
   attr_accessor :master, :request_key, :processor
 
-  class AcountingExports::RequestHandler::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class AccountingExports::RequestHandler::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :records
 
     def init
@@ -55,19 +55,19 @@ class AcountingExports::RequestHandler < Admin::Base
   end
 
   def success
-    AcountingExports::RequestHandler::RequestHandlerPresenter.new(user, params, messages)
+    AccountingExports::RequestHandler::SuccessPresenter.new(user, params, messages)
   end
 
 
   protected
 
   def init_master
-    AcountingExports::RequestHandler::Master::BaseMaster.subscribers(self.request_key)&.first
+    AccountingExports::Master::BaseMaster.subscribers(self.request_key)&.first
   end
 
   def init_processor
     return nil if self.master.blank?
     self.master.new(user,params.to_h)
   end
-  
+
 end

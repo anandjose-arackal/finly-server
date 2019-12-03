@@ -1,4 +1,4 @@
-class AccountingExport::Master::BaseSubscriber
+class AccountingExports::Master::BaseSubscriber
   include EventBus::Subscriber
 
 
