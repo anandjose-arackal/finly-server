@@ -1,4 +1,4 @@
-class AccountingExportBase < ApplicationController
+class BaseControllers::AccountingExportBase < ApplicationController
 
   protect_from_forgery with: :null_session
 
