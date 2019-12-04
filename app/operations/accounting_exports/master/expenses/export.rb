@@ -12,7 +12,7 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
   end
 
   def get_records(data)
-    self.reports = Report.admin_associated_items(current_user).not_open.limit(10)
+    self.reports = Report.admin_associated_items(current_user).not_open
     self.reports = apply_scopes(self.reports, params)
     reports.approved.includes({user:[ :profile,:location, :department]},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type],policy:[policy_user_roles: :user])
 
