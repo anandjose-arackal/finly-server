@@ -5,12 +5,12 @@ class AccountingExports::Master::Expense::Export < AccountingExports::Master::Pr
 
   attr_accessor :expenses
   
-  def get_record(data)
-    user_ids = current_company.users.pluck(:id)
+  def get_records(data)
+    user_ids = current_user&.company&.users&.pluck(:id)
     expenses = Expense.where(user_id: user_ids)
   end
   
-  def set_record_format
+  def set_record_format(expenses)
     expenses.each do |expense|
       row={
       expense_id: expense.id,
