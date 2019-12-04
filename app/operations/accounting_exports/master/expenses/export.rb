@@ -1,20 +1,26 @@
-class AccountingExports::Master::Expense::Export < AccountingExports::Master::Processor::Export
+class AccountingExports::Master::Expenses::Export < AccountingExports::Master::Processor::Export
 
   bus AccountingExports::Master::BaseMaster
-  subscribe 'expense.export'
+  subscribe 'expenses.export'
 
   attr_accessor :expenses
-  
+
+  def process
+    objects = get_records(params)
+    self.records = set_record_format(objects)
+  end
+
   def get_records(data)
-    user_ids = current_user&.company&.users&.pluck(:id)
-    expenses = Expense.where(user_id: user_ids)
+    user_ids = current_user.company&.users&.pluck(:id)
+    expenses = Expense.where(user_id: user_ids).includes(:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type,report: :policy, user:[:profile, :location, :department])
   end
   
   def set_record_format(expenses)
+    self.records =[]
     expenses.each do |expense|
       row={
       expense_id: expense.id,
-      expense_amount: expense.amount.value,
+      expense_amount: expense.amount&.value,
       expense_amount_country_code:expense.amount&.currency&.country_code,
       note:expense.note,
       date: expense.date&.strftime("%d-%b-%Y"),
@@ -42,17 +48,18 @@ class AccountingExports::Master::Expense::Export < AccountingExports::Master::Pr
       igst:(gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : '') : ''),
       cgst: ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''),
       sgst: ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue ''),
-      net_total: (gst_applicable ? (expense.amount&.value - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value),
+      net_total: (gst_applicable ? ((expense.amount&.value || 0) - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value),
       gst_location: (gst_applicable ? expense.gstin_location&.location : ''),
       gst_state:(gst_applicable ? expense.gstin_location&.state&.name : ''),
       gst_state_of_expense:(gst_applicable ? expense.state_of_expense&.name : ''),
       hsn_sac:(gst_applicable ? expense.hsn_sac : ''),
       merchant_bill_no:(gst_applicable ? expense.merchant_bill_no : ''),
       tax_rate:(gst_applicable ? expense.tax_rate&.rate&.to_f : ''),
-      gstin:(gst_applicable ? expense.gstin_location&.gstin : ''),
+      gstin:(gst_applicable ? expense.gstin_location&.gstin : '')
       }
       records <<  row
     end
+    records
   end
   
   end

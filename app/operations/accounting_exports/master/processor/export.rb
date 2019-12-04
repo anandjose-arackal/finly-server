@@ -12,16 +12,9 @@ class AccountingExports::Master::Processor::Export < BaseOperation
 
   end
 
-  def process
-   objects = get_records(params)
-   self.records = set_record_format(objects)
-  end
-
   def success
+    params[:records] = self.records
     AccountingExports::Master::Processor::Export::SuccessPresenter.new(user, params, messages)
   end
 
-  def set_record_format(objects)
-    []
-  end
 end

@@ -1,6 +1,6 @@
 class AccountingExports::RequestHandler < BaseOperation
 
-  attr_accessor :master, :request_key, :processor
+  attr_accessor :master, :request_key, :processor, :records
 
   class AccountingExports::RequestHandler::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :records
@@ -36,13 +36,14 @@ class AccountingExports::RequestHandler < BaseOperation
   def process
     data = params
     result = self.master.(user, data)
-    if result[:success]
-      if result[:message].present?
-        add_message :success, result[:message]
+    self.records = result.records
+    if records.present?
+      params[:records] = records
+      if result.messages.present?
+        add_message :success, result.messages
       end
-      params[:records] = result[:records]
     else
-      add_message :error, (result[:message] || 'Unknown error')
+      add_message :error, (result.messages || 'No records found')
     end
   end
 
@@ -51,6 +52,7 @@ class AccountingExports::RequestHandler < BaseOperation
   end
 
   def success
+    params[:records] = records
     AccountingExports::RequestHandler::SuccessPresenter.new(user, params, messages)
   end
 
@@ -58,7 +60,6 @@ class AccountingExports::RequestHandler < BaseOperation
   protected
 
   def init_master
-    binding.pry
     AccountingExports::Master::BaseMaster.subscribers(self.request_key)&.first
   end
 
