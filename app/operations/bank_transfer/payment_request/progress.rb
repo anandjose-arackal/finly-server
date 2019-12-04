@@ -22,16 +22,18 @@ class BankTransfer::PaymentRequest::Progress < BankTransfer::PaymentRequest::Bas
     # payment_requests_count
     params[:expected_payments] = self.bank_payment_request.expected_payments
     params[:actual_payments] = self.bank_payment_request.payment_order.payments.count
+    params[:status] = self.bank_payment_request.status.name
     BankTransfer::PaymentRequest::PorgressPresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::PorgressPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :expected_payments, :actual_payments
+    attr_accessor :expected_payments, :actual_payments, :status
 
     def init
       self.expected_payments = params[:expected_payments]
       self.actual_payments = params[:actual_payments]
+      self.status = params[:status]
     end
   end
 

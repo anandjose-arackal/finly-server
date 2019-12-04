@@ -312,7 +312,22 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   def progress
     @result = BankTransfer::PaymentRequest::Progress.(current_user, params)
     if @result.success?
-      render json: { total: @result.expected_payments.as_json, actual: @result.actual_payments.as_json }
+      @response = {
+          success: true,
+          total: @result.expected_payments,
+          actual: @result.actual_payments,
+          status: @result.status,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
     else
       respond response: :failure, message: @result.messages[:error]
     end
