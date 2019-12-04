@@ -1,4 +1,4 @@
-class AccountingExportsController < BaseControllers::AccountingExportBase
+class AccountingExportsController < BaseControllers::WebBase
   def index
     @result = AccountingExports::RequestHandler.(current_user, params)
     if @result.records.present?
