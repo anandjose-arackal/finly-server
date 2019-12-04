@@ -2,8 +2,9 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
 
   bus AccountingExports::Master::BaseMaster
   subscribe 'expenses.export'
+  has_scope :filter_date, using: [:from, :to], type: :hash
 
-  attr_accessor :expenses
+  attr_accessor :expenses, :reports
 
   def process
     objects = get_records(params)
@@ -11,13 +12,17 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
   end
 
   def get_records(data)
-    user_ids = current_user.company&.users&.pluck(:id)
-    expenses = Expense.where(user_id: user_ids).includes(:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type,report: :policy, user:[:profile, :location, :department])
+    self.reports = Report.admin_associated_items(current_user).not_open.limit(10)
+    self.reports = apply_scopes(self.reports, params)
+    reports.approved.includes({user:[ :profile,:location, :department]},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type],policy:[policy_user_roles: :user])
+
   end
   
   def set_record_format(expenses)
     self.records =[]
-    expenses.each do |expense|
+    reports.each do |report|
+      fm = report.policy.policy_user_roles.where(user_role_id: 2).first&.user
+      report.expenses.each do |expense|
       row={
       expense_id: expense.id,
       expense_amount: expense.amount&.value,
@@ -55,9 +60,11 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
       hsn_sac:(gst_applicable ? expense.hsn_sac : ''),
       merchant_bill_no:(gst_applicable ? expense.merchant_bill_no : ''),
       tax_rate:(gst_applicable ? expense.tax_rate&.rate&.to_f : ''),
-      gstin:(gst_applicable ? expense.gstin_location&.gstin : '')
+      gstin:(gst_applicable ? expense.gstin_location&.gstin : ''),
+      finance_manager: "#{fm&.first_name} #{fm&.last_name}"
       }
       records <<  row
+      end
     end
     records
   end

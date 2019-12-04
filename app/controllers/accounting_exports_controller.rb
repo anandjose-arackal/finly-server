@@ -1,8 +1,8 @@
-class AccountingExportsController < BaseControllers::AccountingExportBase
+class AccountingExportsController < BaseControllers::WebBase
   def index
-    result = AccountingExports::RequestHandler.(current_user, params)
-    if @result.success?
-      respond response: :success, message: @result.messages[:success]
+    @result = AccountingExports::RequestHandler.(current_user, params)
+    if @result.records.present?
+      respond
     else
       respond response: :failure, message: @result.messages[:error]
     end
