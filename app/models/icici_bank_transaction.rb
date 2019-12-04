@@ -25,6 +25,7 @@
 #  transfer_status_id    :integer
 #  company_id            :integer
 #  request_id            :string(255)
+#  deleted_at            :datetime
 #
 
 class IciciBankTransaction < ApplicationRecord
