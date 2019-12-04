@@ -163,4 +163,3 @@ json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
 json.filter_count @result.filter_count
 
-end
