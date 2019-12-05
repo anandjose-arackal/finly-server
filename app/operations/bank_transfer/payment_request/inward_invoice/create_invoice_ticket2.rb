@@ -279,7 +279,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     initiating_account = retrieve_initiating_account(user.company)
     payment_order_params = {
         initiating_user: user,
-        payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+        payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
@@ -295,7 +295,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     }
     bank_payment_request_params = {
         owner_id: user.id,
-        status_id: BankPaymentRequestStatus.id_for(:open),
+        status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
