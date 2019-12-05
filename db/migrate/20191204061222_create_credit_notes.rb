@@ -26,9 +26,9 @@ class CreateCreditNotes < ActiveRecord::Migration[5.2]
       t.integer :net_payable_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :tds_rate_id, references: 'Amount', foreign_key: true, index: true
       t.integer :tds_amount_id, references: 'Amount', foreign_key: true, index: true
-      t.integer :previously_adjusted_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :freight_amount_id, references: 'Amount', foreign_key: true, index: true
-      t.integer :total_amount_id, references: 'Amount', foreign_key: true, index: true
+      t.integer :previously_adjusted_amount_id, references: 'Amount', foreign_key: true, index: true
+      t.integer :net_adjustable_amount_id, references: 'Amount', foreign_key: true, index: true
 
       t.timestamps
     end
