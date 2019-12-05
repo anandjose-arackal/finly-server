@@ -1669,9 +1669,16 @@ class User < ApplicationRecord
       self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
     end
 
-    while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
-      self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # end
+
+    if finly_id.blank?
+      while User.find_by(finly_id: self.finly_id).present?
+        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      end
     end
+
 
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"
