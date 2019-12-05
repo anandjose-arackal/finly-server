@@ -25,6 +25,7 @@ json.vendor do
         json.ifsc bank_account.ifsc
         json.selected @result.purchase_order.bank_account&.id == bank_account.id
         json.default bank_account.default_account
+        json.disabled bank_account.disabled
       end
     end
   end
