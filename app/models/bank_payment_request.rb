@@ -74,7 +74,7 @@ class BankPaymentRequest < ApplicationRecord
   delegate :scheduled?, to: :payment_order
 
   enum ticket_type: {
-    beneficiary: 'beneficiary',
+    beneficiary: 'beneficiary_payment',
     invoice: 'invoice',
     purchase_order: 'purchase_order'
   }
