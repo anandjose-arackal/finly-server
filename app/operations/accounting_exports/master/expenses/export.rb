@@ -14,7 +14,7 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
   def get_records(data)
     self.reports = Report.admin_associated_items(current_user).not_open
     self.reports = apply_scopes(self.reports, params)
-    reports.approved.includes({user:[ :profile,:location, :department]},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type],policy:[policy_user_roles: :user])
+    reports.approved.includes({user:[ :profile,:location, :department]},expenses:[:category,:amount, :gstin_location,:state_of_expense, :expense_tax_type,:manual_expense,:card_expense],policy:[policy_user_roles: :user])
 
   end
   
@@ -39,8 +39,8 @@ class AccountingExports::Master::Expenses::Export < AccountingExports::Master::P
       cost_center_code: expense.user&.cost_center&.cost_center_code,
       operating_unit: (expense.user.gl_config[:operation_unit] rescue ''),
       expense_type: expense.expense_type.name,
-      created_at: expense.created_at&.strftime("%d-%b-%Y"),
-      updated_at: expense.updated_at&.strftime("%d-%b-%Y"),
+      created_at: expense.created_at&.strftime("%Y:%m:%d %H:%M:%S"),
+      updated_at: expense.updated_at&.strftime("%Y:%m:%d %H:%M:%S"),
       report_id: expense.report&.id,
       category_name:expense.category&.name,
       category_gl_code: expense.category&.gl_code,
