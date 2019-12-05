@@ -42,8 +42,6 @@ class AccountingExports::RequestHandler < BaseOperation
       if result.messages.present?
         add_message :success, result.messages
       end
-    else
-      add_message :error, (result.messages || 'No records found')
     end
   end
 
