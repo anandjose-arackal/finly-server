@@ -162,6 +162,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_ticket_type
+    has_scope :filter_transfer_mode
     # has_scope :filter_custom_text_selection, type: :array
     # has_scope :filter_custom_drop_down_selection, type: :array
 

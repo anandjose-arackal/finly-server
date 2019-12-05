@@ -24,3 +24,4 @@ json.policies do
 end
 
 json.show_payment_file_download current_company.payment_file_configuration.present?
+json.transfer_modes @transfer_modes.as_json

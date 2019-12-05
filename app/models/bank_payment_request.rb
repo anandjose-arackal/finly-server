@@ -346,6 +346,10 @@ class BankPaymentRequest < ApplicationRecord
     where ticket_type: type
   }
 
+  scope :filter_transfer_mode, -> (id) {
+    where transfer_mode_id: id
+  }
+
   attr_accessor :cache_users
 
   before_save do
