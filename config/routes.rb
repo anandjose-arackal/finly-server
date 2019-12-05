@@ -2854,6 +2854,9 @@ Rails.application.routes.draw do
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/departments' => 'organization_account#departments'
   get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+  get 'organization_account/transfer_modes' => 'organization_account#transfer_modes'
+  post 'organization_account/create_transfer_modes' => 'organization_account#create_transfer_modes'
+  delete 'organization_account/destroy_transfer_modes' => 'organization_account#destroy_transfer_modes'
 
 
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'

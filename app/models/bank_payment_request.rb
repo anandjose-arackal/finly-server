@@ -53,6 +53,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
   belongs_to :company, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -532,6 +533,10 @@ class BankPaymentRequest < ApplicationRecord
     if policy.present? && policy.policy_user_roles.present? && BankPaymentRequest.finance_associated_status_ids.include?(self.status_id)
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
     end
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name
   end
 
   private

@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type, :transfer_mode_id
 
 	def personalizer
 		{
@@ -132,6 +132,11 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	end
 
+	def pre_process
+    transfer_mode = user.company.transfer_modes.fetch_modes
+    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
+  end
+
 	def process
 	    # if the validation of the data is successful, it will create a payment order and
 	    # asynchronously add payments to it one by one
@@ -208,6 +213,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
+		    transfer_mode_id: self.transfer_mode_id,
 		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
@@ -233,7 +239,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    payment_order_attributes: payment_order_attributes,
 		    api_initiated: false,
 		    expected_payments: self.validate_operation.order_details.count,
-		    ticket_type: 'beneficiary'
+		    ticket_type: 'beneficiary',
+		    transfer_mode_id: self.transfer_mode_id
 		}
 		bpr_attributes
 	end

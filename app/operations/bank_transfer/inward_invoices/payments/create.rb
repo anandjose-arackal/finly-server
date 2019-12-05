@@ -12,7 +12,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
-                :payment_request_params, :policy
+                :payment_request_params, :policy, :transfer_mode_id
 
   class BankTransfer::InwardInvoices::Payments::Create::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -87,6 +87,11 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     end
   end
 
+  def pre_process
+    transfer_mode = user.company.transfer_modes.fetch_modes
+    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
+  end
+
   def process
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
@@ -141,6 +146,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         payment_status_id: PaymentStatus.id_for(:pending_approval),
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         payment_mode: self.payment_mode, # todo - default is NEFT for now, can be changed to something else later
+        transfer_mode_id: self.transfer_mode_id,
         amount_attributes: {
             value: self.payable_amount,
             currency_id: Currency.first.id
@@ -162,7 +168,8 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
             value: self.payable_amount,
             currency_id: 1
         },
-        payment_mode: "NEFT",
+        payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -184,7 +191,8 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         policy_id: self.policy_id,
         payment_order_attributes: payment_order_params,
         expected_payments: 1,
-        ticket_type: 'invoice'
+        ticket_type: 'invoice',
+        transfer_mode_id: self.transfer_mode_id
     }
     return bank_payment_request_params
   end

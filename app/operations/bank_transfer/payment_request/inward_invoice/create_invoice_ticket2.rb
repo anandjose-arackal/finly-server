@@ -13,7 +13,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -165,6 +165,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     end
   end
 
+  def pre_process
+    transfer_mode = user.company.transfer_modes.fetch_modes
+    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
+  end
+
   def process
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
@@ -286,6 +291,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -306,7 +312,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         policy_id: self.policy&.id,
         payment_order_attributes: payment_order_params,
         expected_payments: self.inward_invoices.count,
-        ticket_type: 'invoice'
+        ticket_type: 'invoice',
+        transfer_mode_id: self.transfer_mode_id
     }
     return bank_payment_request_params
   end
