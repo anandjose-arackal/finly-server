@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_29_110649) do
+ActiveRecord::Schema.define(version: 2019_12_06_114217) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2125,6 +2125,62 @@ ActiveRecord::Schema.define(version: 2019_11_29_110649) do
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
+  end
+
+  create_table "credit_note_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "credit_notes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.integer "user_id"
+    t.integer "invoice_id"
+    t.integer "procurement_id"
+    t.integer "status_id"
+    t.integer "controlling_level_id"
+    t.integer "policy_id"
+    t.integer "vendor_id"
+    t.integer "shipping_location_id"
+    t.integer "billing_location_id"
+    t.string "sequence_id"
+    t.date "credit_note_date"
+    t.text "narration"
+    t.text "billing_address"
+    t.text "shipping_address"
+    t.integer "gross_receivable_amount_id"
+    t.integer "gst_amount_id"
+    t.integer "discount_amount_id"
+    t.integer "net_receivable_amount_id"
+    t.integer "tds_rate_id"
+    t.integer "tds_amount_id"
+    t.integer "freight_amount_id"
+    t.integer "previously_adjusted_amount_id"
+    t.integer "net_adjustable_amount_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
+    t.index ["company_id"], name: "index_credit_notes_on_company_id"
+    t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
+    t.index ["credit_note_date"], name: "index_credit_notes_on_credit_note_date"
+    t.index ["discount_amount_id"], name: "index_credit_notes_on_discount_amount_id"
+    t.index ["freight_amount_id"], name: "index_credit_notes_on_freight_amount_id"
+    t.index ["gross_receivable_amount_id"], name: "index_credit_notes_on_gross_receivable_amount_id"
+    t.index ["gst_amount_id"], name: "index_credit_notes_on_gst_amount_id"
+    t.index ["invoice_id"], name: "index_credit_notes_on_invoice_id"
+    t.index ["net_adjustable_amount_id"], name: "index_credit_notes_on_net_adjustable_amount_id"
+    t.index ["net_receivable_amount_id"], name: "index_credit_notes_on_net_receivable_amount_id"
+    t.index ["policy_id"], name: "index_credit_notes_on_policy_id"
+    t.index ["previously_adjusted_amount_id"], name: "index_credit_notes_on_previously_adjusted_amount_id"
+    t.index ["procurement_id"], name: "index_credit_notes_on_procurement_id"
+    t.index ["sequence_id"], name: "index_credit_notes_on_sequence_id"
+    t.index ["shipping_location_id"], name: "index_credit_notes_on_shipping_location_id"
+    t.index ["status_id"], name: "index_credit_notes_on_status_id"
+    t.index ["tds_amount_id"], name: "index_credit_notes_on_tds_amount_id"
+    t.index ["tds_rate_id"], name: "index_credit_notes_on_tds_rate_id"
+    t.index ["user_id"], name: "index_credit_notes_on_user_id"
+    t.index ["vendor_id"], name: "index_credit_notes_on_vendor_id"
   end
 
   create_table "crono_jobs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

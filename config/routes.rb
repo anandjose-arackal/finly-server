@@ -3894,6 +3894,14 @@ Rails.application.routes.draw do
   end
   # Utility Bill Payments / BBPS Ends  #
 
+
+  # New Route for P2P
+  namespace :p2p do
+    # Credit Note
+    resources :credit_notes do
+    end
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

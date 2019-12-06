@@ -11,7 +11,6 @@ class CreateCreditNotes < ActiveRecord::Migration[5.2]
       t.integer :vendor_id, references: 'YesBankVendor', foreign_key: true, index: true
       t.integer :shipping_location_id, references: 'BranchLocation', foreign_key: true, index: true
       t.integer :billing_location_id, references: 'BranchLocation', foreign_key: true, index: true
-      t.integer :billing_location_id, references: 'BranchLocation', foreign_key: true, index: true
 
       t.string :sequence_id, index: true
       t.date :credit_note_date, index: true
@@ -23,7 +22,7 @@ class CreateCreditNotes < ActiveRecord::Migration[5.2]
       t.integer :gross_receivable_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :gst_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :discount_amount_id, references: 'Amount', foreign_key: true, index: true
-      t.integer :net_payable_amount_id, references: 'Amount', foreign_key: true, index: true
+      t.integer :net_receivable_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :tds_rate_id, references: 'Amount', foreign_key: true, index: true
       t.integer :tds_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :freight_amount_id, references: 'Amount', foreign_key: true, index: true
