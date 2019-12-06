@@ -47,9 +47,8 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    if self.vendor.pan.present? and ( self.vendor.approved? or self.vendor.auto_approved? )
+    if self.vendor.pan.present? and ( self.vendor.approved? or self.vendor.auto_approved? or self.vendor.awaiting_approval? )
       vendor_parameters.delete(:pan)
-      vendor_parameters.delete(:gstin_locations_attributes)
     end
 
     if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?

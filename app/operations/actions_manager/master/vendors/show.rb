@@ -81,8 +81,8 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     #   return true
     # end
     if vendor.created_by_id == user.id
-      return vendor.draft? || vendor.rejected? || vendor.retracted? || vendor.awaiting_approval?
-      return (vendor.approved? or vendor.auto_approved?) and vendor.pan.blank?
+      return vendor.draft? || vendor.rejected? || vendor.retracted?
+      return (vendor.approved? or vendor.auto_approved? or vendor.awaiting_approval?) and vendor.pan.blank?
     end
 
     # Allow admin to edit pan after taking control
