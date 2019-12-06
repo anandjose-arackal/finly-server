@@ -14,7 +14,7 @@ class PasswordsController < Devise::PasswordsController
     @result = {
         success: true,
         messages: {
-            success: ["Password reset instructions sent. Check you mail!"]
+            success: ['You would receive an email with a link to retrieve your password if the email address is registered with us!']
         }
     }
     render json: @result.as_json

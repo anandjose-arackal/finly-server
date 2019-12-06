@@ -47,6 +47,9 @@
 #  default_password          :boolean          default(FALSE)
 #  point_of_contact          :boolean          default(FALSE)
 #  otp_attempts              :integer          default(0)
+#  user_group_location_id    :integer
+#  user_group_department_id  :integer
+#  user_group_designation_id :integer
 #  user_delegate_id          :integer
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
@@ -1174,11 +1177,25 @@ class User < ApplicationRecord
   end
 
   def json_for_trail(options = {})
-    {
+    if options[:vendor_show]
+      data = {
         id: id,
         name: name,
-        email: email
-    }
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active
+      }
+      return data
+    else
+      {
+          id: id,
+          name: name,
+          email: email
+      }
+    end
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
@@ -1576,7 +1593,7 @@ class User < ApplicationRecord
   end
 
   def associated_group_users(exclude_self: false)
-    users = User.where(default_company_id: self.default_company_id).with_email_or_mobile_number(self.email, self.mobile_number)
+    users = User.where(finly_id: self.finly_id)
     users = users.without_id(self.id) if exclude_self
     users
   end
@@ -1652,9 +1669,16 @@ class User < ApplicationRecord
       self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
     end
 
-    while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
-      self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # end
+
+    if finly_id.blank?
+      while User.find_by(finly_id: self.finly_id).present?
+        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      end
     end
+
 
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"

@@ -39,6 +39,9 @@ class BankAccount < ApplicationRecord
   has_many :finly_transactions, as: :finly_account
   # belongs_to :company_id
 
+  attr_accessor :confirm_account_number
+
+
   validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true

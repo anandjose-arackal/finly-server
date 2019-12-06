@@ -20,6 +20,7 @@
 #  item_code            :string(255)
 #  account              :string(255)
 #  supply_item_type_id  :integer
+#  count                :integer
 #  deleted_at           :datetime
 #  product_type_id      :integer          default(1)
 #  item_number          :string(255)
@@ -37,6 +38,7 @@ class Item < ApplicationRecord
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
+  default_scope {unscope(where: :deleted_at)}
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true

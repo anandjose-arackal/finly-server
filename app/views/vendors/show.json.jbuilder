@@ -1,6 +1,6 @@
 json.id @result.vendor.id
 json.vendor_approval_workflow @result.vendor_approval_workflow
-json.created_by @result.vendor.created_by&.json_for_trail
+json.created_by @result.vendor.created_by&.json_for_trail({vendor_show: true})
 json.vendor do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number
   if @result.vendor.is_a?(YesBankVendor)
@@ -18,6 +18,7 @@ json.vendor do
     json.state_code_id @result.vendor.state_code_id
     json.state_code_name @result.vendor.state_code&.full_name
     json.created_by @result.vendor.created_by&.name
+    json.gst_registered @result.vendor.gst_registered
     json.vendor_id @result.vendor.vendor_id
     json.rejection_note @result.vendor&.reject_note
     json.tds_rates do
@@ -58,6 +59,21 @@ json.gstin_locations do
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
         :constitution_of_business, :taxpayer_type, :status, :api_response, :address
+      end
+    end
+    gstin_master = Gstin.with_gstin(gstin_location.gstin).first
+    if gstin_master.present?
+      json.verified_details do
+        json.address gstin_master&.address
+        json.constitution_of_business gstin_master&.constitution_of_business 
+        json.date_of_registration gstin_master&.date_of_registration
+        json.gstin gstin_master&.gstin
+        json.legal_name_of_business gstin_master&.legal_name_of_business
+        json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(@result.vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
+        json.state gstin_master&.state
+        json.status gstin_master&.status
+        json.trade_name gstin_master&.trade_name
+        json.valid_response 'true'
       end
     end
   end

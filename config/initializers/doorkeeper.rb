@@ -213,3 +213,18 @@ Doorkeeper.configure do
   # realm "Doorkeeper"
 end
 # Doorkeeper.configuration.token_grant_types << 'password'
+
+# module UserSessionHelper
+#   def user_session
+#     return super() if super()
+#
+#     return UserSession.find_by(id: user_session_id) if user_session_id.present?
+#     session = UserSession.find_by(access_token_id: self.id)
+#     self.update(user_session: session) if session
+#     session
+#   end
+# end
+# Doorkeeper::AccessToken.include UserSessionHelper
+Doorkeeper::AccessToken.has_one :user_session
+Doorkeeper::AccessToken.belongs_to :admin_user, optional: true
+Doorkeeper::AccessToken.belongs_to :status, class_name: "UserSessionStatus", optional: true

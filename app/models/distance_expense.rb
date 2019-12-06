@@ -10,8 +10,8 @@
 #  distance_id                       :integer
 #  maps_distance_id                  :integer
 #  type_id                           :integer
-#  odometer_reading_start            :decimal(10, 2)
-#  odometer_reading_end              :decimal(10, 2)
+#  odometer_reading_start            :decimal(10, )
+#  odometer_reading_end              :decimal(10, )
 #  odometer_reading_receipt_start_id :integer
 #  odometer_reading_receipt_end_id   :integer
 #  vehicle_rate_id                   :integer

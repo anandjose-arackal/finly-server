@@ -27,7 +27,7 @@ class Vendors::Base < BaseOperation
                                    :msme_registered, :msme_registration_number,
                                    :business_name, :trade_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
-                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy, :disabled],
+                                   bank_accounts_attributes: [:id, :account_number, :confirm_account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy, :disabled],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :_destroy],
                                    gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :address, :_destroy]
     )
@@ -156,8 +156,8 @@ class Vendors::Base < BaseOperation
     file[:attached_file] = File.new(file_path, 'r')
   end
 
-  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil)
-    if pan_number.present? && gstin.present?
+  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil, gst_registered=nil)
+    if pan_number.present? && gstin.present? && (gst_registered != "0")
       pan_number_from_gstin = gstin[2..gstin.length-4]
       unless pan_number == pan_number_from_gstin
         add_message :error, "Pan number #{pan_number} does not match with gstin pan #{pan_number_from_gstin}"
@@ -165,6 +165,22 @@ class Vendors::Base < BaseOperation
       end
     end
     true
+  end
+
+  def validate_duplicate_bank_account
+    if vendor.present? && vendor.is_a?(YesBankVendor)
+      if self.vendor.bank_accounts.present?
+        account_numbers = self.vendor.bank_accounts.map(&:account_number)
+        duplicate_account_numbers = account_numbers.select{|item| account_numbers.count(item) > 1}.uniq
+        if duplicate_account_numbers.present?
+          add_message :error, "Duplicate records found for account numbers #{duplicate_account_numbers.join(', ')}"  
+        end
+        # if user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').present?
+        #   associated_account_numbers = user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').pluck(:account_number)
+        #   add_message :error, "Account number: #{associated_account_numbers.join(', ')}  already in use"
+        # end
+      end
+    end
   end
 
 end
