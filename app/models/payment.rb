@@ -428,7 +428,7 @@ class Payment < ApplicationRecord
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner], payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true

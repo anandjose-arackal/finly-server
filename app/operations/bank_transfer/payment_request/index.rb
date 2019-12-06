@@ -147,7 +147,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Index::PaymentPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payment_requests, :paginated_payment_requests
+    attr_accessor :payment_requests, :paginated_payment_requests, :payments
 
     has_scope :filter_status
     has_scope :filter_date, using: [:from, :to], type: :hash
@@ -205,12 +205,17 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = self.payment_requests.order_by(:submitted_at)
       # end
       self.paginated_payment_requests = self.payment_requests.paginate(page: page, per_page: per_page) rescue ::BankPaymentRequest.none
+
+      poid = self.paginated_payment_requests.pluck(:payment_order_id)
+      self.payments = ::Payment.where(payment_order_id: poid).include_minimal_for_index
+
       if [168, 169, 174, 175].include?(user.company_id)
         self.paginated_payment_requests = self.paginated_payment_requests.include_for_index_meesho
       else
         self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
       end
 
+      
     end
 
     def set_scopes
