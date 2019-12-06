@@ -60,8 +60,15 @@ class Vendors::Create < Vendors::Base
 
     if user.company_id == 156
       unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
+        # allow companies to proceed with vendor empanelment if they dont have pan details
+        # commenting this for now
+        # 
+        # add_message :error, "Please provide PAN to proceed"
+        # return
+
+        # if no pan supplied, then logically they dont have gstin details
+        # 
+        vendor_parameters.delete(:gstin_locations_attributes)
       else
         validate_attachment(vendor_parameters, :pan)
       end

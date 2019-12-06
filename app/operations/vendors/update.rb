@@ -40,11 +40,23 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    if self.vendor.pan.present? and ( self.vendor.approved? or self.vendor.auto_approved? )
+      vendor_parameters.delete(:pan)
+      vendor_parameters.delete(:gstin_locations_attributes)
+    end
+
+    if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?
+      vendor_parameters.delete(:gstin_locations_attributes)
+    end
+
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
+        # allow companies to proceed with vendor empanelment if they dont have pan details
+        # commenting this for now
+        # 
+        # add_message :error, "Please provide PAN to proceed"
+        # return
       else
         validate_attachment(vendor_parameters, :pan)
       end
