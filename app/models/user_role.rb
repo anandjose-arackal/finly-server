@@ -63,7 +63,7 @@ class UserRole < ApplicationRecord
       payment_agreement_auditor: 35,
       po_invoice_initiator: 36,
       po_invoice_reviewer: 37,
-      po_invoice_auditor: 38, 
+      po_invoice_auditor: 38,
       non_po_invoice_initiator: 39,
       non_po_invoice_reviewer: 40,
       non_po_invoice_auditor: 41,
@@ -72,7 +72,12 @@ class UserRole < ApplicationRecord
       utility_bill_master_initiator: 42,
       utility_bill_master_reviewer: 43,
       utility_bill_initiator: 44,
-      utility_bill_reviewer: 45
+      utility_bill_reviewer: 45,
+
+      # Credit Notes
+      credit_note_initiator: 46,
+      credit_note_reviewer: 47,
+      credit_note_auditor: 48
   }
   ### ENSURE SECURITY POLICY IS CONFIGURED FOR THE USER ROLE in SecurityPolicy::Config ###
 
