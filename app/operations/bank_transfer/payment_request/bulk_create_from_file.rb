@@ -3,7 +3,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id, :policy, :upload
+                :headers, :contents, :validate_operation, :policy_id, :policy, :upload,
+                :transfer_mode_id, :transfer_mode
 
   def pre_validate
     if user.blank?
@@ -62,6 +63,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.payment_mode = params[:transfer_type]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     self.scheduled_at = params[:scheduled_at]
     self.policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: self.policy_id)
@@ -78,7 +81,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -184,6 +187,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
@@ -206,7 +210,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
         payment_order_attributes: payment_order_attributes,
         api_initiated: false,
         expected_payments: self.validate_operation.order_details.count,
-        ticket_type: 'beneficiary'
+        ticket_type: 'beneficiary',
+        transfer_mode_id: self.transfer_mode_id
     }
     bpr_attributes
   end

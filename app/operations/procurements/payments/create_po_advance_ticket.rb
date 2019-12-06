@@ -6,7 +6,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id, :policy, :payments, :contents,
                 :description, :bank_payment_request, :total_advance_amount,
                 :payment_request_params, :receiving_account, :bank_payment_request_params,
-                :requested_amount, :all_purchase_orders, :transfer_mode_id
+                :requested_amount, :all_purchase_orders, :transfer_mode_id, :transfer_mode
 
   class Procurements::Payments::CreatePoAdvanceTicket::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -62,6 +62,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     self.scheduled_at = params[:scheduled_at]
     self.description = params[:description]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     # self.total_advance_amount = params[:total_advance_amount]
@@ -95,7 +97,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -215,11 +217,6 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
 
   # end
 
-  def pre_process
-    transfer_mode = user.company.transfer_modes.fetch_modes
-    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
-  end
-
   def process
     self.bank_payment_request_params = parse_payment_order_data
     payment_params = parse_payment_params
@@ -326,7 +323,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
           payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
           parent_type: purchase_order&.class.name,
           parent_id: purchase_order&.id,
-          advance_tds_slab_id: po_advance[:advance_tds_slab_id]
+          advance_tds_slab_id: po_advance[:advance_tds_slab_id],
+          transfer_mode_id: self.transfer_mode_id
       }
     end
     payment_params

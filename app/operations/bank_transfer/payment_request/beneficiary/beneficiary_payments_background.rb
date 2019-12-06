@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
-                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items
+                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items, :transfer_mode_id
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -50,6 +50,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
+    self.transfer_mode_id = self.bank_payment_request.transfer_mode_id
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     initiating_account = retrieve_initiating_account(user.company)
@@ -96,6 +97,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: self.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               # value: payment[:original_amount],
               value: beneficiary_payment&.balance_due&.value,

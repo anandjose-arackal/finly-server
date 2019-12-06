@@ -3,7 +3,7 @@
 class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy, :policy_id,
                 :description, :bank_payment_request, :advance_amount,
-                :payment_request_params, :transfer_mode_id
+                :payment_request_params, :transfer_mode_id, :transfer_mode
 
   class Procurements::Payments::CreateAdvance::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -50,6 +50,8 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     self.description = params[:description]
 
     params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
@@ -108,11 +110,6 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
       add_message :error, "This vendor doesn't have any bank accounts"
       return
     end
-  end
-
-  def pre_process
-    transfer_mode = user.company.transfer_modes.fetch_modes
-    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
   end
 
   def process

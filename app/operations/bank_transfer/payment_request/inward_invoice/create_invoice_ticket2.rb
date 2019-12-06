@@ -13,7 +13,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status, :transfer_mode_id
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -88,6 +88,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
@@ -115,7 +117,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -163,11 +165,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       end
       self.requested_amount += payable_amount
     end
-  end
-
-  def pre_process
-    transfer_mode = user.company.transfer_modes.fetch_modes
-    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
   end
 
   def process
@@ -239,6 +236,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: self.bank_payment_request.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id

@@ -12,7 +12,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
-                :payment_request_params, :policy, :transfer_mode_id
+                :payment_request_params, :policy, :transfer_mode_id, :transfer_mode
 
   class BankTransfer::InwardInvoices::Payments::Create::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -29,6 +29,8 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     self.policy_id = params[:policy_id]
     self.payable_amount = params[:payable_amount]
     self.description = params[:description]
@@ -61,7 +63,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -85,11 +87,6 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     if self.payable_amount.to_f > remaining_amount.to_f
       add_message :error, "You cannot pay more than the remaining amount in an invoice. Maximum payable - #{self.inward_invoice.balance_due&.currency&.symbol}#{remaining_amount.to_f}"
     end
-  end
-
-  def pre_process
-    transfer_mode = user.company.transfer_modes.fetch_modes
-    self.transfer_mode_id = transfer_mode[self.payment_mode&.downcase]
   end
 
   def process
