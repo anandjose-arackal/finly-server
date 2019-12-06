@@ -334,6 +334,29 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def bulk_actions
+    @result = BankTransfer::PaymentRequest::Review::BulkActions.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          result: @result.summary,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+
+  end
+
 
   private
 

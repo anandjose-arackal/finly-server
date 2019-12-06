@@ -3386,6 +3386,7 @@ Rails.application.routes.draw do
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
     patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
+    post 'bulk_actions' => 'bank_payment_requests#bulk_actions', as: :bulk_actions
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
     post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
