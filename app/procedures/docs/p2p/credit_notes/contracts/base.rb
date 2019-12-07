@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Contracts::Base < Reform::Form
+class Docs::P2p::CreditNotes::Contracts::Base < Reform::Form
 
   property :id
 

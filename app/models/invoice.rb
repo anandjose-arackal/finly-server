@@ -70,8 +70,8 @@
 #  submitted_at                    :datetime
 #  approved_at                     :datetime
 #  po_adjusted_advance             :integer
-#  po_advance                      :integer
-#  po_prev_adjusted_advance        :integer
+#  po_advance                      :decimal(20, 2)
+#  po_prev_adjusted_advance        :decimal(20, 2)
 #  advance_amount_required         :boolean          default(FALSE)
 #  gstin_location_id               :bigint
 #  transaction_service_period_from :date
@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer

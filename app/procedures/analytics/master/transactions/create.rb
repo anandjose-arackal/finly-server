@@ -6,9 +6,9 @@ class Analytics::Master::Transactions::Create < Transactions::API
     end
   end
 
-  MASTER = {
-      InvoiceLineItem => Analytics::Master::Transactions::Contracts::InvoiceItem
-  }
+  # MASTER = {
+  #     InvoiceLineItem => Analytics::Master::Transactions::Contracts::InvoiceItem
+  # }
 
   # step Model(TransactionAp, :new)
   step Contract::Build(builder: :build_contract)

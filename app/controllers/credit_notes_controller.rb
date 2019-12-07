@@ -10,14 +10,14 @@ class CreditNotesController < BaseControllers::WebBase
   end
 
   def edit_config
-    endpoint Docs::P2P::CreditNotes::Configs::Edit
+    endpoint Docs::P2p::CreditNotes::Configs::Edit
     respond_to do |format|
       format.json {}
     end
   end
 
   def filters_config
-    endpoint Docs::P2P::CreditNotes::Configs::Filters
+    endpoint Docs::P2p::CreditNotes::Configs::Filters
     respond_to do |format|
       format.json {}
     end
@@ -37,7 +37,7 @@ class CreditNotesController < BaseControllers::WebBase
 
   def review
     params[:aasm_event] = params[:type]
-    endpoint Docs::P2P::CreditNotes::Ops::Review
+    endpoint Docs::P2p::CreditNotes::Ops::Review
     respond_to do |format|
       format.json {}
     end

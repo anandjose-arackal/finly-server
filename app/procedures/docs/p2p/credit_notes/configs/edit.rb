@@ -1,6 +1,6 @@
-class Docs::P2P::CreditNotes::Configs::Edit < Transactions::API
+class Docs::P2p::CreditNotes::Configs::Edit < Transactions::API
 
-  pass Model(BbpsBillerSubscription, :find_by)
+  pass Model(CreditNote, :find_by)
   step :init
 
   def init(options, params:, current_user:, model:, **)

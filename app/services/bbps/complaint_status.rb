@@ -5,7 +5,7 @@ class Bbps::ComplaintStatus < Bbps::Api
     end
   end
   #
-  setup_defaults
+  # setup_defaults
   path "getComplaintStatus"
   #
   # Message Code(B6000)| Ref No |Agent institution Id | Channel Id| Agent Id | Complaint Id |
