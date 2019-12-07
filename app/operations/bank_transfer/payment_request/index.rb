@@ -208,7 +208,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
       poid = self.paginated_payment_requests.pluck(:payment_order_id)
       sql = poid.map { |id| "(SELECT * FROM payments WHERE payment_order_id = #{id} LIMIT 3)"}.join(" UNION ALL ")
-      payment_ids = ::Payment.find_by_sql(sql).pluck(:id)
+      payment_ids = ::Payment.find_by_sql(sql).pluck(:id) rescue []
       self.payments = ::Payment.where(id: payment_ids).include_minimal_for_index
       # self.payments = ActiveRecord::Associations::Preloader.new.preload(payments, payment_includes)
 
