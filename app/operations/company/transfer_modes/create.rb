@@ -13,7 +13,7 @@ class Company::TransferModes::Create < Company::TransferModes::Base
       return
     end
 
-    if TransferMode.pluck(:id).exclude? self.transfer_mode_id
+    if TransferMode.pluck(:id).exclude? self.transfer_mode_id.to_i
       add_message :error, "Unknown transfer mode"
       return
     end
