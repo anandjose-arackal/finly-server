@@ -296,7 +296,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         payment_order_attributes: payment_order_attributes,
         api_initiated: false,
         description: self.description,
-        expected_payments: payment_params.count,
+        expected_payments: self.all_purchase_orders.count,
         ticket_type: 'purchase_order',
         transfer_mode_id: self.transfer_mode_id
     }
