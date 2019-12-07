@@ -29,7 +29,7 @@ class TransferModeCompanyMapping < ApplicationRecord
 		{
 			id: id,
 			name: mode.name,
-			mode_id: mode.mode_id
+			mode_id: mode_id
 		}
 	end
 
