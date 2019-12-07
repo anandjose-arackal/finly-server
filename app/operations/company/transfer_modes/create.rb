@@ -13,14 +13,14 @@ class Company::TransferModes::Create < Company::TransferModes::Base
       return
     end
 
-    if TransferMode.pluck(:id).exclude? transfer_mode_parameters[:mode_id]
+    if TransferMode.pluck(:id).exclude? self.transfer_mode_id
       add_message :error, "Unknown transfer mode"
       return
     end
   end
 
   def process
-    self.transfer_mode = self.company.transfer_modes.build(transfer_mode_parameters)
+    self.transfer_mode = self.company.transfer_modes.build(mode_id: self.transfer_mode_id)
 
     if self.transfer_mode.save
       add_message :success, "Successfully configured a new Transfer Mode"
