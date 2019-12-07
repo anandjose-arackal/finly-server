@@ -1,13 +1,13 @@
 class Company::TransferModes::Create < Company::TransferModes::Base
-
+  attr_accessor :transfer_mode_id
 
   def init
     super
-    self.transfer_mode_parameters = mode_params
+    self.transfer_mode_id = params[:id] || params[:mode_id] || params[:transfer_mode_id]
   end
 
   def validate
-    mode = self.company.transfer_modes.find_by mode_id: transfer_mode_parameters[:mode_id]
+    mode = self.company.transfer_modes.find_by mode_id: self.transfer_mode_id
     if mode.present?
       add_message :error, "Transfer Mode already configured."
       return

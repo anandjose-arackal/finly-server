@@ -4,7 +4,7 @@ class Company::TransferModes::Destroy < Company::TransferModes::Base
 
   def init
     transfer_mode_id = params[:id] || params[:mode_id] || params[:transfer_mode_id]
-    self.transfer_mode = user.company.transfer_modes.find_by id: transfer_mode_id
+    self.transfer_mode = user.company.transfer_modes.find_by mode_id: transfer_mode_id
   end
 
   def validate
