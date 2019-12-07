@@ -52,7 +52,7 @@ class Vendors::Update < Vendors::Base
     end
 
     if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?
-      vendor_parameters.delete(:gstin_locations_attributes)
+      vendor_parameters[:gstin_locations_attributes] = []
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
