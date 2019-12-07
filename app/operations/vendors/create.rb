@@ -58,7 +58,10 @@ class Vendors::Create < Vendors::Base
     end
 
     if self.vendor_parameters[:pan].blank?
-      vendor_parameters[:gstin_locations_attributes] = []
+      vendor_parameters[:gstin_locations_attributes].each do |gstin|
+        gstin[:gstin] = nil
+        gstin[:gstin_id] = nil
+      end
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
@@ -85,7 +88,10 @@ class Vendors::Create < Vendors::Base
 
         # if no pan supplied, then logically they dont have gstin details
         # 
-        vendor_parameters[:gstin_locations_attributes] = []
+        vendor_parameters[:gstin_locations_attributes].each do |gstin|
+          gstin[:gstin] = nil
+          gstin[:gstin_id] = nil
+        end
       else
         validate_attachment(vendor_parameters, :pan)
       end
