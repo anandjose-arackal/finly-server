@@ -58,11 +58,11 @@ class Vendors::Create < Vendors::Base
     end
 
 
-    unless user.company_id == 156
-      if vendor_parameters[:pan].blank? 
-        add_message :error, 'Please provide PAN to proceed'
-        return
-      end
+    unless user.company_id == 156 || vendor_parameters[:pan].blank?
+      # if vendor_parameters[:pan].blank? 
+      #   add_message :error, 'Please provide PAN to proceed'
+      #   return
+      # end
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
         return
