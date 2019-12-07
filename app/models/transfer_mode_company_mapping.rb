@@ -28,7 +28,8 @@ class TransferModeCompanyMapping < ApplicationRecord
 	def as_json
 		{
 			id: id,
-			name: mode.name
+			name: mode.name,
+			mode_id: mode.mode_id
 		}
 	end
 
