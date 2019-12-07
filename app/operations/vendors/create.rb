@@ -57,6 +57,10 @@ class Vendors::Create < Vendors::Base
       end
     end
 
+    if self.vendor_parameters[:pan].blank?
+      vendor_parameters.delete(:gstin_locations_attributes)
+      add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
+    end
 
     unless user.company_id == 156 || vendor_parameters[:pan].blank?
       # if vendor_parameters[:pan].blank? 
