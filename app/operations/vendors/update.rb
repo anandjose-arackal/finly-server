@@ -47,6 +47,19 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    if self.vendor.pan.present? and ( self.vendor.approved? or self.vendor.auto_approved? or self.vendor.awaiting_approval? )
+      vendor_parameters.delete(:pan)
+    end
+
+    if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?
+      # vendor_parameters[:gstin_locations_attributes] = []
+      vendor_parameters[:gstin_locations_attributes].each do |gstin|
+        gstin[:gstin] = nil
+        gstin[:gstin_id] = nil
+      end
+      add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
+    end
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]
@@ -69,11 +82,13 @@ class Vendors::Update < Vendors::Base
 
 
     # TODO - check if this is required for all companies
-    unless user.company_id == 156
-      if vendor_parameters[:pan].blank? 
-        add_message :error, 'Please provide PAN to proceed'
-        return
-      end
+    # UPDATE - not required
+    # 
+    unless user.company_id == 156 || vendor_parameters[:pan].blank?
+      # if vendor_parameters[:pan].blank? 
+      #   add_message :error, 'Please provide PAN to proceed'
+      #   return
+      # end
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
         return
@@ -85,8 +100,11 @@ class Vendors::Update < Vendors::Base
     if user.company_id == 156
 
       unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
+        # allow companies to proceed with vendor empanelment if they dont have pan details
+        # commenting this for now
+        # 
+        # add_message :error, "Please provide PAN to proceed"
+        # return
       else
         validate_attachment(vendor_parameters, :pan)
       end
@@ -113,6 +131,7 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    unless [156, 205, 206, 207, 208].include?(user.company_id)
       vendor_pan = vendor_parameters[:pan]
       if vendor_pan.present? && (vendor.pan != vendor_pan)
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
@@ -120,6 +139,7 @@ class Vendors::Update < Vendors::Base
           return
         end
       end
+    end
 
     if self.vendor_parameters[:bank_accounts_attributes].blank?
       add_message :error, "Please provide bank account details"
