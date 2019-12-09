@@ -1,0 +1,1 @@
+json.payment_details @result.payment.as_json({invoice_show: true})
