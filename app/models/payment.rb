@@ -854,20 +854,22 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
     {
-      total_amount: { value: self.invoice.item_amounts_total, editable: false },
+      total_amount: { value: self.invoice.item_amounts_total, editable: false }, # TOTAL
       inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
       discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
-      tax_type_id: { value: self.invoice.tax_type_id, editable: false },
-      tax: { tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
+      #tax_type_id: { value: self.invoice.tax_type_id, editable: false },
+      tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
       tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: false },
-      advance_amount: { value: self.invoice.advance_amount&.value, editable: false },
+      advance_amount: { value: self.invoice.advance_amount&.value, editable: false }, # Advance
       freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
       net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
+      net_total: { value: self.invoice.net_amount&.value, editable: false }, #Net Total
       roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
       tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
-      payment_amount: { value: self.amount_value, editable: false }
+      gst_type_id: { value: self.invoice.gst_type_id, editable: false }, 
+      payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
+      balance_due:{ value: invoice.balance_due&.value, editable: false } # Invoice AMOUNT
     }
   end
 
