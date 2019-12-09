@@ -20,13 +20,12 @@ class PaymentFiles::Formats::Stanza::Process < PaymentFiles::Formats::BaseFormat
     content = []
     count=1
     self.payment_file_data.each do |payment|
-
       content << [
           count,
           payment[:employee_id],
           payment[:receiving_user_name],
           payment[:beneficiary_ifsc],
-          payment[:beneficiary_account_no],
+          payment[:beneficiary_account_number],
           payment[:note],
           payment[:amount],
           payment[:approved_by],
