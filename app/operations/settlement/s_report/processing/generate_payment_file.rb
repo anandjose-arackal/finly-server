@@ -67,6 +67,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
 
   def data_points(mapping)
     data = {}
+    first_report = mapping&.reports&.first
     data[:beneficiary_account_name] = mapping.processor_accountable.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
@@ -83,9 +84,9 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
     data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
     data[:employee_id] = mapping.user.profile.employee_id
-    data[:approved_by] = retrieve_approved_by(mapping&.report)
+    data[:approved_by] = retrieve_approved_by(first_report)
     data[:cost_center] = mapping&.user&.cost_center&.name
-    data[:period] = retrieve_period(mapping.report)
+    data[:period] = retrieve_period(first_report)
     data
   end
 

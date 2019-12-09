@@ -87,9 +87,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate <
   end
 
   def print_ledger_name(expense)
-    ledger_name=""
-    ledger_name += gl_code(expense)
-    ledger_name += "-#{expense.category.gl_code}"
+    "#{gl_code(expense)}-#{expense.category&.name}"
   end
 
   def print_cost_center(expense)
