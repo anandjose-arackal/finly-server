@@ -67,7 +67,7 @@ class User::Update < User::Base
   private
 
   def parse_user_params
-    user_params = params.require(:user).permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name, profile_attributes: [:date_of_birth, :gender, :address_1,
+    user_params = params.require(:user).permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name, profile_attributes: [:id, :date_of_birth, :gender, :address_1,
                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
     user_params
   end
