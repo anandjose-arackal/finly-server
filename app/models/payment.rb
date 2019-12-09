@@ -866,7 +866,8 @@ class Payment < ApplicationRecord
       roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
       tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false }
+      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
+      payment_amount: { value: self.amount_value, editable: false }
     }
   end
 
