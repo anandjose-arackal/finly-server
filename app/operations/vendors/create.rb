@@ -58,26 +58,27 @@ class Vendors::Create < Vendors::Base
     end
 
 
-    unless user.company_id == 156
-      if vendor_parameters[:pan].blank? 
-        add_message :error, 'Please provide PAN to proceed'
-        return
-      end
+    # unless user.company_id == 156
+
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
-        return
       end
-
+      validate_attachment(vendor_parameters, :pan)
     end
 
 
-    if user.company_id == 156
-      unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
-      else
-        validate_attachment(vendor_parameters, :pan)
-      end
+    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+
 
       # if vendor_parameters[:pan].present?
       #   existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]

@@ -68,28 +68,30 @@ class Vendors::Update < Vendors::Base
     end
 
 
-    # TODO - check if this is required for all companies
-    unless user.company_id == 156
-      if vendor_parameters[:pan].blank? 
-        add_message :error, 'Please provide PAN to proceed'
-        return
-      end
+    # # TODO - check if this is required for all companies
+    # # unless user.company_id == 156
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #   unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+    #     add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+    #     return
+    #   end
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
-        return
       end
-
+      validate_attachment(vendor_parameters, :pan)
     end
 
 
-    if user.company_id == 156
+    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
-      unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
-      else
-        validate_attachment(vendor_parameters, :pan)
-      end
 
       # Remove Empty gstin locations
       if vendor_parameters[:gstin_locations_attributes].present?
