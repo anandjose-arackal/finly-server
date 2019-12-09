@@ -25,19 +25,20 @@
 #  application                    :string(255)
 #  payment_mode                   :string(255)
 #  reference_id                   :string(255)      not null
+#  post_operation                 :text(65535)
+#  post_operation_payload         :text(65535)
 #  retry_count                    :integer          default(0)
 #  invoice_id                     :integer
 #  parent_type                    :string(255)
 #  parent_id                      :integer
-#  post_operation                 :text(65535)
-#  post_operation_payload         :text(65535)
 #  category_id                    :integer
-#  api_initiated                  :boolean          default(FALSE)
-#  original_payment_for_refund_id :integer
-#  destination_pocket_id          :integer
 #  scheduled_at                   :date
+#  api_initiated                  :boolean          default(FALSE)
 #  processed_at                   :date
+#  original_payment_for_refund_id :integer
 #  cost_center_id                 :integer
+#  destination_pocket_id          :integer
+#  transaction_reference_id       :string(255)
 #  company_id                     :integer
 #  external_reference_id          :string(255)
 #  purchase_order_id              :integer
