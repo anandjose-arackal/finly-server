@@ -131,6 +131,7 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    unless [156, 205, 206, 207, 208].include?(user.company_id)
       vendor_pan = vendor_parameters[:pan]
       if vendor_pan.present? && (vendor.pan != vendor_pan)
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
@@ -138,6 +139,7 @@ class Vendors::Update < Vendors::Base
           return
         end
       end
+    end
 
     if self.vendor_parameters[:bank_accounts_attributes].blank?
       add_message :error, "Please provide bank account details"

@@ -184,11 +184,13 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    vendor_pan = vendor_parameters[:pan]
-    if vendor_pan.present?
-      if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
-        add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
-        return
+    unless [156, 205, 206, 207, 208].include?(user.company_id)
+      vendor_pan = vendor_parameters[:pan]
+      if vendor_pan.present?
+        if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
+          add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
+          return
+        end
       end
     end
 
