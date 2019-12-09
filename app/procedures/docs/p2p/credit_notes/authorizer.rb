@@ -6,7 +6,7 @@ class Docs::P2p::CreditNotes::Authorizer
   end
 
   def create?
-    @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator))
+    @user.has_policy_role?(UserRole.id_for(:credit_note_initiator))
   end
 
   def approve?
