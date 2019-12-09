@@ -47,9 +47,6 @@
 #  default_password          :boolean          default(FALSE)
 #  point_of_contact          :boolean          default(FALSE)
 #  otp_attempts              :integer          default(0)
-#  user_group_location_id    :integer
-#  user_group_department_id  :integer
-#  user_group_designation_id :integer
 #  user_delegate_id          :integer
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
