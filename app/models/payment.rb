@@ -864,7 +864,9 @@ class Payment < ApplicationRecord
       freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
       net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
       roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
-      tds_slabs: tds_slabs
+      tds_slabs: tds_slabs,
+      tax_rates: self.invoice.company.tax_rates,
+      gst_type_id: { value: self.invoice.gst_type_id, editable: false }
     }
   end
 
