@@ -20,7 +20,7 @@ class User::Update < User::Base
   end
 
   def authorized_user_types
-    [:company_admin, :admin]
+    [:company_admin, :admin, :vendor_payments_admin]
   end
 
   def init
