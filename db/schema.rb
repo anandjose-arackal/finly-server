@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_03_130849) do
+ActiveRecord::Schema.define(version: 2019_12_05_181008) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -722,6 +722,9 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.integer "otp_attempts"
     t.integer "otp_count"
     t.text "rejection_note"
+    t.integer "expected_payments", default: 0
+    t.string "ticket_type"
+    t.integer "transfer_mode_id"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
@@ -729,6 +732,8 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
     t.index ["status_id"], name: "index_bank_payment_requests_on_status_id"
+    t.index ["ticket_type"], name: "index_bank_payment_requests_on_ticket_type"
+    t.index ["transfer_mode_id"], name: "index_bank_payment_requests_on_transfer_mode_id"
   end
 
   create_table "bank_transaction_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -3905,6 +3910,8 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.integer "company_id"
     t.string "request_id"
     t.datetime "deleted_at"
+    t.integer "transfer_mode_id"
+    t.index ["transfer_mode_id"], name: "index_icici_bank_transactions_on_transfer_mode_id"
   end
 
   create_table "icici_statements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -5332,6 +5339,8 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.text "description"
     t.integer "uploader_id"
     t.datetime "deleted_at"
+    t.boolean "allow_delete", default: true
+    t.index ["allow_delete"], name: "index_payment_order_attachments_on_allow_delete"
   end
 
   create_table "payment_order_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5373,6 +5382,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.boolean "api_initiated", default: false
     t.integer "bank_account_provider_id"
     t.datetime "deleted_at"
+    t.integer "transfer_mode_id"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
@@ -5380,6 +5390,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.index ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id"
     t.index ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id"
     t.index ["payment_purpose_id"], name: "index_payment_orders_on_payment_purpose_id"
+    t.index ["transfer_mode_id"], name: "index_payment_orders_on_transfer_mode_id"
   end
 
   create_table "payment_purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5525,6 +5536,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.integer "otp_attempts"
     t.boolean "on_hold"
     t.boolean "disabled"
+    t.integer "transfer_mode_id"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -5551,6 +5563,7 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.index ["receiving_user_id"], name: "index_payments_on_receiving_user_id"
     t.index ["reference_id"], name: "index_payments_on_reference_id"
     t.index ["reference_resource_type", "reference_resource_id"], name: "index_payments_on_reference_resource"
+    t.index ["transfer_mode_id"], name: "index_payments_on_transfer_mode_id"
   end
 
   create_table "per_diem_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -7259,6 +7272,22 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.index ["user_id"], name: "index_transcribed_expenses_on_user_id"
   end
 
+  create_table "transfer_mode_company_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.integer "mode_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_transfer_mode_company_mappings_on_company_id"
+    t.index ["mode_id"], name: "index_transfer_mode_company_mappings_on_mode_id"
+  end
+
+  create_table "transfer_modes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.index ["name"], name: "index_transfer_modes_on_name"
+  end
+
   create_table "travel_members", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "title"
     t.string "first_name"
@@ -8433,9 +8462,11 @@ ActiveRecord::Schema.define(version: 2019_12_03_130849) do
     t.string "beneficiary_full_name"
     t.integer "beneficiary_verification_retry_count"
     t.datetime "deleted_at"
+    t.integer "transfer_mode_id"
     t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
     t.index ["beneficiary_bank_account_id"], name: "index_yes_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_yes_bank_transactions_on_company_id"
+    t.index ["transfer_mode_id"], name: "index_yes_bank_transactions_on_transfer_mode_id"
     t.index ["transfer_status_id"], name: "index_yes_bank_transactions_on_transfer_status_id"
     t.index ["unique_request_number"], name: "index_yes_bank_transactions_on_unique_request_number"
   end

@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: transfer_mode_company_mappings
+#
+#  id         :bigint           not null, primary key
+#  company_id :integer
+#  mode_id    :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class TransferModeCompanyMapping < ApplicationRecord
 	belongs_to :company
 	belongs_to :transfer_mode, class_name: 'TransferMode', foreign_key: :mode_id

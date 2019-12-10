@@ -38,6 +38,7 @@
 #  vedor_code               :string(255)
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
+#  rcm_enabled              :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord

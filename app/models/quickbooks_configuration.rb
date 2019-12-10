@@ -14,6 +14,7 @@
 #  reimbursable_account_id         :integer
 #  non_reimbursable_account_id     :integer
 #  company_id                      :integer
+#  deleted_at                      :datetime
 #
 
 # one instance of this will exist for every company
