@@ -661,8 +661,8 @@ class Payment < ApplicationRecord
   end
 
   def as_json(options={})
-    if options[:invoice_show]
-      return payment_request_show_json('Invoice')
+    if options[:payment_request_edit]
+      return payment_request_show_json(self.parent_type)
     end
   end
 
@@ -783,11 +783,11 @@ class Payment < ApplicationRecord
 
   def payment_request_show_json(document_type)
     { document_type: document_type,
-      document_details: get_document_details(document_type='Invoice'),
-      amount_details: get_amount_details,
-      custom_fields: get_custom_fields,
+      document_details: get_document_details(document_type),
+      amount_details: get_amount_details(document_type),
+      custom_fields: get_custom_fields(document_type),
       payment_id: self.id,
-      attachment_details: get_attachment_details
+      attachment_details: get_attachment_details(document_type)
     }
   end
 
@@ -795,8 +795,11 @@ class Payment < ApplicationRecord
     case document_type
     when 'Invoice'
       return get_invoice_details
-    when 'PoAvance'
+    # PO Advance
+    when 'PurchaseOrder'
+      return get_po_advance_details
     when 'BeneficiaryPayment'
+      return get_beneficiary_details
     end
   end
 
@@ -807,15 +810,93 @@ class Payment < ApplicationRecord
       account_number: { number: self.receiving_account&.account_number },
       ifsc: { code: self.receiving_account&.ifsc },
       beneficiary_type: { type: get_beneficiary_type },
-      field_details: get_field_details('invoice')
+      field_details: get_field_details('Invoice')
+    }
+  end
+
+  def get_po_advance_details
+    {
+      document_type: 'PoAdvance',
+      owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
+      account_number: { number: self.receiving_account&.account_number },
+      ifsc: { code: self.receiving_account&.ifsc },
+      beneficiary_type: { type: get_beneficiary_type },
+      field_details: get_field_details('PurchaseOrder') 
+    }
+  end
+
+  def get_beneficiary_details
+    {
+      document_type: 'BeneficiaryPayment',
+      owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
+      account_number: { number: self.receiving_account&.account_number },
+      ifsc: { code: self.receiving_account&.ifsc },
+      beneficiary_type: { type: get_beneficiary_type },
+      field_details: get_field_details('BeneficiaryPayment')
     }
   end
 
   def get_field_details(document_type)
     case document_type
-    when 'invoice'
+    when 'Invoice'
       invoice_field_details
+    when 'PurchaseOrder'
+      po_advance_field_details
+    when 'BeneficiaryPayment'
+      get_beneficiary_field_details
     end
+  end
+
+  def get_beneficiary_field_details
+    parameters = RequestStore.store[:params]
+    parameters[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
+    departments = Company::Departments::Index.(self.beneficiary_payment.creator, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.beneficiary_payment.creator, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.beneficiary_payment.creator, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    {
+      invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
+      invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
+      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
+      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
+      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: false, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      categories: categories,
+      cost_centers: cost_centers,
+      departments: departments
+    }
+  end
+
+  def po_advance_field_details
+    # {
+  #   net_amount: precision_value payment.amount&.value
+  #   total_amount: self.requested_advance_amount&.value
+  #   roundoff_amount: 0
+  #   invoice_amount: json.balance_due payment.amount&.value
+  #   payable_amount: json.payment_amount payment.amount_value
+  # }
+    po = self&.purchase_order
+    parameters = RequestStore.store[:params]
+    parameters[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
+    departments = Company::Departments::Index.(self.purchase_order.user, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.purchase_order.user, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.purchase_order.user, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    {
+      invoice_number: { value: self.purchase_order.po_number, editable: true, field_type: 'field_text' },
+      invoice_date: { value: nil, editable: false, field_type: 'field_text' },
+      due_date: { value: nil, field_type: 'field_text', editable: false },
+      category: { id: nil, name: nil, editable: false, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.purchase_order.cost_center_id, name: self.purchase_order&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
+      department: { id: self.purchase_order.department_id, name: self.purchase_order&.department&.name, editable: false, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      categories: categories,
+      cost_centers: cost_centers,
+      departments: departments
+    }
   end
 
   def invoice_field_details
@@ -850,7 +931,63 @@ class Payment < ApplicationRecord
     beneficiary_type
   end
 
-  def get_amount_details
+  def get_amount_details(document_type)
+    case document_type
+    when 'Invoice'
+      get_invoice_amount_details
+    when 'PurchaseOrder'
+      get_po_advance_amount_details
+    when 'BeneficiaryPayment'
+      get_beneficiary_amount_details
+    end
+  end
+
+  def get_po_advance_amount_details
+    parameters = RequestStore.store[:params]
+    tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
+    {
+      total_amount: { value: self.purchase_order.requested_advance_amount&.value, editable: false }, # TOTAL
+      inclusive_of_taxes: {value: nil, editable: false},
+      discount: { discount_type_id: nil, rate: nil, discount_amount: nil, editable: false},
+      tax: { tax_type_id: nil, tax_amount: nil, value: nil, editable: false },
+      tds: { tds_type_id: nil, tds_amount: nil, editable: false },
+      advance_amount: { value: nil, editable: false }, # Advance
+      freight_amount: { value: nil, editable: false },
+      net_payable_amount: { value: nil, editable: false },
+      net_total: { value: self.amount&.value, editable: false }, #Net Total
+      roundoff_amount: { value: 0, editable: false },
+      tds_slabs: tds_slabs,
+      tax_rates: self.purchase_order.company.tax_rates,
+      gst_type_id: { value: self.purchase_order.gst_type_id, editable: false }, 
+      payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
+      balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
+    }
+  end
+
+  def get_beneficiary_amount_details
+    parameters = RequestStore.store[:params]
+    tds_slabs = TdsSlabs::Index.(self.beneficiary_payment.creator, parameters).tds_slabs rescue nil
+    {
+      total_amount: { value: precision_value(self.parent.original_amount&.value), editable: false }, # TOTAL
+      inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: false},
+      discount: { discount_type_id: nil, rate: nil, discount_amount: nil, editable: false },
+      #tax_type_id: { value: self.invoice.tax_type_id, editable: false },
+      tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: false },
+      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: false },
+      advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: false }, # Advance
+      freight_amount: { value: nil, editable: false },
+      net_payable_amount: { value: nil, editable: false },
+      net_total: { value: precision_value(self.parent.net_amount&.value), editable: false }, #Net Total
+      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
+      tds_slabs: tds_slabs,
+      tax_rates: self.invoice.company.tax_rates,
+      gst_type_id: { value: self.invoice.gst_type_id, editable: false }, 
+      payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
+      balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
+    }
+  end
+
+  def get_invoice_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
     {
@@ -873,16 +1010,40 @@ class Payment < ApplicationRecord
     }
   end
 
-  def get_custom_fields
-    self.invoice.custom_fields
+  def get_custom_fields(document_type)
+    case document_type
+    when 'Invoice'
+      self.invoice.custom_fields
+    when 'PurchaseOrder'
+      self.purchase_order.custom_fields
+    when 'BeneficiaryPayment'
+      self.invoice.custom_fields
+    end
   end
 
-  def get_attachment_details
-    {
-      url: self.invoice.invoice_attachments.first&.attached_file&.url,
-      thumb: self.invoice.invoice_attachments.first&.attached_file&.url(:thumb),
-      content_type: self.invoice.invoice_attachments.first&.attached_file&.content_type,
-      file_name: self.invoice.invoice_attachments.first&.attached_file&.original_filename
-    }
+  def get_attachment_details(document_type)
+    case document_type
+    when 'Invoice'
+      {
+        url: self.invoice.invoice_attachments.first&.attached_file&.url,
+        thumb: self.invoice.invoice_attachments.first&.attached_file&.url(:thumb),
+        content_type: self.invoice.invoice_attachments.first&.attached_file&.content_type,
+        file_name: self.invoice.invoice_attachments.first&.attached_file&.original_filename
+      }
+    when 'PurchaseOrder'
+      {
+        url: self.purchase_order.attachments.first&.attached_file&.url,
+        thumb: self.purchase_order.attachments.first&.attached_file&.url(:thumb),
+        content_type: self.purchase_order.attachments.first&.attached_file&.content_type,
+        file_name: self.purchase_order.attachments.first&.attached_file&.original_filename
+      }
+    when 'BeneficiaryPayment'
+      {
+        url: nil,
+        thumb: nil,
+        content_type: nil,
+        file_name: nil
+      }
+    end
   end
 end
