@@ -1,3 +1,11 @@
+# == Schema Information
+#
+# Table name: credit_note_item_types
+#
+#  id   :bigint           not null, primary key
+#  name :string(255)
+#
+
 class CreditNoteItemType < ApplicationRecord
   include Seedable
 
