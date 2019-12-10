@@ -246,6 +246,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def payments_info
+    @result = BankTransfer::PaymentRequest::PaymentsInfo.(current_user, params)
+    respond
+  end
+
   def payments_count
     @result = BankTransfer::PaymentRequest::PaymentsCount.(current_user, params)
     if @result.success?
