@@ -11,8 +11,6 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  purpose_id                 :integer
-#  parent_id                  :integer
-#  code                       :string(255)
 #  expense_management         :boolean
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
@@ -22,6 +20,7 @@
 #  category_code              :string(255)
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
+#  deleted_at                 :datetime
 #
 
 class Category < ApplicationRecord
