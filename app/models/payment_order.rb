@@ -66,6 +66,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
   belongs_to :bank_account_provider, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   serialize :post_operation_payload, Hash
 
@@ -186,6 +187,10 @@ class PaymentOrder < ApplicationRecord
       return self.payments.first&.payment_mode
     end
     super
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name
   end
 
   def payment_type

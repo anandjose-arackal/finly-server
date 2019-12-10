@@ -76,6 +76,8 @@ class BankPaymentRequestComment < ApplicationRecord
         comment_content += " updated #{self.edited_field} from #{self.previous_value} to #{self.new_value}, at beneficiary: #{self.beneficiary.name}"
       when BankPaymentRequestCommentAction.id_for(:mark_as_credited)
         comment_content += " marked the payment order as credited"
+      when BankPaymentRequestCommentAction.id_for(:payment_retry)
+        comment_content += " initiated payment retry"
       else
         return nil
     end

@@ -21,7 +21,7 @@ attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :optio
               :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
               :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date,
               :company, :new_accounts, :new_vendors, :bank_accounts, :beneficiary_payments, :original_amounts, :advance_amounts, :payment_amounts,
-              :initiating_account, :user, :invoices, :payments
+              :initiating_account, :user, :invoices, :payments, :transfer_mode
 
 def self.call(user, options = {})
   self.new.perform(user, options)
@@ -529,6 +529,7 @@ def payment_params(payment)
     payment_status_id: PaymentStatus.id_for(:pending_approval),
     payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
     payment_mode: self.payment_mode,
+    transfer_mode_id: self.bank_payment_request.transfer_mode_id,
     note: payment[:note],
     # payment_notification_users: payment[:payment_notification_users],
     date: DateUtils.local_date,
