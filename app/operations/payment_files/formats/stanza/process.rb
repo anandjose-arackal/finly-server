@@ -18,7 +18,7 @@ class PaymentFiles::Formats::Stanza::Process < PaymentFiles::Formats::BaseFormat
   def process
     headers = retrieve_axis_headers
     content = []
-    count=1
+    count = 1
     self.payment_file_data.each do |payment|
       content << [
           count,

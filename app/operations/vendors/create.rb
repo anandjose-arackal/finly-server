@@ -65,29 +65,27 @@ class Vendors::Create < Vendors::Base
       add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
     end
 
-    unless user.company_id == 156 || vendor_parameters[:pan].blank?
-      # if vendor_parameters[:pan].blank? 
-      #   add_message :error, 'Please provide PAN to proceed'
-      #   return
-      # end
+    # unless user.company_id == 156
+
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
-        return
       end
-
+      validate_attachment(vendor_parameters, :pan)
     end
 
+    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
-    if user.company_id == 156
       unless vendor_parameters[:pan].present?
-        # allow companies to proceed with vendor empanelment if they dont have pan details
-        # commenting this for now
-        # 
-        # add_message :error, "Please provide PAN to proceed"
-        # return
-
-        # if no pan supplied, then logically they dont have gstin details
-        # 
         vendor_parameters[:gstin_locations_attributes].each do |gstin|
           gstin[:gstin] = nil
           gstin[:gstin_id] = nil
@@ -165,7 +163,7 @@ class Vendors::Create < Vendors::Base
         next if gstin_location[:_destroy]
 
         gstins << gstin_location[:gstin]
-        duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin)> 1}
+        duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin) > 1}
 
         if duplicate_gstin.present?
           add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
@@ -176,15 +174,18 @@ class Vendors::Create < Vendors::Base
         if gstin_location[:gstin].present?
           gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
           validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
-          if gstin.present?
-            add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
-            return
+
+          unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+            if gstin.present?
+              add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+              return
+            end
           end
         end
       end
     end
 
-    unless [156, 205, 206, 207, 208].include?(user.company_id)
+    unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
       vendor_pan = vendor_parameters[:pan]
       if vendor_pan.present?
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?

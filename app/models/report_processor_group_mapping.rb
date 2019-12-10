@@ -48,7 +48,7 @@ class ReportProcessorGroupMapping < ApplicationRecord
   scope :not_completed_including_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :exclude_cancelled, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:cancelled) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
-  scope :include_for_payment_file, -> { includes :amount, :processor_accountable,user: :profile,reports: [dlrms: [:reviewer,:taken_control_by,:forwarded_by]] }
+  scope :include_for_payment_file, -> {includes :amount, :processor_accountable, user: :profile, reports: [dlrms: [:reviewer, :taken_control_by, :forwarded_by]]}
   scope :sum_amounts, -> { joins(:amount).sum(:INR) }
   scope :pluck_group_id, -> { pluck(:processor_group_id) }
   before_destroy do
