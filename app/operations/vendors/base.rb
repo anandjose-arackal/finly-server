@@ -158,8 +158,8 @@ class Vendors::Base < BaseOperation
 
   def validate_pan_number_in_gstin(pan_number=nil, gstin=nil, gst_registered=nil)
     if pan_number.present? && gstin.present? && (gst_registered != "0")
-      pan_number_from_gstin.upcase = gstin[2..gstin.length - 4]&.upcase
-      unless pan_number == pan_number_from_gstin
+      pan_number_from_gstin = gstin[2..gstin.length - 4].to_s&.upcase
+      unless pan_number.to_s&.upcase == pan_number_from_gstin
         add_message :error, "Pan number #{pan_number} does not match with gstin pan #{pan_number_from_gstin}"
         return false
       end
