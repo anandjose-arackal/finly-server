@@ -150,7 +150,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              advance_amount: {spreadsheet: true},
              invoice_net_payable_amount: {spreadsheet: true},
              approvers: {spreadsheet: true},
-             finance_approved_date: {spreadsheet: true}
+             finance_approved_date: {spreadsheet: true},
+             due_date: {spreadsheet: true},
+             attachment_links: {spreadsheet: true}
+
          ]
 
   def input
@@ -164,7 +167,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order},:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},:discount_amount,parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:discount_amount,:created_by,:gstin_location, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order},:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},:discount_amount,parent: [:invoice_attachments, :invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:discount_amount,:created_by,:gstin_location, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -413,6 +416,18 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def policy(invoice_line_item)
     invoice_line_item.parent&.policy&.name
+  end
+
+  def due_date(invoice_line_item)
+    invoice_line_item.parent&.due_date.strftime("%d-%b-%Y")
+  end
+
+  def attachment_links(invoice_line_item)
+    data = ""
+    invoice_line_item.parent&.invoice_attachments.each do |attachment|
+      data += attachment.url + "\x0D\x0A"
+    end
+    data
   end
 
 end
