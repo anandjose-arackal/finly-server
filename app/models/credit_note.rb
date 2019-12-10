@@ -58,4 +58,39 @@ class CreditNote < ApplicationRecord
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
 
+  def as_json(options = {})
+    if options[:payment_history]
+      return payment_history_json
+    else
+      {
+          id: id,
+          procurement_id: procurement_id,
+          gst_amount: precision_value(gst_amount&.value),
+          tds_amount: precision_value(tds_amount&.value),
+
+          gst_type_id: gst_type_id,
+          date: credit_note_date,
+          created_at: created_at,
+          updated_at: updated_at,
+
+          invoice_number: invoice.invoice_number,
+          freight_amount: self.freight_amount&.value,
+          roundoff_amount: self.roundoff_amount,
+          tds_rate: precision_value(self.tds_rate),
+          attachment: attachments.as_json,
+
+          custom_fields: self.custom_fields,
+
+          cost_center: cost_center.as_json,
+          department: department,
+          policy: policy,
+
+
+          items: items.as_json,
+          note: note,
+      }
+    end
+  end
+
+
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_06_114217) do
+ActiveRecord::Schema.define(version: 2019_12_10_063149) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2125,6 +2125,48 @@ ActiveRecord::Schema.define(version: 2019_12_06_114217) do
     t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
+  end
+
+  create_table "credit_note_item_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+  end
+
+  create_table "credit_note_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "credit_note_id"
+    t.integer "item_id"
+    t.integer "invoice_item_id"
+    t.integer "category_id"
+    t.integer "credit_note_item_type"
+    t.text "comment"
+    t.string "gl_code"
+    t.string "hsn_sac"
+    t.decimal "original_quantity", precision: 20, scale: 5
+    t.decimal "revised_quantity", precision: 20, scale: 5
+    t.decimal "quantity", precision: 20, scale: 5
+    t.decimal "original_rate", precision: 20, scale: 5
+    t.decimal "revised_rate", precision: 20, scale: 5
+    t.decimal "rate", precision: 20, scale: 5
+    t.integer "original_taxable_amount_id"
+    t.integer "revised_taxable_amount_id"
+    t.integer "taxable_amount_id"
+    t.integer "original_tax_rate_id"
+    t.integer "revised_tax_rate_id"
+    t.integer "tax_rate_id"
+    t.integer "total"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_credit_note_items_on_category_id"
+    t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
+    t.index ["credit_note_item_type"], name: "index_credit_note_items_on_credit_note_item_type"
+    t.index ["invoice_item_id"], name: "index_credit_note_items_on_invoice_item_id"
+    t.index ["item_id"], name: "index_credit_note_items_on_item_id"
+    t.index ["original_tax_rate_id"], name: "index_credit_note_items_on_original_tax_rate_id"
+    t.index ["original_taxable_amount_id"], name: "index_credit_note_items_on_original_taxable_amount_id"
+    t.index ["revised_tax_rate_id"], name: "index_credit_note_items_on_revised_tax_rate_id"
+    t.index ["revised_taxable_amount_id"], name: "index_credit_note_items_on_revised_taxable_amount_id"
+    t.index ["tax_rate_id"], name: "index_credit_note_items_on_tax_rate_id"
+    t.index ["taxable_amount_id"], name: "index_credit_note_items_on_taxable_amount_id"
+    t.index ["total"], name: "index_credit_note_items_on_total"
   end
 
   create_table "credit_note_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
