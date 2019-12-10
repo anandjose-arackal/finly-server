@@ -171,14 +171,15 @@ class Vendors::Create < Vendors::Base
         end
 
 
-      if gstin_location[:gstin].present?
-        gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
-        validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
+        if gstin_location[:gstin].present?
+          gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
+          validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
 
-        unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
-          if gstin.present?
-            add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
-            return
+          unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+            if gstin.present?
+              add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+              return
+            end
           end
         end
       end
@@ -217,7 +218,7 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    end
+  end
 
   def pre_process
     # setting the first account as default if none of them are marked as default
