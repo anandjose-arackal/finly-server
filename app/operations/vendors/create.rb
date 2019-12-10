@@ -57,6 +57,13 @@ class Vendors::Create < Vendors::Base
       end
     end
 
+    if self.vendor_parameters[:pan].blank?
+      vendor_parameters[:gstin_locations_attributes].each do |gstin|
+        gstin[:gstin] = nil
+        gstin[:gstin_id] = nil
+      end
+      add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
+    end
 
     # unless user.company_id == 156
 
@@ -76,9 +83,16 @@ class Vendors::Create < Vendors::Base
       validate_attachment(vendor_parameters, :pan)
     end
 
-
     if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
+      unless vendor_parameters[:pan].present?
+        vendor_parameters[:gstin_locations_attributes].each do |gstin|
+          gstin[:gstin] = nil
+          gstin[:gstin_id] = nil
+        end
+      else
+        validate_attachment(vendor_parameters, :pan)
+      end
 
       # if vendor_parameters[:pan].present?
       #   existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
@@ -128,32 +142,33 @@ class Vendors::Create < Vendors::Base
 
     # check for duplicate gstin in the system for the  current company
     gstins = []
-    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
-      poc_email = gstin_location[:poc_email]
-      poc_mobile_number = gstin_location[:poc_mobile_number]
-      if poc_email.present?
-        unless Constants::VALID_EMAIL_FORMAT.match?(poc_email)
-          add_message :error, "#{poc_email}: Invalid email"
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+        poc_email = gstin_location[:poc_email]
+        poc_mobile_number = gstin_location[:poc_mobile_number]
+        if poc_email.present?
+          unless Constants::VALID_EMAIL_FORMAT.match?(poc_email)
+            add_message :error, "#{poc_email}: Invalid email"
+            return
+          end
+        end
+
+        if poc_mobile_number.present?
+          unless Constants::VALID_MOBILE_NUMBER.match?(poc_mobile_number)
+            add_message :error, "#{poc_mobile_number}: Invalid mobile number"
+            return
+          end
+        end
+
+        next if gstin_location[:_destroy]
+
+        gstins << gstin_location[:gstin]
+        duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin) > 1}
+
+        if duplicate_gstin.present?
+          add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
           return
         end
-      end
-
-      if poc_mobile_number.present?
-        unless Constants::VALID_MOBILE_NUMBER.match?(poc_mobile_number)
-          add_message :error, "#{poc_mobile_number}: Invalid mobile number"
-          return
-        end
-      end
-
-      next if gstin_location[:_destroy]
-
-      gstins << gstin_location[:gstin]
-      duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin)> 1}
-
-      if duplicate_gstin.present?
-        add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
-        return
-      end
 
 
       if gstin_location[:gstin].present?
@@ -202,7 +217,7 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-  end
+    end
 
   def pre_process
     # setting the first account as default if none of them are marked as default
@@ -240,9 +255,11 @@ class Vendors::Create < Vendors::Base
     end
 
     # Remove Empty gstin locations
-    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-      unless gst.keys.present?
-        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+        unless gst.keys.present?
+          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+        end
       end
     end
 
