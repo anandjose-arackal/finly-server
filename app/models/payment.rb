@@ -947,7 +947,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: "",
       discount: "",
       tax: "",
-      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: false },
+      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true },
       advance_amount: "", # Advance
       freight_amount: "",
       net_payable_amount: "",
@@ -967,7 +967,7 @@ class Payment < ApplicationRecord
     {
       total_amount: { value: precision_value(self.parent.original_amount&.value), editable: true }, # TOTAL
       inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
-      discount: "",
+      #discount: "",
       #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
       tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
       tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true },
