@@ -419,13 +419,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def due_date(invoice_line_item)
-    invoice_line_item.parent&.due_date.strftime("%d-%b-%Y")
+    invoice_line_item.parent&.due_date&.strftime("%d-%b-%Y")
   end
 
   def attachment_links(invoice_line_item)
     data = ""
-    invoice_line_item.parent&.invoice_attachments.each do |attachment|
-      data += attachment.url + "\x0D\x0A"
+    invoice_line_item.parent&.attachments.each do |attachment|
+      data += attachment.file.url + "\x0D\x0A"
     end
     data
   end
