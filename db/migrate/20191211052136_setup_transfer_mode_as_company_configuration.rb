@@ -3,9 +3,10 @@ class SetupTransferModeAsCompanyConfiguration < ActiveRecord::Migration[5.2]
   	columns = [:company_id, :mode_id]
 	values = []
 	Company.all.each do |company|
-	TransferMode.all.each do |tm|
-	values << [company.id, tm.id]
-	end
+		next if company.transfer_modes.present?
+		TransferMode.all.each do |tm|
+			values << [company.id, tm.id]
+		end
 	end
 	TransferModeCompanyMapping.import columns, values
   end
