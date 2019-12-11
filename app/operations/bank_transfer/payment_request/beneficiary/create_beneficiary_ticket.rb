@@ -14,7 +14,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type, :transfer_mode_id,
+					:transfer_mode
 
 	def personalizer
 		{
@@ -61,6 +62,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	def init
 		
 		self.payment_mode = params[:payment_mode] || params[:transfer_type]
+		self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
@@ -99,7 +102,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	      return
 	    end
 
-	    if self.payment_mode.blank?
+	    if self.payment_mode.blank? or self.transfer_mode.blank?
 	      add_message :error, "Payment mode cannot be blank"
 	      return
 	    end
@@ -208,6 +211,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
+		    transfer_mode_id: self.transfer_mode_id,
 		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
@@ -231,7 +235,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    policy_id: self.policy&.id,
 		    description: self.description,
 		    payment_order_attributes: payment_order_attributes,
-		    api_initiated: false
+		    api_initiated: false,
+		    expected_payments: self.validate_operation.order_details.count,
+		    ticket_type: 'beneficiary',
+		    transfer_mode_id: self.transfer_mode_id
 		}
 		bpr_attributes
 	end

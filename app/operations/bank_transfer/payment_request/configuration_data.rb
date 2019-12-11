@@ -20,6 +20,8 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
       import: true
     }
 
+    params[:transfer_modes] = user.company.transfer_modes
+
   end
 
   # def authorize
@@ -48,7 +50,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
 
 
   class BankTransfer::PaymentRequest::ConfigurationDataPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs
+    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs, :transfer_modes
     
     def init
       self.departments = params[:departments]
@@ -58,6 +60,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
       self.tds_slabs = params[:tds_slabs]
       self.custom_fields_config = params[:custom_fields_config]
       self.tabs = params[:tabs]
+      self.transfer_modes = params[:transfer_modes]
     end
 
   end

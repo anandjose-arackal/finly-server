@@ -102,6 +102,8 @@ class Payment < ApplicationRecord
   belongs_to :initiating_account, optional: true, polymorphic: true
   belongs_to :receiving_account, optional: true, polymorphic: true
 
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
+
   has_many :system_messages, as: :messagable, dependent: :destroy
 
   accepts_nested_attributes_for :amount
@@ -426,7 +428,7 @@ class Payment < ApplicationRecord
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner], payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true
@@ -666,6 +668,9 @@ class Payment < ApplicationRecord
     end
   end
 
+  def mode
+    self.transfer_mode&.mode&.name
+  end
 
   private
 

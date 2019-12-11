@@ -152,3 +152,5 @@ json.comments do
     end
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

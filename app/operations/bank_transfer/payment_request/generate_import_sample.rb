@@ -44,9 +44,11 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     category_headers = ["ID", "Category Name"]
     category_contents = []
     all_categories = Categories::Index.(current_user, params)
-    if all_categories.categories.roots.present?
+    # if all_categories.categories.roots.present?
+    if all_categories.categories.leaves.present?
       # current_company.categories.inward_invoices_only.each do |category|
-      all_categories.categories.roots.each do |category|
+      # all_categories.categories.roots.each do |category|
+      all_categories.categories.leaves.each do |category|
         category_contents << [category.id, category.name]
       end
     end

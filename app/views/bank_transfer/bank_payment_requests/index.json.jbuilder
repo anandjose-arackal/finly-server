@@ -1,14 +1,15 @@
 json.results do
   json.array! @result.paginated_payment_requests.each do |payment_request|
-
+    json.ticket_type payment_request.ticket_type
+    
     json.controlling_level_name payment_request.controlling_level&.name
     json.rejection_note payment_request.rejection_note
     # json.can_approve payment_request.can_approve?
-    json.can_approve payment_request.can_really_approve?
+    # json.can_approve payment_request.can_really_approve?
     # json.can_reject payment_request.can_reject?
-    json.can_reject payment_request.can_really_reject?
+    # json.can_reject payment_request.can_really_reject?
     # json.can_take_control payment_request.can_take_real_control?
-    json.can_take_control payment_request.can_really_take_control?
+    # json.can_take_control payment_request.can_really_take_control?
 
     item  = payment_request.payment_order
     json.id payment_request&.id
@@ -18,7 +19,7 @@ json.results do
     end
     json.name payment_request.name
     json.scheduled_at scheduled_at
-    json.controlling_user payment_request.get_reviewers.first&.name
+    # json.controlling_user payment_request.get_reviewers.first&.name
     processed_date = item.processed_at
     if processed_date.present?
       processed_date = processed_date.strftime('%d %b %Y')
@@ -49,7 +50,10 @@ json.results do
     json.payments_count payment_request.payment_order.payments.size
 
     unless [168, 169, 174, 175].include?(current_user.company_id)
-      payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
+      # payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
+      # payments = payments.include_minimal_for_index
+
+      payments = @result.payments.select { |payment| payment if payment.payment_order_id == payment_request.payment_order_id }
       json.payments do
         json.array!(payments) do |payment|
           json.id payment.id
@@ -57,7 +61,7 @@ json.results do
           json.payment_mode payment.payment_mode&.upcase
           json.date payment.date.strftime('%d %b %Y')
           json.amount payment.amount_value
-          json.utr payment.reference_resource&.bank_reference_number
+          # json.utr payment.reference_resource&.bank_reference_number
           json.payment_status payment.payment_status_name
           if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)
             json.business_name payment&.receiving_account&.account_owner&.business_name
