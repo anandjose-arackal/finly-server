@@ -39,7 +39,8 @@ class ExportField < ApplicationRecord
       25 => "Spent from Account",
       26 => "Policy",
       27 => "Report Submission Date",
-      29 => "Report Creation Date"
+      29 => "Report Creation Date",
+      30 => "Receipt Link"
   }
 
   def self.id_for(name_in_sym)
