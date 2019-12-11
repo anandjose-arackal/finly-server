@@ -14,11 +14,6 @@ class Procurements::PurchaseOrders::BulkUploadLineItems < Procurements::Purchase
       add_message :error, 'Error loading file. File not uploaded correctly'
       return
     end
-    # docon does not new items to be added in a po if created from pr
-    if [203, 2].include?(self.purchase_order.company_id) && (self.purchase_order.items.pluck(:purchase_request_item_id).present?)
-      add_message :error, "New items cannot be added if this PO was created from PR."
-      return
-    end
   end
 
   def init
