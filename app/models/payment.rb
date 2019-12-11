@@ -887,7 +887,7 @@ class Payment < ApplicationRecord
       category: "",
       cost_center: { id: self.purchase_order.cost_center_id, name: self.purchase_order&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
       department: { id: self.purchase_order.department_id, name: self.purchase_order&.department&.name, editable: false, field_type: 'field_drop_down_item' },
-      location: { id: self.purcase_order.location_id, name: self.purcase_order&.location&.name, editable: false, field_type: 'field_drop_down_item' },
+      location: { id: self.purchase_order.location_id, name: self.purchase_order&.location&.name, editable: false, field_type: 'field_drop_down_item' },
       narration: { value: self.note, editable: false, field_type: 'field_text_area' },
       categories: categories,
       cost_centers: cost_centers,
@@ -947,7 +947,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: "",
       discount: "",
       tax: "",
-      tds: { tds_type_id: self.purcase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: false },
+      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: false },
       advance_amount: "", # Advance
       freight_amount: "",
       net_payable_amount: "",
