@@ -1,4 +1,4 @@
-class Docs::P2p::CreditNotes::Authorizer
+class Docs::P2P::CreditNotes::Authorizer
   attr_reader :user, :model
 
   def initialize(user, model)

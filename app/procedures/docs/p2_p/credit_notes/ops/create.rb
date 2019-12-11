@@ -1,17 +1,17 @@
-class Docs::P2p::CreditNotes::Ops::Create < Transactions::API
+class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
 
   # Create an empty model
   step Model(CreditNote, :new)
 
   # Pass the model to the policy and check if user can perform the action
-  step Policy::Pundit(Docs::P2p::CreditNotes::Authorizer, :create?)
+  step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :create?)
 
   # Below method makes sure all necessary data is present for contract to work properly, it also sets default value for
   # number of attributes
   step :set_default_params
 
   # Instantiate contract
-  step Contract::Build(constant: Docs::P2p::CreditNotes::Contracts::Base)
+  step Contract::Build(constant: Docs::P2P::CreditNotes::Contracts::Base)
 
   # Validate Contract; 'key' represents under which key in params all the data can be found so it can be assigned to the
   # contract and data can be validated

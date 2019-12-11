@@ -3896,10 +3896,8 @@ Rails.application.routes.draw do
 
 
   # New Route for P2P
-  namespace :p2p do
     # Credit Note
-    resources :credit_notes do
-    end
+  resources :credit_notes do
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

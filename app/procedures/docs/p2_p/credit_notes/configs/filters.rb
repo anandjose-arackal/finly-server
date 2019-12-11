@@ -1,4 +1,4 @@
-class Docs::P2p::CreditNotes::Configs::Filters < Transactions::API
+class Docs::P2P::CreditNotes::Configs::Filters < Transactions::API
 
   step :init
 

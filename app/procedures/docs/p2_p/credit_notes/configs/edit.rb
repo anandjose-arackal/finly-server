@@ -1,4 +1,4 @@
-class Docs::P2p::CreditNotes::Configs::Edit < Transactions::API
+class Docs::P2P::CreditNotes::Configs::Edit < Transactions::API
 
   pass Model(CreditNote, :find_by)
   step :init
