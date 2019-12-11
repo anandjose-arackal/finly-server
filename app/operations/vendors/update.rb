@@ -47,10 +47,6 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    if self.vendor.pan.present? and ( self.vendor.approved? or self.vendor.auto_approved? or self.vendor.awaiting_approval? )
-      vendor_parameters.delete(:pan)
-    end
-
     if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?
       # vendor_parameters[:gstin_locations_attributes] = []
       vendor_parameters[:gstin_locations_attributes].each do |gstin|
@@ -81,33 +77,30 @@ class Vendors::Update < Vendors::Base
     end
 
 
-    # TODO - check if this is required for all companies
-    # UPDATE - not required
-    # 
-    unless user.company_id == 156 || vendor_parameters[:pan].blank?
-      # if vendor_parameters[:pan].blank? 
-      #   add_message :error, 'Please provide PAN to proceed'
-      #   return
-      # end
+    # # TODO - check if this is required for all companies
+    # # unless user.company_id == 156
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #   unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+    #     add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+    #     return
+    #   end
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
-        return
       end
-
+      validate_attachment(vendor_parameters, :pan)
     end
 
 
-    if user.company_id == 156
+    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
-      unless vendor_parameters[:pan].present?
-        # allow companies to proceed with vendor empanelment if they dont have pan details
-        # commenting this for now
-        # 
-        # add_message :error, "Please provide PAN to proceed"
-        # return
-      else
-        validate_attachment(vendor_parameters, :pan)
-      end
 
       # Remove Empty gstin locations
       if vendor_parameters[:gstin_locations_attributes].present?
@@ -131,7 +124,7 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    unless [156, 205, 206, 207, 208].include?(user.company_id)
+    unless [156, 205, 206, 207, 208, 1, 2].include?(user.company_id)
       vendor_pan = vendor_parameters[:pan]
       if vendor_pan.present? && (vendor.pan != vendor_pan)
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?

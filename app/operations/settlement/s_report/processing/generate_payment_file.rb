@@ -91,7 +91,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   end
 
   def retrieve_period(report)
-    report.expenses&.pluck(:date)&.each{|dt| dt.strftime("%B")}&.uniq&.to_sentence(last_word_connector: " and ")
+    report.expenses&.pluck(:date)&.each {|dt| dt.strftime("%B")}&.uniq&.to_sentence(last_word_connector: " and ")
   end
 
   def retrieve_approved_by(report)
