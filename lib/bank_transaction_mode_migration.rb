@@ -1,6 +1,6 @@
-class MigrateTransferModeToTransactions < ActiveRecord::Migration[5.2]
-  def change
-  	yes_all = YesBankTransaction.where(company_id: 2).all
+class BankTransactionModeMigration
+	def self.run
+  	yes_all = YesBankTransaction.all
   	objects = []
   	puts "YesBankTransaction count - #{yes_all.count}"
   	yes_all.each do |yes|
@@ -14,7 +14,7 @@ class MigrateTransferModeToTransactions < ActiveRecord::Migration[5.2]
 
   	icici_all = IciciBankTransaction.all
   	objects = []
-  	puts "IciciBankTransaction count - #{yes_all.count}"
+  	puts "IciciBankTransaction count - #{icici_all.count}"
   	icici_all.each do |icici|
   		print "."
   		tm = icici.company.transfer_modes.fetch_modes
