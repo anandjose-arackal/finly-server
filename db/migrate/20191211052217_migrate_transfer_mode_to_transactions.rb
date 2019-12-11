@@ -1,6 +1,6 @@
 class MigrateTransferModeToTransactions < ActiveRecord::Migration[5.2]
   def change
-  	yes_all = YesBankTransaction.all
+  	yes_all = YesBankTransaction.where(company_id: 2).all
   	objects = []
   	puts "YesBankTransaction count - #{yes_all.count}"
   	yes_all.each do |yes|
