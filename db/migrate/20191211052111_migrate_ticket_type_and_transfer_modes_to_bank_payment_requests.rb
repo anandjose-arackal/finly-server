@@ -1,8 +1,8 @@
 class MigrateTicketTypeAndTransferModesToBankPaymentRequests < ActiveRecord::Migration[5.2]
   def change
   	# migrate parent_type from payments to bpr
-	# bank_payment_requests = BankPaymentRequest.where(company_id: 1).all
-	bank_payment_requests = BankPaymentRequest.all
+	bank_payment_requests = BankPaymentRequest.where(company_id: 2).all
+	# bank_payment_requests = BankPaymentRequest.all
 	puts "Ticket count - #{bank_payment_requests.count}"
 	bank_payment_requests.all.each do |bpr|
 	print "."
