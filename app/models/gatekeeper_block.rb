@@ -5,7 +5,7 @@
 #  id            :bigint           not null, primary key
 #  user_id       :integer
 #  company_id    :integer
-#  params        :text(16777215)
+#  params        :text(65535)
 #  headers       :text(65535)
 #  act           :string(255)
 #  premise       :string(255)
