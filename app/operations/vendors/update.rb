@@ -99,7 +99,7 @@ class Vendors::Update < Vendors::Base
     end
 
 
-    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    if [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
 
       # Remove Empty gstin locations
@@ -124,7 +124,7 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    unless [156, 205, 206, 207, 208, 1, 2].include?(user.company_id)
+    unless [156, 179, 205, 206, 207, 208, 1, 2].include?(user.company_id)
       vendor_pan = vendor_parameters[:pan]
       if vendor_pan.present? && (vendor.pan != vendor_pan)
         if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
