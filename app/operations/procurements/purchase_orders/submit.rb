@@ -21,6 +21,11 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       add_message :error, 'Purchase Order not found'
     end
 
+    if self.purchase_order.bank_account.disabled
+      add_message :error, "This purchase order has a bank account which is disabled. Payment can only be processed to active bank accounts"
+      return
+    end
+
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     if self.purchase_order.items.present?

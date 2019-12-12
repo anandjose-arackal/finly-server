@@ -6,6 +6,7 @@
 #  parent_id                 :integer
 #  parent_type               :string(255)
 #  action_user_id            :integer
+#  action_user_type          :string(255)
 #  action_id                 :integer
 #  action_user_role_id       :integer
 #  action_level_id           :integer
@@ -182,11 +183,19 @@ class Trail < ApplicationRecord
         action = " reopened"
       when TrailAction.id_for(:forward)
         action = " forwarded"
+      when TrailAction.id_for(:deactivate)
+        action = " deactivated"
+      when TrailAction.id_for(:reactivate)
+        action = " reactivated"
       else
         action = ""
     end
-
-    body += action + " the #{self.parent_type}."    
+    if self.parent_type == 'YesBankVendor'
+      doc = 'Vendor'
+      body += action + " the #{doc}."    
+    else
+      body += action + " the #{self.parent_type}."    
+    end
 
     body
   end
