@@ -37,6 +37,9 @@ class Export::Reports::Base < Export::Base
   def retrieve_data(preferences, report, expense, custom_fields_data)
     data_arr = []
     user = expense.user
+
+    gst_applicable  = expense.category&.gst_applicable?
+
     preferences.each do |pref|
       case pref.export_field_id
         when ExportField.type_report_id
@@ -101,6 +104,14 @@ class Export::Reports::Base < Export::Base
           data_arr << expense&.report&.submitted_at&.strftime("%H:%M, %d/%m/%Y")
         when ExportField.id_for(:report_creation_date)
           data_arr << expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
+      when ExportField.id_for(:receipt_link)
+          data_arr << expense&.receipts&.first&.image&.url
+        when ExportField.id_for(:igst)
+          data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value).round(2) : '') : '')
+        when ExportField.id_for(:cgst)
+          data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
+        when ExportField.id_for(:sgst)
+          data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
         else
           data_arr << ''
       end
