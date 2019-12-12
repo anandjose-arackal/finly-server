@@ -22,7 +22,9 @@ class CreditNotesController < BaseControllers::WebBase
   end
 
   def create
-    endpoint Docs::P2P::CreditNotes::Ops::Create
+    @op = Docs::P2P::CreditNotes::Ops::Create.(params: params, current_user: current_user)
+    debugger
+    # endpoint Docs::P2P::CreditNotes::Ops::Create
     respond_to do |format|
       format.json {}
     end

@@ -6,16 +6,19 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # Pass the model to the policy and check if user can perform the action
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :create?)
 
+  # Since most of details will be picked from invoice, invoice has to be set
+  step :get_invoice
+
   # Below method makes sure all necessary data is present for contract to work properly, it also sets default value for
   # number of attributes
   step :set_default_params
 
   # Instantiate contract
-  step Contract::Build(constant: Docs::P2P::CreditNotes::Contracts::Base)
+  step Contract::Build(constant: Docs::P2P::CreditNotes::Contracts::Create)
 
   # Validate Contract; 'key' represents under which key in params all the data can be found so it can be assigned to the
   # contract and data can be validated
-  step Contract::Validate(key: 'subscription')
+  step Contract::Validate(key: 'credit_note')
 
   # Just a method to for testing; will be removed in future
   fail :check
@@ -26,9 +29,27 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # Creates DLRMs post creation of document
   step :setup_dlrm
 
-  step Transactions::Messages::SuccessMessage('Utility Bill Master created successfully')
+  step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
   def check(params, **)
+  end
+
+  def get_invoice(options, current_user:, params:, **)
+    invoice_id = params[:credit_note][:invoice_id]
+    if invoice_id.blank?
+      add_message(options, :error, :invoice_id, "Invoice not found")
+      return false
+    end
+
+    invoice_show_op = Procurements::Invoices::Show.(current_user, {id: invoice_id})
+    debugger
+    unless invoice_show_op.success?
+      add_message(options, :error, :invoice_id, "Unable to load Invoice")
+      return false
+    end
+
+    options[:invoice] = invoice_show_op.invoice
+    true
   end
 
   def setup_dlrm(options, current_user:, params:, model:, **)
@@ -39,34 +60,22 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     dlrm_validation_op.success?
   end
 
-  def set_default_params(options, params:, current_user:, **)
-    bbps_biller_id = params[:bbps_biller_id] || params[:subscription][:bbps_biller_id]
-    op = Docs::UtilityBills::Billers::Ops::Show.(params: {id: bbps_biller_id}, "current_user" => current_user)
+  def set_default_params(options, params:, current_user:, invoice:, **)
+    params[:credit_note][:user_id] = current_user&.id
+    params[:credit_note][:company_id] = current_user&.company_id
+    params[:credit_note][:current_user] = current_user
 
-    biller = op['model'] if op.success?
-
-    params[:subscription][:user_id] = current_user&.id
-    params[:subscription][:current_user] = current_user
-
-    fetch_requirement = biller&.fetch_requirement
-    support_bill_validation = biller&.support_bill_validation
-
-    params[:subscription][:fetch_requirement] = fetch_requirement
-    params[:subscription][:company_id] = current_user.company_id
-    params[:subscription][:support_bill_validation] = support_bill_validation
-    params[:subscription][:auto_generate_bill] = params[:subscription][:auto_generate_bill] || resolve_auto_bill_generation(fetch_requirement)
+    params[:credit_note][:department_id] = invoice.department_id
+    params[:credit_note][:cost_center_id] = invoice.cost_center_id
+    params[:credit_note][:shipping_location_id] = invoice.delivery_location_id
+    params[:credit_note][:billing_location_id] = invoice.location_id
+    params[:credit_note][:vendor_id] = invoice.vendor_id
+    params[:credit_note][:billing_address] = invoice.billing_address
+    params[:credit_note][:shipping_address] = invoice.shipping_address
     true
   end
-
-
-  def resolve_auto_bill_generation(fetch_requirement)
-    case fetch_requirement
-    when 'MANDATORY', 'OPTIONAL'
-      true
-    when 'NOT_SUPPORTED', nil
-      false
-    else
-      false
-    end
-  end
 end
+
+
+# Logics
+# 1. If invoice already has a credit note
