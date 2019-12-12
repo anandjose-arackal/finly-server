@@ -952,7 +952,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: "",
       discount: "",
       tax: "",
-      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: false },
+      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true },
       advance_amount: "", # Advance
       freight_amount: "",
       net_payable_amount: "",
@@ -960,7 +960,7 @@ class Payment < ApplicationRecord
       roundoff_amount: { value: 0, editable: false },
       tds_slabs: tds_slabs,
       tax_rates: self.purchase_order.company.tax_rates,
-      gst_type_id: { value: self.purchase_order.gst_type_id, editable: false }, 
+      gst_type_id: {value: self.purchase_order.gst_type_id, editable: false}, 
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
     }
@@ -968,11 +968,11 @@ class Payment < ApplicationRecord
 
   def get_beneficiary_amount_details
     parameters = RequestStore.store[:params]
-    tds_slabs = TdsSlabs::Index.(self.beneficiary_payment.creator, parameters).tds_slabs rescue nil
+    tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
     {
       total_amount: { value: precision_value(self.parent.original_amount&.value), editable: true }, # TOTAL
       inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
-      discount: "",
+      #discount: "",
       #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
       tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
       tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true },
@@ -983,8 +983,8 @@ class Payment < ApplicationRecord
       roundoff_amount: { value: self.parent.roundoff_amount, editable: true },
       tds_slabs: tds_slabs,
       tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: true }, 
-      payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+      gst_type_id: {value: self.invoice.gst_type_id, editable: true},
+      payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
       balance_due:{ value: self.parent.balance_due&.value, editable: true } # Invoice AMOUNT
     }
   end
@@ -993,6 +993,7 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
     {
+      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
       total_amount: { value: self.invoice.item_amounts_total, editable: false }, # TOTAL
       inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
       discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
@@ -1005,7 +1006,7 @@ class Payment < ApplicationRecord
       roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
       tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false }, 
+      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: invoice.balance_due&.value, editable: false } # Invoice AMOUNT
     }
@@ -1046,5 +1047,28 @@ class Payment < ApplicationRecord
         file_name: nil
       }
     end
+  end
+
+  def calculate_tds_applicable_amount(document_type)
+    case document_type
+    when 'Invoice'
+      # tds_percentage = self.invoice&.tds_slab&.tds.to_f
+      return calculate_tds_applicable_sum(self.invoice)
+    end
+  end
+
+  # Amount on which TDS is applied
+  def calculate_tds_applicable_sum(invoice)
+    amount_arr = []
+    # Get value from line items
+    invoice.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+      if item.discount.present? && item.inventory_line_item.product_type.goods?
+        amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
+      else
+        amt = (item.rate * item.quantity)
+      end
+      amount_arr << amt#*tds_percentage/100
+    end
+    return amount_arr.sum
   end
 end
