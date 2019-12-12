@@ -191,11 +191,11 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_delivery_date(purchase_order)
-    DateUtils.date_formatted purchase_order&.delivery_date
+     purchase_order&.delivery_date&.strftime("%d-%b-%Y")
   end
 
   def po_date(purchase_order)
-    DateUtils.date_formatted purchase_order&.created_at
+    purchase_order&.created_at&.strftime("%d-%b-%Y")
   end
 
   def po_submitted_on(purchase_order)

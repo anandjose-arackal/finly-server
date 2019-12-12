@@ -4,7 +4,7 @@
 #
 #  id                     :integer          not null, primary key
 #  invoice_id             :integer
-#  description            :string(255)
+#  description            :text(65535)
 #  quantity               :decimal(20, 5)
 #  rate                   :decimal(20, 10)
 #  tax                    :decimal(20, 10)

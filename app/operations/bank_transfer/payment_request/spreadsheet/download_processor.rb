@@ -164,16 +164,16 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.initiating_user.name,
             payment.initiating_user.email,
             payment.payment_order.bank_payment_request.status&.name&.humanize,
-            payment.payment_order.scheduled_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
+            payment.payment_order.scheduled_at&.strftime("%d-%b-%Y"),
+            payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%b-%Y"),
+            payment.payment_order.processed_at&.strftime("%d-%b-%Y"),
             # payment.payment_order.bank_payment_request.controlling_user&.name,
             reviewer_names,
             pr.policy&.name,
             purchase_order.present? ? purchase_order&.po_number: '',
             payment.invoice&.invoice_number,
-            payment.invoice&.due_date&.strftime("%d-%m-%Y"),
-            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            payment.invoice&.due_date&.strftime("%d-%b-%Y"),
+            payment.invoice&.date&.strftime("%d-%b-%Y"),
             payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)

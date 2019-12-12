@@ -183,11 +183,19 @@ class Trail < ApplicationRecord
         action = " reopened"
       when TrailAction.id_for(:forward)
         action = " forwarded"
+      when TrailAction.id_for(:deactivate)
+        action = " deactivated"
+      when TrailAction.id_for(:reactivate)
+        action = " reactivated"
       else
         action = ""
     end
-
-    body += action + " the #{self.parent_type}."    
+    if self.parent_type == 'YesBankVendor'
+      doc = 'Vendor'
+      body += action + " the #{doc}."    
+    else
+      body += action + " the #{self.parent_type}."    
+    end
 
     body
   end
