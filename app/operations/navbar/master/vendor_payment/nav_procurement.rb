@@ -9,7 +9,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :divider, :invoices_section, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :divider, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :utility_bill_masters]},
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :utility_bill_masters, :track_bbps_complaints]},
           :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
@@ -157,6 +157,11 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def utility_bill_masters
     return nil unless user.company.utility_bills_enabled?
     {name: 'Utility Bill Masters', id: 'manage', url: 'utility_bill_masters/params={"tabName": "agreements"}'}
+  end
+
+  def track_bbps_complaints
+    return nil unless user.company.utility_bills_enabled?
+    {name: 'BBPS Complaints', id: 'manage', url: 'track_bill_complaint/params={"tabName": "agreements"}'}
   end
 
   def manage_payment_agreements
