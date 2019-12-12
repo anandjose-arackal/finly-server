@@ -119,3 +119,4 @@ json.budgets do
 end
 
 json.reviewal_chain @result.bank_payment_request.get_reviewal_chain
+json.transfer_modes current_company.transfer_modes.as_json
