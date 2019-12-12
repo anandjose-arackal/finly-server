@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_05_181008) do
+ActiveRecord::Schema.define(version: 2019_12_12_030842) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1527,6 +1527,7 @@ ActiveRecord::Schema.define(version: 2019_12_05_181008) do
     t.datetime "entity_submitted_at"
     t.boolean "billed", default: false
     t.datetime "deleted_at"
+    t.datetime "date"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -4656,8 +4657,8 @@ ActiveRecord::Schema.define(version: 2019_12_05_181008) do
     t.string "locatable_type"
     t.decimal "latitude", precision: 30, scale: 15
     t.decimal "longitude", precision: 30, scale: 15
-    t.string "name"
-    t.text "address"
+    t.string "name", collation: "utf8_bin"
+    t.text "address", limit: 16777215, collation: "utf8_bin"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "order"
@@ -5866,7 +5867,7 @@ ActiveRecord::Schema.define(version: 2019_12_05_181008) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "company_id"
-    t.text "note"
+    t.text "note", limit: 16777215, collation: "utf8_bin"
     t.boolean "is_deleted", default: false, null: false
     t.string "procurement_type"
     t.string "transaction_id"
