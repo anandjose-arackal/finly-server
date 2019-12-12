@@ -34,7 +34,7 @@ class Export::Reports::Base < Export::Base
   end
 
 
-  def retrieve_data(preferences, report, expense, custom_fields_data)
+  def retrieve_data(preferences, report, expense, custom_field_column_names)
     data_arr = []
     user = expense.user
 
@@ -104,7 +104,7 @@ class Export::Reports::Base < Export::Base
           data_arr << expense&.report&.submitted_at&.strftime("%H:%M, %d/%m/%Y")
         when ExportField.id_for(:report_creation_date)
           data_arr << expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
-      when ExportField.id_for(:receipt_link)
+        when ExportField.id_for(:receipt_link)
           data_arr << expense&.receipts&.first&.image&.url
         when ExportField.id_for(:igst)
           data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value).round(2) : '') : '')
@@ -117,19 +117,9 @@ class Export::Reports::Base < Export::Base
       end
     end
     # now adding the custom field values for the respective expense
-    data_arr += retrieve_custom_field_data(custom_fields_data, expense)
-    data_arr
+    data_arr += retrieve_custom_field_values(expense,custom_field_column_names)
   end
 
-  def retrieve_custom_field_data(custom_fields_data, expense)
-    configuration_ids = custom_fields_data[:configuration_ids]
-    expense_custom_fields_data = custom_fields_data[:values][expense.id]
-    values = []
-      configuration_ids.each do |id|
-        values << expense_custom_fields_data[id]
-      end
-    values
-  end
 
   def extract_custom_field_names(reports)
     # now extract the custom fields from each expense that is a part of all the report
@@ -145,29 +135,13 @@ class Export::Reports::Base < Export::Base
     field_names.uniq! || []
   end
 
-  def generate_custom_field_data(reports)
-    # now extract the custom fields from each expense that is a part of all the report
-    configuration_ids = []
-    headers = []
-    values = {}
-    reports.each do |report|
-      report.expenses.each do |expense|
-        # this gets all the custom field names from all different types of expenses
-        values[expense.id] = {}
-        cf = expense.custom_fields
-        cf&.each do |custom_field|
-          unless configuration_ids.include?(custom_field.field_configuration_id)
-            configuration_ids << custom_field.field_configuration_id
-            headers << custom_field.field_configuration.field_name
-          end
-          values[expense.id][custom_field.field_configuration_id] = custom_field.string_value
-        end
-      end
+  def retrieve_custom_field_values(expense, custom_field_column_names )
+    records =[]
+    custom_field_column_names.each do |cf_name|
+      expense.custom_fields.map{|ecf| records << ecf.string_value if ecf.field_configuration.field_name == cf_name}
     end
-    # headers: contains the header labels,
-    # configuration_ids: contains the field_configuration ids which correlate with the position of headers
-    # values: hash[expense_id][field_configuration_id] which contains string values
-    {headers: headers, configuration_ids: configuration_ids, values: values}
+    records
   end
+
 
 end
