@@ -18,6 +18,7 @@
 #  review_position           :integer          default(0)
 #  admin_note                :text(65535)
 #  company_id                :integer          not null
+#  deleted_at                :datetime
 #
 
 class CardAssignRequest < ApplicationRecord
