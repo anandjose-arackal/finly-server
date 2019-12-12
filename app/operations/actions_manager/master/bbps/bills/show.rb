@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy, :view_payment_ticket]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy, :view_payment_ticket, :raise_dispute]
 
   def initialize(user = nil, params = {})
     super

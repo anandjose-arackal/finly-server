@@ -50,7 +50,7 @@ class BbpsBillsFetch < ApplicationJob
           autofetched: autofetched
       }
 
-      op = Docs::UtilityBills::Bills::Ops::Create.(params)
+      op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
     else
       params = {
           amount: 0,
