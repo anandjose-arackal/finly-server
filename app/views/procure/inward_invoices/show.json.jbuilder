@@ -192,6 +192,7 @@ json.invoice do
           json.ifsc bank_account.ifsc
           json.default bank_account.default_account
           json.selected invoice.receiving_account&.id == bank_account.id
+          json.disabled bank_account.disabled
         end
       end
     end

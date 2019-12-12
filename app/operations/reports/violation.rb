@@ -292,7 +292,7 @@ class Reports::Violation < Reports::Base
 
   def check_budget(rule, expense)
     dates = []
-    if expense.usage_date_type.blank?
+    if expense.usage_date_type.blank? || expense.usage_date_type == "none"
       # Usage date is not set, so pick expense date for budget violation check
       dates << expense.date
     elsif expense.usage_date_end.blank?
