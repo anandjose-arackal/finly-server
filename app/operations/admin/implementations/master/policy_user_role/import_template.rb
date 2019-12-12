@@ -5,7 +5,7 @@ class Admin::Implementations::Master::PolicyUserRole::ImportTemplates < Admin::I
 
   headers({
               "Vendor Payments" => {:policy_name => 'Policy Name',
-                                    :user_id => 'User Email / Mobile',
+                                    :user_id => 'User Email / Mobile / Employee Id',
                                     :purchase_request_initiator => 'Purchase Request Initiator',
                                     :purchase_request_reviewer => 'Purchase Request Reviewer' ,
                                     :purchase_request_auditor => 'Purchase Request Auditor',

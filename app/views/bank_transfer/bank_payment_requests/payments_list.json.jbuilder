@@ -8,15 +8,15 @@ json.payments do
       json.owner_trade_name payment&.receiving_account&.account_owner&.trade_name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
       json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+      json.disabled payment&.receiving_account&.disabled
+      json.name payment.receiving_account&.name
+      json.account_number payment.receiving_account&.account_number
+      json.ifsc payment.receiving_account&.ifsc
     else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
       json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
     end
-    json.disabled payment&.receiving_account&.disabled
-    json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account&.account_number
-    json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
@@ -169,15 +169,17 @@ json.filter_count @result.filter_count
 unless [168, 169, 174, 175, 118].include?(current_user.company_id)
   json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
-    unless payment.receiving_account&.is_a?(BbpsBiller)
+    if payment.receiving_account&.is_a?(BbpsBiller)
+      json.name payment.receiving_account&.biller_name
+    else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
       json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+      json.name payment.receiving_account&.name
+      json.account_number payment.receiving_account&.account_number
+      json.disabled payment.receiving_account&.disabled
+      json.ifsc payment.receiving_account&.ifsc
     end
-    json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account&.account_number
-    json.disabled payment.receiving_account&.disabled
-    json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value

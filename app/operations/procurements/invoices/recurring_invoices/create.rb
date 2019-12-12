@@ -280,6 +280,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       new_invoice.agreement_item_type = invoice_type.camelize
       new_invoice.agreement_item_id = payment_agreement_type_id
       new_invoice.save
+      CustomField::SetFields.(new_invoice, FieldParentType.id_for(:invoice), reset_fields: true, save: true)
     end
   end
 

@@ -39,6 +39,7 @@
 #  early_payment_fee_selected :boolean          default(FALSE)
 #  late_payment_fee_selected  :boolean          default(FALSE)
 #  convenience_fee_selected   :boolean          default(FALSE)
+#  bbps_biller_id             :integer
 #
 
 require 'rails_helper'

@@ -22,11 +22,13 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  payment_mode              :string(255)
 #  post_operation            :text(65535)
 #  post_operation_payload    :text(65535)
-#  payment_mode              :string(255)
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
+#  deleted_at                :datetime
+#  transfer_mode_id          :integer
 #
 
 class PaymentOrder < ApplicationRecord

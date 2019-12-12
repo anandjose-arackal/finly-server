@@ -702,7 +702,7 @@ DEPENDENCIES
   activerecord-import (~> 1.0, >= 1.0.3)
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)
-  annotate (~> 2.7.5)
+  annotate (~> 2.7)
   autoprefixer-rails (~> 9.4.4)
   awesome_print (~> 1.8.0)
   aws-sdk-s3 (~> 1.30.0)

@@ -7,7 +7,6 @@
 #  form_id                      :integer          not null
 #  form_section_id              :integer          not null
 #  created_by_user_id           :integer
-#  parent_id                    :string(255)
 #  field_key                    :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :boolean
