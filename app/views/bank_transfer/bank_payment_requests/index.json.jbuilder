@@ -12,6 +12,7 @@ json.results do
     # json.can_take_control payment_request.can_really_take_control?
 
     item  = payment_request.payment_order
+    payments_count = item.payments.size
     json.id payment_request&.id
     scheduled_at = item.scheduled_at
     if scheduled_at.present?
@@ -31,7 +32,7 @@ json.results do
       json.mobile_number item.initiating_user.mobile_number
     end
     json.note item.note
-    json.items_count item.payments.size
+    json.items_count payments_count
     json.payment_order_status do
       json.id item.payment_order_status.id
       json.name item.payment_order_status.name.humanize
@@ -47,7 +48,7 @@ json.results do
     end
     json.payment_file_downloaded payment_request.payment_file_downloaded
 
-    json.payments_count payment_request.payment_order.payments.size
+    json.payments_count payments_count
 
     unless [168, 169, 174, 175].include?(current_user.company_id)
       # payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
