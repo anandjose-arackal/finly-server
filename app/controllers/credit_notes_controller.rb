@@ -2,6 +2,10 @@ class CreditNotesController < BaseControllers::WebBase
   layout :resolve_layout
 
   def index
+    endpoint Docs::P2P::CreditNotes::Ops::Index
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def show

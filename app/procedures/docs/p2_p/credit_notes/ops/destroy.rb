@@ -1,5 +1,4 @@
-class Docs::P2P::CreditNotes::Ops
-  ::Destroy < Transactions::API
+class Docs::P2P::CreditNotes::Ops::Destroy < Transactions::API
 
   step Model(CreditNote, :find_by)
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :destroy?)
