@@ -38,7 +38,6 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def destroy?
-    debugger
     CreditNote.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
   end
 

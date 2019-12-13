@@ -6,7 +6,6 @@ class CreditNotesController < BaseControllers::WebBase
 
   def show
     @op = Docs::P2P::CreditNotes::Ops::Show.(params: params, current_user: current_user)
-    debugger
     # endpoint Docs::P2P::CreditNotes::Ops::Create
     respond_to do |format|
       format.json {}
@@ -29,7 +28,6 @@ class CreditNotesController < BaseControllers::WebBase
 
   def create
     @op = Docs::P2P::CreditNotes::Ops::Create.(params: params, current_user: current_user)
-    debugger
     # endpoint Docs::P2P::CreditNotes::Ops::Create
     respond_to do |format|
       format.json {}
@@ -41,7 +39,6 @@ class CreditNotesController < BaseControllers::WebBase
 
   def destroy
     @op = Docs::P2P::CreditNotes::Ops::Destroy.(params: params, current_user: current_user)
-    debugger
     # endpoint Docs::P2P::CreditNotes::Ops::Create
     respond_to do |format|
       format.json {}
