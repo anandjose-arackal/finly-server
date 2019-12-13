@@ -788,6 +788,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Initiator logic end ######################
+
+    ############# Creditor logic start ######################
+    if bank_payment_request.is_crediting_user?
+      if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
   end
   
   def transfer_type
@@ -868,6 +878,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Initiator logic end ######################
+
+    ############# Creditor logic start ######################
+    if bank_payment_request.is_crediting_user?
+      if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
   end
 
   def reviewal_flow
