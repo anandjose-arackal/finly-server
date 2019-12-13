@@ -23,7 +23,7 @@
 #  original_tax_rate_id       :integer
 #  revised_tax_rate_id        :integer
 #  tax_rate_id                :integer
-#  total                      :integer
+#  total_amount_id            :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #

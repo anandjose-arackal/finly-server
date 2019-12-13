@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_10_063149) do
+ActiveRecord::Schema.define(version: 2019_12_12_134534) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2152,9 +2152,10 @@ ActiveRecord::Schema.define(version: 2019_12_10_063149) do
     t.integer "original_tax_rate_id"
     t.integer "revised_tax_rate_id"
     t.integer "tax_rate_id"
-    t.integer "total"
+    t.integer "total_amount_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["category_id"], name: "index_credit_note_items_on_category_id"
     t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
     t.index ["credit_note_item_type"], name: "index_credit_note_items_on_credit_note_item_type"
@@ -2166,7 +2167,7 @@ ActiveRecord::Schema.define(version: 2019_12_10_063149) do
     t.index ["revised_taxable_amount_id"], name: "index_credit_note_items_on_revised_taxable_amount_id"
     t.index ["tax_rate_id"], name: "index_credit_note_items_on_tax_rate_id"
     t.index ["taxable_amount_id"], name: "index_credit_note_items_on_taxable_amount_id"
-    t.index ["total"], name: "index_credit_note_items_on_total"
+    t.index ["total_amount_id"], name: "index_credit_note_items_on_total_amount_id"
   end
 
   create_table "credit_note_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2202,6 +2203,10 @@ ActiveRecord::Schema.define(version: 2019_12_10_063149) do
     t.integer "net_adjustable_amount_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.integer "roundoff_amount_id"
+    t.integer "department_id"
+    t.integer "cost_center_id"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"

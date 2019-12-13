@@ -29,6 +29,10 @@
 #  net_adjustable_amount_id      :integer
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  deleted_at                    :datetime
+#  roundoff_amount_id            :integer
+#  department_id                 :integer
+#  cost_center_id                :integer
 #
 
 require 'rails_helper'

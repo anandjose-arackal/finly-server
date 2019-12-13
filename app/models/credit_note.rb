@@ -29,6 +29,10 @@
 #  net_adjustable_amount_id      :integer
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  deleted_at                    :datetime
+#  roundoff_amount_id            :integer
+#  department_id                 :integer
+#  cost_center_id                :integer
 #
 
 class CreditNote < ApplicationRecord
@@ -43,6 +47,9 @@ class CreditNote < ApplicationRecord
   belongs_to :vendor, class_name: 'YesBankVendor', optional: true
   belongs_to :shipping_location, class_name: 'BranchLocation', optional: true
   belongs_to :billing_location, class_name: 'BranchLocation', optional: true
+  belongs_to :tds_rate, class_name: 'TdsRatesList', optional: true
+  belongs_to :department, class_name: 'Department', optional: true
+  belongs_to :cost_center, class_name: 'CostCenter', optional: true
 
   belongs_to :gross_receivable_amount, class_name: 'Amount', optional: true
   belongs_to :gst_amount, class_name: 'Amount', optional: true
@@ -55,6 +62,7 @@ class CreditNote < ApplicationRecord
 
   belongs_to :tds_rate_id, class_name: 'TdsRatesList', optional: true
 
+  has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
 
@@ -66,30 +74,31 @@ class CreditNote < ApplicationRecord
           id: id,
           procurement_id: procurement_id,
           gst_amount: precision_value(gst_amount&.value),
-          tds_amount: precision_value(tds_amount&.value),
 
-          gst_type_id: gst_type_id,
+          # gst_type_id: gst_type_id,
           date: credit_note_date,
           created_at: created_at,
           updated_at: updated_at,
 
-          invoice_number: invoice.invoice_number,
-          freight_amount: self.freight_amount&.value,
-          roundoff_amount: self.roundoff_amount,
-          tds_rate: precision_value(self.tds_rate),
-          attachment: attachments.as_json,
+          invoice_number: invoice&.invoice_number,
+          freight_amount: freight_amount&.value,
+          # roundoff_amount: roundoff_amount,
+          tds_amount: precision_value(tds_amount&.value),
+          # attachment: attachments.as_json,
 
-          custom_fields: self.custom_fields,
+          # custom_fields: self.custom_fields,
 
           cost_center: cost_center.as_json,
-          department: department,
-          policy: policy,
-
-
+          department: department.as_json,
+          policy: policy.as_json,
           items: items.as_json,
-          note: note,
+          # note: note,
       }
     end
+  end
+
+  def self.open_statuses
+    CreditNoteStatus.ids_for(:draft, :rejected, :retracted)
   end
 
 

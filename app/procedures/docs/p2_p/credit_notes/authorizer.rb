@@ -38,7 +38,8 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def destroy?
-    BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
+    debugger
+    CreditNote.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
   end
 
   def take_control?

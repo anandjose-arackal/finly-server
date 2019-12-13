@@ -3897,6 +3897,9 @@ Rails.application.routes.draw do
 
   # New Route for P2P
     # Credit Note
+  get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
+  get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+
   resources :credit_notes do
   end
 
