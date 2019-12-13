@@ -34,7 +34,11 @@ class Event::EBankPaymentRequest::EPayment::Failure < Event::EBankPaymentRequest
   end
 
   def affected_users
-    [bank_payment_request.owner, self.crediting_user]
+    users= [bank_payment_request.owner, self.crediting_user]
+    if parent_document_owner.present?
+      users += parent_document_owner
+    end
+    return users
   end
 
   def event_id
@@ -115,6 +119,11 @@ class Event::EBankPaymentRequest::EPayment::Failure < Event::EBankPaymentRequest
   def bank_payment_request_view_role(user)
     # return UserRole.id_for(:initiator)
     bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+  end
+
+  def parent_document_owner
+    user_id = bank_payment_request.payment_order.payments.first.send(:document_owner_attribute) rescue nil
+    document_owner = user.company.users.find_by_id(user_id)
   end
 
 end

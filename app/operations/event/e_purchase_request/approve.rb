@@ -54,7 +54,7 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   def mailer_subject(user)
     if user == self.approving_user
       "You approved the purchase request : #{self.purchase_request.order_number}"
-    elsif po_initiators.include?(user)
+    elsif po_initiators.present? && po_initiators.include?(user)
       "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
     else
       "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
@@ -64,7 +64,7 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   def mailer_body(user)
     if user == self.approving_user
       "You have approved the purchase request: #{self.purchase_request.order_number}"
-    elsif po_initiators.include?(user)
+    elsif po_initiators.present? && po_initiators.include?(user)
       "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
     else
       "#{self.approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
