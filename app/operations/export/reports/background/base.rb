@@ -120,7 +120,9 @@ class Export::Reports::Background::Base < BackgroundOperation
   def retrieve_custom_field_values(expense, custom_field_column_names )
     records =[]
     custom_field_column_names.each do |cf_name|
-      expense.custom_fields.map{|ecf| records << (ecf.field_configuration.field_name == cf_name ? ecf.string_value : ' ')}
+      value = ''
+      expense.custom_fields.map{|ecf| value = (ecf.string_value || '') if ecf.field_configuration.field_name == cf_name}
+      records << value
     end
     records
   end
