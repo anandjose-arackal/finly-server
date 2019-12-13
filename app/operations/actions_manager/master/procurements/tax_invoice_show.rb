@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Master::Base
 
   register_handle :proc_tax_invoice_show
-  validate :data_provider
+  # validate :data_provider
 
   # register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove]
 

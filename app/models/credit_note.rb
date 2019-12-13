@@ -67,8 +67,8 @@ class CreditNote < ApplicationRecord
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
 
   def as_json(options = {})
-    if options[:payment_history]
-      return payment_history_json
+    if options[:index]
+      {}
     else
       {
           id: id,
@@ -77,8 +77,8 @@ class CreditNote < ApplicationRecord
 
           # gst_type_id: gst_type_id,
           date: credit_note_date,
-          created_at: created_at,
-          updated_at: updated_at,
+          created_at: created_at.strftime('%d %b %Y'),
+          updated_at: updated_at.strftime('%d %b %Y'),
 
           invoice_number: invoice&.invoice_number,
           freight_amount: freight_amount&.value,
@@ -97,9 +97,77 @@ class CreditNote < ApplicationRecord
     end
   end
 
-  def self.open_statuses
-    CreditNoteStatus.ids_for(:draft, :rejected, :retracted)
+  def self.document_owner_attribute
+    'user_id'
   end
 
+  def self.document_status_attribute
+    'status_id'
+  end
 
+  def self.document_status_class_name
+    'CreditNoteStatus'
+  end
+
+  def self.role_based_associated_status_ids(user)
+    CreditNoteStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if [UserRole.id_for(:credit_note_initiator)]
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+        elsif [UserRole.id_for(:credit_note_reviewer)]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :voided]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.open_status_ids(user)
+    CreditNoteStatus.ids_for(:draft)
+  end
+
+  def self.finance_associated_status_ids
+    CreditNoteStatus.ids_for(:approved, :auto_approved, :voided)
+  end
+
+  def self.auditor_associated_status_ids
+    CreditNoteStatus.ids_for([:approved, :auto_approved, :awaiting_approval, :rejected, :retracted, :voided])
+  end
+
+  def self.roles
+    [
+        :purchase_order_initiator,
+        :purchase_order_reviewer,
+        :purchase_order_auditor,
+        :po_invoice_initiator,
+        :po_invoice_reviewer,
+        :po_invoice_auditor,
+        :non_po_invoice_initiator,
+        :non_po_invoice_reviewer,
+        :non_po_invoice_auditor,
+        :credit_note_initiator,
+        :credit_note_reviewer,
+        :credit_note_auditor,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
+    ]
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push CreditNoteStatus.id_for(status)
+    end
+
+    status_ids.reject {|status_id| status_id.nil?}
+  end
 end
