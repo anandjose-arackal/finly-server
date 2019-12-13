@@ -273,7 +273,7 @@ class Payment < ApplicationRecord
     user_ids = User.where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
 
     where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
-            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?)) OR id LIKE ?", bank_account_ids, vendor_ids, user_ids, "%#{term.to_i}%")
   }
 
   scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
