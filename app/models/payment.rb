@@ -51,6 +51,7 @@
 #  otp_attempts                   :integer
 #  on_hold                        :boolean
 #  disabled                       :boolean
+#  transfer_mode_id               :integer
 #
 
 class Payment < ApplicationRecord
@@ -663,9 +664,12 @@ class Payment < ApplicationRecord
   end
 
   def mode
-    self.transfer_mode&.mode&.name
+    self.transfer_mode&.mode&.name&.upcase
   end
 
+  def payment_mode
+    mode || super
+  end
 
   private
 

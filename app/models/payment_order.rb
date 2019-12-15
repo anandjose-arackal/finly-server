@@ -28,6 +28,7 @@
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
 #  deleted_at                :datetime
+#  transfer_mode_id          :integer
 #
 
 class PaymentOrder < ApplicationRecord
@@ -183,14 +184,14 @@ class PaymentOrder < ApplicationRecord
   end
 
   def payment_mode
-    if super.blank?
+    if mode.blank?
       return self.payments.first&.payment_mode
     end
-    super
+    mode || super
   end
 
   def mode
-    self.transfer_mode&.mode&.name
+    self.transfer_mode&.mode&.name&.upcase
   end
 
   def payment_type

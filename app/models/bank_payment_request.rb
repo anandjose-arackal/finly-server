@@ -28,12 +28,15 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
-#  rejection_note               :text(65535)
 #  bank_account_provider_id     :integer
 #  otp                          :string(255)
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
 #  otp_count                    :integer
+#  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -540,8 +543,10 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def mode
-    self.transfer_mode&.mode&.name
+    self.transfer_mode&.mode&.name&.upcase
   end
+
+
 
   private
 

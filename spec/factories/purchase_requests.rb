@@ -12,15 +12,16 @@
 #  submitted_at               :datetime
 #  approved_at                :datetime
 #  order_number               :string(255)
+#  reject_note                :text(65535)
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
-#  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
+#  deleted_at                 :datetime
 #
 
 FactoryBot.define do
