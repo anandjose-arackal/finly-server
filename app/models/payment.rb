@@ -970,6 +970,7 @@ class Payment < ApplicationRecord
       #discount: "",
       #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
       tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
+      tax_rate: {tax_rate_id: self.parent.tax_rate_id, editable: false},
       tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true },
       advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: true }, # Advance
       freight_amount: "",
