@@ -9,6 +9,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     params[:policies] = Policy::VendorPayments::Index.(user, params)
     params[:cost_centers] = CostCenters::Index.(user, params)
     params[:tds_slabs] = TdsSlabs::Index.(user, params)
+    params[:tax_rates] = user.company.tax_rates
     load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
 
@@ -50,7 +51,8 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
 
 
   class BankTransfer::PaymentRequest::ConfigurationDataPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs, :transfer_modes
+
+    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs, :transfer_modes, :tax_rates
     
     def init
       self.departments = params[:departments]
@@ -61,6 +63,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
       self.custom_fields_config = params[:custom_fields_config]
       self.tabs = params[:tabs]
       self.transfer_modes = params[:transfer_modes]
+      self.tax_rates = params[:tax_rates]
     end
 
   end
