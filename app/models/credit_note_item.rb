@@ -7,7 +7,7 @@
 #  item_id                    :integer
 #  invoice_item_id            :integer
 #  category_id                :integer
-#  credit_note_item_type      :integer
+#  credit_note_item_type_id   :integer
 #  comment                    :text(65535)
 #  gl_code                    :string(255)
 #  hsn_sac                    :string(255)
@@ -26,6 +26,8 @@
 #  total_amount_id            :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  deleted_at                 :datetime
+#  tax_amount_id              :integer
 #
 
 class CreditNoteItem < ApplicationRecord
@@ -36,13 +38,15 @@ class CreditNoteItem < ApplicationRecord
   belongs_to :item, class_name: 'Item', optional: true
   belongs_to :invoice_item, class_name: 'InvoiceLineItem', optional: true
   belongs_to :category, class_name: 'Category', optional: true
+  belongs_to :credit_note_item_type, class_name: 'CreditNoteItemType', optional: true
+  belongs_to :parent, class_name: 'CreditNote', foreign_key: 'credit_note_id', optional: true
 
   belongs_to :original_taxable_amount, class_name: 'Amount', optional: true
   belongs_to :taxable_amount, class_name: 'Amount', optional: true
 
   belongs_to :original_tax_rate, class_name: 'TaxRate', optional: true
   belongs_to :tax_rate, class_name: 'TaxRate', optional: true
-
+  belongs_to :tax_amount, class_name: 'Amount', optional: true
   belongs_to :total_amount, class_name: 'Amount', optional: true
 
   def as_json(options={})
@@ -66,17 +70,33 @@ class CreditNoteItem < ApplicationRecord
 
   end
 
+  def total_amount_value
+    total_amount.value
+  end
+
   private
 
   def calculate_total
-    after_discount = quantity * rate
-    tax_amount = after_discount * self.tax_rate.rate / 100
+    currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")
+    taxable_amount_value = quantity * rate
+    tax_amount_value = taxable_amount_value * self.tax_rate.rate / 100
+
+    if self.taxable_amount.present?
+      self.taxable_amount.value = taxable_amount_value
+    else
+      self.taxable_amount = Amount.new(value: taxable_amount_value, currency_id: currency_id)
+    end
+
+    if self.tax_amount.present?
+      self.tax_amount.value = tax_amount_value
+    else
+      self.tax_amount = Amount.new(value: (tax_amount_value), currency_id: currency_id)
+    end
 
     if self.total_amount.present?
-      self.total_amount.value = tax_amount + after_discount
+      self.total_amount.value = tax_amount_value + taxable_amount_value
     else
-      self.total_amount = Amount.new(value: (tax_amount + after_discount), currency_id: 1)
+      self.total_amount = Amount.new(value: (tax_amount_value + taxable_amount_value), currency_id: currency_id)
     end
   end
-
 end

@@ -20,21 +20,22 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
   step Contract::Validate(key: 'credit_note')
 
   step Contract::Persist()
-  fail :check2
-  step :test
+  step :setup_dlrm
+
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
 
-  def check(options, **)
-  end
-
-  def check2(options, **)
-  end
-
-  def test(options, **)
-    true
-  end
 
   def set_default_params(options, params:, current_user:, **)
     params[:credit_note][:current_user] = current_user
+  end
+
+  def setup_dlrm(options, current_user:, params:, model:, **)
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
+        reviewal_document: model,
+        document_reviewer_mappings: params[:document_reviewer_mappings]
+    })
+
+    dlrm_validation_op.success?
+    true
   end
 end

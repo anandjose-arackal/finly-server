@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_12_134534) do
+ActiveRecord::Schema.define(version: 2019_12_14_081604) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -2127,6 +2127,17 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
   end
 
+  create_table "credit_note_adjustments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "invoice_id"
+    t.integer "credit_note_id"
+    t.integer "amount_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amount_id"], name: "index_credit_note_adjustments_on_amount_id"
+    t.index ["credit_note_id"], name: "index_credit_note_adjustments_on_credit_note_id"
+    t.index ["invoice_id"], name: "index_credit_note_adjustments_on_invoice_id"
+  end
+
   create_table "credit_note_item_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
   end
@@ -2136,7 +2147,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.integer "item_id"
     t.integer "invoice_item_id"
     t.integer "category_id"
-    t.integer "credit_note_item_type"
+    t.integer "credit_note_item_type_id"
     t.text "comment"
     t.string "gl_code"
     t.string "hsn_sac"
@@ -2156,9 +2167,10 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "tax_amount_id"
     t.index ["category_id"], name: "index_credit_note_items_on_category_id"
     t.index ["credit_note_id"], name: "index_credit_note_items_on_credit_note_id"
-    t.index ["credit_note_item_type"], name: "index_credit_note_items_on_credit_note_item_type"
+    t.index ["credit_note_item_type_id"], name: "index_credit_note_items_on_credit_note_item_type_id"
     t.index ["invoice_item_id"], name: "index_credit_note_items_on_invoice_item_id"
     t.index ["item_id"], name: "index_credit_note_items_on_item_id"
     t.index ["original_tax_rate_id"], name: "index_credit_note_items_on_original_tax_rate_id"
@@ -2193,7 +2205,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.text "billing_address"
     t.text "shipping_address"
     t.integer "gross_receivable_amount_id"
-    t.integer "gst_amount_id"
+    t.integer "tax_amount_id"
     t.integer "discount_amount_id"
     t.integer "net_receivable_amount_id"
     t.integer "tds_rate_id"
@@ -2207,6 +2219,8 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.integer "roundoff_amount_id"
     t.integer "department_id"
     t.integer "cost_center_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -2214,7 +2228,6 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.index ["discount_amount_id"], name: "index_credit_notes_on_discount_amount_id"
     t.index ["freight_amount_id"], name: "index_credit_notes_on_freight_amount_id"
     t.index ["gross_receivable_amount_id"], name: "index_credit_notes_on_gross_receivable_amount_id"
-    t.index ["gst_amount_id"], name: "index_credit_notes_on_gst_amount_id"
     t.index ["invoice_id"], name: "index_credit_notes_on_invoice_id"
     t.index ["net_adjustable_amount_id"], name: "index_credit_notes_on_net_adjustable_amount_id"
     t.index ["net_receivable_amount_id"], name: "index_credit_notes_on_net_receivable_amount_id"
@@ -2224,6 +2237,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.index ["sequence_id"], name: "index_credit_notes_on_sequence_id"
     t.index ["shipping_location_id"], name: "index_credit_notes_on_shipping_location_id"
     t.index ["status_id"], name: "index_credit_notes_on_status_id"
+    t.index ["tax_amount_id"], name: "index_credit_notes_on_tax_amount_id"
     t.index ["tds_amount_id"], name: "index_credit_notes_on_tds_amount_id"
     t.index ["tds_rate_id"], name: "index_credit_notes_on_tds_rate_id"
     t.index ["user_id"], name: "index_credit_notes_on_user_id"
@@ -4186,6 +4200,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_134534) do
     t.integer "vlpm_id"
     t.text "client_note"
     t.boolean "payable", default: false
+    t.integer "cn_adjusted_amount_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"

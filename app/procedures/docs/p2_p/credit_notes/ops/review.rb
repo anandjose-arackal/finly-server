@@ -27,6 +27,7 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
       return false
     end
 
+
     true
   end
 
@@ -36,7 +37,9 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
         aasm_event: params[:aasm_event],
     }
     op = WorkflowManager::Base.(current_user, parameters)
-
+    unless op.success?
+      add_message(options, :error, :base, op.messages.errors)
+    end
     op.success?
   end
 

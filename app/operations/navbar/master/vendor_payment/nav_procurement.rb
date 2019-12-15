@@ -9,7 +9,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :divider, :invoices_section, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :divider, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :utility_bill_masters]},
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters]},
           :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
@@ -162,6 +162,13 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def manage_payment_agreements
     return nil unless (user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
     {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
+  end
+
+  def credit_notes
+    # return nil unless (
+    #       user.credit_note_initiator? ||
+    #       user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
+    {name: 'Credit Notes', id: 'manage', url: 'credit_notes/params={"tabName": "agreements"}'}
   end
 
   def create

@@ -25,6 +25,8 @@ class CreditNotesController < BaseControllers::WebBase
 
   def filters_config
     endpoint Docs::P2P::CreditNotes::Configs::Filters
+    # @op = Docs::P2P::CreditNotes::Configs::Filters.(params: params, current_user: current_user)
+    # debugger
     respond_to do |format|
       format.json {}
     end
@@ -39,6 +41,11 @@ class CreditNotesController < BaseControllers::WebBase
   end
 
   def update
+    @op = Docs::P2P::CreditNotes::Ops::Update.(params: params, current_user: current_user)
+    # endpoint Docs::P2P::CreditNotes::Ops::Create
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def destroy
@@ -52,6 +59,7 @@ class CreditNotesController < BaseControllers::WebBase
   def review
     params[:aasm_event] = params[:type]
     endpoint Docs::P2P::CreditNotes::Ops::Review
+    # @op = Docs::P2P::CreditNotes::Ops::Review.(params: params, current_user: current_user)
     respond_to do |format|
       format.json {}
     end

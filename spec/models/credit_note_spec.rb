@@ -19,7 +19,7 @@
 #  billing_address               :text(65535)
 #  shipping_address              :text(65535)
 #  gross_receivable_amount_id    :integer
-#  gst_amount_id                 :integer
+#  tax_amount_id                 :integer
 #  discount_amount_id            :integer
 #  net_receivable_amount_id      :integer
 #  tds_rate_id                   :integer
@@ -33,6 +33,8 @@
 #  roundoff_amount_id            :integer
 #  department_id                 :integer
 #  cost_center_id                :integer
+#  submitted_at                  :datetime
+#  approved_at                   :datetime
 #
 
 require 'rails_helper'

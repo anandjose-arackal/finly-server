@@ -19,7 +19,7 @@
 #  billing_address               :text(65535)
 #  shipping_address              :text(65535)
 #  gross_receivable_amount_id    :integer
-#  gst_amount_id                 :integer
+#  tax_amount_id                 :integer
 #  discount_amount_id            :integer
 #  net_receivable_amount_id      :integer
 #  tds_rate_id                   :integer
@@ -33,6 +33,8 @@
 #  roundoff_amount_id            :integer
 #  department_id                 :integer
 #  cost_center_id                :integer
+#  submitted_at                  :datetime
+#  approved_at                   :datetime
 #
 
 class CreditNote < ApplicationRecord
@@ -52,7 +54,7 @@ class CreditNote < ApplicationRecord
   belongs_to :cost_center, class_name: 'CostCenter', optional: true
 
   belongs_to :gross_receivable_amount, class_name: 'Amount', optional: true
-  belongs_to :gst_amount, class_name: 'Amount', optional: true
+  belongs_to :tax_amount, class_name: 'Amount', optional: true
   belongs_to :discount_amount, class_name: 'Amount', optional: true
   belongs_to :net_receivable_amount, class_name: 'Amount', optional: true
   belongs_to :tds_amount, class_name: 'Amount', optional: true
@@ -60,9 +62,14 @@ class CreditNote < ApplicationRecord
   belongs_to :previously_adjusted_amount, class_name: 'Amount', optional: true
   belongs_to :net_adjustable_amount, class_name: 'Amount', optional: true
 
-  belongs_to :tds_rate_id, class_name: 'TdsRatesList', optional: true
+  belongs_to :tds_rate, class_name: 'TdsRatesList', optional: true
 
   has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
+  has_many :adjustments, class_name: 'CreditNoteAdjustment' #, dependent: :destroy
+
+  # before_save :calculate_amount
+  before_validation :calculate_amount
+  # before_validation { debugger; puts "Hello"}
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
 
@@ -73,26 +80,28 @@ class CreditNote < ApplicationRecord
       {
           id: id,
           procurement_id: procurement_id,
-          gst_amount: precision_value(gst_amount&.value),
-
+          status: status.as_json,
           # gst_type_id: gst_type_id,
-          date: credit_note_date,
+          credit_note_date: credit_note_date,
           created_at: created_at.strftime('%d %b %Y'),
           updated_at: updated_at.strftime('%d %b %Y'),
-
           invoice_number: invoice&.invoice_number,
-          freight_amount: freight_amount&.value,
           # roundoff_amount: roundoff_amount,
-          tds_amount: precision_value(tds_amount&.value),
+
           # attachment: attachments.as_json,
-
           # custom_fields: self.custom_fields,
-
           cost_center: cost_center.as_json,
           department: department.as_json,
           policy: policy.as_json,
           items: items.as_json,
-          # note: note,
+          gross_receivable_amount: gross_receivable_amount.as_json,
+          tax_amount: tax_amount.as_json,
+          tds_rate_id: tds_rate_id,
+          tds_amount: tds_amount.as_json,
+          net_receivable_amount: net_receivable_amount.as_json,
+          freight_amount: freight_amount.as_json,
+          previously_adjusted_amount: previously_adjusted_amount.as_json,
+          net_adjustable_amount: net_adjustable_amount.as_json
       }
     end
   end
@@ -170,4 +179,72 @@ class CreditNote < ApplicationRecord
 
     status_ids.reject {|status_id| status_id.nil?}
   end
+
+  def self.open_statuses
+    self.status_ids(:draft, :retracted, :rejected)
+  end
+
+  private
+
+  def calculate_amount
+    currency_id = company&.base_currency_id || 1
+
+    items_json = items.as_json
+
+    # Gross Receivable Amount
+    gross_receivable_amount_value = items_json.collect {|item| item[:taxable_amount]}.collect {|item| item[:value]}.compact.sum
+    if gross_receivable_amount.present?
+      gross_receivable_amount.value = gross_receivable_amount_value
+    else
+      self.gross_receivable_amount = Amount.new(value: gross_receivable_amount_value, currency_id: currency_id)
+    end
+    # Tax Amount (GST)
+    tax_amount_value = items_json.collect {|item| item[:tax_amount]}.compact.collect {|item| item[:value]}.compact.sum
+    if tax_amount.present?
+      tax_amount.value = tax_amount_value
+    else
+      self.tax_amount = Amount.new(value: tax_amount_value, currency_id: currency_id)
+    end
+
+    tds_amount_value = 0
+    tds_rate_percentage = tds_rate&.tds
+    if tds_rate_percentage.present?
+      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+
+      if self.tds_amount.present?
+        self.tds_amount.value = tds_amount_value
+      else
+        self.tds_amount = Amount.new(value: tds_amount_value, currency_id: currency_id)
+      end
+    end
+
+    net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
+    if self.net_receivable_amount.present?
+      self.net_receivable_amount.value = net_receivable_amount_value
+    else
+      self.net_receivable_amount = Amount.new(value: net_receivable_amount_value, currency_id: currency_id)
+    end
+
+    update_adjustable_amount
+  end
+
+  def update_adjustable_amount
+    currency_id = net_receivable_amount.currency_id
+    previously_adjusted_amount_value = adjustments.joins(:amount).sum(:value)
+
+    if self.previously_adjusted_amount.present?
+      self.previously_adjusted_amount.value = previously_adjusted_amount_value
+    else
+      self.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount_value, currency_id: currency_id)
+    end
+
+    net_adjustable_amount_value = net_receivable_amount&.value&.to_f - previously_adjusted_amount_value
+    if self.net_adjustable_amount.present?
+      self.net_adjustable_amount.value = net_adjustable_amount_value
+    else
+      self.net_adjustable_amount = Amount.new(value: net_adjustable_amount_value, currency_id: currency_id)
+    end
+  end
+
+
 end

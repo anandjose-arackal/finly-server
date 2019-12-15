@@ -7,7 +7,7 @@
 #  item_id                    :integer
 #  invoice_item_id            :integer
 #  category_id                :integer
-#  credit_note_item_type      :integer
+#  credit_note_item_type_id   :integer
 #  comment                    :text(65535)
 #  gl_code                    :string(255)
 #  hsn_sac                    :string(255)
@@ -26,6 +26,8 @@
 #  total_amount_id            :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  deleted_at                 :datetime
+#  tax_amount_id              :integer
 #
 
 require 'rails_helper'

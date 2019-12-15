@@ -30,7 +30,7 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def submit?
-    BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
+    CreditNote.open_statuses.include?(@model.status_id) && @model.user_id == @user.id
   end
 
   def retract?
@@ -58,7 +58,7 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def add_bill?
-    (@model.pocs.include?(@user) || @user.vendor_payment_admin?) && (BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(@model.status_id))
+    (@model.pocs.include?(@user) || @user.vendor_payment_admin?) && (CreditNote.status_ids(:approved, :auto_approved, :reactivated).include?(@model.status_id))
   end
 
   private

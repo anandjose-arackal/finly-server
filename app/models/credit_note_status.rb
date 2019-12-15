@@ -11,6 +11,14 @@
 class CreditNoteStatus < ApplicationRecord
   include Seedable
 
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        display_name: name.split("_").map(&:capitalize).join(" ")
+    }
+  end
+
   def self.values
     %w( draft retracted awaiting_approval rejected approved auto_approved partially_adjusted adjusted voided )
   end
