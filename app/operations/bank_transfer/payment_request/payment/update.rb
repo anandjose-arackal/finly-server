@@ -120,18 +120,18 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    # if nothing is passed inside invoice items attributes, assume that all are to be deleted
-    if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
-      if self.payment&.invoice&.invoice_items.present?
-        self.payment_params[:invoice_attributes][:invoice_items_attributes] = []
-        self.payment&.invoice&.invoice_items.each do |item|
-          self.payment_params[:invoice_attributes][:invoice_items_attributes] << {
-              id: item.id,
-              _destroy: true
-          }
-        end
-      end
-    end
+    # # if nothing is passed inside invoice items attributes, assume that all are to be deleted
+    # if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
+    #   if self.payment&.invoice&.invoice_items.present?
+    #     self.payment_params[:invoice_attributes][:invoice_items_attributes] = []
+    #     self.payment&.invoice&.invoice_items.each do |item|
+    #       self.payment_params[:invoice_attributes][:invoice_items_attributes] << {
+    #           id: item.id,
+    #           _destroy: true
+    #       }
+    #     end
+    #   end
+    # end
 
     # if inclusive of taxes is not sent in the backend, mark it as false
     if self.payment_params&.dig(:invoice_attributes)
