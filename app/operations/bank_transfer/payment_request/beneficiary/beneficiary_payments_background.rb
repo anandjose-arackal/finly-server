@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute, :payment_params, :beneficiary_payments, :from_payment_agreement, :agreement_type, :agreement_related_document_id, :ticket_type, :security_deposit, :beneficiary_payment, :security_deposits, :agreement_beneficiary_payment, :agreement_security_deposit, 
-                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items
+                :init_text_field, :init_drop_down_field, :import_id, :import_number, :import_date, :init_multi_select_field, :init_multi_select_selction_items, :tax_rate_id
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -26,6 +26,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.agreement_related_document_id = options[:document_id]
     self.ticket_type = options[:ticket_type]
     self.options = options
+    self.tax_rate_id = options[:tax_rate_id]
     self.run
   end
 
@@ -505,6 +506,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
+      tax_rate_id: self.tax_rate_id,
       original_amount_attributes: {
               value: payment[:original_amount],
               currency_id: Currency.first.id

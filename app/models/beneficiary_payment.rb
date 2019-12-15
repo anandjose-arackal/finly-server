@@ -103,6 +103,7 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :payments, as: :parent
 
