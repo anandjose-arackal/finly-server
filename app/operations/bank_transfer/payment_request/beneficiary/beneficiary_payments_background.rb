@@ -26,7 +26,6 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
     self.agreement_related_document_id = options[:document_id]
     self.ticket_type = options[:ticket_type]
     self.options = options
-    self.tax_rate_id = options[:tax_rate_id]
     self.run
   end
 
@@ -506,7 +505,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
       inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
-      tax_rate_id: self.tax_rate_id,
+      tax_rate_id: payment[:tax_rate_id],
       original_amount_attributes: {
               value: payment[:original_amount],
               currency_id: Currency.first.id

@@ -155,6 +155,7 @@ class BeneficiaryPayment < ApplicationRecord
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid?,
         tax_rate: precision_value(self.tax_rate),
+        tax_rate_id: self.tax_rate_id,
         tds_rate: precision_value(self.tds_slab&.tds),
         net_amount: precision_value(self.net_amount&.value),
         gross_amount: precision_value(self.gross_amount&.value),
