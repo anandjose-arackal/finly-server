@@ -970,7 +970,7 @@ class Payment < ApplicationRecord
 
   def get_beneficiary_amount_details
     parameters = RequestStore.store[:params]
-    tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
+    tds_slabs = TdsSlabs::Index.(self.parent.creator, parameters).tds_slabs rescue nil
     {
       total_amount: { value: precision_value(self.parent.original_amount&.value), editable: true }, # TOTAL
       inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
