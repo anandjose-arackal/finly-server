@@ -253,6 +253,7 @@ class YesBankVendor < ApplicationRecord
         state_code: state_code&.state_code,
         address: address,
         trade_name: trade_name,
+        rcm_enabled: rcm_enabled,
         custom_fields: self.custom_fields
     }
   end

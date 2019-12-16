@@ -101,6 +101,7 @@ json.invoice do
     json.name invoice.vendor&.name
     json.email invoice.vendor&.email
     json.id invoice.vendor&.id
+    json.rcm_enabled invoice.vendor&.rcm_enabled
 
     json.selected_bank_account do
       json.account_number invoice.receiving_account&.account_number
