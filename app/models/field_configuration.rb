@@ -73,6 +73,7 @@ class FieldConfiguration < ApplicationRecord
   accepts_nested_attributes_for :multiselect_items
   accepts_nested_attributes_for :field_parent_mappings
   accepts_nested_attributes_for :policy_field_mappings
+  accepts_nested_attributes_for :parent_dependent_field_configuration_mappings
 
   scope :with_id, -> (id) {where id: id}
 
@@ -94,6 +95,10 @@ class FieldConfiguration < ApplicationRecord
 
   scope :include_for_index, -> {
     includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
+  }
+
+  scope :filter_parent_drop_down_id, -> (drop_down_id) {
+    joins(:parent_dependent_field_configuration_mappings).where('parent_dependent_field_configuration_mappings.parent_type = ? AND parent_dependent_field_configuration_mappings.parent_id IN (?)', "FieldDropDownItem", drop_down_id)
   }
 
   delegate :drop_down?, :multiselect?, to: :field_type

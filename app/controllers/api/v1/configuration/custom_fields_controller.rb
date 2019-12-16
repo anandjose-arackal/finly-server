@@ -56,4 +56,10 @@ class Api::V1::Configuration::CustomFieldsController < BaseControllers::ApiBase
     @result = CustomField::Configuration::Users::Remove.(current_user, params)
     respond response: @result&.success? ? :success : :failure
   end
+
+  # this action will return the dependent field configurations given a particular drop down item
+  def dependent_field_configurations
+    @result = CustomField::Configuration::Index.(current_user, params)
+    respond
+  end
 end
