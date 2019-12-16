@@ -66,6 +66,7 @@ class CreditNote < ApplicationRecord
 
   has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
   has_many :adjustments, class_name: 'CreditNoteAdjustment' #, dependent: :destroy
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   # before_save :calculate_amount
   before_validation :calculate_amount

@@ -9,7 +9,6 @@ class Procurements::Comments::Create < Procurements::Comments::Base
     document_type = comment_params[:parent_commentable_type]
     document_id = comment_params[:parent_commentable_id]
 
-
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id
     else
