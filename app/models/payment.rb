@@ -962,7 +962,7 @@ class Payment < ApplicationRecord
       roundoff_amount: { value: 0, editable: false },
       tds_slabs: tds_slabs,
       tax_rates: self.purchase_order.company.tax_rates,
-      gst_type_id: {value: self.purchase_order.gst_type_id, editable: false}, 
+      #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false}, 
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
     }
@@ -1001,7 +1001,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
       discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
       tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
-      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds},
+      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
       advance_amount: { value: self.invoice.advance_amount&.value, editable: false }, # Advance
       freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
       net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
