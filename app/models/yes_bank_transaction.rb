@@ -21,6 +21,7 @@
 #  beneficiary_full_name                :string(255)
 #  beneficiary_verification_retry_count :integer
 #  deleted_at                           :datetime
+#  transfer_mode_id                     :integer
 #
 
 class YesBankTransaction < ApplicationRecord

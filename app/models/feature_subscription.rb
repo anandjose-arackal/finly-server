@@ -33,7 +33,6 @@
 #  bank_service_provider          :string(255)
 #  request_encryption_enabled     :boolean          default(FALSE)
 #  group_entity_structure         :boolean          default(FALSE)
-#  vendor_portal                  :boolean          default(FALSE)
 #  grn_enabled                    :boolean          default(TRUE)
 #  srn_enabled                    :boolean          default(FALSE)
 #  agreement_based_payment_system :boolean          default(FALSE)

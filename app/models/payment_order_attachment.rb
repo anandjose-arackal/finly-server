@@ -13,6 +13,7 @@
 #  description                :text(65535)
 #  uploader_id                :integer
 #  deleted_at                 :datetime
+#  allow_delete               :boolean          default(TRUE)
 #
 
 class PaymentOrderAttachment < ApplicationRecord
