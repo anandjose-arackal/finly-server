@@ -4,10 +4,10 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   subscribe 'vendors.import'
   headers ({
       :id => "ID",
-      :name => "Vendor NAme",
+      :business_name => "Legal Name",
       :vendor_type => "Vendor Type",
       :vendor_id => "Vendor Code",
-      :business_name => "Business Name",
+      :trade_name => "Trade Name",
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",
@@ -97,11 +97,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   
   def set_params(data)
     messages =[]
-    name = data[:name].to_s
-    messages << "Name can't Blank" if name.blank?
+    business_name = data[:business_name].to_s
+    messages << "Legal Name can't Blank" if business_name.blank?
     mobile_number = clean_up_data data[:mobile_number]
     email = data[:email].to_s
-    business_name = data[:business_name].to_s
+    trade_name = data[:trade_name].to_s
     pan = data[:pan].to_s
     state =data[:state].to_s
     description = data[:description].to_s
@@ -137,12 +137,12 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
 
     gst_registered = (gstin.present? ? true : false)
-    params =  {"vendor"=>{"name"=> name,
+    params =  {"vendor"=>{"business_name"=> business_name,
                           "authorized"=>"1",
                           "mobile_number"=> mobile_number,
                           "email"=> email ,
                           "currency_id"=>"1",
-                          "business_name"=> business_name,
+                          "trade_name"=> trade_name,
                           "pan"=> pan,
                           "description"=> description,
                           "address"=> address,
