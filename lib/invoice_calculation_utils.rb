@@ -248,8 +248,14 @@ class InvoiceCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
-    self.tax_amount = self.net_amount - self.gross_amount
+    if self.invoice.rcm_enabled?
+      self.net_amount = self.gross_amount
+      net_if_tax_applied = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = net_if_tax_applied - self.gross_amount
+    else
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = self.net_amount - self.gross_amount
+    end
   end
 
   def calculate_inclusive_taxes
