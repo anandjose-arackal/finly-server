@@ -185,16 +185,6 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    unless [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
-      vendor_pan = vendor_parameters[:pan]
-      if vendor_pan.present?
-        if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
-          add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
-          return
-        end
-      end
-    end
-
     if self.vendor_parameters[:bank_accounts_attributes].blank?
       add_message :error, "Please provide bank account details"
       return
