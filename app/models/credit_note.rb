@@ -97,7 +97,7 @@ class CreditNote < ApplicationRecord
           billing_location: billing_location.as_json,
           billing_address: billing_address,
           narration: narration,
-          shipping_address: shpping_address,
+          shipping_address: shipping_address,
           cost_center: cost_center.as_json,
           department: department.as_json,
           policy: policy.as_json,
