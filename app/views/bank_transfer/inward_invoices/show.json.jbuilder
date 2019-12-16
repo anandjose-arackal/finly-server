@@ -14,6 +14,7 @@ json.invoice do
   else
     json.original_amount precision_value invoice.original_amount&.value
   end
+  json.rcm_enabled invoice&.rcm_enabled
   json.raw_amount precision_value invoice&.amount&.value
   json.advance_amount precision_value invoice.advance_amount&.value
   json.tax_amount precision_value invoice.tax_amount&.value
