@@ -48,6 +48,7 @@ class FieldDropDownItem < ApplicationRecord
         id: id,
         name: name,
         dependent_field_configurations: dependent_field_configurations,
+        custom_field_name: self.field_configuration&.field_name,
         dependent_cf_present: self.dependent_field_configurations.exists?
     }
   end

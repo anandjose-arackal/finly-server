@@ -222,7 +222,8 @@ class FieldConfiguration < ApplicationRecord
         global: self.global,
         value: self.default_value,
         options: options,
-        root_field: self.root_field
+        root_field: self.root_field,
+        parent_drop_down_items: parent_drop_down_items
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
       if self.drop_down_items.joins(:dependent_field_configurations).present?
