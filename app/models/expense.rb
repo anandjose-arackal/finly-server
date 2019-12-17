@@ -1051,7 +1051,7 @@ class Expense < ApplicationRecord
       end
     else
       if self.gst_amount.present?
-        self.gst_amount.value = value
+        self.gst_amount.update_attributes(value: value)
       else
         self.build_gst_amount(value: value, currency_id: Currency.id_for(:INR))
       end
