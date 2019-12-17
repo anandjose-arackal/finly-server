@@ -9,6 +9,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  company_account_type_id :integer
+#  deleted_at              :datetime
 #
 
 class CompanyAccount < ApplicationRecord

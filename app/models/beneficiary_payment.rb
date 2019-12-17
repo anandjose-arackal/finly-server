@@ -39,6 +39,7 @@
 #  resource_template_id            :integer
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
+#  deleted_at                      :datetime
 #
 
     #                 :id => :integer,
@@ -103,6 +104,7 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :payments, as: :parent
 
@@ -154,6 +156,7 @@ class BeneficiaryPayment < ApplicationRecord
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid?,
         tax_rate: precision_value(self.tax_rate),
+        tax_rate_id: self.tax_rate_id,
         tds_rate: precision_value(self.tds_slab&.tds),
         net_amount: precision_value(self.net_amount&.value),
         gross_amount: precision_value(self.gross_amount&.value),
