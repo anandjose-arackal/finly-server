@@ -543,8 +543,10 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def mode
-    self.transfer_mode&.mode&.name
+    self.transfer_mode&.mode&.name&.upcase
   end
+
+
 
   private
 

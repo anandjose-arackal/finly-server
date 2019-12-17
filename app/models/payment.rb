@@ -664,7 +664,7 @@ class Payment < ApplicationRecord
   end
 
   def mode
-    self.transfer_mode&.mode&.name
+    self.transfer_mode&.mode&.name&.upcase
   end
 
   def as_json(options={})
@@ -675,6 +675,10 @@ class Payment < ApplicationRecord
 
   def mode
     self.transfer_mode&.mode&.name
+  end
+
+  def payment_mode
+    mode || super
   end
 
   private

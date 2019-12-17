@@ -698,11 +698,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Initiator logic start ####################
-    if bank_payment_request.is_initiating_user?
-      if bank_payment_request.payment_order.initiating_user_id == user.id
-        return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
-      end
-    end
+    # if bank_payment_request.is_initiating_user?
+    #   if bank_payment_request.payment_order.initiating_user_id == user.id
+    #     return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
+    #   end
+    # end
     ############# Initiator logic end ####################
   end
 
