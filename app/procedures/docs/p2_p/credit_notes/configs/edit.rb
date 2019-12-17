@@ -11,6 +11,7 @@ class Docs::P2P::CreditNotes::Configs::Edit < Transactions::API
     # result['cost_centers'] = current_user.company.cost_centers
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, {filter_role_id: [UserRole.id_for(:credit_note_initiator)]}).policies rescue Policy.none
     result['credit_note_item_types'] = CreditNoteItemType.all
+    result['tax_rates'] = current_user.company.tax_rates
     result['reviewal_chains'] = []
 
     if model.present?
