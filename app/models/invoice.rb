@@ -689,6 +689,7 @@ class Invoice < ApplicationRecord
         discount_type_id: self.discount_type_id,
         due_date: self.due_date,
         invoice_number: self.invoice_number,
+        invoice_id: self.invoice_id,
         inclusive_of_taxes: self.inclusive_of_taxes,
         freight_amount: self.freight_amount&.value,
         roundoff_amount: self.roundoff_amount,
