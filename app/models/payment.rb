@@ -860,19 +860,21 @@ class Payment < ApplicationRecord
     departments = Company::Departments::Index.(self.beneficiary_payment.creator, parameters).policy_department_filter_mapping rescue nil
     categories = Categories::Index.(self.beneficiary_payment.creator, parameters).vp_categories rescue nil
     cost_centers = CostCenters::Index.(self.beneficiary_payment.creator, parameters).cost_centers rescue nil
+    cc_emails = self.parent.payment_notification_users["cc_emails"] rescue []
     #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
       invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
-      invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
-      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
-      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
-      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
-      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: false, field_type: 'field_drop_down_item' },
-      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      invoice_date: { value: self.invoice.date, editable: true, field_type: 'field_text' },
+      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: true },
+      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: true, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: true, field_type: 'field_drop_down_item' },
+      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: true, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: true, field_type: 'field_text_area' },
       categories: categories,
       cost_centers: cost_centers,
-      departments: departments
+      departments: departments,
+      cc_emails: { value: cc_emails, editable: true, field_type: 'multi_select'}
     }
   end
 
@@ -995,6 +997,14 @@ class Payment < ApplicationRecord
   def get_invoice_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
+    if self.invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      invoice_advance = self.invoice.po_adjusted_advance&.value&.to_f
+    elsif self.invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      invoice_advance = self.invoice.advance_amount&.value&.to_f
+    else
+      invoice_advance = self.invoice.advance_amount&.value&.to_f
+    end
+
     {
       tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
       total_amount: { value: self.invoice.item_amounts_total, editable: false }, # TOTAL
@@ -1002,7 +1012,7 @@ class Payment < ApplicationRecord
       discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
       tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
       tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
-      advance_amount: { value: self.invoice.advance_amount&.value, editable: false }, # Advance
+      advance_amount: { value: invoice_advance, editable: false }, # Advance
       freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
       net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
       net_total: { value: self.invoice.net_amount&.value, editable: false }, #Net Total
