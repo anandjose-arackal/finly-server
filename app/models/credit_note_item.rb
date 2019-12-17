@@ -76,20 +76,28 @@ class CreditNoteItem < ApplicationRecord
   private
 
   def calculate_total
+    # Reset Original Values if credit note item type has changed
+    reset_original_values
+
+
     currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")
+
+    # case credit_note_item_type_id
+    # when CreditNoteItemType.id_for(:qty_change)
+    #   calculate_qty_change
+    # when CreditNoteItemType.id_for(:price_drop)
+    #   calculate_price_drop
+    # when CreditNoteItemType.id_for(:gst_change)
+    #   calculate_gst_change
+    # else
+    #   # Do nothing
+    #   return
+    # end
+
     taxable_amount_value = quantity * rate
     tax_amount_value = taxable_amount_value * self.tax_rate.rate / 100
 
-    case credit_note_item_type_id
-    when CreditNoteItemType.id_for(:qty_change)
-    when CreditNoteItemType.id_for(:price_drop)
-    when CreditNoteItemType.id_for(:gst_change)
-    else
-      # Do nothing
-    end
-  end
 
-  def calculate_qty_change
     if self.taxable_amount.present?
       self.taxable_amount.update(value: taxable_amount_value)
     else
@@ -109,10 +117,31 @@ class CreditNoteItem < ApplicationRecord
     end
   end
 
+  def reset_original_values
+    case credit_note_item_type_id
+    when CreditNoteItemType.id_for(:qty_change)
+      self.rate = original_rate
+      self.tax_rate_id = original_tax_rate_id
+    when CreditNoteItemType.id_for(:price_drop)
+      self.quantity = original_quantity
+      self.tax_rate_id = original_tax_rate_id
+    when CreditNoteItemType.id_for(:gst_change)
+      self.quantity = original_quantity
+      self.rate = original_rate
+    end
+  end
+
+  def calculate_qty_change
+
+
+  end
+
   def calculate_price_drop
+
   end
 
   def calculate_gst_change
+
   end
 
 end

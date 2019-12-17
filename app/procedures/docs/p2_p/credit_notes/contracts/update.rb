@@ -13,11 +13,11 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     property :quantity, presence: true
     property :rate, presence: true
     # property :taxable_amount, populate_if_empty: Amount do # WORKING
-    property :taxable_amount, populate_if_empty: Amount do
-      property :id
-      property :value, presence: true
-      property :currency_id, presence: true
-    end
+    # property :taxable_amount, populate_if_empty: Amount do
+    #   property :id
+    #   property :value, presence: true
+    #   property :currency_id, presence: true
+    # end
     property :tax_rate_id, presence: true
   end
 
