@@ -1030,17 +1030,17 @@ class Payment < ApplicationRecord
     case document_type
     when 'Invoice'
       {
-        url: self.invoice.invoice_attachments.first&.attached_file&.url,
-        thumb: self.invoice.invoice_attachments.first&.attached_file&.url(:thumb),
-        content_type: self.invoice.invoice_attachments.first&.attached_file&.content_type,
-        file_name: self.invoice.invoice_attachments.first&.attached_file&.original_filename
+        url: self.parent.attachments.first&.file&.url,
+        thumb: self.parent.attachments.first&.file&.url(:thumb),
+        content_type: self.parent.attachments.first&.file&.content_type,
+        file_name: self.parent.attachments.first&.file&.original_filename
       }
     when 'PurchaseOrder'
       {
-        url: self.purchase_order.attachments.first&.attached_file&.url,
-        thumb: self.purchase_order.attachments.first&.attached_file&.url(:thumb),
-        content_type: self.purchase_order.attachments.first&.attached_file&.content_type,
-        file_name: self.purchase_order.attachments.first&.attached_file&.original_filename
+        url: self.parent.attachments.first&.file&.url,
+        thumb: self.parent.attachments.first&.file&.url(:thumb),
+        content_type: self.parent.attachments.first&.file&.content_type,
+        file_name: self.parent.attachments.first&.file&.original_filename
       }
     when 'BeneficiaryPayment'
       {
