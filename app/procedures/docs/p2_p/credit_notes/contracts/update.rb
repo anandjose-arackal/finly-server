@@ -1,5 +1,4 @@
 class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
-
   property :id
   property :policy_id, presence: true
   property :narration
@@ -13,6 +12,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     property :comment
     property :quantity, presence: true
     property :rate, presence: true
+    # property :taxable_amount, populate_if_empty: Amount do # WORKING
     property :taxable_amount, populate_if_empty: Amount do
       property :id
       property :value, presence: true
@@ -22,13 +22,8 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   end
 
   validate :company_entities # Checks for departments
-  validate :xx # Checks for departments
 
   private
-
-  def xx
-    true
-  end
 
   def items!(collection:, fragment:, index:, options:, **)
     item = items.find {|item| item.id.to_s == fragment["id"].to_s}
@@ -38,7 +33,8 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
       return skip!
     end
 
-    item ? items.insert(index, item.model) : items.insert(index, CreditNoteItem.new)
+    # item ? items.insert(index, item.model) : items.insert(index, CreditNoteItem.new)
+    item || items << CreditNoteItem.new
   end
 
   def company_entities

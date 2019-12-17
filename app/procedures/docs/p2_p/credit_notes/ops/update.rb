@@ -22,7 +22,7 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
   step Contract::Persist()
   step :setup_dlrm
 
-  step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
+  step Transactions::Messages::SuccessMessage('Successfully Updated Credit Note')
 
 
   def set_default_params(options, params:, current_user:, **)

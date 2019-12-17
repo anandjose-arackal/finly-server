@@ -202,14 +202,14 @@ class CreditNote < ApplicationRecord
     # Gross Receivable Amount
     gross_receivable_amount_value = items_json.collect {|item| item[:taxable_amount]}.collect {|item| item[:value]}.compact.sum
     if gross_receivable_amount.present?
-      gross_receivable_amount.value = gross_receivable_amount_value
+      gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
       self.gross_receivable_amount = Amount.new(value: gross_receivable_amount_value, currency_id: currency_id)
     end
     # Tax Amount (GST)
     tax_amount_value = items_json.collect {|item| item[:tax_amount]}.compact.collect {|item| item[:value]}.compact.sum
     if tax_amount.present?
-      tax_amount.value = tax_amount_value
+      tax_amount.update(value: tax_amount_value)
     else
       self.tax_amount = Amount.new(value: tax_amount_value, currency_id: currency_id)
     end
@@ -220,7 +220,7 @@ class CreditNote < ApplicationRecord
       tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
 
       if self.tds_amount.present?
-        self.tds_amount.value = tds_amount_value
+        self.tds_amount.update(value: tds_amount_value)
       else
         self.tds_amount = Amount.new(value: tds_amount_value, currency_id: currency_id)
       end
@@ -228,7 +228,7 @@ class CreditNote < ApplicationRecord
 
     net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
     if self.net_receivable_amount.present?
-      self.net_receivable_amount.value = net_receivable_amount_value
+      self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
       self.net_receivable_amount = Amount.new(value: net_receivable_amount_value, currency_id: currency_id)
     end
@@ -241,18 +241,16 @@ class CreditNote < ApplicationRecord
     previously_adjusted_amount_value = adjustments.joins(:amount).sum(:value)
 
     if self.previously_adjusted_amount.present?
-      self.previously_adjusted_amount.value = previously_adjusted_amount_value
+      self.previously_adjusted_amount.update(value: previously_adjusted_amount_value)
     else
       self.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount_value, currency_id: currency_id)
     end
 
     net_adjustable_amount_value = net_receivable_amount&.value&.to_f - previously_adjusted_amount_value
     if self.net_adjustable_amount.present?
-      self.net_adjustable_amount.value = net_adjustable_amount_value
+      self.net_adjustable_amount.update(value: net_adjustable_amount_value)
     else
       self.net_adjustable_amount = Amount.new(value: net_adjustable_amount_value, currency_id: currency_id)
     end
   end
-
-
 end
