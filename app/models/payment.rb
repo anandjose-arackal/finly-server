@@ -956,7 +956,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: "",
       discount: "",
       tax: "",
-      tds: { tds_type_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds },
+      tds: { tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds },
       advance_amount: "", # Advance
       freight_amount: "",
       net_payable_amount: "",
@@ -980,7 +980,7 @@ class Payment < ApplicationRecord
       #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
       tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
       tax_rate: {tax_rate_id: self.parent.tax_rate_id, editable: true},
-      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true, tds_slab_rate: self.parent&.tds_slab&.tds },
+      tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true, tds_slab_rate: self.parent&.tds_slab&.tds },
       advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: true }, # Advance
       freight_amount: "",
       net_payable_amount: "",
@@ -1011,7 +1011,7 @@ class Payment < ApplicationRecord
       inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
       discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
       tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
-      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
+      tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
       advance_amount: { value: invoice_advance, editable: false }, # Advance
       freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
       net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
