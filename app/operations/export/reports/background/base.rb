@@ -101,7 +101,9 @@ class Export::Reports::Background::Base < BackgroundOperation
           data_arr << expense&.report&.submitted_at&.strftime("%H:%M, %d/%m/%Y")
         when ExportField.id_for(:report_creation_date)
           data_arr << expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
-        else
+        when ExportField.id_for(:receipt_link)
+          data_arr << expense&.receipts&.first&.image&.url
+      else
           data_arr << ''
       end
     end

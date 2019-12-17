@@ -6,13 +6,14 @@
 #  name       :string(255)      not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #
 
 class ExportField < ApplicationRecord
   include Seedable
 
   scope :with_id, ->(id) { where id: id }
+
+  scope :ordered_by_name, -> { reorder(name: :asc) }
 
   VALUES = {
       1 => "Employee Name",
@@ -40,7 +41,12 @@ class ExportField < ApplicationRecord
       25 => "Spent from Account",
       26 => "Policy",
       27 => "Report Submission Date",
-      29 => "Report Creation Date"
+      29 => "Report Creation Date",
+      30 => "Receipt Link",
+      31 => "Report Creation Date",
+      32 => "IGST",
+      33 => "CGST",
+      34 => "SGST"
   }
 
   def self.id_for(name_in_sym)

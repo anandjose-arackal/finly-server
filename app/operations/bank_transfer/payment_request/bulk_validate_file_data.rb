@@ -105,6 +105,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       note = item[:note]
       external_reference_id = item[:external_reference_id]
       custom_fields_key = item[:custom_fields] || item["custom_fields"]
+      emails = item[:payment_notification_users] || item['payment_notification_users']
 
       # generating custom field data
       custom_fields = {}
@@ -363,6 +364,19 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           self.error_messages << "Entered cost center ID not found for this company. Please recheck the list of Cost Centers."
           self.issue_item[:cost_center_id] = "Entered cost center ID not found for this company. Please recheck the list of Cost Centers."
         end
+      end
+
+      if emails.present? && emails.dig(:cc_emails)
+        invalid_emails = []
+        emails.dig(:cc_emails).each do |email|
+          unless Constants::VALID_EMAIL_FORMAT.match(email)
+            invalid_emails << email
+          end
+        end
+
+        self.valid = false
+        self.error_messages << "Invalid email format for - #{invalid_emails.join(", ")}"
+        self.issue_item[:cc_emails] = "Invalid email format for - #{invalid_emails.join(", ")}"
       end
 
       if self.valid
