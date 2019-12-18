@@ -849,20 +849,20 @@ class Payment < ApplicationRecord
 
   def get_beneficiary_field_details
     parameters = RequestStore.store[:params]
-    parameters[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
-    departments = Company::Departments::Index.(self.beneficiary_payment.creator, parameters).policy_department_filter_mapping rescue nil
-    categories = Categories::Index.(self.beneficiary_payment.creator, parameters).vp_categories rescue nil
-    cost_centers = CostCenters::Index.(self.beneficiary_payment.creator, parameters).cost_centers rescue nil
-    #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    departments = Company::Departments::Index.(self.parent.creator, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.parent.creator, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.parent.creator, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    #parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
       invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
       invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
-      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
-      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
-      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
-      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: false, field_type: 'field_drop_down_item' },
-      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: true },
+      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: true, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: true, field_type: 'field_drop_down_item' },
+      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: true, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: true, field_type: 'field_text_area' },
       categories: categories,
       cost_centers: cost_centers,
       departments: departments
