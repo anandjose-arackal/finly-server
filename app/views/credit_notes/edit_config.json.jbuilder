@@ -3,6 +3,7 @@ json.result do
   json.policies {json.array! @op['result']['policies']}
   json.credit_note_item_types {json.array! @op['result']['credit_note_item_types']}
   json.tax_rates {json.array! @op['result']['tax_rates']}
+  json.tds_rates {json.array! @op['result']['tds_rates']}
 
   json.reviewal_chains do
     json.array! @op['result']['reviewal_chains'] do |chain|

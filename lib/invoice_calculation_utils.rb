@@ -300,4 +300,9 @@ class InvoiceCalculationUtils
     self.net_amount = original_net_amount + self.freight_amount
   end
 
+  # Credit Note Adjustments
+  def calculate_cn_adjustments
+
+  end
+
 end

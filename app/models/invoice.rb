@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -89,7 +89,11 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
+#  vendor_poc_id                   :integer
+#  vlpm_id                         :integer
+#  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
@@ -183,6 +187,7 @@ class Invoice < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
+  has_many :credit_note_adjustments
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -202,6 +207,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
   accepts_nested_attributes_for :notify_users, allow_destroy: true
+  accepts_nested_attributes_for :credit_note_adjustments, allow_destroy: true
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tds_amount

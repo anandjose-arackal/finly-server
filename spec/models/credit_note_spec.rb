@@ -35,6 +35,7 @@
 #  cost_center_id                :integer
 #  submitted_at                  :datetime
 #  approved_at                   :datetime
+#  credit_note_number            :string(255)
 #
 
 require 'rails_helper'

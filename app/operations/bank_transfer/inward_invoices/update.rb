@@ -217,6 +217,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Please select the bank account for the vendor. If they are not present, please update this detail from the Vendor Empanelment screen."
       return
     end
+
+    # Credit Note Adjustments Validation
+    inward_invoice_params[:credit_note_adjusments_attributes].each do |adjustment_attr|
+      op = Docs::P2P::CreditNotes::Ops::Show(params: {id: adjustment_attr[:credit_note_id]}, current_user: user)
+      unless op.success?
+        add_message :error, "Credit Note not found for provided amount #{adjustment_attr[:amount][:value]}"
+        next
+      end
+
+      credit_note = op['model']
+      if adjustment_attr[:amount][:value].to_f > credit_note.net_adjustable_amount&.value.to_f
+        add_message :error, "Cannot adjust amount more than available credits in Credit Note #{credit_note.credit_note_number} "
+      end
+    end
   end
 
   def pre_process
