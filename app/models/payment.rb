@@ -906,7 +906,7 @@ class Payment < ApplicationRecord
     #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
-      invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
+      invoice_number: { value: self.invoice.invoice_number, editable: false, field_type: 'field_text' },
       invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
       due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
       category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
@@ -987,22 +987,22 @@ class Payment < ApplicationRecord
 
   def get_invoice_amount_details
     parameters = RequestStore.store[:params]
-    tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
+    tds_slabs = TdsSlabs::Index.(self.parent.created_by, parameters).tds_slabs rescue nil
     {
       tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-      total_amount: { value: self.invoice.item_amounts_total, editable: false }, # TOTAL
-      inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
-      discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
-      tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
-      tds: { tds_type_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
-      advance_amount: { value: self.invoice.advance_amount&.value, editable: false }, # Advance
-      freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
-      net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
-      net_total: { value: self.invoice.net_amount&.value, editable: false }, #Net Total
-      roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
+      total_amount: { value: self.parent.item_amounts_total, editable: false }, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
+      tds: { tds_type_id: self.parent.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds, tds_slab_id: self.parent.tds_slab_id},
+      advance_amount: { value: self.parent.advance_amount&.value, editable: false }, # Advance
+      freight_amount: { value: self.parent.freight_amount&.value, editable: false },
+      net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
+      net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
+      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
-      tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: { value: self.parent.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: invoice.balance_due&.value, editable: false } # Invoice AMOUNT
     }
@@ -1011,7 +1011,7 @@ class Payment < ApplicationRecord
   def get_custom_fields(document_type)
     case document_type
     when 'Invoice'
-      self.invoice.custom_fields
+      self.parent.custom_fields
     when 'PurchaseOrder'
       self.purchase_order.custom_fields
     when 'BeneficiaryPayment'
