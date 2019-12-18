@@ -11,7 +11,7 @@
 #  updated_at            :datetime         not null
 #  user_id               :integer
 #  company_id            :integer
-#  note                  :text(65535)
+#  note                  :text(16777215)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)

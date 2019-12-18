@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  po_number                       :string(255)
 #  narration                       :text(65535)
+#  po_number                       :string(255)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -89,11 +89,7 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
-#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
@@ -825,7 +821,6 @@ class Invoice < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
   end
-
   ############ End ############
 
   # def can_take_control?
