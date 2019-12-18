@@ -6,4 +6,8 @@ class BaseControllers::AccountingExportBase < ApplicationController
     :accounting_export
   end
 
+  # def verify_user_session(doorkeeper_token)
+  #   true
+  # end
+
 end
