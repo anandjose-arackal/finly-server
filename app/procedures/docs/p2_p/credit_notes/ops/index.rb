@@ -2,13 +2,26 @@ class Docs::P2P::CreditNotes::Ops::Index < Transactions::API
   include HasScope
 
   has_scope :filter_search
+  has_scope :filter_sequence_id
+  has_scope :filter_credit_note_number
   has_scope :filter_status
+  has_scope :filter_adjustables
+
 
   has_scope :filter_department_id
   has_scope :filter_cost_center_id
   has_scope :filter_location_id
   has_scope :filter_policy_id
   has_scope :filter_user_id
+  has_scope :filter_vendor_id
+
+  has_scope :filter_invoice_id
+  has_scope :filter_invoice_number
+
+  has_scope :filter_date, using: [:from, :to], type: :hash
+  has_scope :filter_created_on_date, using: [:from, :to], type: :hash
+  has_scope :filter_approved_on_date, using: [:from, :to], type: :hash
+  has_scope :filter_amount, using: [:gteq, :lteq], type: :hash
 
 
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :index?)
@@ -35,7 +48,7 @@ class Docs::P2P::CreditNotes::Ops::Index < Transactions::API
     per_page = params[:per_page] || 30
     credit_notes = apply_scopes(credit_notes, params)
     result = {
-        "credit_notes" => credit_notes.paginate(page: page, per_page: per_page)
+        "credit_notes" => credit_notes.sort_for_index.paginate(page: page, per_page: per_page).includes_for_index
     }
     options['result'] = result
   end

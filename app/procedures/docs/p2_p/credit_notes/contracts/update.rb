@@ -2,6 +2,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   property :id
   property :policy_id, presence: true
   property :narration
+  property :credit_note_number
   property :credit_note_date
 
   property :current_user, virtual: true

@@ -76,12 +76,34 @@ class CreditNote < ApplicationRecord
 
   def as_json(options = {})
     if options[:index]
-      {}
+      data = {
+          id: id,
+          sequence_id: sequence_id,
+          creidt_note_number: credit_note_number,
+          status_name: status&.name,
+          status_id: status&.id,
+          narration: narration,
+          credit_note_date: credit_note_date,
+          created_at: created_at.strftime('%d %b %Y'),
+          updated_at: updated_at.strftime('%d %b %Y'),
+          invoice_number: invoice&.invoice_number,
+          vendor_name: vendor.display_name,
+          vendor_id: vendor.id,
+          department_name: department&.name,
+          department_id: department&.id,
+          cost_center_name: cost_center&.name,
+          cost_center_id: cost_center&.id,
+          policy_name: policy&.name,
+          policy_id: policy&.id,
+          previously_adjusted_amount: previously_adjusted_amount.as_json,
+          net_adjustable_amount: net_adjustable_amount.as_json
+      }
     else
-      {
+      data = {
           id: id,
           procurement_id: procurement_id,
           status: status.as_json,
+          credit_note_number: credit_note_number,
           sequence_id: sequence_id,
           # gst_type_id: gst_type_id,
           credit_note_date: credit_note_date,
@@ -112,7 +134,88 @@ class CreditNote < ApplicationRecord
           net_adjustable_amount: net_adjustable_amount.as_json
       }
     end
+
+    return data
   end
+
+  scope :filter_status, -> (status) {
+    case status
+    when 'approved', :approved
+      where(status_id: CreditNoteStatus.id_for(:approved))
+    when 'auto_approved', :auto_approved
+      where(status_id: CreditNoteStatus.id_for(:auto_approved))
+    when 'processing', :processing
+      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'awaiting_approval', :awaiting_approval
+      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'retracted', :retracted
+      where(status_id: CreditNoteStatus.id_for(:retracted))
+    when 'rejected', :rejected
+      where(status_id: CreditNoteStatus.id_for(:rejected))
+    when 'draft', :draft
+      where(status_id: CreditNoteStatus.id_for(:draft))
+    when 'voided', :voided
+      where(status_id: CreditNoteStatus.id_for(:voided))
+    else
+      # do nothing
+    end
+  }
+
+  scope :with_id, -> (id) {
+    where id: id
+  }
+
+  scope :sort_for_index, -> {
+    reorder('credit_notes.created_at DESC')
+  }
+
+  scope :includes_for_index, -> {
+    includes(:invoice, :vendor, :department, :cost_center, :policy, :status, net_adjustable_amount: [:currency], previously_adjusted_amount: [:currency])
+  }
+
+  scope :filter_department_id, -> (id) {
+    where(department_id: id)
+  }
+
+  scope :filter_cost_center_id, -> (id) {
+    where(cost_center_id: id)
+  }
+
+  scope :filter_policy_id, -> (id) {
+    where(policy_id: id)
+  }
+
+  scope :filter_location_id, -> (id) {
+    where(location_id: id)
+  }
+
+  scope :filter_invoice_id, -> (id) {
+    where(invoice_id: id)
+  }
+
+  scope :filter_invoice_number, -> (invoice_number) {
+    joins(:invoice).where("invoices.invoice_number like ?", invoice_number)
+  }
+
+  scope :filter_adjustables, -> (enabled) {
+    if enabled
+      joins(:net_adjustable_amount).where("amounts.value > ?", 0)
+    end
+  }
+
+  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', start_date, end_date)}
+  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+
+  scope :filter_amount, -> (gteq, lteq) do
+    gteq = gteq.to_f
+    lteq = lteq.present? ? lteq.to_f : 9999999999999999
+
+    joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
+  end
+
+
+  # Transitionable Methods #
 
   def self.document_owner_attribute
     'user_id'
@@ -191,6 +294,8 @@ class CreditNote < ApplicationRecord
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
   end
+
+  # Transitionable Methods End #
 
   private
 
