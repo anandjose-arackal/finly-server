@@ -100,7 +100,7 @@ class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
-  include EventProducer
+  # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
@@ -112,7 +112,7 @@ class Invoice < ApplicationRecord
   # resolver :admin, Documents::Invoices::Policy::Scope
   # resolver Documents::Invoices::Policy::Scope
   # produces_event!
-  event_channel 'invoice'
+  # event_channel 'invoice'
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
 

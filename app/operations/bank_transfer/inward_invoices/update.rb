@@ -219,7 +219,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     # Credit Note Adjustments Validation
-    inward_invoice_params[:credit_note_adjusments_attributes].each do |adjustment_attr|
+    inward_invoice_params[:credit_note_adjusments_attributes]&.each do |adjustment_attr|
       op = Docs::P2P::CreditNotes::Ops::Show(params: {id: adjustment_attr[:credit_note_id]}, current_user: user)
       unless op.success?
         add_message :error, "Credit Note not found for provided amount #{adjustment_attr[:amount][:value]}"

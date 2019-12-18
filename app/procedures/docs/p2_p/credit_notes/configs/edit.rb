@@ -5,7 +5,6 @@ class Docs::P2P::CreditNotes::Configs::Edit < Transactions::API
 
   def init(options, params:, current_user:, model:, **)
     result = {}
-    result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid"]
     # result['departments'] = Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves
     # result['locations'] = Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves
     # result['cost_centers'] = current_user.company.cost_centers

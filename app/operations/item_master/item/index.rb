@@ -3,7 +3,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   attr_accessor :inventory_line_items
 
   class ItemMaster::Item::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
+    include HasScope
     attr_accessor :inventory_line_items, :paginated_line_items, :offset
 
     has_scope :search

@@ -62,6 +62,7 @@ class CreditNoteItem < ApplicationRecord
         original_rate: original_rate,
         rate: rate,
         original_taxable_amount: original_taxable_amount.as_json,
+        tax_amount: tax_amount.as_json,
         taxable_amount: taxable_amount.as_json,
         original_tax_rate: original_tax_rate.as_json,
         tax_rate: tax_rate.as_json,

@@ -302,6 +302,9 @@ class InvoiceCalculationUtils
 
   # Credit Note Adjustments
   def calculate_cn_adjustments
+    adjustment_amount = 0
+
+    self.invoice.cn_adjustments
 
   end
 

@@ -79,6 +79,7 @@ class CreditNote < ApplicationRecord
     if options[:index]
       data = {
           id: id,
+          procurement_id: procurement_id,
           sequence_id: sequence_id,
           creidt_note_number: credit_note_number,
           status_name: status&.name,
@@ -126,6 +127,10 @@ class CreditNote < ApplicationRecord
           policy: policy.as_json,
           items: items.as_json,
           gross_receivable_amount: gross_receivable_amount.as_json,
+          after_tax_amount: {
+              currency: gross_receivable_amount.currency.as_json,
+              value: gross_receivable_amount&.value.to_f + tax_amount&.value.to_f
+          },
           tax_amount: tax_amount.as_json,
           tds_rate_id: tds_rate_id,
           tds_amount: tds_amount.as_json,
