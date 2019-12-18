@@ -206,6 +206,9 @@ GEM
     devise_invitable (1.7.5)
       actionmailer (>= 4.1.0)
       devise (>= 4.0.0)
+    devise_saml_authenticatable (1.5.0)
+      devise (> 2.0.0)
+      ruby-saml (~> 1.7)
     devise_zxcvbn (4.4.1)
       devise
       zxcvbn-js (~> 4.4.1)
@@ -465,6 +468,8 @@ GEM
     rspec-support (3.9.0)
     ruby-ole (1.2.12.2)
     ruby-prof (0.17.0)
+    ruby-saml (1.11.0)
+      nokogiri (>= 1.5.10)
     ruby_dep (1.5.0)
     ruby_http_client (3.3.0)
     rubyzip (1.2.4)
@@ -610,6 +615,7 @@ DEPENDENCIES
   devise (~> 4.7.1)
   devise-security (= 0.13.0)
   devise_invitable (~> 1.7.5)
+  devise_saml_authenticatable
   devise_zxcvbn (= 4.4.1)
   doorkeeper (~> 5.0.2)
   elastic-apm (~> 2.8.1)
@@ -675,6 +681,7 @@ DEPENDENCIES
   roo-xls (~> 1.2.0)
   rspec-rails (~> 3.8)
   ruby-prof (~> 0.17.0)
+  ruby-saml
   rubyzip (~> 1.2.2)
   sass-rails (~> 5.0.7)
   saxlsx

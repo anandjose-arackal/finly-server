@@ -52,6 +52,9 @@ gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref
 # gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
 gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
 
+# gem for SAML SSO
+gem 'ruby-saml'
+gem 'devise_saml_authenticatable'
 
 gem 'rubyzip', '~> 1.2.2'
 
