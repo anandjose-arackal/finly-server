@@ -915,7 +915,7 @@ class Payment < ApplicationRecord
     #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
-      invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
+      invoice_number: { value: self.invoice.invoice_number, editable: false, field_type: 'field_text' },
       invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
       due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
       category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
@@ -1018,8 +1018,8 @@ class Payment < ApplicationRecord
       net_total: { value: self.invoice.net_amount&.value, editable: false }, #Net Total
       roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
-      tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: { value: self.parent.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: invoice.balance_due&.value, editable: false } # Invoice AMOUNT
     }
@@ -1028,7 +1028,7 @@ class Payment < ApplicationRecord
   def get_custom_fields(document_type)
     case document_type
     when 'Invoice'
-      self.invoice.custom_fields
+      self.parent.custom_fields
     when 'PurchaseOrder'
       self.purchase_order.custom_fields
     when 'BeneficiaryPayment'
