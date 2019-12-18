@@ -27,7 +27,7 @@ class Vendors::Base < BaseOperation
                                    :msme_registered, :msme_registration_number,
                                    :business_name, :trade_name, :address, :payment_term_id, :currency_id, :policy_id, :vendor_id, :override_vendor_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
-                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy],
+                                   bank_accounts_attributes: [:id, :account_number, :confirm_account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy, :disabled],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :_destroy],
                                    gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :address, :_destroy]
     )
@@ -53,7 +53,7 @@ class Vendors::Base < BaseOperation
     custom_fields[:user] = user
     custom_fields[:reset_fields] = reset_fields
     custom_fields[:save] = save
-    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
+    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:yes_bank_vendor), custom_fields)
   end
 
   # def validate_business_name(vendor_params)
@@ -95,7 +95,7 @@ class Vendors::Base < BaseOperation
         gstin_location[:gstin_id] = gstin_master.id
         if gstin_master.status == "Active"
 
-          unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]
+          unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]&.upcase
             add_message :error, "PAN doesn't match with GSTIN for Location #{index + 1}"
           end
 
@@ -154,6 +154,33 @@ class Vendors::Base < BaseOperation
     file_path = "tmp/#{file_name}"
     File.open(file_path, 'wb') { |f| f.write(Base64.decode64(file_data)) }
     file[:attached_file] = File.new(file_path, 'r')
+  end
+
+  def validate_pan_number_in_gstin(pan_number=nil, gstin=nil, gst_registered=nil)
+    if pan_number.present? && gstin.present? && (gst_registered != "0")
+      pan_number_from_gstin = gstin[2..gstin.length - 4].to_s&.upcase
+      unless pan_number.to_s&.upcase == pan_number_from_gstin
+        add_message :error, "Pan number #{pan_number} does not match with gstin pan #{pan_number_from_gstin}"
+        return false
+      end
+    end
+    true
+  end
+
+  def validate_duplicate_bank_account
+    if vendor.present? && vendor.is_a?(YesBankVendor)
+      if self.vendor.bank_accounts.present?
+        account_numbers = self.vendor.bank_accounts.map(&:account_number)
+        duplicate_account_numbers = account_numbers.select{|item| account_numbers.count(item) > 1}.uniq
+        if duplicate_account_numbers.present?
+          add_message :error, "Duplicate records found for account numbers #{duplicate_account_numbers.join(', ')}"  
+        end
+        # if user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').present?
+        #   associated_account_numbers = user.company.bank_accounts.where(account_number: account_numbers).where.not(account_owner_id: vendor.id, account_owner_type: 'YesBankVendor').pluck(:account_number)
+        #   add_message :error, "Account number: #{associated_account_numbers.join(', ')}  already in use"
+        # end
+      end
+    end
   end
 
 end

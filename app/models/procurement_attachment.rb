@@ -15,6 +15,7 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  user_id                   :integer
+#  vendor_poc_id             :integer
 #
 
 class ProcurementAttachment < ApplicationRecord
@@ -44,6 +45,17 @@ class ProcurementAttachment < ApplicationRecord
       url: file&.url(:original, timestamp: false),
       content_type: file_content_type
     }
+  end
+
+  def file_format
+    if self.file_content_type == 'application/pdf'
+      type = "pdf"
+    elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.file_content_type)
+      type = "image"
+    else
+      type = "other"
+    end
+    type
   end
 
   private

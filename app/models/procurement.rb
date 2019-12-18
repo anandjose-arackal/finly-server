@@ -11,11 +11,13 @@
 #  updated_at            :datetime         not null
 #  user_id               :integer
 #  company_id            :integer
-#  note                  :text(65535)
+#  note                  :text(16777215)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
 #  deleted_at            :datetime
+#  vendor_poc_id         :integer
+#  vlpm_id               :integer
 #
 
 class Procurement < ApplicationRecord
@@ -250,7 +252,7 @@ class Procurement < ApplicationRecord
     if user.present?
       category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
 
-      inventory_line_item_ids = user.company.items.with_category_id(category_ids)
+      inventory_line_item_ids = user.company.items.non_deleted.with_category_id(category_ids)
 
       purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
 
@@ -408,6 +410,16 @@ class Procurement < ApplicationRecord
       where(id: filtered_ids)
     end
   }
+
+  scope :filter_pr_number, -> (pr_number){
+    joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.order_number LIKE ?', "%#{pr_number}%")
+  }
+
+  scope :filter_pr_creator_id, -> (creator_id){
+    joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.creator_id = ?', creator_id)
+  }
+
+
 
   def awaiting_action?(user)
     # Ideal method:
@@ -600,7 +612,8 @@ class Procurement < ApplicationRecord
   def as_json
     {
       id: self.id,
-      purchase_order_id: self.purchase_order&.id
+      purchase_order_id: self.purchase_order&.id,
+      invoice_id: self.invoices&.first&.id
     }
   end
 

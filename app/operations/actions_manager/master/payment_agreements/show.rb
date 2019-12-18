@@ -1,7 +1,7 @@
 class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::Base
 
   register_handle :payment_agreement_show
-  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable ]
+  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate ]
 
   def initialize(user=nil, params=nil)
     super
@@ -15,6 +15,8 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
 
 
   def edit_btn
+    return false if payment_agreement.terminated?
+
     if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
       return true if payment_agreement.action_users(:return_control).include?(user)
     end
@@ -67,6 +69,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def approve
+    return false if payment_agreement.terminated?
     # ############# Reviewer logic start #########################
     # if payment_agreement.is_reviewing_user? || user.vendor_payments_admin?
     #   if payment_agreement.awaiting_approval?
@@ -96,7 +99,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def unapprove
-    unless payment_agreement.approved?
+    unless payment_agreement.approved? || payment_agreement.terminated?
       if last_level?
         state = (previous_reviewer.include? user.id) ? true : false
       else
@@ -166,6 +169,10 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
 
   def policy_editable
     payment_agreement.draft? || payment_agreement.retracted? || payment_agreement.rejected?
+  end
+
+  def terminate
+    user.vendor_payments_admin? && payment_agreement.approved?
   end
 
 end

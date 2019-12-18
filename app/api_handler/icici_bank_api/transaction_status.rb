@@ -38,7 +38,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       return
     end
 
-    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.possible_failure?
+    unless self.icici_bank_transaction.pending_for_processing? || self.icici_bank_transaction.pending_utr? || self.icici_bank_transaction.possible_failure? || self.icici_bank_transaction.suspect?
       add_message :error, "Only pending UTR and pending for processing cases can be checked for status"
       return
     end
@@ -65,32 +65,46 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 404
 
       when 500
-
-      when 200
-        self.api_response_success = true
-        self.transaction_status_response = self.parsed_response["STATUS"]
+        self.transaction_status_response = (self.parsed_response["Response"] || self.parsed_response["RESPONSE"])
         case self.transaction_status_response&.upcase
-          when "SUCCESS"
-            utr = self.parsed_response["UTRNUMBER"]
-            # This is because only IMPS and RTGS transactions return the URT in the API
-            # Now all transactions give UTR in the transaction status API
-            if utr.present?
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
-            end
-          when "PENDING FOR PROCESSING"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
-          when "REJECTED", "RECALLED"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
-          when "SUSPECT"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
-          when "PENDING"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
-          when "FAILURE"
+        when "FAILURE"
+          self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        else
+          # do nothing?
+        end
+      when 200
+        self.transaction_status_response = self.parsed_response["STATUS"]
+        api_response = (self.parsed_response["RESPONSE"] || self.parsed_response["Response"])
+        if api_response&.upcase == "SUCCESS"
+          case self.transaction_status_response&.upcase
+            when "SUCCESS"
+              utr = self.parsed_response["UTRNUMBER"]
+              # This is because only IMPS and RTGS transactions return the URT in the API
+              # Now all transactions give UTR in the transaction status API
+              if utr.present?
+                self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+              end
+            when "PENDING FOR PROCESSING"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
+            when "REJECTED", "RECALLED"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
+            when "SUSPECT"
+              # this seems to be a temporary status which can then swing either way after a while. So adding this to the list of statuses that we shall regularly scan for statuses later
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
+            when "PENDING"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
+            when "FAILURE"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+            when "CANCELLED"
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
+            else
+              # do nothing?
+          end
+        else
+          message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
+          if message == "Invalid Inquiry Req id or unique Id"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-          when "CANCELLED"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
-          else
-            # do nothing?
+          end
         end
       else
         # handle it gracefully

@@ -50,11 +50,10 @@ class User::Login::SendVerificationOtp < BaseOperation
     response = Sms::UserOtp.(selected_user, otp: self.otp)
     if response.success?
       # have to save it without validation because update_attributes considers validations
-      selected_user.assign_attributes(otp_count: (selected_user.otp_count+1), otp_attempts: 0)
+      selected_user.update_columns(otp_count: (selected_user.otp_count+1), otp_attempts: 0)
       if otp != selected_user.otp
-        selected_user.assign_attributes({otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0})
+        selected_user.update_columns({otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0})
       end
-      selected_user.save(validate: false)
     else
       messages[:error] = response.messages[:error]
     end

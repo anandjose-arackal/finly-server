@@ -2,30 +2,28 @@
 #
 # Table name: bank_accounts
 #
-#  id                        :integer          not null, primary key
-#  yes_bank_vendor_id        :integer
-#  account_number            :string(255)
-#  ifsc                      :string(255)
-#  name                      :string(255)
-#  address_1                 :string(255)
-#  address_2                 :string(255)
-#  address_3                 :string(255)
-#  pin_code                  :string(255)
-#  country                   :string(255)
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  account_owner_id          :integer
-#  account_owner_type        :string(255)
-#  company_id                :integer
-#  reimbursable              :boolean
-#  default_account           :boolean          default(FALSE)
-#  is_deleted                :boolean          default(FALSE)
-#  disabled                  :boolean          default(FALSE)
-#  deleted_at                :datetime
-#  on_hold                   :boolean          default(FALSE)
-#  bank_account_master_id    :integer
-#  yes_bank_verified         :boolean          default(FALSE)
-#  yes_bank_beneficiary_code :string(255)
+#  id                     :integer          not null, primary key
+#  yes_bank_vendor_id     :integer
+#  account_number         :string(255)
+#  ifsc                   :string(255)
+#  name                   :string(255)
+#  address_1              :string(255)
+#  address_2              :string(255)
+#  address_3              :string(255)
+#  pin_code               :string(255)
+#  country                :string(255)
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  account_owner_id       :integer
+#  account_owner_type     :string(255)
+#  company_id             :integer
+#  reimbursable           :boolean
+#  default_account        :boolean          default(FALSE)
+#  is_deleted             :boolean          default(FALSE)
+#  disabled               :boolean          default(FALSE)
+#  deleted_at             :datetime
+#  on_hold                :boolean          default(FALSE)
+#  bank_account_master_id :integer
 #
 
 class BankAccount < ApplicationRecord
@@ -40,6 +38,9 @@ class BankAccount < ApplicationRecord
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
   # belongs_to :company_id
+
+  attr_accessor :confirm_account_number
+
 
   validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
@@ -59,6 +60,7 @@ class BankAccount < ApplicationRecord
   scope :only_users, -> {where account_owner_type: "User"}
   scope :default_accounts, -> { where(default_account: true).non_deleted}
   scope :non_deleted, -> {where deleted_at: nil}
+  scope :enabled, -> {where disabled: false}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }
@@ -127,7 +129,8 @@ class BankAccount < ApplicationRecord
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        default_account: default_account
+        default_account: default_account,
+        disabled: disabled
     }
   end
 

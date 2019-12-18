@@ -13,17 +13,19 @@ json.vendor do
     json.ifsc @result.purchase_order.bank_account&.ifsc
     json.name @result.purchase_order.bank_account&.name
     json.id @result.purchase_order.bank_account&.id
+    json.disabled @result.purchase_order.bank_account&.disabled
   end
 
   if @result.purchase_order.vendor&.bank_accounts.present?
     json.bank_accounts do
-      json.array!(@result.purchase_order.vendor&.bank_accounts) do |bank_account|
+      json.array!(@result.purchase_order.vendor&.bank_accounts.enabled) do |bank_account|
         json.id bank_account.id
         json.name bank_account.name
         json.account_number bank_account.account_number
         json.ifsc bank_account.ifsc
         json.selected @result.purchase_order.bank_account&.id == bank_account.id
         json.default bank_account.default_account
+        json.disabled bank_account.disabled
       end
     end
   end
@@ -97,7 +99,7 @@ json.balance_due do
 end
 
 json.items do
-  json.array! @result.purchase_order.items do |item|
+  json.array! @result.purchase_order_items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
@@ -183,7 +185,7 @@ json.comments do
   end
 end
 
-json.po_item_categories current_company.categories.inward_invoice_items_only
+json.po_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.policies do
   json.array! @result.policies do |policy|

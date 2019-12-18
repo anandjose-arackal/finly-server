@@ -1,4 +1,4 @@
-json.array!(@result.paginated_payments) do |payment|
+json.array!(@result.paginated_payments.include_for_index) do |payment|
   json.id payment.id
   json.beneficiary do
     json.name payment.receiving_user.name

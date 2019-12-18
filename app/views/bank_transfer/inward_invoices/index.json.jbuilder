@@ -20,6 +20,7 @@ json.results do
       json.controlling_user controlling_user
       json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at&.strftime("%d-%m-%Y")
+      json.created_by invoice.created_by&.name
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
       json.advance invoice.advance
@@ -83,8 +84,8 @@ json.results do
       # json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
       # json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
-      json.paid_amount invoice.payment_amounts_total
-      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total)
+      json.paid_amount invoice.payment_amounts_total.round(2)
+      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total(false)).round(2)
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if invoice&.invoice_items.present?
@@ -125,6 +126,7 @@ json.results do
           json.id invoice.vendor&.id
           json.gst invoice.vendor&.gst
           json.pan invoice.vendor&.pan
+          json.trade_name invoice&.vendor&.trade_name
 
           json.selected_bank_account do
             json.account_number invoice.receiving_account&.account_number

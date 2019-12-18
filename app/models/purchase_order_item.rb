@@ -6,7 +6,7 @@
 #  purchase_order_id        :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :string(255)
+#  description              :text(65535)
 #  hsn_sac                  :string(255)
 #  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
@@ -104,6 +104,7 @@ class PurchaseOrderItem < ApplicationRecord
   }
 
   scope :include_details, -> {includes(:total_amount, :cost_center,purchase_order: [:department, :location])}
+  scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

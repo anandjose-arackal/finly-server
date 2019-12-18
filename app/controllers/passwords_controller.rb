@@ -14,7 +14,7 @@ class PasswordsController < Devise::PasswordsController
     @result = {
         success: true,
         messages: {
-            success: ["Password reset instructions sent. Check you mail!"]
+            success: ['You would receive an email with a link to retrieve your password if the email address is registered with us!']
         }
     }
     render json: @result.as_json
@@ -48,7 +48,7 @@ class PasswordsController < Devise::PasswordsController
                     to: resource.email,
                     user_agent: request.user_agent,
                     ip: request.remote_ip,
-                    timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+                    timestamp: Time.zone.now.strftime("%I:%M %p, %d %b %Y")
                 }
             )
           end

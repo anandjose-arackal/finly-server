@@ -1,4 +1,5 @@
 class Vendors::BulkApproveProcessor < BackgroundOperation
+
   attr_accessor :vendor_ids, :result
 
   def init
@@ -19,7 +20,7 @@ class Vendors::BulkApproveProcessor < BackgroundOperation
     vendor_ids.each do |id|
       data_success = {}
       data_error = {}
-      op = Vendors::TakeControl.(user, {vendor_id: id}) # Disable mailer
+      op = Vendors::Approve.(user, {vendor_id: id}) # Disable mailer
       vendor = YesBankVendor.find_by id: id
       unless op.success?
         data_error[:messages] = op.messages[:error]

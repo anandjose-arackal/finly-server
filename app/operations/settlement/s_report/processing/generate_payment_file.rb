@@ -42,7 +42,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     # Format as required by PaymentFiles::Generate
     payment_params = []
 
-    if user.company.id == 164 # Satin CreditCare
+    if [2, 164].include? user.company.id # Satin CreditCare or L&C
       load_data = satin_data
     else
       load_data = general_data
@@ -67,6 +67,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
 
   def data_points(mapping)
     data = {}
+    first_report = mapping&.reports&.first
     data[:beneficiary_account_name] = mapping.processor_accountable.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
@@ -80,7 +81,30 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:note] = mapping.note
     data[:report_ids] = mapping&.reports&.collect(&:id)&.join(', ')
     data[:report_id] = mapping.try(:report_id)
+    data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
+    data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
+    data[:employee_id] = mapping.user.profile.employee_id
+    data[:approved_by] = retrieve_approved_by(first_report)
+    data[:cost_center] = mapping&.user&.cost_center&.name
+    data[:period] = retrieve_period(first_report)
     data
+  end
+
+  def retrieve_period(report)
+    report.expenses&.pluck(:date)&.each {|dt| dt.strftime("%B")}&.uniq&.to_sentence(last_word_connector: " and ")
+  end
+
+  def retrieve_approved_by(report)
+    return '' if report.dlrms.blank?
+    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).last
+    if dlrm&.taken_control_by_id&.present?
+      return dlrm.taken_control_by&.name
+    elsif dlrm&.forwarded_by_id&.present?
+      return dlrm&.forwarded_by&.name
+    elsif dlrm&.reviewer_id.present?
+      return dlrm.reviewer&.name
+    end
+    ''
   end
 
 end

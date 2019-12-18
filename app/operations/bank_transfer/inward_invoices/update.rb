@@ -378,11 +378,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def validate_agreement_limit
-    if self.inward_invoice.agreement_item.present? && 
+    if self.inward_invoice.agreement_item.present? && self.inward_invoice.agreement_item_type == 'GeneralInvoice'
       payment_agreement = inward_invoice.agreement_item.payment_agreement
       if inward_invoice.agreement_item.total_invoice_amount&.value.present? && inward_invoice.agreement_item.billing_type.variable_periodic?
         available_limit = inward_invoice.agreement_item.total_invoice_amount&.value - get_invoice_amount_sum(payment_agreement)
-        if available_limit < inward_invoice&.balance_due&.value
+        if available_limit.present? && available_limit < inward_invoice&.balance_due&.value
           add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
           return
         end
@@ -404,4 +404,5 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def get_invoice_amount_sum(payment_agreement)
     payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
   end
+
 end

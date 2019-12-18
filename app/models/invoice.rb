@@ -70,8 +70,8 @@
 #  submitted_at                    :datetime
 #  approved_at                     :datetime
 #  po_adjusted_advance             :integer
-#  po_advance                      :integer
-#  po_prev_adjusted_advance        :integer
+#  po_advance                      :decimal(20, 2)
+#  po_prev_adjusted_advance        :decimal(20, 2)
 #  advance_amount_required         :boolean          default(FALSE)
 #  gstin_location_id               :bigint
 #  transaction_service_period_from :date
@@ -80,19 +80,23 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  po_number                       :string(255)
 #  narration                       :text(65535)
-#  bank_account_id                 :integer
-#  rejection_note                  :text(65535)
+#  po_number                       :string(255)
 #  payment_agreement_id            :integer
+#  bank_account_id                 :integer
 #  vendor_location_id              :integer
 #  billing_type_id                 :integer
+#  rejection_note                  :text(65535)
+#  vendor_poc_id                   :integer
+#  vlpm_id                         :integer
+#  client_note                     :text(65535)
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
+#  payable                         :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
 
@@ -259,7 +263,7 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      ids = self.joins(:balance_due).where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved])).where.not(amounts: {value: 0}).pluck(:id)
+      ids = self.joins(:balance_due).non_beneficiary.where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved, :initiated]), payable: true).where.not(amounts: {value: 0}).pluck(:id)
       where id: ids
     end
   }
@@ -531,6 +535,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
+    return super if self.policy_id.present?
     self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
@@ -570,10 +575,14 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def payment_amounts_total
+  def payment_amounts_total(completed_only=true)
     if self.payments.present?
       # return self.payments.successful.joins(:amount).sum(:value)
-      return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      if completed_only
+        return self.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      else
+        return self.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
+      end
     else
       return 0
     end
@@ -614,8 +623,8 @@ class Invoice < ApplicationRecord
 
     if paid_amount == 0
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    elsif paid_amount >= balance_due
-      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+    elsif paid_amount >= balance_due - 0.99
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid), payable: false)
     elsif paid_amount <= balance_due
       self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
     end
@@ -674,7 +683,8 @@ class Invoice < ApplicationRecord
         tax_type_id: self.tax_type_id,
         tds_type_id: self.tds_type_id,
         discount_amount: precision_value(self.discount_amount&.value),
-        discount: precision_value(self.discount),
+        # discount: precision_value(self.discount),
+        discount: invoice_discount_rate,
         date: self.date,
         discount_type_id: self.discount_type_id,
         due_date: self.due_date,
@@ -685,10 +695,11 @@ class Invoice < ApplicationRecord
         net_payable_amount: self.balance_due&.value,
         balance_due: self.balance_due&.value,
         taxable_amount: precision_value(self.gross_amount&.value),
-        editable: self.unpaid? || self.initiated?,
-        tax_rate: precision_value(self.tax_rate),
+        editable: self.unpaid? || self.initiated? || self.partially_paid?,
+        tax_rate: return_tax_rate,
         tds_rate: precision_value(self.tds_rate),
-        discount_rate: precision_value(self.discount_rate),
+        # discount_rate: precision_value(self.discount_rate),
+        discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
         invoice_attachment: {
             url: self.invoice_attachments.first&.attached_file&.url,
@@ -717,7 +728,7 @@ class Invoice < ApplicationRecord
         # paid_amount: self.payments.successful.joins(:amount).sum(:value),
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
-        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total(false)),
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
         invoice_items: invoice_items.as_json,
         note: self.note,
@@ -729,8 +740,15 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def return_tax_rate
+    ori_value = (self.item_amounts_total.to_f - self.discount_amount&.value.to_f)
+    tax_value = self.tax_amount&.value.to_f
+    calci_tax_rate = ( tax_value / ori_value ) * 100
+    precision_value( calci_tax_rate )
+  end
+
   def invoice_discount_rate
-    ((self.discount_amount&.value / self.item_amounts_total) * 100).round(2) rescue 0
+    ((self.discount_amount&.value.to_f / self.item_amounts_total.to_f) * 100).round(2) rescue 0
   end
 
   def include_original_amount
@@ -943,6 +961,16 @@ class Invoice < ApplicationRecord
     invoice_status_id != InwardInvoiceStatus.id_for(:open)
   end
 
+  def invoice_payment_status
+    payment_status_ids = self.payments.pluck(:payment_status_id)
+
+    if (payment_status_ids & [PaymentStatus.id_for(:completed)]).any? && (payment_status_ids & PaymentStatus.status_ids_for_invoice_initiated).any?
+      return InwardInvoiceStatus.where(id: InwardInvoiceStatus.ids_for([:partially_paid, :initiated])).as_json
+    else
+      return [self.invoice_status.as_json]
+    end
+  end
+
   private
 
   # def payment_agreement_updations
@@ -1038,7 +1066,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :initiated)
   end
 
   def self.auditor_associated_status_ids

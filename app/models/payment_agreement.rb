@@ -24,6 +24,9 @@
 #  renewal_reminder_date :datetime
 #  total_amount_id       :integer
 #  override_order_number :string(255)
+#  terminated_at         :datetime
+#  terminated_by_id      :integer
+#  termination_reason    :text(65535)
 #
 
 class PaymentAgreement < ApplicationRecord
@@ -39,7 +42,7 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
-
+  belongs_to :terminated_by, optional: true, class_name: 'User'
 
   has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
@@ -54,6 +57,7 @@ class PaymentAgreement < ApplicationRecord
   
   has_many :notify_users, as: :document, dependent: :destroy 
   has_many :security_deposits, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
 
   has_many :attachments, as: :resource, dependent: :destroy
@@ -65,7 +69,9 @@ class PaymentAgreement < ApplicationRecord
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, to: :status
+
+  attr_accessor :payment_agreement_custom_fields
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
@@ -253,6 +259,7 @@ class PaymentAgreement < ApplicationRecord
     with_ids(ids)
   }
 
+
   def as_json(options={})
     {
       id: self.id,
@@ -272,7 +279,9 @@ class PaymentAgreement < ApplicationRecord
       renewal_date: self.renewal_date&.to_date,
       note: self.note,
       renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options)
+      vendors: get_related_vendors(options),
+      custom_fields: self.custom_fields,
+      termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
     }
   end
 
@@ -367,11 +376,28 @@ class PaymentAgreement < ApplicationRecord
 
   def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
+      # Payment agreement cannot be created for past months
+      # validate_current_month
       if self.agreement_date > self.execution_date
         errors.add(:agreement_date, 'cannot be greater than execution date')
       end
     end
   end
+
+  def validate_current_month
+    if self.agreement_date.present?
+      if self.agreement_date&.to_date < Date.today.beginning_of_month
+        errors.add(:agreement_date, 'cannot be from previous months')
+      end
+    end
+
+    if self.execution_date.present?
+      if self.execution_date&.to_date < Date.today.beginning_of_month
+        errors.add(:execution_date, 'cannot be from previous months')
+      end
+    end
+  end
+
 
   def expiration_date_if_allowed
     if self.no_expiration.blank? && self.expiration_date.blank?

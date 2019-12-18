@@ -58,6 +58,7 @@
 #  department_id             :integer
 #  location_id               :integer
 #  default_company_id        :integer
+#  finly_id                  :string(36)
 #
 
 class User < ApplicationRecord
@@ -104,17 +105,17 @@ class User < ApplicationRecord
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
-  has_many :policies, -> {where(:'policy_user_mappings.deleted_at' => nil)}, through: :policy_user_mappings, dependent: :destroy
-  has_many :admin_policy_user_mappings, -> {admin}, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
+  has_many :policies, -> { where(:'policy_user_mappings.deleted_at' => nil) }, through: :policy_user_mappings, dependent: :destroy
+  has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
   has_many :reports, inverse_of: :user, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
-  has_many :interacted_reports, -> {distinct}, source: :report, through: :report_tracks
-  has_many :manager_report_tracks, -> {manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
-  has_many :manager_reports, -> {distinct}, source: :report, through: :manager_report_tracks
-  has_many :finance_report_tracks, -> {finance_manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
-  has_many :finance_reports, -> {distinct}, source: :report, through: :finance_report_tracks
+  has_many :interacted_reports, -> { distinct }, source: :report, through: :report_tracks
+  has_many :manager_report_tracks, -> { manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
+  has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
+  has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
+  has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
   has_many :policy_user_roles
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
@@ -139,12 +140,12 @@ class User < ApplicationRecord
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :authentications
   has_many :cards, dependent: :destroy
-  has_many :payroll_cards, -> {where(card_program_id: CardProgram.id_for(:payroll))}, class_name: 'Card'
-  has_many :reimbursement_cards, -> {where(card_program_id: CardProgram.id_for(:reimbursement))}, class_name: 'Card'
-  has_many :reimbursement_payroll_cards, -> {where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)])}, class_name: 'Card'
-  has_many :meal_cards, -> {where(card_program_id: CardProgram.id_for(:meal))}, class_name: 'Card'
-  has_many :medical_cards, -> {where(card_program_id: CardProgram.id_for(:medical))}, class_name: 'Card'
-  has_many :expense_cards, -> {where(card_program_id: CardProgram.id_for(:expense))}, class_name: 'Card'
+  has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
+  has_many :reimbursement_cards, -> { where(card_program_id: CardProgram.id_for(:reimbursement)) }, class_name: 'Card'
+  has_many :reimbursement_payroll_cards, -> { where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)]) }, class_name: 'Card'
+  has_many :meal_cards, -> { where(card_program_id: CardProgram.id_for(:meal)) }, class_name: 'Card'
+  has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
+  has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests, inverse_of: :user
 
@@ -153,11 +154,11 @@ class User < ApplicationRecord
 
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
-  has_many :interacted_money_requests, -> {distinct}, source: :money_request, through: :money_request_tracks
-  has_many :manager_money_request_tracks, -> {manager_role}, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
-  has_many :manager_money_requests, -> {distinct}, source: :money_request, through: :manager_money_request_tracks
-  has_many :finance_money_request_tracks, -> {finance_manager_role}, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
-  has_many :finance_money_requests, -> {distinct}, source: :money_request, through: :finance_money_request_tracks
+  has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
+  has_many :manager_money_request_tracks, -> { manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
+  has_many :manager_money_requests, -> { distinct }, source: :money_request, through: :manager_money_request_tracks
+  has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
+  has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
   has_many :notifier_type_configurations
   has_many :user_balance_histories, dependent: :destroy
@@ -181,28 +182,28 @@ class User < ApplicationRecord
   has_many :bank_payment_requests, foreign_key: :owner_id
   has_many :bank_payment_request_trails, class_name: "BankPaymentRequestTrail", foreign_key: :action_user_id
   has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
-  has_many :interacted_payment_requests, -> {distinct}, source: :bank_payment_request, through: :bank_payment_request_trails
-  has_many :manager_payment_request_trails, -> {manager_role}, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :manager_payment_requests, -> {distinct}, source: :bank_payment_request, through: :manager_payment_request_trails
-  has_many :finance_payment_request_trails, -> {finance_manager_role}, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :finance_payment_requests, -> {distinct}, source: :bank_payment_request, through: :finance_payment_request_trails
+  has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
+  has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
 
   # adding associations for the user manager mapping of travel requests
   has_many :travel_requests
   has_many :travel_request_trails, class_name: "TravelRequestTrail", foreign_key: :action_user_id
   has_many :controlling_travel_requests, class_name: "TravelRequest", foreign_key: :controlling_user_id
-  has_many :interacted_travel_requests, -> {distinct}, source: :travel_requests, through: :travel_request_trails
-  has_many :manager_travel_request_trails, -> {manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
-  has_many :manager_travel_requests, -> {distinct}, source: :travel_request, through: :manager_travel_request_trails
-  has_many :travel_manager_travel_request_trails, -> {travel_manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
-  has_many :travel_manager_travel_requests, -> {distinct}, source: :travel_request, through: :travel_manager_travel_request_trails
+  has_many :interacted_travel_requests, -> { distinct }, source: :travel_requests, through: :travel_request_trails
+  has_many :manager_travel_request_trails, -> { manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_travel_requests, -> { distinct }, source: :travel_request, through: :manager_travel_request_trails
+  has_many :travel_manager_travel_request_trails, -> { travel_manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :travel_manager_travel_requests, -> { distinct }, source: :travel_request, through: :travel_manager_travel_request_trails
 
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
   has_many :resource_templates
-  has_many :purchase_order_templates, -> {filter_resource_type(:purchase_orders)}, class_name: 'ResourceTemplate', foreign_key: :user_id
-  has_many :invoice_templates, -> {filter_resource_type(:invoices)}, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
   # Inward Invoices
   has_many :inward_invoices, class_name: "Invoice", foreign_key: :created_by_user_id
@@ -238,10 +239,9 @@ class User < ApplicationRecord
   has_one :user_permission, dependent: :destroy
 
   has_many :user_sessions
-  has_many :user_devices
-
-  has_many :user_ips
-  has_many :user_agent_clients
+  has_many :user_devices, foreign_key: :user_finly_id, primary_key: :finly_id
+  has_many :user_ips, foreign_key: :user_finly_id, primary_key: :finly_id
+  has_many :user_agent_clients, foreign_key: :user_finly_id, primary_key: :finly_id
 
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
@@ -255,6 +255,9 @@ class User < ApplicationRecord
   has_many :document_message_receipts
   has_many :document_messages
 
+  has_many :users_with_group_mapping
+  has_many :group_companies, through: :users_with_group_mapping, foreign_key: :company_id
+  has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -270,9 +273,9 @@ class User < ApplicationRecord
   delegate :company_name, to: :company
 
   ############# Devise validateable validations ############
-  validates_presence_of     :password, if: :password_required?
+  validates_presence_of :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :password, within: (8..128), allow_blank: true
+  validates_length_of :password, within: (8..128), allow_blank: true
   ################ End of Devise validateable ##############
 
   validates :company_id, presence: true
@@ -284,27 +287,27 @@ class User < ApplicationRecord
   validates :user_panel_subscription, presence: true
   validate :password_complexity
 
-  scope :with_id, ->(user_id) {where id: user_id}
+  scope :with_id, ->(user_id) { where id: user_id }
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids
   }
-  scope :with_company_id, ->(company_id) {where company_id: company_id}
+  scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_company_id, -> (company_id) { where.not(company_id: company_id) }
-  scope :without_id, ->(user_id) {where.not id: user_id}
+  scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
     where 'first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ?',
           "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%"
   end
-  scope :filter_email, -> (email) {where('email like ?', "%#{email}%")}
-  scope :filter_user_id, ->(user_id) {where id: user_id}
-  scope :with_roles, -> {joins :role_mapping}
-  scope :only_managers, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))}
+  scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
+  scope :filter_user_id, ->(user_id) { where id: user_id }
+  scope :with_roles, -> { joins :role_mapping }
+  scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { # passed argument is only for has scope, no effect here
-    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
+  scope :filter_vendor_payments_reviewers, -> (flag) {# passed argument is only for has scope, no effect here
+    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
@@ -315,8 +318,8 @@ class User < ApplicationRecord
     case type
     when 'PurchaseOrderProvider', :PurchaseOrderProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
-    # when 'InvoiceProvider', :InvoiceProvider
-    #   joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+      # when 'InvoiceProvider', :InvoiceProvider
+      #   joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
     when 'YesBankVendorProvider', :YesBankVendorProvider
@@ -335,22 +338,22 @@ class User < ApplicationRecord
   scope :filter_em_reviewers, -> (flag) {
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))
   }
-  scope :only_finance_managers, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))}
-  scope :only_vendor_payment_creditors, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
+  scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
   # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
-  scope :only_admins, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', Purpose.id_for(:expense_management))}
-  scope :only_vendor_payment_admins, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
-  scope :only_auditors, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor))}
-  scope :sort_by_name, -> {order(first_name: :asc, last_name: :asc)}
-  scope :active, -> {where active: true}
-  scope :inactive, -> {filter_state(3)}
-  scope :pending, -> {filter_state(2)}
-  scope :invited_by, ->(id) {where invited_by_id: id}
-  scope :with_vendor_payments_enabled, -> {joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)}
-  scope :with_expense_management_enabled, -> {joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)}
-  scope :include_all_accounts_with_balance, -> {includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance])}
-  scope :include_reimbursable_accounts, -> {includes :bank_accounts, :reimbursement_cards}
-  scope :with_email, ->(email) {where email: email}
+  scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', Purpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
+  scope :only_auditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor)) }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
+  scope :active, -> { where active: true }
+  scope :inactive, -> { filter_state(3) }
+  scope :pending, -> { filter_state(2) }
+  scope :invited_by, ->(id) { where invited_by_id: id }
+  scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
+  scope :include_reimbursable_accounts, -> { includes :bank_accounts, :reimbursement_cards }
+  scope :with_email, ->(email) { where email: email }
   scope :with_email_or_mobile_number, -> (email, mobile_number) {
     if email.present? && mobile_number.present?
       where('email = ? OR mobile_number = ?', email, mobile_number)
@@ -434,7 +437,7 @@ class User < ApplicationRecord
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
     ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
-                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
     self.where(id: ids)
@@ -443,7 +446,7 @@ class User < ApplicationRecord
   scope :user_search, -> (term) {
     if term.present?
       ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
-                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
       ids.uniq!
       self.where(id: ids)
     end
@@ -521,8 +524,8 @@ class User < ApplicationRecord
 
   end
 
-  scope :filter_company_id, -> (company_id) {where company_id: company_id}
-  scope :company_id, -> (company_id) {where company_id: company_id}
+  scope :filter_company_id, -> (company_id) { where company_id: company_id }
+  scope :company_id, -> (company_id) { where company_id: company_id }
 
   scope :created_between, -> (date_from, date_to) {
     unless date_from.blank? && date_to.blank?
@@ -546,12 +549,12 @@ class User < ApplicationRecord
     where('created_at <= ?', end_date)
   }
 
-  scope :signed_up, -> {where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)}
-  scope :pending, -> {where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true)}
-  scope :only_employees, -> {where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq}
-  scope :sort_by_name, -> {order(first_name: :asc, last_name: :asc)}
-  scope :with_balance_sheet, -> {includes(:balance_sheet => [:cash_in_hand, :approved_reports_total])}
-  scope :with_bank_accounts, -> {joins(:bank_accounts)}
+  scope :signed_up, -> { where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true) }
+  scope :pending, -> { where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true) }
+  scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
+  scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
+  scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+  scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
     if StringUtils.to_bool(enabled)
@@ -796,6 +799,7 @@ class User < ApplicationRecord
   before_save :strip_whitespace
 
   around_update :set_passwords_for_linked_users
+  after_save :generate_finly_id
   after_create :sync_users_for_group_entity
 
   after_create do
@@ -832,7 +836,7 @@ class User < ApplicationRecord
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     #
     # setting the default company_id for this user - if there is already a user added with this company
-    if self.company.group_entity_structure_enabled? && self.company.group_id.present? && self.company.group&.default_company_id.present?
+    if self.company.group_entity_structure_enabled? && self.company.group_id.present? && self.company.group&.default_company_id.present? && self.default_company_id.blank?
       self.update_columns(default_company_id: self.company.group.default_company_id)
     else
       self.update_columns(default_company_id: self.company_id)
@@ -1170,11 +1174,25 @@ class User < ApplicationRecord
   end
 
   def json_for_trail(options = {})
-    {
+    if options[:vendor_show]
+      data = {
         id: id,
         name: name,
-        email: email
-    }
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active
+      }
+      return data
+    else
+      {
+          id: id,
+          name: name,
+          email: email
+      }
+    end
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
@@ -1422,6 +1440,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
   end
 
+  def is_vendor_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_auditor), document)
+  end
+
   def is_item_master_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
   end
@@ -1492,15 +1514,15 @@ class User < ApplicationRecord
 
 
   # Agreement Based Payments Role
-  def is_payment_agreement_initiator?(document=nil)
+  def is_payment_agreement_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
   end
 
-  def is_payment_agreement_reviewer?(document=nil)
+  def is_payment_agreement_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), document)
   end
 
-  def is_payment_agreement_auditor?(document=nil)
+  def is_payment_agreement_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
 
@@ -1567,6 +1589,17 @@ class User < ApplicationRecord
     return company.departments.with_ids(department_ids)
   end
 
+  def associated_group_users(exclude_self: false)
+    users = User.where(finly_id: self.finly_id)
+    users = users.without_id(self.id) if exclude_self
+    users
+  end
+
+  def associated_group_role_ids
+    associated_user_ids = associated_group_users.pluck(:id)
+    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id) + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id)
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.
@@ -1590,15 +1623,25 @@ class User < ApplicationRecord
         other_users.each do |user|
           next if user.id == self.id
           user.update_columns(encrypted_password: self.encrypted_password) if user.encrypted_password != self.encrypted_password
-          user.update_columns(otp: self.otp, otp_verified_at: self.otp_verified_at, otp_verified: self.otp_verified)
+          user.update_columns(
+              otp: self.otp,
+              otp_verified_at: self.otp_verified_at,
+              otp_verified: self.otp_verified,
+              password_changed_at: self.password_changed_at,
+              last_activity_at: self.last_activity_at
+          )
         end
       end
     end
   end
 
   def sync_users_for_group_entity
-    users = User.without_id(self.id).with_email_or_mobile_number(self.email, self.mobile_number)
-    previously_added_user = users.without_id(self.id).reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
+    return unless self.company.group_entity_structure_enabled? && self.company.group_id.present?
+
+    group_companies = self.company.group.companies
+    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+    previously_added_user = users.reorder(created_at: :asc).first # this is the first user added to the system before a new one with the same email ID is added
+
     return if previously_added_user.blank?
     # setting OTP verified for all users if the current user is verified
     if previously_added_user&.otp_verified?
@@ -1609,6 +1652,33 @@ class User < ApplicationRecord
     if previously_added_user&.verified
       users.update_all(verified: true)
       self.update_columns(verified: true)
+    end
+  end
+
+  def generate_finly_id
+    return if self.finly_id.present?
+    return unless valid?
+
+    if self.company.group_entity_structure_enabled? && self.company.group_id.present?
+      group_companies = self.company.group.companies
+      users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number).without_id(self.id)
+      previously_added_user = users.reorder(created_at: :asc).first #
+      self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
+    end
+
+    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # end
+
+    if finly_id.blank?
+      while User.find_by(finly_id: self.finly_id).present?
+        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      end
+    end
+
+
+    unless self.save
+      raise "Failed to save unique ID: #{self.errors.full_messages}"
     end
   end
 
