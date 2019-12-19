@@ -4,7 +4,7 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
 
   register_handle :credit_note_show
   register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
-                    :void, :destroy]
+                    :void, :destroy, :tds_editable]
 
   def initialize(user = nil, params = {})
     super
@@ -56,6 +56,10 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
 
   def destroy
     (CreditNote.open_statuses.include?(credit_note.status_id) && credit_note.user_id == user.id)
+  end
+
+  def tds_editable
+    false
   end
 
   private
