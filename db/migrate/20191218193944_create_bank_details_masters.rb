@@ -1,10 +1,10 @@
 class CreateBankDetailsMasters < ActiveRecord::Migration[5.2]
   def change
-    # create_table :bank_details_masters do |t|
-    #   t.string :name
-    #   t.string :ifsc_prefix
-    #   t.timestamps
-    # end
+    create_table :bank_details_masters do |t|
+      t.string :name
+      t.string :ifsc_prefix
+      t.timestamps
+    end
 
 
     data = [
