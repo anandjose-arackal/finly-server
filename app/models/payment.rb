@@ -1065,22 +1065,29 @@ class Payment < ApplicationRecord
   def calculate_tds_applicable_amount(document_type)
     case document_type
     when 'Invoice'
-      # tds_percentage = self.invoice&.tds_slab&.tds.to_f
       return calculate_tds_applicable_sum(self.invoice)
     end
   end
 
   # Amount on which TDS is applied
-  def calculate_tds_applicable_sum(invoice)
+  def calculate_tds_applicable_sum(document)
     amount_arr = []
-    # Get value from line items
-    invoice.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
-      if item.discount.present? && item.inventory_line_item.product_type.goods?
-        amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
-      else
-        amt = (item.rate * item.quantity)
+    case document.class.name
+    when 'Invoice'
+      # Get value from line items
+      if document.invoice_type.name == 'non_po_invoice'
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          amount_arr << item.taxable_amount&.value
+        end
+      elsif document.invoice_type.name == 'tax_invoice'
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          if item.inventory_line_item.product_type.goods?
+            amount_arr << item.taxable_amount&.value
+          else
+            amount_arr << item.billable_amount&.value
+          end
+        end
       end
-      amount_arr << amt#*tds_percentage/100
     end
     return amount_arr.sum
   end
