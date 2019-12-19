@@ -1,0 +1,2 @@
+class BankDetailsMaster < ApplicationRecord
+end
