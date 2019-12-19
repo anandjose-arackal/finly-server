@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
-    self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
+    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : nil
 
   end
 
@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       add_message :error, "Payment not found"
     end
     # validate custom fields
-    if payment&.invoice.present?
+    if payment&.invoice.present? && params[:custom_fields].present?
       set_fields = set_custom_fields(false)
       unless set_fields&.success?
         add_message :error, set_fields&.messages&.dig(:error)
@@ -34,10 +34,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     # validate that the amount is being passed # todo - uncomment it later
-    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
-      add_message :error, "Sub Total cannot be blank"
-      return
-    end
+    # unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
+    #   add_message :error, "Sub Total cannot be blank"
+    #   return
+    # end
 
     # if the amount is inclusive of taxes, the tax cannot be blank
     if StringUtils.to_bool(payment_params&.dig(:invoice_attributes, :inclusive_of_taxes))
@@ -281,6 +281,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
     bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
     bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
+    bp_payment[:tax_rate_id] = params[:payment][:invoice_attributes][:tax_rate_id]
     bp_payment[:payment_notification_users] = params.require(:payment).dig(:invoice_attributes, :payment_notification_users) rescue nil
     self.bp_params = bp_payment
 
