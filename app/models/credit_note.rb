@@ -211,10 +211,8 @@ class CreditNote < ApplicationRecord
     where(vendor_id: vendor_id)
   }
 
-  scope :filter_adjustables, -> (enabled) {
-    if enabled
-      joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved))
-    end
+  scope :filter_adjustables, -> (enabled = true) {
+    joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved))
   }
 
   scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', start_date, end_date)}

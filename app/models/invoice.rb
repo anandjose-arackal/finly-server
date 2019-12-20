@@ -626,7 +626,7 @@ class Invoice < ApplicationRecord
   end
 
   def available_credits
-    available_credit_data = self.vendor.credit_notes.joins(:net_adjustable_amount).group(:currency_id).sum(:value)
+    available_credit_data = self.vendor.credit_notes.filter_adjustables.group(:currency_id).sum(:value)
     result = []
     available_credit_data.keys.each do |currency_id|
       data = {
