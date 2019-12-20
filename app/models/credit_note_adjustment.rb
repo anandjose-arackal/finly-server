@@ -17,4 +17,25 @@ class CreditNoteAdjustment < ApplicationRecord
   belongs_to :invoice, optional: true
 
   accepts_nested_attributes_for :amount
+
+  before_create :calculate_credit_note_amounts
+
+  private
+
+  def calculate_credit_note_adjustments
+
+    if credit_note.previously_adjusted_amount.present?
+      previously_adjusted_amount = credit_note.previously_adjusted_amount.value
+      credit_note.previously_adjusted_amount.update(value: previously_adjusted_amount + amount.value)
+    else
+      credit_note.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount + amount.value, currency_id: 1) # Todo Take care of currency id
+    end
+
+    if credit_note.net_adjustable_amount.present?
+      net_adjustable_amount = credit_note.net_adjustable_amount.value
+      credit_note.net_adjustable_amount.update(value: net_adjustable_amount + amount.value)
+    else
+      credit_note.net_adjustable_amount = Amount.new(value: net_adjustable_amount + amount.value, currency_id: 1)
+    end
+  end
 end
