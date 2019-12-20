@@ -42,6 +42,7 @@ class Procurement < ApplicationRecord
   has_many :delivery_challans, dependent: :destroy
   has_many :e_way_bills, dependent: :destroy
   has_many :procurement_status_taggables, dependent: :destroy
+  has_many :credit_notes
 
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable, dependent: :destroy
 

@@ -304,7 +304,9 @@ class InvoiceCalculationUtils
   def calculate_cn_adjustments
     adjustment_amount = 0
 
-    self.invoice.cn_adjustments
+    self.invoice.credit_note_adjustments.each do |cna|
+      adjustment_amount += cna.amount
+    end
 
   end
 

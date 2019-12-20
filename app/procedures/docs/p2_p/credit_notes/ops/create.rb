@@ -67,6 +67,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     params[:credit_note][:current_user] = current_user
 
     params[:credit_note][:invoice_id] = invoice.id
+    params[:credit_note][:procurement_id] = invoice.procurement&.id
     params[:credit_note][:tds_rate_id] = invoice.tds_slab_id
     params[:credit_note][:department_id] = invoice.department_id
     params[:credit_note][:cost_center_id] = invoice.cost_center_id

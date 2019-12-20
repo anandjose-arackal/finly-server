@@ -1,6 +1,6 @@
 class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   property :id
-  property :policy_id, presence: true
+  property :policy_id, validates: {presence: true}
   property :narration
   property :credit_note_number
   property :credit_note_date
@@ -8,18 +8,12 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   property :current_user, virtual: true
 
   collection :items, populator: :items! do
-    property :id, presence: true
-    property :credit_note_item_type_id, presence: true
+    property :id, validates: {presence: true}
+    property :credit_note_item_type_id, validates: {presence: true}
     property :comment
-    property :quantity, presence: true
-    property :rate, presence: true
-    # property :taxable_amount, populate_if_empty: Amount do # WORKING
-    # property :taxable_amount, populate_if_empty: Amount do
-    #   property :id
-    #   property :value, presence: true
-    #   property :currency_id, presence: true
-    # end
-    property :tax_rate_id, presence: true
+    property :quantity, validates: {presence: true}
+    property :rate, validates: {presence: true}
+    property :tax_rate_id, validates: {presence: true}
   end
 
   validate :company_entities # Checks for departments

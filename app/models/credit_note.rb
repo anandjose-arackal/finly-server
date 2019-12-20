@@ -81,7 +81,7 @@ class CreditNote < ApplicationRecord
           id: id,
           procurement_id: procurement_id,
           sequence_id: sequence_id,
-          creidt_note_number: credit_note_number,
+          credit_note_number: credit_note_number,
           status_name: status&.name,
           status_id: status&.id,
           narration: narration,
@@ -97,8 +97,12 @@ class CreditNote < ApplicationRecord
           cost_center_id: cost_center&.id,
           policy_name: policy&.name,
           policy_id: policy&.id,
+          user_name: user&.name,
+          user_email: user&.email,
+          user_employee_id: user.employee_id,
           previously_adjusted_amount: previously_adjusted_amount.as_json,
           net_adjustable_amount: net_adjustable_amount.as_json
+
       }
     else
       data = {
