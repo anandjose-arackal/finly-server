@@ -83,7 +83,7 @@ class Vendors::Create < Vendors::Base
       validate_attachment(vendor_parameters, :pan)
     end
 
-    if [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    if [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
       unless vendor_parameters[:pan].present?
         vendor_parameters[:gstin_locations_attributes].each do |gstin|
@@ -175,22 +175,12 @@ class Vendors::Create < Vendors::Base
           gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
           validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
 
-          unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+          unless [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
             if gstin.present?
               add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
               return
             end
           end
-        end
-      end
-    end
-
-    unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
-      vendor_pan = vendor_parameters[:pan]
-      if vendor_pan.present?
-        if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
-          add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
-          return
         end
       end
     end

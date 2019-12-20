@@ -210,7 +210,7 @@ class User::Balances::Show < User::Base
   end
 
   def set_yes_bank_balances
-    if selected_user.vendor_payments_admin? || (selected_user.company.bank_reimbursement_enabled? || selected_user.admin?)
+    if selected_user.vendor_payments_admin? || selected_user.is_bank_payment_request_creditor? || (selected_user.company.bank_reimbursement_enabled? && selected_user.admin?)
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Bank Transfer Credits",
@@ -227,7 +227,7 @@ class User::Balances::Show < User::Base
   end
 
   def set_icici_bank_balances
-    if selected_user.vendor_payments_admin? || (selected_user.company.bank_reimbursement_enabled? || selected_user.admin?)
+    if selected_user.vendor_payments_admin? || selected_user.is_bank_payment_request_creditor? || (selected_user.company.bank_reimbursement_enabled? && selected_user.admin?)
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Bank Transfer Credits",
