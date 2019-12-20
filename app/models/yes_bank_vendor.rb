@@ -69,6 +69,7 @@ class YesBankVendor < ApplicationRecord
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
+  has_many :credit_notes, foreign_key: :vendor_id
 
 
   default_scope { unscope(:where) }

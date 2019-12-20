@@ -625,6 +625,20 @@ class Invoice < ApplicationRecord
     nil
   end
 
+  def available_credits
+    available_credit_data = self.vendor.credit_notes.joins(:net_adjustable_amount).group(:currency_id).sum(:value)
+    result = []
+    available_credit_data.keys.each do |currency_id|
+      data = {
+          currency: Currency.find(currency_id).as_json,
+          amount: available_credit_data[currency_id]
+      }
+
+      result.push(data)
+    end
+    result
+  end
+
   def awaiting_action(user)
     # awaiting_action = false
     # if self.level&.reviewers&.include? user
@@ -734,6 +748,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+          available_credits: self.vendor.credit_notes.filter_adjustable.joins(:amount).sum(:value),
 
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
