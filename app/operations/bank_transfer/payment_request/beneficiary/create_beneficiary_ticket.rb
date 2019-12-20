@@ -34,7 +34,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	      return
 	    end
 	    if params[:payments_attributes].blank?
-	      add_message :error, 'Vendor params not sent for processing.'
+	      add_message :error, 'Beneficiary payment details not sent for processing.'
 	      return
 	    end
 	    unless params[:policy_id].present?
