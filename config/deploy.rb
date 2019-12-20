@@ -1,7 +1,10 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production','foreground_production', 'api_production', 'background_production', 'yes_bank_balance_poller', 'console_production'].include?(fetch(:stage)&.to_s)
+if ['aws_production', 'foreground_production', 'api_production',
+    'background_production', 'background_production_bgg', 'background_production_bgp',
+    'background_production_bgpc', 'yes_bank_balance_poller',
+    'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 end
 
@@ -21,7 +24,8 @@ when :itzcash_production
   # set :deploy_to, '/home/viveka/app'
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-when :aws_production, :background_production, :foreground_production, :console_production, :api_production
+when :aws_production, :background_production, :foreground_production, :console_production,
+    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc
   branch = fetch :branch
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -121,10 +125,10 @@ set :keep_releases, 5
 
 # setting up rollbar environment variables for deploy tracking
 set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
-set :rollbar_env, Proc.new {fetch :stage}
-set :rollbar_role, Proc.new {:app}
+set :rollbar_env, Proc.new { fetch :stage }
+set :rollbar_role, Proc.new { :app }
 
-set :puma_rackup, -> {File.join(current_path, 'config.ru')}
+set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
 set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock" #accept array for multi-bind
