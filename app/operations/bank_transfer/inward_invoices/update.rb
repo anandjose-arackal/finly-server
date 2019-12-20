@@ -430,27 +430,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Total Credit Note Adjustment Amount Cannot Exceed Invoice Balance Due"
       return
     end
-
-    # if inward_invoice_params[:credit_note_adjusments_attributes].present?
-    #   inward_invoice_params[:credit_note_adjusments_attributes].each do |adjustment_attr|
-    #     op = Docs::P2P::CreditNotes::Ops::Show(params: {id: adjustment_attr[:credit_note_id]}, current_user: user)
-    #     unless op.success?
-    #       add_message :error, "Credit Note not found for provided amount #{adjustment_attr[:amount][:value]}"
-    #       next
-    #     end
-    #
-    #     credit_note = op['model']
-    #     unless credit_note.vendor_id == invoice.vendor_id
-    #       add_message :error, "Applied Credit Note #{credit_note.credit_note_number} doesn't belong to Vendor #{invoice.vendor.vendor_id}"
-    #     end
-    #
-    #     if adjustment_attr[:amount][:value].to_f > credit_note.net_adjustable_amount&.value.to_f
-    #       add_message :error, "Cannot adjust amount more than available credits in Credit Note #{credit_note.credit_note_number} "
-    #     end
-    #   end
-    # end
-
-
   end
 
   def update_agreement_available_limit
