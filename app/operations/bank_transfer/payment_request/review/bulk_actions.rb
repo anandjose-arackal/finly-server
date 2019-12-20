@@ -130,14 +130,15 @@ class BankTransfer::PaymentRequest::Review::BulkActions < BankTransfer::PaymentR
   def build_processable
     payment_tickets = self.processable_bank_payment_requests
     total_items = payment_tickets.count
-    total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    # total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    total_amount = payment_tickets.map {|p| p.payment_order&.amount_requested&.value.to_f.round(2)}.compact.sum
     items = []
 
     payment_tickets.each do |bpr|
       items << {
         id: bpr.id,
         order_name: bpr.name,
-        requested_amount: bpr.requested_amount&.value.to_f.round(2),
+        requested_amount: bpr.payment_order&.amount_requested&.value.to_f.round(2),
         status: bpr.status&.name 
       }
     end
@@ -148,7 +149,8 @@ class BankTransfer::PaymentRequest::Review::BulkActions < BankTransfer::PaymentR
   def build_unprocessable
     payment_tickets = self.unprocessable_bank_payment_requests
     total_items = payment_tickets.count
-    total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    # total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    total_amount = payment_tickets.map {|p| p.payment_order&.amount_requested&.value.to_f.round(2)}.compact.sum
     items = []
 
     # FE does not require this for now
@@ -168,7 +170,8 @@ class BankTransfer::PaymentRequest::Review::BulkActions < BankTransfer::PaymentR
   def build_selected
     payment_tickets = self.bank_payment_requests
     total_items = payment_tickets.count
-    total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    # total_amount = payment_tickets.map {|p| p.requested_amount.value.to_f.round(2)}.compact.sum
+    total_amount = payment_tickets.map {|p| p.payment_order&.amount_requested&.value.to_f.round(2)}.compact.sum
     items = []
 
     # FE does not require this for now
