@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
+class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
 
   property :id
   property :company_id, validates: {presence: true}
@@ -60,7 +60,7 @@ class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
   # end
 
   def items!(collection:, fragment:, index:, options:, **)
-    item = items.find {|item| item.id.to_s == fragment["id"].to_s}
+    item = items.find { |item| item.id.to_s == fragment["id"].to_s }
 
 
     # if fragment["_destroy"]

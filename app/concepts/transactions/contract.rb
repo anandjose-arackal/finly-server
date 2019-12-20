@@ -14,19 +14,19 @@ class Transactions::Contract < Reform::Form
     end
   end
 
-  def self.deserialize(deserializer)
+  def self.Deserialize(deserializer)
     klass = self
     {
-        deserializer: {
-            parse_pipeline: ->(*) {->(input, represented:, **) {
-              if deserializer.is_a?(Symbol)
-                klass.send(deserializer, input, represented, **input)
-              elsif deserializer.is_a?(Class)
-                # Todo
-              else
-                deserializer.call(input, represented, **input)
-              end
-            }}
+        parse_pipeline: ->(*) {
+          ->(input, represented:, **) {
+            if deserializer.is_a?(Symbol)
+              klass.send(deserializer, input, represented, **input)
+            elsif deserializer.is_a?(Class)
+              # Todo
+            else
+              deserializer.call(input, represented, **input)
+            end
+          }
         }
     }
   end
