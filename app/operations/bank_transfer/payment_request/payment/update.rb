@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
-    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : nil
+    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : self.payment.amount.value
 
   end
 
@@ -53,7 +53,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       invoice_amount = invoice.balance_due&.value.to_f
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
       if payment_amount.to_f + previous_payments.to_f > invoice_amount
-        add_message :error, "Payment update amount would go above the invoice balance due."
+        add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
     end
@@ -159,10 +159,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     set_custom_fields(false) # this should hopefully add the attributes to the model
-    if self.payment.save
-      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
-    else
-      add_message :error, self.payment.errors.full_messages
+    ActiveRecord::Base.transaction do
+      if self.payment.save
+        recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+        validate_payable_amount
+        if has_errors?
+          raise ActiveRecord::Rollback
+        end
+      else
+        add_message :error, self.payment.errors.full_messages
+      end
     end
 
     case payment.parent_type
@@ -311,6 +317,12 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       else
         invoice.update payable: false
       end
+    end
+  end
+
+  def validate_payable_amount
+    if payment.parent.balance_due.value < payment.amount_value
+      add_message :error, "Payable amount cannot be greater than balance due"
     end
   end
 

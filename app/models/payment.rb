@@ -1075,7 +1075,7 @@ class Payment < ApplicationRecord
     case document.class.name
     when 'Invoice'
       # Get value from line items
-      if document.invoice_type.name == 'non_po_invoice'
+      if ["non_po_invoice", "recurring_invoice", "agreement_invoice"].include?(document.invoice_type.name)
         document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
           amount_arr << item.taxable_amount&.value
         end
