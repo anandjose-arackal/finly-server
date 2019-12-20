@@ -94,7 +94,8 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
 
     # generate comments for marking these payment requests as credited
     self.bank_payment_requests.each do |payment_request|
-      payment_request.payment_order.update_processed_amount
+      new_amount = payment_request.payment_order.payments.completed.joins(:amount).sum(:value)
+      payment_request.payment_order.create_amount_processed(value: new_amount, currency_id: 1)
       payment_request.comments.create user_id: user.id,
                                      action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
 
