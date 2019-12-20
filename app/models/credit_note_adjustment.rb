@@ -21,10 +21,11 @@ class CreditNoteAdjustment < ApplicationRecord
   before_create :calculate_credit_note_amounts
 
   before_update :calculate_adjustable_amount
+  before_destroy :calculate_adjustable_amount
 
   private
 
-  def calculate_credit_note_adjustments
+  def calculate_credit_note_amounts
 
     if credit_note.previously_adjusted_amount.present?
       previously_adjusted_amount = credit_note.previously_adjusted_amount.value

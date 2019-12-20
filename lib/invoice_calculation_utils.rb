@@ -316,16 +316,18 @@ class InvoiceCalculationUtils
   def calculate_cn_adjustments(invoice_params, payment, invoice)
     return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
 
-    adjustment_amount_to_add = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount].dig(:value)}.sum
-    adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:amount].dig(:value)}.sum
+    adjustment_amount_to_add = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:amount_attributes]&.dig(:value)}.sum
+    adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value)}.sum
 
     balance_due_amount = invoice.balance_due.value
 
     balance_due_amount = balance_due_amount + adjustment_amount_to_add - adjustment_amount_to_subtract
 
-    if self.invoice.balance_due.present?
-      self.invoice.balance_due.value = balance_due_amount
+
+    if invoice.balance_due.present?
+      invoice.balance_due.value = balance_due_amount
     end
+
   end
 
 end

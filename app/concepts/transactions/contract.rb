@@ -30,5 +30,4 @@ class Transactions::Contract < Reform::Form
         }
     }
   end
-
 end
