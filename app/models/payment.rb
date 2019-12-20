@@ -863,13 +863,13 @@ class Payment < ApplicationRecord
 
   def get_beneficiary_field_details
     parameters = RequestStore.store[:params]
-    parameters[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
-    departments = Company::Departments::Index.(self.beneficiary_payment.creator, parameters).policy_department_filter_mapping rescue nil
-    categories = Categories::Index.(self.beneficiary_payment.creator, parameters).vp_categories rescue nil
-    cost_centers = CostCenters::Index.(self.beneficiary_payment.creator, parameters).cost_centers rescue nil
-    cc_emails = self.parent.payment_notification_users["cc_emails"] rescue []
-    #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    departments = Company::Departments::Index.(self.parent.creator, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.parent.creator, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.parent.creator, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    cc_emails = self.parent.payment_notification_users["cc_emails"] rescue []
+    #parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
       invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
       invoice_date: { value: self.invoice.date, editable: true, field_type: 'field_text' },
@@ -922,7 +922,7 @@ class Payment < ApplicationRecord
     #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
-      invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
+      invoice_number: { value: self.invoice.invoice_number, editable: false, field_type: 'field_text' },
       invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
       due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
       category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
@@ -1004,38 +1004,38 @@ class Payment < ApplicationRecord
   def get_invoice_amount_details
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
-    if self.invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
-      invoice_advance = self.invoice.po_adjusted_advance&.value&.to_f
-    elsif self.invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
-      invoice_advance = self.invoice.advance_amount&.value&.to_f
+    if self.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      invoice_advance = self.parent.po_adjusted_advance&.value&.to_f
+    elsif self.parent.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      invoice_advance = self.parent.advance_amount&.value&.to_f
     else
-      invoice_advance = self.invoice.advance_amount&.value&.to_f
+      invoice_advance = self.parent.advance_amount&.value&.to_f
     end
 
     {
       tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-      total_amount: { value: self.invoice.item_amounts_total, editable: false }, # TOTAL
-      inclusive_of_taxes: {value: self.invoice.inclusive_of_taxes, editable: false},
-      discount: { discount_type_id: self.invoice.discount_type_id, rate: self.invoice.discount, discount_amount: precision_value(self.invoice.discount_amount&.value), editable: false},
-      tax: { tax_type_id: self.invoice.tax_type_id, tax_amount: precision_value(self.invoice.tax_amount&.value), value: precision_value(self.invoice.tax), editable: false },
-      tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.invoice.tds_amount&.value), editable: true, tds_slab_rate: self.invoice&.tds_slab&.tds, tds_slab_id: self.invoice.tds_type_id},
+      total_amount: { value: self.parent.item_amounts_total, editable: false }, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
+      tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
       advance_amount: { value: invoice_advance, editable: false }, # Advance
-      freight_amount: { value: self.invoice.freight_amount&.value, editable: false },
-      net_payable_amount: { value: self.invoice.balance_due&.value, editable: false },
-      net_total: { value: self.invoice.net_amount&.value, editable: false }, #Net Total
-      roundoff_amount: { value: self.invoice.roundoff_amount, editable: false },
+      freight_amount: { value: self.parent.freight_amount&.value, editable: false },
+      net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
+      net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
+      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
       tds_slabs: tds_slabs,
-      tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: { value: self.invoice.gst_type_id, editable: false },
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: { value: self.parent.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
-      balance_due:{ value: invoice.balance_due&.value, editable: false } # Invoice AMOUNT
+      balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
     }
   end
 
   def get_custom_fields(document_type)
     case document_type
     when 'Invoice'
-      self.invoice.custom_fields
+      self.parent.custom_fields
     when 'PurchaseOrder'
       self.purchase_order.custom_fields
     when 'BeneficiaryPayment'
@@ -1072,22 +1072,29 @@ class Payment < ApplicationRecord
   def calculate_tds_applicable_amount(document_type)
     case document_type
     when 'Invoice'
-      # tds_percentage = self.invoice&.tds_slab&.tds.to_f
       return calculate_tds_applicable_sum(self.invoice)
     end
   end
 
   # Amount on which TDS is applied
-  def calculate_tds_applicable_sum(invoice)
+  def calculate_tds_applicable_sum(document)
     amount_arr = []
-    # Get value from line items
-    invoice.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
-      if item.discount.present? && item.inventory_line_item.product_type.goods?
-        amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
-      else
-        amt = (item.rate * item.quantity)
+    case document.class.name
+    when 'Invoice'
+      # Get value from line items
+      if ["non_po_invoice", "recurring_invoice", "agreement_invoice"].include?(document.invoice_type.name)
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          amount_arr << item.taxable_amount&.value
+        end
+      elsif document.invoice_type.name == 'tax_invoice'
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          if item.inventory_line_item.product_type.goods?
+            amount_arr << item.taxable_amount&.value
+          else
+            amount_arr << item.billable_amount&.value
+          end
+        end
       end
-      amount_arr << amt#*tds_percentage/100
     end
     return amount_arr.sum
   end
