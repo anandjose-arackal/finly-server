@@ -139,6 +139,7 @@ json.invoice do
 
   json.credit_note_adjustments do
     json.array! invoice.credit_note_adjustments do |cna|
+      json.id cna.id
       json.credit_note_id cna.credit_note.id
       json.credit_note_number cna.credit_note.credit_note_number
       json.credit_note_sequence_id cna.credit_note.sequence_id
