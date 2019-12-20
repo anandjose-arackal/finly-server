@@ -1,4 +1,5 @@
 class Transactions::Contract < Reform::Form
+
   def add_schema_errors(errors_list)
     errors_list.to_h.each do |attr, err_list|
       # if err_list.is_a?(Hash)
@@ -12,6 +13,15 @@ class Transactions::Contract < Reform::Form
       # end
       errors.add attr, err_list
     end
+  end
+
+  def self.property(name, options)
+    if options[:deserializer].present?
+      unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
+        options[:deserializer] = Deserialize(options[:deserializer])
+      end
+    end
+    super(name, options)
   end
 
   def self.Deserialize(deserializer)
@@ -30,4 +40,14 @@ class Transactions::Contract < Reform::Form
         }
     }
   end
+
+  # class Transactions::Contract::Test < Transactions::Contract
+  #
+  #   property :name, deserializer: -> (input, represented, **) {represented.name = "a"}
+  #   property :gl_code, deserializer: -> (input, represented, **) {debugger}
+  #
+  #   validates :name, presence: true
+  #
+  # end
+
 end
