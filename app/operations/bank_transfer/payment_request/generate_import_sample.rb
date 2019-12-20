@@ -69,6 +69,17 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
         name: "Cost Centers"
     }
 
+    tax_rate_headers = ["ID", "Tax Rate"]
+    tax_rate_contents = []
+    current_company.tax_rates.each do |tax_rate|
+      tax_rate_contents << [tax_rate.id, tax_rate.rate]
+    end
+    self.sheets << {
+        item_headers: tax_rate_headers,
+        item_contents: tax_rate_contents,
+        name: "Tax Rate IDs",
+    }
+
     # adding departments to the excel sheet
     department_headers = ["ID", "Department Name"]
     department_contents = []

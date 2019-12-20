@@ -46,7 +46,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.headers = [:name, :business_name, :bank_account_number, :ifsc, :original_amount,
-               :inclusive_of_taxes, :gst_type_id, :tax, :advance_amount, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
+               :inclusive_of_taxes, :gst_type_id, :tax_rate_id, :advance_amount, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
     payment_order_custom_fields = current_company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice))
     payment_order_custom_fields.each do |field|
       headers << field.field_name.gsub(" ", "_").underscore.to_sym

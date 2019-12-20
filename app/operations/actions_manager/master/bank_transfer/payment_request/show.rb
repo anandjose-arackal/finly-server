@@ -112,11 +112,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def delete
     ############# Admin logic start #######################
-    if user.vendor_payments_admin?
-      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
-        return true
-      end
-    end
+    # if user.vendor_payments_admin?
+    #   if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    #     return true
+    #   end
+    # end
     ############# Admin logic end #######################
 
 
@@ -129,11 +129,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def submit
     ############# Admin logic start #######################
-    if user.vendor_payments_admin?
-      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
-        return true
-      end
-    end
+    # if user.vendor_payments_admin?
+    #   if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    #     return true
+    #   end
+    # end
     ############# Admin logic end #######################
 
     ############# Initiator logic start #######################
@@ -391,7 +391,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       # return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?)
 
 
-      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing? || bank_payment_request.retracted? || bank_payment_request.rejected?)
+      # if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing? || bank_payment_request.retracted? || bank_payment_request.rejected?)
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing?)
         if bank_payment_request.action_users(:return_control).include?(user)
           return true
         end
