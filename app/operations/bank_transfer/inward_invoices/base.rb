@@ -43,7 +43,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                         :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :purchase_order_item_id,
                                     # :billable_amount
                                     ], custom_fields: [],
-                                    credit_note_adjustments_attributes: [:id, :_destroy, :credit_note_id, amount: [:value, :currency_id]]
+                                    credit_note_adjustments_attributes: [:id, :_destroy, :credit_note_id, amount_attributes: [:value, :currency_id]]
     )
   end
 

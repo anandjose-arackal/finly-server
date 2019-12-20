@@ -137,6 +137,15 @@ json.invoice do
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
   json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
+  json.credit_note_adjustments do
+    json.array! invoice.credit_note_adjustments do |cna|
+      json.credit_note_id cna.credit_note.id
+      json.credit_note_number cna.credit_note.credit_note_number
+      json.credit_note_sequence_id cna.credit_note.sequence_id
+      json.amount cna.amount.as_json
+    end
+  end
+
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|

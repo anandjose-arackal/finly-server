@@ -13,4 +13,8 @@
 class CreditNoteAdjustment < ApplicationRecord
 
   belongs_to :amount, optional: true
+  belongs_to :credit_note, optional: true
+  belongs_to :invoice, optional: true
+
+  accepts_nested_attributes_for :amount
 end
