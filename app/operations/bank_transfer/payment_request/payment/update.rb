@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
-    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : self.payment.amount.value
+    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : self.payment.amount.value.round(2)
 
   end
 
@@ -330,9 +330,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     when 'Invoice'
       invoice = payment.parent
-      invoice_amount = invoice.balance_due&.value.to_f
+      invoice_amount = invoice.balance_due&.value.round(2) - 0.99
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if payment_amount.to_f + previous_payments.to_f > invoice_amount
+      if payment_amount.to_f + previous_payments.to_f >= invoice_amount
         add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
