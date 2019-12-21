@@ -332,7 +332,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       #   self.issue_item[:tax] = 'Invalid tax entered'
       # end
 
-      if tax_rate_id.present? && tax_rate_ids.exclude?(tax_rate_id)
+      if tax_rate_id.present? && tax_rate_ids.exclude?(tax_rate_id.to_i)
         self.valid = false
         self.error_messages << "Invalid tax entered"
         self.issue_item[:tax_rate_id] = 'Invalid tax entered'
@@ -390,7 +390,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if self.valid
-        tax = tax_rates.find {|tax_rate| tax_rate if tax_rate.id == item[:tax_rate_id]}&.rate || 0
+        tax = tax_rates.find {|tax_rate| tax_rate if tax_rate.id == item[:tax_rate_id].to_i}&.rate || 0
         payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
         # self.requested_amount += amount.to_f
         self.requested_amount += payable_amount.to_f
