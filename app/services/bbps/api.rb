@@ -15,12 +15,13 @@ class Bbps::Api < ServiceApi
   class_attr :request_fields, default: []
   class_attr :response_fields, default: []
   class_attr :success_object
+  class_attr :encryption_key, default: Rails.application.config_for(:bbps_config)&.dig('encryption_key')
   skip_user_authorization!
   http_method :post
   mime_type "application/json"
-  url "https://uatsky.yesbank.in:444/app/uat/bbps"
-  header 'X-IBM-Client-Id', "9e10ff7b-3141-4b0c-aa56-d110148c0fe7"
-  header 'X-IBM-Client-Secret', "cK7bT1nN7eK2gQ0vS2cT4uI0oP7mN7dB2tG4tN3jB0sY2uQ2mW"
+  url Rails.application.config_for(:bbps_config)&.dig('base_url')
+  header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.dig('client_id')
+  header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.dig('client_secret')
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
@@ -53,13 +54,13 @@ class Bbps::Api < ServiceApi
   end
 
   # Todo load from YAML
-  def encryption_key
-    '4d5390bef3ef1ee3d4a7e77fd42238cb'
-  end
+  # def self.encryption_key
+  #   ''
+  # end
 
   def encrypt(message)
     result = nil
-    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{encryption_key}\"") do |stdin, stdout, strerr|
+    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
       result = stdout.read
     end
     result
