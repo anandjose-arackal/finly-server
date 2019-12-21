@@ -44,6 +44,9 @@
 
 class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
+  include Sequenced::ActsAsSequenced
+  acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
+
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
   belongs_to :department, optional: true
