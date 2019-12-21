@@ -44,7 +44,12 @@ class Transactions::API < Trailblazer::Operation
   def self.call(options = {}, &handlers)
     result = super(options)
     if matcher.present?
-      matcher.(result, &handlers) if block_given?
+      if matcher.is_a?(Symbol)
+        matcher_klass = self.send(matcher, options, result)
+      else
+        matcher_klass = matcher
+      end
+      matcher_klass.(result, &handlers) if block_given?
     end
     result
   end

@@ -16,7 +16,6 @@ class Bbps::ComplaintCreate < Bbps::Api
   #
   # setup_defaults
   path "raiseComplaint"
-  setup_matcher
 
   # # Message Code(B5000)| Ref No |Agent institution Id | Channel Id| Agent Id |
   # # Complaint Category |Compliant type| Complaint Entity ID |Description |

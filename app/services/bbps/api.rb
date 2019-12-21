@@ -26,8 +26,10 @@ class Bbps::Api < ServiceApi
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
 
-  def self.setup_matcher
-    matcher Dry::Matcher.new(
+  matcher :build_matcher
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
         success: Dry::Matcher::Case.new(
             match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
             resolve: -> (result) { handle_success(result) }

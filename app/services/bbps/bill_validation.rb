@@ -38,7 +38,6 @@ class Bbps::BillValidation < Bbps::Api
   end
 
   path "billValidate"
-  setup_matcher
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
   # Customer Param 1 | Customer Param 2 | Customer Param 3 | Customer Param 4 | Customer Param 5 |

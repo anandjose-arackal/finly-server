@@ -54,7 +54,6 @@ class Bbps::BillPay < Bbps::Api
   end
 
   path "billPay"
-  setup_matcher
 
   # Message Code(B2000) | Order No |Agent institution Id |Channel Id |Agent Id |
   # Quick Pay |Split Pay |Split Pay Amt |Customer name|Customermobile|
