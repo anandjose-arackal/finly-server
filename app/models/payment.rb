@@ -1097,7 +1097,7 @@ class Payment < ApplicationRecord
         end
       end
     end
-    return amount_arr.sum
+    return precision_value(amount_arr.sum)
   end
 
   def get_custom_field_config(document_type)
