@@ -68,13 +68,15 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   def data_points(mapping)
     data = {}
     first_report = mapping&.reports&.first
-    data[:beneficiary_account_name] = mapping.processor_accountable.name
+    ifsc = mapping.processor_accountable&.ifsc
+    ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
+    data[:beneficiary_account_name] = BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
     data[:amount] = mapping.amount.value
     data[:payment_mode] = 'NEFT'
     data[:date] = Date.today
-    data[:beneficiary_ifsc] = mapping.processor_accountable.ifsc
+    data[:beneficiary_ifsc] = ifsc
     data[:ifsc] = mapping.processor_accountable.ifsc
     data[:email] = mapping.user.email
     data[:receiving_mobile_number] = mapping.user.mobile_number
