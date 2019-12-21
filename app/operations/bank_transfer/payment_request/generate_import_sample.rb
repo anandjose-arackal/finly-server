@@ -135,7 +135,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Sub Total",
        "Inclusive of Taxes? (Y/N)",
        "GST Type (1 - IGST ; 2 - CGST/SGST)",
-       "Tax Rate",
+       "Tax Rate ID",
        "Advance Amount",
        "Discount Rate",
        "TDS Slab ID",
