@@ -18,13 +18,6 @@ class Transactions::Contract < Reform::Form
   def self.property(name, options = {})
     if options.present?
       Deserializer.setup(options)
-      if options[:populator].is_a?(Class)
-        options[:populator] = -> (**) do
-          model = options[:populator].find_by
-          model.deleted_at = DateTime.now
-
-        end
-      end
     end
     super(name, options)
   end
