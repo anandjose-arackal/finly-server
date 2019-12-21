@@ -384,9 +384,11 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
           end
         end
 
-        self.valid = false
-        self.error_messages << "Invalid email format for - #{invalid_emails.join(", ")}"
-        self.issue_item[:cc_emails] = "Invalid email format for - #{invalid_emails.join(", ")}"
+        if invalid_emails.present?
+          self.valid = false
+          self.error_messages << "Invalid email format for - #{invalid_emails.join(", ")}"
+          self.issue_item[:cc_emails] = "Invalid email format for - #{invalid_emails.join(", ")}"
+        end
       end
 
       if self.valid
