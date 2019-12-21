@@ -332,7 +332,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       #   self.issue_item[:tax] = 'Invalid tax entered'
       # end
 
-      if tax_rate_id.present? && tax_rate_ids.include?(tax_rate_id)
+      if tax_rate_id.present? && tax_rate_ids.exclude?(tax_rate_id)
         self.valid = false
         self.error_messages << "Invalid tax entered"
         self.issue_item[:tax_rate_id] = 'Invalid tax entered'
