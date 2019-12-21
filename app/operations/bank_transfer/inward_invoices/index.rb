@@ -75,12 +75,11 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def check_payable
       self.paginated_invoices.each do |invoice|
-        invoice_amount = invoice.balance_due&.value.to_f
+        invoice_amount = invoice.balance_due&.value.to_f - 0.99
         paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
         previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
-        total_payments = (payable_amount.to_f + 0.99) + previous_payments
 
-        if (total_payments >= invoice_amount.round(2)) || (paid_amount >= invoice_amount) || (previous_payments >= invoice_amount)
+        if (paid_amount >= invoice_amount) || (previous_payments >= invoice_amount)
           invoice.update payable: false
         end
       end
