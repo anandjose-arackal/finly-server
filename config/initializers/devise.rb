@@ -364,15 +364,22 @@ Devise.setup do |config|
 
   # Configure with your SAML settings (see ruby-saml's README for more information: https://github.com/onelogin/ruby-saml).
   config.saml_configure do |settings|
+    if Rails.env.production?
+      base = "https://www.finly.io"
+    else
+      # base = "https://www.dev.finly.io"
+      base = "http://localhost:3001"
+    end
     # assertion_consumer_service_url is required starting with ruby-saml 1.4.3: https://github.com/onelogin/ruby-saml#updating-from-142-to-143
-    settings.assertion_consumer_service_url     = "http://localhost:3000/users/saml/auth"
+    settings.assertion_consumer_service_url     = "#{base}/users/saml/auth"
     settings.assertion_consumer_service_binding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     settings.name_identifier_format             = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
-    settings.issuer                             = "http://localhost:3000/saml/metadata"
+    settings.issuer                             = "#{base}/saml/metadata"
     settings.authn_context                      = ""
-    settings.idp_slo_target_url                 = "http://localhost/simplesaml/www/saml2/idp/SingleLogoutService.php"
-    settings.idp_sso_target_url                 = "http://localhost/simplesaml/www/saml2/idp/SSOService.php"
-    settings.idp_cert_fingerprint               = "00:A1:2B:3C:44:55:6F:A7:88:CC:DD:EE:22:33:44:55:D6:77:8F:99"
+    # settings.idp_slo_target_url                 = "http://localhost/simplesaml/www/saml2/idp/SingleLogoutService.php"
+    settings.idp_slo_target_url                 = "https://finly.okta.com/app/finly_finlysso_1/exk29wpyxpnjkbk6T357/sso/saml"
+    settings.idp_sso_target_url                 = "https://finly.okta.com/app/finly_finlysso_1/exk29wpyxpnjkbk6T357/sso/saml"
+    settings.idp_cert_fingerprint               = "26:4B:FF:5E:D0:3F:5D:F1:82:85:DE:D4:0E:A8:27:37:02:59:E1:A9:2F:F5:8D:F4:44:EB:F3:DA:D0:D4:2D:DE"
     settings.idp_cert_fingerprint_algorithm     = "http://www.w3.org/2000/09/xmldsig#sha1"
   end
 
