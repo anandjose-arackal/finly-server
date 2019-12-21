@@ -111,16 +111,16 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
   def check_payable
     ids = []
-    self.invoices.each do |invoice|
+    self.invoices.includes(:balance_due, payments: [:amount]).each do |invoice|
       invoice_amount = invoice.balance_due&.value.to_f - 0.99
-      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
-      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+      paid_amount = invoice.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+      previous_payments = invoice.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum
 
       if (paid_amount >= invoice_amount) || (previous_payments >= invoice_amount)
-        ids << invoice.id
+        ids << invoice.id if invoice.payable
       end
     end
-    self.invoices.where(id: ids).update_all(payable: false)
+    self.invoices.where(id: ids).update_all(payable: false) if ids.present?
   end
 
 end
