@@ -391,6 +391,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       if self.valid
         tax = tax_rates.find {|tax_rate| tax_rate if tax_rate.id == item[:tax_rate_id].to_i}&.rate || 0
+        item[:tax] = tax
         payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
         # self.requested_amount += amount.to_f
         self.requested_amount += payable_amount.to_f
@@ -526,7 +527,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         "Sub Total",
         "Inclusive of Taxes? (Y/N)",
         "GST Type (1 - IGST ; 2 - CGST/SGST)",
-        "Tax Rate",
+        "Tax Rate ID",
         "Advance Amount",
         "Discount Rate",
         "TDS Slab ID",
