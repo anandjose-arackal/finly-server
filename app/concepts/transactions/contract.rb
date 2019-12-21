@@ -15,30 +15,48 @@ class Transactions::Contract < Reform::Form
     end
   end
 
-  def self.property(name, options)
-    if options[:deserializer].present?
-      unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
-        options[:deserializer] = Deserialize(options[:deserializer])
+  def self.property(name, options = {})
+    if options.present?
+      Deserializer.setup(options)
+      if options[:populator].is_a?(Class)
+        options[:populator] = -> (**) do
+          model = options[:populator].find_by
+          model.deleted_at = DateTime.now
+
+        end
       end
     end
     super(name, options)
   end
 
-  def self.Deserialize(deserializer)
-    klass = self
-    {
-        parse_pipeline: ->(*) {
-          ->(input, represented:, **) {
-            if deserializer.is_a?(Symbol)
-              klass.send(deserializer, input, represented, **input)
-            elsif deserializer.is_a?(Class)
-              # Todo
-            else
-              deserializer.call(input, represented, **input)
-            end
+  # In-case deserialize: is defined in options, it sets it up the correct way for trailblazer
+  class Deserializer
+    def self.setup(options)
+      if options[:deserializer].present?
+        unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
+          options[:deserializer] = deserialize(options[:deserializer])
+        end
+      end
+    end
+
+    protected
+
+    def self.deserialize(deserializer)
+      klass = self
+      {
+          parse_pipeline: ->(*) {
+            ->(input, represented:, **) {
+              if deserializer.is_a?(Symbol)
+                klass.send(deserializer, input, represented, **input)
+              elsif deserializer.is_a?(Class)
+                # Todo
+              else
+                deserializer.call(input, represented, **input)
+              end
+            }
           }
-        }
-    }
+      }
+    end
   end
 
   # class Transactions::Contract::Test < Transactions::Contract
