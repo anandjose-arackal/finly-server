@@ -48,6 +48,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = self.invoices.order(created_at: :desc).paginate(page: params[:page], per_page: (params[:per_page] || 30))
+      check_payable
     end
 
     def po_invoice_status_count
@@ -68,6 +69,21 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       InwardInvoiceStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = sprintf '%02d', raw_count[ps.id] else h[ps.name] = sprintf '%02d', 0 end}
       h[:awaiting_approval] = sprintf '%02d', self.invoices&.where(invoice_type_id: id).awaiting_action_items(user)&.count || 0
       return h
+    end
+
+    private
+
+    def check_payable
+      self.paginated_invoices.each do |invoice|
+        invoice_amount = invoice.balance_due&.value.to_f
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+        previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+        total_payments = (payable_amount.to_f + 0.99) + previous_payments
+
+        if (total_payments >= invoice_amount.round(2)) || (paid_amount >= invoice_amount) || (previous_payments >= invoice_amount)
+          invoice.update payable: false
+        end
+      end
     end
 
   end
