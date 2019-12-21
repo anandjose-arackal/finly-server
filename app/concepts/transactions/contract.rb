@@ -16,10 +16,14 @@ class Transactions::Contract < Reform::Form
   end
 
   def self.property(name, options = {})
-    if options.present?
-      Deserializer.setup(options)
-    end
+    sanitize_options options
     super(name, options)
+  end
+
+  def self.sanitize_options(options)
+    return unless options.present?
+
+    Deserializer.setup(options)
   end
 
   # In-case deserialize: is defined in options, it sets it up the correct way for trailblazer
