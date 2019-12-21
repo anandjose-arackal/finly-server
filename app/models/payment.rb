@@ -897,7 +897,7 @@ class Payment < ApplicationRecord
     #Reassign filter role id in case parameters is being directly used
     parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
     {
-      po_number: { value: self.purchase_order.po_number, editable: true, field_type: 'field_text' },
+      po_number: { value: self.purchase_order.po_number, editable: false, field_type: 'field_text' },
       invoice_number: "",
       invoice_date: "",
       due_date: "",
