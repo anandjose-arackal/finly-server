@@ -7,7 +7,8 @@ class Bbps::ComplaintStatus < Bbps::Api
   #
   # setup_defaults
   path "getComplaintStatus"
-  #
+  setup_matcher
+
   # Message Code(B6000)| Ref No |Agent institution Id | Channel Id| Agent Id | Complaint Id |
   # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5| Additional Field 6|
   # Additional Field 7| Additional Field 8| Additional Field 9|Additional Field 10| Additional Field 11| Additional Field 12|

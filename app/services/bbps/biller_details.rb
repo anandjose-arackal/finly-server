@@ -8,6 +8,7 @@ class Bbps::BillerDetails < Bbps::Api
 
   path "getBillerDetails"
   parse -> (user, params, response) { parse_json_response(:biller_details, user, params, response) }
+  setup_matcher
 
   # Message Code (B8000)| Ref No| Agent institution Id |Channel Id| Biller Id| Additional Field 1 |Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15
   request_fields(

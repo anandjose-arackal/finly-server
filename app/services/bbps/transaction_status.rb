@@ -7,6 +7,7 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   path "getTxnStatus"
+  setup_matcher
 
   # Message Code(B4000)|Ref No| Agent institution Id | Channel Id|Agent Id | Complaint Type|
   # Order No|Mobile No| From Date|To Date|

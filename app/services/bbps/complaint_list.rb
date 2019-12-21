@@ -7,6 +7,7 @@ class Bbps::ComplaintList < Bbps::Api
   end
 
   path "getComplaintList"
+  setup_matcher
 
   # Message Code(B9000)| Ref No |Agent institution Id | Channel Id| Agent Id | Mobile No |
   # Additional Field 1| Additional Field 2| Additional Field 3| Additional Field 4| Additional Field 5|

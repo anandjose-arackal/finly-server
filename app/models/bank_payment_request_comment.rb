@@ -15,7 +15,6 @@
 #  new_value               :text(65535)
 #  edited_field            :text(65535)
 #  beneficiary_id          :integer
-#  deleted_at              :datetime
 #
 
 class BankPaymentRequestComment < ApplicationRecord

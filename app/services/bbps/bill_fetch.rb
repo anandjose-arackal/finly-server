@@ -48,6 +48,7 @@ class Bbps::BillFetch < Bbps::Api
   end
 
   path "billFetch"
+  setup_matcher
 
   # Message Code(B1000)|Ref No |Agent Institution Id|Channel Id |AgentId |Customer name |Customer mobile |Customer email |Customer Aadhar No |Customer PAN id |
   #   INITIATING_CHANNEL:

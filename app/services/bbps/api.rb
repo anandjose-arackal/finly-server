@@ -25,16 +25,19 @@ class Bbps::Api < ServiceApi
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
-  matcher Dry::Matcher.new(
-    success: Dry::Matcher::Case.new(
-      match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
-      resolve: -> (result) { handle_success(result) }
-    ),
-    failure: Dry::Matcher::Case.new(
-      match: -> (result) { true },
-      resolve: -> (result) { result.errors }
+
+  def self.setup_matcher
+    matcher Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
+            resolve: -> (result) { handle_success(result) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) { true },
+            resolve: -> (result) { result.errors }
+        )
     )
-  )
+  end
 
   def body
     message = generate_message
@@ -150,15 +153,15 @@ class Bbps::Api < ServiceApi
   end
 
   def agent_institution_id
-    'YS01'
+    Rails.application.config_for(:bbps_config)&.dig('agent_institution_id')
   end
 
   def channel_id
-    'C1001'
+    Rails.application.config_for(:bbps_config)&.dig('channel_id')
   end
 
   def agent_id
-    "18798"
+    Rails.application.config_for(:bbps_config)&.dig('agent_Id')
   end
 
   def customer_param_for(param)

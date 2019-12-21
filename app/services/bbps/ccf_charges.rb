@@ -8,6 +8,7 @@ class Bbps::CCFCharges < Bbps::Api
   end
 
   path "getCCFCharges"
+  setup_matcher
 
   # Message Code (B3000)| Ref No| Agent institution Id |Channel Id| Biller Id| Amount |Additional Field 2 |Additional Field 3 |Additional Field 4 |Additional Field 5 |Additional Field 6| Additional Field 7| Additional Field 8| Additional Field 9| Additional Field 10| Additional Field 11| Additional Field 12| Additional Field 13| Additional Field 14| Additional Field 15
   request_fields(
