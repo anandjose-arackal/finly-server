@@ -4,7 +4,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
                 :requested_amount, :issues, :issue_item, :ghost_invoice, :payment_order_custom_fields, :from_payment_agreement,
                 :mandatory_fields, :drop_down_fields, :drop_down_field_ids,
                 :tds_slab_ids, :all_departments_ids, :all_category_ids, :all_cost_center_ids,
-                :tax_rates,:tax_rate_ids
+                :tax_rates,:tax_rate_ids,
+                :categories_with_children
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -69,8 +70,12 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = all_departments&.policy_department_filter_mapping&.pluck(:id)
 
+    ids = self.order_details.pluck(:category_id).compact.map(&:to_i)
+
     all_categories = Categories::Index.(current_user, params)
     self.all_category_ids = all_categories.categories.leaves.pluck(:id) rescue []
+
+    self.categories_with_children = all_categories.categories.where(ancestry: ids).pluck(:ancestry).compact.map(&:to_i)
 
     all_cost_centers = current_company.cost_centers.vendor_payments_only
     self.all_cost_center_ids = all_cost_centers.pluck(:id) rescue []
@@ -361,7 +366,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if category_id.present?
-        unless self.all_category_ids.include? category_id.to_i
+        # unless self.all_category_ids.include? category_id.to_i
+        if self.categories_with_children.include? category_id.to_i
           self.valid = false
           self.error_messages << "Entered category ID not found for this company. Please recheck the list of Categories."
           self.issue_item[:category_id] = "Entered category ID not found for this company. Please recheck the list of Categories."
