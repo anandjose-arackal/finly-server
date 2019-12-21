@@ -800,6 +800,7 @@ class Payment < ApplicationRecord
       document_details: get_document_details(document_type),
       amount_details: get_amount_details(document_type),
       custom_fields: get_custom_fields(document_type),
+      custom_field_config: get_custom_field_config(document_type),
       payment_id: self.id,
       attachment_details: get_attachment_details(document_type)
     }
@@ -1097,5 +1098,15 @@ class Payment < ApplicationRecord
       end
     end
     return amount_arr.sum
+  end
+
+  def get_custom_field_config(document_type)
+    case document_type
+    when 'BeneficiaryPayment'
+      invoice_cf_ids = self.invoice.custom_fields.pluck(:field_configuration_id)
+      # Non created custom fields in the config
+      configurations = initiating_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
+      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+    end
   end
 end
