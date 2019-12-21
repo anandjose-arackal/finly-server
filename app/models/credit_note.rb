@@ -70,7 +70,7 @@ class CreditNote < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   # before_save :calculate_amount
-  before_validation :calculate_amount
+  before_save :calculate_amount
   # before_validation { debugger; puts "Hello"}
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
@@ -132,7 +132,7 @@ class CreditNote < ApplicationRecord
           items: items.as_json,
           gross_receivable_amount: gross_receivable_amount.as_json,
           after_tax_amount: {
-              currency: gross_receivable_amount.currency.as_json,
+              currency: gross_receivable_amount&.currency.as_json,
               value: gross_receivable_amount&.value.to_f + tax_amount&.value.to_f
           },
           tax_amount: tax_amount.as_json,

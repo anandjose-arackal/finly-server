@@ -20,8 +20,9 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # contract and data can be validated
   step Contract::Validate(key: 'credit_note')
 
-  # Just a method to for testing; will be removed in future
-  fail :check
+  # Just a methoid to for testing; will be removed in future
+  # step :check
+  # fail :check
 
   # Persist saves the model if validations go through successfully
   step Contract::Persist()
@@ -32,6 +33,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
   def check(params, **)
+    true
   end
 
   def get_invoice(options, current_user:, params:, **)
