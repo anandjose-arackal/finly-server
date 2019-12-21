@@ -64,7 +64,6 @@ class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
   #     return skip!
   #   end
   #
-  #   debugger
   #
   #   item ? items.insert(index, item.model) : items.insert(index, CreditNoteItem.new)
   # end

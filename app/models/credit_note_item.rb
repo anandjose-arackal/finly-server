@@ -74,6 +74,18 @@ class CreditNoteItem < ApplicationRecord
     total_amount.value
   end
 
+  def get_taxable_amount
+    quantity * rate
+  end
+
+  def get_tax_amount
+    get_taxable_amount * tax_rate.rate / 100
+  end
+
+  def get_total_amount
+    get_taxable_amount + get_tax_amount
+  end
+
   private
 
   def calculate_total
@@ -98,23 +110,22 @@ class CreditNoteItem < ApplicationRecord
     taxable_amount_value = quantity * rate
     tax_amount_value = taxable_amount_value * self.tax_rate.rate / 100
 
-
     if self.taxable_amount.present?
-      self.taxable_amount.update(value: taxable_amount_value)
+      self.taxable_amount.update(value: get_taxable_amount)
     else
-      self.taxable_amount = Amount.create(value: taxable_amount_value, currency_id: currency_id)
+      self.taxable_amount = Amount.create(value: get_taxable_amount, currency_id: currency_id)
     end
 
     if self.tax_amount.present?
-      self.tax_amount.update(value: tax_amount_value)
+      self.tax_amount.update(value: get_tax_amount)
     else
-      self.tax_amount = Amount.create(value: (tax_amount_value), currency_id: currency_id)
+      self.tax_amount = Amount.create(value: get_tax_amount, currency_id: currency_id)
     end
 
     if self.total_amount.present?
-      self.total_amount.update(value: tax_amount_value + taxable_amount_value)
+      self.total_amount.update(value: get_total_amount)
     else
-      self.total_amount = Amount.create(value: (tax_amount_value + taxable_amount_value), currency_id: currency_id)
+      self.total_amount = Amount.create(value: get_total_amount, currency_id: currency_id)
     end
   end
 

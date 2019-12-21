@@ -182,8 +182,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def create_credit_note
-    # todo logic for showing button
-    false
+    InwardInvoiceStatus.ids_for(:paid, :closed).include?(invoice.invoice_status_id) && user.has_policy_role?(:credit_note_initiator)
   end
 
 end
