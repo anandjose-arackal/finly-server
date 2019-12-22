@@ -1,13 +1,25 @@
 class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
 
+  schema do
+    params do
+      required(:credit_note) do
+        hash do
+          required(:invoice_id).filled
+        end
+      end
+    end
+  end
+
   # Create an empty model
   step Model(CreditNote, :new)
 
+  step :init
+
+  # Prevalidation
+  step :pre_validate
+
   # Pass the model to the policy and check if user can perform the action
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :create?)
-
-  # Since most of details will be picked from invoice, invoice has to be set
-  step :get_invoice
 
   # Below method makes sure all necessary data is present for contract to work properly, it also sets default value for
   # number of attributes
@@ -20,9 +32,6 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # contract and data can be validated
   step Contract::Validate(key: 'credit_note')
 
-  # Just a methoid to for testing; will be removed in future
-  # step :check
-  # fail :check
 
   # Persist saves the model if validations go through successfully
   step Contract::Persist()
@@ -32,24 +41,21 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
 
   step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
-  def check(params, **)
+
+  def init(options, current_user:, params:, **)
+    invoice_id = params[:credit_note][:invoice_id]
+
+    invoice = Procurements::Invoices::Show.(current_user, {id: invoice_id}).invoice rescue nil
+    options[:invoice] = invoice
     true
   end
 
-  def get_invoice(options, current_user:, params:, **)
-    invoice_id = params[:credit_note][:invoice_id]
-    if invoice_id.blank?
-      add_message(options, :error, :invoice_id, "Invoice not found")
-      return false
+  def pre_validate(options, current_user, **)
+    # Validate Invoice Presence
+    unless options[:invoice].present?
+      add_message(options, :error, :invoice, "Unable to load Invoice")
+      return
     end
-
-    invoice_show_op = Procurements::Invoices::Show.(current_user, {id: invoice_id})
-    unless invoice_show_op.success?
-      add_message(options, :error, :invoice_id, "Unable to load Invoice")
-      return false
-    end
-
-    options[:invoice] = invoice_show_op.invoice
     true
   end
 
@@ -106,14 +112,6 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
               value: item.taxable_amount.value,
               currency_id: item.taxable_amount.currency_id
           },
-          # original_taxable_amount: Amount.new({
-          #     value: item.taxable_amount.value,
-          #     currency_id: item.taxable_amount.currency_id
-          # }),
-          # taxable_amount: Amount.new({
-          #     value: item.taxable_amount.value,
-          #     currency_id: item.taxable_amount.currency_id
-          # }),
           original_tax_rate_id: item.tax_rate_id,
           tax_rate_id: item.tax_rate_id
       }

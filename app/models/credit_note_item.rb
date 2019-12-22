@@ -144,16 +144,12 @@ class CreditNoteItem < ApplicationRecord
   end
 
   def calculate_qty_change
-
-
   end
 
   def calculate_price_drop
-
   end
 
   def calculate_gst_change
-
   end
 
 end

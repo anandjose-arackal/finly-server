@@ -42,6 +42,8 @@ class CreditNote < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
+  acts_as_sequenced column: :sequence_id, purpose: :credit_note, editable: false, prefix: 'CN'
+
   attr_accessor :skip_callback
 
   belongs_to :company, optional: true
@@ -72,8 +74,8 @@ class CreditNote < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   # before_save :calculate_amount
-  after_save :calculate_amount, unless: :skip_callback
-  before_save :calculate_amount_2
+  after_create :calculate_from_items_values, unless: :skip_callback
+  before_save :calculate_from_item_methods
 
 
   # before_validation { debugger; puts "Hello"}
@@ -84,8 +86,8 @@ class CreditNote < ApplicationRecord
     if options[:index]
       data = {
           id: id,
-          procurement_id: procurement_id,
           sequence_id: sequence_id,
+          procurement_id: procurement_id,
           credit_note_number: credit_note_number,
           status_name: status&.name,
           status_id: status&.id,
@@ -316,10 +318,8 @@ class CreditNote < ApplicationRecord
 
   private
 
-  def calculate_amount
+  def calculate_from_items_values
     currency_id = company&.base_currency_id || 1
-
-    # items = items.as_json
 
     # Gross Receivable Amount
     gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
@@ -360,7 +360,7 @@ class CreditNote < ApplicationRecord
     self.save(validation: false)
   end
 
-  def calculate_amount_2
+  def calculate_from_item_methods
     currency_id = company&.base_currency_id || 1
 
     # items = items.as_json
