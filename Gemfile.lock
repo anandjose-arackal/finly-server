@@ -13,9 +13,9 @@ GIT
 
 GIT
   remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
-  revision: 4f6f332be815bdbba2339a4bf62fab8357fe7e4a
+  revision: 9ac70c0a33835beb84fc19f9efee47cdcf215898
   specs:
-    finly-secure_storage-sdk (0.1.43)
+    finly-secure_storage-sdk (0.1.44)
       aws-sdk-ec2 (>= 1.24.0)
       rails (>= 4.2)
 
