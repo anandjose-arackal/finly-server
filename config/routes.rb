@@ -4263,14 +4263,12 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  # devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
+  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
-  devise_scope :user do
-    get 'users/saml/sign_in', to: 'saml_sessions#new'
-    get 'users/saml/sign_in', to: 'saml_sessions#new'
-    post 'users/saml/auth', to: 'saml_sessions#create'
-    delete 'users/saml/logout'
-  end
+
+  get 'users/saml/sign_in', to: 'single_sign_ons#saml'
+  post 'users/saml/auth', to: 'single_sign_ons#saml_auth'
+  delete 'users/saml/logout', to: 'single_sign_ons#saml_logout'
 
   use_doorkeeper do
     # it accepts :authorizations, :tokens, :applications and :authorized_applications

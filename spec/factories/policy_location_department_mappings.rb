@@ -10,6 +10,7 @@
 #  updated_at    :datetime         not null
 #  company_id    :integer
 #  creator_id    :integer
+#  deleted_at    :datetime
 #
 
 FactoryBot.define do

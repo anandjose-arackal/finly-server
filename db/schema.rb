@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_12_030842) do
+ActiveRecord::Schema.define(version: 2019_12_22_133731) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1854,7 +1854,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_030842) do
     t.index ["user_id"], name: "index_cash_on_hands_on_user_id"
   end
 
-  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
     t.string "name", null: false
     t.string "gl_code"
@@ -1935,6 +1935,7 @@ ActiveRecord::Schema.define(version: 2019_12_12_030842) do
     t.string "subdomain"
     t.integer "group_id"
     t.datetime "deleted_at"
+    t.string "sub_domain"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6951,6 +6952,29 @@ ActiveRecord::Schema.define(version: 2019_12_12_030842) do
     t.datetime "updated_at", null: false
     t.string "company_name"
     t.datetime "deleted_at"
+  end
+
+  create_table "single_sign_on_configurations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.string "assertion_consumer_service_url"
+    t.string "assertion_consumer_service_binding"
+    t.string "name_identifier_format"
+    t.string "issuer"
+    t.string "idp_sso_target_url"
+    t.string "idp_cert_fingerprint"
+    t.string "idp_cert"
+    t.string "idp_cert_fingerprint_algorithm"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "single_sign_on_type_id"
+    t.string "authentication_context"
+    t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
+  end
+
+  create_table "single_sign_on_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "sso_keys", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

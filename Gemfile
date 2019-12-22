@@ -55,6 +55,8 @@ gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_stor
 # gem for SAML SSO
 gem 'ruby-saml'
 gem 'devise_saml_authenticatable'
+gem 'omniauth-saml'
+gem 'omniauth-multi-provider'
 
 gem 'rubyzip', '~> 1.2.2'
 

@@ -24,6 +24,7 @@
 #  updated_at             :datetime         not null
 #  default                :boolean
 #  reimbursement          :boolean          default(FALSE)
+#  deleted_at             :datetime
 #
 
 class ItzCashDmtBeneficiary < ApplicationRecord
