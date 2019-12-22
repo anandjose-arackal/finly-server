@@ -42,6 +42,8 @@ class CreditNote < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
+  attr_accessor :skip_callback
+
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :status, class_name: "CreditNoteStatus", optional: true
@@ -70,7 +72,10 @@ class CreditNote < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   # before_save :calculate_amount
-  before_validation :calculate_amount
+  after_save :calculate_amount, unless: :skip_callback
+  before_save :calculate_amount_2
+
+
   # before_validation { debugger; puts "Hello"}
 
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
@@ -132,7 +137,7 @@ class CreditNote < ApplicationRecord
           items: items.as_json,
           gross_receivable_amount: gross_receivable_amount.as_json,
           after_tax_amount: {
-              currency: gross_receivable_amount.currency.as_json,
+              currency: gross_receivable_amount&.currency.as_json,
               value: gross_receivable_amount&.value.to_f + tax_amount&.value.to_f
           },
           tax_amount: tax_amount.as_json,
@@ -314,21 +319,21 @@ class CreditNote < ApplicationRecord
   def calculate_amount
     currency_id = company&.base_currency_id || 1
 
-    items_json = items.as_json
+    # items = items.as_json
 
     # Gross Receivable Amount
-    gross_receivable_amount_value = items_json.collect {|item| item[:taxable_amount]}.collect {|item| item[:value]}.compact.sum
+    gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
-      self.gross_receivable_amount = Amount.new(value: gross_receivable_amount_value, currency_id: currency_id)
+      self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
     # Tax Amount (GST)
-    tax_amount_value = items_json.collect {|item| item[:tax_amount]}.compact.collect {|item| item[:value]}.compact.sum
+    tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     if tax_amount.present?
       tax_amount.update(value: tax_amount_value)
     else
-      self.tax_amount = Amount.new(value: tax_amount_value, currency_id: currency_id)
+      self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
     end
 
     tds_amount_value = 0
@@ -339,7 +344,7 @@ class CreditNote < ApplicationRecord
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
       else
-        self.tds_amount = Amount.new(value: tds_amount_value, currency_id: currency_id)
+        self.tds_amount = Amount.create(value: tds_amount_value, currency_id: currency_id)
       end
     end
 
@@ -347,7 +352,53 @@ class CreditNote < ApplicationRecord
     if self.net_receivable_amount.present?
       self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
-      self.net_receivable_amount = Amount.new(value: net_receivable_amount_value, currency_id: currency_id)
+      self.net_receivable_amount = Amount.create(value: net_receivable_amount_value, currency_id: currency_id)
+    end
+
+    update_adjustable_amount
+    self.skip_callback = true
+    self.save(validation: false)
+  end
+
+  def calculate_amount_2
+    currency_id = company&.base_currency_id || 1
+
+    # items = items.as_json
+
+    # Gross Receivable Amount
+    # gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
+    gross_receivable_amount_value = items.map(&:get_taxable_amount).compact.sum
+    if gross_receivable_amount.present?
+      gross_receivable_amount.update(value: gross_receivable_amount_value)
+    else
+      self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
+    end
+    # Tax Amount (GST)
+    # tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
+    tax_amount_value = items.map(&:get_tax_amount).compact.sum
+    if tax_amount.present?
+      tax_amount.update(value: tax_amount_value)
+    else
+      self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
+    end
+
+    tds_amount_value = 0
+    tds_rate_percentage = tds_rate&.tds
+    if tds_rate_percentage.present?
+      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+
+      if self.tds_amount.present?
+        self.tds_amount.update(value: tds_amount_value)
+      else
+        self.tds_amount = Amount.create(value: tds_amount_value, currency_id: currency_id)
+      end
+    end
+
+    net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
+    if self.net_receivable_amount.present?
+      self.net_receivable_amount.update(value: net_receivable_amount_value)
+    else
+      self.net_receivable_amount = Amount.create(value: net_receivable_amount_value, currency_id: currency_id)
     end
 
     update_adjustable_amount
@@ -360,14 +411,15 @@ class CreditNote < ApplicationRecord
     if self.previously_adjusted_amount.present?
       self.previously_adjusted_amount.update(value: previously_adjusted_amount_value)
     else
-      self.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount_value, currency_id: currency_id)
+      self.previously_adjusted_amount = Amount.create(value: previously_adjusted_amount_value, currency_id: currency_id)
     end
 
     net_adjustable_amount_value = net_receivable_amount&.value&.to_f - previously_adjusted_amount_value
     if self.net_adjustable_amount.present?
       self.net_adjustable_amount.update(value: net_adjustable_amount_value)
     else
-      self.net_adjustable_amount = Amount.new(value: net_adjustable_amount_value, currency_id: currency_id)
+      self.net_adjustable_amount = Amount.create(value: net_adjustable_amount_value, currency_id: currency_id)
     end
   end
+
 end

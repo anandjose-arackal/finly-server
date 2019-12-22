@@ -12,18 +12,18 @@ class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
   property :shipping_location_id, validates: {presence: true}
   property :vendor_id, validates: {presence: true}
   property :narration
-  property :tds_rate_id, validates: {presence: true}
+  property :tds_rate_id
 
   property :current_user, virtual: true
   property :status_id, default: CreditNoteStatus.id_for(:draft)
 
-  collection :items, populator: :items! do
+  collection :items, populate_if_emtpy: CreditNoteItem, populator: :items! do
     # property :credit_note_item_type_id, validates:{ presence: true }
     property :item_id, validates: {presence: true}
     property :invoice_item_id, validates: {presence: true}
     property :category_id, validates: {presence: true}
     property :comment, validates: {presence: true}
-    property :hsn_sac, validates: {presence: true}
+    property :hsn_sac, presence: true
     property :original_quantity, validates: {presence: true}
     property :quantity, validates: {presence: true}
     property :original_rate, validates: {presence: true}
@@ -55,20 +55,20 @@ class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
 
   private
 
-  # def amount!(fragment:, **)
+  # def items!(collection:, fragment:, index:, options:, **)
+  #   item = items.find { |item| item.id.to_s == fragment["id"].to_s }
   #
+  #
+  #   if fragment["_destroy"]
+  #     items.delete(item)
+  #     return skip!
+  #   end
+  #
+  #
+  #   item ? items.insert(index, item.model) : items.insert(index, CreditNoteItem.new)
   # end
 
   def items!(collection:, fragment:, index:, options:, **)
-    item = items.find { |item| item.id.to_s == fragment["id"].to_s }
-
-
-    # if fragment["_destroy"]
-    #   items.delete(item)
-    #   return skip!
-    # end
-
-
-    item ? items.insert(index, item.model) : items.insert(index, CreditNoteItem.new)
+    items.insert(index, CreditNoteItem.new)
   end
 end

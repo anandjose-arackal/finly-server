@@ -20,8 +20,9 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # contract and data can be validated
   step Contract::Validate(key: 'credit_note')
 
-  # Just a method to for testing; will be removed in future
-  fail :check
+  # Just a methoid to for testing; will be removed in future
+  # step :check
+  # fail :check
 
   # Persist saves the model if validations go through successfully
   step Contract::Persist()
@@ -32,6 +33,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
   def check(params, **)
+    true
   end
 
   def get_invoice(options, current_user:, params:, **)
@@ -80,6 +82,12 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     # Credit Note Items Attributes
     items = []
     invoice.items.each do |item|
+      if item.discount_amount.present? && item.discount_amount.value > 0
+        discount_amount = item.discount_amount.value / item.quantity
+        rate = item.rate - discount_amount
+      else
+        rate = item.rate
+      end
       item_attr = {
           item_id: item.inventory_line_item_id,
           invoice_item_id: item.id,
@@ -88,8 +96,8 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
           hsn_sac: item.hsn_sac,
           original_quantity: item.quantity,
           quantity: item.quantity,
-          original_rate: item.rate,
-          rate: item.rate,
+          original_rate: rate,
+          rate: rate,
           original_taxable_amount: {
               value: item.taxable_amount.value,
               currency_id: item.taxable_amount.currency_id
