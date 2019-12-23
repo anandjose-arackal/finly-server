@@ -16,6 +16,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  gender             :string(255)
+#  deleted_at         :datetime
 #
 
 class TravelMember < ApplicationRecord

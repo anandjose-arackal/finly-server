@@ -11,6 +11,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  success     :boolean
+#  deleted_at  :datetime
 #
 
 class CallbackTrack < ApplicationRecord

@@ -10,6 +10,7 @@
 #  updated_at                    :datetime         not null
 #  invoice_number_config_type_id :integer
 #  purpose_id                    :integer
+#  deleted_at                    :datetime
 #
 
 class InvoiceNumberConfig < ApplicationRecord
