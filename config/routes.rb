@@ -4269,7 +4269,7 @@ Rails.application.routes.draw do
   # devise_for :users, skip: [:session, :password]
 
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
-  post 'users/saml/auth', to: 'single_sign_on#saml_auth'
+  post 'users/saml/auth', to: 'single_sign_on#create'
   delete 'users/saml/logout', to: 'single_sign_on#saml_logout'
 
   use_doorkeeper do

@@ -17,6 +17,7 @@
 #  single_sign_on_type_id             :integer
 #  authentication_context             :string(255)
 #  finly_sso_path                     :string(255)
+#  label                              :string(255)
 #
 
 require 'rails_helper'

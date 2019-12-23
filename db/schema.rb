@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_23_104022) do
+ActiveRecord::Schema.define(version: 2019_12_23_124151) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -6969,6 +6969,7 @@ ActiveRecord::Schema.define(version: 2019_12_23_104022) do
     t.integer "single_sign_on_type_id"
     t.string "authentication_context"
     t.string "finly_sso_path"
+    t.string "label"
     t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
   end
 
