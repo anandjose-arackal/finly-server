@@ -12,6 +12,10 @@ class SingleSignOnController < Oauth::TokenController
     company = Company.find_by_sub_domain(subdomain)
     sign_on_type = SingleSignOnType.id_for(action_name.to_sym)
     config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.first
+    ################## only for development sakes ###################
+    company = Company.first
+    config = company.single_sign_on_configurations.first
+    #################################################################
     # debugger
     if company.present? and config.present?
       settings = saml_settings(config)
