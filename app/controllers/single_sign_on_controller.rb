@@ -16,10 +16,11 @@ class SingleSignOnController < Oauth::TokenController
     if company.present? and config.present?
       settings = saml_settings(config)
       @redirect_url = saml_request.create(settings)
-      # redirect_to(saml_request.create(settings))
+      # debugger
     else
       @redirect_url = "/login"
     end
+    render json: {redirect_url: @redirect_url}, status: 200
   end
 
   def saml_auth
