@@ -1,6 +1,10 @@
 payment = @result.payment
 parent = payment.parent rescue nil
-json.owner_name payment.receiving_account&.account_owner&.name
+if payment.receiving_account&.account_owner_type == "YesBankVendor"
+  json.owner_name payment.receiving_account&.account_owner&.business_name
+else
+  json.owner_name payment.receiving_account&.account_owner&.name
+end
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.disabled payment.receiving_account&.disabled
@@ -151,7 +155,9 @@ json.bank_payment_request_id @result.bank_payment_request&.id
 
 if @result.vendor.present?
   if @result.vendor.is_a?(YesBankVendor)
-    json.vendor @result.vendor.as_json({payment_show: true})
+    json.vendor do
+      json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+    end
   end
 end
 
