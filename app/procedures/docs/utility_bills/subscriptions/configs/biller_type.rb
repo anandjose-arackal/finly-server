@@ -13,10 +13,13 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerType < Transactions::API
         {name: "Broadband Prepaid", field_name: "Operator"},
         {name: "Broadband Postpaid", field_name: "Operator"},
         {name: "Cable",field_name: "Operator"},
+        {name: "Mobile Postpaid", field_name: "Operator"},
         {name: "DTH", field_name: "Operator"},
         {name: "Electricity", field_name: "Board"},
         {name: "Landline Postpaid", field_name: "Operator"},
-        {name: "Water", field_name: "Board"}
+        {name: "Water", field_name: "Board"},
+        {name: "Mobile Prepaid", field_name: "Operator"},
+        {name: "Gas", field_name: "Operator"}
     ]
 
     type = params[:type]
