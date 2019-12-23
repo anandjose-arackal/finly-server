@@ -95,6 +95,7 @@ json.payments do
         json.custom_fields do
           json.array! invoice.custom_fields
         end
+        json.custom_field_config invoice.remaining_custom_field_config
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 

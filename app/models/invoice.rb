@@ -971,6 +971,14 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def remaining_custom_field_config
+    current_user = RequestStore.store[:current_user]
+    invoice_cf_ids = self.custom_fields.pluck(:field_configuration_id)
+    configurations = current_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
+      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+      return custom_fields_config
+  end
+
   private
 
   # def payment_agreement_updations

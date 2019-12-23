@@ -100,7 +100,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               # value: payment[:original_amount],
-              value: beneficiary_payment&.balance_due&.value,
+              value: get_balance_due_amount,
               currency_id: Currency.first.id
           },
           note: payment[:note],
@@ -550,5 +550,14 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
   def update_status
     self.security_deposit.update(status_id: SecurityDepositStatus.id_for(:processing)) if self.agreement_type == 'security_deposit'
     self.beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:processing)) if self.agreement_type == 'beneficiary'
+  end
+
+  def get_balance_due_amount
+    if self.beneficiary_payment.present?
+      return self.beneficiary_payment&.balance_due&.value
+    end
+    if self.security_deposit.present?
+      return self.security_deposit&.payable_amount&.value
+    end
   end
 end
