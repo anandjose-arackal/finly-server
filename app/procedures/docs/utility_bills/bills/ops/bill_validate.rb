@@ -50,18 +50,22 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   end
 
   def bill_validate(options, validation_params:, **)
-    handle = self.object_id
-    ::BackgroundJobs::Bbps::BillValidation.perform_async(handle, validation_params)
-    timeout = 30
-    now = Time.now
-    while (Time.now - now) < timeout
-      result = Resque.reserve(handle)
-      next if result.blank?
+    # op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
+    op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
 
-      data = result.args.first
+    # handle = self.object_id
+    # ::BackgroundJobs::Bbps::BillValidation.perform_async(handle, validation_params)
+    # timeout = 30
+    # now = Time.now
+    # while (Time.now - now) < timeout
+    #   result = Resque.reserve(handle)
+    #   next if result.blank?
+    #
+    #   data = result.args.first
 
 
-    end
+    # end
+    true
   end
 
   private

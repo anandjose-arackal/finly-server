@@ -8,7 +8,7 @@ class BbpsBillsFetch < ApplicationJob
 
     bbps_subscriptions.each do |subscription|
       parameters = customer_params(subscription).with_indifferent_access
-      Bbps::BillFetch.(parameters, "current_user" => User.first) do |op|
+      Bbps::BillFetch.(params: parameters, "current_user" => User.first) do |op|
         op.success {|result| create_bill(result, subscription, autofetched)}
         op.failure {|result| p result}
       end

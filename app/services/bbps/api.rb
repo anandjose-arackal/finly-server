@@ -1,5 +1,6 @@
 class Bbps::Api < ServiceApi
-
+  include BackgroundWorker
+  sidekiq_options queue: :yes_bank_bbps
   # Matcher = Dry::Matcher.new(
   #     success: Dry::Matcher::Case.new(
   #         match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
