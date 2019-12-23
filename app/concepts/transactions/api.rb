@@ -11,20 +11,48 @@ class Transactions::API < Trailblazer::Operation
   module Transactions::API::BackgroundWorker
     extend ActiveSupport::Concern
 
+    WAIT_TIMEOUT = 30.seconds
+
     included do
       include Sidekiq::Worker
     end
 
     class_methods do
-      def call_async(payload)
+      def call_async(payload, wait: false, wait_timeout: WAIT_TIMEOUT)
         encoded_data = Events::Serializer.encode(payload)
-        self.perform_async(encoded_data)
+        if wait
+          return perform_with_wait encoded_data, wait_timeout
+        else
+          self.perform_async(encoded_data)
+        end
+      end
+
+      def perform_with_wait(encoded_data, timeout)
+        response_handle = "#{self.object_id}_#{DateTime.now.strftime("%y%m%d%s%m")}"
+        self.perform_async(encoded_data, response_handle)
+        timeout ||= WAIT_TIMEOUT
+        now = Time.now
+        while (Time.now - now) < timeout
+          result = Resque.reserve(response_handle)
+          next if result.blank?
+
+          return result.args.first
+        end
       end
     end
 
-    def perform(payload)
+    def perform(payload, response_handle = nil)
       decoded_data = Events::Serializer.decode(payload)
-      self.class.call(decoded_data)
+      result = self.class.call(decoded_data)
+      respond_to_handle(result, response_handle) if response_handle
+      result
+    end
+
+    def respond_to_handle(result, response_handle)
+      queue = Struct.new(:queue).new(response_handle)
+      response = result.as_json.except('params', 'current_user')
+      success = result.success? ? true : false
+      Resque.enqueue(queue, {success: success, result: response, errors: result.errors})
     end
   end
 

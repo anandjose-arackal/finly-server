@@ -1,6 +1,7 @@
 class ServiceApi < Transactions::API
   include Dry::Monads[:result]
   include DynamicAttributes
+  include BackgroundWorker
 
   attr_accessor :user, :params
 

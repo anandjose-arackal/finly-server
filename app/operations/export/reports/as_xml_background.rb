@@ -42,7 +42,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   def process
     self.column_names = default_column_names + custom_field_column_names
     self.data = []
-    reports.each do |r|
+    reports.find_each(batch_size: 1000) do |r|
       r.expenses.each do |e|
         self.data << retrieve_data(preferences, r, e, custom_field_column_names)
       end
