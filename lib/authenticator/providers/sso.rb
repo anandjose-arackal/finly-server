@@ -17,6 +17,8 @@ class Authenticator::Providers::Sso < Authenticator::Providers::Base
   def authenticate
     self.sso_config_id = params[:sso_config_id]
 
+    self.sso_config_id = 1 if self.sso_config_id.blank?
+
     fail_with_event :on_invalid_sso_config, "Invalid configuration passed for SSO"
 
     self.sso_response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :settings => saml_settings(self.sso_config_id))
@@ -67,7 +69,9 @@ class Authenticator::Providers::Sso < Authenticator::Providers::Base
   def saml_settings(config_id)
     sso_config = SingleSignOnConfiguration.find_by(id: config_id)
     if sso_config.blank?
-
+      # return error message
+      params[:message] = "Invalid configuration passed for SSO"
+      UserSessions::Create.(:failed, params)
     end
     settings = OneLogin::RubySaml::Settings.new
     settings.assertion_consumer_service_url     = sso_config.assertion_consumer_service_url
