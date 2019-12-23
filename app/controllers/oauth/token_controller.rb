@@ -27,7 +27,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       response_message = nil
       if create_user_sessions
         response_message = on_session_create
-        if response_message == true or response_message.is_a?(Hash) and response_message[:success]
+        if response_message == true or (response_message.is_a?(Hash) and response_message[:success])
           on_create_success(response)
           return
         end
