@@ -3895,6 +3895,17 @@ Rails.application.routes.draw do
   end
   # Utility Bill Payments / BBPS Ends  #
 
+
+  # New Route for P2P
+  # Credit Note
+  get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
+  get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
+  get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+
+  resources :credit_notes do
+    patch 'review', to: 'credit_notes#review'
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

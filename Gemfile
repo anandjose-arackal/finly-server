@@ -56,7 +56,7 @@ gem 'figaro', '~> 1.1.1'
 gem 'puma', '~> 3.12.0'
 
 gem 'resque', '~> 2.0.0'
-gem 'ransack'
+# gem 'ransack'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
 gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'

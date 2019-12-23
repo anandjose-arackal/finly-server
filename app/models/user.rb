@@ -208,6 +208,7 @@ class User < ApplicationRecord
 
   # Inward Invoices
   has_many :inward_invoices, class_name: "Invoice", foreign_key: :created_by_user_id
+  has_many :credit_notes
 
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings

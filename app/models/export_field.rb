@@ -13,7 +13,7 @@ class ExportField < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
 
-  scope :ordered_by_name, -> { reorder(name: :asc) }
+  scope :ordered_by_name, -> {reorder(name: :asc)}
 
   VALUES = {
       1 => "Employee Name",

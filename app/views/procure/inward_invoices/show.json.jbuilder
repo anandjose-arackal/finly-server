@@ -70,6 +70,7 @@ json.invoice do
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
   json.user invoice.created_by.as_json rescue nil
+  json.available_credits invoice.available_credits
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -135,6 +136,16 @@ json.invoice do
   json.net_payable_amount invoice.balance_due&.value
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
   json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+
+  json.credit_note_adjustments do
+    json.array! invoice.credit_note_adjustments do |cna|
+      json.id cna.id
+      json.credit_note_id cna.credit_note.id
+      json.credit_note_number cna.credit_note.credit_note_number
+      json.credit_note_sequence_id cna.credit_note.sequence_id
+      json.amount cna.amount.as_json
+    end
+  end
 
   # invoice items
   json.invoice_items do

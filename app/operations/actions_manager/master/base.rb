@@ -46,7 +46,9 @@ class ActionsManager::Master::Base
       bbps_subscriptions_show: '::ActionsManager::Master::Bbps::Subscriptions::Show',
       bbps_subscriptions_index: '::ActionsManager::Master::Bbps::Subscriptions::Index',
       bbps_bills_show: '::ActionsManager::Master::Bbps::Bills::Show',
-      bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index'
+      bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index',
+      credit_notes_index: '::ActionsManager::Master::CreditNotes::Index',
+      credit_note_show: '::ActionsManager::Master::CreditNotes::Show'
   }.with_indifferent_access
 
   def self.set_data_map

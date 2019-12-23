@@ -64,6 +64,8 @@ class WorkflowManager::Base < BaseOperation
       self.aasm_document = ::WorkflowManager::Aasm::BbpsBillerSubscriptionProvider.new user, workflow_input
     when 'BbpsBill'
       self.aasm_document = ::WorkflowManager::Aasm::BbpsBillProvider.new user, workflow_input
+    when 'CreditNote'
+      self.aasm_document = ::WorkflowManager::Aasm::CreditNoteProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

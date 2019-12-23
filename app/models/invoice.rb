@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -100,7 +100,7 @@ class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
-  include EventProducer
+  # include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
@@ -112,7 +112,7 @@ class Invoice < ApplicationRecord
   # resolver :admin, Documents::Invoices::Policy::Scope
   # resolver Documents::Invoices::Policy::Scope
   # produces_event!
-  event_channel 'invoice'
+  # event_channel 'invoice'
   # record_events 'submit', 'approve', 'show'
   # collection_events 'index'
 
@@ -168,6 +168,7 @@ class Invoice < ApplicationRecord
   belongs_to :payment_agreement, optional: true
   belongs_to :agreement_item, optional: true, polymorphic: true
 
+  has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
   # because multiple payments can be made against one invoice
@@ -187,6 +188,8 @@ class Invoice < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
+  has_many :credit_note_adjustments
+
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -206,6 +209,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
   accepts_nested_attributes_for :notify_users, allow_destroy: true
+  accepts_nested_attributes_for :credit_note_adjustments, allow_destroy: true
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tds_amount
@@ -623,6 +627,20 @@ class Invoice < ApplicationRecord
     nil
   end
 
+  def available_credits
+    available_credit_data = self.vendor.credit_notes.filter_adjustables.group(:currency_id).sum(:value)
+    result = []
+    available_credit_data.keys.each do |currency_id|
+      data = {
+          currency: Currency.find(currency_id).as_json,
+          amount: available_credit_data[currency_id]
+      }
+
+      result.push(data)
+    end
+    result
+  end
+
   def awaiting_action(user)
     # awaiting_action = false
     # if self.level&.reviewers&.include? user
@@ -732,6 +750,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+          available_credits: self.vendor.credit_notes.filter_adjustable.joins(:amount).sum(:value),
 
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
