@@ -18,7 +18,8 @@ class Docs::UtilityBills::Subscriptions::Configs::BillerType < Transactions::API
         {name: "Electricity", field_name: "Board"},
         {name: "Landline Postpaid", field_name: "Operator"},
         {name: "Water", field_name: "Board"},
-        {name: "Mobile Prepaid", field_name: "Operator"}
+        {name: "Mobile Prepaid", field_name: "Operator"},
+        {name: "Gas", field_name: "Operator"}
     ]
 
     type = params[:type]

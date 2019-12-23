@@ -5,7 +5,7 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
 
   def init(options, params:, current_user:, model:, **)
     result = {}
-    result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid"]
+    result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid", "Gas"]
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, {filter_role_id: [UserRole.id_for(:utility_bill_initiator)]}).policies rescue Policy.none
     result['reviewal_chains'] = []
 

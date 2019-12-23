@@ -106,11 +106,6 @@ class Bbps::BillFetch < Bbps::Api
     'B1000'
   end
 
-  # def ref_number
-  #   'AbinashTest100001'
-  # end
-
-
   def customer_name
     params[:customer_name]
   end
