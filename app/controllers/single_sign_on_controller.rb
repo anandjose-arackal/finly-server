@@ -26,24 +26,17 @@ class SingleSignOnController < Oauth::TokenController
     render json: {redirect_url: @redirect_url}, status: 200
   end
 
+  # this will be the catch-all controller for SAML as well as Ouath strategies
+  # The logic for choosing between the strategies will be held in the Authenticator::Processor operation
   def create
     RequestStore.store[:sso] = true
     set_grant_type
     set_scope
     super()
-    # sso_response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :settings => saml_settings)
-    # if sso_response.is_valid?
-    #   debugger
-    #   # authenticate the user accordingly, and send tokens to the FE
-    #   # Need to authenticate the user here with the gatekeeper method of doing so
-    #   # debugger
-    #   # first set the requisite parameters that are needed for the authentication and then go ahead
-    # end
-    # debugger
   end
 
   def saml_logout
-    # yet to be implemented
+    # yet to be implemented. When though?
   end
 
   private
@@ -54,15 +47,6 @@ class SingleSignOnController < Oauth::TokenController
 
   # the below will be generalized based on the company that is using it
   # which will be determined based on the subdomain
-  # TODO - remove the placeholder configurations from below before moving to production
-  # def saml_settings(sso_config = SingleSignOnConfiguration.first)
-  #   if Rails.env.production?
-  #     base = "https://www.finly.io"
-  #   else
-  #     # base = "https://www.dev.finly.io"
-  #     base = "http://localhost:3001"
-  #   end
-  #
   #   settings = OneLogin::RubySaml::Settings.new
   #   # settings.assertion_consumer_service_url     = "#{base}/users/saml/auth/"
   #   settings.assertion_consumer_service_url     = sso_config.assertion_consumer_service_url
@@ -84,7 +68,7 @@ class SingleSignOnController < Oauth::TokenController
   #   settings.idp_cert_fingerprint               = sso_config.idp_cert_fingerprint
   #   # settings.idp_cert_fingerprint_algorithm     = "http://www.w3.org/2000/09/xmldsig#sha1"
   #   settings.idp_cert_fingerprint_algorithm     = sso_config.idp_cert_fingerprint_algorithm
-  #
+  #e
   #   settings
   # end
 end
