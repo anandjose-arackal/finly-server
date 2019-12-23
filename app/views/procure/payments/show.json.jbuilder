@@ -151,11 +151,8 @@ json.bank_payment_request_id @result.bank_payment_request&.id
 
 if @result.vendor.present?
   if @result.vendor.is_a?(YesBankVendor)
-    json.vendor do
-      json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
-    end
+    json.vendor @result.vendor.as_json({payment_show: true})
   end
-
 end
 
 json.comments do

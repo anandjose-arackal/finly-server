@@ -231,29 +231,37 @@ class YesBankVendor < ApplicationRecord
 
   def as_json(options={})
     display_name = self.business_name || self.name
+    if options[:payment_show]
+      return vendor_json[:name] = self.business_name
+    else
+      return vendor_json
+    end
+  end
+
+  def vendor_json
     {
-        id: id,
-        display_name: display_name,
-        vendor_id: vendor_id,
-        name: name,
-        created_at: created_at,
-        email: email,
-        mobile_number: mobile_number,
-        authorized: authorized,
-        description: description,
-        is_deleted: is_deleted,
-        pan: pan,
-        tin: tin,
-        gst: gst,
-        gst_registered: gst_registered,
-        state: state,
-        state_code_id: state_code_id,
-        tds_id: tds_rates_list_id,
-        bank_accounts: bank_accounts.enabled,
-        state_code: state_code&.state_code,
-        address: address,
-        trade_name: trade_name,
-        custom_fields: self.custom_fields
+      id: id,
+      display_name: display_name,
+      vendor_id: vendor_id,
+      name: name,
+      created_at: created_at,
+      email: email,
+      mobile_number: mobile_number,
+      authorized: authorized,
+      description: description,
+      is_deleted: is_deleted,
+      pan: pan,
+      tin: tin,
+      gst: gst,
+      gst_registered: gst_registered,
+      state: state,
+      state_code_id: state_code_id,
+      tds_id: tds_rates_list_id,
+      bank_accounts: bank_accounts.enabled,
+      state_code: state_code&.state_code,
+      address: address,
+      trade_name: trade_name,
+      custom_fields: self.custom_fields
     }
   end
 
