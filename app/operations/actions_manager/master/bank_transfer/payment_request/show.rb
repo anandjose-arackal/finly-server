@@ -367,10 +367,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Initiator logic end ####################
 
     ############# Reviewer logic start ###################
-    if bank_payment_request.is_reviewing_user?
-      # When control comes to the user where user is allowed to approve, he can edit the bank payment request too before approval
-      return true if bank_payment_request.action_users(:approve).include?(user)
-    end
+    # if bank_payment_request.is_reviewing_user?
+    #   # When control comes to the user where user is allowed to approve, he can edit the bank payment request too before approval
+    #   return true if bank_payment_request.action_users(:approve).include?(user)
+    # end
     ############# Reviewer logic end ####################
 
     ############# Creditor logic start ##################
@@ -442,9 +442,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end ####################
 
     ############# Reviewer logic start ####################
-    if bank_payment_request.is_reviewing_user?
-      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
-    end
+    # if bank_payment_request.is_reviewing_user?
+    #   return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    # end
       ############# Reviewer logic end ####################
 
       ############# Initiator logic start ####################
@@ -471,9 +471,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end ####################
 
     ############# Reviewer logic start ####################
-    if bank_payment_request.is_reviewing_user?
-      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
-    end
+    # if bank_payment_request.is_reviewing_user?
+    #   return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    # end
     ############# Reviewer logic end ####################
 
     ############# Initiator logic start ####################
