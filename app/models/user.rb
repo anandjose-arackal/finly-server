@@ -375,12 +375,18 @@ class User < ApplicationRecord
       app = 'expense_management'
     when 'fc', :fc
       app = 'invoicing_system'
+    when 'fi', :fc
+      app = 'finly_insights'
     else
       # do nothing?
     end
     if app.present?
-      relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
-      where(id: relevant_user_ids)
+      if app == 'finly_insights'
+         relevant_user_ids = ids #all users in em and vp
+      else
+        relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+        where(id: relevant_user_ids)
+      end
     end
   }
 
