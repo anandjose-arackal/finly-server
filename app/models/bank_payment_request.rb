@@ -80,7 +80,8 @@ class BankPaymentRequest < ApplicationRecord
   enum ticket_type: {
     beneficiary: 'beneficiary_payment',
     invoice: 'invoice',
-    purchase_order: 'purchase_order'
+    purchase_order: 'purchase_order',
+    security_deposit: 'security_deposit'
   }
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}

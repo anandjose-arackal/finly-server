@@ -39,7 +39,7 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: role_id,
                                              application: RequestStore.store[:current_app],
-                                             amount_id: params[:payment]&.amount_id)
+                                             amount_id: bank_payment_request&.payment_order&.amount_processed_id)
       notification.save
   end
 
