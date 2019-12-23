@@ -22,4 +22,8 @@ class SingleSignOnConfiguration < ApplicationRecord
   belongs_to :company
   belongs_to :single_sign_on_type
 
+  def self.as_json(options = {})
+    super(options)
+  end
+
 end

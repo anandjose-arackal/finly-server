@@ -1,4 +1,8 @@
-class SingleSignOnController < BaseControllers::WebBase
+class SingleSignOnController < Oauth::TokenController
+
+  include ApplicationHelper
+  include ActiveSupport::Concern
+  include ActionController::Instrumentation
 
   skip_before_action :verify_authenticity_token, raise: false
 
@@ -6,22 +10,27 @@ class SingleSignOnController < BaseControllers::WebBase
     subdomain = self.request.subdomain
     saml_request = OneLogin::RubySaml::Authrequest.new
     company = Company.find_by_sub_domain(subdomain)
-    sign_on_type = SingleSignOnType.id_for(action.to_sym)
+    sign_on_type = SingleSignOnType.id_for(action_name.to_sym)
     config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.first
+    # debugger
     if company.present? and config.present?
       settings = saml_settings(company, config)
-      redirect_to(saml_request.create(settings))
+      # debugger
+      @redirect_url = saml_request.create(settings)
+      # redirect_to(saml_request.create(settings))
     else
-      redirect_to '/'
+      @redirect_url = "/login"
     end
   end
 
   def saml_auth
+    RequestStore.store[:sso] = true
+    # debugger
     sso_response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :settings => saml_settings)
     if sso_response.is_valid?
       # authenticate the user accordingly, and send tokens to the FE
       # Need to authenticate the user here with the gatekeeper method of doing so
-
+      # debugger
     end
   end
 
@@ -49,7 +58,7 @@ class SingleSignOnController < BaseControllers::WebBase
     end
 
     settings = OneLogin::RubySaml::Settings.new
-    settings.assertion_consumer_service_url     = "#{base}/users/saml/auth/"
+    # settings.assertion_consumer_service_url     = "#{base}/users/saml/auth/"
     settings.assertion_consumer_service_url     = sso_config.assertion_consumer_service_url
     # settings.assertion_consumer_service_binding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     settings.assertion_consumer_service_binding = sso_config.assertion_consumer_service_url
@@ -73,3 +82,4 @@ class SingleSignOnController < BaseControllers::WebBase
     settings
   end
 end
+

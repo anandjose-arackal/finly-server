@@ -30,8 +30,9 @@
 #                      api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                                                                      api/v1/configuration/category#index
 #                            api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                                                                            api/v1/configuration#category
 #                                          email_processor POST   /email/incoming(.:format)                                                                                           griddler/emails#create
-#                                       users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       saml_sessions#new
-#                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          saml_sessions#create
+#                                       users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       single_sign_on#saml
+#                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#saml_auth
+#                                        users_saml_logout DELETE /users/saml/logout(.:format)                                                                                        single_sign_on#saml_logout
 #                               native_oauth_authorization GET    /oauth/authorize/native(.:format)                                                                                   doorkeeper/authorizations#show
 #                                      oauth_authorization GET    /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#new
 #                                                          DELETE /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#destroy
@@ -630,6 +631,7 @@
 #                                                          PATCH  /card_restrictions/:id(.:format)                                                                                    card_restrictions#update
 #                                                          PUT    /card_restrictions/:id(.:format)                                                                                    card_restrictions#update
 #                                                          DELETE /card_restrictions/:id(.:format)                                                                                    card_restrictions#destroy
+#                                   single_sign_on_configs GET    /companies/sso_configs(.:format)                                                                                    companies#single_sign_on_configs
 #                                         companies_notify GET    /companies/notify(.:format)                                                                                         companies#notify
 #                                             load_options GET    /companies/load_options(.:format)                                                                                   companies#load_options
 #                    companies_categories_and_cost_centers GET    /companies/categories_and_cost_centers(.:format)                                                                    companies#categories_and_cost_centers
@@ -4263,12 +4265,12 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
+  # devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
 
-  get 'users/saml/sign_in', to: 'single_sign_ons#saml'
-  post 'users/saml/auth', to: 'single_sign_ons#saml_auth'
-  delete 'users/saml/logout', to: 'single_sign_ons#saml_logout'
+  get 'users/saml/sign_in', to: 'single_sign_on#saml'
+  post 'users/saml/auth', to: 'single_sign_on#saml_auth'
+  delete 'users/saml/logout', to: 'single_sign_on#saml_logout'
 
   use_doorkeeper do
     # it accepts :authorizations, :tokens, :applications and :authorized_applications
@@ -4678,6 +4680,7 @@ Rails.application.routes.draw do
 
   resources :card_restrictions
 
+  get 'companies/sso_configs', to: 'companies#single_sign_on_configs', as: :single_sign_on_configs
   get 'companies/notify', to: 'companies#notify'
   get 'companies/load_options', to: 'companies#load_options', as: :load_options
   get 'companies/categories_and_cost_centers', to: 'companies#categories_and_cost_centers'

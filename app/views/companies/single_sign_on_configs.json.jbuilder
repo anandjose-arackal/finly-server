@@ -1,0 +1,1 @@
+json.sso_configs @sso_configs
