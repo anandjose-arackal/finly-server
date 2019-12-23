@@ -24,7 +24,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     item = items.find {|item| item.id.to_s == fragment["id"].to_s}
 
     if fragment["_destroy"]
-      items.delete(item)
+      items.destroy(item)
       return skip!
     end
 

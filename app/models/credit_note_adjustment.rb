@@ -8,9 +8,11 @@
 #  amount_id      :integer
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  deleted_at     :datetime
 #
 
 class CreditNoteAdjustment < ApplicationRecord
+  include SoftDeletable
 
   belongs_to :amount, optional: true
   belongs_to :credit_note, optional: true

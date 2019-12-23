@@ -168,6 +168,7 @@ class Invoice < ApplicationRecord
   belongs_to :payment_agreement, optional: true
   belongs_to :agreement_item, optional: true, polymorphic: true
 
+  has_one :credit_note
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
   # because multiple payments can be made against one invoice
@@ -188,6 +189,7 @@ class Invoice < ApplicationRecord
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :credit_note_adjustments
+
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true

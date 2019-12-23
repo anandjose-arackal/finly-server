@@ -18,6 +18,9 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   # Prevalidation
   step :pre_validate
 
+  # Validate
+  step :validate
+
   # Pass the model to the policy and check if user can perform the action
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :create?)
 
@@ -50,12 +53,22 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
     true
   end
 
-  def pre_validate(options, current_user, **)
+  def pre_validate(options, current_user:, **)
     # Validate Invoice Presence
     unless options[:invoice].present?
       add_message(options, :error, :invoice, "Unable to load Invoice")
       return
     end
+    true
+  end
+
+  def validate(options, current_user:, invoice:, **)
+    if invoice.credit_note.present?
+      credit_note = invoice.credit_note
+      add_message(options, :error, :invoice_id, "Credit Note with sequence id #{credit_note.sequence_id} already exists for the invoice")
+      return
+    end
+
     true
   end
 

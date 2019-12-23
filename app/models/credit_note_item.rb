@@ -31,7 +31,7 @@
 #
 
 class CreditNoteItem < ApplicationRecord
-  include MathUtil
+  include MathUtil, SoftDeletable
 
   before_save :calculate_total
 
