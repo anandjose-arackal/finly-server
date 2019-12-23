@@ -150,9 +150,9 @@ end
 json.bank_payment_request_id @result.bank_payment_request&.id
 
 if @result.vendor.present?
-  if @result.vendor.is_a?(YesBankVendor)
+  if payment.receiving_user_type == 'YesBankVendor'
     json.vendor do
-      json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+      json.extract! payment.receiving_user, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
     end
   end
 

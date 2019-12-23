@@ -428,6 +428,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def edit_payment_history
+    # Security deposit is non editable. There will always be one payment attached to security deposit
+    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit'
+      return false
+    end
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.processing?
@@ -457,6 +461,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def delete_payment_history
+    # Security deposit is non editable. There will always be one payment attached to security deposit
+    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit'
+      return false
+    end
+
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
