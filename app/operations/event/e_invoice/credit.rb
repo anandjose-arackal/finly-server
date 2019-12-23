@@ -57,7 +57,8 @@ class Event::EInvoice::Credit < Event::EInvoice::Base
                                              path_object_type: "Invoice",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             application: RequestStore.store[:current_app])
+                                             application: RequestStore.store[:current_app],
+                                             amount_id: payment&.amount_id)
     notification.save
   end
 
