@@ -14,8 +14,7 @@ class SingleSignOnController < Oauth::TokenController
     config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.first
     # debugger
     if company.present? and config.present?
-      settings = saml_settings(company, config)
-      # debugger
+      settings = saml_settings(config)
       @redirect_url = saml_request.create(settings)
       # redirect_to(saml_request.create(settings))
     else
@@ -49,7 +48,7 @@ class SingleSignOnController < Oauth::TokenController
   # the below will be generalized based on the company that is using it
   # which will be determined based on the subdomain
   # TODO - remove the placeholder configurations from below before moving to production
-  def saml_settings(company = Company.first, sso_config = SingleSignOnConfiguration.first)
+  def saml_settings(sso_config = SingleSignOnConfiguration.first)
     if Rails.env.production?
       base = "https://www.finly.io"
     else
@@ -65,7 +64,7 @@ class SingleSignOnController < Oauth::TokenController
     # settings.name_identifier_format             = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
     settings.name_identifier_format             = sso_config.name_identifier_format
     # settings.issuer                             = "#{base}/saml/metadata"
-    settings.issuer                             = "https://www.finly.io/"
+    settings.issuer                             = sso_config.issuer
     # settings.authn_context                      = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
     settings.authn_context                      = sso_config.authentication_context
     # settings.idp_slo_target_url                 = "http://localhost/simplesaml/www/saml2/idp/SingleLogoutService.php"
