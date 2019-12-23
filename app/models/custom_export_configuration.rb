@@ -10,7 +10,6 @@
 #  custom_purchase_order :boolean
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  deleted_at            :datetime
 #
 
 class CustomExportConfiguration < ApplicationRecord

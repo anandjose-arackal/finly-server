@@ -29,15 +29,17 @@ module Transactions::Matcher
 
   module Transactions::Matcher::DSL
     def self.included(base)
-      base.extend ClassMethods
+      # base.extend ClassMethods
+      base.include DynamicAttributes
+      base.class_attr :matcher, default: Transactions::Matcher::Default
     end
 
-    module ClassMethods
-      def matcher(config = NoObject)
-        @matcher = config unless config == NoObject
-        @matcher ||= Transactions::Matcher::Default
-      end
-    end
+    # module ClassMethods
+    #   def matcher(config = NoObject)
+    #     @matcher = config unless config == NoObject
+    #     @matcher ||= Transactions::Matcher::Default
+    #   end
+    # end
   end
 
 end

@@ -42,6 +42,7 @@ class ServiceApi < Transactions::API
 
   def execute(options, params:, current_user:, **)
     options['response'] = get_response
+    puts "Response: #{options[:response]&.body}"
     true
   end
 

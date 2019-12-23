@@ -45,6 +45,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         # Partially Close
         unless purchase_request.partially_closed?
           params[:aasm_event] = 'partially_close'
+          params[:document] = purchase_request
           op = WorkflowManager::Base.(user, params)
           unless op.success?
             add_message :error, "Cannot partially close associated purchase request #{purchase_request.order_number} at this state"
