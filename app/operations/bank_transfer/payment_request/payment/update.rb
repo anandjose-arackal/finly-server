@@ -183,7 +183,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
       # trigger the calculation only if tds sent and it is different from po tds
       # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
-      if self.incoming_tds_for_po.present? && (self.incoming_tds_for_po.to_i != purchase_order.advance_tds_slab_id)
+      if self.incoming_tds_for_po != purchase_order.advance_tds_slab_id
         purchase_order.assign_attributes(self.po_params)
         purchase_order.save
         purchase_order.process_line_item_calculation
@@ -297,13 +297,21 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def construct_po_params
     po_payment = {}
 
-    po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+    if self.payment_params[:invoice_attributes].present? && self.payment_params[:invoice_attributes][:tds_slab_id].present?
+      po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+    else
+      po_payment[:advance_tds_slab_id] = nil
+    end
 
     self.po_params = po_payment
   end
 
   def validate_po_params
-    self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+    if self.payment_params[:invoice_attributes].present? && self.payment_params[:invoice_attributes][:tds_slab_id].present?
+      self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+    else
+      self.incoming_tds_for_po = self.payment_params[:invoice_attributes]
+    end
   end
 
   def recheck_payable_flag
