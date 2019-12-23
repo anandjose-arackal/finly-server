@@ -42,7 +42,6 @@
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  can_associate_children       :boolean          default(FALSE)
 #
 
 require 'rails_helper'

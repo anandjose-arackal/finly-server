@@ -76,6 +76,4 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   def has_taken_control?
     bbps_subscription.dlrms.where(level_id: bbps_subscription.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
   end
-
-
 end

@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
 
   property :id
   property :subscription_id #, presence: true
-  property :bbps_biller_id
+  property :bbps_biller_id, validates: {presence: true}
   property :sequence_id
 
   property :department_id

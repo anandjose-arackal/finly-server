@@ -109,6 +109,26 @@ class Bbps::BillValidation < Bbps::Api
     customer_param_for(:customer_param_5)
   end
 
+  def additional_tag_1_name
+    amount_for(:amount_1)
+  end
+
+  def additional_tag_2_name
+    amount_for(:amount_2)
+  end
+
+  def additional_tag_3_name
+    amount_for(:amount_3)
+  end
+
+  def additional_tag_4_name
+    amount_for(:amount_4)
+  end
+
+  def additional_tag_5_name
+    amount_for(:amount_5)
+  end
+
   def self.handle_success(result)
     true
   end

@@ -163,13 +163,18 @@ class Bbps::Api < ServiceApi
   end
 
   def agent_id
-    Rails.application.config_for(:bbps_config)&.dig('agent_Id')
+    Rails.application.config_for(:bbps_config)&.dig('agent_id')
   end
 
   def customer_param_for(param)
     return "NA" if params[param].blank?
 
     "#{params[param][:key]}=#{params[param][:value]}"
+  end
+
+  def amount_for(param)
+    return "NA" if params[param].blank?
+    params[param]
   end
 
   def self.format(obj)

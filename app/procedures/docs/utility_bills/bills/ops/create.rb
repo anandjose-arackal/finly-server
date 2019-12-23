@@ -13,7 +13,6 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     true
   end
 
-
   def set_default_params(options, params:, **)
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
     bill = subscription.attributes.slice('policy_id', 'department_id', 'location_id', 'cost_center_id', 'company_id')
@@ -26,14 +25,13 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     #   - fixed_charge
     #   - additional_charge
 
-
     late_payment_fee = params[:late_payment_fee]&.to_f || 0
     early_payment_fee = params[:early_payment_fee]&.to_f || 0
     convenience_fee = params[:convenience_fee]&.to_f || 0
     amount = params[:amount]&.to_f || 0
 
     bill['bill_date'] = params[:bill_date]
-    bill['bbps_bill_id'] = subscription.bbps_biller_id
+    bill['bbps_biller_id'] = subscription.bbps_biller_id
     bill['bill_number'] = params[:bill_number]
     bill['due_date'] = params[:due_date]
     bill['bill_period'] = params[:bill_period]

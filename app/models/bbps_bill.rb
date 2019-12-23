@@ -40,12 +40,16 @@
 #  late_payment_fee_selected  :boolean          default(FALSE)
 #  convenience_fee_selected   :boolean          default(FALSE)
 #  bbps_biller_id             :integer
+#  bill_validation_required   :boolean
 #
 
 class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
+
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
+
+  before_save :resolve_bill_validation
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -236,6 +240,10 @@ class BbpsBill < ApplicationRecord
     data
   end
 
+  def bill_validation_required?
+    bill_validation_required
+  end
+
   def self.document_owner_attribute
     'user_id'
   end
@@ -289,5 +297,13 @@ class BbpsBill < ApplicationRecord
 
   def payable?
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
+  end
+
+  private
+
+  def resolve_bill_validation
+    if self.amount.present? && self.amount.changes.keys.include?("value") && self.biller.present? && (self.biller.support_bill_validation == "MANDATORY" || self.biller.support_bill_validation == "OPTIONAL")
+      self.bill_validation_required = true
+    end
   end
 end

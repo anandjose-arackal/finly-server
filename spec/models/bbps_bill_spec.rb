@@ -40,6 +40,7 @@
 #  late_payment_fee_selected  :boolean          default(FALSE)
 #  convenience_fee_selected   :boolean          default(FALSE)
 #  bbps_biller_id             :integer
+#  bill_validation_required   :boolean
 #
 
 require 'rails_helper'

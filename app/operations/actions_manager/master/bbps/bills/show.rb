@@ -3,7 +3,9 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control, :destroy, :view_payment_ticket, :raise_dispute]
+  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
+                    :return_control, :destroy, :view_payment_ticket, :raise_dispute,
+                    :bill_validate]
 
   def initialize(user = nil, params = {})
     super
@@ -18,7 +20,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def submit
-    (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
+    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
   def edit
@@ -34,7 +36,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def approve
-    bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
+    !bbps_bill.bill_validation_required? && bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)
   end
 
   def reject
@@ -74,6 +76,10 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
 
   def has_taken_control?
     bbps_bill.dlrms.where(level_id: bbps_bill.controlling_level_id).map(&:taken_control_by_id).include?(user.id)
+  end
+
+  def bill_validate
+    bbps_bill.bill_validation_required?
   end
 
 end

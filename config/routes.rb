@@ -3888,6 +3888,7 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      patch 'bill_validate', to: 'bills#bill_validate'
     end
 
     resources :complaints
