@@ -24,7 +24,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
     content = []
     self.payment_file_data.each do |payment|
       content << [
-          'I',
+          'N',
           '',
           payment[:beneficiary_account_number],
           sprintf('%.2f',payment[:amount]),

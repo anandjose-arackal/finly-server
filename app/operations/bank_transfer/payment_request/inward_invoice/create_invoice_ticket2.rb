@@ -176,6 +176,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
+        self.inward_invoices.update_all(payable: true)
         self.bank_payment_request.destroy
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return
