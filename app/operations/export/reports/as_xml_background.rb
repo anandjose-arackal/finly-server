@@ -44,7 +44,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
     cf_headers = cf_data[:headers]
     self.column_names = default_column_names + cf_headers
     self.data = []
-    reports.each do |r|
+    reports.find_each(batch_size: 1000) do |r|
       r.expenses.each do |e|
         self.data << retrieve_data(preferences, r, e, cf_data)
       end
