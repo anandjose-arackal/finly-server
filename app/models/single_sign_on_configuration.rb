@@ -16,6 +16,7 @@
 #  updated_at                         :datetime         not null
 #  single_sign_on_type_id             :integer
 #  authentication_context             :string(255)
+#  finly_sso_path                     :string(255)
 #
 
 class SingleSignOnConfiguration < ApplicationRecord

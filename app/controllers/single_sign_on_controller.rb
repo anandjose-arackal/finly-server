@@ -35,7 +35,10 @@ class SingleSignOnController < Oauth::TokenController
       # authenticate the user accordingly, and send tokens to the FE
       # Need to authenticate the user here with the gatekeeper method of doing so
       # debugger
+      # first set the requisite parameters that are needed for the authentication and then go ahead
+      create
     end
+    # debugger
   end
 
   def saml_logout
