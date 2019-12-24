@@ -76,6 +76,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order},:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},:discount_amount,parent: [:invoice_attachments, :invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:discount_amount,:created_by,:gstin_location, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
+  def additional_fields
+    invoice_line_item.parent.custom_fields.map {|cf| {header: cf.field_configuration.field_name, value: cf.string_value}}
+  end
+
   def po_number(invoice_line_item)
     invoice_line_item.parent&.procurement&.purchase_order&.po_number
   end
