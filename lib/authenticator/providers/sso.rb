@@ -31,7 +31,7 @@ class Authenticator::Providers::Sso < Authenticator::Providers::Base
 
   def on_invalid_saml_session(message)
     unless self.sso_response.is_valid?
-      params[:message] = message || "Invalid login details"
+      params[:message] = self.sso_response.errors || "Invalid login details"
       UserSessions::Create.(:failed, params)
     end
   end
