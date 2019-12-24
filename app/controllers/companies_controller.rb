@@ -28,7 +28,7 @@ class CompaniesController < BaseControllers::WebBase
   end
 
   def single_sign_on_configs
-    subdomain = self.request.subdomain
+    subdomain = params[:subdomain] || self.request.subdomain
     if Rails.env.production?
       company = Company.find_by_sub_domain(subdomain)
     else
@@ -36,7 +36,8 @@ class CompaniesController < BaseControllers::WebBase
     end
     if company.blank?
       # redirect to the login page, because they don't have any configurations
-      redirect_to '/'
+      @sso_configs = []
+      return
     end
     @sso_configs = company.single_sign_on_configurations
   end
