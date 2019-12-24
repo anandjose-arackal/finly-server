@@ -158,6 +158,31 @@ class Bbps::BillFetch < Bbps::Api
   def self.handle_success(result)
     # customer_bbps_name, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
     # :convenience_fee_desc, :late_payment_fee, :early_payment_fee
+    #  "message_code" => "B1001",
+    #                   "status" => "Y",
+    #               "error_code" => "000",
+    #               "error_desc" => "Successful",
+    #                   "ref_no" => "R24121911254444851",
+    #     "agent_institution_id" => "YB28",
+    #               "channel_id" => "BSC",
+    #              "bbps_ref_id" => "R24121911254444851FETCHREF165545241",
+    #                 "agent_id" => "YB01YB28BSC528205568",
+    #            "customer_name" => "REENA RANI",
+    #          "customer_mobile" => "7406032047",
+    #           "customer_email" => "NA",
+    #       "customer_aadhar_no" => "NA",
+    #          "customer_pan_id" => "NA",
+    #                "biller_id" => "BSESYAMPLDEL01",
+    #                   "amount" => "2000",
+    #                "bill_date" => "2019-12-20",
+    #                 "due_date" => "2020-01-07",
+    #              "bill_number" => "151191591",
+    #              "bill_period" => "DECEMBER",
+    #          "convenience_fee" => "NA",
+    #     "convenience_fee_desc" => "NA",
+    #         "late_payment_fee" => "NA",
+    #        "early_payment_fee" => "NA",
+    #         "additional_field" => "NA"
     OpenStruct.new(
         {
             # Add Order ID
@@ -170,6 +195,18 @@ class Bbps::BillFetch < Bbps::Api
             convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
             late_payment_fee: result['response.parsed']['late_payment_fee'],
             early_payment_fee: result['response.parsed']['early_payment_fee'],
+            error_code: result['response.parsed']['error_code'],
+            error_desc: result['response.parsed']['error_desc'],
+            ref_no: result['response.parsed']['ref_no'],
+            agent_institution_id: result['response.parsed']['agent_institution_id'],
+            channel_id: result['response.parsed']['channel_id'],
+            bbps_ref_id: result['response.parsed']['bbps_ref_id'],
+            agent_id: result['response.parsed']['agent_id'],
+            customer_name: result['response.parsed']['customer_name'],
+            customer_mobile: result['response.parsed']['customer_mobile'],
+            customer_email: result['response.parsed']['customer_email'],
+            customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
+            customer_pan_id: result['response.parsed']['customer_pan_id']
         }
     )
   end

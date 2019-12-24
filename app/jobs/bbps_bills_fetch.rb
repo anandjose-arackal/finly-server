@@ -37,7 +37,7 @@ class BbpsBillsFetch < ApplicationJob
     #     }
     if autofetched
       params = {
-          amount: result.amount,
+          amount: (result.amount.to_f / 100),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,
@@ -68,8 +68,8 @@ class BbpsBillsFetch < ApplicationJob
   end
 
   def get_amount_from_response(response)
-    return response.to_f if response.to_s.include?("=")
-    response.to_s.split("=")[1].to_f
+    return response.to_f unless response.to_s.include?("=")
+    response.to_s.split("=")[1].to_f / 100
   end
 
   def customer_params(subscription)

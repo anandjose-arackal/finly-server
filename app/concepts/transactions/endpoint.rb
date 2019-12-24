@@ -91,7 +91,7 @@ module Transactions
       end
 
       def failure(result)
-        controller.render json: {success: false, errors: result.errors.as_json}, status: 422
+        controller.render json: {success: false, messages: {errors: result.errors.as_json}}, status: 422
       end
 
       # Todo deprecated
