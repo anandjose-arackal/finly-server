@@ -15,14 +15,15 @@ class Gatekeeper::Event
   end
 
   def run
-    return success_verdict false unless ENABLED
-    return success_verdict false if RequestStoreUtil.current_user.class.name == AdminUser.name
+    return success_verdict require_otp: false unless ENABLED
+    return success_verdict require_otp: false if RequestStoreUtil.current_user.class.name == AdminUser.name
 
     if RequestStoreUtil.security_policy and not RequestStoreUtil.security_policy.gatekeeper.enabled?
-      return success_verdict false
+      return success_verdict require_otp: false
     end
 
     require_otp = false
+    response_message = nil
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)
       unless result.success?
@@ -30,13 +31,15 @@ class Gatekeeper::Event
         return result
       end
       require_otp ||= result.require_otp
+      response_message ||= result.response_message
     end
-    success_verdict require_otp
+    success_verdict require_otp: require_otp, response_message: response_message
   end
 
-  def success_verdict(require_otp)
+  def success_verdict(require_otp:, response_message: nil)
     verdict = Gatekeeper::Checker::Verdict.success_verdict
-    verdict.require_otp(require_otp)
+    verdict.require_otp(require_otp) if require_otp
+    verdict.response_message(response_message) if response_message
     verdict
   end
 
