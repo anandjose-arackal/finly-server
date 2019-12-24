@@ -10,8 +10,9 @@ class SingleSignOnController < Oauth::TokenController
     subdomain = self.request.subdomain
     saml_request = OneLogin::RubySaml::Authrequest.new
     company = Company.find_by(subdomain: subdomain)
+    sso_config_id = params[:sso_config_id]
     sign_on_type = SingleSignOnType.id_for(action_name.to_sym)
-    config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.first
+    config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.with_id(sso_config_id)&.first
     ################## only for development sakes ###################
     company = Company.first
     config = company.single_sign_on_configurations.first
