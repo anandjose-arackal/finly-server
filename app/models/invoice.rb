@@ -750,7 +750,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
-          available_credits: self.vendor.credit_notes.filter_adjustable.joins(:amount).sum(:value),
+          available_credits: self.vendor.credit_notes.filter_adjustable.joins(:net_adjustable_amount).sum(:value),
 
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
