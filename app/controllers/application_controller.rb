@@ -117,6 +117,8 @@ class ApplicationController < ActionController::Base
         return :em
       when "fc", :fc
         return :fc
+      when "fi", :fi
+        return :fi
       end
     end
     # todo Referrer is jugaad as disburse is using expense management endpoints.
