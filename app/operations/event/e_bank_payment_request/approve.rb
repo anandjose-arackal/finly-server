@@ -70,7 +70,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
   def mailer_subject(user)
     approver_id = self.bank_payment_request.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
-      "Payment Order approved : #{self.bank_payment_request.name}"
+      return "Payment Order approved : #{self.bank_payment_request.name}"
     else
       if approved and user.id == self.bank_payment_request.owner.id
         if auto_approve
@@ -122,7 +122,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
   def parent_document_creator
     document_owners = []
     self.bank_payment_request.payment_order.payments.each do |payment|
-       user_id = payment.parent.send(:document_owner_id)
+       user_id = payment.parent.method('creator_id').call rescue nil
        document_owner = user.company.users.find_by_id user_id
        if document_owner.present?
         document_owners += [document_owner]
