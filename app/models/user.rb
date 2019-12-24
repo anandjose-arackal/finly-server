@@ -385,8 +385,8 @@ class User < ApplicationRecord
          relevant_user_ids = ids #all users in em and vp
       else
         relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
-        where(id: relevant_user_ids)
       end
+      where(id: relevant_user_ids)
     end
   }
 
