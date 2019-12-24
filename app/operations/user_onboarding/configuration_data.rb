@@ -130,16 +130,17 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
 			rename_keys = {"bank_payment_request" => "payment_ticket"}
 
 			rename_keys.each do |k,v|
-				ss.each do |s|
-					if s[:name].starts_with?(k)
-						s[:name] = s[:name].sub k, v
+          ss.each do |s|
+            if s[:name].starts_with?(k)
+              s[:name] = s[:name].sub k, v
+          end
         end
-			end
-      h[:document_roles] = ss
+        h[:document_roles] = ss
 
-      next if h[:document_roles].blank?
+        next if h[:document_roles].blank?
 
-      self.grouped_roles << h
+        self.grouped_roles << h
+      end
     end
   end
 
