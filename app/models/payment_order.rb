@@ -28,6 +28,7 @@
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
 #  deleted_at                :datetime
+#  transfer_mode_id          :integer
 #
 
 class PaymentOrder < ApplicationRecord
@@ -66,6 +67,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
   belongs_to :bank_account_provider, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   serialize :post_operation_payload, Hash
 
@@ -182,10 +184,14 @@ class PaymentOrder < ApplicationRecord
   end
 
   def payment_mode
-    if super.blank?
+    if mode.blank?
       return self.payments.first&.payment_mode
     end
-    super
+    mode || super
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
   end
 
   def payment_type

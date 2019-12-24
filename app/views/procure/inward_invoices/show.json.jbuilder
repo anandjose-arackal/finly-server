@@ -55,7 +55,7 @@ json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
-                :cost_allocation_items, :narration, :discount_type_id
+                :cost_allocation_items, :narration, :discount_type_id, :rcm_enabled
 
   json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
@@ -358,3 +358,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

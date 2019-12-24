@@ -2,8 +2,9 @@
 #
 # Table name: trail_actions
 #
-#  id   :integer          not null, primary key
-#  name :string(255)
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  deleted_at :datetime
 #
 
 class TrailAction < ApplicationRecord

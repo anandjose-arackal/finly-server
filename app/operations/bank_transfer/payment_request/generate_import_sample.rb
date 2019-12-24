@@ -44,9 +44,11 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     category_headers = ["ID", "Category Name"]
     category_contents = []
     all_categories = Categories::Index.(current_user, params)
-    if all_categories.categories.roots.present?
+    # if all_categories.categories.roots.present?
+    if all_categories.categories.leaves.present?
       # current_company.categories.inward_invoices_only.each do |category|
-      all_categories.categories.roots.each do |category|
+      # all_categories.categories.roots.each do |category|
+      all_categories.categories.leaves.each do |category|
         category_contents << [category.id, category.name]
       end
     end
@@ -65,6 +67,17 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
         item_headers: cost_center_headers,
         item_contents: cost_center_contents,
         name: "Cost Centers"
+    }
+
+    tax_rate_headers = ["ID", "Tax Rate"]
+    tax_rate_contents = []
+    current_company.tax_rates.each do |tax_rate|
+      tax_rate_contents << [tax_rate.id, tax_rate.rate]
+    end
+    self.sheets << {
+        item_headers: tax_rate_headers,
+        item_contents: tax_rate_contents,
+        name: "Tax Rate IDs",
     }
 
     # adding departments to the excel sheet
@@ -122,7 +135,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Sub Total",
        "Inclusive of Taxes? (Y/N)",
        "GST Type (1 - IGST ; 2 - CGST/SGST)",
-       "Tax Rate",
+       "Tax Rate ID",
        "Advance Amount",
        "Discount Rate",
        "TDS Slab ID",
