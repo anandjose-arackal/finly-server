@@ -49,22 +49,16 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
     true
   end
 
-  def bill_validate(options, validation_params:, **)
-    # op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
-    op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
+  def bill_validate(options, model:, validation_params:, **)
+    op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
+    # op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
 
-    # handle = self.object_id
-    # ::BackgroundJobs::Bbps::BillValidation.perform_async(handle, validation_params)
-    # timeout = 30
-    # now = Time.now
-    # while (Time.now - now) < timeout
-    #   result = Resque.reserve(handle)
-    #   next if result.blank?
-    #
-    #   data = result.args.first
+    result = op.with_indifferent_access
 
-
-    # end
+    if result[:success]
+      p "##############Result", result
+      # model.update(validation_order_number: )
+    end
     true
   end
 
