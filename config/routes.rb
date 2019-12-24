@@ -3901,7 +3901,6 @@ Rails.application.routes.draw do
   end
   # Utility Bill Payments / BBPS Ends  #
 
-
   # New Route for P2P
   # Credit Note
   get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
