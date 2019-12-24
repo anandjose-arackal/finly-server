@@ -29,7 +29,7 @@ class CompaniesController < BaseControllers::WebBase
 
   def single_sign_on_configs
     subdomain = params[:subdomain] || self.request.subdomain
-    company = Company.find_by_sub_domain(subdomain)
+    company = Company.find_by(subdomain: subdomain)
     # if Rails.env.production?
     #   company = Company.find_by_sub_domain(subdomain)
     # else
