@@ -93,6 +93,7 @@
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
+#  rcm_enabled                     :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
 #
@@ -774,7 +775,8 @@ class Invoice < ApplicationRecord
           discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
           payment_agreement_id: self.payment_agreement_id,
           created_from_payment_agreement: self.payment_agreement_id.present?,
-          agreement_number: self&.payment_agreement&.get_agreement_number
+          agreement_number: self&.payment_agreement&.get_agreement_number,
+          payable: self.payable
       }
     end
   end
@@ -1009,6 +1011,14 @@ class Invoice < ApplicationRecord
     else
       return [self.invoice_status.as_json]
     end
+  end
+
+  def remaining_custom_field_config
+    current_user = RequestStore.store[:current_user]
+    invoice_cf_ids = self.custom_fields.pluck(:field_configuration_id)
+    configurations = current_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
+      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+      return custom_fields_config
   end
 
   private

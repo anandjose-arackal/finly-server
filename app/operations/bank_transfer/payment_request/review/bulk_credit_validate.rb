@@ -97,7 +97,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           minimum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).first.min_amount
           maximum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).first.max_amount || 999999999999999999999999
 
-          max_payment_value = payment_request.payments.joins(:amount).pluck(:amount).max || 0
+          max_payment_value = payment_request.payments.joins(:amount).pluck(:value).max || 0
           if  max_payment_value > maximum
             hash[:selectable] = false
             self.unprocessable_amount += payment_request.payment_order.amount_requested&.value

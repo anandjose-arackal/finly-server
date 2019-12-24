@@ -9,6 +9,7 @@ json.summary do
   end
   # json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
+  json.transfer_mode @result.bank_payment_request.mode
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
@@ -79,6 +80,7 @@ json.attachments do
     json.file_type attachment.file_format(attachment.attached_file)
     json.content_type attachment.attached_file.content_type
     json.file_name attachment.attached_file.original_filename
+    json.allow_delete attachment.allow_delete
   end
 end
 
@@ -117,3 +119,4 @@ json.budgets do
 end
 
 json.reviewal_chain @result.bank_payment_request.get_reviewal_chain
+json.transfer_modes current_company.transfer_modes.as_json

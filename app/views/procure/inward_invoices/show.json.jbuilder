@@ -358,3 +358,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

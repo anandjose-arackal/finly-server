@@ -116,12 +116,25 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
     document_list.each do |list|
       h = {}
       h[:document_name] = list
-      # h[:document_roles] = self.user_roles.keys.map(&:to_s).select {|ur| ur.include? list}
+      h[:document_name] = 'payment_ticket' if list == 'bank_payment_request'# h[:document_roles] = self.user_roles.keys.map(&:to_s).select {|ur| ur.include? list}
       ss = []
-      user_roles.except(:admin, :policy_admin).each {|k, v|
-        if k.to_s.starts_with?(list) then
-          hh = {}; hh[:name] = k.to_s; hh[:id] = v; ss << hh;
-        end;}
+      user_roles.except(:admin, :policy_admin).each do|k, v|
+        if k.to_s.starts_with?(list)
+          hh = {}
+          hh[:name] = k.to_s
+				  hh[:id] = v
+				  ss << hh
+				end
+			end
+
+			rename_keys = {"bank_payment_request" => "payment_ticket"}
+
+			rename_keys.each do |k,v|
+				ss.each do |s|
+					if s[:name].starts_with?(k)
+						s[:name] = s[:name].sub k, v
+        end
+			end
       h[:document_roles] = ss
 
       next if h[:document_roles].blank?
