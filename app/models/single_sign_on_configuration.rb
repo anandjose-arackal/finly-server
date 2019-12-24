@@ -32,4 +32,8 @@ class SingleSignOnConfiguration < ApplicationRecord
     where single_sign_on_type_id: type_id
   }
 
+  scope :with_id, -> (id) {
+    where id: id
+  }
+
 end
