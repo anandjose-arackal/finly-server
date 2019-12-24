@@ -27,5 +27,9 @@ class SingleSignOnConfiguration < ApplicationRecord
   def self.as_json(options = {})
     super(options)
   end
+  
+  scope :with_single_sign_on_type, -> (type_id) {
+    where single_sign_on_type_id: type_id
+  }
 
 end
