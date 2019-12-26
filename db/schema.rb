@@ -6771,6 +6771,31 @@ ActiveRecord::Schema.define(version: 2019_12_24_110020) do
     t.string "company_name"
   end
 
+  create_table "single_sign_on_configurations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.string "assertion_consumer_service_url"
+    t.string "assertion_consumer_service_binding"
+    t.string "name_identifier_format"
+    t.string "issuer"
+    t.string "idp_sso_target_url"
+    t.string "idp_cert_fingerprint"
+    t.string "idp_cert"
+    t.string "idp_cert_fingerprint_algorithm"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "single_sign_on_type_id"
+    t.string "authentication_context"
+    t.string "finly_sso_path"
+    t.string "label"
+    t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
+  end
+
+  create_table "single_sign_on_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "sso_keys", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "xor_key"
     t.string "sha512_key"

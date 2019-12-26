@@ -38,7 +38,7 @@ module Transactions::Matcher
       def match_result(options, result, &block)
         return nil unless matcher.present?
 
-        return nil if block_given?
+        return nil unless block_given?
 
         if matcher.is_a?(Symbol)
           matcher_klass = self.send(matcher, options, result)
