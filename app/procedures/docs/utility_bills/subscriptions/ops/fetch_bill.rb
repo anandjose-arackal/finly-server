@@ -10,7 +10,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   step :bill_fetch
 
-  step :check_bill
+  step :check_bill_presence
 
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
@@ -62,7 +62,8 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     true
   end
 
-  def check_bill(options, model:, result:, **)
+  def check_bill_presence(options, model:, result:, **)
+
     if result['data'].status == 'Y'
       bill_date_month = Date.parse(result['data'].bill_date).strftime("%m")
       bill_period = result['data'].bill_period
