@@ -123,7 +123,9 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def post_process
-
+    if payment_order.failed? || payment_order.partially_completed?
+      Event::EBankPaymentRequest::EPayment::Failure.(user, bank_payment_request: bank_payment_request)
+    end
   end
 
   def execute_post_operations(success)

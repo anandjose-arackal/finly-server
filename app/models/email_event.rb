@@ -7,6 +7,7 @@
 #  event      :string(255)      not null
 #  link       :string(255)
 #  timestamp  :datetime
+#  timestamp  :datetime
 #  event_id   :string(255)
 #  payload    :text(4294967295)
 #  created_at :datetime         not null

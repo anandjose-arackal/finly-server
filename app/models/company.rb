@@ -12,6 +12,8 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
+#  deleted_at       :datetime
+#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord
@@ -98,6 +100,7 @@ class Company < ApplicationRecord
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
+  has_many :single_sign_on_configurations
 
   has_many :bbps_bills
   has_many :bbps_yes_bank_transactions
