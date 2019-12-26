@@ -258,4 +258,8 @@ class Bbps::BillPay < Bbps::Api
     )
   end
 
+  def self.handle_error(data)
+    data
+  end
+
 end

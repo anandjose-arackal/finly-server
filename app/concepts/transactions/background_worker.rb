@@ -8,10 +8,12 @@ module Transactions::BackgroundWorker
   end
 
   class_methods do
-    def call_async(payload, wait: false, wait_timeout: WAIT_TIMEOUT)
+    def call_async(payload, wait: false, wait_timeout: WAIT_TIMEOUT, &handlers)
       encoded_data = Events::Serializer.encode(payload)
       if wait
-        return perform_with_wait encoded_data, wait_timeout
+        result = perform_with_wait encoded_data, wait_timeout
+        match_result(payload, result, &handlers)
+        return result
       else
         self.perform_async(encoded_data)
       end
@@ -24,6 +26,7 @@ module Transactions::BackgroundWorker
       now = Time.now
       while (Time.now - now) < timeout
         result = Resque.reserve(response_handle)
+
         next if result.blank?
 
         return result.args.first

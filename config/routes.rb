@@ -5731,6 +5731,7 @@ Rails.application.routes.draw do
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
       patch 'add_bill', to: 'subscriptions#add_bill'
+      get 'fetch_bill', to: 'subscriptions#fetch_bill'
     end
 
     get 'bills/edit_config', to: 'bills#edit_config'

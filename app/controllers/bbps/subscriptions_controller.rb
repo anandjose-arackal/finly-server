@@ -64,6 +64,10 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     end
   end
 
+  def fetch_bill
+    endpoint Docs::UtilityBills::Subscriptions::Ops::FetchBill
+  end
+
   def review
     params[:aasm_event] = params[:type]
     endpoint Docs::UtilityBills::Subscriptions::Ops::Review

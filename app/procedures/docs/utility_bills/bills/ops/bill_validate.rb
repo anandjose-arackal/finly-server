@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
 
   step :init
 
-  step Model(BbpsBill, :find_by, :bbps_id)
+  step Model(BbpsBill, :find_by)
 
   step :validate
 
