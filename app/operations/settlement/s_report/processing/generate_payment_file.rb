@@ -67,13 +67,16 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
 
   def data_points(mapping)
     data = {}
-    data[:beneficiary_account_name] = mapping.processor_accountable.name
+    first_report = mapping&.reports&.first
+    ifsc = mapping.processor_accountable&.ifsc
+    ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
+    data[:beneficiary_account_name] = BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
     data[:amount] = mapping.amount.value
     data[:payment_mode] = 'NEFT'
     data[:date] = Date.today
-    data[:beneficiary_ifsc] = mapping.processor_accountable.ifsc
+    data[:beneficiary_ifsc] = ifsc
     data[:ifsc] = mapping.processor_accountable.ifsc
     data[:email] = mapping.user.email
     data[:receiving_mobile_number] = mapping.user.mobile_number
@@ -82,7 +85,28 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:report_id] = mapping.try(:report_id)
     data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
     data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
+    data[:employee_id] = mapping.user.profile.employee_id
+    data[:approved_by] = retrieve_approved_by(first_report)
+    data[:cost_center] = mapping&.user&.cost_center&.name
+    data[:period] = retrieve_period(first_report)
     data
+  end
+
+  def retrieve_period(report)
+    report.expenses&.pluck(:date)&.each {|dt| dt.strftime("%B")}&.uniq&.to_sentence(last_word_connector: " and ")
+  end
+
+  def retrieve_approved_by(report)
+    return '' if report.dlrms.blank?
+    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).last
+    if dlrm&.taken_control_by_id&.present?
+      return dlrm.taken_control_by&.name
+    elsif dlrm&.forwarded_by_id&.present?
+      return dlrm&.forwarded_by&.name
+    elsif dlrm&.reviewer_id.present?
+      return dlrm.reviewer&.name
+    end
+    ''
   end
 
 end

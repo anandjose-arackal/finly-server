@@ -81,7 +81,7 @@ gem 'roo-xls', '~> 1.2.0'
 gem 'write_xlsx', '~> 0.85.6'
 gem 'saxlsx'
 # Gem to show db schema in model file
-gem 'annotate', '~> 2.7.5'
+gem 'annotate', '~> 2.7'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'

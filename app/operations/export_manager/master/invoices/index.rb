@@ -1,96 +1,3 @@
-# class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
-#   attr_accessor :input_data
-#
-#   bus ExportManager::Master::BaseMaster
-#   subscribe :invoices
-#   generators ExportManager::Generator::Spreadsheet
-#   processor ExportManager::Processor::Synchronous
-#   validate :input
-#   fields [
-#              finly_ref_no: {spreadsheet: true},
-#              #po_number: {spreadsheet: true},
-#              invoice_type: {spreadsheet: true},
-#              invoice_number: {spreadsheet: true},
-#              invoice_date: {spreadsheet: true},
-#              vendor_name: {spreadsheet: true},
-#              vendor_ref_num: {spreadsheet: true},
-#              #added_by: {spreadsheet: true},
-#              total_amount: {spreadsheet: true},
-#              total_payable: {spreadsheet: true},
-#              total_tax: {spreadsheet: true},
-#              narration: {spreadsheet: true},
-#              nature_of_expense: {spreadsheet: true},
-#          ]
-#
-#   def input
-#     return self.input_data unless self.input_data.nil?
-#
-#     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
-#
-#     unless invoices_presenter.success?
-#       add_message :error, invoices_presenter.messages[:error]
-#       return
-#     end
-#
-#     self.input_data = invoices_presenter.invoices
-#   end
-#
-#   def finly_ref_no(invoice)
-#     invoice.invoice_id
-#   end
-#
-#   # def po_number(invoice)
-#   #   invoice.po_number
-#   # end
-#
-#   def invoice_type(invoice)
-#     invoice.invoice_type&.name
-#   end
-#
-#   def invoice_number(invoice)
-#     invoice.invoice_number
-#   end
-#
-#   def invoice_date(invoice)
-#     invoice.date
-#   end
-#
-#   def vendor_name(invoice)
-#     invoice.vendor&.name
-#   end
-#
-#   def vendor_ref_num(invoice)
-#     invoice.vendor_id
-#   end
-#
-#   # def added_by(invoice)
-#   #   invoice.created_by
-#   # end
-#
-#   def total_amount(invoice)
-#     invoice.amount&.value
-#   end
-#
-#   def total_payable(invoice)
-#     invoice.remaining_amount&.value
-#   end
-#
-#   def total_tax(invoice)
-#     invoice.tax_amount&.value
-#   end
-#
-#   # Todo work-around for Swiggy
-#   def narration(invoice)
-#     invoice.custom_fields.with_field_key(:narration).first&.string_value
-#   end
-#
-#   def nature_of_expense(invoice)
-#     invoice.custom_fields.with_field_key(:nature_of_expense).first&.string_value
-#   end
-#   # Todo work-around for Swiggy
-#
-# end
-
 class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
   attr_accessor :input_data
 
@@ -150,7 +57,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              advance_amount: {spreadsheet: true},
              invoice_net_payable_amount: {spreadsheet: true},
              approvers: {spreadsheet: true},
-             finance_approved_date: {spreadsheet: true}
+             finance_approved_date: {spreadsheet: true},
+             due_date: {spreadsheet: true}
+
          ]
 
   def input
@@ -164,7 +73,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order},:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},:discount_amount,parent: [:invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:discount_amount,:created_by,:gstin_location, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order},:category,:department,:tax_rate,:cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency},:discount_amount,parent: [:invoice_attachments, :invoice_type,:vendor,:delivery_location,:invoice_status,:location,:tds_slab,:advance_amount,:balance_due,:discount_amount,:created_by,:gstin_location, {dlrms: [:reviewer,:taken_control_by, :forwarded_to]},{custom_fields: [:value, :field_configuration]},{tds_amount: :currency},:amount,{procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -414,5 +323,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   def policy(invoice_line_item)
     invoice_line_item.parent&.policy&.name
   end
+
+  def due_date(invoice_line_item)
+    invoice_line_item.parent&.due_date&.strftime("%d-%b-%Y")
+  end
+
 
 end

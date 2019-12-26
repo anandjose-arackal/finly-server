@@ -457,6 +457,14 @@ class Company < ApplicationRecord
     end
   end
 
+  def blocked?
+    status_id == CompanyStatus.id_for(:deactivated)
+  end
+
+  def partial_blocked?
+    status_id == CompanyStatus.id_for(:partial_block)
+  end
+
   private
 
   def init_config_present

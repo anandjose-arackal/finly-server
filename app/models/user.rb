@@ -379,11 +379,17 @@ class User < ApplicationRecord
       app = 'expense_management'
     when 'fc', :fc
       app = 'invoicing_system'
+    when 'fi', :fc
+      app = 'finly_insights'
     else
       # do nothing?
     end
     if app.present?
-      relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+      if app == 'finly_insights'
+         relevant_user_ids = ids #all users in em and vp
+      else
+        relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+      end
       where(id: relevant_user_ids)
     end
   }
@@ -1670,9 +1676,16 @@ class User < ApplicationRecord
       self.finly_id = previously_added_user.finly_id if previously_added_user.present? and previously_added_user.finly_id.present?
     end
 
-    while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
-      self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # while finly_id.blank? or User.find_by(finly_id: self.finly_id).present?
+    #   self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase if finly_id.blank?
+    # end
+
+    if finly_id.blank?
+      while User.find_by(finly_id: self.finly_id).present?
+        self.finly_id = UUIDTools::UUID.timestamp_create().to_s.upcase
+      end
     end
+
 
     unless self.save
       raise "Failed to save unique ID: #{self.errors.full_messages}"

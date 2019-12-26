@@ -22,6 +22,7 @@ config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
 config/insights_config.yml
+config/bbps_config.yml
 .rubocop.yml
 .vscode/
 

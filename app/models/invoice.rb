@@ -93,6 +93,7 @@
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord

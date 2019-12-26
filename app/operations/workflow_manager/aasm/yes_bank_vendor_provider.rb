@@ -11,7 +11,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     # todo add unapprove etc
 
     event :submit do
-      # transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: [:reviewers_not_present?, :vendor_workflow_disabled?]
       transitions from: [:draft, :retracted, :rejected], to: :awaiting_approval, guard: [:reviewers_present?]
     end
 
@@ -26,7 +26,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     event :take_control do
-      transitions :from => :awaiting_approval, :to => :awaiting_approval
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :user_is_admin?
     end
 
     event :return_control do
@@ -65,6 +65,13 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
   end
 
+  def vendor_workflow_disabled?
+    !document.company.feature_subscription.vendor_empanelment_workflow
+  end
+
+  def user_is_admin?
+    user.vendor_payment_admin?
+  end
 
   def reviewal_chain_present?
     document.dlrms.present?
