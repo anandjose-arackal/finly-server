@@ -5,7 +5,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   subscribe :invoices
   generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  processor ExportManager::Processor::Asynchronous
   validate :input
 
   attribute :finly_ref_no
