@@ -93,7 +93,6 @@
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
-#  rcm_enabled                     :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
 #

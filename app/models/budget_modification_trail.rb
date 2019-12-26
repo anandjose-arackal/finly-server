@@ -11,7 +11,6 @@
 #  previous_value      :string(255)
 #  current_value       :string(255)
 #  changed_column_name :string(255)
-#  deleted_at          :datetime
 #
 
 class BudgetModificationTrail < ApplicationRecord

@@ -9,7 +9,6 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  calculated_balance_id     :integer
-#  deleted_at                :datetime
 #
 
 class BalanceTallyLedger < ActiveRecord::Base

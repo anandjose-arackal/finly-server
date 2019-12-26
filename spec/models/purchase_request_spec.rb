@@ -21,7 +21,6 @@
 #  cost_center_id             :integer
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
-#  deleted_at                 :datetime
 #
 
 require 'rails_helper'
