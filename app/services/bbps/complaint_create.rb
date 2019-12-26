@@ -103,4 +103,8 @@ class Bbps::ComplaintCreate < Bbps::Api
     OpenStruct.new data
   end
 
+  def self.handle_error(data)
+    data
+  end
+
 end

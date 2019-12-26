@@ -183,10 +183,12 @@ class Bbps::BillFetch < Bbps::Api
     #         "late_payment_fee" => "NA",
     #        "early_payment_fee" => "NA",
     #         "additional_field" => "NA"
+    debugger
     OpenStruct.new(
         {
             # Add Order ID
             amount: result['response.parsed']['amount'],
+            status: result['response.parsed']['status'],
             bill_date: result['response.parsed']['bill_date'],
             due_date: result['response.parsed']['due_date'],
             bill_number: result['response.parsed']['bill_number'],
@@ -207,8 +209,12 @@ class Bbps::BillFetch < Bbps::Api
             customer_email: result['response.parsed']['customer_email'],
             customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
             customer_pan_id: result['response.parsed']['customer_pan_id']
+
         }
     )
   end
 
+  def self.handle_error(data)
+    data
+  end
 end

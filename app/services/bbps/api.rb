@@ -35,6 +35,10 @@ class Bbps::Api < ServiceApi
             match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
             resolve: -> (result) { handle_success(result) }
         ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) { result['response.parsed']&.dig(:status) == 'N' },
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
         failure: Dry::Matcher::Case.new(
             match: -> (result) { true },
             resolve: -> (result) { result.errors }
@@ -118,6 +122,10 @@ class Bbps::Api < ServiceApi
 
   def self.handle_success(result)
     result
+  end
+
+  def self.handle_error(data)
+    data
   end
 
   def client

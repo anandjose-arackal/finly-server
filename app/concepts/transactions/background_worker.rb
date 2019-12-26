@@ -24,6 +24,7 @@ module Transactions::BackgroundWorker
       now = Time.now
       while (Time.now - now) < timeout
         result = Resque.reserve(response_handle)
+
         next if result.blank?
 
         return result.args.first
