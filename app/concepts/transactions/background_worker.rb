@@ -68,7 +68,6 @@ module Transactions::BackgroundWorker
 
   def perform(payload, response_handle = nil)
     decoded_data = Events::Serializer.decode(payload).with_indifferent_access
-    debugger
 
     result = self.class.call(decoded_data)
     self.class.respond_to_handle(result, response_handle) if response_handle
