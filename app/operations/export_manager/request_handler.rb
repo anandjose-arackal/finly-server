@@ -35,11 +35,12 @@ class ExportManager::RequestHandler < BaseOperation
     self.type = params[:type]
     self.master = init_master
     return if self.master.blank?
-    self.processor = init_processor
+
+    self.processor = self.master.processor.new(user, params, master)
   end
 
   def validate
-    if self.master.blank? or self.processor.blank?
+    if self.master.blank? or self.processor.blank? or self.master.generator.blank?
       add_message :error, 'Invalid Type. Error while generating export'
       return
     end
@@ -48,11 +49,10 @@ class ExportManager::RequestHandler < BaseOperation
       add_message :error, m.errors
       return
     end
-
   end
 
   def process
-    result = self.processor.run
+    self.processor.run
     # if result[:success]
     #   if result[:message].present?
     #     add_message :success, result[:message]
@@ -73,45 +73,5 @@ class ExportManager::RequestHandler < BaseOperation
     ExportManager::Master::BaseMaster.subscribers(self.type)&.first
   end
 
-  def init_processor
-    raise "Processor is not defined for #{self.master}" if self.master.processor.blank?
-
-    self.master.processor.new(user, params, master)
-  end
-
-  # def from_personalizer(klass_name)
-  #   base_path = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/export_manager#{user.company_id}/master#{user.company_id}/"
-  #   klass_name_s = klass_name.to_s
-  #   klass_name_s.gsub!('::ExportManager::Master::', '')
-  #   master_name = klass_name_s.gsub!('ExportManager::Master::', '')
-  #   klass_name_s = klass_name_s.split('::').map(&:underscore)
-  #   path = base_path + klass_name_s.join('/') + '.rb'
-  #
-  #   return nil unless File.exists?(path)
-  #   load path
-  #   Object.const_get("Personalizer::Adapters::Company#{user.company_id}::ExportManager#{user.company_id}::Master#{user.company_id}::#{master_name}")
-  # end
-
-  # def init_config
-  #   return {} if self.type.blank?
-  #   type = self.params[:type]
-  #   fields_arr = self.fields
-  #   if fields_arr.size == 1 and fields_arr.first.is_a?(Hash)
-  #     fields = fields_arr.first
-  #   else
-  #     fields = {}
-  #     fields_arr.each do |field|
-  #       if field.is_a?(Hash)
-  #         fields[field.keys.first] = field.values.first
-  #       elsif field.is_a?(Symbol)
-  #         fields[field] = DEFAULT_CONFIG
-  #       end
-  #     end
-  #   end
-  #   company_config = {}
-  #   company_config_items = user.company.export_configs.with_field_name(type)
-  #   company_config_items&.map {|item| company_config[item[:key]] = {spreadsheet: item[:spreadsheet], pdf: item[:pdf]}}
-  #   fields.merge company_config
-  # end
 
 end

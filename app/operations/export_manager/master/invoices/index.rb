@@ -1,5 +1,4 @@
 class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
-  include ExportManager::Generator::Spreadsheet::Builder
 
   attr_accessor :input_data
 
@@ -60,7 +59,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   attribute :due_date
 
   def name
-    "Invoices"
+    'Invoices'
   end
 
   def input

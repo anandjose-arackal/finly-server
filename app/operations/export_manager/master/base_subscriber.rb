@@ -7,7 +7,7 @@ class ExportManager::Master::BaseSubscriber
 
   attr_accessor :user, :params, :input, :messages
 
-  class_attr :generator
+  class_attr :generator_klass
   class_attr :processor
   class_attr :validations, default: []
 
@@ -20,6 +20,14 @@ class ExportManager::Master::BaseSubscriber
 
   def self.validate(method)
     validations << method
+  end
+
+  def self.generator(klass = NoObject)
+    unless klass == NoObject
+      generator_klass(klass)
+      ExportManager::Generator::Spreadsheet.setup(self)
+    end
+    generator_klass
   end
 
   def self.fields(list)

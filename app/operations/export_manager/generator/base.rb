@@ -7,6 +7,10 @@ class ExportManager::Generator::Base < BaseOperation
     self.formats.include?(format.to_sym)
   end
 
+  def self.setup(master_class)
+
+  end
+
   def self.build(master)
     if master.class.generator.respond_to?(:each)
       generator = master.class.generator.first
@@ -59,11 +63,11 @@ class ExportManager::Generator::Base < BaseOperation
   end
 
   def success!
-    export_job.update(status_id: ExportJobStatus.id_for(:completed))
+    export_job.update(status_id: ExportJobStatus.id_for(:completed), completed_at: DateTime.now)
   end
 
   def failure!
-    export_job.update(status_id: ExportJobStatus.id_for(:failed))
+    export_job.update(status_id: ExportJobStatus.id_for(:failed), completed_at: DateTime.now)
   end
 
 end

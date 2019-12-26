@@ -16,6 +16,10 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
 
   end
 
+  def self.setup(master_class)
+    master_class.include Builder
+  end
+
   def perform
     headers = load_headers
     contents = load_contents

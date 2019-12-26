@@ -1,11 +1,10 @@
 class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseSubscriber
-  include ExportManager::Generator::Spreadsheet::Builder
 
   attr_accessor :entities
 
   validate :input
   subscribe :budget_entities
-  processor ExportManager::Processor::Synchronous
+  processor ExportManager::Processor::Asynchronous
   generator ExportManager::Generator::Spreadsheet
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
@@ -26,7 +25,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   # attribute :custom_fields
 
   def name
-    "Usage Entities"
+    'Budgets'
   end
 
   def input

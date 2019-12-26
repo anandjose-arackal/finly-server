@@ -4,10 +4,22 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
   bus ExportManager::Master::BaseMaster
   subscribe :purchase_request
   generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  processor ExportManager::Processor::Asynchronous
   validate :input
-  fields [request_id: {spreadsheet: true}, description: {spreadsheet: true}, department: {spreadsheet: true}, location: {spreadsheet: true}, policy:{spreadsheet: true}, total_items: {spreadsheet: true}, created_by: {spreadsheet: true}, status: {spreadsheet: true}, amount: {spreadsheet: true}]
 
+  attribute :request_id
+  attribute :description
+  attribute :department
+  attribute :location
+  attribute :policy
+  attribute :total_items
+  attribute :created_by
+  attribute :status
+  attribute :amount
+
+  def name
+    'Purchase Requests'
+  end
 
   def input
     return self.input_data unless self.input_data.nil?
@@ -19,7 +31,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
       return
     end
 
-    purchase_request_presenter.purchase_requests.includes(:total_amount,:status,:creator,:policy,:location,:department)
+    purchase_request_presenter.purchase_requests.includes(:total_amount, :status, :creator, :policy, :location, :department)
   end
 
   def request_id(purchase_request)

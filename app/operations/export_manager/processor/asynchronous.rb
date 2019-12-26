@@ -4,7 +4,8 @@ class ExportManager::Processor::Asynchronous < ExportManager::Processor::Base
 
     def process
       master_class = Object.const_get(params[:master_class])
-      generator = master_class.generator.build(master_class.new(user, JSON.parse(params[:request_params])))
+      master = master_class.new(user, JSON.parse(params[:request_params]))
+      generator = master_class.generator.build(master)
       generator.run
     end
 
