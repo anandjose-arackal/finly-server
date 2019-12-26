@@ -43,6 +43,8 @@ class Procurements::Comments::Create < Procurements::Comments::Base
       Event::EPurchaseOrder::Comment.(user, document: document, purchase_order: document)
     when 'Invoice'
       Event::EInvoice::Comment.(user, document: document, invoice: document)
+    when 'PurchaseRequest'
+      Event::EPurchaseRequest::Comment.(user, document: document, purchase_request: document)
     end
 
 
