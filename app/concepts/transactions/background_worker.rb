@@ -1,7 +1,7 @@
 module Transactions::BackgroundWorker
   extend ActiveSupport::Concern
 
-  WAIT_TIMEOUT = 30.seconds
+  WAIT_TIMEOUT = 45.seconds
 
   included do
     include Sidekiq::Worker

@@ -38,15 +38,17 @@ module Transactions::Matcher
       def match_result(options, result, &block)
         return nil unless matcher.present?
 
+        return nil if block_given?
+
         if matcher.is_a?(Symbol)
           matcher_klass = self.send(matcher, options, result)
         else
           matcher_klass = matcher
         end
 
-        handlers = Transactions::Endpoint::Handlers.new(self, options, &block).()
+        # handlers = Transactions::Endpoint::Handlers.new(self, options, &block).()
 
-        matcher_klass.(result, &handlers) if block_given?
+        matcher_klass.(result, &block) if block_given?
       end
     end
   end
