@@ -41,7 +41,7 @@ class Bbps::Api < ServiceApi
         ),
         failure: Dry::Matcher::Case.new(
             match: -> (result) { true },
-            resolve: -> (result) { result.errors }
+            resolve: -> (result) {result}
         )
     )
   end

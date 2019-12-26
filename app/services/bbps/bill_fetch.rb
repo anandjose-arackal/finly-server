@@ -183,7 +183,6 @@ class Bbps::BillFetch < Bbps::Api
     #         "late_payment_fee" => "NA",
     #        "early_payment_fee" => "NA",
     #         "additional_field" => "NA"
-    debugger
     OpenStruct.new(
         {
             # Add Order ID
