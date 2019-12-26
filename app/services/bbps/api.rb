@@ -32,11 +32,11 @@ class Bbps::Api < ServiceApi
   def self.build_matcher(options, result)
     Dry::Matcher.new(
         success: Dry::Matcher::Case.new(
-            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig(:status) == 'Y'},
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'Y'},
             resolve: -> (result) { handle_success(result) }
         ),
         error: Dry::Matcher::Case.new(
-            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig(:status) == 'N'},
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'N'},
             resolve: -> (result) { handle_error(result['response.parsed']) }
         ),
         failure: Dry::Matcher::Case.new(

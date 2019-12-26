@@ -50,8 +50,25 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   end
 
   def bill_validate(options, model:, validation_params:, **)
-    op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
+    # op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
     # op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
+    Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true}) do |op|
+      op.success do |result|
+        p "SUCCESS"
+        options['result']['data'] = result
+      end
+
+      op.error do |result|
+        p "ERROR"
+        options['result']['data'] = result
+      end
+
+      op.failure do |messages|
+        p "FAILURE"
+        add_message options, :error, :base, messages
+        return
+      end
+    end
 
     result = op.with_indifferent_access
 
