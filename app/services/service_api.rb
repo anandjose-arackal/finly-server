@@ -31,7 +31,7 @@ class ServiceApi < Transactions::API
   end
 
   def init(options, params:, current_user:, **)
-    self.params = params
+    self.params = options[:params]
     self.user = current_user
     true
   end
