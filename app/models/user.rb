@@ -80,6 +80,9 @@ class User < ApplicationRecord
   # zxcvb-js gem
   devise :zxcvbnable
 
+  # making user model authenticable with SSO
+  devise :saml_authenticatable
+
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
 
@@ -382,11 +385,17 @@ class User < ApplicationRecord
       app = 'expense_management'
     when 'fc', :fc
       app = 'invoicing_system'
+    when 'fi', :fc
+      app = 'finly_insights'
     else
       # do nothing?
     end
     if app.present?
-      relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+      if app == 'finly_insights'
+         relevant_user_ids = ids #all users in em and vp
+      else
+        relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+      end
       where(id: relevant_user_ids)
     end
   }

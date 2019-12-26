@@ -26,7 +26,8 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     self.role_id = params[:role_id]
     self.include_attachments = self.purchase_order&.approved?
     if self.purchase_order.present? && self.purchase_order.purchase_request_items.present?
-      self.purchase_request_creator = self.purchase_order.purchase_request_items.first.purchase_request.creator
+      purchase_request_creator_ids = self.purchase_order.purchase_request_items.joins(:purchase_request).pluck('purchase_requests.creator_id')
+      self.purchase_request_creator = user.company.users.where(id: purchase_request_creator_ids)
     end
   end
 
