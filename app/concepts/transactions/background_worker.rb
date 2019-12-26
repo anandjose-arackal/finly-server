@@ -37,7 +37,7 @@ module Transactions::BackgroundWorker
       queue = Struct.new(:queue).new(response_handle)
       response = result.to_hash
       success = result.success? ? true : false
-      Resque.enqueue(queue, {success: success, result: filter_result(response), errors: result.errors})
+      Resque.enqueue(queue, filter_result(response).merge({success: success, errors: result.errors}))
     end
 
     # Filter hash/array to only keep basic data types such as Numeric, Symbol and Strings.
