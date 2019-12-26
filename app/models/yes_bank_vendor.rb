@@ -38,6 +38,7 @@
 #  vedor_code               :string(255)
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
+#  rcm_enabled              :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -253,6 +254,7 @@ class YesBankVendor < ApplicationRecord
         state_code: state_code&.state_code,
         address: address,
         trade_name: trade_name,
+        rcm_enabled: rcm_enabled,
         custom_fields: self.custom_fields
     }
   end

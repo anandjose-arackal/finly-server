@@ -5,7 +5,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
   sidekiq_options queue: :payments_creation
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :invoices_status, :invoices
+                :company_id, :execute, :payment_params, :invoices_status, :invoices,
+                :transfer_mode_id
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -37,6 +38,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
+    self.transfer_mode_id = self.bank_payment_request.transfer_mode_id
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     self.payments_attributes.each do |payment|
@@ -58,6 +60,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           purchase_order_id: payment[:purchase_order_id],
           invoice_id: payment[:invoice_id],
           payment_mode: self.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: payment[:requested_amount],
               currency_id: Currency.first.id

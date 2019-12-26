@@ -122,7 +122,7 @@ json.trail do
           json.email item.initiating_user.email
           json.mobile_number item.initiating_user.mobile_number
         end
-        json.amount item.amount&.value
+        json.amount item.amount&.value.round(2) rescue 0
       end
     elsif item.is_a?(BillOfSupply)
       json.bill_of_supply_details do

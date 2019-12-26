@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class BankPaymentRequestCommentAction < ApplicationRecord
@@ -14,6 +15,7 @@ class BankPaymentRequestCommentAction < ApplicationRecord
   def self.values
     [:submit, :approve, :unapprove, :retract, :reject, :credit, :comment, :payment_edit,
      :add_attachment, :forward, :take_control, :unapprove, :auto_approve, :cancel,
-     :add_beneficiary, :remove_beneficiary, :mark_as_credited, :return_control]
+     :add_beneficiary, :remove_beneficiary, :mark_as_credited, :return_control,
+ 		 :payment_retry]
   end
 end

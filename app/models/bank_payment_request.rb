@@ -34,6 +34,9 @@
 #  otp_attempts                 :integer
 #  otp_count                    :integer
 #  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -53,6 +56,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
   belongs_to :company, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -72,6 +76,13 @@ class BankPaymentRequest < ApplicationRecord
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, :pending?, :creation_in_progress?, to: :status, allow_nil: true
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
+
+  enum ticket_type: {
+    beneficiary: 'beneficiary_payment',
+    invoice: 'invoice',
+    purchase_order: 'purchase_order',
+    security_deposit: 'security_deposit'
+  }
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
@@ -334,6 +345,15 @@ class BankPaymentRequest < ApplicationRecord
     where(payment_order_id: payment_order_ids)
   }
 
+  scope :filter_ticket_type, -> (type) {
+    type = type.to_s.underscore
+    where ticket_type: type
+  }
+
+  scope :filter_transfer_mode, -> (id) {
+    where transfer_mode_id: id
+  }
+
   attr_accessor :cache_users
 
   before_save do
@@ -522,6 +542,12 @@ class BankPaymentRequest < ApplicationRecord
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
     end
   end
+
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
+  end
+
+
 
   private
 

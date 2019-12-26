@@ -12,6 +12,7 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
+#  deleted_at       :datetime
 #
 
 class Company < ApplicationRecord
@@ -133,6 +134,8 @@ class Company < ApplicationRecord
 
   has_many :admin_implementation_requests
 
+  has_many :transfer_mode_company_mappings
+  alias_attribute :transfer_modes, :transfer_mode_company_mappings
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
