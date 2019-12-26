@@ -4,7 +4,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
   subscribe :non_po_items
 
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

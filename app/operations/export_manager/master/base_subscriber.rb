@@ -2,21 +2,39 @@ class ExportManager::Master::BaseSubscriber
   include EventBus::Subscriber
   include Supporters::ErrorTracker
   include DynamicProperty
+  include DynamicAttributes
   include MathUtil
 
   attr_accessor :user, :params, :input, :messages
 
-  define_property :singleton, :fields, :processor
-  define_property_array :singleton, :validate, :generators
+  class_attr :generator
+  class_attr :processor
+  class_attr :validations, default: []
+
+  bus ExportManager::Master::BaseMaster
 
   def initialize(user, params)
     self.user = user
     self.params = params
   end
 
-  def self.validations
-    validate
+  def self.validate(method)
+    validations << method
   end
+
+  def self.fields(list)
+
+  end
+
+  # def self.generator(klass = NoObject, &block)
+  #   generator_klass({klass: klass, block: block}) unless klass == NoObject
+  #   generator_klass
+  # end
+  #
+  # def self.processor(klass = NoObject, &block)
+  #   processor_klass({klass: klass, block: block}) unless klass == NoObject
+  #   processor_klass
+  # end
 
   def valid?
     clear_messages

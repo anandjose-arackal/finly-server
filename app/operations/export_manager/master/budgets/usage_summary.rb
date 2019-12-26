@@ -4,7 +4,7 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::Base
 
   bus ExportManager::Master::BaseMaster
   subscribe :budget_summary
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

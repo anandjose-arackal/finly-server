@@ -2,7 +2,7 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Maste
 
   bus ExportManager::Master::BaseMaster
   subscribe :vp_users
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

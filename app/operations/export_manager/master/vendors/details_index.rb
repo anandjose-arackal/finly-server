@@ -4,7 +4,7 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
 
   subscribe :vendor_details
 
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

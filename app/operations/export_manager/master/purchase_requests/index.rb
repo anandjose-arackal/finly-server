@@ -3,7 +3,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
 
   bus ExportManager::Master::BaseMaster
   subscribe :purchase_request
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [request_id: {spreadsheet: true}, description: {spreadsheet: true}, department: {spreadsheet: true}, location: {spreadsheet: true}, policy:{spreadsheet: true}, total_items: {spreadsheet: true}, created_by: {spreadsheet: true}, status: {spreadsheet: true}, amount: {spreadsheet: true}]

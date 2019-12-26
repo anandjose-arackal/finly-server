@@ -8,7 +8,7 @@ class ExportManager::Processor::Synchronous < ExportManager::Processor::Base
   end
 
   def run
-    generator.run
+    build_generator.run
   end
 
 end

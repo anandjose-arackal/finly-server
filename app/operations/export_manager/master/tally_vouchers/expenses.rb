@@ -2,7 +2,7 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
 
   bus ExportManager::Master::BaseMaster
   subscribe :tally_expense_voucher_xls
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

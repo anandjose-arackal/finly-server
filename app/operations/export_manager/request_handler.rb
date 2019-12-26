@@ -53,14 +53,14 @@ class ExportManager::RequestHandler < BaseOperation
 
   def process
     result = self.processor.run
-    if result[:success]
-      if result[:message].present?
-        add_message :success, result[:message]
-      end
-      params[:file_url] = result[:file_url]
-    else
-      add_message :error, (result[:message] || 'Unknown error')
-    end
+    # if result[:success]
+    #   if result[:message].present?
+    #     add_message :success, result[:message]
+    #   end
+    #   params[:file_url] = result[:file_url]
+    # else
+    #   add_message :error, (result[:message] || 'Unknown error')
+    # end
   end
 
   def success
@@ -74,22 +74,23 @@ class ExportManager::RequestHandler < BaseOperation
   end
 
   def init_processor
-    return nil if self.master.processor.blank?
+    raise "Processor is not defined for #{self.master}" if self.master.processor.blank?
+
     self.master.processor.new(user, params, master)
   end
 
-  def from_personalizer(klass_name)
-    base_path = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/export_manager#{user.company_id}/master#{user.company_id}/"
-    klass_name_s = klass_name.to_s
-    klass_name_s.gsub!('::ExportManager::Master::', '')
-    master_name = klass_name_s.gsub!('ExportManager::Master::', '')
-    klass_name_s = klass_name_s.split('::').map(&:underscore)
-    path = base_path + klass_name_s.join('/') + '.rb'
-
-    return nil unless File.exists?(path)
-    load path
-    Object.const_get("Personalizer::Adapters::Company#{user.company_id}::ExportManager#{user.company_id}::Master#{user.company_id}::#{master_name}")
-  end
+  # def from_personalizer(klass_name)
+  #   base_path = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/export_manager#{user.company_id}/master#{user.company_id}/"
+  #   klass_name_s = klass_name.to_s
+  #   klass_name_s.gsub!('::ExportManager::Master::', '')
+  #   master_name = klass_name_s.gsub!('ExportManager::Master::', '')
+  #   klass_name_s = klass_name_s.split('::').map(&:underscore)
+  #   path = base_path + klass_name_s.join('/') + '.rb'
+  #
+  #   return nil unless File.exists?(path)
+  #   load path
+  #   Object.const_get("Personalizer::Adapters::Company#{user.company_id}::ExportManager#{user.company_id}::Master#{user.company_id}::#{master_name}")
+  # end
 
   # def init_config
   #   return {} if self.type.blank?

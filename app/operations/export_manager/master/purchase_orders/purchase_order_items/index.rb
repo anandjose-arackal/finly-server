@@ -2,7 +2,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
   bus ExportManager::Master::BaseMaster
   subscribe :purchase_order_items
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

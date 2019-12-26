@@ -3,7 +3,7 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
 
   bus ExportManager::Master::BaseMaster
   subscribe :inventory_items
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
 

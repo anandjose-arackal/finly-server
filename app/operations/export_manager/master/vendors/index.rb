@@ -5,7 +5,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
 
   subscribe :vendors
 
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [

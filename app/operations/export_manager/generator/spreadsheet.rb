@@ -1,43 +1,57 @@
 class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
 
-  register_format :xls, :csv
+  module Builder
+    extend ActiveSupport::Concern
 
-  def run
+    class_methods do
+      def attribute(name, column_name: nil)
+        column_name = name.to_s.humanize unless column_name.present?
+        attributes << {name: name, column_name: column_name}
+      end
+
+      def attributes
+        @attributes ||= []
+      end
+    end
+
+  end
+
+  def perform
     headers = load_headers
     contents = load_contents
     exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
     file = Paperclip::Tempfile.new(file_name)
     open(file.path, 'wb') do |f|
-      case format
-      when :csv
-        f.write exporter.generate_csv
-      when :xls
-        f.write exporter.generate_xls
-      end
+      # case format
+      # when :csv
+      #   f.write exporter.generate_csv
+      # when :xls
+      f.write exporter.generate_xls
+      # end
     end
-    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day), created_by_id: user.id, company_id: user.company_id
-    {file_url: temp_file.file.url(:original, timestamp: false), success: true}
+    save_attachment(file)
+    success!
   end
 
-  def format
-    params[:export_format]&.to_sym
-  end
+  # def format
+  #   params[:export_format]&.to_sym
+  # end
 
   def file_name
-    case format
-    when :xls
-      return ['export', '.xls']
-    when :csv
-      return ['export', '.csv']
-    else
-      nil
-    end
+    # case format
+    # when :xls
+    return ['export', '.xls']
+    # when :csv
+    #   return ['export', '.csv']
+    # else
+    #   nil
+    # end
   end
 
   def load_headers
     headers = []
-    self.config.each do |field, conf|
-      headers << (conf[:label] || field.to_s.humanize) if conf[:spreadsheet]
+    self.master.class.attributes.each do |attribute|
+      headers << attribute[:column_name]
     end
     headers
   end
@@ -46,18 +60,20 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
     contents = []
     data = master.input
     return contents if data.nil?
+    index = 1
     data.each do |entry|
       row = []
-      self.config.each do |field, conf|
-        if conf[:spreadsheet]
-          if master.respond_to?(field)
-            row << master.send(field, entry)
-          else
-            raise "#{field} not defined for exporter #{master.class.name}"
-          end
+      self.master.class.attributes.each do |attribute|
+        field = attribute[:name]
+        if master.respond_to?(field)
+          row << master.send(field, entry) rescue nil
+        else
+          raise "#{field} not defined for exporter #{master.class.name}"
         end
       end
       contents << row
+      progress_update(index)
+      index += 1
     end
     contents
   end

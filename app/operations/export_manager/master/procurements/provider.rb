@@ -4,7 +4,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   subscribe :procurement
 
-  generators ExportManager::Generator::Spreadsheet
+  generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [
