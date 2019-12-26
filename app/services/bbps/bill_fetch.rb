@@ -208,7 +208,6 @@ class Bbps::BillFetch < Bbps::Api
             customer_email: result['response.parsed']['customer_email'],
             customer_aadhar_no: result['response.parsed']['customer_aadhar_no'],
             customer_pan_id: result['response.parsed']['customer_pan_id']
-
         }
     )
   end
