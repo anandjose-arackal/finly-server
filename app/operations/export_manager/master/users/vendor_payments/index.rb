@@ -1,6 +1,6 @@
 class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
+
   subscribe :vp_users
   generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Asynchronous

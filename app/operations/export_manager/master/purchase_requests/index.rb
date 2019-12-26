@@ -1,7 +1,7 @@
 class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::BaseSubscriber
   attr_accessor :input_data
 
-  bus ExportManager::Master::BaseMaster
+
   subscribe :purchase_request
   generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Asynchronous

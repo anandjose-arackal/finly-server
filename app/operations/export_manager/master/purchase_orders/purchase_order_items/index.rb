@@ -1,6 +1,6 @@
 class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
+
   subscribe :purchase_order_items
   generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Asynchronous

@@ -1,7 +1,7 @@
 class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscriber
   attr_accessor :vendor_ba
 
-  bus ExportManager::Master::BaseMaster
+
 
   subscribe :vendors
 

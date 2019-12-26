@@ -1,6 +1,6 @@
 class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
+
 
   subscribe :vendor_details
 

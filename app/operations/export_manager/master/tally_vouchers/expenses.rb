@@ -1,6 +1,6 @@
 class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
+
   subscribe :tally_expense_voucher_xls
   generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Asynchronous
