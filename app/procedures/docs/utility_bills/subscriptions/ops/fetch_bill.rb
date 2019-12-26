@@ -45,12 +45,12 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     Bbps::BillFetch.call_async({params: fetch_params, "current_user" => User.first}, {wait: true}) do |op|
       op.success do |result|
         p "SUCCESS"
-        options['result'][:data] = result
+        options['result']['data'] = result
       end
 
       op.error do |result|
         p "ERROR"
-        options['result'][:data] = result
+        options['result']['data'] = result
       end
 
       op.failure do |messages|
