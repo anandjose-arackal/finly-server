@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
   attr_accessor :scheduled_at, :payment_mode, :policy_id, :bbps_bills,
                 :bank_payment_request, :payable_amount, :description,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount,
-                :payments, :transfer_mode_id
+                :payments, :transfer_mode_id, :transfer_mode
 
 
   class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket::UtilityBillsPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -59,7 +59,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
-    self.transfer_mode_id = params[:transfer_mode_id] || TransferMode.find_by(name: params[:payment_mode].downcase)
+    self.transfer_mode_id = params[:transfer_mode_id] || current_company.transfer_modes.find_by(mode_id: TransferMode.find_by(name: params[:payment_mode].downcase))&.id
     self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
@@ -179,6 +179,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BbpsBiller",
         payment_purpose_id: PaymentPurpose.id_for(:utility_bill_payment),
@@ -194,6 +195,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
             value: self.requested_amount,
             currency_id: 1
         },
+        transfer_mode_id: self.transfer_mode_id,
         description: self.description,
         policy_id: self.policy&.id,
         payment_order_attributes: payment_order_params
