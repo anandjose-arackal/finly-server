@@ -6,7 +6,7 @@
 #  name                    :string(255)      not null
 #  export_type             :string(255)
 #  created_by_id           :integer
-#  completed_on            :datetime
+#  completed_at            :datetime
 #  total_records           :integer
 #  completed_records       :integer
 #  completion_percentage   :integer

@@ -57,6 +57,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   attribute :approvers
   attribute :finance_approved_date
   attribute :due_date
+  attribute :custom_fields, dynamic: true
 
   def name
     'Invoices'

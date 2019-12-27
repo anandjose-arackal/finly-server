@@ -32,6 +32,7 @@ class ExportManager::Generator::Base < BaseOperation
     self.input = master.input
     self.export_job = create_job
     perform
+    notify
   end
 
   def create_job
@@ -68,6 +69,10 @@ class ExportManager::Generator::Base < BaseOperation
 
   def failure!
     export_job.update(status_id: ExportJobStatus.id_for(:failed), completed_at: DateTime.now)
+  end
+
+  def notify
+    # Todo
   end
 
 end

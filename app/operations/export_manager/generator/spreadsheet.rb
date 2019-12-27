@@ -1,12 +1,87 @@
 class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
 
-  module Builder
+  class Attribute
+    attr_accessor :name, :column_name, :dynamic
+
+    def initialize(name:, column_name: nil, dynamic: false)
+      self.name = name
+      self.column_name = column_name || name.to_s.humanize
+      self.dynamic = dynamic
+    end
+
+  end
+
+  class Row
+    attr_accessor :record
+
+    def initialize(record:)
+      self.record = record
+    end
+
+    def values
+      @values ||= {}
+    end
+
+    def add(column, value)
+      values[column] = value
+    end
+
+  end
+
+  class Builder
+    attr_accessor :master, :attributes, :headers
+
+    def initialize(master, attributes)
+      self.master = master
+      self.header = Header.new
+    end
+
+    def headers
+      @headers ||= []
+    end
+
+    def index_of(name)
+      headers << name unless headers.include?(name)
+
+      headers.find_index(name)
+    end
+
+    def build(input)
+      generate_rows(input)
+      generate_spreadsheet
+    end
+
+    def generate_rows(input)
+      input.each do |record|
+        row = Row.new(record: record)
+        master.attributes.each do |attribute|
+          if attribute.dynamic?
+            master.send(attribute.name, row, record)
+          else
+            value = master.send(attribute.name, record)
+            row.add(attribute.column, value)
+          end
+        end
+        rows << row
+      end
+    end
+
+    def generate_spreadsheet
+
+    end
+
+    def rows
+      @rows ||= []
+    end
+
+  end
+
+  module Helper
     extend ActiveSupport::Concern
 
     class_methods do
-      def attribute(name, column_name: nil)
-        column_name = name.to_s.humanize unless column_name.present?
-        attributes << {name: name, column_name: column_name}
+      def attribute(name, column_name: nil, dynamic: false)
+        attributes << Attribute.new({name: name, column_name: column_name, dynamic: dynamic})
       end
 
       def attributes
@@ -17,7 +92,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
   end
 
   def self.setup(master_class)
-    master_class.include Builder
+    master_class.include Helper
   end
 
   def perform
