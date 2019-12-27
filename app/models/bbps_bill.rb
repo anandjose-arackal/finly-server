@@ -56,6 +56,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :company, optional: true
   belongs_to :location, class_name: 'BranchLocation', optional: true
   belongs_to :user, class_name: 'User', optional: true
   belongs_to :status, class_name: 'BbpsBillStatus', optional: true

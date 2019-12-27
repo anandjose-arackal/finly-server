@@ -161,38 +161,38 @@ json.payments do
   end
 end
 
-# json.payments_count @result.ordered_payments.count
-# json.payments_status_ids @result.payment_status_ids
-# json.payment_status_id_count @result.payment_status_id_count
-json.payments_count @result.ordered_payments.size
-# non-paginated payments listing all payments in this payment order
-json.filter_count @result.filter_count
-unless [168, 169, 174, 175, 118].include?(current_user.company_id)
-  json.unpaid_payments do
-  json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
-    if payment.receiving_account&.is_a?(BbpsBiller)
-      json.name payment.receiving_account&.biller_name
-    else
-      json.owner_name payment.receiving_account&.account_owner&.name
-      json.beneficiary_id payment.receiving_account&.account_owner&.id
-      json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
-      json.name payment.receiving_account&.name
-      json.account_number payment.receiving_account&.account_number
-      json.disabled payment.receiving_account&.disabled
-      json.ifsc payment.receiving_account&.ifsc
-    end
-    json.amount precision_value payment.amount_value
-    json.payment_amount payment.amount_value
-    json.net_amount precision_value payment.amount_value
-    json.status payment.payment_status_name
-    json.id payment.id
-    json.note payment.note
-    json.account_id payment.receiving_account&.id
-    if payment.receiving_user&.is_a?(User) || payment.receiving_user&.is_a?(BbpsBillerSubscription) || payment.receiving_user&.authorized
-      json.beneficiary_type "authorized"
-    else
-      json.beneficiary_type "unauthorized"
-    end
-  end
-end
-end
+# # json.payments_count @result.ordered_payments.count
+# # json.payments_status_ids @result.payment_status_ids
+# # json.payment_status_id_count @result.payment_status_id_count
+# json.payments_count @result.ordered_payments.size
+# # non-paginated payments listing all payments in this payment order
+# json.filter_count @result.filter_count
+# unless [168, 169, 174, 175, 118].include?(current_user.company_id)
+#   json.unpaid_payments do
+#   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
+#     if payment.receiving_account&.is_a?(BbpsBiller)
+#       json.name payment.receiving_account&.biller_name
+#     else
+#       json.owner_name payment.receiving_account&.account_owner&.name
+#       json.beneficiary_id payment.receiving_account&.account_owner&.id
+#       json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+#       json.name payment.receiving_account&.name
+#       json.account_number payment.receiving_account&.account_number
+#       json.disabled payment.receiving_account&.disabled
+#       json.ifsc payment.receiving_account&.ifsc
+#     end
+#     json.amount precision_value payment.amount_value
+#     json.payment_amount payment.amount_value
+#     json.net_amount precision_value payment.amount_value
+#     json.status payment.payment_status_name
+#     json.id payment.id
+#     json.note payment.note
+#     json.account_id payment.receiving_account&.id
+#     if payment.receiving_user&.is_a?(User) || payment.receiving_user&.is_a?(BbpsBillerSubscription) || payment.receiving_user&.authorized
+#       json.beneficiary_type "authorized"
+#     else
+#       json.beneficiary_type "unauthorized"
+#     end
+#   end
+# end
+# end
