@@ -34,37 +34,16 @@ class ExportJob < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  def progress_changed(completed)
-    update completed_records: completed
-  end
-
-  def pending!
-    update status_id: ExportJobStatus.id_for(:pending)
-  end
-
   def pending?
     status_id == ExportJobStatus.id_for(:pending)
-  end
-
-  def in_progress!
-    update status_id: ExportJobStatus.id_for(:in_progress)
   end
 
   def in_progress?
     status_id == ExportJobStatus.id_for(:in_progress)
   end
 
-  def success!(attachment = nil)
-    update status_id: ExportJobStatus.id_for(:success), attachment: attachment
-
-  end
-
   def success?
-    status_id == ExportJobStatus.id_for(:success)
-  end
-
-  def failed!
-    update status_id: ExportJobStatus.id_for(:failed)
+    status_id == ExportJobStatus.id_for(:completed)
   end
 
   def failed?

@@ -65,10 +65,12 @@ class ExportManager::Generator::Base < BaseOperation
 
   def success!
     export_job.update(status_id: ExportJobStatus.id_for(:completed), completed_at: DateTime.now)
+    ExportJobMailer.delay.success(export_job)
   end
 
   def failure!
     export_job.update(status_id: ExportJobStatus.id_for(:failed), completed_at: DateTime.now)
+    ExportJobMailer.delay.failure(export_job)
   end
 
   def notify
