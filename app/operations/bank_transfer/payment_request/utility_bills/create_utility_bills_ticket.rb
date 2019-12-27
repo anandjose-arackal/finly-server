@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
   attr_accessor :scheduled_at, :payment_mode, :policy_id, :bbps_bills,
                 :bank_payment_request, :payable_amount, :description,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount,
-                :payments
+                :payments, :transfer_mode_id
 
 
   class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket::UtilityBillsPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -59,6 +59,8 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id] || TransferMode.find_by(name: params[:payment_mode].downcase)
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
@@ -147,6 +149,7 @@ class BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket < Ban
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:utility_bill_payment),
           payment_mode: self.bank_payment_request.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: bill.amount_value,
               currency_id: Currency.first.id
