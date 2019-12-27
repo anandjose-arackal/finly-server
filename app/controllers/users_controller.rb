@@ -6,7 +6,7 @@ class UsersController < BaseControllers::WebBase
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
-    @managers = User::Team::GetManagers.(current_user, params)
+    # @managers = User::Team::GetManagers.(current_user, params)
     respond
   end
 
