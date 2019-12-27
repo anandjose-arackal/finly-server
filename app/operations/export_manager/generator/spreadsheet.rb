@@ -74,6 +74,12 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
     end
 
     def generate_rows
+      master.class.attributes.each do |attr|
+        next if attr.dynamic
+
+        header.add attr.column_name
+      end
+
       return unless master.input.present?
 
       index = 1
