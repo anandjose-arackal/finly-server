@@ -65,9 +65,9 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   def check_bill_presence(options, model:, result:, **)
 
     if result['data'].status == 'Y'
-      bill_date_month = Date.parse(result['data'].bill_date).strftime("%m")
+      bill_date_year = Date.parse(result['data'].bill_date).strftime("%Y")
       bill_period = result['data'].bill_period
-      bill = model.bbps_bills.where('extract(month from bill_date) = ?', bill_date_month).where('lower(bill_period) = ?', bill_period.downcase).first
+      bill = model.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
 
       if bill.present?
         result['bill'] = bill

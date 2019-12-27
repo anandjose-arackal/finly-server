@@ -9,7 +9,11 @@ class BbpsBillsFetch < ApplicationJob
     bbps_subscriptions.each do |subscription|
       parameters = customer_params(subscription).with_indifferent_access
       Bbps::BillFetch.(params: parameters, "current_user" => User.first) do |op|
-        op.success {|result| create_bill(result, subscription, autofetched)}
+        op.success do |result|
+          Rails.logger.fatal "Success:Result", result
+          create_bill(result, subscription, autofetched)
+        end
+        op.error {|result| p result}
         op.failure {|result| p result}
       end
     end
@@ -23,19 +27,17 @@ class BbpsBillsFetch < ApplicationJob
   end
 
   def create_bill(result, subscription, autofetched)
-    ##<OpenStruct amount="100000", bill_date="2015-06-14", due_date="2015-06-20", bill_number="12303", bill_period="june", convenience_fee="NA", convenience_fee_desc="NA", late_payment_fee="Late Payment Fee=40", early_payment_fee="Fixed Charges=50">
-    # {
-    #                       "amount" => "100000",
-    #                    "bill_date" => "2015-06-14",
-    #                     "due_date" => "2015-06-20",
-    #                  "bill_number" => "12303",
-    #                  "bill_period" => "june",
-    #              "convenience_fee" => "NA",
-    #         "convenience_fee_desc" => "NA",
-    #             "late_payment_fee" => "Late Payment Fee=40",
-    #            "early_payment_fee" => "Fixed Charges=50"
-    #     }
     if autofetched
+
+      next unless result.status == 'Y'
+
+      bill_date_year = Date.parse(result.bill_date).strftime("%Y")
+      bill_period = result.bill_period
+      bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+
+      # Do not create bill if bill for same year and period exists
+      next if bill.present?
+
       params = {
           amount: (result.amount.to_f / 100),
           bill_date: result.bill_date,
