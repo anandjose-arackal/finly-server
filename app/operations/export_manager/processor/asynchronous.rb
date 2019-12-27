@@ -13,7 +13,7 @@ class ExportManager::Processor::Asynchronous < ExportManager::Processor::Base
 
   def run
     Job.call_async(user, {request_params: params.to_json, master_class: master_class})
-    {success: true, message: "Processing. You will receive an email with the file in 5 to 10 minutes."}
+    {success: true, message: "Processing. You will receive the download link in an email in the next 5 - 10 minutes"}
   end
 
 end

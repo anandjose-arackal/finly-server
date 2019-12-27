@@ -56,6 +56,7 @@ class ExportJob < ApplicationRecord
 
   def success!(attachment = nil)
     update status_id: ExportJobStatus.id_for(:success), attachment: attachment
+
   end
 
   def success?
