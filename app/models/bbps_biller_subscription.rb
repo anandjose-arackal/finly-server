@@ -128,6 +128,7 @@ class BbpsBillerSubscription < ApplicationRecord
         location: location.as_json,
         policy: policy.as_json,
         active: active,
+        auto_fetchable: auto_fetchable,
         note: note,
         created_at: created_at.strftime("%d-%b-%Y"),
         updated_at: updated_at.strftime("%d-%b-%Y"),
@@ -145,6 +146,11 @@ class BbpsBillerSubscription < ApplicationRecord
         customer_name: customer_name,
         customer_pan: customer_pan
     }
+  end
+
+  def auto_fetchable
+    true if ["MANDATORY", "OPTIONAL"].include? self.biller.fetch_requirement
+    false
   end
 
   def all_customer_fields
