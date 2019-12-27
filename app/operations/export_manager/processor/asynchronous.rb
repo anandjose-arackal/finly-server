@@ -12,7 +12,8 @@ class ExportManager::Processor::Asynchronous < ExportManager::Processor::Base
   end
 
   def run
-    Job.call_async(user, {request_params: params.to_json, master_class: master_class})
+    Job.call(user, {request_params: params.to_json, master_class: master_class.to_s})
+    # Job.call_async(user, {request_params: params.to_json, master_class: master_class})
   end
 
 end

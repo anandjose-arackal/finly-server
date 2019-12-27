@@ -25,10 +25,10 @@ class ExportManager::RequestHandler < BaseOperation
       add_message :error, 'Invalid Type. Error while generating export'
       return
     end
-    if params[:export_format].blank?
-      add_message :error, 'Invalid Format. Error while generating export'
-      return
-    end
+    # if params[:export_format].blank?
+    #   add_message :error, 'Invalid Format. Error while generating export'
+    #   return
+    # end
   end
 
   def init
