@@ -53,9 +53,13 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
         options['result']['data'] = result
       end
 
-      op.failure do |messages|
+      op.failure do |result|
         p "FAILURE"
-        add_message options, :error, :base, messages
+
+        if result["errors"].present? && result["errors"].is_a?(Hash)
+          messages = result["errors"].values.flatten
+          add_message options, :error, :base, messages
+        end
         return
       end
     end

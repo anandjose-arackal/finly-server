@@ -63,9 +63,11 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
         options['result']['data'] = result
       end
 
-      op.failure do |messages|
-        p "FAILURE"
-        add_message options, :error, :base, messages
+      op.failure do |result|
+        if result["errors"].present? && result["errors"].is_a?(Hash)
+          messages = result["errors"].values.flatten
+          add_message options, :error, :base, messages
+        end
         return
       end
     end
