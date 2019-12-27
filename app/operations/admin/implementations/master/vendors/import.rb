@@ -197,6 +197,6 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
 
   def check_existing_vendor(vendor_params)
     return false if vendor_params["vendor_id"].blank?
-    existing_vendor = company.yes_bank_vendors.find_by_vendor_id vendor_params["vendor_id"]
+    existing_vendor = company.yes_bank_vendors.non_deleted.find_by_vendor_id vendor_params["vendor_id"]
   end
 end
