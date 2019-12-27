@@ -133,7 +133,17 @@ class UserRole < ApplicationRecord
       po_invoice_auditor: 38,
       non_po_invoice_initiator: 39,
       non_po_invoice_reviewer: 40,
-      non_po_invoice_auditor: 41
+      non_po_invoice_auditor: 41,
+      # BBPS Roles
+      utility_bill_master_initiator: 42,
+      utility_bill_master_reviewer: 43,
+      utility_bill_initiator: 44,
+      utility_bill_reviewer: 45,
+
+      # Credit Notes
+      credit_note_initiator: 46,
+      credit_note_reviewer: 47,
+      credit_note_auditor: 48
   }
 
 
@@ -168,7 +178,18 @@ class UserRole < ApplicationRecord
       non_po_invoice_auditor: 41,
       payment_agreement_initiator: 33,
       payment_agreement_reviewer: 34,
-      payment_agreement_auditor: 35
+      payment_agreement_auditor: 35,
+
+      # BBPS Roles
+      utility_bill_master_initiator: 42,
+      utility_bill_master_reviewer: 43,
+      utility_bill_initiator: 44,
+      utility_bill_reviewer: 45,
+
+      # Credit Notes
+      credit_note_initiator: 46,
+      credit_note_reviewer: 47,
+      credit_note_auditor: 48
   }
 
   def self.seed_data
