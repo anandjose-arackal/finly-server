@@ -28,7 +28,11 @@ class ExportJob < ApplicationRecord
   has_attached_file :attachment, :use_timestamp => false
   do_not_validate_attachment_file_type :attachment
 
+  scope :created_after, -> (datetime) { where 'created_at > ?', datetime}
+
   serialize :request_params, JSON
+
+  default_scope {order(created_at: :desc)}
 
   def progress_changed(completed)
     update completed_records: completed
@@ -64,6 +68,22 @@ class ExportJob < ApplicationRecord
 
   def failed?
     status_id == ExportJobStatus.id_for(:failed)
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name,
+        export_type: export_type,
+        created_by_id: created_by_id,
+        completed_at: completed_at&.strftime("%Y-%m-%d  %H:%M:%S"),
+        total_records: total_records,
+        completed_records: completed_records,
+        completion_percentage: completion_percentage,
+        attachment: attachment&.url,
+        created_at: created_at&.strftime("%Y-%m-%d  %H:%M:%S"),
+        status: status&.name,
+    }
   end
 
 end

@@ -6,7 +6,7 @@ class CreateExportJobs < ActiveRecord::Migration[5.2]
       t.integer :created_by_id, index: true, references: 'users'
       t.references :company, index: true, null: false
       t.text :request_params, limit: 4294967295
-      t.datetime :completed_on, index: true
+      t.datetime :completed_at, index: true
       t.integer :total_records, index: true
       t.integer :completed_records, index: true
       t.integer :completion_percentage, index: true
