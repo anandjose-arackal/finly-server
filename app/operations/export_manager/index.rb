@@ -27,7 +27,7 @@ class ExportManager::Index < BaseOperation
       end
 
 
-      self.export_jobs = params[:export_jobs].created_after(7.days.ago)
+      self.export_jobs = params[:export_jobs].created_after(7.days.ago).includes(:status)
       self.export_jobs = apply_scopes(self.export_jobs, params)
 
       page = params[:page] || 1
