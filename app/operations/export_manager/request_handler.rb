@@ -52,15 +52,15 @@ class ExportManager::RequestHandler < BaseOperation
   end
 
   def process
-    self.processor.run
-    # if result[:success]
-    #   if result[:message].present?
-    #     add_message :success, result[:message]
-    #   end
-    #   params[:file_url] = result[:file_url]
-    # else
-    #   add_message :error, (result[:message] || 'Unknown error')
-    # end
+    result = self.processor.run
+    if result[:success]
+      if result[:message].present?
+        add_message :success, result[:message]
+      end
+      params[:file_url] = result[:file_url]
+    else
+      add_message :error, (result[:message] || 'Unknown error')
+    end
   end
 
   def success
