@@ -244,6 +244,4 @@ class BbpsBillerSubscription < ApplicationRecord
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
   end
-
-
 end
