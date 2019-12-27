@@ -58,6 +58,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   attribute :finance_approved_date
   attribute :due_date
   # attribute :custom_fields, dynamic: true
+  #
+  # def custom_fields(row, invoice_line_item)
+  #   debugger
+  # end
 
   def name
     'Invoices'

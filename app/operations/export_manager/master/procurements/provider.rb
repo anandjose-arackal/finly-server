@@ -72,7 +72,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   attribute :invoice_custom_fields
 
   def name
-    'Purchase Transactions'
+    'Purchase Orders'
   end
 
   def input

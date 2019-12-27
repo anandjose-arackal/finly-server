@@ -76,7 +76,7 @@ class ExportJob < ApplicationRecord
         name: name,
         export_type: export_type,
         completed_at: completed_at&.strftime("%Y-%m-%d  %H:%M:%S"),
-        total_records: (completed_records || 0),
+        total_records: (total_records || 0),
         completed_records: (completed_records || 0),
         completion_percentage: (completion_percentage || 0),
         attachment: attachment&.url,
