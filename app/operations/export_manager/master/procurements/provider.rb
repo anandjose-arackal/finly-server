@@ -1,78 +1,79 @@
 class ExportManager::Master::Procurements::Provider < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
 
   subscribe :procurement
-
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  generator ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Asynchronous
   validate :input
-  fields [
-             procurement_name: {spreadsheet: true, pdf: true},
-             vendor_name: {spreadsheet: true, pdf: true},
-             vendor_business_name: {spreadsheet: false, pdf: true},
-             vendor_mobile_number: {spreadsheet: false, pdf: true},
-             vendor_state_code: {spreadsheet: false, pdf: true},
-             vendor_gstin: {spreadsheet: true, pdf: true},
-             vendor_pan: {spreadsheet: false, pdf: true},
-             vendor_tds_rate: {spreadsheet: false, pdf: true},
-             vendor_tds_description: {spreadsheet: false, pdf: true},
-             vendor_type: {spreadsheet: false, pdf: true},
-             vendor_description: {spreadsheet: false, pdf: true},
-             vendor_address: {spreadsheet: false, pdf: true},
-             vendor_custom_fields: {spreadsheet: false, pdf: true},
-             approval_pending_level_number: {spreadsheet: true, pdf: false},
-             approval_pending_level_name: {spreadsheet: true, pdf: false},
-             approval_pending_reviewers: {spreadsheet: true, pdf: false},
-             approved_reviewers: {spreadsheet: true, pdf:false},
-             policy: {spreadsheet: true, pdf: true},
-             department: {spreadsheet: true, pdf: true},
-             sub_department: {spreadsheet: true, pdf: true},
-             cost_center: {spreadsheet: true, pdf: true},
-             po_user: {spreadsheet: true, pdf: true},
-             po_status: {spreadsheet: true, pdf: true},
-             po_number: {spreadsheet: true, pdf: true},
-             po_payment_term: {spreadsheet: false, pdf: true},
-             po_date: {spreadsheet: true, pdf: true},
-             po_delivery_date: {spreadsheet: false, pdf: true},
-             po_submitted_on: {spreadsheet: false, pdf: true},
-             is_po_approved: {spreadsheet: true, pdf: true},
-             po_approved_on: {spreadsheet: false, pdf: true},
-             po_sent_on: {spreadsheet: false, pdf: true},
-             po_base_value: {spreadsheet: true, pdf: true},
-             po_cgst: {spreadsheet: false, pdf: true},
-             po_sgst: {spreadsheet: false, pdf: true},
-             po_igst: {spreadsheet: false, pdf: true},
-             po_line_items_count: {spreadsheet: false, pdf: true},
-             po_purchase_address: {spreadsheet: true, pdf: true},
-             po_delivery_address: {spreadsheet: true, pdf: true},
-             po_custom_fields: {spreadsheet: false, pdf: true},
-             inwards_status: {spreadsheet: false, pdf: true},
-             last_inward_received_on: {spreadsheet: false, pdf: true},
-             invoice_number: {spreadsheet: true, pdf: true},
-             invoice_id: {spreadsheet: true, pdf: true},
-             invoice_payment_term: {spreadsheet: false, pdf: true},
-             invoice_delivery_date: {spreadsheet: false, pdf: true},
-             invoice_submitted_on: {spreadsheet: false, pdf: true},
-             invoice_approved_on: {spreadsheet: false, pdf: true},
-             is_invoice_approved: {spreadsheet: true, pdf: true},
-             invoice_sent_on: {spreadsheet: false, pdf: true},
-             invoice_cgst: {spreadsheet: true, pdf: true},
-             invoice_sgst: {spreadsheet: true, pdf: true},
-             invoice_igst: {spreadsheet: true, pdf: true},
-             invoice_tds_type: {spreadsheet: true, pdf: true},
-             invoice_tds_rate: {spreadsheet: true, pdf: true},
-             invoice_tds_amount: {spreadsheet: false, pdf: true},
-             invoice_base_amount: {spreadsheet: true, pdf: true},
-             invoice_discount_amount: {spreadsheet: true, pdf: true},
-             invoice_total_amount: {spreadsheet: true, pdf: true},
-             invoice_total_amount_after_tds: {spreadsheet: false, pdf: true},
-             invoice_payable_amount: {spreadsheet: false, pdf: true},
-             invoice_line_items_count: {spreadsheet: false, pdf: true},
-             invoice_purchase_address: {spreadsheet: false, pdf: true},
-             invoice_delivery_address: {spreadsheet: false, pdf: true},
-             invoice_custom_fields: {spreadsheet: false, pdf: true}
-         ]
+
+  attribute :procurement_name
+  attribute :vendor_name
+  attribute :vendor_business_name
+  attribute :vendor_mobile_number
+  attribute :vendor_state_code
+  attribute :vendor_gstin
+  attribute :vendor_pan
+  attribute :vendor_tds_rate
+  attribute :vendor_tds_description
+  attribute :vendor_type
+  attribute :vendor_description
+  attribute :vendor_address
+  attribute :vendor_custom_fields
+  attribute :approval_pending_level_number
+  attribute :approval_pending_level_name
+  attribute :approval_pending_reviewers
+  attribute :approved_reviewers
+  attribute :policy
+  attribute :department
+  attribute :sub_department
+  attribute :cost_center
+  attribute :po_user
+  attribute :po_status
+  attribute :po_number
+  attribute :po_payment_term
+  attribute :po_date
+  attribute :po_delivery_date
+  attribute :po_submitted_on
+  attribute :is_po_approved
+  attribute :po_approved_on
+  attribute :po_sent_on
+  attribute :po_base_value
+  attribute :po_cgst
+  attribute :po_sgst
+  attribute :po_igst
+  attribute :po_line_items_count
+  attribute :po_purchase_address
+  attribute :po_delivery_address
+  attribute :po_custom_fields
+  attribute :inwards_status
+  attribute :last_inward_received_on
+  attribute :invoice_number
+  attribute :invoice_id
+  attribute :invoice_payment_term
+  attribute :invoice_delivery_date
+  attribute :invoice_submitted_on
+  attribute :invoice_approved_on
+  attribute :is_invoice_approved
+  attribute :invoice_sent_on
+  attribute :invoice_cgst
+  attribute :invoice_sgst
+  attribute :invoice_igst
+  attribute :invoice_tds_type
+  attribute :invoice_tds_rate
+  attribute :invoice_tds_amount
+  attribute :invoice_base_amount
+  attribute :invoice_discount_amount
+  attribute :invoice_total_amount
+  attribute :invoice_total_amount_after_tds
+  attribute :invoice_payable_amount
+  attribute :invoice_line_items_count
+  attribute :invoice_purchase_address
+  attribute :invoice_delivery_address
+  attribute :invoice_custom_fields
+
+  def name
+    'Purchase Orders'
+  end
 
   def input
     # if params[:filter_po_status].present?
@@ -85,7 +86,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
       add_message :error, result.messages[:error]
       return
     end
-    result.purchase_orders.includes(:policy,:vendor,:gstin_location,:controlling_level,:level,:department, :sub_department,:cost_center,:user, :status, :total_before_tax,procurement:[invoices:[:gst_type, :tax_amount, :tds_slab,:discount_amount,:net_amount,:invoice_items]])
+    result.purchase_orders.includes(:policy, :vendor, :gstin_location, :controlling_level, :level, :department, :sub_department, :cost_center, :user, :status, :total_before_tax, procurement: [invoices: [:gst_type, :tax_amount, :tds_slab, :discount_amount, :net_amount, :invoice_items]])
   end
 
   def procurement_name(purchase_order)
@@ -129,7 +130,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def approved_reviewers(purchase_order)
-    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map{|dlr| dlr.reviewer.name}&.join(" ,")
+    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map { |dlr| dlr.reviewer.name }&.join(" ,")
   end
 
   def vendor_tds_rate(purchase_order)
@@ -191,7 +192,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_delivery_date(purchase_order)
-     purchase_order&.delivery_date&.strftime("%d-%b-%Y")
+    purchase_order&.delivery_date&.strftime("%d-%b-%Y")
   end
 
   def po_date(purchase_order)

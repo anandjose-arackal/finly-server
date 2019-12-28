@@ -38,6 +38,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders, :paginated_purchase_orders
 
+    has_scope :filter_ids, type: :array
     has_scope :filter_user
     has_scope :filter_po_number
     has_scope :filter_status
