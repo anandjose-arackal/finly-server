@@ -25,7 +25,6 @@ module ExportManager::Generator::Spreadsheet::Builder
   end
 
   def add_field?(attribute)
-    puts "Params: #{params}, Field: #{fields}, attr: #{attribute.name}, add: #{(fields.blank? or fields.include?(attribute.name.to_s))}"
     fields.blank? or fields.include?(attribute.name.to_s)
   end
 
