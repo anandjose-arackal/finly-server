@@ -1,14 +1,12 @@
 class ExportManager::Generator::Base < BaseOperation
-  cattr_accessor :formats
   attr_accessor :master, :options, :export_job, :input #, :config
 
-  def self.accept?(format, options = {})
-    return false if self.formats.blank?
-    self.formats.include?(format.to_sym)
+  def self.setup(master_class)
+    # To be inherited
   end
 
-  def self.setup(master_class)
-
+  def perform
+    # To be inherited
   end
 
   def self.build(master)
@@ -49,10 +47,6 @@ class ExportManager::Generator::Base < BaseOperation
             status_id: ExportJobStatus.id_for(:pending)
         }
     )
-  end
-
-  def perform
-    # To be inherited
   end
 
   def progress_update(completed)

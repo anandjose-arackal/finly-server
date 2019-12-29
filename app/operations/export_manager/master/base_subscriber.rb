@@ -30,10 +30,6 @@ class ExportManager::Master::BaseSubscriber
     generator_klass
   end
 
-  def self.fields(list)
-
-  end
-
   # def self.generator(klass = NoObject, &block)
   #   generator_klass({klass: klass, block: block}) unless klass == NoObject
   #   generator_klass
