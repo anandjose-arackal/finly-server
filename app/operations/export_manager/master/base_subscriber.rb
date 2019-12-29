@@ -7,15 +7,35 @@ class ExportManager::Master::BaseSubscriber
 
   attr_accessor :user, :params, :input, :messages
 
+  class_attr :label
+  class_attr :job_name
   class_attr :generator_klass
   class_attr :processor
+  class_attr :screen
   class_attr :validations, default: []
 
   bus ExportManager::Master::BaseMaster
+  job_name -> (user, params, input) { self.class.label }
 
-  def initialize(user, params)
-    self.user = user
-    self.params = params
+  def self.config(options = {})
+    # raise "Label is not defined for #{self.name}" if label.blank?
+    # raise "#{self.name} has not subscribed to any event" if event.blank?
+
+    {
+        label: label,
+        type: type,
+        key: event,
+        screen: screen,
+        config: generator_config
+    }
+  end
+
+  def self.type
+    generator&.type
+  end
+
+  def self.generator_config
+    generator.config(self)
   end
 
   def self.validate(method)
@@ -30,15 +50,10 @@ class ExportManager::Master::BaseSubscriber
     generator_klass
   end
 
-  # def self.generator(klass = NoObject, &block)
-  #   generator_klass({klass: klass, block: block}) unless klass == NoObject
-  #   generator_klass
-  # end
-  #
-  # def self.processor(klass = NoObject, &block)
-  #   processor_klass({klass: klass, block: block}) unless klass == NoObject
-  #   processor_klass
-  # end
+  def initialize(user, params)
+    self.user = user
+    self.params = params
+  end
 
   def valid?
     clear_messages

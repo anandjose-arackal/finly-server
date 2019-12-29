@@ -2,9 +2,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   attr_accessor :input_data
 
+  label 'Export Invoices (XLS)'
   subscribe :invoices
   generator ExportManager::Generator::Spreadsheet
   processor ExportManager::Processor::Asynchronous
+  screen :invoices_index
   validate :input
 
   attribute :finly_ref_no
@@ -63,10 +65,6 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.custom_fields.includes(:field_configuration).each do |custom_field|
       row.add(custom_field.field_configuration.field_name, custom_field.string_value)
     end
-  end
-
-  def name
-    'Invoices'
   end
 
   def input

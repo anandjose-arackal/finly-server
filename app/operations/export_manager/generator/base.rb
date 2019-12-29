@@ -1,7 +1,15 @@
 class ExportManager::Generator::Base < BaseOperation
+  include DynamicAttributes
+
   attr_accessor :master, :options, :export_job, :input #, :config
 
+  class_attr :type
+
   def self.setup(master_class)
+    # To be inherited
+  end
+
+  def self.config(master_class)
     # To be inherited
   end
 
@@ -33,12 +41,24 @@ class ExportManager::Generator::Base < BaseOperation
     notify
   end
 
+  def build_job_name
+    case master.class.job_name.class
+    when Proc
+      return master.job_name.call(master.user, master.params, self.input)
+    when Symbol
+      return master.send(master.class.job_name, master.user, master.params, self.input)
+    else
+      return master.job_name
+    end
+  end
+
   def create_job
     total_count = self.input.count
+
     # Build generator
     self.export_job = user.export_jobs.create(
         {
-            name: master.name,
+            name: build_job_name,
             export_type: nil,
             total_records: total_count,
             completed_records: 0,

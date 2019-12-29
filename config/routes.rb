@@ -3850,6 +3850,7 @@ Rails.application.routes.draw do
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
 
+  get 'export_jobs/config', to: 'export_jobs#export_jobs_config'
   resources :export_jobs, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
