@@ -1,11 +1,9 @@
-class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Budgets::UsageEntities < ExportManager::Generators::Spreadsheet
 
   attr_accessor :entities
 
   validate :input
-  subscribe :budget_entities
-  processor ExportManager::Processor::Asynchronous
-  generator ExportManager::Generator::Spreadsheet
+  handle :budget_entities
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type

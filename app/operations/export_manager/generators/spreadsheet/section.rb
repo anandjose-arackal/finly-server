@@ -1,4 +1,4 @@
-class ExportManager::Generator::Spreadsheet::Section
+class ExportManager::Generators::Spreadsheet::Section
 
   attr_accessor :name, :attributes
 

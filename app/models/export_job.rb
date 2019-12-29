@@ -19,6 +19,7 @@
 #  status_id               :integer          not null
 #  company_id              :bigint           not null
 #  request_params          :text(4294967295)
+#  deleted_at              :datetime
 #
 
 class ExportJob < ApplicationRecord

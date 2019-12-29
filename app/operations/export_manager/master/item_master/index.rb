@@ -1,9 +1,9 @@
 require 'ostruct'
-class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::ItemMaster::Index < ExportManager::Generators::Spreadsheet
 
-  subscribe :inventory_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :inventory_items
+
+
   validate :input
 
   attribute :item_number

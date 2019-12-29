@@ -1,9 +1,9 @@
-class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Generators::Spreadsheet
 
 
-  subscribe :vp_users
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :vp_users
+
+
   validate :input
 
   attribute :employee_id

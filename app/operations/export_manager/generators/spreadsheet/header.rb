@@ -1,4 +1,4 @@
-class ExportManager::Generator::Spreadsheet::Header
+class ExportManager::Generators::Spreadsheet::Header
 
   def list
     @list ||= []

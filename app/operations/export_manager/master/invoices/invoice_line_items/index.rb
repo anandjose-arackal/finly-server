@@ -1,8 +1,8 @@
-class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Generators::Spreadsheet
 
-  subscribe :non_po_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :non_po_items
+
+
   validate :input
 
   attribute :procurement_name

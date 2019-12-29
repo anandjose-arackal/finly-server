@@ -1,9 +1,9 @@
-class ExportManager::Master::Procurements::Provider < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Procurements::Provider < ExportManager::Generators::Spreadsheet
 
 
-  subscribe :procurement
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :procurement
+
+
   validate :input
 
   attribute :procurement_name

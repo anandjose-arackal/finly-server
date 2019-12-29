@@ -1,10 +1,10 @@
-class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseRequests::Index < ExportManager::Generators::Spreadsheet
   attr_accessor :input_data
 
 
-  subscribe :purchase_request
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :purchase_request
+
+
   validate :input
 
   attribute :request_id

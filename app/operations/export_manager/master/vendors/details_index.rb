@@ -1,11 +1,11 @@
-class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Generators::Spreadsheet
 
 
 
-  subscribe :vendor_details
+  handle :vendor_details
 
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+
+
   validate :input
 
   attribute :vendor_business_name

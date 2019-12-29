@@ -1,9 +1,9 @@
-class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Generators::Spreadsheet
 
 
-  subscribe :purchase_order_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :purchase_order_items
+
+
   validate :input
 
   attribute :procurement_name

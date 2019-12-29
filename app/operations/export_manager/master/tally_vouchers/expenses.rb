@@ -1,9 +1,9 @@
-class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Generators::Spreadsheet
 
 
-  subscribe :tally_expense_voucher_xls
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :tally_expense_voucher_xls
+
+
   validate :input
 
   attribute :report_name
