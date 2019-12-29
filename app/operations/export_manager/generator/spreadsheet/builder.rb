@@ -2,8 +2,33 @@ module ExportManager::Generator::Spreadsheet::Builder
   extend ActiveSupport::Concern
 
   class_methods do
+    def section(name, &block)
+      @section = ExportManager::Generator::Spreadsheet::Section.new(name: name)
+      sections << @section
+      block.call
+      @section = nil
+    end
+
     def attribute(name, column_name: nil, dynamic: false)
-      attributes << ExportManager::Generator::Spreadsheet::Attribute.new({name: name, column_name: column_name, dynamic: dynamic})
+      section = @section || default_section
+      attr = ExportManager::Generator::Spreadsheet::Attribute.new(
+          {
+              name: name,
+              column_name: column_name,
+              section: section,
+              dynamic: dynamic
+          }
+      )
+      section&.add attr
+      attributes << attr
+    end
+
+    def sections
+      @sections ||= [default_section]
+    end
+
+    def default_section
+      @default_section ||= ExportManager::Generator::Spreadsheet::Section.new(name: :default)
     end
 
     def attributes
@@ -25,7 +50,7 @@ module ExportManager::Generator::Spreadsheet::Builder
   end
 
   def add_field?(attribute)
-    fields.blank? or fields.include?(attribute.name.to_s)
+    (fields.blank? and attribute.default) or fields.include?(attribute.name.to_s)
   end
 
   # Converts input records to array of Row Objects. Each row object contains a hash of the columns and values

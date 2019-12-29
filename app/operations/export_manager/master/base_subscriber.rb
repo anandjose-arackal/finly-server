@@ -7,6 +7,7 @@ class ExportManager::Master::BaseSubscriber
 
   attr_accessor :user, :params, :input, :messages
 
+  class_attr :configurable, default: false
   class_attr :label
   class_attr :job_name
   class_attr :generator_klass
@@ -30,7 +31,8 @@ class ExportManager::Master::BaseSubscriber
         type: type,
         key: event,
         screen: screen,
-        config: generator_config
+        configurable: configurable,
+        config: generator_config,
     }
   end
 

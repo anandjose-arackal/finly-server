@@ -8,7 +8,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
   end
 
   def self.config(master_class)
-    master_class.attributes.as_json
+    master_class.sections.reject {|section| section.attributes.blank?}.as_json
   end
 
   def perform
