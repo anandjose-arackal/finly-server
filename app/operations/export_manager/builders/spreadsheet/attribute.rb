@@ -15,7 +15,6 @@ class ExportManager::Builders::Spreadsheet::Attribute
         name: name,
         column_name: column_name,
         default: default,
-        section: section&.name
     }
   end
 
