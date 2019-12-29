@@ -7,10 +7,10 @@ class ExportManager::Config < BaseOperation
 
   def init
     self.exports = []
-    subscribers = ExportManager::Master::BaseMaster.subscribers
+    subscribers = ExportManager::Master.subscribers
     subscribers.each do |_, list|
       list.each do |master|
-        self.exports << master.config if params[:screen].blank? or master.screen.to_s == params[:screen].to_s
+        self.exports << master.properties if params[:screen].blank? or master.screen.to_s == params[:screen].to_s
       end
     end
   end

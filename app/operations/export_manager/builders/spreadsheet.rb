@@ -3,6 +3,10 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
 
   type :spreadsheet
 
+  def self.config
+    sections.reject {|s| s.attributes.blank?}.as_json
+  end
+
   def generate
     generate_rows
     file = generate_spreadsheet

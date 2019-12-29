@@ -19,6 +19,7 @@ module ExportManager::DSL::Config
           configurable: configurable,
       }
       props[:config] = config if configurable
+      props
     end
 
     def config

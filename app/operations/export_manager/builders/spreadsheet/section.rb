@@ -18,7 +18,7 @@ class ExportManager::Builders::Spreadsheet::Section
 
   def as_json(options={})
     {
-        name: name,
+        section: name,
         attributes: attributes.as_json
     }
   end
