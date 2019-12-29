@@ -15,7 +15,11 @@ class ExportManager::Master::BaseSubscriber
   class_attr :validations, default: []
 
   bus ExportManager::Master::BaseMaster
-  job_name -> (user, params, input) { self.class.label }
+  job_name :job_name
+
+  def job_name(user, params, input)
+    self.class.label
+  end
 
   def self.config(options = {})
     # raise "Label is not defined for #{self.name}" if label.blank?

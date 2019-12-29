@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_26_114340) do
+ActiveRecord::Schema.define(version: 2019_12_29_122313) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3164,7 +3164,7 @@ ActiveRecord::Schema.define(version: 2019_12_26_114340) do
     t.string "name", null: false
     t.string "export_type"
     t.integer "created_by_id"
-    t.datetime "completed_on"
+    t.datetime "completed_at"
     t.integer "total_records"
     t.integer "completed_records"
     t.integer "completion_percentage"
@@ -3175,7 +3175,11 @@ ActiveRecord::Schema.define(version: 2019_12_26_114340) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status_id", null: false
-    t.index ["completed_on"], name: "index_export_jobs_on_completed_on"
+    t.bigint "company_id", null: false
+    t.text "request_params", limit: 4294967295
+    t.datetime "deleted_at"
+    t.index ["company_id"], name: "index_export_jobs_on_company_id"
+    t.index ["completed_at"], name: "index_export_jobs_on_completed_at"
     t.index ["completed_records"], name: "index_export_jobs_on_completed_records"
     t.index ["completion_percentage"], name: "index_export_jobs_on_completion_percentage"
     t.index ["created_at"], name: "index_export_jobs_on_created_at"

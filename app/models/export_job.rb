@@ -22,6 +22,8 @@
 #
 
 class ExportJob < ApplicationRecord
+  include SoftDeletable
+
   belongs_to :status, class_name: 'ExportJobStatus'
   belongs_to :created_by, optional: true, class_name: 'User'
 

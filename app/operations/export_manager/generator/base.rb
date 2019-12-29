@@ -42,13 +42,12 @@ class ExportManager::Generator::Base < BaseOperation
   end
 
   def build_job_name
-    case master.class.job_name.class
-    when Proc
-      return master.job_name.call(master.user, master.params, self.input)
-    when Symbol
-      return master.send(master.class.job_name, master.user, master.params, self.input)
+    if master.class.job_name.class.name == Proc.name
+      master.class.job_name.call(master.user, master.params, self.input)
+    elsif master.class.job_name.class.name == Symbol.name
+      master.send(master.class.job_name, master.user, master.params, self.input)
     else
-      return master.job_name
+      master.class.job_name
     end
   end
 

@@ -10,4 +10,9 @@ class ExportJobsController < BaseControllers::WebBase
     respond
   end
 
+  def create
+    @result = ExportManager::RequestHandler.(current_user, params)
+    respond_success_failure
+  end
+
 end
