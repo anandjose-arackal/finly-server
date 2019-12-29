@@ -1,5 +1,5 @@
 require 'ostruct'
-class ExportManager::Master::ItemMaster::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spreadsheet
 
   handle :inventory_items
 

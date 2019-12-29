@@ -1,9 +1,9 @@
-module ExportManager::Generators::Spreadsheet::DSL
+module ExportManager::Builders::Spreadsheet::DSL
   extend ActiveSupport::Concern
 
   class_methods do
     def section(name, &block)
-      @section = ExportManager::Generators::Spreadsheet::Section.new(name: name)
+      @section = ExportManager::Builders::Spreadsheet::Section.new(name: name)
       sections << @section
       block.call
       @section = nil
@@ -11,7 +11,7 @@ module ExportManager::Generators::Spreadsheet::DSL
 
     def attribute(name, column_name: nil, dynamic: false)
       section = @section || default_section
-      attr = ExportManager::Generators::Spreadsheet::Attribute.new(
+      attr = ExportManager::Builders::Spreadsheet::Attribute.new(
           {
               name: name,
               column_name: column_name,
@@ -28,7 +28,7 @@ module ExportManager::Generators::Spreadsheet::DSL
     end
 
     def default_section
-      @default_section ||= ExportManager::Generators::Spreadsheet::Section.new(name: :default)
+      @default_section ||= ExportManager::Builders::Spreadsheet::Section.new(name: :default)
     end
 
     def attributes

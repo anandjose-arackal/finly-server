@@ -2,7 +2,6 @@ class ExportManager::API
   include EventBus::Subscriber
   include Supporters::ErrorTracker
   include DynamicAttributes
-  include ExportManager::DSL::Builder
   include ExportManager::DSL::Config
   include ExportManager::DSL::Generator
   include ExportManager::DSL::DataProvider

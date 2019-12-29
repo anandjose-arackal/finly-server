@@ -1,4 +1,4 @@
-class ExportManager::Generators::Spreadsheet < ExportManager::API
+class ExportManager::Builders::Spreadsheet < ExportManager::API
   include DSL
 
   type :spreadsheet

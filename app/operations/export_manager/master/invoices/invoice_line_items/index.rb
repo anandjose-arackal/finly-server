@@ -1,4 +1,4 @@
-class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Builders::Spreadsheet
 
   handle :non_po_items
 

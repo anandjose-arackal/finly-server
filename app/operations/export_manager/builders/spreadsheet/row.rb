@@ -1,4 +1,4 @@
-class ExportManager::Generators::Spreadsheet::Row
+class ExportManager::Builders::Spreadsheet::Row
   attr_accessor :record, :header
 
   def initialize(record:, header:)

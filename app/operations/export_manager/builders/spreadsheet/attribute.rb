@@ -1,4 +1,4 @@
-class ExportManager::Generators::Spreadsheet::Attribute
+class ExportManager::Builders::Spreadsheet::Attribute
 
   attr_accessor :name, :column_name, :dynamic, :default, :section
 

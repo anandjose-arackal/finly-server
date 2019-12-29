@@ -1,4 +1,4 @@
-class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Spreadsheet
 
 
 

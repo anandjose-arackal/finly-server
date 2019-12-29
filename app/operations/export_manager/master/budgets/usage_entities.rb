@@ -1,4 +1,4 @@
-class ExportManager::Master::Budgets::UsageEntities < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::Spreadsheet
 
   attr_accessor :entities
 

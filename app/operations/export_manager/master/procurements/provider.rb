@@ -1,4 +1,4 @@
-class ExportManager::Master::Procurements::Provider < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Procurements::Provider < ExportManager::Builders::Spreadsheet
 
 
   handle :procurement

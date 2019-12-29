@@ -1,4 +1,4 @@
-class ExportManager::Master::Budgets::UsageSummary < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Spreadsheet
 
   attr_accessor :spent_amount
 

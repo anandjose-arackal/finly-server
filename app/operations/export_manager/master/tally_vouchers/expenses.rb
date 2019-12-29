@@ -1,4 +1,4 @@
-class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Builders::Spreadsheet
 
 
   handle :tally_expense_voucher_xls

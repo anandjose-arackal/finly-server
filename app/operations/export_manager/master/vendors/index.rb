@@ -1,4 +1,4 @@
-class ExportManager::Master::Vendors::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :vendor_ba
 
 

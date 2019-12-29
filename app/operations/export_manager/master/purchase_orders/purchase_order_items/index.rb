@@ -1,4 +1,4 @@
-class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Builders::Spreadsheet
 
 
   handle :purchase_order_items

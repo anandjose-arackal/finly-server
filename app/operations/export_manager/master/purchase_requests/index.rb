@@ -1,4 +1,4 @@
-class ExportManager::Master::PurchaseRequests::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :input_data
 
 

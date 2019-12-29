@@ -1,4 +1,4 @@
-class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Generators::Spreadsheet
+class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Builders::Spreadsheet
 
 
   handle :vp_users
