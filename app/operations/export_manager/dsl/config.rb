@@ -9,6 +9,7 @@ module ExportManager::DSL::Config
     class_attr :system
     class_attr :type, default: :generic
     class_attr :document
+    class_attr :company_scope, default: {}.with_indifferent_access
   end
 
   class_methods do
@@ -30,6 +31,10 @@ module ExportManager::DSL::Config
 
     def accept?(user, params)
       true
+    end
+
+    def scope(env, id, name)
+      self.company_scope[env] = {id: id, name: name}
     end
   end
 

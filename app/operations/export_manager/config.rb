@@ -10,7 +10,11 @@ class ExportManager::Config < BaseOperation
     subscribers = ExportManager::Master.subscribers
     subscribers.each do |_, list|
       list.each do |master|
-        self.exports << master.config if params[:screen].blank? or master.screen.to_s == params[:screen].to_s
+        next unless params[:screen].blank? or master.screen.to_s == params[:screen].to_s
+        next unless master.accept?(user, params)
+        next unless master.valid_company?(user, params)
+
+        self.exports << master.config
       end
     end
   end
