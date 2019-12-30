@@ -20,6 +20,7 @@
 #  company_id              :bigint           not null
 #  request_params          :text(4294967295)
 #  deleted_at              :datetime
+#  master                  :string(255)
 #
 
 require 'rails_helper'

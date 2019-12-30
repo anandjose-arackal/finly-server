@@ -12,7 +12,7 @@ class ExportJobsController < BaseControllers::WebBase
 
   def create
     @result = ExportManager::RequestHandler.(current_user, params)
-    respond_success_failure
+    respond
   end
 
 end

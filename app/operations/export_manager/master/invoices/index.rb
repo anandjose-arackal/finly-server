@@ -1,6 +1,6 @@
 class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsheet
 
-  label 'Export Invoices (XLS)'
+  label 'Export Invoices'
   configurable true
   handle :invoices
   screen 'invoices.index'

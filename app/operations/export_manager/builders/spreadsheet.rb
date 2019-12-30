@@ -4,7 +4,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
   type :spreadsheet
 
   def self.config
-    sections = self.sections.reject {|s| s.attributes.blank?}.as_json
+    sections = self.sections.reject { |s| s.attributes.blank? }.as_json
     config = super()
     config[:fields] = sections if config.present?
     config
@@ -71,17 +71,29 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
       contents << row.build
     end
     exporter = Exporter::Spreadsheet.new(self.user, {headers: headers, contents: contents})
-    file_name = ['export', '.xls']
     file = Paperclip::Tempfile.new(file_name)
     open(file.path, 'wb') do |f|
-      # case format
-      # when :csv
-      #   f.write exporter.generate_csv
-      # when :xls
-      f.write exporter.generate_xls
-      # end
+      case format
+      when :csv
+        f.write exporter.generate_csv
+      when :xls
+        f.write exporter.generate_xls
+      end
     end
     file
+  end
+
+  def file_name
+    case format
+    when :csv
+      ['export', '.csv']
+    when :xls
+      ['export', '.xls']
+    end
+  end
+
+  def format
+    params[:export_format]&.to_sym || :xls
   end
 
   def rows
