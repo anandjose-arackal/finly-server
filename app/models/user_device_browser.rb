@@ -27,7 +27,7 @@
 #  silver_light_enabled   :boolean
 #  silver_light_version   :string(255)
 #  is_mime_types          :boolean
-#  mime_types_list        :text(65535)
+#  mime_types_list        :string(255)
 #  fonts_list             :text(65535)
 #  is_local_storage       :boolean
 #  is_session_storage     :boolean
@@ -37,7 +37,6 @@
 #  updated_at             :datetime         not null
 #  is_mobile              :boolean
 #  status_id              :integer          not null
-#  message                :text(65535)
 #
 
 class UserDeviceBrowser < ApplicationRecord
