@@ -46,6 +46,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
 
     index = 1
     data.each do |record|
+      update record: record
       row = Row.new(record: record, header: header)
       self.class.attributes.each do |attribute|
         next unless add_field?(attribute)
@@ -53,7 +54,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
         if attribute.dynamic
           self.send attribute.name, row, record
         else
-          value = self.send attribute.name, record rescue nil
+          value = self.send attribute.name, record
           row.add attribute.column_name, value
         end
       end

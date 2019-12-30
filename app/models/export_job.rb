@@ -28,6 +28,7 @@ class ExportJob < ApplicationRecord
 
   belongs_to :status, class_name: 'ExportJobStatus'
   belongs_to :created_by, optional: true, class_name: 'User'
+  belongs_to :record, polymorphic: true, optional: true
 
   has_attached_file :attachment, :use_timestamp => false
   do_not_validate_attachment_file_type :attachment

@@ -16,6 +16,7 @@ module ExportManager::DSL::Job
             company_id: user.company_id,
             request_params: params,
             master: self.class.name,
+            document: self.class.document,
             status_id: ExportJobStatus.id_for(:pending)
         }
     )

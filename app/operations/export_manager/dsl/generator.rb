@@ -36,13 +36,19 @@ module ExportManager::DSL::Generator
     if sync?
       build
     else
-      Background.call(user, {export_job_id: self.export_job.id})
+      Background.call_async(user, {export_job_id: self.export_job.id})
     end
   end
 
   def build
     update status_id: ExportJobStatus.id_for(:in_progress)
-    generate
+    begin
+      generate
+    rescue Exception => e
+      stack_trace = "#{e.message}\n#{e.backtrace.join("\n")}"
+      update crash_stacktrace: stack_trace, status_id: ExportJobStatus.id_for(:failed), message: "Exception: #{e.message}"
+      raise e
+    end
   end
 
   def generate

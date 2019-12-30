@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_29_122313) do
+ActiveRecord::Schema.define(version: 2019_12_30_105815) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3178,6 +3178,13 @@ ActiveRecord::Schema.define(version: 2019_12_29_122313) do
     t.bigint "company_id", null: false
     t.text "request_params", limit: 4294967295
     t.datetime "deleted_at"
+    t.string "master"
+    t.string "document"
+    t.string "processing_record_type"
+    t.bigint "processing_record_id"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.text "crash_details"
     t.index ["company_id"], name: "index_export_jobs_on_company_id"
     t.index ["completed_at"], name: "index_export_jobs_on_completed_at"
     t.index ["completed_records"], name: "index_export_jobs_on_completed_records"
@@ -3186,6 +3193,7 @@ ActiveRecord::Schema.define(version: 2019_12_29_122313) do
     t.index ["created_by_id"], name: "index_export_jobs_on_created_by_id"
     t.index ["export_type"], name: "index_export_jobs_on_export_type"
     t.index ["name"], name: "index_export_jobs_on_name"
+    t.index ["record_type", "record_id"], name: "index_export_jobs_on_record_type_and_record_id"
     t.index ["total_records"], name: "index_export_jobs_on_total_records"
     t.index ["updated_at"], name: "index_export_jobs_on_updated_at"
   end
