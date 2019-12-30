@@ -5,6 +5,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   configurable true
   handle :invoices
   screen 'invoices.index'
+  system :vp
   # scope "development", 156, 'Bundl Technologies Pvt Ltd'
   validate :fetch_invoices
 

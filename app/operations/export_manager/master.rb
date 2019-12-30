@@ -2,4 +2,20 @@ class ExportManager::Master
   include EventBus::Bus
 
   subscribers_path "#{Rails.root}/app/operations/export_manager/master"
+
+  def self.fetch(user, params, scope: nil)
+    handlers = []
+    subscribers.each do |_, list|
+      list.each do |master|
+        next unless params[:screen].blank? or master.screen.to_s == params[:screen].to_s
+        next unless params[:handle].blank? or master.handle_name.to_s == params[:handle].to_s
+        next unless params[:system].blank? or master.system.to_s == params[:system].to_s
+        next unless master.accept?(user, params)
+        next unless master.valid_company?(user, params)
+
+        handlers << master.config
+      end
+    end
+    handlers
+  end
 end

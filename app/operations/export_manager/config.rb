@@ -6,17 +6,7 @@ class ExportManager::Config < BaseOperation
   end
 
   def init
-    self.exports = []
-    subscribers = ExportManager::Master.subscribers
-    subscribers.each do |_, list|
-      list.each do |master|
-        next unless params[:screen].blank? or master.screen.to_s == params[:screen].to_s
-        next unless master.accept?(user, params)
-        next unless master.valid_company?(user, params)
-
-        self.exports << master.config
-      end
-    end
+    self.exports = ExportManager::Master.fetch(user, params)
   end
 
   def success
