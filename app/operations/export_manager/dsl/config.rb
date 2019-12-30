@@ -10,20 +10,14 @@ module ExportManager::DSL::Config
   end
 
   class_methods do
-    def properties
-      props = {
+    def config
+      {
           label: label,
           type: type,
           handle: handle_name,
           screen: screen,
           configurable: configurable,
       }
-      props[:config] = config if configurable
-      props
-    end
-
-    def config
-      nil
     end
 
     def handle(event)

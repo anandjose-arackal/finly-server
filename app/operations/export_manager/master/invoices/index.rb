@@ -3,7 +3,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   label 'Export Invoices (XLS)'
   configurable true
   handle :invoices
-  screen :invoices_index
+  screen 'invoices.index'
   validate :input
 
   section :header do
