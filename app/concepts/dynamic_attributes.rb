@@ -7,11 +7,12 @@ module DynamicAttributes
   module ClassMethods
     # Same as class_attribute of ruby.
     # Over class_attribute this allows setting values by calling attribute(value) instead of attribute = value
-    def class_attr(name, default: nil)
+    def class_attr(name, default: NoObject)
       attribute = "attribute_#{name}"
-      class_attribute attribute, default: default
+      class_attribute attribute#, default: default
       define_singleton_method name do |value = NoObject|
         send("#{attribute}=", value) unless value == NoObject
+        send("#{attribute}=", default) unless send(attribute).present? or default == NoObject
         send(attribute)
       end
       send(attribute)

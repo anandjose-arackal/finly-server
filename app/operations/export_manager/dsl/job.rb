@@ -7,9 +7,10 @@ module ExportManager::DSL::Job
   end
 
   def create_job
+    name = build_name || "Export"
     self.export_job = user.export_jobs.create(
         {
-            name: build_name,
+            name: name,
             export_type: nil,
             total_records: 0,
             completed_records: 0,
