@@ -4,10 +4,6 @@ module DynamicAttributes
     base.extend ClassMethods
   end
 
-  def self.set_default_value(klass, attribute, default)
-
-  end
-
   module ClassMethods
     # Same as class_attribute of ruby.
     # Over class_attribute this allows setting values by calling attribute(value) instead of attribute = value
