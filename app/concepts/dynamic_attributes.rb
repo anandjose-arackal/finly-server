@@ -4,15 +4,25 @@ module DynamicAttributes
     base.extend ClassMethods
   end
 
+  def self.set_default_value(klass, attribute, default)
+
+  end
+
   module ClassMethods
     # Same as class_attribute of ruby.
     # Over class_attribute this allows setting values by calling attribute(value) instead of attribute = value
-    def class_attr(name, default: NoObject)
+    def class_attr(name, default: nil)
       attribute = "attribute_#{name}"
-      class_attribute attribute#, default: default
+      class_attribute attribute #, default: default
       define_singleton_method name do |value = NoObject|
         send("#{attribute}=", value) unless value == NoObject
-        send("#{attribute}=", default) unless send(attribute).present? or default == NoObject
+        unless default.nil? or send(attribute).present?
+          if default.is_a?(Array) or default.is_a?(Hash)
+            send("#{attribute}=", default.dup)
+          else
+            send("#{attribute}=", default)
+          end
+        end
         send(attribute)
       end
       send(attribute)

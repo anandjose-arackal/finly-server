@@ -2,12 +2,12 @@ module ExportManager::DSL::Validator
   extend ActiveSupport::Concern
 
   included do
-    class_attr :validations#, default: []
+    class_attr :validations, default: []
   end
 
   class_methods do
     def validate(validation)
-      validations([]) if validations.nil?
+      # validations([]) if validations.nil?
       validations << validation
     end
 
