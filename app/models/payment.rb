@@ -1032,7 +1032,9 @@ class Payment < ApplicationRecord
       tax_rates: self.parent.company.tax_rates,
       gst_type_id: { value: self.parent.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
-      balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
+      balance_due:{ value: self.parent.balance_due&.value, editable: false }, # Invoice AMOUNT
+      available_credits: { value: self.parent.available_credits, editable: false },
+      credit_note_adjustments: { value: self.parent.credit_note_adjustments.as_json, editable: false }
     }
   end
 
