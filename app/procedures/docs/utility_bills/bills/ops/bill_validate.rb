@@ -12,6 +12,8 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
 
   step :update_bill
 
+  step Transactions::Messages::SuccessMessage('Successful')
+
   def init(options, params:, **)
     params[:id] = params[:bill_id]
   end
