@@ -14,9 +14,8 @@ module ExportManager::DSL::Validator
     def valid_company?(user, params)
       scope = company_scope[Rails.env]
       return true unless scope.present?
-
-      return false if scope[:id].to_s != user.company_id.to_s or
-          scope[:name] != user.company.name
+      return false if scope[:id].to_s != user.company_id.to_s
+      return false if scope[:name] != user.company.name
       true
     end
   end
