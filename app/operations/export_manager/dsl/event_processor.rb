@@ -17,7 +17,7 @@ module ExportManager::DSL::EventProcessor
   end
 
   def pre_process!
-    pre_processors.each do |process|
+    self.class.pre_processors.each do |process|
       if process.is_a?(Symbol)
         self.send(process)
       else
@@ -27,7 +27,7 @@ module ExportManager::DSL::EventProcessor
   end
 
   def post_process!
-    post_processors.each do |process|
+    self.class.post_processors.each do |process|
       if process.is_a?(Symbol)
         self.send(process)
       else

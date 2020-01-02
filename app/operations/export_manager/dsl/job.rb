@@ -15,6 +15,7 @@ module ExportManager::DSL::Job
             total_records: 0,
             completed_records: 0,
             company_id: user.company_id,
+            note: params[:note],
             request_params: params,
             master: self.class.name,
             document: self.class.document,

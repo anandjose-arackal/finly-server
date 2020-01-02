@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_30_105815) do
+ActiveRecord::Schema.define(version: 2020_01_02_102449) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3184,7 +3184,9 @@ ActiveRecord::Schema.define(version: 2019_12_30_105815) do
     t.bigint "processing_record_id"
     t.string "record_type"
     t.bigint "record_id"
-    t.text "crash_details"
+    t.text "crash_stacktrace"
+    t.text "message"
+    t.text "note"
     t.index ["company_id"], name: "index_export_jobs_on_company_id"
     t.index ["completed_at"], name: "index_export_jobs_on_completed_at"
     t.index ["completed_records"], name: "index_export_jobs_on_completed_records"
