@@ -75,7 +75,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :custom_fields, dynamic: true
   end
 
-  # post_process -> (user, params) do
+  # post_process -> do
   #   debugger
   # end
 

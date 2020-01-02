@@ -31,7 +31,7 @@ module ExportManager::DSL::EventProcessor
       if process.is_a?(Symbol)
         self.send(process)
       else
-        process.call(user, params)
+        instance_eval &process
       end
     end
   end
