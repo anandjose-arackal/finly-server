@@ -82,10 +82,10 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
         header.add attr.column_name
       end
 
-      return unless master.input.present?
+      return unless master.input.count > 0
 
       index = 1
-      master.input.each do |record|
+      master.input.find_each do |record|
         row = Row.new(record: record, header: header)
         master.class.attributes.each do |attribute|
           if attribute.dynamic
