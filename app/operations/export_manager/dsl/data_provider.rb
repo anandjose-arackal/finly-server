@@ -11,6 +11,7 @@ module ExportManager::DSL::DataProvider
       update total_records: 1
     end
     @loaded = true
+    @data
   end
 
   def input

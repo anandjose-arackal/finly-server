@@ -3,8 +3,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::
 
 
   handle :purchase_request
-
-
+  screen 'purchase_requests.index'
   validate :input
 
   attribute :request_id
