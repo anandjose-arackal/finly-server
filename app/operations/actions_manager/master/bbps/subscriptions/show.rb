@@ -60,7 +60,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def add_bill
     BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(bbps_subscription.status_id) &&
-        ["OPTIONAL", "NOT_SUPPORTED", nil].include?(bbps_subscription.fetch_requirement)
+        ["OPTIONAL", "NOT_SUPPORTED", nil].include?(bbps_subscription.fetch_requirement) && (bbps_subscription.subscription.pocs.include?(user) || bbps_subscription.user_id == user.id || user.vendor_payment_admin?)
   end
 
   def fetch_bill

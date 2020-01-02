@@ -10,6 +10,8 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
 
   step :bill_validate
 
+  step :update_bill
+
   def init(options, params:, **)
     params[:id] = params[:bill_id]
   end
@@ -58,11 +60,13 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
         p "SUCCESS"
         Rails.logger.fatal "RESULT", result
         options['result']['data'] = result
+        return true
       end
 
       op.error do |result|
         p "ERROR"
         options['result']['data'] = result
+        return
       end
 
       op.failure do |result|
@@ -81,6 +85,13 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
       # model.update(validation_order_number: )
     end
     true
+  end
+
+  def update_bill(options, model:, result:, **)
+    order_number = result['data'].order_number
+
+    model.update(order_number: order_number, order_number_type: "BillValidate", bill_validation_required: false)
+
   end
 
   private
