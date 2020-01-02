@@ -68,12 +68,12 @@ class ExportJob < ApplicationRecord
         id: id,
         name: name,
         export_type: export_type,
-        completed_at: completed_at&.strftime("%I:%m%p, %d-%m-%Y"),
+        completed_at: completed_at&.strftime("%I:%M%p, %d-%m-%Y"),
         total_records: (total_records || 0),
         completed_records: (completed_records || 0),
         completion_percentage: (completion_percentage || 0),
         attachment: attachment&.url,
-        created_at: created_at&.strftime("%I:%m%p, %d-%m-%Y"),
+        created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
         status: status&.name,
     }
   end
