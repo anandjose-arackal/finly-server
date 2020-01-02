@@ -63,7 +63,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           id: payment_request.id,
           name: payment_request.name,
           payment_request: payment_request,
-          allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil) ,
+          allowed: is_transfer_within_timeframe(payment_request) ,
           next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
           total_amount: payment_request.payment_order.amount_requested&.value,
           created_at: payment_request.created_at.strftime("%d-%m-%Y"),
@@ -192,6 +192,16 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    end
+  end
+
+  def is_transfer_within_timeframe(payment_request)
+    # Timeframes are defines only for NEFT, IMPS, RTGS
+    if TransferMode.common_modes.include?(payment_request.payment_order&.transfer_mode&.mode_id)
+      TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil)
+    else
+      # Custom transfer mode does not depend on transfer timings 
+      true
     end
   end
 
