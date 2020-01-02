@@ -58,7 +58,7 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
     Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true}) do |op|
       op.success do |result|
         p "SUCCESS"
-        Rails.logger.fatal "RESULT", result
+        Rails.logger.fatal "RESULT \n #{result.inspect}"
         options['result']['data'] = result
         return true
       end
