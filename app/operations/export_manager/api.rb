@@ -7,6 +7,7 @@ class ExportManager::API
   include ExportManager::DSL::DataProvider
   include ExportManager::DSL::Job
   include ExportManager::DSL::Validator
+  include ExportManager::DSL::EventProcessor
 
   attr_accessor :user, :params
 

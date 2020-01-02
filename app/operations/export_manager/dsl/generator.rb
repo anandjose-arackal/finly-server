@@ -43,7 +43,9 @@ module ExportManager::DSL::Generator
   def build
     update status_id: ExportJobStatus.id_for(:in_progress)
     begin
+      pre_process!
       generate
+      post_process!
     rescue Exception => e
       stack_trace = "#{e.message}\n#{e.backtrace.join("\n")}"
       update crash_stacktrace: stack_trace, status_id: ExportJobStatus.id_for(:failed), message: "Exception: #{e.message}"

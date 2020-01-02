@@ -75,6 +75,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :custom_fields, dynamic: true
   end
 
+  # post_process -> (user, params) do
+  #   debugger
+  # end
+
   def custom_fields(row, invoice_line_item)
     invoice_line_item.parent.custom_fields.includes(:field_configuration).each do |custom_field|
       row.add(custom_field.field_configuration.field_name, custom_field.string_value)
