@@ -42,10 +42,10 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
       header.add attr.column_name
     end
 
-    return unless data.present?
+    return unless export_job.total_records <= 0
 
     index = 1
-    data.each do |record|
+    data.find_each do |record|
       update record: record
       row = Row.new(record: record, header: header)
       self.class.attributes.each do |attribute|

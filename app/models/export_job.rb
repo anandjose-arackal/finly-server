@@ -28,6 +28,7 @@
 #  record_id               :bigint
 #  crash_stacktrace        :text(65535)
 #  message                 :text(65535)
+#  note                    :text(65535)
 #
 
 class ExportJob < ApplicationRecord
