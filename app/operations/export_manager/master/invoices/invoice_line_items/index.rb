@@ -1,31 +1,31 @@
 class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
-
   subscribe :non_po_items
+  generator ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Asynchronous
+  validate :input
 
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
-  validate :data_provider
-  fields [
-    procurement_name: {spreadsheet: true, pdf: true},
-    invoice_id: {spreadsheet: true, pdf: true},
-    invoice_number: {spreadsheet: true, pdf: true},
-    invoice_date: {spreadsheet: true, pdf: true},
-    created_by: {spreadsheet: true, pdf: true},
-    description: {spreadsheet: true, pdf: true},
-    comment: {spreadsheet: true, pdf: true},
-    category: {spreadsheet: true, pdf: true},
-    policy: {spreadsheet: true, pdf: true},
-    hsn_sac: {spreadsheet: true, pdf: true},
-    quantity: {spreadsheet: true, pdf: true},
-    rate: {spreadsheet: true, pdf: true},
-    discount: {spreadsheet: true, pdf: true},
-    discount_amount: {spreadsheet: true, pdf: true},
-    tax: {spreadsheet: true, pdf: true},
-    tax_amount: {spreadsheet: true, pdf: true},
-    total_amount: {spreadsheet: true, pdf: true}                
-  ]
+  attribute :procurement_name
+  attribute :invoice_id
+  attribute :invoice_number
+  attribute :invoice_date
+  attribute :created_by
+  attribute :description
+  attribute :comment
+  attribute :category
+  attribute :policy
+  attribute :hsn_sac
+  attribute :quantity
+  attribute :rate
+  attribute :discount
+  attribute :discount_amount
+  attribute :tax
+  attribute :tax_amount
+  attribute :total_amount
+
+  def name
+    'Invoices'
+  end
 
   def input
     procurements_op = ::Procurements::Index.(user, params)
@@ -50,7 +50,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
   def invoice_id(item)
     invoice(item)&.invoice_id
-  end 
+  end
 
   def invoice_number(item)
     invoice(item)&.invoice_number
@@ -58,7 +58,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
   def invoice_date(item)
     invoice(item)&.date&.strftime("%d-%b-%Y")
-  end 
+  end
 
   def created_by(item)
     invoice(item)&.created_by&.name
@@ -116,6 +116,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   end
 
   protected
+
   def invoice(item)
     item&.parent
   end

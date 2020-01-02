@@ -82,41 +82,26 @@
 #  cost_allocation_items           :boolean          default(FALSE)
 #  narration                       :text(65535)
 #  po_number                       :string(255)
-#  payment_agreement_id            :integer
 #  bank_account_id                 :integer
+#  rejection_note                  :text(65535)
+#  payment_agreement_id            :integer
 #  vendor_location_id              :integer
 #  billing_type_id                 :integer
-#  rejection_note                  :text(65535)
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
 #  vendor_poc_id                   :integer
 #  vlpm_id                         :integer
 #  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
   include Sequenced::ActsAsSequenced
-  include EventProducer
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
-
-  enum cost_allocation_type: {header: 1, line_items: 2}
-
-  # form Documents::Invoices::Form
-  # policy Documents::Invoices::Policy
-  # state_machine Documents::Invoices::StateMachine
-  # resolver :admin, Documents::Invoices::Policy::Scope
-  # resolver Documents::Invoices::Policy::Scope
-  # produces_event!
-  event_channel 'invoice'
-  # record_events 'submit', 'approve', 'show'
-  # collection_events 'index'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -226,12 +211,7 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  validates :invoice_number,
-            :format => {
-                with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/,
-                :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'
-            },
-            :length => {minimum: 0, maximum: 30}, :allow_blank => true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
 
   before_destroy :rollback_agreement_invoice
 
@@ -316,7 +296,7 @@ class Invoice < ApplicationRecord
     end
   }
 
-  scope :filter_reviewer_awaiting_approval, -> (user_id = nil) {
+  scope :filter_reviewer_awaiting_approval, -> (user_id = nil){
     if user_id.present?
       self.awaiting_action_items(user_id)
     end
@@ -335,19 +315,19 @@ class Invoice < ApplicationRecord
   }
 
   scope :invoice_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('date >= ? && date <= ?', from, to)
   }
 
   scope :filter_creation_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
   }
 
   scope :filter_approved_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('invoices.approved_at >= ? && invoices.approved_at <= ?', from.beginning_of_day, to.end_of_day)
   }
@@ -360,7 +340,7 @@ class Invoice < ApplicationRecord
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
   }
@@ -493,21 +473,21 @@ class Invoice < ApplicationRecord
   }
 
   # Sorting
-  scope :sort_invoice_id, -> (type) {
+  scope :sort_invoice_id, -> (type){
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.invoice_id #{type}")
     end
   }
 
-  scope :sort_date, -> (type) {
+  scope :sort_date, -> (type){
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.date #{type}")
     end
   }
 
-  scope :sort_due_date, -> (type) {
+  scope :sort_due_date, -> (type){
     type = type&.strip&.upcase
     if type && ['ASC', 'DESC'].include?(type)
       reorder("invoices.due_date #{type}")
@@ -686,7 +666,7 @@ class Invoice < ApplicationRecord
   #   self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
   # end
 
-  def as_json(options = {})
+  def as_json(options={})
     if options[:payment_history]
       return payment_history_json
     else
@@ -735,15 +715,15 @@ class Invoice < ApplicationRecord
         category_id: self.category_id,
         category_name: self.category&.name,
 
-          cost_center_id: self.cost_center_id,
-          cost_center_name: self.cost_center&.name,
+        cost_center_id: self.cost_center_id,
+        cost_center_name: self.cost_center&.name,
 
-          tds_slab_id: self.tds_slab_id,
-          tds_slab_name: self.tds_slab&.name,
-          tds_rate: self.tds,
+        tds_slab_id: self.tds_slab_id,
+        tds_slab_name: self.tds_slab&.name,
+        tds_rate: self.tds,
 
-          # invoice amounts total
-          item_amounts_total: self.item_amounts_total,
+        # invoice amounts total
+        item_amounts_total: self.item_amounts_total,
 
         # paid amount for this invoice
         # paid_amount: self.payments.successful.joins(:amount).sum(:value),
@@ -774,9 +754,9 @@ class Invoice < ApplicationRecord
 
   def include_original_amount
     if self.invoice_items.present?
-      precision_value(self.amount&.value)
+        precision_value(self.amount&.value)
     else
-      precision_value(self.original_amount&.value)
+        precision_value(self.original_amount&.value)
     end
   end
 
@@ -827,7 +807,6 @@ class Invoice < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
   end
-
   ############ End ############
 
   # def can_take_control?
@@ -868,7 +847,7 @@ class Invoice < ApplicationRecord
     # end
   end
 
-  def can_take_control?(user = nil)
+  def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
@@ -910,7 +889,7 @@ class Invoice < ApplicationRecord
     end
   end
 
-  def self.role_based_initiator_associated_items(user, role_id, options = {})
+  def self.role_based_initiator_associated_items(user, role_id, options={})
     if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
@@ -971,7 +950,7 @@ class Invoice < ApplicationRecord
   #   else
   #     self.create_original_amount(value: raw_val.sum, currency_id: 1)
   #   end
-
+    
   #   if self.taxable_amount.present?
   #     self.taxable_amount.update(value: taxable_val.sum)
   #   else
@@ -1031,7 +1010,7 @@ class Invoice < ApplicationRecord
     self.created_by_user_id = user.id
   end
 
-  def update_company(user = nil)
+  def update_company(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     if user.present?
       if self.company_id.blank?

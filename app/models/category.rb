@@ -11,8 +11,6 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  purpose_id                 :integer
-#  parent_id                  :integer
-#  code                       :string(255)
 #  expense_management         :boolean
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
@@ -40,7 +38,7 @@ class Category < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   validates :company_id, presence: true
-  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry]}
+  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry, :active]}
   # validate :at_least_one_application
 
   default_scope { order(name: :asc) }
