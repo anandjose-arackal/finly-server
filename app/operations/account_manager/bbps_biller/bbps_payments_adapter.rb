@@ -40,26 +40,53 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         }
     }
 
-    op = Bbps::BillPay.(params: params, current_user: payment.initiating_user)
-
-    # now if the above was successful or failed, we shall be updating the status accordingly
-    if op.success?
-      # i.e. this is a success which will mark the payment as succeeded
-      if op.status == "Y"
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: op.bbps_ref_id)
+    Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
+      op.success do |result|
+        Rails.logger.fatal "Success:Result", result
+        # here we are assuming that the bill gets paid through the BillPay API
+        # have to add a check for cases when it's a timeout or any other status other than
+        # a 200 OK response
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: result.bbps_ref_id)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-      elsif payment.response_code != 200
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
-        payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
       end
-    else
-      bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      op.errors.each do |error|
-        payment.system_messages.build(content: error,
-                                      system_message_type_id: SystemMessageType.id_for(:error)).save
+      op.error do |result|
+        Rails.logger.fatal "Failure:Result", result
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        result.errors.each do |error|
+          payment.system_messages.build(content: error,
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
+      end
+      op.failure do |result|
+        Rails.logger.fatal "Failure:Result", result
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        result.errors.each do |error|
+          payment.system_messages.build(content: error,
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
       end
     end
+
+    # # now if the above was successful or failed, we shall be updating the status accordingly
+    # if op.success?
+    #   # i.e. this is a success which will mark the payment as succeeded
+    #   if op.status == "Y"
+    #     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: op.bbps_ref_id)
+    #     payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    #   elsif payment.response_code != 200
+    #     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+    #     payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
+    #   end
+    # else
+    #   bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+    #   payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #   op.errors.each do |error|
+    #     payment.system_messages.build(content: error,
+    #                                   system_message_type_id: SystemMessageType.id_for(:error)).save
+    #   end
+    # end
     true
   end
 
