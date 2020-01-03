@@ -31,6 +31,7 @@ module Transactions::BackgroundWorker
 
         return result.args.first
       end
+      {success: false, timeout: true} # todo Add timeout messages
     end
 
     def respond_to_handle(result, response_handle)

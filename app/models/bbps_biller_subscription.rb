@@ -149,7 +149,7 @@ class BbpsBillerSubscription < ApplicationRecord
   end
 
   def auto_fetchable
-    true if ["MANDATORY", "OPTIONAL"].include? self.biller.fetch_requirement
+    return true if ["MANDATORY", "OPTIONAL"].include? self.biller.fetch_requirement
     false
   end
 

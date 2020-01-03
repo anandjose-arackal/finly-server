@@ -4,7 +4,8 @@ class Docs::UtilityBills::Bills::Configs::Filters < Transactions::API
 
   def init(options, params:, current_user:, **)
     result = {}
-    result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid", "Gas"]
+    # result['types'] = ["DTH", "Cable", "Electricity", "Mobile Postpaid", "Water", "Landline Postpaid", "Broadband Prepaid", "Telephone", "Broadband Postpaid", "Mobile Prepaid", "Gas"]
+    result['types'] = BbpsBiller.all.pluck(:biller_category_name).uniq.compact
     result['departments'] = Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves
     result['locations'] = Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves
     result['cost_centers'] = current_user.company.cost_centers

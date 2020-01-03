@@ -4,7 +4,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   register_handle :bbps_subscriptions_show
   register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
-                    :deactivate, :reactivate, :add_bill, :raise_dispute, :destroy]
+                    :deactivate, :reactivate, :add_bill, :raise_dispute, :destroy, :fetch_bill]
 
   def initialize(user = nil, params = {})
     super
@@ -60,7 +60,11 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
 
   def add_bill
     BbpsBillerSubscription.status_ids(:approved, :auto_approved, :reactivated).include?(bbps_subscription.status_id) &&
-        ["OPTIONAL", "NOT_SUPPORTED", nil].include?(bbps_subscription.fetch_requirement)
+        ["OPTIONAL", "NOT_SUPPORTED", nil].include?(bbps_subscription.fetch_requirement) && (bbps_subscription.subscription.pocs.include?(user) || bbps_subscription.user_id == user.id || user.vendor_payment_admin?)
+  end
+
+  def fetch_bill
+    true if ["MANDATORY", "OPTIONAL"].include? bbps_subscription.biller.fetch_requirement
   end
 
   def raise_dispute
