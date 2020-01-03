@@ -21,7 +21,7 @@
 #  request_params          :text(4294967295)
 #  deleted_at              :datetime
 #  master                  :string(255)
-#  document                :string(255)
+#  description             :string(255)
 #  processing_record_type  :string(255)
 #  processing_record_id    :bigint
 #  record_type             :string(255)
