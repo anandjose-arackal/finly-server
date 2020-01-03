@@ -26,8 +26,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params = {
         amount: bank_transaction.amount_value,
-        customer_name: bill.subscription.customer_name,
-        mobile_number: bill.subscription.mobile_number,
+        customer_name: bank_transaction.customer_name,
+        mobile_number: bank_transaction.customer_mobile,
         bill_date: bank_transaction.bill_date,
         due_date: bank_transaction.due_date,
         bill_number: bank_transaction.bill_number,
@@ -46,7 +46,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     if op.success?
       # i.e. this is a success which will mark the payment as succeeded
       if op.status == "Y"
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: op.bbps_ref_id)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       elsif payment.response_code != 200
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
@@ -83,6 +83,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     if payment.reference_resource.present?
       return payment.reference_resource
     end
+    bill = payment.parent
     bank_transaction = payment.company.bbps_yes_bank_transactions.build(
         order_number: retrieve_order_number(payment),
         biller_id: payment.parent.subscription_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
@@ -91,6 +92,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: payment.parent.bill_period,
         due_date: payment.parent.due_date,
         bill_number: payment.parent.bill_number,
+        customer_name: bill.subscription.customer_name,
+        customer_email: bill.subscription.customer_email,
+        customer_mobile: bill.subscription.mobile_number,
         amount_attributes: {
             value: payment.amount_value,
             currency_id: Currency.first.id
@@ -109,9 +113,11 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     return bank_transaction
   end
 
+  # this particular method returns the order number if it's already generated,
+  # or generates one on the fly if not present
   def retrieve_order_number(payment)
     bill = payment.parent
-    order_number = bill.validation_order_number || generate_order_number
+    order_number = bill.order_number || generate_order_number
     order_number
   end
 

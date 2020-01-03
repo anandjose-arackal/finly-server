@@ -900,7 +900,8 @@ ActiveRecord::Schema.define(version: 2020_01_02_134133) do
     t.boolean "convenience_fee_selected", default: false
     t.integer "bbps_biller_id"
     t.boolean "bill_validation_required"
-    t.string "validation_order_number"
+    t.string "order_number"
+    t.string "order_number_type"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -2071,6 +2072,7 @@ ActiveRecord::Schema.define(version: 2020_01_02_134133) do
     t.boolean "show_custom_fields_in_pdf", default: true
     t.boolean "show_po_approved_trail", default: false
     t.datetime "deleted_at"
+    t.boolean "email_purchase_order_initiator"
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
     t.index ["default_card_expense_category_id"], name: "index_company_configurations_on_default_card_expense_category_id"
@@ -3350,6 +3352,44 @@ ActiveRecord::Schema.define(version: 2020_01_02_134133) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+  end
+
+  create_table "export_job_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_export_job_statuses_on_created_at"
+    t.index ["name"], name: "index_export_job_statuses_on_name"
+    t.index ["updated_at"], name: "index_export_job_statuses_on_updated_at"
+  end
+
+  create_table "export_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "export_type"
+    t.integer "created_by_id"
+    t.bigint "company_id", null: false
+    t.text "request_params", limit: 4294967295
+    t.datetime "completed_at"
+    t.integer "total_records"
+    t.integer "completed_records"
+    t.integer "completion_percentage"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id", null: false
+    t.index ["company_id"], name: "index_export_jobs_on_company_id"
+    t.index ["completed_at"], name: "index_export_jobs_on_completed_at"
+    t.index ["completed_records"], name: "index_export_jobs_on_completed_records"
+    t.index ["completion_percentage"], name: "index_export_jobs_on_completion_percentage"
+    t.index ["created_at"], name: "index_export_jobs_on_created_at"
+    t.index ["created_by_id"], name: "index_export_jobs_on_created_by_id"
+    t.index ["export_type"], name: "index_export_jobs_on_export_type"
+    t.index ["name"], name: "index_export_jobs_on_name"
+    t.index ["total_records"], name: "index_export_jobs_on_total_records"
+    t.index ["updated_at"], name: "index_export_jobs_on_updated_at"
   end
 
   create_table "export_preferences", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
