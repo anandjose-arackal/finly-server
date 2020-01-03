@@ -91,9 +91,7 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
 
   def update_bill(options, model:, result:, **)
     order_number = result['data'].order_number
-
     model.update(order_number: order_number, order_number_type: "BillValidate", bill_validation_required: false)
-
   end
 
   private
