@@ -16,6 +16,7 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  delegated_action_user_id :integer
+#  deleted_at               :datetime
 #
 
 

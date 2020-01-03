@@ -14,6 +14,7 @@
 #  email                        :string(255)
 #  payment_receivable_status_id :integer
 #  payment_id                   :integer
+#  deleted_at                   :datetime
 #
 
 class PaymentReceivable < ApplicationRecord
