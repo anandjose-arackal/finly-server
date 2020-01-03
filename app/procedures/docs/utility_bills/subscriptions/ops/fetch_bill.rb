@@ -12,6 +12,8 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   step :check_bill_presence
 
+  step :update_bill
+
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
   end
@@ -80,6 +82,25 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
     true
   end
+
+  def update_bill(options, result:, **)
+    return true if result['bill'].blank?
+
+    # Update Bill with Reference Number
+    bill_update_params = {
+        order_number: result['data'].ref_no,
+        order_number_type: 'BillFetch'
+    }
+
+    # Create Contract
+
+    # Validate Contract
+
+    # Persist Contract
+
+    result['bill'].update(order_number: result['data'].ref_no, order_number_type: "BillFetch")
+  end
+
   private
 
   def customer_params(subscription)

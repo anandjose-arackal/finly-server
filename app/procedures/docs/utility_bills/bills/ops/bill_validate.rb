@@ -10,6 +10,10 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
 
   step :bill_validate
 
+  step :update_bill
+
+  step Transactions::Messages::SuccessMessage('Successful')
+
   def init(options, params:, **)
     params[:id] = params[:bill_id]
   end
@@ -50,17 +54,21 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   end
 
   def bill_validate(options, model:, validation_params:, **)
+    options['result'] = {}
     # op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
     # op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
     Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true}) do |op|
       op.success do |result|
         p "SUCCESS"
+        Rails.logger.fatal "RESULT \n #{result.inspect}"
         options['result']['data'] = result
+        return true
       end
 
       op.error do |result|
         p "ERROR"
         options['result']['data'] = result
+        return
       end
 
       op.failure do |result|
@@ -79,6 +87,13 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
       # model.update(validation_order_number: )
     end
     true
+  end
+
+  def update_bill(options, model:, result:, **)
+    order_number = result['data'].order_number
+
+    model.update(order_number: order_number, order_number_type: "BillValidate", bill_validation_required: false)
+
   end
 
   private

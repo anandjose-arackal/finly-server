@@ -2,11 +2,12 @@ class Docs::UtilityBills::Bills::Contracts::Update < Docs::UtilityBills::Bills::
 
   property :id
   property :sequence_id
-  property :policy_id, presence: true
+  property :policy_id, validates: {presence: true}
+
 
   property :amount, populate_if_empty: Amount do
-    property :value, presence: true
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}
+    property :currency_id, validates: {presence: true}
   end
 
   private

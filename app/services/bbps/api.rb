@@ -183,7 +183,7 @@ class Bbps::Api < ServiceApi
 
   def amount_for(param)
     return "NA" if params[param].blank?
-    params[param]
+    params[param].to_f * 100
   end
 
   def self.format(obj)

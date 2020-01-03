@@ -23,7 +23,7 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || poc?
+    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc?
   end
 
   def reject?

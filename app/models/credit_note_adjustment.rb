@@ -23,7 +23,7 @@ class CreditNoteAdjustment < ApplicationRecord
   before_create :calculate_credit_note_amounts
 
   before_update :calculate_adjustable_amount
-  before_destroy :calculate_adjustable_amount
+  after_destroy :calculate_adjustable_amount
 
 
   def as_json
@@ -56,20 +56,21 @@ class CreditNoteAdjustment < ApplicationRecord
   end
 
   def calculate_adjustable_amount
-    if self.invoice_id.blank?
-      if credit_note.previously_adjusted_amount.present?
-        previously_adjusted_amount = credit_note.previously_adjusted_amount.value
-        credit_note.previously_adjusted_amount.update(value: previously_adjusted_amount - amount.value)
-      else
-        credit_note.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount - amount.value, currency_id: 1) # Todo Take care of currency id
-      end
-
-      if credit_note.net_adjustable_amount.present?
-        net_adjustable_amount = credit_note.net_adjustable_amount.value
-        credit_note.net_adjustable_amount.update(value: net_adjustable_amount + amount.value)
-      else
-        credit_note.net_adjustable_amount = Amount.new(value: net_adjustable_amount + amount.value, currency_id: 1)
-      end
+    # debugger
+    # if self.invoice_id.blank?
+    if credit_note.previously_adjusted_amount.present?
+      previously_adjusted_amount = credit_note.previously_adjusted_amount.value
+      credit_note.previously_adjusted_amount.update(value: previously_adjusted_amount - amount.value)
+    else
+      credit_note.previously_adjusted_amount = Amount.new(value: previously_adjusted_amount - amount.value, currency_id: 1) # Todo Take care of currency id
     end
+
+    if credit_note.net_adjustable_amount.present?
+      net_adjustable_amount = credit_note.net_adjustable_amount.value
+      credit_note.net_adjustable_amount.update(value: net_adjustable_amount + amount.value)
+    else
+      credit_note.net_adjustable_amount = Amount.new(value: net_adjustable_amount + amount.value, currency_id: 1)
+    end
+    # end
   end
 end

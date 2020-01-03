@@ -130,7 +130,15 @@ class Bbps::BillValidation < Bbps::Api
   end
 
   def self.handle_success(result)
-    true
+    OpenStruct.new(
+        {
+            # Add Order ID
+            order_number: result['response.parsed']['order_number'],
+            status: result['response.parsed']['status'],
+            error_code: result['response.parsed']['error_code'],
+            error_description: result['response.parsed']['error_desc']
+        }
+    )
   end
 
 end

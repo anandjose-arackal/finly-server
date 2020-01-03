@@ -12,12 +12,12 @@ class Bbps::BillPay < Bbps::Api
       # Todo fill from request
       # required(:initiating_channel).filled
 
-      # required(:amount).filled
-      # required(:bill_date).filled
-      # required(:due_date).filled
-      # required(:bill_number).filled
-      # required(:bill_period).filled
-      # required(:biller_id).filled
+      required(:amount).filled
+      required(:bill_date).filled
+      required(:due_date).filled
+      required(:bill_number).filled
+      required(:bill_period).filled
+      required(:biller_id).filled
 
       # Atleast one param is required
       required(:customer_param_1) do
@@ -138,7 +138,7 @@ class Bbps::BillPay < Bbps::Api
   # 12303091|Sept|NA|NA|Y|0
   response_fields(
       [
-          :message_code, :status, :error_code, :error_desc, :ref_no, :agent_institution_id, :channel_id,
+          :message_code, :status, :error_code, :error_desc, :order_number, :agent_institution_id, :channel_id,
           :bbps_ref_id, :agent_id, :customer_name, :customer_mobile, :customer_email, :customer_aadhar_no, :customer_pan_id,
           :channel_id, :biller_id, :amount, :bill_date, :due_date, :bill_number, :bill_period, :convenience_fee,
           :convenience_fee_desc, :late_payment_fee, :early_payment_fee,
@@ -155,9 +155,10 @@ class Bbps::BillPay < Bbps::Api
     params[:customer_name]
   end
 
-  # def order_number
-  #   'AbinashTest100002'
-  # end
+  def order_number
+    # needs to be generated from the adapter and sent here
+    params[:order_number]
+  end
 
   def on_us_off_us
     'Y'
@@ -167,9 +168,9 @@ class Bbps::BillPay < Bbps::Api
     0
   end
 
-  # def quick_pay
-  #   params[:quick_pay] || "N"
-  # end
+  def quick_pay
+    params[:quick_pay] || "N"
+  end
 
   def customer_mobile
     params[:mobile_number]

@@ -11,6 +11,9 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
     result['locations'] = Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves
     result['cost_centers'] = current_user.company.cost_centers
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator)]}).policies rescue Policy.none
+    result['categories'] = current_user.company.categories.inward_invoice_items_only
+    result['tax_rates'] = current_user.company.tax_rates
+
     result['reviewal_chains'] = []
 
     if model.present?

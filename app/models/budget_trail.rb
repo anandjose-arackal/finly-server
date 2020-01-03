@@ -15,7 +15,6 @@
 #  user_id              :integer
 #  department_id        :integer
 #  entity_date          :date
-#  entity_date          :date
 #  sub_department_id    :integer
 #  procurement_id       :integer
 #  entity_status_id     :integer

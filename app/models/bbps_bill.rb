@@ -41,7 +41,8 @@
 #  convenience_fee_selected   :boolean          default(FALSE)
 #  bbps_biller_id             :integer
 #  bill_validation_required   :boolean
-#  validation_order_number    :string(255)
+#  order_number               :string(255)
+#  order_number_type          :string(255)
 #
 
 class BbpsBill < ApplicationRecord
@@ -65,6 +66,9 @@ class BbpsBill < ApplicationRecord
   belongs_to :late_payment_fee, foreign_key: :late_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :early_payment_fee, foreign_key: :early_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :convenience_fee, foreign_key: :convenience_fee_id, class_name: 'Amount', optional: true
+
+  belongs_to :tax_rate, class_name: 'TaxRate', optional: true
+  belongs_to :category, class_name: 'Category', optional: true
 
   has_many :payments, as: :parent
 
@@ -170,6 +174,7 @@ class BbpsBill < ApplicationRecord
           cost_center: cost_center.as_json,
           location: location.as_json,
           policy: policy.as_json,
+          autofetched: autofetched,
           # note: note,
           created_at: created_at.strftime("%d-%b-%Y"),
           updated_at: updated_at.strftime("%d-%b-%Y"),
@@ -185,12 +190,16 @@ class BbpsBill < ApplicationRecord
     data = {
         id: id,
         biller: subscription.biller.as_json({index: true}),
+        autofetched: autofetched,
         # name: name,
         sequence_id: sequence_id,
         department: department.as_json,
         cost_center: cost_center.as_json,
         location: location.as_json,
         policy: policy.as_json,
+        category: category.as_json,
+        tax_rate: tax_rate.as_json,
+        hsn_sac: hsn_sac,
         # note: note,
         created_at: created_at.strftime("%d-%b-%Y"),
         updated_at: updated_at.strftime("%d-%b-%Y"),
