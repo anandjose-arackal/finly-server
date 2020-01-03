@@ -9,6 +9,7 @@
 #  post_operatable_type :string(255)      not null
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  deleted_at           :datetime
 #
 
 class PostOperationAction < ApplicationRecord

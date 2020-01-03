@@ -9,6 +9,7 @@
 #  options           :text(65535)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  deleted_at        :datetime
 #
 
 class AccountingSystemConfiguration < ApplicationRecord

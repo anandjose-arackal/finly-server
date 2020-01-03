@@ -7,7 +7,7 @@
 #  status               :string(255)
 #  error_code           :string(255)
 #  error_desc           :string(255)
-#  ref_no               :string(255)
+#  order_number         :string(255)
 #  agent_institution_id :string(255)
 #  channel_id           :string(255)
 #  bbps_ref_id          :string(255)

@@ -7,7 +7,6 @@
 #  event      :string(255)      not null
 #  link       :string(255)
 #  timestamp  :datetime
-#  timestamp  :datetime
 #  event_id   :string(255)
 #  payload    :text(4294967295)
 #  created_at :datetime         not null
@@ -15,6 +14,7 @@
 #  ip_addr    :string(255)
 #  user_agent :string(255)
 #  link_tags  :string(255)
+#  deleted_at :datetime
 #
 
 class EmailEvent < ApplicationRecord

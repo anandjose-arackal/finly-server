@@ -35,7 +35,7 @@ class AccountManager::Base < BackgroundOperation
       when 'UtilityBillsAccount'
         return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(account, payment)
       when 'BbpsBiller'
-        return AccountManager::BbpsBiller::BbpsAccountsAdapter.new(account, payment)
+        return AccountManager::BbpsBiller::BbpsPaymentsAdapter.new(account, payment)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

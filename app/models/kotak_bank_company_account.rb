@@ -8,6 +8,7 @@
 #  company_id :integer
 #  balance_id :integer
 #  enabled    :boolean          default(FALSE)
+#  deleted_at :datetime
 #
 
 class KotakBankCompanyAccount < ApplicationRecord

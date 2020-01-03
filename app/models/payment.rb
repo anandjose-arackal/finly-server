@@ -429,7 +429,7 @@ class Payment < ApplicationRecord
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :reference_resource, :receiving_user, receiving_account: [:account_owner], payment_order: [bank_payment_request: [:status]])
+    includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true
@@ -671,10 +671,6 @@ class Payment < ApplicationRecord
     if options[:payment_request_edit]
       return payment_request_show_json(self.parent_type)
     end
-  end
-
-  def mode
-    self.transfer_mode&.mode&.name
   end
 
   def payment_mode

@@ -7,7 +7,7 @@
 #  status               :string(255)
 #  error_code           :string(255)
 #  error_desc           :string(255)
-#  ref_no               :string(255)
+#  order_number         :string(255)
 #  agent_institution_id :string(255)
 #  channel_id           :string(255)
 #  bbps_ref_id          :string(255)
@@ -39,7 +39,7 @@
 class BbpsYesBankTransaction < ApplicationRecord
 
   has_one :payment, as: :reference_resource
-  belongs_to :transfer_status
+  belongs_to :transfer_status, class_name: "BankTransferStatus"
   belongs_to :amount
   belongs_to :biller, class_name: "BbpsBillerSubscription"
   belongs_to :company
@@ -50,6 +50,11 @@ class BbpsYesBankTransaction < ApplicationRecord
 
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
   delegate :amount_value, to: :amount
+
+  # stub method for reference number that is generated at bank's end
+  def bank_reference_number
+    self.bbps_ref_id
+  end
 
 end
 
