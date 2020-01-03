@@ -60,6 +60,9 @@ class BbpsBillerSubscription < ApplicationRecord
   belongs_to :status, class_name: 'BbpsBillerSubscriptionStatus', optional: true
   belongs_to :agreement, class_name: 'PaymentAgreement', optional: true
 
+  belongs_to :category, class_name: 'Category', optional: true
+  belongs_to :tax_rate, class_name: 'TaxRate', optional: true
+
   has_many :customer_fields, class_name: 'BbpsSubscriptionField', foreign_key: :subscription_id
   has_many :subscription_pocs, class_name: 'BbpsSubscriptionPoc', foreign_key: :subscription_id
 
@@ -127,6 +130,9 @@ class BbpsBillerSubscription < ApplicationRecord
         cost_center: cost_center.as_json,
         location: location.as_json,
         policy: policy.as_json,
+        category: category.as_json,
+        tax_rate: tax_rate.as_json,
+        hsn_sac: hsn_sac,
         active: active,
         auto_fetchable: auto_fetchable,
         note: note,
