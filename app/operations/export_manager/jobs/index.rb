@@ -21,9 +21,9 @@ class ExportManager::Jobs::Index < BaseOperation
     has_scope :filter_creation_date, using: [:from, :to], type: :hash
 
     def init
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
-      end
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
 
       self.export_jobs = params[:export_jobs].created_after(7.days.ago).includes(:status)
