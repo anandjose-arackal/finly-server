@@ -25,6 +25,8 @@
 #  transfer_status_id    :integer
 #  company_id            :integer
 #  request_id            :string(255)
+#  deleted_at            :datetime
+#  transfer_mode_id      :integer
 #
 
 require 'rails_helper'
