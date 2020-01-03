@@ -45,20 +45,8 @@ class Docs::P2P::CreditNotes::Authorizer
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
 
-  # def return_control?
-  #   @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
-  # end
-
-  def deactivate?
-    @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved?)
-  end
-
-  def reactivate?
-    @user.vendor_payment_admin? && (@model.deactivated?)
-  end
-
-  def add_bill?
-    (@model.pocs.include?(@user) || @user.vendor_payment_admin?) && (CreditNote.status_ids(:approved, :auto_approved, :reactivated).include?(@model.status_id))
+  def void?
+    CreditNoteStatus.ids_for(:approved, :auto_approved).include?(@model.status_id) && (@user.vendor_payment_admin? || @model.user_id == @user.id)
   end
 
   private
