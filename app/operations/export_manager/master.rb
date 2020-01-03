@@ -7,7 +7,10 @@ class ExportManager::Master
     handlers = []
     subscribers.each do |_, list|
       list.each do |master|
-        next unless params[:screen].blank? or master.screen.to_s == params[:screen].to_s
+        screen = master.screen
+        screen = [master.screen] unless screen.respond_to?(:each)
+        screen = screen.map(&:to_s)
+        next unless params[:screen].blank? or screen.include?(params[:screen].to_s)
         next unless params[:handle].blank? or master.handle_name.to_s == params[:handle].to_s
         next unless params[:system].blank? or master.system.to_s == params[:system].to_s
         next unless master.accept?(user, params)

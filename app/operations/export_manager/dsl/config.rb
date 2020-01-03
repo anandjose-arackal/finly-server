@@ -19,7 +19,6 @@ module ExportManager::DSL::Config
           type: type,
           description: description,
           handle: handle_name,
-          screen: screen,
           configurable: configurable,
       }
     end

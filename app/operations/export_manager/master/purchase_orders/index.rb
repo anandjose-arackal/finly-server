@@ -1,11 +1,11 @@
-class ExportManager::Master::Procurements::Provider < ExportManager::Builders::Spreadsheet
+class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Spreadsheet
 
   label 'Export'
-  description 'Procurements Export'
+  description 'Purchase Orders Export'
   configurable true
   system :vp
-  screen 'procurements.index'
-  handle :procurement
+  screen ['purchase_orders.index', 'po_advances.index']
+  handle :purchase_orders
   validate :input
 
   attribute :procurement_name
