@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_30_100550) do
+ActiveRecord::Schema.define(version: 2020_01_02_134133) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -940,7 +940,7 @@ ActiveRecord::Schema.define(version: 2019_12_30_100550) do
     t.string "status"
     t.string "error_code"
     t.string "error_desc"
-    t.string "ref_no"
+    t.string "order_number"
     t.string "agent_institution_id"
     t.string "channel_id"
     t.string "bbps_ref_id"
@@ -967,7 +967,6 @@ ActiveRecord::Schema.define(version: 2019_12_30_100550) do
     t.datetime "updated_at", null: false
     t.integer "transfer_status_id"
     t.integer "amount_id"
-    t.string "order_number"
     t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
     t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end

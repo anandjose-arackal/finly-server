@@ -29,14 +29,14 @@ class BbpsBillsFetch < ApplicationJob
   def create_bill(result, subscription, autofetched)
     if autofetched
 
-      next unless result.status == 'Y'
+      return unless result.status == 'Y'
 
       bill_date_year = Date.parse(result.bill_date).strftime("%Y")
       bill_period = result.bill_period
       bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
 
       # Do not create bill if bill for same year and period exists
-      next if bill.present?
+      return if bill.present?
 
       params = {
           amount: (result.amount.to_f / 100),

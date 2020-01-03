@@ -9,6 +9,7 @@
 #  updated_at        :datetime         not null
 #  balance_id        :integer
 #  enabled           :boolean          default(FALSE)
+#  deleted_at        :datetime
 #
 
 class YesBankCompanyAccount < ApplicationRecord

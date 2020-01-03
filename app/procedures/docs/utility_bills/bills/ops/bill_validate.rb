@@ -50,8 +50,6 @@ class Docs::UtilityBills::Bills::Ops::BillValidate < Transactions::API
   end
 
   def bill_validate(options, model:, validation_params:, **)
-    # op = Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true})
-    # op = Bbps::BillValidation.call({params: validation_params, current_user: User.first})
     Bbps::BillValidation.call_async({params: validation_params, current_user: User.first}, {wait: true}) do |op|
       op.success do |result|
         p "SUCCESS"
