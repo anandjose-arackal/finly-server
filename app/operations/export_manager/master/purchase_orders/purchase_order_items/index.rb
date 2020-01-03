@@ -2,6 +2,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
 
   handle :purchase_order_items
+  screen 'purchase_orders.index'
   validate :input
 
   attribute :procurement_name
