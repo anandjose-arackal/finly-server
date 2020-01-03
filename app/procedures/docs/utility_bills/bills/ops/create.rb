@@ -15,7 +15,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
   def set_default_params(options, params:, **)
     subscription = BbpsBillerSubscription.find_by id: params[:subscription_id]
-    bill = subscription.attributes.slice('policy_id', 'department_id', 'location_id', 'cost_center_id', 'company_id')
+    bill = subscription.attributes.slice('policy_id', 'department_id', 'location_id', 'cost_center_id', 'company_id', 'category_id', 'tax_rate_id', 'hsn_sac')
 
 
     autofetched = params[:autofetched]

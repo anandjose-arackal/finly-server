@@ -7,6 +7,8 @@ json.result do
   json.cost_centers {json.array! @op['result']['cost_centers']}
   json.policies {json.array! @op['result']['policies']}
   json.locations {json.array! @op['result']['locations']}
+  json.categories {json.array! @op['result']['categories']}
+  json.tax_rates {json.array! @op['result']['tax_rates']}
 
   json.reviewal_chains do
     json.array! @op['result']['reviewal_chains'] do |chain|

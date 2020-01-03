@@ -57,7 +57,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       op.errors.each do |error|
         payment.system_messages.build(content: error,
-                                    system_message_type_id: SystemMessageType.id_for(:error)).save
+                                      system_message_type_id: SystemMessageType.id_for(:error)).save
       end
     end
     true
@@ -98,7 +98,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         amount_attributes: {
             value: payment.amount_value,
             currency_id: Currency.first.id
-      })
+        })
     bank_transaction.save
 
     payment.with_lock do

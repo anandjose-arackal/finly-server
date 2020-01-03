@@ -24,7 +24,7 @@ class Docs::UtilityBills::Bills::Authorizer
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || (@user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user)) ||
+    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || (@user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user)) ||
         @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
   end
 

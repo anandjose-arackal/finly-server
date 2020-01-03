@@ -11,6 +11,10 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :company_id, presence: true
   property :autofetched
 
+  property :category_id
+  property :tax_rate_id
+  property :hsn_sac
+
   # Should be used in update
   property :policy_id
   property :user_id

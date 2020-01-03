@@ -67,6 +67,9 @@ class BbpsBill < ApplicationRecord
   belongs_to :early_payment_fee, foreign_key: :early_payment_fee_id, class_name: 'Amount', optional: true
   belongs_to :convenience_fee, foreign_key: :convenience_fee_id, class_name: 'Amount', optional: true
 
+  belongs_to :tax_rate, class_name: 'TaxRate', optional: true
+  belongs_to :category, class_name: 'Category', optional: true
+
   has_many :payments, as: :parent
 
   accepts_nested_attributes_for :amount
@@ -192,6 +195,9 @@ class BbpsBill < ApplicationRecord
         cost_center: cost_center.as_json,
         location: location.as_json,
         policy: policy.as_json,
+        category: category.as_json,
+        tax_rate: tax_rate.as_json,
+        hsn_sac: hsn_sac,
         # note: note,
         created_at: created_at.strftime("%d-%b-%Y"),
         updated_at: updated_at.strftime("%d-%b-%Y"),

@@ -11,6 +11,10 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   property :location_id
   property :policy_id, presence: true
 
+  property :category_id
+  property :tax_rate_id
+  property :hsn_sac
+
   property :note
   property :user_id, presence: true
   property :active

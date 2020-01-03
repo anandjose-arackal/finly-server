@@ -28,20 +28,20 @@
 #  deleted_at                   :datetime
 #
 
-    # table_name => purchase_request_items
-    # 
-    #                     :id => :integer,
-    #    :purchase_request_id => :integer,
-    # :inventory_line_item_id => :integer,
-    #              :vendor_id => :integer,
-    #   :delivery_location_id => :integer,
-    #                :purpose => :text,
-    #               :quantity => :integer,
-    #         :unit_amount_id => :integer,
-    #    :estimated_amount_id => :integer,
-    #          :delivery_date => :date,
-    #             :created_at => :datetime,
-    #             :updated_at => :datetime
+# table_name => purchase_request_items
+#
+#                     :id => :integer,
+#    :purchase_request_id => :integer,
+# :inventory_line_item_id => :integer,
+#              :vendor_id => :integer,
+#   :delivery_location_id => :integer,
+#                :purpose => :text,
+#               :quantity => :integer,
+#         :unit_amount_id => :integer,
+#    :estimated_amount_id => :integer,
+#          :delivery_date => :date,
+#             :created_at => :datetime,
+#             :updated_at => :datetime
 
 
 class PurchaseRequestItem < ApplicationRecord
