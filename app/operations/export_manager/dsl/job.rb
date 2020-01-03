@@ -18,14 +18,14 @@ module ExportManager::DSL::Job
             note: params[:note],
             request_params: params,
             master: self.class.name,
-            document: self.class.document,
+            description: self.class.description,
             status_id: ExportJobStatus.id_for(:pending)
         }
     )
   end
 
   def build_name
-    return self.class.label unless self.class.job_name
+    return (self.class.description || self.class.label) unless self.class.job_name
 
     job_name = self.class.job_name
     if job_name.class.name == Proc.name

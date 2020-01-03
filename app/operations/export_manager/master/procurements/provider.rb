@@ -1,9 +1,11 @@
 class ExportManager::Master::Procurements::Provider < ExportManager::Builders::Spreadsheet
 
-
+  label 'Export'
+  description 'Procurements Export'
+  configurable true
+  system :vp
+  screen 'procurements.index'
   handle :procurement
-
-
   validate :input
 
   attribute :procurement_name
@@ -70,10 +72,6 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Builders::S
   attribute :invoice_purchase_address
   attribute :invoice_delivery_address
   attribute :invoice_custom_fields
-
-  def name
-    'Purchase Orders'
-  end
 
   def input
     # if params[:filter_po_status].present?

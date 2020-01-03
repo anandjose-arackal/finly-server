@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_02_102449) do
+ActiveRecord::Schema.define(version: 2020_01_03_103752) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3179,7 +3179,7 @@ ActiveRecord::Schema.define(version: 2020_01_02_102449) do
     t.text "request_params", limit: 4294967295
     t.datetime "deleted_at"
     t.string "master"
-    t.string "document"
+    t.string "description"
     t.string "processing_record_type"
     t.bigint "processing_record_id"
     t.string "record_type"

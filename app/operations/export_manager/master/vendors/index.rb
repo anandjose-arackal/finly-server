@@ -1,12 +1,12 @@
 class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :vendor_ba
 
-
-
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  screen 'vendors.index'
   handle :vendors
-
-
-
   validate :input
 
   attribute :vendor_business_name

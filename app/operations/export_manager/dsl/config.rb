@@ -8,7 +8,7 @@ module ExportManager::DSL::Config
     class_attr :screen
     class_attr :system
     class_attr :type, default: :generic
-    class_attr :document
+    class_attr :description
     class_attr :company_scope, default: {}.with_indifferent_access
   end
 
@@ -17,7 +17,7 @@ module ExportManager::DSL::Config
       {
           label: label,
           type: type,
-          document: document,
+          description: description,
           handle: handle_name,
           screen: screen,
           configurable: configurable,

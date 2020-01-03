@@ -1,9 +1,12 @@
 class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Builders::Spreadsheet
 
 
+  label 'Export'
+  description 'Users Export'
+  configurable true
+  system :vp
+  screen 'users.vp.index'
   handle :vp_users
-
-
   validate :input
 
   attribute :employee_id
@@ -11,10 +14,6 @@ class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Build
   attribute :email
   attribute :mobile_number
   attribute :status
-
-  def name
-    'Users'
-  end
 
   def input
     result = ::BankTransfer::Users::Index.(user, params)

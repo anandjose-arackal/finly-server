@@ -14,10 +14,6 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
   attribute :budget_usage
   attribute :usage_percentage
 
-  def name
-    'Budgets'
-  end
-
   def input
     op = ::Budgets::Index.(user, params)
     unless op.success?

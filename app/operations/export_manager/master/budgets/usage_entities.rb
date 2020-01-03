@@ -22,10 +22,6 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   attribute :created_by
   # attribute :custom_fields
 
-  def name
-    'Budgets'
-  end
-
   def input
     op = ::Budgets::Show.(user, params)
     unless op.success?

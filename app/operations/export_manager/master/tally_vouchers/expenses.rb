@@ -17,10 +17,6 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Builders::
   attribute :amount
   attribute :purpose
 
-  def name
-    'Tally'
-  end
-
   def input
     result = ::Reports::Index.(user, params)
     unless result.success?

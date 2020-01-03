@@ -1,9 +1,12 @@
 class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :input_data
 
-
-  handle :purchase_request
+  label 'Export'
+  description 'Purchase Requests Export'
+  configurable true
+  system :vp
   screen 'purchase_requests.index'
+  handle :purchase_request
   validate :input
 
   attribute :request_id
@@ -15,10 +18,6 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::
   attribute :created_by
   attribute :status
   attribute :amount
-
-  def name
-    'Purchase Requests'
-  end
 
   def input
     return self.input_data unless self.input_data.nil?

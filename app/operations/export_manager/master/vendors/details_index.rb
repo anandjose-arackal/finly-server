@@ -1,11 +1,11 @@
 class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Spreadsheet
 
-
-
-  handle :vendor_details
-
-
-
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  # screen 'vendors.index'
+  # handle :vendor_details
   validate :input
 
   attribute :vendor_business_name
@@ -24,10 +24,6 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Sp
   attribute :default_account_number
   attribute :default_account_ifsc
   attribute :created_at
-
-  def name
-    'Vendors'
-  end
 
   def input
     params[:beneficiary_type] = 2
