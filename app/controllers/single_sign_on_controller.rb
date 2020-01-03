@@ -33,6 +33,7 @@ class SingleSignOnController < Oauth::TokenController
     set_grant_type
     set_scope
     super()
+    RequestStoreUtil.current_session.verify('sso')
   end
 
   def saml_logout
