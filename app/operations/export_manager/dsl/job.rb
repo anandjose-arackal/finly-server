@@ -51,12 +51,12 @@ module ExportManager::DSL::Job
 
   def success!
     export_job.update(status_id: ExportJobStatus.id_for(:completed), completed_at: DateTime.now, completion_percentage: 100)
-    ExportJobMailer.delay.success(export_job)
+    ExportJobMailer.delay.success(export_job.id)
   end
 
   def failure!
     export_job.update(status_id: ExportJobStatus.id_for(:failed), completed_at: DateTime.now)
-    ExportJobMailer.delay.failure(export_job)
+    ExportJobMailer.delay.failure(export_job.id)
   end
 
 end

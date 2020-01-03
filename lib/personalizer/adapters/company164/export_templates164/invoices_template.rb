@@ -1,16 +1,37 @@
-class Personalizer::Adapters::Company164::InvoicesTemplates< Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :invoices
+class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate < ExportManager::Builders::Spreadsheet
 
-  has_scope :filter_creation_date, using: [:from, :to], type: :hash
+  label 'Export 2'
+  description 'Invoice'
+  configurable false
+  handle :invoices
+  screen 'invoices.index'
+  system :vp
+  # scope "development", 2, 'L&C Ltd.'
+  validate :fetch_invoices
 
-  def pre_validate
+  def fetch_invoices
+    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
 
+    unless invoices_presenter.success?
+      add_message :error, invoices_presenter.messages[:error]
+      return
+    end
+    invoices_presenter
   end
 
-  def init
-    self.headers = [
+  def input
+    invoices_presenter = fetch_invoices
+
+    return if has_errors?
+
+    invoices = invoices_presenter.invoices
+    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+  end
+
+  def generate_rows
+    [
         'S. NO.',
-        'Report ID','Voucher Type',
+        'Report ID', 'Voucher Type',
         'Period',
         'Voucher Date',
         'Description',
@@ -36,42 +57,40 @@ class Personalizer::Adapters::Company164::InvoicesTemplates< Personalizer::Adapt
         'SAC',
         'Ref. Invoice No.',
         'Remarks/Notes/Explanation'
+    ].each do |label|
+      header.add label
+    end
 
-    ]
-    company = user.company
-    self.invoices = Invoice.where(company_id: company.id, invoice_type_id: [1,3]).where(invoice_status_id: [3,10]).includes(:payments, :paid_amount, :amount, :created_by)
-    self.invoices = apply_scopes(self.invoices, params)
-
-    self.contents = []
     sl_no = 1
-    invoices.each do |inv|
-      row = [sl_no,
-            inv.invoice_id,
-            'BP',
-            inv.date&.strftime("%Y%m"),
-            inv.date&.strftime("%d/%m/%Y"),
-            get_description(inv),
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '43181001',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            (inv.paid_amount&.value || 0.0),
-            '',
-            '',
-            inv.receiving_account_id,
-            inv.payments&.first&.reference_resource&.bank_reference_number
-            ]
-      contents << row
+    data.find_each do |inv|
+      row = [
+          sl_no,
+          inv.invoice_id,
+          'BP',
+          inv.date&.strftime("%Y%m"),
+          inv.date&.strftime("%d/%m/%Y"),
+          get_description(inv),
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '43181001',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          (inv.paid_amount&.value || 0.0),
+          '',
+          '',
+          inv.receiving_account_id,
+          inv.payments&.first&.reference_resource&.bank_reference_number
+      ]
+      rows << row
       row = [sl_no,
              inv.invoice_id,
              'BP',
@@ -98,19 +117,11 @@ class Personalizer::Adapters::Company164::InvoicesTemplates< Personalizer::Adapt
              inv.receiving_account_id,
              inv.payments&.first&.reference_resource&.bank_reference_number
       ]
-      contents << row
-      sl_no +=1
+      rows << row
+      progress_update sl_no
+      sl_no += 1
     end
 
-  end
-
-  def get_description(inv)
-    payment_ids = inv.payments&.pluck(:id)&.join(',')
-    "Being Payment made against various Payment IDs #{payment_ids}"
-  end
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
   end
 
 end
