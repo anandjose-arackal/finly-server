@@ -1,22 +1,25 @@
 class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::BaseSubscriber
 
-  bus ExportManager::Master::BaseMaster
+
   subscribe :tally_expense_voucher_xls
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  generator ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Asynchronous
   validate :input
-  fields [
-                      report_name: {spreadsheet: true},
-                      reference_number: {spreadsheet: true},
-                      employee_name: {spreadsheet: true},
-                      merchant: {spreadsheet: true},
-                      date: {spreadsheet: true},
-                      category: {spreadsheet: true},
-                      gl_code: {spreadsheet: true},
-                      currency: {spreadsheet: true},
-                      amount: {spreadsheet: true},
-                      purpose: {spreadsheet: true}
-                  ]
+
+  attribute :report_name
+  attribute :reference_number
+  attribute :employee_name
+  attribute :merchant
+  attribute :date
+  attribute :category
+  attribute :gl_code
+  attribute :currency
+  attribute :amount
+  attribute :purpose
+
+  def name
+    'Tally'
+  end
 
   def input
     result = ::Reports::Index.(user, params)

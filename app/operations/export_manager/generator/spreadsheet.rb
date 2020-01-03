@@ -1,65 +1,155 @@
 class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
 
-  register_format :xls, :csv
+  class Attribute
+    attr_accessor :name, :column_name, :dynamic
 
-  def run
-    headers = load_headers
-    contents = load_contents
-    exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
-    file = Paperclip::Tempfile.new(file_name)
-    open(file.path, 'wb') do |f|
-      case format
-      when :csv
-        f.write exporter.generate_csv
-      when :xls
-        f.write exporter.generate_xls
+    def initialize(name:, column_name: nil, dynamic: false)
+      self.name = name
+      self.column_name = column_name || name.to_s.humanize
+      self.dynamic = dynamic
+    end
+
+  end
+
+  class Header
+
+    def list
+      @list ||= []
+    end
+
+    def add(name)
+      list << name unless list.include?(name)
+    end
+
+    # def index_of(name)
+    #   headers << name unless headers.include?(name)
+    #
+    #   headers.find_index(name)
+    # end
+
+  end
+
+  class Row
+    attr_accessor :record, :header
+
+    def initialize(record:, header:)
+      self.record = record
+      self.header = header
+    end
+
+    def values
+      @values ||= {}
+    end
+
+    def add(column, value)
+      header.add column
+      values[column] = value
+    end
+
+    def build
+      data = []
+      header.list.each do |column|
+        data << values[column]
       end
+      data
     end
-    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day), created_by_id: user.id, company_id: user.company_id
-    {file_url: temp_file.file.url(:original, timestamp: false), success: true}
+
   end
 
-  def format
-    params[:export_format]&.to_sym
-  end
+  # Responsible for generating the file
+  class Builder
+    attr_accessor :master, :processor, :header
 
-  def file_name
-    case format
-    when :xls
-      return ['export', '.xls']
-    when :csv
-      return ['export', '.csv']
-    else
-      nil
+    def initialize(processor)
+      self.processor = processor
+      self.master = processor.master
+      self.header = Header.new
     end
-  end
 
-  def load_headers
-    headers = []
-    self.config.each do |field, conf|
-      headers << (conf[:label] || field.to_s.humanize) if conf[:spreadsheet]
+    def build
+      generate_rows
+      file = generate_spreadsheet
+      self.processor.save_attachment file
+      self.processor.success!
+      file
     end
-    headers
-  end
 
-  def load_contents
-    contents = []
-    data = master.input
-    return contents if data.nil?
-    data.each do |entry|
-      row = []
-      self.config.each do |field, conf|
-        if conf[:spreadsheet]
-          if master.respond_to?(field)
-            row << master.send(field, entry)
+    # Converts input records to array of Row Objects. Each row object contains a hash of the columns and values
+    def generate_rows
+      master.class.attributes.each do |attr|
+        next if attr.dynamic
+
+        header.add attr.column_name
+      end
+
+      return unless master.input.count > 0
+
+      index = 1
+      master.input.find_each do |record|
+        row = Row.new(record: record, header: header)
+        master.class.attributes.each do |attribute|
+          if attribute.dynamic
+            master.send attribute.name, row, record
           else
-            raise "#{field} not defined for exporter #{master.class.name}"
+            value = master.send attribute.name, record rescue nil
+            row.add attribute.column_name, value
           end
         end
+        rows << row
+
+        self.processor.progress_update(index)
+        index += 1
       end
-      contents << row
     end
-    contents
+
+    def generate_spreadsheet
+      headers = header.list
+      contents = []
+      self.rows.each do |row|
+        contents << row.build
+      end
+      exporter = Exporter::Spreadsheet.new(self.processor.user, {headers: headers, contents: contents})
+      file_name = ['export', '.xls']
+      file = Paperclip::Tempfile.new(file_name)
+      open(file.path, 'wb') do |f|
+        # case format
+        # when :csv
+        #   f.write exporter.generate_csv
+        # when :xls
+        f.write exporter.generate_xls
+        # end
+      end
+      file
+    end
+
+    def rows
+      @rows ||= []
+    end
+
+  end
+
+  module Helper
+    extend ActiveSupport::Concern
+
+    class_methods do
+      def attribute(name, column_name: nil, dynamic: false)
+        attributes << Attribute.new({name: name, column_name: column_name, dynamic: dynamic})
+      end
+
+      def attributes
+        @attributes ||= []
+      end
+    end
+
+  end
+
+  def self.setup(master_class)
+    master_class.include Helper
+  end
+
+  def perform
+    builder = Builder.new(self)
+    builder.build
   end
 
 end

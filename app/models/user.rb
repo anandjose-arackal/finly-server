@@ -140,6 +140,8 @@ class User < ApplicationRecord
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
 
+  has_many :export_jobs, foreign_key: :created_by_id
+
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :authentications
