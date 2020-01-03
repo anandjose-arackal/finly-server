@@ -174,6 +174,7 @@ class BbpsBill < ApplicationRecord
           cost_center: cost_center.as_json,
           location: location.as_json,
           policy: policy.as_json,
+          autofetched: autofetched,
           # note: note,
           created_at: created_at.strftime("%d-%b-%Y"),
           updated_at: updated_at.strftime("%d-%b-%Y"),
@@ -189,6 +190,7 @@ class BbpsBill < ApplicationRecord
     data = {
         id: id,
         biller: subscription.biller.as_json({index: true}),
+        autofetched: autofetched,
         # name: name,
         sequence_id: sequence_id,
         department: department.as_json,

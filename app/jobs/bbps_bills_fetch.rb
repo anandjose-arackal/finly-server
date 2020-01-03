@@ -8,13 +8,13 @@ class BbpsBillsFetch < ApplicationJob
 
     bbps_subscriptions.each do |subscription|
       parameters = customer_params(subscription).with_indifferent_access
-      Bbps::BillFetch.(params: parameters, "current_user" => User.first) do |op|
+      Bbps::BillFetch.call_async({params: parameters, "current_user" => User.first}, wait: true) do |op|
         op.success do |result|
-          Rails.logger.fatal "Success:Result", result
+          ap result
           create_bill(result, subscription, autofetched)
         end
-        op.error {|result| p result}
-        op.failure {|result| p result}
+        op.error {|result| ap result}
+        op.failure {|result| ap result}
       end
     end
 
@@ -28,7 +28,6 @@ class BbpsBillsFetch < ApplicationJob
 
   def create_bill(result, subscription, autofetched)
     if autofetched
-
       return unless result.status == 'Y'
 
       bill_date_year = Date.parse(result.bill_date).strftime("%Y")
@@ -49,9 +48,10 @@ class BbpsBillsFetch < ApplicationJob
           early_payment_fee: get_amount_from_response(result.early_payment_fee),
           late_payment_fee: get_amount_from_response(result.late_payment_fee),
           subscription_id: subscription.id,
-          autofetched: autofetched
+          autofetched: autofetched,
+          order_number: result.ref_no,
+          order_number_type: "BillFetch"
       }
-
       op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
     else
       params = {
@@ -93,6 +93,4 @@ class BbpsBillsFetch < ApplicationJob
 
     parameters
   end
-
-
 end

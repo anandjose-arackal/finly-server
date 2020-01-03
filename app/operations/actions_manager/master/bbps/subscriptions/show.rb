@@ -51,7 +51,7 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   end
 
   def deactivate
-    (bbps_subscription.approved? || bbps_subscription.auto_approved?) && user.vendor_payment_admin?
+    (bbps_subscription.approved? || bbps_subscription.auto_approved? || bbps_subscription.reactivated?) && user.vendor_payment_admin?
   end
 
   def reactivate
