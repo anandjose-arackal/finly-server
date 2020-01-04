@@ -4,7 +4,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   description 'Invoice'
   configurable false
   handle :lms_export
-  screen 'invoices.index'
+  # screen 'invoices.index'
   system :vp
   # scope "development", 2, 'L&C Ltd.'
   validate :fetch_invoices
