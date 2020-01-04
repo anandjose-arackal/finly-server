@@ -5,6 +5,7 @@ class ExportManager::Builders::Spreadsheet::Header
   end
 
   def add(name)
+    name = name&.to_s
     list << name unless list.include?(name)
   end
 

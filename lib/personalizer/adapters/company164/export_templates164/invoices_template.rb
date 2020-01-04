@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   label 'Export 2'
   description 'Invoice'
   configurable false
-  handle :invoices
+  handle :lms_export
   screen 'invoices.index'
   system :vp
   # scope "development", 2, 'L&C Ltd.'
@@ -25,103 +25,89 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     return if has_errors?
 
     invoices = invoices_presenter.invoices
-    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    # InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
   def generate_rows
-    [
-        'S. NO.',
-        'Report ID', 'Voucher Type',
-        'Period',
-        'Voucher Date',
-        'Description',
-        'Invoice amount',
-        'Invoice Number',
-        'Invoice Date',
-        'Invoice Type',
-        'State',
-        'Supplier GSTN',
-        'Place Of Supply',
-        'Account',
-        'Sub Account',
-        'Department',
-        'Cost Center',
-        'Tax',
-        'Tax Exemption(%)',
-        'Base Amount',
-        'Debit',
-        'Credit',
-        'Comments',
-        'Supplier',
-        'Reference Code',
-        'SAC',
-        'Ref. Invoice No.',
-        'Remarks/Notes/Explanation'
-    ].each do |label|
-      header.add label
-    end
-
     sl_no = 1
     data.find_each do |inv|
-      row = [
-          sl_no,
-          inv.invoice_id,
-          'BP',
-          inv.date&.strftime("%Y%m"),
-          inv.date&.strftime("%d/%m/%Y"),
-          get_description(inv),
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '43181001',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          (inv.paid_amount&.value || 0.0),
-          '',
-          '',
-          inv.receiving_account_id,
-          inv.payments&.first&.reference_resource&.bank_reference_number
-      ]
+      row = Row.new(record: inv, header: header)
+      {
+          'S. NO.': sl_no,
+          'Report ID': inv.invoice_id,
+          'Voucher Type': 'BP',
+          'Period': inv.date&.strftime("%Y%m"),
+          'Voucher Date': inv.date&.strftime("%d/%m/%Y"),
+          'Description': get_description(inv),
+          'Invoice amount': '',
+          'Invoice Number': '',
+          'Invoice Date': '',
+          'Invoice Type': '',
+          'State': '',
+          'Supplier GSTN': '',
+          'Place Of Supply': '',
+          'Account': '43181001',
+          'Sub Account': '',
+          'Department': '',
+          'Cost Center': '',
+          'Tax': '',
+          'Tax Exemption(%)': '',
+          'Base Amount': '',
+          'Debit': (inv.paid_amount&.value || 0.0),
+          'Credit': '',
+          'Comments': '',
+          'Supplier': inv.receiving_account_id,
+          'Reference Code': inv.payments&.first&.reference_resource&.bank_reference_number,
+          'SAC': "",
+          'Ref. Invoice No.': "",
+          'Remarks/Notes/Explanation': "",
+      }.each do |k, v|
+        row.add k, v
+      end
+      row = Row.new(record: inv, header: header)
       rows << row
-      row = [sl_no,
-             inv.invoice_id,
-             'BP',
-             inv.date&.strftime("%Y%m"),
-             inv.date&.strftime("%d/%m/%Y"),
-             get_description(inv),
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             '61110004',
-             inv.created_by_id,
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             (inv.paid_amount&.value || 0.0),
-             '',
-             inv.receiving_account_id,
-             inv.payments&.first&.reference_resource&.bank_reference_number
-      ]
+      {
+          'S. NO.': sl_no,
+          'Report ID': inv.invoice_id,
+          'Voucher Type': 'BP',
+          'Period': inv.date&.strftime("%Y%m"),
+          'Voucher Date': inv.date&.strftime("%d/%m/%Y"),
+          'Description': get_description(inv),
+          'Invoice amount': '',
+          'Invoice Number': '',
+          'Invoice Date': '',
+          'Invoice Type': '',
+          'State': '',
+          'Supplier GSTN': '',
+          'Place Of Supply': '',
+          'Account': '61110004',
+          'Sub Account': inv.created_by&.name,
+          'Department': '',
+          'Cost Center': '',
+          'Tax': '',
+          'Tax Exemption(%)': '',
+          'Base Amount': '',
+          'Debit': '',
+          'Credit': (inv.paid_amount&.value || 0.0),
+          'Comments': '',
+          'Supplier': inv.receiving_account_id,
+          'Reference Code': inv.payments&.first&.reference_resource&.bank_reference_number,
+          'SAC': "",
+          'Ref. Invoice No.': "",
+          'Remarks/Notes/Explanation': "",
+      }.each do |k, v|
+        row.add k, v
+      end
       rows << row
       progress_update sl_no
       sl_no += 1
     end
 
+  end
+
+  def get_description(inv)
+    payment_ids = inv.payments&.pluck(:id)&.join(',')
+    "Being Payment made against various Payment IDs #{payment_ids}"
   end
 
 end
