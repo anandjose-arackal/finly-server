@@ -3,7 +3,7 @@
 
 class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
-  attr_accessor :payment, :payment_order, :payment_mode
+  attr_accessor :payment, :payment_order, :payment_mode, :bank_payment_request
 
   def pre_validate
     if user.blank? || params.blank?
@@ -13,12 +13,14 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
   def init
     id = params[:id] || params[:payment_id]
-    op = BankTransfer::Payments::Index.(user, params)
-    self.payment = op.payments.find_by(id: id)
+    self.payment = Payment.where(company_id: user.company.id).find_by(id: id)
     self.payment_mode = params[:payment_mode] || self.payment&.payment_mode
+    self.bank_payment_request = payment&.payment_order&.bank_payment_request
   end
 
   def validate
+
+
     if self.payment.blank?
       add_message :error, "Payment not found"
       return
@@ -37,6 +39,11 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
     unless payment.payment_order.present?
       add_message :error, "This payment does not belong to a payment order"
+      return
+    end
+
+    unless bank_payment_request.is_initiating_user?(user) || bank_payment_request.is_reviewing_user?(user) || bank_payment_request.is_crediting_user?(user)
+      add_message :error, "You are not authorized to do this action"
       return
     end
   end
