@@ -13,7 +13,6 @@
 #  blank_password   :boolean          default(FALSE)
 #  invalid_username :boolean          default(FALSE)
 #  invalid_password :boolean          default(FALSE)
-#  deleted_at       :datetime
 #
 
 require 'rails_helper'

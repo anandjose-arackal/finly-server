@@ -15,7 +15,6 @@
 #  rule          :string(255)
 #  level         :integer          default(1), not null
 #  admin_user_id :integer
-#  deleted_at    :datetime
 #
 
 class GatekeeperBlock < ApplicationRecord

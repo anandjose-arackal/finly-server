@@ -22,7 +22,6 @@
 #  travel_approves_to_id              :integer
 #  approves_to_violation_only         :boolean          default(FALSE)
 #  approves_finance_to_violation_only :boolean          default(FALSE)
-#  deleted_at                         :datetime
 #
 
 class UserManagerMapping < ApplicationRecord

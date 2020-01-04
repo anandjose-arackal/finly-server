@@ -51,7 +51,6 @@
 #  otp_attempts                   :integer
 #  on_hold                        :boolean
 #  disabled                       :boolean
-#  transfer_mode_id               :integer
 #
 
 class Payment < ApplicationRecord
