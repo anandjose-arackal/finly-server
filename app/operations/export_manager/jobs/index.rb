@@ -10,7 +10,7 @@ class ExportManager::Jobs::Index < BaseOperation
   end
 
   def success
-    ExportManager::Jobs::Index::SuccessPresenter.new(user, {export_jobs: self.export_jobs}, messages)
+    ExportManager::Jobs::Index::SuccessPresenter.new(user, params.merge({export_jobs: self.export_jobs}), messages)
   end
 
   class ExportManager::Jobs::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
