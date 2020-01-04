@@ -246,7 +246,6 @@ class Company < ApplicationRecord
   def d_code
     return nil if itz_cash_property.blank?
     itz_cash_property.d_code
-    ""
   end
 
   def hdfc?
