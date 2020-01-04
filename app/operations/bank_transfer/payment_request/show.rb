@@ -75,7 +75,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.payments_verified = []
       # separating the verified and unverified payments
       self.payment_order.payments.each do |payment|
-        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+        if payment.receiving_user.is_a?(User) || payment.receiving_user.is_a?(BbpsBillerSubscription) || payment.receiving_user.authorized
           self.payments_verified << payment
         else
           self.payments_unverified << payment

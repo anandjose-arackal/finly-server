@@ -32,7 +32,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
         # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
         # Get all policies where user has goods receiver role
         received_pending_ids = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
-        
+
         if user.vendor_payments_admin? && !filter_awaiting_action
           pr_ids = user.company.procurements.pluck(:id)
         else

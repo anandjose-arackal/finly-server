@@ -1,6 +1,10 @@
 payment = @result.payment
 parent = payment.parent rescue nil
-json.owner_name payment.receiving_account&.account_owner&.name
+if payment.receiving_account&.account_owner_type == "YesBankVendor"
+  json.owner_name payment.receiving_account&.account_owner&.business_name
+else
+  json.owner_name payment.receiving_account&.account_owner&.name
+end
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.disabled payment.receiving_account&.disabled
@@ -15,6 +19,7 @@ json.note payment.note
 json.account_id payment.receiving_account.id
 json.beneficiary_id payment.receiving_account.account_owner&.id
 json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
+json.created_at payment.created_at.strftime("%b %d, %Y")
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
 else
@@ -154,7 +159,6 @@ if @result.vendor.present?
       json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
     end
   end
-
 end
 
 json.comments do

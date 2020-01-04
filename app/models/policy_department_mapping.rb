@@ -2,9 +2,10 @@
 #
 # Table name: policy_department_mappings
 #
-#  id            :integer          not null, primary key
-#  policy_id     :integer          not null
-#  department_id :integer          not null
+#  id            :bigint           not null, primary key
+#  policy_id     :integer
+#  department_id :integer
+#  enabled       :boolean
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  deleted_at    :datetime

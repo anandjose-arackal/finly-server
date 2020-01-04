@@ -213,6 +213,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     custom_field_op = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
     @field_configurations = custom_field_op.field_configurations
     @policies = current_company.vendor_payment_policies
+    @transfer_modes = current_company.transfer_modes
     respond_to do |format|
       format.json {}
     end
@@ -242,6 +243,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
   def payments_list
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
+    respond
+  end
+
+  def payments_info
+    @result = BankTransfer::PaymentRequest::PaymentsInfo.(current_user, params)
     respond
   end
 
@@ -299,6 +305,8 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     when 'bulk_beneficiary'
       # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
       create_bulk_beneficiary_ticket(current_user, params)
+    when 'bill_payment'
+      create_bill_payment(current_user, params)
     else
       respond response: :failure, message: "Invalid ticket type provided. Please provide one of either 'invoice', 'po_advance', 'beneficiary' or 'bulk_beneficiary'"
     end
@@ -307,6 +315,53 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   def generate_otp
     @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
     respond_success_failure
+  end
+
+  def progress
+    @result = BankTransfer::PaymentRequest::Progress.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          total: @result.expected_payments,
+          actual: @result.actual_payments,
+          status: @result.status,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def bulk_actions
+    @result = BankTransfer::PaymentRequest::Review::BulkActions.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          result: @result.summary,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+
   end
 
 
@@ -459,6 +514,29 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
       end
     end
   end
+
+  def create_bill_payment(current_user, params)
+    @result = BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          bank_payment_request_id: @result.bank_payment_request.id,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 
 end
 

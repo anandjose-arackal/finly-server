@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
-    self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
+    self.payment_amount = self.payment_params&.dig(:amount_attributes).present? ? self.payment_params&.dig(:amount_attributes, :value).to_f : self.payment.amount.value.round(2)
 
   end
 
@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       add_message :error, "Payment not found"
     end
     # validate custom fields
-    if payment&.invoice.present?
+    if payment&.invoice.present? && params[:custom_fields].present?
       set_fields = set_custom_fields(false)
       unless set_fields&.success?
         add_message :error, set_fields&.messages&.dig(:error)
@@ -34,10 +34,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     # validate that the amount is being passed # todo - uncomment it later
-    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
-      add_message :error, "Sub Total cannot be blank"
-      return
-    end
+    # unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
+    #   add_message :error, "Sub Total cannot be blank"
+    #   return
+    # end
 
     # if the amount is inclusive of taxes, the tax cannot be blank
     if StringUtils.to_bool(payment_params&.dig(:invoice_attributes, :inclusive_of_taxes))
@@ -53,11 +53,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       invoice_amount = invoice.balance_due&.value.to_f
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
       if payment_amount.to_f + previous_payments.to_f > invoice_amount
-        add_message :error, "Payment update amount would go above the invoice balance due."
+        add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
     end
-      
   end
 
   def pre_process
@@ -120,23 +119,23 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    # if nothing is passed inside invoice items attributes, assume that all are to be deleted
-    if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
-      if self.payment&.invoice&.invoice_items.present?
-        self.payment_params[:invoice_attributes][:invoice_items_attributes] = []
-        self.payment&.invoice&.invoice_items.each do |item|
-          self.payment_params[:invoice_attributes][:invoice_items_attributes] << {
-              id: item.id,
-              _destroy: true
-          }
-        end
-      end
-    end
+    # # if nothing is passed inside invoice items attributes, assume that all are to be deleted
+    # if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
+    #   if self.payment&.invoice&.invoice_items.present?
+    #     self.payment_params[:invoice_attributes][:invoice_items_attributes] = []
+    #     self.payment&.invoice&.invoice_items.each do |item|
+    #       self.payment_params[:invoice_attributes][:invoice_items_attributes] << {
+    #           id: item.id,
+    #           _destroy: true
+    #       }
+    #     end
+    #   end
+    # end
 
     # if inclusive of taxes is not sent in the backend, mark it as false
-    if self.payment_params&.dig(:invoice_attributes)
-      self.payment_params[:invoice_attributes][:inclusive_of_taxes] = !!self.payment_params[:invoice_attributes][:inclusive_of_taxes]
-    end
+    # if self.payment_params&.dig(:invoice_attributes)
+    #   self.payment_params[:invoice_attributes][:inclusive_of_taxes] = !!self.payment_params[:invoice_attributes][:inclusive_of_taxes]
+    # end
 
     if self.payment_params&.dig(:invoice_attributes, :category_id)
       self.payment_params[:category_id] = payment_params[:invoice_attributes][:category_id]
@@ -159,10 +158,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     set_custom_fields(false) # this should hopefully add the attributes to the model
-    if self.payment.save
-      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
-    else
-      add_message :error, self.payment.errors.full_messages
+    ActiveRecord::Base.transaction do
+      if self.payment.save
+        recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+        validate_payable_amount
+        if has_errors?
+          raise ActiveRecord::Rollback
+        end
+      else
+        add_message :error, self.payment.errors.full_messages
+      end
     end
 
     case payment.parent_type
@@ -177,7 +182,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
       # trigger the calculation only if tds sent and it is different from po tds
       # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
-      if self.incoming_tds_for_po.present? && (self.incoming_tds_for_po.to_i != purchase_order.advance_tds_slab_id)
+      if self.incoming_tds_for_po != purchase_order.advance_tds_slab_id
         purchase_order.assign_attributes(self.po_params)
         purchase_order.save
         purchase_order.process_line_item_calculation
@@ -251,10 +256,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def recalculate_totals
+    payable_amount = payment.amount_value
     if payment.invoice&.invoice_items.present?
       case payment.parent_type
       when 'Invoice'
-        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+        InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, payable_amount)
       else
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
       end
@@ -262,7 +268,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       # if there are, in fact, invoice items, use the invoice items library
       case payment.parent_type
       when 'Invoice'
-        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, payable_amount)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
       end
@@ -281,6 +287,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
     bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
     bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
+    bp_payment[:tax_rate_id] = params[:payment][:invoice_attributes][:tax_rate_id]
     bp_payment[:payment_notification_users] = params.require(:payment).dig(:invoice_attributes, :payment_notification_users) rescue nil
     self.bp_params = bp_payment
 
@@ -289,13 +296,21 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def construct_po_params
     po_payment = {}
 
-    po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+    if self.payment_params[:invoice_attributes].present? && self.payment_params[:invoice_attributes][:tds_slab_id].present?
+      po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+    else
+      po_payment[:advance_tds_slab_id] = nil
+    end
 
     self.po_params = po_payment
   end
 
   def validate_po_params
-    self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+    if self.payment_params[:invoice_attributes].present? && self.payment_params[:invoice_attributes][:tds_slab_id].present?
+      self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
+    else
+      self.incoming_tds_for_po = self.payment_params[:invoice_attributes]
+    end
   end
 
   def recheck_payable_flag
@@ -309,6 +324,24 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         invoice.update payable: true
       else
         invoice.update payable: false
+      end
+    end
+  end
+
+  def validate_payable_amount
+    case self.payment.parent_type
+    when 'BeneficiaryPayment'
+      if payment.invoice.balance_due.value.to_f < payment.amount_value.to_f
+        add_message :error, "Payable amount cannot be greater than balance due"
+        return
+      end
+    when 'Invoice'
+      invoice = payment.parent
+      invoice_amount = invoice.balance_due&.value.round(2)
+      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
+      if payment_amount.to_f + previous_payments.to_f > invoice_amount
+        add_message :error, "Payable amount cannot be greater than balance due."
+        return
       end
     end
   end

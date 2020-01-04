@@ -99,6 +99,7 @@ linked_files = %w{
   config/redis_config.yml
   config/mattermost_config.yml
   config/insights_config.yml
+  config/bbps_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production

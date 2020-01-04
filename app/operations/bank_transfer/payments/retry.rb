@@ -54,6 +54,10 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def post_process
+    self.payment.payment_order.bank_payment_request.comments.create user_id: user.id,
+                                     action_id: BankPaymentRequestCommentAction.id_for(:payment_retry),
+                                     note: "Retry for Payment ID - #{self.payment.id}"
+
     add_message :success, "Payment initiated! Check back in some time to check the status"
   end
 

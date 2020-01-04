@@ -36,7 +36,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     unless payment_ids.is_a?(Array)
       payment_ids = payment_ids&.split(",")
     end
-    self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
+    # self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
+    self.crediting_payments = self.bank_payment_request.payments.creditable # all payments will be done together
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
   end
 
@@ -224,6 +225,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           user.company.kotak_bank_company_account
         when "YesBankCompanyAccount"
           return user.company.yes_bank_company_account
+        when "UtilityBillsAccount"
+          return user.company.utility_bills_account
         else
           return user.company.yes_bank_company_account
         end
@@ -258,6 +261,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
         when "YesBankCompanyAccount"
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "UtilityBillsAccount"
+          return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(user.company.utility_bills_account)
         else
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

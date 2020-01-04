@@ -43,7 +43,7 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
   end
 
   def destroy(bank_account)
-   ""
+    ""
   end
 
   def post_process

@@ -65,7 +65,6 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
 #  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
@@ -441,7 +440,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_po_approver_id, -> (approver_id){
+  scope :filter_po_approver_id, -> (approver_id) {
     if approver_id.present?
       ids = self.awaiting_action_items(approver_id)&.pluck(:id)
       where(id: ids)

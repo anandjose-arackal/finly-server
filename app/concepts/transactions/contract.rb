@@ -1,4 +1,5 @@
 class Transactions::Contract < Reform::Form
+
   def add_schema_errors(errors_list)
     errors_list.to_h.each do |attr, err_list|
       # if err_list.is_a?(Hash)
@@ -14,11 +15,34 @@ class Transactions::Contract < Reform::Form
     end
   end
 
-  def self.deserialize(deserializer)
-    klass = self
-    {
-        deserializer: {
-            parse_pipeline: ->(*) { ->(input, represented:, **) {
+  def self.property(name, options = {})
+    sanitize_options options
+    super(name, options)
+  end
+
+  def self.sanitize_options(options)
+    return unless options.present?
+
+    Deserializer.setup(options)
+  end
+
+  # In-case deserialize: is defined in options, it sets it up the correct way for trailblazer
+  class Deserializer
+    def self.setup(options)
+      if options[:deserializer].present?
+        unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
+          options[:deserializer] = deserialize(options[:deserializer])
+        end
+      end
+    end
+
+    protected
+
+    def self.deserialize(deserializer)
+      klass = self
+      {
+          parse_pipeline: ->(*) {
+            ->(input, represented:, **) {
               if deserializer.is_a?(Symbol)
                 klass.send(deserializer, input, represented, **input)
               elsif deserializer.is_a?(Class)
@@ -26,9 +50,19 @@ class Transactions::Contract < Reform::Form
               else
                 deserializer.call(input, represented, **input)
               end
-            } }
-        }
-    }
+            }
+          }
+      }
+    end
   end
+
+  # class Transactions::Contract::Test < Transactions::Contract
+  #
+  #   property :name, deserializer: -> (input, represented, **) {represented.name = "a"}
+  #   property :gl_code, deserializer: -> (input, represented, **) {debugger}
+  #
+  #   validates :name, presence: true
+  #
+  # end
 
 end

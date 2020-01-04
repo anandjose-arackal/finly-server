@@ -28,36 +28,36 @@ class Dashboard::ExpenseManagement::ReportsDashboard < Dashboard::ExpenseManagem
       self.counts = []
 
       personal_report_data = {
-        type: 'personal_report',
-        data: [
-          {
-            title: "Unsubmitted",
-            count: self.reports.filter_status(1, user.id).count,
-            total_amount: self.reports.filter_status(1, user.id).map {|report| report.total_amount}&.compact&.sum,
-            filters: [{filter_status: 1}]
-          },
+          type: 'personal_report',
+          data: [
+              {
+                  title: "Unsubmitted",
+                  count: self.reports.filter_status(1, user.id).count,
+                  total_amount: self.reports.filter_status(1, user.id).map {|report| report.total_amount}&.compact&.sum,
+                  filters: [{filter_status: 1}]
+              },
 
-          {
-            title: "Processing",
-            count: self.reports.filter_status(2, user.id).count,
-            total_amount: self.reports.filter_status(2, user.id).map {|report| report.total_amount}&.compact&.sum,
-            filters: [{filter_status: 2}]
-          },
+              {
+                  title: "Processing",
+                  count: self.reports.filter_status(2, user.id).count,
+                  total_amount: self.reports.filter_status(2, user.id).map {|report| report.total_amount}&.compact&.sum,
+                  filters: [{filter_status: 2}]
+              },
 
-          {
-            title: "Rejected",
-            count: self.reports.filter_status(4, user.id).count,
-            total_amount: self.reports.filter_status(4, user.id).map {|report| report.total_amount}&.compact&.sum,
-            filters: [{filter_status: 4}]
-          },
+              {
+                  title: "Rejected",
+                  count: self.reports.filter_status(4, user.id).count,
+                  total_amount: self.reports.filter_status(4, user.id).map {|report| report.total_amount}&.compact&.sum,
+                  filters: [{filter_status: 4}]
+              },
 
-          {
-            title: "Approved",
-            count: self.reports.filter_status(5, user.id).count,
-            total_amount: self.reports.filter_status(5, user.id).map {|report| report.total_amount}&.compact&.sum,
-            filters: [{filter_status: 5}]
-          }
-        ]
+              {
+                  title: "Approved",
+                  count: self.reports.filter_status(5, user.id).count,
+                  total_amount: self.reports.filter_status(5, user.id).map {|report| report.total_amount}&.compact&.sum,
+                  filters: [{filter_status: 5}]
+              }
+          ]
 
       }
 

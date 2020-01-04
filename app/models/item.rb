@@ -20,7 +20,6 @@
 #  item_code            :string(255)
 #  account              :string(255)
 #  supply_item_type_id  :integer
-#  count                :integer
 #  deleted_at           :datetime
 #  product_type_id      :integer          default(1)
 #  item_number          :string(255)
@@ -62,6 +61,9 @@ class Item < ApplicationRecord
 
   scope :with_category_id, -> (id) { where category_id: id }
   scope :search_term, -> (term) {
+    where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+  scope :filter_search, -> (term) {
     where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
@@ -107,37 +109,37 @@ class Item < ApplicationRecord
 
   def as_json
     {
-      id: id,
-      item_number: item_number,
-      unit_of_measurement: unit_of_measurement,
-      hsn_sac: hsn_sac,
-      category_name: category&.name,
-      category_id: category_id,
-      category_gl_code: category&.gl_code,
-      rate: rate,
-      description: description,
-      discount: discount,
-      sku: sku,
-      tax_amount: self.tax_amount,
-      tax_rate_id: tax_rate_id,
-      tax: tax,
-      account: account,
-      item_code: item_code,
-      gl_code: item_code,
-      supply_item_type_id: supply_item_type_id,
-      item_type: supply_item_type.as_json,
-      product_type: product_type_id,
-      product_type_label: product_type_label,
-      rate_contract_vendors: rate_contract_vendors,
-      preferred_vendors: rate_contract_vendors,
-      user: user,
-      active: active,
-      item_expense_type_id: item_expense_type_id,
-      item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable,
-      tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description,
-      custom_fields: self.custom_fields
+        id: id,
+        item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
+        hsn_sac: hsn_sac,
+        category_name: category&.name,
+        category_id: category_id,
+        category_gl_code: category&.gl_code,
+        rate: rate,
+        description: description,
+        discount: discount,
+        sku: sku,
+        tax_amount: self.tax_amount,
+        tax_rate_id: tax_rate_id,
+        tax: tax,
+        account: account,
+        item_code: item_code,
+        gl_code: item_code,
+        supply_item_type_id: supply_item_type_id,
+        item_type: supply_item_type.as_json,
+        product_type: product_type_id,
+        product_type_label: product_type_label,
+        rate_contract_vendors: rate_contract_vendors,
+        preferred_vendors: rate_contract_vendors,
+        user: user,
+        active: active,
+        item_expense_type_id: item_expense_type_id,
+        item_expense_type_name: item_expense_type&.name,
+        tds_applicable: tds_applicable,
+        tds_applicable_label: (tds_applicable ? "yes" : "no"),
+        custom_description: get_custom_description,
+        custom_fields: self.custom_fields
 
     }
   end

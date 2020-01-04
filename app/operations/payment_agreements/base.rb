@@ -13,11 +13,11 @@ class PaymentAgreements::Base < BaseOperation
   def payment_agreement_parameters
     params.require(:payment_agreement).permit(
 
-      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
+        :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :renewal_reminder_date , :reject_note, :override_order_number,
         selected_invoice_frequency_attributes: {},
-        payment_agreement_custom_fields: {}, 
+        payment_agreement_custom_fields: {},
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id, :include_tax_and_tds,
+        general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :bank_account_id, :note, :billing_start_date, :billing_day_of_month, :discount_type_id, :tds_slab_id, :roundoff_amount, :vendor_id, :due_date, :vendor_location_id, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :prepaid, :escalation_percentage, :override_invoice_id, :include_tax_and_tds,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -43,7 +43,7 @@ class PaymentAgreements::Base < BaseOperation
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
+        rental_invoices_attributes: [:id, :_destroy, :department_id, :bank_account_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :vendor_id, :vendor_location_id, :billing_start_date, :billing_day_of_month, :tds_slab_id, :discount_type_id, :due_date, :roundoff_amount, :start_date, :end_date, :lock_in_period, :rent_free_period, :tenancy_period, :square_feet, :notice_period, :prepaid, :escalation_percentage, :override_invoice_id,
         invoice_custom_fields: {},
 
         invoice_items_attributes: [
@@ -67,13 +67,13 @@ class PaymentAgreements::Base < BaseOperation
         # payment_agreement_escalation_attributes: [:id, :period_id, :number, :percentage_increment, :_destroy],
         # invoice_frequency_attributes: [:id, :number, :period_id, :_destroy]
       ],
-      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id, 
+        beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :bank_account_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :gst_type_id, :tds_slab_id, :renewal_date, :tax_rate_id,
         tax_amount_attributes: [:id, :value, :currency_id],
         payable_amount_attributes: [:id, :currency_id, :value],
         original_amount_attributes: [:id, :currency_id, :value]
 
       ],
-      security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id, 
+        security_deposits_attributes: [:id, :_destroy, :vendor_id, :note, :cost_center_id, :department_id, :location_id, :vendor_location_id, :bank_account_id,
         original_amount_attributes: [:id, :currency_id, :value]
       ]
       
@@ -381,7 +381,7 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
-  def validate_document_custom_fields(document, custom_fields, save=false)
+  def validate_document_custom_fields(document, custom_fields, save = false)
     set_fields = set_custom_fields_document document, custom_fields, save
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]

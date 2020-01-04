@@ -1,7 +1,8 @@
 class Documents::Master
 
   def self.list
-    %w(Invoice)
+    # %w(Invoice)
+    []
   end
 
   def self.for(model_name)

@@ -30,6 +30,7 @@ class YesBankTransaction < ApplicationRecord
   belongs_to :beneficiary_bank_account, optional: true, class_name: "BankAccount"
   belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
   belongs_to :bank_transaction_type, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   has_one :payment, as: :reference_resource
 
@@ -56,6 +57,10 @@ class YesBankTransaction < ApplicationRecord
 
   def utr
     self.bank_reference_number
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name
   end
 
   private

@@ -57,7 +57,8 @@ class Event::EPurchaseOrder::Credit < Event::EPurchaseOrder::Base
                                              path_object_type: "Purchase Order",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             application: RequestStore.store[:current_app])
+                                             application: RequestStore.store[:current_app],
+                                             amount_id: payment&.amount_id)
     notification.save
   end
 

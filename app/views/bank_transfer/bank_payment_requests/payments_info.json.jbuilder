@@ -1,0 +1,1 @@
+json.payment_details @result.payment.as_json({payment_request_edit: true})

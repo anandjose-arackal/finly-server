@@ -4699,6 +4699,9 @@ Rails.application.routes.draw do
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/departments' => 'organization_account#departments'
   get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+  get 'organization_account/transfer_modes' => 'organization_account#transfer_modes'
+  post 'organization_account/create_transfer_modes' => 'organization_account#create_transfer_modes'
+  delete 'organization_account/destroy_transfer_modes' => 'organization_account#destroy_transfer_modes'
 
 
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
@@ -5008,6 +5011,7 @@ Rails.application.routes.draw do
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
+  get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
@@ -5216,6 +5220,7 @@ Rails.application.routes.draw do
     resources :payment_orders do
 
     end
+    get 'bank_payment_requests/progress', to: 'bank_payment_requests#progress', as: :progress
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     get 'bank_payment_requests/count_with_filters', to: 'bank_payment_requests#count_with_filters', as: :count_with_filters
     get 'payment_requests/get_company_bank_accounts', to: 'bank_payment_requests#get_company_bank_accounts', as: :get_company_bank_accounts
@@ -5232,6 +5237,7 @@ Rails.application.routes.draw do
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
     patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
+    post 'bulk_actions' => 'bank_payment_requests#bulk_actions', as: :bulk_actions
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
     post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
@@ -5264,6 +5270,7 @@ Rails.application.routes.draw do
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
       get 'payments', to: 'bank_payment_requests#payments_list', as: :payments_lst
+      get 'payments_info', to: 'bank_payment_requests#payments_info'
       get 'payments_count', to: 'bank_payment_requests#payments_count'
       delete 'remove_attachment', to: 'bank_payment_requests#remove_attachment', as: :remove_attachment
     end
@@ -5564,6 +5571,8 @@ Rails.application.routes.draw do
     resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
 
+
+
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'
     get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
@@ -5714,6 +5723,43 @@ Rails.application.routes.draw do
   resources :forms
 
   resources :insights
+
+  # Utility Bill Payments / BBPS Start #
+  namespace :bbps do
+    get 'subscriptions/edit_config', to: 'subscriptions#edit_config'
+    get 'subscriptions/biller_type_config', to: 'subscriptions#biller_type_config'
+    get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
+    get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
+    get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
+    resources :subscriptions do
+      patch 'review', to: 'subscriptions#review'
+      patch 'add_bill', to: 'subscriptions#add_bill'
+      get 'fetch_bill', to: 'subscriptions#fetch_bill'
+    end
+
+    get 'bills/edit_config', to: 'bills#edit_config'
+    get 'bills/actions_config', to: 'bills#actions_config'
+    get 'bills/filters_config', to: 'bills#filters_config'
+    get 'bills/payables', to: 'bills#payable_bills'
+    resources :bills do
+      patch 'review', to: 'bills#review'
+      patch 'bill_validate', to: 'bills#bill_validate'
+    end
+
+    resources :complaints
+  end
+  # Utility Bill Payments / BBPS Ends  #
+
+  # New Route for P2P
+  # Credit Note
+  get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
+  get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
+  get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+
+  resources :credit_notes do
+    patch 'review', to: 'credit_notes#review'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -44,4 +44,8 @@ class Bbps::BillersList < Bbps::Api
     list.map { |item| format(item) }
   end
 
+  def self.handle_error(data)
+    data
+  end
+
 end
