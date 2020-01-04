@@ -14,17 +14,12 @@
 #  updated_at           :datetime         not null
 #  user_id              :integer
 #  department_id        :integer
-#  entity_date          :date
+#  date                 :date
 #  sub_department_id    :integer
 #  procurement_id       :integer
 #  entity_status_id     :integer
 #  amount_before_tax_id :integer
 #  amount_after_tax_id  :integer
-#  entity_created_at    :datetime
-#  entity_submitted_at  :datetime
-#  billed               :boolean          default(FALSE)
-#  deleted_at           :datetime
-#  date                 :datetime
 #
 
 class BudgetTrail < ApplicationRecord

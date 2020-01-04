@@ -25,8 +25,6 @@
 #  calculated_before_tax_amount :boolean          default(FALSE)
 #  purchase_request             :boolean
 #  invoice                      :boolean
-#  budget_group_criterium_id    :integer
-#  active                       :boolean          default(FALSE)
 #
 
 class Budget < ApplicationRecord
