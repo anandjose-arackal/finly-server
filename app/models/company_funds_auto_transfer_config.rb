@@ -12,7 +12,6 @@
 #  updated_at           :datetime         not null
 #  enabled              :boolean          default(FALSE)
 #  transfer_mode        :string(255)
-#  deleted_at           :datetime
 #
 
 class CompanyFundsAutoTransferConfig < ApplicationRecord

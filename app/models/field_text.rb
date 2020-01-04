@@ -6,7 +6,6 @@
 #  value      :text(65535)      not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #
 
 class FieldText < ApplicationRecord

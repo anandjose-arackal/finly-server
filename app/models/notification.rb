@@ -22,7 +22,6 @@
 #  view_role_id         :integer
 #  message              :text(65535)
 #  application          :string(255)
-#  deleted_at           :datetime
 #
 
 class Notification < ApplicationRecord

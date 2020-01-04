@@ -21,7 +21,6 @@
 #  booking_type_restaurant :boolean          default(TRUE)
 #  booking_type_other      :boolean          default(TRUE)
 #  trips_money_request     :boolean          default(TRUE)
-#  deleted_at              :datetime
 #
 
 class PolicyConfiguration < ApplicationRecord
