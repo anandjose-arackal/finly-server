@@ -42,7 +42,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
       op.success do |result|
-        Rails.logger.fatal "Success:Result", result
+        puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
@@ -50,7 +50,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       end
       op.error do |result|
-        Rails.logger.fatal "Failure:Result", result
+        puts "Error:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result.errors.each do |error|
@@ -59,7 +59,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         end
       end
       op.failure do |result|
-        Rails.logger.fatal "Failure:Result", result
+        puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result.errors.each do |error|
