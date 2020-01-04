@@ -77,6 +77,7 @@ class ExportManager::Builders::Spreadsheet < ExportManager::API
       case format
       when :csv
         f.write exporter.generate_csv
+        file.content_type = 'text/csv'
       when :xls
         f.write exporter.generate_xls
       end
