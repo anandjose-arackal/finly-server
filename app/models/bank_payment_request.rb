@@ -327,22 +327,33 @@ class BankPaymentRequest < ApplicationRecord
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
-  scope :filter_payment_ids, -> (payment_ids) {
+  # scope :filter_payment_ids, -> (payment_ids) {
+  #   payment_ids = payment_ids.split(",").each {|e| e.strip!}
+  #   all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
+  #   if all_payments.where(id: payment_ids).any?
+  #     payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+  #     where(payment_order_id: payment_order_ids)
+  #   else
+  #     BankPaymentRequest.none
+  #   end
+  # }
+
+  scope :filter_payment_ids, -> (payment_ids){
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
-    all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    if all_payments.where(id: payment_ids).any?
-      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-      where(payment_order_id: payment_order_ids)
-    else
-      BankPaymentRequest.none
+    if payment_ids.present?
+      joins(payment_order: :payments).where("payments.id IN (?)", payment_ids)
     end
   }
 
+  # scope :filter_vendor_id, -> (vendor_id) {
+  #   payment_order_ids = self.pluck(:payment_order_id)
+  #   payments = Payment.where(payment_order_id: payment_order_ids)
+  #   payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
+  #   where(payment_order_id: payment_order_ids)
+  # }
+
   scope :filter_vendor_id, -> (vendor_id) {
-    payment_order_ids = self.pluck(:payment_order_id)
-    payments = Payment.where(payment_order_id: payment_order_ids)
-    payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    joins(payment_order: :payments).where("payments.receiving_user_type = ? AND payments.receiving_user_id = ?", "YesBankVendor", vendor_id)
   }
 
   scope :filter_ticket_type, -> (type) {
