@@ -75,6 +75,7 @@ class ExportJob < ApplicationRecord
         attachment: attachment&.url,
         created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
         status: status&.name,
+        note: note
     }
   end
 
