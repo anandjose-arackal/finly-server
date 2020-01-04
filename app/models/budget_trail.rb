@@ -14,7 +14,6 @@
 #  updated_at           :datetime         not null
 #  user_id              :integer
 #  department_id        :integer
-#  date              :date
 #  entity_date          :date
 #  sub_department_id    :integer
 #  procurement_id       :integer

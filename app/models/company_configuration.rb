@@ -25,6 +25,8 @@
 #  show_custom_fields_in_pdf        :boolean          default(TRUE)
 #  show_po_approved_trail           :boolean          default(FALSE)
 #  deleted_at                       :datetime
+#  email_purchase_order_initiator   :boolean
+#  email_purchase_order_initiator   :boolean
 #
 
 class CompanyConfiguration < ApplicationRecord

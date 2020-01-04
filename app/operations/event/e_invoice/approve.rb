@@ -50,7 +50,8 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
     #   end
     #   users
     # end
-    self.invoice.document_role_users(:creditor).present? ? ( self.invoice.affected_users(:approve) + self.invoice.document_role_users(:creditor) ) : self.invoice.affected_users(:approve)
+    affected_user = self.invoice.document_role_users(:creditor).present?  && self.invoice.approved? ? ( self.invoice.affected_users(:approve) + self.invoice.document_role_users(:creditor) + [self.invoice.created_by] ) : self.invoice.affected_users(:approve) + [self.invoice.created_by]
+    return affected_user.uniq
   end
 
   def notification_affected_users

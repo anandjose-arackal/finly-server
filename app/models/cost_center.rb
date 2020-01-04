@@ -10,6 +10,8 @@
 #  updated_at       :datetime         not null
 #  is_deleted       :boolean
 #  deleted_at       :datetime
+#  category_id      :integer
+#  code             :string(255)
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)

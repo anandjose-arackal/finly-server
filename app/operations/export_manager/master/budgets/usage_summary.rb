@@ -1,20 +1,18 @@
-class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Spreadsheet
 
   attr_accessor :spent_amount
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :budget_summary
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  handle :budget_summary
+
+
   validate :input
-  fields [
-                  budget_name: {spreadsheet: true, pdf: false},
-                  budget_start_date: {spreadsheet: true, pdf: false},
-                  budget_end_date: {spreadsheet: true, pdf: false},
-                  budget_amount: {spreadsheet: true, pdf: false},
-                  budget_usage: {spreadsheet: true, pdf: false},
-                  usage_percentage: {spreadsheet: true, pdf: true}
-                  ]
+
+  attribute :budget_name
+  attribute :budget_start_date
+  attribute :budget_end_date
+  attribute :budget_amount
+  attribute :budget_usage
+  attribute :usage_percentage
 
   def input
     op = ::Budgets::Index.(user, params)
