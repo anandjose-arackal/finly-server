@@ -7,7 +7,7 @@
 #  department_id :integer          not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  enabled       :boolean
+#  deleted_at    :datetime
 #
 
 class PolicyDepartmentMapping < ApplicationRecord

@@ -11,6 +11,7 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  company_id   :integer
+#  deleted_at   :datetime
 #
 
 class CompanyAgreementTrack < ApplicationRecord

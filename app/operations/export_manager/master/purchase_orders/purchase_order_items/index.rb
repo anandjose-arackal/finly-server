@@ -1,28 +1,30 @@
-class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Builders::Spreadsheet
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :purchase_order_items
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
-  validate :data_provider
-  fields [
-    procurement_name: {spreadsheet: true, pdf: true},
-    po_number: {spreadsheet: true, pdf: true},
-    po_date: {spreadsheet: true, pdf: true},
-    created_by: {spreadsheet: true, pdf: true},
-    description: {spreadsheet: true, pdf: true},
-    comment: {spreadsheet: true, pdf: true},
-    category: {spreadsheet: true, pdf: true},
-    policy: {spreadsheet: true, pdf: true},
-    hsn_sac: {spreadsheet: true, pdf: true},
-    quantity: {spreadsheet: true, pdf: true},
-    rate: {spreadsheet: true, pdf: true},
-    discount: {spreadsheet: true, pdf: true},
-    discount_amount: {spreadsheet: true, pdf: true},
-    tax: {spreadsheet: true, pdf: true},
-    tax_amount: {spreadsheet: true, pdf: true},
-    total_amount: {spreadsheet: true, pdf: true}                
-  ]
+
+  label 'Export'
+  description 'Purchase Orders Export'
+  configurable true
+  system :vp
+  # screen 'purchase_orders.index'
+  handle :purchase_order_items
+  validate :input
+
+  attribute :procurement_name
+  attribute :po_number
+  attribute :po_date
+  attribute :created_by
+  attribute :description
+  attribute :comment
+  attribute :category
+  attribute :policy
+  attribute :hsn_sac
+  attribute :quantity
+  attribute :rate
+  attribute :discount
+  attribute :discount_amount
+  attribute :tax
+  attribute :tax_amount
+  attribute :total_amount
 
   def input
     procurements_op = ::Procurements::Index.(user, params)
@@ -47,11 +49,11 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
   def po_number(item)
     purchase_order(item)&.po_number
-  end 
+  end
 
   def po_date(item)
     purchase_order(item)&.created_at&.strftime "%d-%b-%Y"
-  end 
+  end
 
   def created_by(item)
     purchase_order(item)&.user&.name
@@ -107,7 +109,9 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   def policy(item)
     item&.purchase_order&.policy&.name
   end
+
   protected
+
   def purchase_order(item)
     item&.purchase_order
   end

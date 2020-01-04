@@ -8,7 +8,8 @@ module CustomFieldFilterSupport
         parent_table_name = self.first&.class&.table_name
         if parent_table_name.present?
           filtered_text_obj.each.with_index(1) do |raw_hash, index|
-            parsed_hash = JSON.parse(raw_hash).with_indifferent_access
+            parsed_hash = raw_hash
+            parsed_hash = JSON.parse(raw_hash).with_indifferent_access if raw_hash.is_a?(String)
             id = parsed_hash[:id]
             value = parsed_hash[:value]
             if id.present? && value.present?
@@ -26,7 +27,8 @@ module CustomFieldFilterSupport
         parent_table_name = self.first&.class&.table_name
         if parent_table_name.present?
           filter_dropdown_obj.each.with_index(1) do |raw_hash, index|
-            parsed_hash = JSON.parse(raw_hash).with_indifferent_access
+            parsed_hash = raw_hash
+            parsed_hash = JSON.parse(raw_hash).with_indifferent_access if raw_hash.is_a?(String)
             id = parsed_hash[:id]
             value_id = parsed_hash[:value]
             if id.present? && value_id.present?
