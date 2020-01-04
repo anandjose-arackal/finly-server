@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_02_134133) do
+ActiveRecord::Schema.define(version: 2020_01_03_104831) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -900,7 +900,8 @@ ActiveRecord::Schema.define(version: 2020_01_02_134133) do
     t.boolean "convenience_fee_selected", default: false
     t.integer "bbps_biller_id"
     t.boolean "bill_validation_required"
-    t.string "validation_order_number"
+    t.string "order_number"
+    t.string "order_number_type"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -5236,6 +5237,7 @@ ActiveRecord::Schema.define(version: 2020_01_02_134133) do
     t.integer "status_id", default: 1
     t.text "message"
     t.integer "admin_user_id"
+    t.string "authentication_type", default: "password"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"

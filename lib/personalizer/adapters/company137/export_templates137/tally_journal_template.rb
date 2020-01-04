@@ -131,7 +131,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
     "Purchase - #{state_name}"
   end
 
-  def get_csgt_ledger(po)
+  def get_cgst_ledger(po)
     state_name = po.gstin_location&.state&.name&.upcase
     "Input CGST #{state_name}"
   end

@@ -97,6 +97,7 @@ class Company < ApplicationRecord
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
+  has_many :single_sign_on_configurations
 
   has_many :budgets
   has_many :procurements
@@ -244,7 +245,8 @@ class Company < ApplicationRecord
 
   def d_code
     return nil if itz_cash_property.blank?
-    itz_cash_property.d_code
+   # itz_cash_property.d_code
+   ""
   end
 
   def hdfc?
