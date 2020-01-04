@@ -59,6 +59,7 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
+#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -78,6 +79,9 @@ class User < ApplicationRecord
   devise :password_expirable, :password_archivable, :expirable #, :session_limitable, :secure_validatable
   # zxcvb-js gem
   devise :zxcvbnable
+
+  # making user model authenticable with SSO
+  devise :saml_authenticatable
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token

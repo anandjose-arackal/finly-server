@@ -12,6 +12,7 @@
 #  updated_at                       :datetime         not null
 #  attachment_url                   :text(65535)
 #  attachment_url_file_name         :string(255)
+#  deleted_at                       :datetime
 #
 
 class ReceiptEmailAttachment < ApplicationRecord
