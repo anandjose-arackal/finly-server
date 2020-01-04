@@ -12,8 +12,6 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
-#  deleted_at       :datetime
-#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord
@@ -258,7 +256,6 @@ class Company < ApplicationRecord
   def d_code
     return nil if itz_cash_property.blank?
     itz_cash_property.d_code
-    ""
   end
 
   def hdfc?

@@ -12,7 +12,6 @@
 #  updated_at        :datetime         not null
 #  created_by_id     :integer
 #  company_id        :integer
-#  deleted_at        :datetime
 #
 
 class TemporaryFile < ApplicationRecord

@@ -13,7 +13,7 @@
 #  payable_amount_id               :integer
 #  inclusive_of_taxes              :boolean
 #  gst_type_id                     :integer
-#  tax                             :decimal(10, 3)
+#  tax                             :decimal(10, )
 #  tds_slab_id                     :integer
 #  company_id                      :integer
 #  sub_department_id               :integer
@@ -39,7 +39,6 @@
 #  resource_template_id            :integer
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
-#  deleted_at                      :datetime
 #
 
 #                 :id => :integer,
