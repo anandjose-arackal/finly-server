@@ -249,7 +249,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
-      invoice_items_attributes << {
+      data = {
           tax: item.tax,
           discount: item.discount,
           unit_of_measurement: item.unit_of_measurement,
@@ -274,8 +274,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           # }
       }
       if item.inventory_line_item.service?
-        invoice_items_attributes[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}
+        data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}
       end
+      invoice_items_attributes << data
     end
     invoice_items_attributes
   end
