@@ -261,12 +261,16 @@ module Transitionable
       user_ids = []
 
       if level.present?
+        dlrms = self.document_level_reviewer_mappings.select{|dlrm| dlrm if dlrm.level_id == level.id}
+
         taken_control_by_ids = []
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
+        # taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids += dlrms.pluck(:taken_control_by_id)
         taken_control_by_ids.compact!
 
         forwarded_to_ids = []
-        forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        # forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        forwarded_to_ids += dlrms.pluck(:forwarded_to_id)
         forwarded_to_ids.compact!
 
         if taken_control_by_ids.present?
@@ -274,7 +278,8 @@ module Transitionable
         elsif forwarded_to_ids.present?
           user_ids = forwarded_to_ids
         else
-          user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+          # user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+          user_ids = dlrms.pluck(:reviewer_id)
         end
 
         # user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)

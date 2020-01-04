@@ -187,6 +187,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         beneficiary_account_ifsc: self.account.ifsc,
         beneficiary_name: self.account.name,
         transfer_status_id: transfer_status_id,
+        transfer_mode_id: payment.transfer_mode_id,
         narration: payment.note,
         amount_attributes: {
             value: payment.amount_value,

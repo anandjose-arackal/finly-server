@@ -4624,8 +4624,8 @@ ActiveRecord::Schema.define(version: 2020_01_03_103752) do
     t.string "locatable_type"
     t.decimal "latitude", precision: 30, scale: 15
     t.decimal "longitude", precision: 30, scale: 15
-    t.string "name", collation: "utf8_bin"
-    t.text "address", limit: 16777215, collation: "utf8_bin"
+    t.string "name"
+    t.text "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "order"
@@ -5781,7 +5781,7 @@ ActiveRecord::Schema.define(version: 2020_01_03_103752) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "company_id"
-    t.text "note", limit: 16777215, collation: "utf8_bin"
+    t.text "note"
     t.boolean "is_deleted", default: false, null: false
     t.string "procurement_type"
     t.string "transaction_id"

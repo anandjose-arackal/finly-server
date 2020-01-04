@@ -94,6 +94,7 @@
 #  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
+#  rcm_enabled                     :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
@@ -691,6 +692,7 @@ class Invoice < ApplicationRecord
         discount_type_id: self.discount_type_id,
         due_date: self.due_date,
         invoice_number: self.invoice_number,
+        invoice_id: self.invoice_id,
         inclusive_of_taxes: self.inclusive_of_taxes,
         freight_amount: self.freight_amount&.value,
         roundoff_amount: self.roundoff_amount,
@@ -704,10 +706,14 @@ class Invoice < ApplicationRecord
         discount_rate: invoice_discount_rate,
         advance_rate: precision_value(self.advance_rate),
         invoice_attachment: {
-            url: self.invoice_attachments.first&.attached_file&.url,
-            thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-            content_type: self.invoice_attachments.first&.attached_file&.content_type,
-            file_name: self.invoice_attachments.first&.attached_file&.original_filename
+            # url: self.invoice_attachments.first&.attached_file&.url,
+            # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+            # content_type: self.invoice_attachments.first&.attached_file&.content_type,
+            # file_name: self.invoice_attachments.first&.attached_file&.original_filename
+            url: self.attachments.first&.file&.url(:original, timestamp: false),
+            thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+            content_type: self.attachments.first&.file_content_type,
+            file_name: self.attachments.first&.file_file_name
         },
         net_amount: precision_value(self.net_amount&.value),
         original_amount: self.include_original_amount,
@@ -737,7 +743,8 @@ class Invoice < ApplicationRecord
         discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
         payment_agreement_id: self.payment_agreement_id,
         created_from_payment_agreement: self.payment_agreement_id.present?,
-        agreement_number: self&.payment_agreement&.get_agreement_number
+        agreement_number: self&.payment_agreement&.get_agreement_number,
+        payable: self.payable
       }
     end
   end
@@ -971,6 +978,14 @@ class Invoice < ApplicationRecord
     else
       return [self.invoice_status.as_json]
     end
+  end
+
+  def remaining_custom_field_config
+    current_user = RequestStore.store[:current_user]
+    invoice_cf_ids = self.custom_fields.pluck(:field_configuration_id)
+    configurations = current_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
+      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+      return custom_fields_config
   end
 
   private
