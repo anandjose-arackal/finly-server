@@ -5,7 +5,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   description 'Purchase Orders Export'
   configurable true
   system :vp
-  screen 'purchase_orders.index'
+  # screen 'purchase_orders.index'
   handle :purchase_order_items
   validate :input
 
