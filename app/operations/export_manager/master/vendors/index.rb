@@ -1,12 +1,12 @@
-class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :vendor_ba
 
-
-
-  subscribe :vendors
-
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  screen 'vendors.index'
+  handle :vendors
   validate :input
 
   attribute :vendor_business_name
@@ -38,10 +38,6 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   attribute :created_at
   attribute :active
 
-  def name
-    'Vendors'
-  end
-
   def input
     result = ::Vendors::Index.(user, params)
 
@@ -55,15 +51,16 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
         non_deleted.
         authorized.
         preload(:bank_accounts, :state_code, :created_by, :vendor_type).
-        left_joins(:gstin_locations).
-        select('
-                              yes_bank_vendors.*,
-                              gstin_locations.address,
-                              gstin_locations.location,
-                              gstin_locations.gstin,
-                              gstin_locations.poc_name,
-                              gstin_locations.poc_email
-                            ')
+        left_joins(:gstin_locations)
+        # .
+        # select('
+        #                       yes_bank_vendors.*,
+        #                       gstin_locations.address,
+        #                       gstin_locations.location,
+        #                       gstin_locations.gstin,
+        #                       gstin_locations.poc_name,
+        #                       gstin_locations.poc_email
+        #                     ')
 
     vendors
   end
@@ -93,7 +90,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def poc_name(vendor)
-    vendor.poc_name
+    vendor.gstin_locations&.first&.poc_name
   end
 
   def mobile_number(vendor)
@@ -105,7 +102,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def poc_email(vendor)
-    vendor.poc_email
+    vendor.gstin_locations&.first&.poc_email
   end
 
   def created_by(vendor)
@@ -117,7 +114,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def gstin(vendor)
-    vendor.gstin
+    vendor.gstin_locations&.first&.gstin
   end
 
   def state_code(vendor)
@@ -137,15 +134,15 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def gstin_location_address(vendor)
-    vendor.address
+    vendor.gstin_locations&.first&.address
   end
 
   def address(vendor)
-    vendor.address
+    vendor.gstin_locations&.first&.address
   end
 
   def gstin_location(vendor)
-    vendor.location
+    vendor.gstin_locations&.first&.location
   end
 
   def default_account_number(vendor)

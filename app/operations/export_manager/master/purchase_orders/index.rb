@@ -1,9 +1,11 @@
-class ExportManager::Master::Procurements::Provider < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Spreadsheet
 
-
-  subscribe :procurement
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Purchase Orders Export'
+  configurable true
+  system :vp
+  screen ['purchase_orders.index', 'po_advances.index']
+  handle :purchase_orders
   validate :input
 
   attribute :procurement_name
@@ -70,10 +72,6 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   attribute :invoice_purchase_address
   attribute :invoice_delivery_address
   attribute :invoice_custom_fields
-
-  def name
-    'Purchase Orders'
-  end
 
   def input
     # if params[:filter_po_status].present?

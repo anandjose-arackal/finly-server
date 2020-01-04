@@ -1,11 +1,11 @@
-class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Spreadsheet
 
-
-
-  subscribe :vendor_details
-
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  # screen 'vendors.index'
+  # handle :vendor_details
   validate :input
 
   attribute :vendor_business_name
@@ -24,10 +24,6 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
   attribute :default_account_number
   attribute :default_account_ifsc
   attribute :created_at
-
-  def name
-    'Vendors'
-  end
 
   def input
     params[:beneficiary_type] = 2

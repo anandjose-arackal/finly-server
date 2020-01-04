@@ -1,5 +1,4 @@
-class ExportManager::Index < BaseOperation
-
+class ExportManager::Jobs::Index < BaseOperation
   attr_accessor :export_jobs
 
   def pre_validate
@@ -11,10 +10,10 @@ class ExportManager::Index < BaseOperation
   end
 
   def success
-    ExportManager::Index::SuccessPresenter.new(user, {export_jobs: self.export_jobs}, messages)
+    ExportManager::Jobs::Index::SuccessPresenter.new(user, {export_jobs: self.export_jobs}, messages)
   end
 
-  class ExportManager::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ExportManager::Jobs::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :export_jobs, :paginated_export_jobs
 
     has_scope :filter_name
@@ -22,9 +21,9 @@ class ExportManager::Index < BaseOperation
     has_scope :filter_creation_date, using: [:from, :to], type: :hash
 
     def init
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
-      end
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
 
       self.export_jobs = params[:export_jobs].created_after(7.days.ago).includes(:status)

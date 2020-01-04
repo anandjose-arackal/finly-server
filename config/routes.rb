@@ -4970,8 +4970,6 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
-  get 'exports/:type', to: 'export#processor'
-
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
@@ -5695,6 +5693,9 @@ Rails.application.routes.draw do
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
 
+  get 'exports/config', to: 'export_jobs#export_jobs_config'
+  get 'exports/:type', to: 'export_jobs#create'
+  post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
 
   # The priority is based upon order of creation: first created -> highest priority.
