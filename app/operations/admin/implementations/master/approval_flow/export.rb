@@ -68,10 +68,10 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
                 reviewer_count = 1
                 mappings.each do |mapping|
                   key = "level #{level.level_number}_reviewer#{reviewer_count}"
-                  policy_details["#{key} employee_id"] = mapping.reviewer&.profile&.employee_id
-                  policy_details["#{key} name"] = mapping.reviewer&.name
-                  policy_details["#{key} mobile_number"] = mapping.reviewer&.mobile_number
-                  policy_details["#{key} email"] = mapping.reviewer&.email
+                  policy_details["#{key}employee_id"] = mapping.reviewer&.profile&.employee_id
+                  policy_details["#{key}name"] = mapping.reviewer&.name
+                  policy_details["#{key}mobile_number"] = mapping.reviewer&.mobile_number
+                  policy_details["#{key}email"] = mapping.reviewer&.email
                   reviewer_count+=1
                 end
             end
