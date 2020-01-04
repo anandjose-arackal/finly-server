@@ -777,6 +777,9 @@ class Payment < ApplicationRecord
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:paid))
       end
     end
 
