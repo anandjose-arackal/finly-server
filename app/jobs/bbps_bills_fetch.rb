@@ -37,12 +37,16 @@ class BbpsBillsFetch < ApplicationJob
       # Do not create bill if bill for same year and period exists
       return if bill.present?
 
+      bill_period = result.bill_period
+
+      bill_period = Date.today.strftime("%B").upcase if bill_period == "NA"
+
       params = {
           amount: (result.amount.to_f / 100),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,
-          bill_period: result.bill_period,
+          bill_period: bill_period,
           convenience_fee: get_amount_from_response(result.convenience_fee),
           convenience_fee_desc: result.convenience_fee_desc,
           early_payment_fee: get_amount_from_response(result.early_payment_fee),
