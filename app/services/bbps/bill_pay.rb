@@ -214,7 +214,7 @@ class Bbps::BillPay < Bbps::Api
 
   # this is because the payments need to be sent in paisa
   def amount
-    params[:amount]&.to_f * 100
+    (params[:amount]&.to_f * 100).round(0)
   end
 
   def payment_mode
