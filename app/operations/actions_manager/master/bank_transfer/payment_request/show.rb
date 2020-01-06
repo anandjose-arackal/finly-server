@@ -446,9 +446,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end ####################
 
     ############# Reviewer logic start ####################
-    # if bank_payment_request.is_reviewing_user?
-    #   return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
-    # end
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
       ############# Reviewer logic end ####################
 
       ############# Initiator logic start ####################
