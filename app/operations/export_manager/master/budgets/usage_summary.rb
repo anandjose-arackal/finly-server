@@ -1,10 +1,10 @@
-class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Spreadsheet
 
   attr_accessor :spent_amount
 
-  subscribe :budget_summary
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  handle :budget_summary
+
+
   validate :input
 
   attribute :budget_name
@@ -13,10 +13,6 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::Base
   attribute :budget_amount
   attribute :budget_usage
   attribute :usage_percentage
-
-  def name
-    'Budgets'
-  end
 
   def input
     op = ::Budgets::Index.(user, params)
