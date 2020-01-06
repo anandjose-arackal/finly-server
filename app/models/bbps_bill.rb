@@ -220,7 +220,7 @@ class BbpsBill < ApplicationRecord
         due_date: due_date,
         bill_date: bill_date,
         bill_period: bill_period,
-        bill_number: bill_period,
+        bill_number: bill_number,
 
         late_payment_fee_selected: late_payment_fee_selected,
         early_payment_fee_selected: early_payment_fee_selected,
