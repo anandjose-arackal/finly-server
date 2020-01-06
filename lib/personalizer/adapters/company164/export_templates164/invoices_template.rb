@@ -1,12 +1,14 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate < ExportManager::Builders::Spreadsheet
 
-  label 'Export 2'
-  description 'Invoice'
+  label 'LMS Export'
+  description 'LMS Export'
   configurable false
   handle :lms_export
-  # screen 'invoices.index'
+  screen 'invoices.index'
   system :vp
-  # scope "development", 2, 'L&C Ltd.'
+  scope 'development', 2, 'L&C Ltd.'
+  scope "staging", 2, 'L&C Ltd.'
+  scope "production", 164, 'Satin Creditcare Network Ltd'
   validate :fetch_invoices
 
   def fetch_invoices
