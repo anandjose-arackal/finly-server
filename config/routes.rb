@@ -5750,6 +5750,8 @@ Rails.application.routes.draw do
     scope :v1 do
       post 'auth', to: 'streamsets/v1/token#create'
       get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+      get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
+      get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
     end
   end
 
