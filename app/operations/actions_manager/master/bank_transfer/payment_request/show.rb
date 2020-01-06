@@ -819,6 +819,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
     ############# Admin logic end ######################
 
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
+
     ############# Creditor logic start ######################
     if bank_payment_request.is_crediting_user?
       if !bank_payment_request.open? && !bank_payment_request.credited?
@@ -849,6 +855,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
     ############# Admin logic end ######################
 
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
+
     ############# Creditor logic start ######################
     if bank_payment_request.is_crediting_user?
       if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
@@ -878,6 +890,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Admin logic start ######################
+
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
     
     ############# Initiator logic start ######################
     if bank_payment_request.is_initiating_user?
