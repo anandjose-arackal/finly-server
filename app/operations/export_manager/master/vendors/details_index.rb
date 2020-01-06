@@ -1,30 +1,29 @@
-class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Builders::Spreadsheet
 
-  bus ExportManager::Master::BaseMaster
-
-  subscribe :vendor_details
-
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  # screen 'vendors.index'
+  # handle :vendor_details
   validate :input
-  fields [
-                      vendor_business_name: {spreadsheet: true, pdf: false},
-                      vendor_id: {spreadsheet: true, pdf: false},
-                      authorized: {spreadsheet: true, pdf: false},
-                      name: {spreadsheet: true, pdf: false},
-                      mobile_number: {spreadsheet: true, pdf: false},
-                      email: {spreadsheet: true, pdf: false},
-                      created_by: {spreadsheet: true, pdf: false},
-                      pan: {spreadsheet: true, pdf: false},
-                      address: {spreadsheet: true, pdf: false},
-                      gstin: {spreadsheet: true, pdf: false},
-                      state_code: {spreadsheet: true, pdf: false},
-                      description: {spreadsheet: true, pdf: false},
-                      vendor_type: {spreadsheet: true, pdf: false},
-                      default_account_number: {spreadsheet: true, pdf: false},
-                      default_account_ifsc: {spreadsheet: true, pdf: false},
-                      created_at: {spreadsheet: true, pdf: false}
-                      ]
+
+  attribute :vendor_business_name
+  attribute :vendor_id
+  attribute :authorized
+  attribute :name
+  attribute :mobile_number
+  attribute :email
+  attribute :created_by
+  attribute :pan
+  attribute :address
+  attribute :gstin
+  attribute :state_code
+  attribute :description
+  attribute :vendor_type
+  attribute :default_account_number
+  attribute :default_account_ifsc
+  attribute :created_at
 
   def input
     params[:beneficiary_type] = 2

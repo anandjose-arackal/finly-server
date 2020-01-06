@@ -60,9 +60,8 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     unless messages.blank?
       return result false, messages.join(', ')
     end
-
     begin
-      unless user.update(user_params)
+      unless user.update(user_params.except(:password, :password_confirmation))
         return result false, user.errors.full_messages
       end
     rescue Exception => e
@@ -142,7 +141,11 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     end
 
     # generating a password for the user
-    generated_password = generate_default_password
+    if data[:id].blank?
+      generated_password = generate_default_password
+    else
+      generated_password = ''
+    end
     company = Company.find_by(id: data[:company_id])
     department_id = company&.departments&.find_by(name: data[:department_code])&.id
     location_id = company&.locations&.find_by(name: data[:location_code])&.id
