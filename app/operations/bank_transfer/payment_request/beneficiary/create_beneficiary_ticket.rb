@@ -133,32 +133,32 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	end
 
 	def process
-	    # if the validation of the data is successful, it will create a payment order and
-	    # asynchronously add payments to it one by one
-	    self.bank_payment_request_params = parse_payment_order_data
-	    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
+		# if the validation of the data is successful, it will create a payment order and
+		# asynchronously add payments to it one by one
+		self.bank_payment_request_params = parse_payment_order_data
+		self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
 
-	    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
-	    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
+		Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
+		Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
 
-	    # Create Document Level Reviewer Mapping
-	    # For setting level specific reviewers from reviewal chain for a document
-	    params[:reviewal_document] = self.bank_payment_request.reload
-	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-	    unless document_reviewer_mappings_op.success?
-	      self.bank_payment_request.destroy
-	      add_message :error, document_reviewer_mappings_op.messages[:error]
-	      return
-	    end
+		# Create Document Level Reviewer Mapping
+		# For setting level specific reviewers from reviewal chain for a document
+		params[:reviewal_document] = self.bank_payment_request.reload
+		document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+		unless document_reviewer_mappings_op.success?
+			self.bank_payment_request.destroy
+			add_message :error, document_reviewer_mappings_op.messages[:error]
+			return
+		end
 
-	    # Delegate payment creation to the background operation
-      # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-      update_status if self.from_payment_agreement # Setting up this status for payment agreement
-      if [168, 169, 174, 175].include?(user.company.id)
-				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
-			else
-				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
-			end
+		# Delegate payment creation to the background operation
+		# ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+		update_status if self.from_payment_agreement # Setting up this status for payment agreement
+		if [168, 169, 174, 175].include?(user.company.id)
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+		else
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+		end
 			# end
 	end
 
