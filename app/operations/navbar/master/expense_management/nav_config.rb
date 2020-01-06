@@ -7,6 +7,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :dashboard,
           :receipts,
           :expenses,
+          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
           :money_requests,
           :reports,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
@@ -16,7 +17,6 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
           # {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
-          # {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
           # {settlements: [:team_settlements, :company_settlements]},
           # :analytics,
           # {export: [:team_exports, :company_exports]},
@@ -75,22 +75,22 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def trips_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Trips', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
+    {name: 'Awaiting Approval', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
   end
 
   def team_trips
     return nil unless user.manager? || user.admin?
-    {name: 'Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
+    {name: 'Team Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
   end
 
   def travel_manager_trips
     return nil unless user.travel_manager?
-    {name: 'Travel Manager Trips', id: 'trips', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
+    {name: 'Travel Manager Approvals', id: 'trips', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
     return nil unless user.admin?
-    {name: 'Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
+    {name: 'Company Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def reports
@@ -185,7 +185,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def statements
     return nil unless user.admin?
-    {name: 'Statements', id: 'statements', url: 'company_statements/params={"view":"admin"}'}
+    {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
   end
 
   def create
@@ -217,6 +217,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def admin
+    return nil unless user.admin?
     analytics&.merge({name: 'Admin'})
   end
 
