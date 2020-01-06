@@ -5714,6 +5714,12 @@ Rails.application.routes.draw do
   post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
+
+  get 'exports/config', to: 'export_jobs#export_jobs_config'
+  get 'exports/:type', to: 'export_jobs#create'
+  post 'exports/:type', to: 'export_jobs#create'
+  resources :export_jobs, only: [:index]
+
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms

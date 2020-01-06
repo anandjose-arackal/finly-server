@@ -9,7 +9,6 @@
 #  token             :string(255)
 #  is_valid          :boolean          default(TRUE)
 #  view_role_id      :integer
-#  deleted_at        :datetime
 #
 
 class EmailAuthorization < ApplicationRecord

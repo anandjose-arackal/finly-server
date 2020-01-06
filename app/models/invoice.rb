@@ -126,6 +126,7 @@ class Invoice < ApplicationRecord
   belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :paid_amount, optional: true, class_name: "Amount"
 
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
@@ -214,7 +215,7 @@ class Invoice < ApplicationRecord
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
-  delegate :paid_amount, to: :paid_amount
+  delegate :paid_amount_value, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, to: :invoice_status, allow_nil: true
@@ -724,6 +725,7 @@ class Invoice < ApplicationRecord
           discount_type_id: self.discount_type_id,
           due_date: self.due_date,
           invoice_number: self.invoice_number,
+          invoice_id: self.invoice_id,
           inclusive_of_taxes: self.inclusive_of_taxes,
           freight_amount: self.freight_amount&.value,
           roundoff_amount: self.roundoff_amount,
@@ -737,10 +739,14 @@ class Invoice < ApplicationRecord
           discount_rate: invoice_discount_rate,
           advance_rate: precision_value(self.advance_rate),
           invoice_attachment: {
-              url: self.invoice_attachments.first&.attached_file&.url,
-              thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-              content_type: self.invoice_attachments.first&.attached_file&.content_type,
-              file_name: self.invoice_attachments.first&.attached_file&.original_filename
+              # url: self.invoice_attachments.first&.attached_file&.url,
+              # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+              # content_type: self.invoice_attachments.first&.attached_file&.content_type,
+              # file_name: self.invoice_attachments.first&.attached_file&.original_filename
+              url: self.attachments.first&.file&.url(:original, timestamp: false),
+              thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+              content_type: self.attachments.first&.file_content_type,
+              file_name: self.attachments.first&.file_file_name
           },
           net_amount: precision_value(self.net_amount&.value),
           original_amount: self.include_original_amount,
@@ -748,6 +754,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
 
           cost_center_id: self.cost_center_id,
@@ -843,7 +850,6 @@ class Invoice < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
   end
-
   ############ End ############
 
   # def can_take_control?

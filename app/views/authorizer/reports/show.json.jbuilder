@@ -110,5 +110,5 @@ json.violations do
 end
 
 json.custom_fields do
-  json.array! @result.report.custom_fields
+  json.array! @result.report.custom_fields.as_json({report_mailer_show: true})
 end

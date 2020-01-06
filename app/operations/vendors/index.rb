@@ -32,9 +32,9 @@ class Vendors::Index < Vendors::Base
     
     def init
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
-      end
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
       self.vendors = params[:vendors]
       self.vendors = apply_scopes(self.vendors, params)

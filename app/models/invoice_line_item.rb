@@ -34,7 +34,6 @@
 #  igst                   :decimal(20, 5)   default(0.0)
 #  purchase_order_item_id :integer
 #  billable_amount_id     :integer
-#  deleted_at             :datetime
 #
 
 class InvoiceLineItem < ApplicationRecord

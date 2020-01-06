@@ -17,7 +17,6 @@
 #  parent_id    :integer
 #  address_name :string(255)
 #  landmark     :text(65535)
-#  deleted_at   :datetime
 #
 
 class Address < ApplicationRecord
