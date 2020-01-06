@@ -79,9 +79,6 @@ class User < ApplicationRecord
   # zxcvb-js gem
   devise :zxcvbnable
 
-  # making user model authenticable with SSO
-  devise :saml_authenticatable
-
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
 
