@@ -42,7 +42,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
       op.success do |result|
-        Rails.logger.fatal "Success:Result", result
+        puts "Success:Result: #{result}"
         # here we are assuming that the bill gets paid through the BillPay API
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
@@ -50,7 +50,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       end
       op.error do |result|
-        Rails.logger.fatal "Failure:Result", result
+        puts "Error:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result.errors.each do |error|
@@ -59,7 +59,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         end
       end
       op.failure do |result|
-        Rails.logger.fatal "Failure:Result", result
+        puts "Failure:Result: #{result}"
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         result.errors.each do |error|
@@ -113,7 +113,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
     bill = payment.parent
     bank_transaction = payment.company.bbps_yes_bank_transactions.build(
         order_number: retrieve_order_number(payment),
-        biller_id: payment.parent.subscription_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
+        biller_id: bill.biller.biller_id, # here, parent will be a BbpsBill object, which holds the subscription ID, ID of the BbpsBillerSubscription
         transfer_status_id: BankTransferStatus.id_for(:open),
         bill_date: payment.parent.bill_date,
         bill_period: payment.parent.bill_period,

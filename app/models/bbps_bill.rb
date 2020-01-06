@@ -43,6 +43,8 @@
 #  bill_validation_required   :boolean
 #  order_number               :string(255)
 #  order_number_type          :string(255)
+#  tax_rate_id                :integer
+#  hsn_sac                    :string(255)
 #
 
 class BbpsBill < ApplicationRecord

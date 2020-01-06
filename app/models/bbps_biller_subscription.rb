@@ -43,6 +43,9 @@
 #  customer_email          :string(255)
 #  customer_aadhar_number  :string(255)
 #  customer_pan            :string(255)
+#  tax_rate_id             :integer
+#  category_id             :integer
+#  hsn_sac                 :string(255)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
