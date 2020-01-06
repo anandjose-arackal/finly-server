@@ -13,8 +13,8 @@ class ExportManager::Master
         next unless params[:screen].blank? or screen.include?(params[:screen].to_s)
         next unless params[:handle].blank? or master.handle_name.to_s == params[:handle].to_s
         next unless params[:system].blank? or master.system.to_s == params[:system].to_s
-        next unless master.accept?(user, params)
         next unless master.valid_company?(user, params)
+        next unless master.accept?(user, params)
 
         handlers << master.config
       end
