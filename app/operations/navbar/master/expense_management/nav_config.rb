@@ -4,7 +4,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   register_structure(
       :tabs,
       [
-          #:dashboard,
+          :dashboard,
           :expenses,
           :receipts,
           :trips,
@@ -238,6 +238,10 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   def divider
     return nil unless user.manager? || user.admin?
     {type: 'divider'}
+  end
+
+  def users
+    company_users
   end
 
 end
