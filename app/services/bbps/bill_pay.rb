@@ -172,6 +172,10 @@ class Bbps::BillPay < Bbps::Api
     "N"
   end
 
+  def split_pay_amount
+    0
+  end
+
   def quick_pay
     params[:quick_pay] || "N"
   end

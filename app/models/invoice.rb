@@ -850,6 +850,7 @@ class Invoice < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
   end
+
   ############ End ############
 
   # def can_take_control?
