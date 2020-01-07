@@ -137,7 +137,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def company_money_requests
-    return nil unless user.admin?
+    return nil unless user.admin? || user.auditor?
     {name: 'Money Requests', id: 'admin', url: 'requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
@@ -232,8 +232,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def auditor
-    return nil unless user.auditor?
-    RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Admin'}) : company_money_requests&.merge({name: 'Admin'})
+    return nil unless user.admin?
+    RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Auditor'}) : company_money_requests&.merge({name: 'Auditor'})
   end
 
   def team
