@@ -31,9 +31,6 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def create
     endpoint Docs::UtilityBills::Subscriptions::Ops::Create
-    respond_to do |format|
-      format.json {}
-    end
   end
 
   def validate_customer_params

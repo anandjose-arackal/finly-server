@@ -79,10 +79,23 @@ class BbpsBillerSubscription < ApplicationRecord
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
 
-  scope :filter_status, -> (status) {
+  scope :filter_status, -> (status, user = nil) {
     case status
     when 'approved', :approved
       where(status_id: BbpsBillerSubscriptionStatus.id_for(:approved))
+    when 'processing', :processing
+      where(status_id: BbpsBillerSubscriptionStatus.id_for(:awaiting_approval))
+    when 'draft', :draft
+      where(status_id: BbpsBillerSubscriptionStatus.ids_for(:draft, :retracted, :rejected))
+    when 'deactivated', :deactivated
+      where(status_id: BbpsBillerSubscriptionStatus.id_for(:deactivated))
+    when 'reactivated', :reactivated
+      where(status_id: BbpsBillerSubscriptionStatus.id_for(:reactivated))
+    when 'awaiting_approval', :awaiting_approval
+      # if user.present?
+      # BbpsBillerSubscription.awaiting_action_items(user)
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+      # end
     end
   }
 
@@ -115,7 +128,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   scope :filter_biller_type, -> (biller_type) {
-    joins(:biller).where("bbps_billers.biller_category_name = ?", "%#{biller_type}%")
+    joins(:biller).where("bbps_billers.biller_category_name = ?", "#{biller_type}")
   }
 
   def cleanup

@@ -92,7 +92,7 @@ class BbpsBill < ApplicationRecord
     when 'processing', :processing
       where(status_id: BbpsBillStatus.id_for(:awaiting_approval))
     when 'awaiting_approval', :awaiting_approval
-      where(status_id: BbpsBillStatus.id_for(:awaiting_approval))
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
     when 'retracted', :retracted
       where(status_id: BbpsBillStatus.id_for(:retracted))
     when 'rejected', :rejected
@@ -144,17 +144,21 @@ class BbpsBill < ApplicationRecord
     where(bbps_biller_id: id)
   }
 
-  scope :filter_biller_type, -> (type) {
-    joins(:biller).where('bbps_billers.biller_category_name = ?', "%#{type}%")
+  # scope :filter_biller_type, -> (type) {
+  #   joins(:biller).where('bbps_billers.biller_category_name = ?', "#{type}")
+  # }
+
+  scope :filter_biller_type, -> (biller_type) {
+    joins(:biller).where("bbps_billers.biller_category_name = ?", "#{biller_type}")
   }
 
   scope :filter_poc_id, -> (id) {
     where(user_id: id)
   }
 
-  scope :filter_bill_date, -> (start_date, end_date) {where('bill_date >= ? AND bill_date =< ? ', start_date, end_date)}
-  scope :filter_due_date, -> (start_date, end_date) {where('due_date >= ? AND due_date =< ? ', start_date, end_date)}
-  scope :filter_paid_on_date, -> (start_date, end_date) {where('paid_on_date >= ? AND paid_on_date =< ? ', start_date, end_date)}
+  scope :filter_bill_date, -> (start_date, end_date) {where('bill_date >= ? AND bill_date <= ? ', start_date, end_date)}
+  scope :filter_due_date, -> (start_date, end_date) {where('due_date >= ? AND due_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
+  scope :filter_paid_on_date, -> (start_date, end_date) {where('paid_on_date >= ? AND paid_on_date <= ? ', start_date, end_date)}
   scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
   scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
 
@@ -170,7 +174,7 @@ class BbpsBill < ApplicationRecord
       data = {
           id: id,
           biller: subscription.biller.as_json({index: true}),
-          # name: name,
+          name: subscription.name,
           sequence_id: sequence_id,
           department: department.as_json,
           cost_center: cost_center.as_json,
@@ -180,11 +184,12 @@ class BbpsBill < ApplicationRecord
           # note: note,
           created_at: created_at.strftime("%d-%b-%Y"),
           updated_at: updated_at.strftime("%d-%b-%Y"),
+          due_date: due_date,
           status: status.as_json,
           user: user&.json_for_trail,
           # biller_category_name: biller_category_name,
           amount: amount.as_json,
-          customer_fields: subscription.customer_fields.as_json,
+          customer_fields: subscription.all_customer_fields,
       }
       return data
     end
