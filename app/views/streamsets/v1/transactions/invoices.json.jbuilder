@@ -1,6 +1,7 @@
 # These fields are a replica of Invoice Exports
 json.result do
   json.array!(@result.paginated_invoice_line_items) do |invoice_line_item|
+    parent = invoice_line_item.parent
     # standard fields
     json.extract! invoice_line_item, :id, :parent_id
 
@@ -40,7 +41,7 @@ json.result do
     json.tds_nature invoice_line_item.parent.tds_slab&.name
     json.tds_amount invoice_line_item.parent.tds_amount&.value || 0.0
     json.tds_percentage invoice_line_item.parent.tds_slab&.tds || 0.0
-    json.invoice_disscount invoice_line_item.parent&.discount_amount&.value || 0
+    json.invoice_discount invoice_line_item.parent&.discount_amount&.value || 0
     json.line_item_discount invoice_line_item.discount_amount&.value || 0
     json.line_item_sgst invoice_line_item.sgst || 0
     json.line_item_cgst invoice_line_item.cgst || 0
@@ -59,6 +60,8 @@ json.result do
     json.created_by invoice_line_item.parent&.created_by&.name
     json.created_at invoice_line_item.parent&.created_at&.strftime("%d-%b-%Y")
     json.po_date invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
+    json.gl_code invoice_line_item.inventory_line_item.category.gl_code rescue nil
+    json.gst_type invoice_line_item.parent.gst_type&.name&.titleize rescue nil
 
     # extra fields
     json.buyer_location_state invoice_line_item.parent.location&.state&.name
