@@ -111,7 +111,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_expenses
-    return nil unless user.manager? || finance_manager?
+    return nil unless user.manager? || user.finance_manager?
     view  = user.finance_manager? ? "finance_manager" : "manager"
     {name: 'Expenses', id: 'expenses', url: "expenses/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
