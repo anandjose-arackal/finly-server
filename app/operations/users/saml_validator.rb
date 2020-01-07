@@ -14,8 +14,15 @@ class Users::SamlValidator < BaseOperation
 
   def init
     # fallback in case the FE doesn't send it. #TODO - handle it more gracefully
-    self.sso_config_id = params[:sso_config_id] || 1
+    self.sso_config_id = params[:sso_config_id]
     self.sso_response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :settings => saml_settings(self.sso_config_id))
+  end
+
+  def validate
+    if self.sso_config_id.blank?
+      add_message :error, "Invalid SSO config passed"
+      return
+    end
   end
 
   def process
