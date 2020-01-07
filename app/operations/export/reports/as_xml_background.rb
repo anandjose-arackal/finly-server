@@ -52,7 +52,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   def post_process
     #adding report names in the name of the file
     names = []
-    reports.each do |report|
+    reports.find_each(batch_size: 1000) do |report|
       names << report.name
     end
     self.report_names = names.to_sentence
