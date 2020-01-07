@@ -232,7 +232,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def auditor
-    return nil unless user.admin?
+    return nil unless user.auditor?
     RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Auditor'}) : company_money_requests&.merge({name: 'Auditor'})
   end
 
