@@ -92,7 +92,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_trips
     return nil unless user.admin? || user.auditor?
-    {name: 'Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
+    view = user.admin? ? "admin" : "auditor"
+    {name: 'Trips', id: "#{view}", url: "travel_requests/params={\"view\": \"#{view}\", \"main_tab\": \"#{view}\"}"}
   end
 
   def reports
@@ -115,7 +116,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_reports
     return nil unless user.admin? || user.auditor?
-    {name: 'Reports', id: 'admin', url: 'reports/params={"view":"admin", "main_tab": "admin"}'}
+    view = user.admin? ? "admin" : "auditor"
+    {name: 'Reports', id: "#{view}", url: "reports/params={\"view\": \"#{view}\", \"main_tab\": \"#{view}\"}"}
   end
 
   def money_requests
@@ -138,7 +140,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_money_requests
     return nil unless user.admin? || user.auditor?
-    {name: 'Money Requests', id: 'admin', url: 'requests/params={"view":"admin", "main_tab": "admin"}'}
+    view = user.admin? ? "admin" : "auditor"
+    {name: 'Money Requests', id: "#{view}", url: "requests/params={\"view\": \"#{view}\", \"main_tab\": \"#{view}\"}"}
   end
 
   def settlements
