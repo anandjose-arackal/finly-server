@@ -65,10 +65,10 @@ json.result do
 
     # extra fields
     json.buyer_location_state invoice_line_item.parent.location&.state&.name
-    json.buyer_location_code invoice_line_item.parent.location&.state&.code
+    json.buyer_location_code invoice_line_item.parent.location&.location_code
 
     json.delivery_location_state invoice_line_item.parent.delivery_location&.state&.name
-    json.delivery_location_code invoice_line_item.parent.delivery_location&.state&.code
+    json.delivery_location_code invoice_line_item.parent.delivery_location&.location_code
 
     json.gstin_location_state invoice_line_item.parent.gstin_location&.state&.name
     json.gstin_location_code invoice_line_item.parent.gstin_location&.state&.state_code
