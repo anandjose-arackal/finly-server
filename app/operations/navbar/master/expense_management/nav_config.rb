@@ -13,6 +13,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
           {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_reports, :team_trips]},
           {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
+          {auditor: [:analytics, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -228,6 +229,11 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   def admin
     return nil unless user.admin?
     RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Admin'}) : company_settlements&.merge({name: 'Admin'})
+  end
+
+  def auditor
+    return nil unless user.auditor?
+    RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Admin'}) : company_money_requests&.merge({name: 'Admin'})
   end
 
   def team
