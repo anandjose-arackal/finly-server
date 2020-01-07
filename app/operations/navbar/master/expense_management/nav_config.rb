@@ -184,8 +184,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_users
-    return nil unless user.admin? || user.finance_manager?
-    {name: 'Users', id: 'team', url: 'employees/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.manager? || user.finance_manager?
+    view = user.finance_manager? ? "finance_manager" : "manager"
+    {name: 'Users', id: 'team', url: "employees/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
   def company_users
