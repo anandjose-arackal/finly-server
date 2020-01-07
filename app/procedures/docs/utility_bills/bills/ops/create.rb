@@ -38,6 +38,7 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
 
     bill['subscription_id'] = subscription.id
     bill['autofetched'] = autofetched
+    bill['bill_validation_required'] = !autofetched
 
     bill['late_payment_fee'] = {
         value: late_payment_fee,
