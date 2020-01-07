@@ -212,7 +212,6 @@ class BbpsBill < ApplicationRecord
         updated_at: updated_at.strftime("%d-%b-%Y"),
         status: status.as_json,
         user: user&.json_for_trail,
-        payments: self.payments,
         payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
 

@@ -609,6 +609,8 @@ class Payment < ApplicationRecord
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
     when 'SecurityDeposit'
       SecurityDeposit.find_by(id: self.parent_id).as_json
+    when 'BbpsBill'
+      BbpsBill.find_by(id: self.parent_id).as_json
     else
       if self.invoice.present?
         self.invoice.as_json
