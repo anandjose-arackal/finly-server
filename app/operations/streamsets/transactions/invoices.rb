@@ -28,7 +28,7 @@ class Streamsets::Transactions::Invoices < BaseOperation
   		self.invoice_line_items = params[:invoice_line_items]
   		page = params[:page] || 1
   		per_page = params[:per_page] || 30
-  		self.paginated_invoice_line_items = self.invoice_line_items.paginate(page: page, per_page: per_page)
+  		self.paginated_invoice_line_items = self.invoice_line_items.order(created_at: :desc).paginate(page: page, per_page: per_page)
   	end
 
   end
