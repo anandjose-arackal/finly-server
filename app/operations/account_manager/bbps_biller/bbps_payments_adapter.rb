@@ -163,7 +163,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         }
       end
     end
-    parameters
+    parameters.symbolize_keys!
   end
 
 end
