@@ -36,6 +36,10 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     bill['due_date'] = params[:due_date]
     bill['bill_period'] = params[:bill_period]
 
+    bill['category_id'] = subscription.category_id
+    bill['tax_rate_id'] = subscription.tax_rate_id
+    bill['hsn_sac'] = subscription.hsn_sac
+
     bill['subscription_id'] = subscription.id
     bill['autofetched'] = autofetched
     bill['bill_validation_required'] = !autofetched

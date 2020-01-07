@@ -51,7 +51,7 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   # end
 
   def deactivate?
-    @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved?)
+    @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved? || @model.reactivated?)
   end
 
   def reactivate?

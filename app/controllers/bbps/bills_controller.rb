@@ -80,8 +80,6 @@ class Bbps::BillsController < BaseControllers::WebBase
     # end
     @bill = @op['model']
 
-    debugger
-
     respond_to do |format|
       format.pdf {
         render pdf: "bill-#{@bill.sequence_id}-#{@bill.subscription.name}-#{@bill.bill_period}",
