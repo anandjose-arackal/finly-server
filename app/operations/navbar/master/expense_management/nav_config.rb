@@ -250,8 +250,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team
-    if user.finance_manager? || user.manager?
-      team_settlements&.merge({name: "Team"})
+    return nil unless user.manager? || user.finance_manager?
+    user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
     end
   end
 
