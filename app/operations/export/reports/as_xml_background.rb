@@ -24,7 +24,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   def init
     report_presenter = ::Reports::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
-    self.reports = report_presenter&.reports.includes_export
+    self.reports = report_presenter&.reports
     if id.present?
       self.reports = self.reports&.with_id(id)
     end
@@ -42,7 +42,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   def process
     self.column_names = default_column_names + custom_field_column_names
     self.data = []
-    reports.find_each(batch_size: 1000) do |r|
+    reports.includes_export.find_each(batch_size: 1000) do |r|
       r.expenses.each do |e|
         self.data << retrieve_data(preferences, r, e, custom_field_column_names)
       end
