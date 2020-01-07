@@ -27,7 +27,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   register_structure(
       :cog_menu, [
       :users,
-      :statements,
+      :company_statements,
+      :personal_statements,
       :organization_account
   ]
   )
@@ -184,9 +185,13 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Load Company Balance', id: 'load-company-balance', url: '/transfers/register'}
   end
 
-  def statements
+  def company_statements
     return nil unless user.admin? || user.auditor?
-    {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
+    {name: 'Company Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
+  end
+
+  def personal_statements
+    {name: 'Personal Statements', id: 'personal-statements', url: "#statements/#{user.id}/params={'view':'personal'}"}
   end
 
   def create
@@ -222,7 +227,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def admin
     return nil unless user.admin?
-    analytics&.merge({name: 'Admin'})
+    RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Admin'}) : company_settlements&.merge({name: 'Admin'})
   end
 
   def team
