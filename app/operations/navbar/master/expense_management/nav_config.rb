@@ -80,7 +80,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def team_trips
     return nil unless user.manager? || user.admin?
-    {name: 'Team Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
+    {name: 'Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
   end
 
   def travel_manager_trips
