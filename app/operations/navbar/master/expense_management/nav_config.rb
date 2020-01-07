@@ -12,7 +12,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :money_requests,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
           {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips]},
-          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
+          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
           {auditor: [:analytics, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
@@ -59,7 +59,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def company_expenses
-    return nil unless user.admin?
+    return nil unless user.admin? || user.auditor?
     {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin", "main_tab": "admin"}'}
   end
 
