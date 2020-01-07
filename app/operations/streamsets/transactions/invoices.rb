@@ -22,10 +22,13 @@ class Streamsets::Transactions::Invoices < BaseOperation
   end 
 
   class Streamsets::Transactions::InvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
-  	attr_accessor :invoice_line_items
+  	attr_accessor :invoice_line_items, :paginated_invoice_line_items
 
   	def init
   		self.invoice_line_items = params[:invoice_line_items]
+  		page = params[:page] || 1
+  		per_page = params[:per_page] || 30
+  		self.paginated_invoice_line_items = self.invoice_line_items.paginate(page: page, per_page: per_page)
   	end
 
   end

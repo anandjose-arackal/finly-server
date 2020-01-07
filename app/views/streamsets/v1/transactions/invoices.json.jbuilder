@@ -1,12 +1,16 @@
+# These fields are a replica of Invoice Exports
 json.result do
-  json.array!(@result.invoice_line_items) do |invoice_line_item|
+  json.array!(@result.paginated_invoice_line_items) do |invoice_line_item|
+    # standard fields
     json.extract! invoice_line_item, :id, :parent_id
-    json.po_number invoice_line_item.parent&.procurement&.purchase_order&.po_number
+
+    json.order_number (invoice_line_item.parent.po_number || invoice_line_item.parent.invoice_id)
+    
     json.invoice_date invoice_line_item.parent&.date&.strftime("%d-%b-%y")
     json.delivery_location invoice_line_item.parent&.delivery_location&.name
-    json.vendor_ref_num invoice_line_item.parent&.vendor_id
+    json.vendor_id invoice_line_item.parent&.vendor_id
     json.total_tax invoice_line_item.tax_amount&.value
-    json.finly_ref_no invoice_line_item.parent.invoice_id
+    json.invoice_id invoice_line_item.parent.invoice_id
     json.invoice_type invoice_line_item.parent.invoice_type&.name&.titleize
     json.invoice_number invoice_line_item.parent.invoice_number
     json.vendor_name invoice_line_item.parent.vendor&.display_name
@@ -56,6 +60,15 @@ json.result do
     json.created_at invoice_line_item.parent&.created_at&.strftime("%d-%b-%Y")
     json.po_date invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
 
+    # extra fields
+    json.buyer_location_state invoice_line_item.parent.location&.state&.name
+    json.buyer_location_code invoice_line_item.parent.location&.state&.code
+
+    json.delivery_location_state invoice_line_item.parent.delivery_location&.state&.name
+    json.delivery_location_code invoice_line_item.parent.delivery_location&.state&.code
+
+    json.gstin_location_state invoice_line_item.parent.gstin_location&.state&.name
+    json.gstin_location_code invoice_line_item.parent.gstin_location&.state&.code
   end
 end
 json.count @result.invoice_line_items.count
