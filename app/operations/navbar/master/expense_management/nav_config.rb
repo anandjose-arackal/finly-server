@@ -7,12 +7,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :dashboard,
           :receipts,
           :expenses,
-          {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
+          :trips,
           :money_requests,
           :reports,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
-          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_reports, :team_trips]},
-          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
+          {team: [:team_settlements, :team_users, :team_exports, :divider, :team_money_requests, :team_reports, :team_trips]},
+          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -75,7 +75,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def trips_awaiting_approval
     return nil unless user.manager? || user.admin?
-    {name: 'Awaiting Approval', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
+    {name: 'Trips', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
   end
 
   def team_trips
@@ -160,7 +160,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_exports
-    return nil unless user.manager? || user.admin?
+    return nil unless user.manager? || user.admin? || user.finance_manager?
     {name: 'Export', id: 'team', url: 'export/params={"view":"manager", "main_tab": "team"}'}
   end
 
@@ -170,7 +170,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_users
-    return nil unless user.admin?
+    return nil unless user.admin? || user.finance_manager?
     {name: 'Users', id: 'team', url: 'users/params={"view":"manager", "main_tab": "team"}'}
   end
 
@@ -180,11 +180,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def load_company_balance
+    return nil unless user.admin? || user.finance_manager?
     {name: 'Load Company Balance', id: 'load-company-balance', url: '/transfers/register'}
   end
 
   def statements
-    return nil unless user.admin?
+    return nil unless user.admin? || user.auditor?
     {name: 'Statements', id: 'statements', url: '#company_statements/params={"view":"admin"}'}
   end
 
@@ -226,6 +227,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def documents_section
+    return nil unless user.manager?
     {type: 'section', name: 'Requests'}
   end
 
