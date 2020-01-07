@@ -20,6 +20,7 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  status_id                       :integer
+#  deleted_at                      :datetime
 #
 
 require 'rails_helper'

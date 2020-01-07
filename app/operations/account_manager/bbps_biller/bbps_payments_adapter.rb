@@ -120,6 +120,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: payment.parent.bill_period,
         due_date: payment.parent.due_date,
         bill_number: payment.parent.bill_number,
+        quick_pay: bill.subscription.quick_pay,
         customer_name: bill.subscription.customer_name,
         customer_email: bill.subscription.customer_email,
         customer_mobile: bill.subscription.mobile_number,
