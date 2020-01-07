@@ -184,6 +184,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
                                          transfer_status_id: transfer_status_id,
+                                         transfer_mode_id: payment.transfer_mode_id,
                                          bank_response: transfer_request.transaction_result,
                                          amount_attributes: {
                                              value: payment.amount_value,

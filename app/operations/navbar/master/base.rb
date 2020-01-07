@@ -109,4 +109,8 @@ class Navbar::Master::Base
     {name: 'Finly Insights', id: 'insights', url: '/insights'}
   end
 
+  def exports
+    {name: 'Exports', id: 'exports', url:'#exports'}
+  end
+
 end

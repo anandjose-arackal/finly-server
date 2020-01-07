@@ -13,7 +13,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -88,6 +88,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
@@ -115,7 +117,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -176,6 +178,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
+        self.inward_invoices.update_all(payable: true)
         self.bank_payment_request.destroy
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return
@@ -234,6 +237,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: self.bank_payment_request.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id
@@ -279,13 +283,14 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     initiating_account = retrieve_initiating_account(user.company)
     payment_order_params = {
         initiating_user: user,
-        payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+        payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -295,7 +300,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     }
     bank_payment_request_params = {
         owner_id: user.id,
-        status_id: BankPaymentRequestStatus.id_for(:open),
+        status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
@@ -304,7 +309,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
         policy_id: self.policy&.id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        expected_payments: self.inward_invoices.count,
+        ticket_type: 'invoice',
+        transfer_mode_id: self.transfer_mode_id
     }
     return bank_payment_request_params
   end

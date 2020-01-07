@@ -103,6 +103,7 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :payments, as: :parent
 
@@ -154,6 +155,7 @@ class BeneficiaryPayment < ApplicationRecord
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid?,
         tax_rate: precision_value(self.tax_rate),
+        tax_rate_id: self.tax_rate_id,
         tds_rate: precision_value(self.tds_slab&.tds),
         net_amount: precision_value(self.net_amount&.value),
         gross_amount: precision_value(self.gross_amount&.value),
@@ -176,7 +178,8 @@ class BeneficiaryPayment < ApplicationRecord
         location_attributes: { id: self.location_id, name: self.location&.name },
         cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
         note: self.note,
-        already_exists: true
+        already_exists: true,
+        payment_agreement_id: self.payment_agreement_id
 
     	}
     end
