@@ -68,7 +68,7 @@ json.result do
     json.delivery_location_code invoice_line_item.parent.delivery_location&.state&.code
 
     json.gstin_location_state invoice_line_item.parent.gstin_location&.state&.name
-    json.gstin_location_code invoice_line_item.parent.gstin_location&.state&.code
+    json.gstin_location_code invoice_line_item.parent.gstin_location&.state&.state_code
   end
 end
 json.count @result.invoice_line_items.count
