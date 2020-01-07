@@ -186,7 +186,7 @@ class BbpsBill < ApplicationRecord
           updated_at: updated_at.strftime("%d-%b-%Y"),
           due_date: due_date,
           status: status.as_json,
-          user: user&.json_for_trail,
+          pocs: subscription.pocs.as_json,
           # biller_category_name: biller_category_name,
           amount: amount.as_json,
           customer_fields: subscription.all_customer_fields,
