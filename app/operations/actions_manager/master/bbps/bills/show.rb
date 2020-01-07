@@ -79,7 +79,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def bill_validate
-    bbps_bill.bill_validation_required? || (bill.subscription.user_id == user.id || bill.subscription.pocs.include?(user))
+    bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user))
   end
 
 end

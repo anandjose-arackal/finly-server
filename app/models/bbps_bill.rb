@@ -212,7 +212,6 @@ class BbpsBill < ApplicationRecord
         updated_at: updated_at.strftime("%d-%b-%Y"),
         status: status.as_json,
         user: user&.json_for_trail,
-        payments: self.payments,
         payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
 
@@ -232,7 +231,7 @@ class BbpsBill < ApplicationRecord
         late_payment_fee_selected: late_payment_fee_selected,
         early_payment_fee_selected: early_payment_fee_selected,
         convenience_fee_selected: convenience_fee_selected,
-
+        subscription_id: subscription&.id,
         biller_category_name: subscription.biller_category_name,
         mobile_number: subscription.mobile_number,
         customer_fields: subscription.all_customer_fields,
