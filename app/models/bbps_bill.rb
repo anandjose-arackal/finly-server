@@ -156,11 +156,11 @@ class BbpsBill < ApplicationRecord
     where(user_id: id)
   }
 
-  scope :filter_bill_date, -> (start_date, end_date) {where('bill_date >= ? AND bill_date <= ? ', start_date, end_date)}
+  scope :filter_bill_date, -> (start_date, end_date) {where('bill_date >= ? AND bill_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
   scope :filter_due_date, -> (start_date, end_date) {where('due_date >= ? AND due_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
-  scope :filter_paid_on_date, -> (start_date, end_date) {where('paid_on_date >= ? AND paid_on_date <= ? ', start_date, end_date)}
-  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
-  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+  scope :filter_paid_on_date, -> (start_date, end_date) {where('paid_on_date >= ? AND paid_on_date <= ? ', Date.parse(start_date), Date.parse(end_date))}
+  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
+  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
 
   scope :filter_amount, -> (gteq, lteq) do
     gteq = gteq.to_f
