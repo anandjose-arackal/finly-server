@@ -5019,6 +5019,8 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  get 'exports/:type', to: 'export#processor'
+
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
@@ -5050,6 +5052,7 @@ Rails.application.routes.draw do
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
+  get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
@@ -5609,6 +5612,8 @@ Rails.application.routes.draw do
     resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
 
+
+
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'
     get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
@@ -5748,17 +5753,54 @@ Rails.application.routes.draw do
   post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
+
+  get 'exports/config', to: 'export_jobs#export_jobs_config'
+  get 'exports/:type', to: 'export_jobs#create'
+  post 'exports/:type', to: 'export_jobs#create'
+  resources :export_jobs, only: [:index]
+
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms
 
   resources :insights
 
+  # Utility Bill Payments / BBPS Start #
+  namespace :bbps do
+    get 'subscriptions/edit_config', to: 'subscriptions#edit_config'
+    get 'subscriptions/biller_type_config', to: 'subscriptions#biller_type_config'
+    get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
+    get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
+    get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
+    resources :subscriptions do
+      patch 'review', to: 'subscriptions#review'
+      patch 'add_bill', to: 'subscriptions#add_bill'
+      get 'fetch_bill', to: 'subscriptions#fetch_bill'
+    end
 
-  get 'exports/config', to: 'export_jobs#export_jobs_config'
-  get 'exports/:type', to: 'export_jobs#create'
-  post 'exports/:type', to: 'export_jobs#create'
-  resources :export_jobs, only: [:index]
+    get 'bills/edit_config', to: 'bills#edit_config'
+    get 'bills/actions_config', to: 'bills#actions_config'
+    get 'bills/filters_config', to: 'bills#filters_config'
+    get 'bills/payables', to: 'bills#payable_bills'
+    resources :bills do
+      patch 'review', to: 'bills#review'
+      patch 'bill_validate', to: 'bills#bill_validate'
+    end
+
+    resources :complaints
+  end
+  # Utility Bill Payments / BBPS Ends  #
+
+  # New Route for P2P
+  # Credit Note
+  get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
+  get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
+  get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+
+  resources :credit_notes do
+    patch 'review', to: 'credit_notes#review'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

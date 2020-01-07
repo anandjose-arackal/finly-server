@@ -239,18 +239,18 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
 
       result = {
-        all: 0,
-        draft: 0,
-        processing: 0,
-        approved: 0,
-        credited: 0,
-        failed: 0,
-        scheduled: 0,
-        pending: 0,
-        awaiting_approval: 0,
-        partially_completed: 0,
-        in_progress: 0,
-        completed: 0
+          all: 0,
+          draft: 0,
+          processing: 0,
+          approved: 0,
+          credited: 0,
+          failed: 0,
+          scheduled: 0,
+          pending: 0,
+          awaiting_approval: 0,
+          partially_completed: 0,
+          in_progress: 0,
+          completed: 0
       }
 
       BankPaymentRequestStatus.all.map do |status|

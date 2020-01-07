@@ -4,33 +4,33 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
   subscribe 'policy_user_role.import'
   headers({
            "Vendor Payments" => {:policy_name => 'Policy Name',
-                    :user_id => 'User Email / Mobile / Employee Id',
-                    :purchase_request_initiator => 'Purchase Request Initiator',
-                    :purchase_request_reviewer => 'Purchase Request Reviewer' ,
-                    :purchase_request_auditor => 'Purchase Request Auditor',
-                    :purchase_order_initiator => 'Purchase Order Intiator',
-                    :purchase_order_reviewer => 'Purchase Order Reviwer',
-                    :purchase_order_auditor => 'Purchase Order Auditor',
-                    :goods_receiver => 'Goods Receiver',
-                    :po_invoice_initiator => "PO Invoice Initiator",
-                    :po_invoice_reviewer => "PO Invoice Reviewer",
-                    :po_invoice_auditor => "PO Invoice Auditor",
-                    :non_po_invoice_initiator => "Non PO Invoice Initiator",
-                    :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
-                    :non_po_invoice_auditor => "Non PO INvoice Auditor",
-                    :bank_payment_request_initiator => 'Bank Payment Request Initiator',
-                    :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
-                    :bank_payment_request_creditor => 'Bank Payment Request Creditor',
-                    :bank_payment_request_auditor => 'Bank Payment Request Auditor',
-                    :item_master_manager => 'Item Master Manager',
-                    :inventory_manager => 'Inventory Manager',
-                    :vendor_creator => 'Vendor Creator',
-                    :vendor_reviewer => 'Vendor Reviewer',
-                    :vendor_auditor => 'Vendor Auditor',
-                    :payment_agreement_initiator => "Payment Agreement Initiator",
-                    :payment_agreement_reviewer => "Payment Agreement Reviewer" ,
-                    :payment_agreement_auditor => "Payement Agreement Auditor",
-                    :budget_manager => 'Budget Manager'},
+                                 :user_id => 'User Email / Mobile / Employee Id',
+                                 :purchase_request_initiator => 'Purchase Request Initiator',
+                                 :purchase_request_reviewer => 'Purchase Request Reviewer',
+                                 :purchase_request_auditor => 'Purchase Request Auditor',
+                                 :purchase_order_initiator => 'Purchase Order Intiator',
+                                 :purchase_order_reviewer => 'Purchase Order Reviwer',
+                                 :purchase_order_auditor => 'Purchase Order Auditor',
+                                 :goods_receiver => 'Goods Receiver',
+                                 :po_invoice_initiator => "PO Invoice Initiator",
+                                 :po_invoice_reviewer => "PO Invoice Reviewer",
+                                 :po_invoice_auditor => "PO Invoice Auditor",
+                                 :non_po_invoice_initiator => "Non PO Invoice Initiator",
+                                 :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
+                                 :non_po_invoice_auditor => "Non PO INvoice Auditor",
+                                 :bank_payment_request_initiator => 'Bank Payment Request Initiator',
+                                 :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
+                                 :bank_payment_request_creditor => 'Bank Payment Request Creditor',
+                                 :bank_payment_request_auditor => 'Bank Payment Request Auditor',
+                                 :item_master_manager => 'Item Master Manager',
+                                 :inventory_manager => 'Inventory Manager',
+                                 :vendor_creator => 'Vendor Creator',
+                                 :vendor_reviewer => 'Vendor Reviewer',
+                                 :vendor_auditor => 'Vendor Auditor',
+                                 :payment_agreement_initiator => "Payment Agreement Initiator",
+                                 :payment_agreement_reviewer => "Payment Agreement Reviewer",
+                                 :payment_agreement_auditor => "Payement Agreement Auditor",
+                                 :budget_manager => 'Budget Manager'},
 
            "Expense Management" => {
                :policy_name => 'Policy Name',
@@ -43,7 +43,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
 
   attr_accessor :policy_user_params, :application, :policy, :user_profiles
   def process
-    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?', company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}

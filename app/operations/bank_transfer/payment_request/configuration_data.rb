@@ -15,10 +15,11 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
 
     procurement_enabled = user.company.procurement_enabled?
     params[:tabs] = {
-      invoices: procurement_enabled,
-      po_advances: procurement_enabled,
-      beneficaries: true,
-      import: true
+        invoices: procurement_enabled,
+        po_advances: procurement_enabled,
+        utility_bills: user.company.utility_bills_enabled?,
+        beneficaries: true,
+        import: true
     }
 
     params[:transfer_modes] = user.company.transfer_modes

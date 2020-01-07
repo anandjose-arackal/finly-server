@@ -3,7 +3,7 @@ json.quotations do
   json.array! @result.quotations do |quote|
     json.merge! quote.as_json
     json.attachments do
-      json.array! quote.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
+      json.array! quote.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
         json.extract! attachment, :id, :description
         json.file_name attachment.file_file_name
         json.file_type attachment.file_format

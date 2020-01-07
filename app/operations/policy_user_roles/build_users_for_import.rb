@@ -24,8 +24,8 @@ class PolicyUserRoles::BulkUsersForImport < PolicyUserRoles::Base
     if bulk_assign[:user_ids]
       self.users = user.company.users.with_id(bulk_assign[:user_ids])
 
-    # used for invitation
-    # 
+      # used for invitation
+      #
     elsif bulk_assign[:user_emails]
       if user.company.feature_subscription.group_entity_structure
         gc = current_company.group
@@ -46,7 +46,7 @@ class PolicyUserRoles::BulkUsersForImport < PolicyUserRoles::Base
     elsif bulk_assign[:user_emails]
       self.users = process_users
     end
-      
+
   end
 
   def process

@@ -4,7 +4,7 @@ module UUIDDefinition
     options[:index] ||= true
     options[:limit] ||= 36
     options[:null] ||= false
-    columns.each { |name| column(name, 'string', options) }
+    columns.each {|name| column(name, 'string', options)}
   end
 end
 

@@ -17,7 +17,7 @@ class RateContracts::Base < BaseOperation
     end
   end
 
-  def validate_custom_fields(save=false)
+  def validate_custom_fields(save = false)
     set_fields = set_custom_fields self.rate_contract, self.custom_fields, save
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]

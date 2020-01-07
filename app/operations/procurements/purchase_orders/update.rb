@@ -357,9 +357,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
           return
         end
       end
-    # rescue => e
-    #   add_message :error, messages
-    # end
+      # rescue => e
+      #   add_message :error, messages
+      # end
 
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 

@@ -45,5 +45,84 @@ class BbpsBiller < ApplicationRecord
   serialize :interchange_fee_conf, JSON
   serialize :interchange_fee, JSON
 
+  scope :filter_search, -> (term) {
+    where("biller_name like ? or biller_alias_name like ?", "%#{term}%", "%#{term}%")
+  }
 
+  scope :filter_category_name, -> (name){
+    where(biller_category_name: name)
+  }
+
+  # defining a few methods for consistency here
+  def name
+    self.biller_name
+  end
+
+  def account_number
+    ""
+  end
+
+  def ifsc
+    ""
+  end
+
+  def as_json(options={})
+    if options[:autocomplete]
+      data = {
+          label: biller_name,
+          value: id
+      }
+
+      return data
+    elsif options[:index]
+      data = {
+          id: id,
+          biller_id: biller_id,
+          biller_name: biller_name,
+          biller_alias_name: biller_alias_name,
+          biller_category_name: biller_category_name,
+      }
+      return data
+    end
+    {
+      biller_id: biller_id,
+      biller_name: biller_name,
+      biller_alias_name: biller_alias_name,
+      biller_category_name: biller_category_name,
+      biller_mode: biller_mode,
+      biller_accepts_adhoc: biller_accepts_adhoc,
+      parent_biller: parent_biller,
+      parent_biller_id: parent_biller_id,
+      biller_owner_shp: biller_owner_shp,
+      biller_coverage: biller_coverage,
+      fetch_requirement: fetch_requirement,
+      payment_amount_exactness: payment_amount_exactness,
+      support_bill_validation: support_bill_validation,
+      biller_effctv_from: biller_effctv_from,
+      biller_effctv_to: biller_effctv_to,
+      biller_temp_deactivation_start: biller_temp_deactivation_start,
+      biller_temp_deactivation_end: biller_temp_deactivation_end,
+      biller_payment_modes: biller_payment_modes,
+      biller_payment_channels: biller_payment_channels,
+      biller_customer_params: biller_customer_params,
+      biller_response_params: biller_response_params,
+      biller_additional_info: biller_additional_info,
+      interchange_fee_conf: interchange_fee_conf,
+      interchange_fee: interchange_fee,
+      status: status,
+      biller_description: biller_description,
+      support_deemed: support_deemed,
+      support_pending_status: support_pending_status,
+      biller_time_out: biller_time_out,
+      created_at: created_at,
+      updated_at: updated_at
+    }
+  end
+
+  def as_json_autocomplete(options={})
+    {
+        label: biller_name,
+        value: id
+    }
+  end
 end

@@ -30,7 +30,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
   def init
     bulk_assign = params[:bulk_assign]
     self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
-    self.user_role_ids = ( UserRole::VP_ROLES.values & bulk_assign[:user_role_ids] ) rescue nil
+    self.user_role_ids = (UserRole::VP_ROLES.values & bulk_assign[:user_role_ids]) rescue nil
     self.user_ids = user.company.users.with_id(bulk_assign[:user_ids]).pluck(:id) rescue nil
   end
 
@@ -84,7 +84,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
     add_date = DateTime.now.strftime('%Y-%m-%d %l:%M:%S')
 
     # RETURNS "(1,2,3, '2019-05-11 17:40:58', '2019-05-11 17:40:58'), (4,5,6, '2019-05-11 17:40:58', '2019-05-11 17:40:58), (...), ...."
-    self.assignable = assignable_roles.collect { |p_id, u_id, r_id| "(#{p_id}, #{u_id}, #{r_id}, '#{add_date}', '#{add_date}')" }.join(",")
+    self.assignable = assignable_roles.collect {|p_id, u_id, r_id| "(#{p_id}, #{u_id}, #{r_id}, '#{add_date}', '#{add_date}')"}.join(",")
   end
 
   def process
@@ -111,7 +111,7 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
 
   def failure
     fields = [:policy_id, :user_id, :user_role_id]
-    params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
+    params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h}
     PolicyUserRoles::BulkAssign::FailurePresenter.new(user, params, messages)
   end
 

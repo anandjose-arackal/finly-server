@@ -72,18 +72,18 @@ class User::Update < User::Base
     user_params
   end
 
-  def split_name( full_name )
+  def split_name(full_name)
     name_array = full_name.split(' ')
 
     if name_array.count > 1
-      first_name  = name_array.shift
+      first_name = name_array.shift
       last_name = name_array.join(' ')
     else
       first_name = name_array.first
-      last_name  = ""
+      last_name = ""
     end
 
-    return [ first_name, last_name ]
+    return [first_name, last_name]
   end
 
 end
