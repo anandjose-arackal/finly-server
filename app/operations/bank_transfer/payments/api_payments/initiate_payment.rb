@@ -3,7 +3,7 @@
 class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
-                :payment_mode, :company_id
+                :payment_mode, :company_id, :transfer_mode_id
 
   class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -56,6 +56,8 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
   def init
     self.company_id = user.company_id
     self.payment_mode = params[:mode]
+    mode_id = TransferMode.find_by(name: self.payment_mode.downcase)
+    self.transfer_mode_id = user.company.transfer_modes.find_by(mode_id: mode_id)&.id
     create_beneficiary
     create_bank_payment_request
   end
@@ -154,6 +156,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       note: params[:note],
       date: DateUtils.local_date,
       external_reference_id: params[:external_reference_id],
+      transfer_mode_id: transfer_mode_id,
       api_initiated: true
     }
     payment_order_params = {
@@ -171,6 +174,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       application: "vp",
       currency_id: Currency.first.id,
       api_initiated: true,
+      transfer_mode_id: transfer_mode_id,
       payments_attributes: [
           payment_params
       ]
@@ -185,6 +189,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       },
       beneficiary_type_id: 2,
       policy_id: user.company.policies.default.first.id,
+      transfer_mode_id: transfer_mode_id,
       api_initiated: true,
       payment_order_attributes: payment_order_params
     }

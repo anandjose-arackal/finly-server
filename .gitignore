@@ -32,6 +32,7 @@ config/bbps_config.yml
 erd.pdf
 !/log/.keep
 /tmp
+/public/system/export_jobs/*
 /public/system/receipts/*
 /public/system/receipt_emails/*
 /public/system/company_configurations/*

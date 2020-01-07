@@ -28,6 +28,10 @@
 #  original_source_updated_at   :datetime
 #  email_id                     :string(255)
 #  sender                       :string(255)
+#  source_file_name             :string(255)
+#  source_content_type          :string(255)
+#  source_file_size             :integer
+#  source_updated_at            :datetime
 #  fixed                        :boolean          default(FALSE)
 #  parsed_merchant              :string(255)
 #  parsed_amount_value          :string(255)
@@ -37,10 +41,6 @@
 #  parsed_category_id           :integer
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  source_file_name             :string(255)
-#  source_content_type          :string(255)
-#  source_file_size             :integer
-#  source_updated_at            :datetime
 #
 
 class ReceiptEmailParseFailure < ApplicationRecord

@@ -2,7 +2,7 @@
 #   attr_accessor :input_data
 #
 #   register_generator ExportManager::Generator::Spreadsheet
-#   register_processor ExportManager::Processor::Synchronous
+#   register_processor ExportManager::Processor::Asynchronous
 #   validate :input
 #   register_fields [
 #                       finly_ref_no: {spreadsheet: true},

@@ -96,6 +96,7 @@ class Company < ApplicationRecord
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
+  has_many :single_sign_on_configurations
 
   has_many :budgets
   has_many :procurements
@@ -124,6 +125,8 @@ class Company < ApplicationRecord
 
   has_many :admin_implementation_requests
 
+  has_many :transfer_mode_company_mappings
+  alias_attribute :transfer_modes, :transfer_mode_company_mappings
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
