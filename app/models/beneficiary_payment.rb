@@ -39,7 +39,6 @@
 #  resource_template_id            :integer
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
-#  deleted_at                      :datetime
 #
 
 #                 :id => :integer,

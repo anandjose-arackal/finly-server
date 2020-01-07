@@ -33,6 +33,8 @@ class SingleSignOnController < Oauth::TokenController
     set_grant_type
     set_scope
     super()
+    @token.update_columns(authentication_type: "sso")
+    RequestStoreUtil.current_session.verify('sso')
   end
 
   def saml_logout

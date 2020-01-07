@@ -11,6 +11,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {payables: [:po_advances, :divider, :invoices_section, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :divider, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters, :track_bbps_complaints]},
           :analytics,
+          :download_manager,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
@@ -40,6 +41,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def dashboard
     {name: 'Dashboard', id: 'dashboard', url: 'dashboard/params={}'}
+  end
+
+  def download_manager
+    {name: 'Download Manager', id: 'download_manager', url: 'download_manager'}
   end
 
   def procure

@@ -51,7 +51,6 @@
 #  otp_attempts                   :integer
 #  on_hold                        :boolean
 #  disabled                       :boolean
-#  transfer_mode_id               :integer
 #
 
 class Payment < ApplicationRecord
@@ -962,7 +961,7 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
     {
-      total_amount: { value: self.purchase_order.requested_advance_amount&.value, editable: false }, # TOTAL
+      total_amount: { value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false }, # TOTAL
       inclusive_of_taxes: "",
       discount: "",
       tax: "",
@@ -984,7 +983,7 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.parent.creator, parameters).tds_slabs rescue nil
     {
-      total_amount: { value: precision_value(self.parent.original_amount&.value), editable: true }, # TOTAL
+      total_amount: { value: precision_value(self.parent&.original_amount&.value), editable: true }, # TOTAL
       inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
       #discount: "",
       #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
@@ -1017,7 +1016,7 @@ class Payment < ApplicationRecord
 
     {
       tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-      total_amount: { value: self.parent.item_amounts_total, editable: false }, # TOTAL
+      total_amount: { value: precision_value(self.parent&.item_amounts_total), editable: false }, # TOTAL
       inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
       discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
       tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },

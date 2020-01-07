@@ -224,6 +224,7 @@ class Vendors::Update < Vendors::Base
     validate_gstin_pan_number
     return if has_errors?
     validate_duplicate_bank_account
+    validate_default_bank_account
     return if has_errors?
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
@@ -288,4 +289,6 @@ class Vendors::Update < Vendors::Base
   def all_bank_accounts_disabled?
     self.vendor.bank_accounts.all? {|account| account.disabled }
   end
+
+
 end

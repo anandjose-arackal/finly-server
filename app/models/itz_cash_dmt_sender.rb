@@ -10,7 +10,6 @@
 #  updated_at      :datetime         not null
 #  status_id       :integer          not null
 #  otp_verified    :boolean          default(FALSE), not null
-#  deleted_at      :datetime
 #
 
 class ItzCashDmtSender < ApplicationRecord

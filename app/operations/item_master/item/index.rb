@@ -17,9 +17,9 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
         params[:filter_search] = params[:search]
       end
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
-      end
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
       per_page = params[:per_page] || 30

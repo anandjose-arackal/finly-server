@@ -59,7 +59,6 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
-#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -79,9 +78,6 @@ class User < ApplicationRecord
   devise :password_expirable, :password_archivable, :expirable #, :session_limitable, :secure_validatable
   # zxcvb-js gem
   devise :zxcvbnable
-
-  # making user model authenticable with SSO
-  devise :saml_authenticatable
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
@@ -139,6 +135,8 @@ class User < ApplicationRecord
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
+
+  has_many :export_jobs, foreign_key: :created_by_id
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy

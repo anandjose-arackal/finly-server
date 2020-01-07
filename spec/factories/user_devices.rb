@@ -19,7 +19,6 @@
 #  client_type                  :string(255)
 #  message                      :text(65535)
 #  user_finly_id                :string(255)
-#  deleted_at                   :datetime
 #
 
 FactoryBot.define do

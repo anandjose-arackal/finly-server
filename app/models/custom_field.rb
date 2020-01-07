@@ -14,7 +14,6 @@
 #  dependent_parent_type  :string(255)
 #  field_key              :string(255)
 #  configured_field_value :text(65535)
-#  deleted_at             :datetime
 #
 
 class CustomField < ApplicationRecord
@@ -173,6 +172,8 @@ class CustomField < ApplicationRecord
     case
     when options[:report_show]
       return report_show
+    when options[:report_mailer_show] # Show page when user navigates from email
+      return report_mailer_show
     else 
       options = []
       dependent_field_configuration_ids = []
@@ -238,6 +239,13 @@ class CustomField < ApplicationRecord
 
   def set_field_key
     self.field_key = self.field_configuration.field_key
+  end
+
+  def report_mailer_show
+    {
+      label: field_configuration.field_name,
+      value: self.value
+    }
   end
 
 end
