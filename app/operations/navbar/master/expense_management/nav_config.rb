@@ -60,7 +60,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_expenses
     return nil unless user.admin? || user.auditor?
-    {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin", "main_tab": "admin"}'}
+    {name: 'Expenses', id: 'expenses', url: 'expenses/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def receipts
