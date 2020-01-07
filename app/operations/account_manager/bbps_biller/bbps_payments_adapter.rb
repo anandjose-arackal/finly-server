@@ -33,6 +33,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_number: bank_transaction.bill_number,
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
+        quick_pay: bank_transaction.quick_pay,
         order_number: bank_transaction.order_number,
         customer_param_1: {
             key: bill.subscription.customer_param_key_1,
