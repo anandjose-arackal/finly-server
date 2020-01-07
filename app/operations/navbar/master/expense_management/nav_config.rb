@@ -231,4 +231,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {type: 'section', name: 'Requests'}
   end
 
+  def divider
+    return nil unless user.manager? || user.admin?
+    {type: 'divider'}
+  end
+
 end

@@ -80,7 +80,7 @@ class Navbar::Master::Base
   end
 
   def organization_account
-    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
+    return nil unless RequestStoreUtil.current_user.company_admin?
     {name: 'Organization Account', id: 'organization_account', url: '#organization_account'}
   end
 
