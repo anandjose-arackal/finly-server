@@ -34,7 +34,7 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   end
 
   def authorize
-    unless reports
+    unless reports.count
       messages[:error] << "Reports to export not found."
     end
   end
