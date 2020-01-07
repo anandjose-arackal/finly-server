@@ -57,9 +57,9 @@ class Personalizer::Adapters::Company196::ExportTemplates196::QuickBookTemplate 
       end
 
       rows << row
+      end
       progress_update sl_no
       sl_no += 1
-      end
     end
 
   end
