@@ -1,14 +1,14 @@
 class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
 
   property :id
-  property :subscription_id #, presence: true
+  property :subscription_id #, validates: {presence: true}
   property :bbps_biller_id, validates: {presence: true}
   property :sequence_id
 
   property :department_id
   property :cost_center_id
   property :location_id
-  property :company_id, presence: true
+  property :company_id, validates: {presence: true}
   property :autofetched
 
   property :category_id
@@ -29,33 +29,33 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :late_payment_fee_selected
   property :convenience_fee_selected
 
-  # property :user_id, presence: true
+  # property :user_id, validates: {presence: true}
 
   property :status_id, default: BbpsBillStatus.id_for(:open)
 
   property :amount, populate_if_empty: Amount do
-    property :value, presence: true, default: 0
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}, default: 0
+    property :currency_id, validates: {presence: true}
   end
 
   property :late_payment_fee, populate_if_empty: Amount do
-    property :value, presence: true, default: 0
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}, default: 0
+    property :currency_id, validates: {presence: true}
   end
 
   property :early_payment_fee, populate_if_empty: Amount do
-    property :value, presence: true, default: 0
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}, default: 0
+    property :currency_id, validates: {presence: true}
   end
 
   property :convenience_fee, populate_if_empty: Amount do
-    property :value, presence: true, default: 0
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}, default: 0
+    property :currency_id, validates: {presence: true}
   end
 
   property :total_amount, populate_if_empty: Amount do
-    property :value, presence: true, default: 0
-    property :currency_id, presence: true
+    property :value, validates: {presence: true}, default: 0
+    property :currency_id, validates: {presence: true}
   end
 
 end

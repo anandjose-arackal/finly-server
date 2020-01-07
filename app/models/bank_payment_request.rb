@@ -335,7 +335,7 @@ class BankPaymentRequest < ApplicationRecord
   #   end
   # }
 
-  scope :filter_payment_ids, -> (payment_ids){
+  scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
     if payment_ids.present?
       joins(payment_order: :payments).where("payments.id IN (?)", payment_ids)

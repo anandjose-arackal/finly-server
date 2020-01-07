@@ -1,22 +1,22 @@
 class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   property :id
-  property :bbps_biller_id, presence: true
-  property :name, presence: true
+  property :bbps_biller_id, validates: {presence: true}
+  property :name, validates: {presence: true}
   property :sequence_id
-  property :mobile_number, presence: true
+  property :mobile_number, validates: {presence: true}
 
   property :department_id
   property :cost_center_id
   property :location_id
-  property :policy_id, presence: true
+  property :policy_id, validates: {presence: true}
 
   property :category_id
   property :tax_rate_id
   property :hsn_sac
 
   property :note
-  property :user_id, presence: true
+  property :user_id, validates: {presence: true}
   property :active
 
   property :agreement_id
@@ -33,13 +33,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   property :status_id, default: BbpsBillerSubscriptionStatus.id_for(:draft)
 
   collection :customer_fields, populator: :customer_fields! do
-    property :subscription_id, presence: true
-    property :label, presence: true
-    property :value, presence: true
+    property :subscription_id, validates: {presence: true}
+    property :label, validates: {presence: true}
+    property :value, validates: {presence: true}
   end
 
   # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
-  #   property :level_id, presence: true
+  #   property :level_id, validates: {presence: true}
   #   property :reviewer_id
   # end
 
@@ -54,8 +54,8 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   def company_entities
     params = {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator)], current_app: :vp}
-    errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
-    errors.add(:cost_center_id, "Invalid Cost Center") unless current_user.company.cost_centers&.pluck(:id).include?(cost_center_id.to_i)
+    # errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
+    # errors.add(:cost_center_id, "Invalid Cost Center") unless current_user.company.cost_centers&.pluck(:id).include?(cost_center_id.to_i)
     errors.add(:location_id, "Invalid Location") unless Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves&.pluck(:id)&.include?(location_id.to_i)
     errors.add(:policy_id, "Invalid Policy") unless ::Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: policy_id).present?
 

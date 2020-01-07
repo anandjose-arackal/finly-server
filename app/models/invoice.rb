@@ -80,8 +80,8 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
@@ -89,12 +89,9 @@
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  payable                         :boolean          default(FALSE)
-#  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
@@ -728,6 +725,7 @@ class Invoice < ApplicationRecord
           discount_type_id: self.discount_type_id,
           due_date: self.due_date,
           invoice_number: self.invoice_number,
+          invoice_id: self.invoice_id,
           inclusive_of_taxes: self.inclusive_of_taxes,
           freight_amount: self.freight_amount&.value,
           roundoff_amount: self.roundoff_amount,
@@ -741,10 +739,14 @@ class Invoice < ApplicationRecord
           discount_rate: invoice_discount_rate,
           advance_rate: precision_value(self.advance_rate),
           invoice_attachment: {
-              url: self.invoice_attachments.first&.attached_file&.url,
-              thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-              content_type: self.invoice_attachments.first&.attached_file&.content_type,
-              file_name: self.invoice_attachments.first&.attached_file&.original_filename
+              # url: self.invoice_attachments.first&.attached_file&.url,
+              # thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+              # content_type: self.invoice_attachments.first&.attached_file&.content_type,
+              # file_name: self.invoice_attachments.first&.attached_file&.original_filename
+              url: self.attachments.first&.file&.url(:original, timestamp: false),
+              thumb: self.attachments.first&.file&.url(:thumb, timestamp: false),
+              content_type: self.attachments.first&.file_content_type,
+              file_name: self.attachments.first&.file_file_name
           },
           net_amount: precision_value(self.net_amount&.value),
           original_amount: self.include_original_amount,
@@ -752,6 +754,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
 
           cost_center_id: self.cost_center_id,

@@ -14,7 +14,7 @@ class Admin::Implementations::Index < Admin::Base
 
   def process
     self.implementation_requests = company.admin_implementation_requests.where('request_key LIKE ?',"%#{params[:request_key]}%")
-    self.policies = company.policies  if ['lrms', 'lurms','approval_flow'].include?(params[:request_key])
+    self.policies = company.policies if ['lrms', 'lurms', 'approval_flow'].include?(params[:request_key])
   end
 
   def success
