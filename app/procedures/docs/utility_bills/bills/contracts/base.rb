@@ -10,6 +10,7 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :location_id
   property :company_id, validates: {presence: true}
   property :autofetched
+  property :bill_validation_required
 
   property :category_id
   property :tax_rate_id

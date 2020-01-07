@@ -1,7 +1,6 @@
 class Docs::UtilityBills::Bills::Contracts::Update < Docs::UtilityBills::Bills::Contracts::Base
 
   property :id
-  property :sequence_id
   property :policy_id, validates: {presence: true}
 
 

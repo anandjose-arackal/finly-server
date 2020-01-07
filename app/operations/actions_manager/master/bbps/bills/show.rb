@@ -5,7 +5,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   register_handle :bbps_bills_show
   register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
                     :return_control, :destroy, :view_payment_ticket, :raise_dispute,
-                    :bill_validate]
+                    :bill_validate, :download_receipt]
 
   def initialize(user = nil, params = {})
     super
@@ -82,4 +82,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
     bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user))
   end
 
+  def download_receipt
+    BbpsBill.status_ids(:failed, :paid).include?(bbps_bill.status_id)
+  end
 end

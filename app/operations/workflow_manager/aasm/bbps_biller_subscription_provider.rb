@@ -50,7 +50,7 @@ class WorkflowManager::Aasm::BbpsBillerSubscriptionProvider < WorkflowManager::A
     end
 
     event :deactivate do ## Confirm the action
-      transitions :from => [:approved, :auto_approved], to: :deactivated
+      transitions :from => [:approved, :auto_approved, :reactivated], to: :deactivated
     end
 
     event :reactivate do ## Confirm the action

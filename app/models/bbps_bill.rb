@@ -249,12 +249,25 @@ class BbpsBill < ApplicationRecord
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
       data[:show_payment_details] = true
-      data[:paid_on_date] = self.paid_on_date
-      data[:transaction_id] = self.transaction_id
-      data[:bbps_id] = self.bbps_id
+      data[:receipt] = generate_receipt
     end
 
     data
+  end
+
+  def generate_receipt
+    {
+        biller_name: subscription.biller&.biller_name,
+        mobile_number: subscription.mobile_number,
+        bill_number: bill_number,
+        bill_date: bill_date,
+        due_date: due_date,
+        transaction_ref_id: payments&.first&.reference_resource&.bbps_ref_id,
+        payment_mode: "BSC",
+        bill_amount: payments&.first&.amount.as_json,
+        transaction_date: payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y"),
+        status: payments&.first&.payment_status&.name
+    }
   end
 
   def bill_validation_required?
@@ -320,6 +333,8 @@ class BbpsBill < ApplicationRecord
 
   def resolve_bill_validation
     if self.amount.present? && self.amount.changes.keys.include?("value") && self.biller.present? && (self.biller.support_bill_validation == "MANDATORY" || self.biller.support_bill_validation == "OPTIONAL")
+      self.bill_validation_required = true
+    elsif not autofetched
       self.bill_validation_required = true
     end
   end
