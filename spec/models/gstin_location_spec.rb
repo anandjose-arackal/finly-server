@@ -16,7 +16,7 @@
 #  poc_designation   :string(255)
 #  location          :string(255)
 #  address           :text(65535)
-#  gl_code           :string(255)
+#  deleted_at        :datetime
 #
 
 require 'rails_helper'
