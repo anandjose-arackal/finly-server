@@ -5786,6 +5786,7 @@ Rails.application.routes.draw do
     resources :bills do
       patch 'review', to: 'bills#review'
       patch 'bill_validate', to: 'bills#bill_validate'
+      get 'download_receipt', to: 'bills#download_receipt'
     end
 
     resources :complaints
