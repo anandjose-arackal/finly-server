@@ -214,7 +214,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def approvals
-    reports_awaiting_approval&.merge({name: 'Approvals'})
+    if user.manager?
+      reports_awaiting_approval&.merge({name: 'Approvals'})
+    end
   end
 
   def admin
@@ -223,7 +225,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team
-    team_settlements&.merge({name: "Team"})
+    if user.finance_manager? || user.auditor?
+      team_settlements&.merge({name: "Team"})
+    end
   end
 
   def documents_section
