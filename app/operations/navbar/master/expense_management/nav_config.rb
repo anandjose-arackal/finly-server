@@ -11,8 +11,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :reports,
           :money_requests,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
-          {team: [:team_settlements, :team_users, :team_exports, :divider, :team_money_requests, :team_reports, :team_trips]},
-          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :company_money_requests, :company_reports, :company_trips]},
+          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_reports, :team_trips]},
+          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -27,7 +27,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   register_structure(
       :cog_menu, [
       :users,
-      :load_company_balance, :statements,
+      :statements,
       :organization_account
   ]
   )
@@ -90,7 +90,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_trips
     return nil unless user.admin?
-    {name: 'Company Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
+    {name: 'Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def reports
@@ -210,6 +210,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def analytics
+    return nil unless RequestStoreUtil.current_company&.analytics_system_enabled?
     {name: 'Analytics', id: 'admin', url: 'analytics/params={"main_tab": "admin"}'}
   end
 
@@ -231,8 +232,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def documents_section
-    return nil unless user.manager?
-    {type: 'section', name: 'Requests'}
+    return nil unless user.manager? || user.admin?
+    {type: 'section', name: 'Records'}
   end
 
   def divider
