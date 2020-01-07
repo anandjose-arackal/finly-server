@@ -47,6 +47,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: result.bbps_ref_id)
+        
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
       end
       op.error do |result|

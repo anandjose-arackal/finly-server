@@ -222,7 +222,9 @@ class Bbps::BillPay < Bbps::Api
   end
 
   def payment_mode
-    "NEFT"
+    # currently hard coded, but will become dynamically done based on the
+    # beneficiary's details in the future
+    "NEFT:<IFSC=SBIN0001114~AccountNo=34968635304>"
   end
 
   def initiating_channel
