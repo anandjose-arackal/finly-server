@@ -206,7 +206,7 @@ class UsersController < BaseControllers::WebBase
   end
 
   def saml_validator
-    @result = User::SamlValidator.(current_user, params)
+    @result = Users::SamlValidator.(current_user, params)
     respond
   end
 

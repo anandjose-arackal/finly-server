@@ -19,7 +19,7 @@ class Users::SamlValidator < BaseOperation
   end
 
   def process
-    if self.sso_response.valid?
+    if self.sso_response.is_valid?
       self.email = self.sso_response.name_id
       RequestStore.store[:skip_password] = true
       op = User::GroupEntitiesLogin.(nil, email_mobile: self.email)
