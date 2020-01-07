@@ -16,7 +16,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   )
 
   register_structure(
-      :cog,
+      :cog_menu,
       [
           :attachments, :users,
           :load_company_balance, :statements,
