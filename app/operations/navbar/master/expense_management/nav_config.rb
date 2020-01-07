@@ -91,7 +91,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def company_trips
-    return nil unless user.admin?
+    return nil unless user.admin? || user.auditor?
     {name: 'Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
@@ -114,7 +114,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def company_reports
-    return nil unless user.admin?
+    return nil unless user.admin? || user.auditor?
     {name: 'Reports', id: 'admin', url: 'reports/params={"view":"admin", "main_tab": "admin"}'}
   end
 
