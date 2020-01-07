@@ -11,7 +11,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :reports,
           :money_requests,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
-          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_reports, :team_trips]},
+          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips]},
           {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
           {auditor: [:analytics, :company_money_requests, :company_reports, :company_trips]},
           # :analytics,
@@ -81,8 +81,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_trips
-    return nil unless user.manager? || user.admin?
-    {name: 'Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.manager? || user.finance_manager?
+    view = user.finance_manager? ? "finance_manager" : "manager"
+    {name: 'Trips', id: 'team', url: "travel_requests/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
   def travel_manager_trips
@@ -109,9 +110,16 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Reports', id: 'approvals', url: 'reports/params={"view":"manager", "filter_status":"99", "main_tab": "approvals"}'}
   end
 
+  def team_expenses
+    return nil unless user.manager? || finance_manager?
+    view  = user.finance_manager? ? "finance_manager" : "manager"
+    {name: 'Expenses', id: 'expenses', url: "expenses/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
+  end
+
   def team_reports
-    return nil unless user.manager? || user.admin?
-    {name: 'Reports', id: 'team', url: 'reports/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.manager? || user.finance_manager?
+    view = user.finance_manager? ? "finance_manager" : "manager"
+    {name: 'Reports', id: 'team', url: "reports/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
   def company_reports
@@ -134,8 +142,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_money_requests
-    return nil unless user.manager? || user.admin?
-    {name: 'Money Requests', id: 'team', url: 'requests/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.manager? || user.finance_manager?
+    view = user.finance_manager? ? "finance_manager" : "manager"
+    {name: 'Money Requests', id: 'team', url: "requests/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
   def company_money_requests
@@ -150,7 +159,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_settlements
-    return nil unless user.finance_manager? || user.admin?
+    return nil unless user.finance_manager?
     {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance", "main_tab": "team"}'}
   end
 
@@ -240,7 +249,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team
-    if user.finance_manager? || user.auditor?
+    if user.finance_manager? || user.manager?
       team_settlements&.merge({name: "Team"})
     end
   end
