@@ -191,7 +191,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def personal_statements
-    {name: 'Personal Statements', id: 'personal-statements', url: "#statements/#{user.id}/params={'view':'personal'}"}
+    {name: 'Personal Statements', id: 'personal-statements', url: "#statements/#{user.id}/params={\"view\":\"personal\"}"}
   end
 
   def create
