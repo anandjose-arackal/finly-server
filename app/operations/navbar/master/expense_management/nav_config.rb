@@ -10,10 +10,11 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :trips,
           :reports,
           :money_requests,
+          :travel_request_bookings,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
           {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips]},
           {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
-          {auditor: [:analytics, :company_money_requests, :company_reports, :company_trips]},
+          {auditor: [:analytics, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -60,7 +61,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def company_expenses
     return nil unless user.admin? || user.auditor?
-    {name: 'Expenses', id: 'expenses', url: 'expenses/params={"view":"admin", "main_tab": "admin"}'}
+    view = user.admin? ? "admin" : "auditor"
+    {name: 'Expenses', id: "#{view}", url: "expenses/params={\"view\":\"#{view}\", \"main_tab\": \"#{view}\"}"}
   end
 
   def receipts
@@ -86,9 +88,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Trips', id: 'team', url: "travel_requests/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
-  def travel_manager_trips
-    return nil unless user.travel_manager?
-    {name: 'Travel Manager Approvals', id: 'trips', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
+  def travel_request_bookings
+    return nil if user.admin? || user.auditor? || !user.is_travel_manager?
+    {name: 'Trip Bookings', id: 'trip-bookings', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
@@ -245,7 +247,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def auditor
-    return nil unless user.auditor?
+    return nil if user.admin? || !user.auditor?
     RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Auditor'}) : company_money_requests&.merge({name: 'Auditor'})
   end
 
