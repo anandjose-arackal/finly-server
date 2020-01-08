@@ -5744,6 +5744,7 @@ Rails.application.routes.draw do
   get 'exports/:type', to: 'export_jobs#create'
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
+  get 'maps/config/:type', to: 'google_maps#maps_config'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
