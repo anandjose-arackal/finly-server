@@ -11,7 +11,6 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  company_name       :string(255)
-#  deleted_at         :datetime
 #
 
 require 'bcrypt'

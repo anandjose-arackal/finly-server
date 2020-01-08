@@ -16,7 +16,6 @@
 #  action_id                        :integer
 #  action_user_role_id              :integer
 #  delegated_action_user_id         :integer
-#  deleted_at                       :datetime
 #
 
 class MoneyRequestTrack < ApplicationRecord
