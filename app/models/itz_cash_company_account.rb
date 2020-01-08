@@ -8,7 +8,6 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  balance_id        :integer
-#  deleted_at        :datetime
 #
 
 class ItzCashCompanyAccount < ApplicationRecord

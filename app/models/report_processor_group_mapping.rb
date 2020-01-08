@@ -17,7 +17,6 @@
 #  note                       :text(65535)
 #  marked_as_closed           :boolean
 #  bank_reference_number      :string(255)
-#  deleted_at                 :datetime
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord
