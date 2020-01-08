@@ -84,7 +84,7 @@ class BbpsBill < ApplicationRecord
   scope :filter_status, -> (status) {
     case status
     when 'payables', :payables
-      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved)).joins(:amount).where("amounts.value > ?", 0)
     when 'approved', :approved
       where(status_id: BbpsBillStatus.id_for(:approved))
     when 'auto_approved', :auto_approved
@@ -103,6 +103,8 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:voided))
     when 'paid', :paid
       where(status_id: BbpsBillStatus.id_for(:paid))
+    when 'failed', :failed
+      where(status_id: BbpsBillStatus.id_for(:failed))
     when 'payment_ticket_created', :payment_ticket_created
       where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
     else
@@ -144,7 +146,8 @@ class BbpsBill < ApplicationRecord
 
   scope :filter_payable_bills, -> (enabled) {
     if enabled
-      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      # where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved)).joins(:amount).where("amounts.value > ?", 0)
     end
   }
 
