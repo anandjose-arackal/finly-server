@@ -41,6 +41,8 @@ class BbpsBillsFetch < ApplicationJob
 
       bill_period = Date.today.strftime("%B").upcase if bill_period == "NA"
 
+      return if result.ref_no.blank?
+
       params = {
           amount: (result.amount.to_f / 100),
           bill_date: result.bill_date,
