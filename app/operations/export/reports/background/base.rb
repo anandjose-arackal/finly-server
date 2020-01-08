@@ -1,6 +1,7 @@
 class Export::Reports::Background::Base < BackgroundOperation
   attr_accessor :company, :preference, :loose_headers,  :custom_field_data
 
+  sidekiq_options queue: :report_export_queue
 
   # class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
   #   attr_accessor :data, :header, :report_names

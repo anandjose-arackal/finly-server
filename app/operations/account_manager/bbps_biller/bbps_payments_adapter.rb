@@ -44,12 +44,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # here we are assuming that the bill gets paid through the BillPay API
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed),
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
                                 bbps_ref_id: result.bbps_ref_id)
 
         # clearing old system messages as well
         payment.system_messages.destroy_all
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
 
         # add a success system message?
         payment.system_messages.build(content: "The payment has been accepted by BBPS. Awaiting credit confirmation from the service provider",
@@ -57,8 +57,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
       end
       op.error do |result|
         puts "Error:Result: #{result}"
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+        payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result.errors.each do |error|
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
@@ -153,7 +153,12 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   # or generates one on the fly if not present
   def retrieve_order_number(payment)
     bill = payment.parent
-    bill.order_number
+    order_number = bill.order_number || generate_order_number
+    order_number
+  end
+
+  def generate_order_number
+    "O#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
   end
 
   def customer_params(subscription)

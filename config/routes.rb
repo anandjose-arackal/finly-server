@@ -60,6 +60,7 @@
 #                                    user_password_expired GET    /users/password_expired(.:format)                                                                                   devise/password_expired#show
 #                                                          PATCH  /users/password_expired(.:format)                                                                                   devise/password_expired#update
 #                                                          PUT    /users/password_expired(.:format)                                                                                   devise/password_expired#update
+#                                      users_saml_validate POST   /users/saml/validate(.:format)                                                                                      users#saml_validator
 #                                       users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       single_sign_on#saml
 #                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#create
 #                                        users_saml_logout DELETE /users/saml/logout(.:format)                                                                                        single_sign_on#saml_logout
@@ -4307,6 +4308,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
 
+  post 'users/saml/validate', to: 'users#saml_validator'
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
   post 'users/saml/auth', to: 'single_sign_on#create'
   delete 'users/saml/logout', to: 'single_sign_on#saml_logout'

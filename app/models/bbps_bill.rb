@@ -34,7 +34,7 @@
 #  late_payment_fee_id        :integer
 #  early_payment_fee_id       :integer
 #  convenience_fee_id         :integer
-#  quick_pay                  :boolean          default(TRUE)
+#  quick_pay                  :string(255)      default("N")
 #  total_amount_id            :integer
 #  early_payment_fee_selected :boolean          default(FALSE)
 #  late_payment_fee_selected  :boolean          default(FALSE)
@@ -54,6 +54,7 @@ class BbpsBill < ApplicationRecord
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
   before_save :resolve_bill_validation
+  before_save :set_quick_pay
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -342,4 +343,17 @@ class BbpsBill < ApplicationRecord
       self.bill_validation_required = true
     end
   end
+
+  # this methid will set the quickpay attribute based on a
+  # bunch of parameters that are present in the biller
+  def set_quick_pay
+    type = self.biller&.biller_mode
+    ad_hoc = self.biller&.biller_accepts_adhoc
+    fetch_requirement = self.biller&.fetch_requirement
+    validation_support = self.biller&.support_bill_validation
+    if (fetch_requirement == "NOT_SUPPORTED") && (validation_support == "NOT_SUPPORTED")
+      self.quick_pay = "Y"
+    end
+  end
+
 end
