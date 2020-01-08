@@ -11,8 +11,8 @@ class Streamsets::Transactions::Payments < BaseOperation
       add_message :error, op.messages[:error]
       return
     end
-
-	  bank_payment_requests = op.payment_requests.where(ticket_type: 'invoice')
+    ticket_type = params[:ticket_type] || ['invoice', 'purchase_order', "beneficiary", nil]
+	  bank_payment_requests = op.payment_requests.where(ticket_type: ticket_type, created_at: (Time.zone.yesterday.beginning_of_day)..(Time.zone.yesterday.end_of_day))
 	  payment_order_ids = bank_payment_requests.pluck(:payment_order_id)
 
 	  self.payments = Payment.where(payment_order_id: payment_order_ids)
@@ -30,7 +30,7 @@ class Streamsets::Transactions::Payments < BaseOperation
   		self.payments = params[:payments].include_for_streamsets
   		page = params[:page] || 1
   		per_page = params[:per_page] || 30
-  		self.paginated_payments = self.payments.paginate(page: page, per_page: per_page)
+  		self.paginated_payments = self.payments.order(payment_order_id: :desc).paginate(page: page, per_page: per_page)
   	end
 
   end
