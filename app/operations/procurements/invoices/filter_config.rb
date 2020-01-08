@@ -30,16 +30,16 @@ class Procurements::Invoices::FilterConfig < Procurements::Invoices::Base
       self.policies = params[:policies]
       self.custom_fields_config = params[:custom_fields_config]
       self.agreement_invoice_enabled = user.company.agreement_based_payment_system_enabled?
-      invoice_custom_field_op = CustomField::Configuration::Index.(user, invoice_custom_field_filter_params )
+      invoice_custom_field_op = CustomField::Configuration::Index.(user, invoice_custom_field_filter_params)
       self.invoice_custom_field_configurations = invoice_custom_field_op.field_configurations
 
     end
 
     def invoice_custom_field_filter_params
       {
-        filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
-        filter_parent_type_id: [FieldParentType.id_for(:invoice)]
-      }    
+          filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
+          filter_parent_type_id: [FieldParentType.id_for(:invoice)]
+      }
 
     end
   end

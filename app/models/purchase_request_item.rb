@@ -27,20 +27,20 @@
 #  rate_contract_item_id        :integer
 #
 
-    # table_name => purchase_request_items
-    # 
-    #                     :id => :integer,
-    #    :purchase_request_id => :integer,
-    # :inventory_line_item_id => :integer,
-    #              :vendor_id => :integer,
-    #   :delivery_location_id => :integer,
-    #                :purpose => :text,
-    #               :quantity => :integer,
-    #         :unit_amount_id => :integer,
-    #    :estimated_amount_id => :integer,
-    #          :delivery_date => :date,
-    #             :created_at => :datetime,
-    #             :updated_at => :datetime
+# table_name => purchase_request_items
+#
+#                     :id => :integer,
+#    :purchase_request_id => :integer,
+# :inventory_line_item_id => :integer,
+#              :vendor_id => :integer,
+#   :delivery_location_id => :integer,
+#                :purpose => :text,
+#               :quantity => :integer,
+#         :unit_amount_id => :integer,
+#    :estimated_amount_id => :integer,
+#          :delivery_date => :date,
+#             :created_at => :datetime,
+#             :updated_at => :datetime
 
 
 class PurchaseRequestItem < ApplicationRecord
@@ -121,17 +121,17 @@ class PurchaseRequestItem < ApplicationRecord
     joins(purchase_request: :location).where('branch_locations.name LIKE ?', "%#{location_name}%")
   }
 
-  scope :filter_policy_id, -> (policy_id){
+  scope :filter_policy_id, -> (policy_id) {
     if policy_id.present?
       joins(:purchase_request).where('purchase_requests.policy_id = ?', policy_id)
     end
   }
 
-  scope :filter_location_id, -> (location_id){
+  scope :filter_location_id, -> (location_id) {
     joins(:purchase_request).where('purchase_requests.location_id = ?', location_id)
   }
 
-  scope :filter_department_id, -> (department_id){
+  scope :filter_department_id, -> (department_id) {
     joins(:purchase_request).where('purchase_requests.location_id = ?', department_id)
   }
 
@@ -159,7 +159,7 @@ class PurchaseRequestItem < ApplicationRecord
     end
   }
 
-  scope :role_based_filter, -> (boolean){
+  scope :role_based_filter, -> (boolean) {
     if StringUtils.to_bool(boolean)
       user = RequestStore.store[:current_user]
       approved_purchase_requests = user.company.purchase_requests.role_based_filter(true)

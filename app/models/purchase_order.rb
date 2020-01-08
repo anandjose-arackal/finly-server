@@ -441,7 +441,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_po_approver_id, -> (approver_id){
+  scope :filter_po_approver_id, -> (approver_id) {
     if approver_id.present?
       ids = self.awaiting_action_items(approver_id)&.pluck(:id)
       where(id: ids)

@@ -9,7 +9,7 @@ class Procurements::PurchaseRequests::FilterConfig < Procurements::PurchaseReque
   end
 
   def process
-    custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params )
+    custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params)
     self.custom_field_configurations = custom_field_op.field_configurations
   end
 
@@ -39,9 +39,9 @@ class Procurements::PurchaseRequests::FilterConfig < Procurements::PurchaseReque
 
   def custom_field_filter_params
     {
-      filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
-      filter_parent_type_id: [FieldParentType.id_for(:purchase_request)]
-    }    
+        filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
+        filter_parent_type_id: [FieldParentType.id_for(:purchase_request)]
+    }
 
   end
 end

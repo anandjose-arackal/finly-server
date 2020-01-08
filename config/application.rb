@@ -12,6 +12,7 @@ module Finly
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.0
 
+    config.trailblazer.enable_loader = false
     config.time_zone = 'Kolkata'
     config.active_record.default_timezone = :local
     config.middleware.use Rack::Attack

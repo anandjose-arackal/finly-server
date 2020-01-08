@@ -160,11 +160,11 @@ class User::Balances::Show < User::Base
       card_adapter = retrieve_adapter(card)
       self.card_info[card.id] =
          {
-             balance: card_adapter.balance,
-             eligibility: card_adapter.credit_eligibility
+             balance: (card_adapter.balance rescue nil),
+             eligibility: (card_adapter.credit_eligibility rescue nil)
          }
     end
-    comp_balance = itz_cash_company_adapter.balance
+    comp_balance = itz_cash_company_adapter.balance rescue nil
     unless comp_balance
       comp_balance = "Temporarily unavailable"
     end

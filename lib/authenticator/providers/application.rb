@@ -3,7 +3,7 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   def self.accept?(request)
     scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first) and !RequestStore.store[:multi_entity_login] and !RequestStore.store[:sso]
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api", "streamsets"].include?(scopes&.first) and !RequestStore.store[:multi_entity_login] and !RequestStore.store[:sso]
   end
 
   def model

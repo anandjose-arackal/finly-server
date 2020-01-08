@@ -39,7 +39,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     unless bank_account.update(bank_account_params.except(:user))
       return result false, bank_account.errors.full_messages
     end
-    result true,'Updated Successfully'
+    result true, 'Updated Successfully'
   end
 
   def destroy_records(data)

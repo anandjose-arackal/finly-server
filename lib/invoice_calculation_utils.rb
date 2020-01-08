@@ -7,7 +7,7 @@ class InvoiceCalculationUtils
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
-                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount
+                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, taxable_amount, invoice_amount, tds_applicable_amount, payment = nil, invoice = nil, payment_amount = nil)
@@ -39,6 +39,18 @@ class InvoiceCalculationUtils
         self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
       end
     end
+
+    # # Applying Credit Note
+    # unless self.invoice.class.name == 'OutwardInvoice'
+    #   if cn_adjustment_amount > 0
+    #     if cn_adjustment_amount <= balance_due_amount
+    #       self.balance_due_amount -= cn_adjustment_amount
+    #     else
+    #       invoice.credit_note_adjustment
+    #       self.balance_due_amount = 0
+    #     end
+    #   end
+    # end
 
     # assign gross amount
     unless self.invoice.class.name == 'OutwardInvoice'
@@ -248,8 +260,14 @@ class InvoiceCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
-    self.tax_amount = self.net_amount - self.gross_amount
+    if self.invoice.rcm_enabled?
+      self.net_amount = self.gross_amount
+      net_if_tax_applied = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = net_if_tax_applied - self.gross_amount
+    else
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = self.net_amount - self.gross_amount
+    end
   end
 
   def calculate_inclusive_taxes
@@ -298,6 +316,23 @@ class InvoiceCalculationUtils
     original_net_amount = self.net_amount
     self.freight_amount = self.invoice.freight_amount&.value.to_f
     self.net_amount = original_net_amount + self.freight_amount
+  end
+
+  # Credit Note Adjustments
+  def calculate_cn_adjustments(invoice_params, payment, invoice)
+    return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
+
+    adjustment_amount_to_add = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
+    adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
+
+    balance_due_amount = invoice.balance_due.value
+
+    balance_due_amount = balance_due_amount + adjustment_amount_to_add - adjustment_amount_to_subtract
+
+    if invoice.balance_due.present?
+      invoice.balance_due.value = balance_due_amount
+    end
+
   end
 
 end

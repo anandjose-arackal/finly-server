@@ -42,8 +42,13 @@ class ActionsManager::Master::Base
       general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment',
       non_po_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index',
       po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
-      agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index'
-
+      agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index',
+      bbps_subscriptions_show: '::ActionsManager::Master::Bbps::Subscriptions::Show',
+      bbps_subscriptions_index: '::ActionsManager::Master::Bbps::Subscriptions::Index',
+      bbps_bills_show: '::ActionsManager::Master::Bbps::Bills::Show',
+      bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index',
+      credit_notes_index: '::ActionsManager::Master::CreditNotes::Index',
+      credit_note_show: '::ActionsManager::Master::CreditNotes::Show'
   }.with_indifferent_access
 
   def self.set_data_map
