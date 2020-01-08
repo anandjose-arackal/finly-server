@@ -6,7 +6,7 @@ class BankTransactionModeMigration
     Company.all.each do |company|      
     	objects = []
     	YesBankTransaction.find_each do |yes|
-    		print "."
+    		print "#{yes.id}...//..."
     		tm = company.transfer_modes.fetch_modes
     		pm = yes.transfer_type
     		yes.transfer_mode_id = tm[pm&.downcase]
@@ -18,7 +18,7 @@ class BankTransactionModeMigration
     	objects = []
     	# puts "IciciBankTransaction count - #{icici_all.count}"
     	IciciBankTransaction.find_each do |icici|
-    		print "."
+    		print "#{icici.id}...//..."
     		tm = company.transfer_modes.fetch_modes
     		pm = icici.transfer_type
     		icici.transfer_mode_id = tm[pm&.downcase]
