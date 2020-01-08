@@ -324,12 +324,7 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.status_ids(*statuses)
-    status_ids = []
-    statuses.each do |status|
-      status_ids.push BbpsBillStatus.id_for(status)
-    end
-
-    status_ids.reject {|status_id| status_id.nil?}
+    BbpsBillStatus.ids_for(statuses)
   end
 
   def self.open_statuses
