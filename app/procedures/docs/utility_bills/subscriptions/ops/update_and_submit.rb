@@ -16,7 +16,7 @@ class Docs::UtilityBills::Subscriptions::Ops::UpdateAndSubmit < Transactions::AP
   end
 
   def submit(options, params:, current_user:, **)
-    params[:aasm_event] = params[:submit]
+    params[:aasm_event] = :submit
     op = Docs::UtilityBills::Subscriptions::Ops::Review.(params: params, current_user: current_user)
 
     op.messages.each do |key, val|
