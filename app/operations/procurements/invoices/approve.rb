@@ -45,7 +45,7 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
-      
+
       invoice.update payable: true
 
       # if invoice final amount comes to zero, probably because so much advance was adjusted, then auto mark it as paid

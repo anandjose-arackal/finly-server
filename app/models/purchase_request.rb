@@ -184,7 +184,7 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
-  scope :role_based_filter, -> (boolean){
+  scope :role_based_filter, -> (boolean) {
     if boolean
       user = RequestStore.store[:current_user]
       if user.present?

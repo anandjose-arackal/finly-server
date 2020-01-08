@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < ActionsManager::Master::Procurements::PurchaseOrders::Base
 
   register_handle :non_po_purchase_order_show
-  validate :input
+  # validate :data_provider
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :audit_trail, :download, :send_btn, :export_invoice_items]
 
   def more_details_button

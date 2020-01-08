@@ -5,65 +5,227 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {expenses: [:your_expenses, :team_expenses, :policy_expenses, :company_expenses]},
-          {trips: [:your_trips, :team_trips, :policy_trips, :company_trips]},
-          {reports: [:your_reports, :team_reports, :policy_reports, :company_reports]},
-          {money_requests: [:your_money_requests, :team_money_requests, :policy_money_requests, :company_money_requests]},
-          {users: [:team_users, :company_users]},
-          {settlements: [:team_settlements, :company_settlements]},
-          :analytics,
-          {export: [:your_exports, :team_exports, :policy_exports, :company_exports]},
+          :receipts,
+          :expenses,
+          :money_requests,
+          :reports,
+          {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
+          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_reports, :team_trips]},
+          {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_reports, :company_trips]},
+          # :analytics,
+          # {expenses: [:your_expenses, :company_expenses]},
+          # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
+          # {reports: [:your_reports, :reports_awaiting_approval, :team_reports, :company_reports]},
+          # {trips: [:your_trips, :trips_awaiting_approval, :team_trips, :travel_manager_trips, :company_trips]},
+          # {settlements: [:team_settlements, :company_settlements]},
+          # :analytics,
+          # {export: [:team_exports, :company_exports]},
           {create: [:create_expense, :create_trip, :create_report, :create_money_request]}
       ]
   )
+
+  register_structure(
+      :cog_menu, [
+      :users,
+      :load_company_balance, :statements,
+      :organization_account
+  ]
+  )
+
+  register_structure(
+      :cog_modules, [
+      :finly_vendor_payments, :finly_disburse, :finly_collect, :finly_insights
+  ]
+  )
+
+
+  def self.accept?
+    return false unless RequestStoreUtil.current_company&.feature_subscription&.expense_management_enabled
+    true
+  end
 
   def dashboard
     {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
   end
 
   def expenses
-    {name: 'Expenses', id: 'expenses', url: 'expenses'}
+    {name: 'Expenses', id: 'expenses', url: 'expenses/params={"view":"personal"}'}
+  end
+
+  def your_expenses
+    {name: 'Your Expenses', id: 'expenses', url: 'expenses/params={"view":"personal"}'}
+  end
+
+  def company_expenses
+    return nil unless user.admin?
+    {name: 'Company Expenses', id: 'expenses', url: 'expenses/params={"view":"admin", "main_tab": "admin"}'}
+  end
+
+  def receipts
+    {name: 'Receipts', id: 'receipts', url: 'receipts/params={"view":"personal"}'}
   end
 
   def trips
-    {name: 'Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
+    {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
   end
 
   def your_trips
-    {name: 'Your Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
+    {name: 'Your Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
+  end
+
+  def trips_awaiting_approval
+    return nil unless user.manager? || user.admin?
+    {name: 'Trips', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
   end
 
   def team_trips
-    {name: 'Team - Trips', id: 'trips', url: 'trips/params={"view":"personal"}'}
+    return nil unless user.manager? || user.admin?
+    {name: 'Trips', id: 'team', url: 'travel_requests/params={"view":"manager", "main_tab": "team"}'}
+  end
+
+  def travel_manager_trips
+    return nil unless user.travel_manager?
+    {name: 'Travel Manager Trips', id: 'trips', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
-    {name: 'Policy - Trips', id: 'trips', url: 'trips/params={"view":"admin"}'}
+    return nil unless user.admin?
+    {name: 'Trips', id: 'admin', url: 'travel_requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def reports
-    {name: 'Reports', id: 'reports', url: 'reports'}
+    {name: 'Reports', id: 'reports', url: 'reports/params={"view":"personal"}'}
+  end
+
+  def your_reports
+    {name: 'Your Reports', id: 'reports', url: 'reports/params={"view":"personal"}'}
+  end
+
+  def reports_awaiting_approval
+    return nil unless user.manager? || user.admin?
+    {name: 'Reports', id: 'approvals', url: 'reports/params={"view":"manager", "filter_status":"99", "main_tab": "approvals"}'}
+  end
+
+  def team_reports
+    return nil unless user.manager? || user.admin?
+    {name: 'Reports', id: 'team', url: 'reports/params={"view":"manager", "main_tab": "team"}'}
+  end
+
+  def company_reports
+    return nil unless user.admin?
+    {name: 'Reports', id: 'admin', url: 'reports/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def money_requests
-    {name: 'Money_requests', id: 'money_requests', url: 'money_requests'}
+    {name: 'Money Requests', id: 'money_requests', url: 'requests/params={"view":"personal"}'}
   end
 
-  def users
-    {name: 'Users', id: 'users', url: 'users'}
+  def your_money_requests
+    {name: 'Your Money Requests', id: 'money_requests', url: 'requests/params={"view":"personal"}'}
+  end
+
+  def money_requests_awaiting_approval
+    return nil unless user.manager? || user.admin?
+    {name: 'Money Requests', id: 'approvals', url: 'requests/params={"view":"manager", "filter_status":"99", "main_tab": "approvals"}'}
+  end
+
+  def team_money_requests
+    return nil unless user.manager? || user.admin?
+    {name: 'Money Requests', id: 'team', url: 'requests/params={"view":"manager", "main_tab": "team"}'}
+  end
+
+  def company_money_requests
+    return nil unless user.admin?
+    {name: 'Money Requests', id: 'admin', url: 'requests/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def settlements
-    {name: 'Settlements', id: 'settlements', url: 'settlements'}
+    return nil unless user.finance_manager? || user.admin?
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
+  end
+
+  def team_settlements
+    return nil unless user.finance_manager? || user.admin?
+    {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance", "main_tab": "team"}'}
+  end
+
+  def company_settlements
+    return nil unless user.admin?
+    {name: 'Settlements', id: 'admin', url: 'settlements_dashboard/params={"view":"admin", "main_tab": "admin"}'}
   end
 
   def export
-    {name: 'Export', id: 'export', url: 'export'}
+    return nil unless user.manager? || user.admin?
+    {name: 'Export', id: 'export', url: 'export/params={"view":"manager"}'}
+  end
+
+  def team_exports
+    return nil unless user.manager? || user.admin?
+    {name: 'Export', id: 'team', url: 'export/params={"view":"manager", "main_tab": "team"}'}
+  end
+
+  def company_exports
+    return nil unless user.admin?
+    {name: 'Export', id: 'admin', url: 'export/params={"view":"admin", "main_tab": "admin"}'}
+  end
+
+  def team_users
+    return nil unless user.admin?
+    {name: 'Users', id: 'team', url: 'users/params={"view":"manager", "main_tab": "team"}'}
+  end
+
+  def company_users
+    return nil unless user.admin?
+    {name: 'Users', id: 'admin', url: 'users/params={"view":"admin", "main_tab": "admin"}'}
+  end
+
+  def load_company_balance
+    {name: 'Load Company Balance', id: 'load-company-balance', url: '/transfers/register'}
+  end
+
+  def statements
+    return nil unless user.admin?
+    {name: 'Statements', id: 'statements', url: 'company_statements/params={"view":"admin"}'}
   end
 
   def create
     {name: 'Create', id: 'create', url: 'create'}
   end
 
+  def create_expense
+    {name: 'Create Expense', id: 'create_expense', url: 'expenses/new_expense/params={"view":"personal"}'}
+  end
+
+  def create_trip
+    {name: 'Create Trip', id: 'create_trip', url: 'travel_requests/params={"view":"personal",  "create": "true"}'}
+  end
+
+  def create_report
+    {name: 'Create Report', id: 'create_report', url: 'reports/params={"view":"personal", "create": "true"}'}
+  end
+
+  def create_money_request
+    {name: 'Create Money Request', id: 'create_money_request', url: 'requests/params={"view":"personal", "create": "true"}'}
+  end
+
+  def analytics
+    {name: 'Analytics', id: 'admin', url: 'analytics/params={"main_tab": "admin"}'}
+  end
+
+  def approvals
+    reports_awaiting_approval&.merge({name: 'Approvals'})
+  end
+
+  def admin
+    analytics&.merge({name: 'Admin'})
+  end
+
+  def team
+    team_settlements&.merge({name: "Team"})
+  end
+
+  def documents_section
+    {type: 'section', name: 'Requests'}
+  end
 
 end

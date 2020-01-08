@@ -12,7 +12,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
     self.reviewal_chain_data = []
     self.dlrm_mapping_data = [] # will contain dlrm_level_data inside of it
     self.document_amount = get_document_amount
-    self.reviewal_levels = ReviewalLevel.with_policy_ids(document.policy_id).with_associated_entity_type(provider_name).non_deleted # todo - when policy id is not present
+    self.reviewal_levels = ReviewalLevel.with_policy_ids(document.policy_id).with_associated_entity_type(provider_name).non_deleted.reorder(:level_number) # todo - when policy id is not present
   end
 
   def validate

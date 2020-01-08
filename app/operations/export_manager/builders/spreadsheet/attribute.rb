@@ -10,7 +10,7 @@ class ExportManager::Builders::Spreadsheet::Attribute
     self.section = section
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         name: name,
         column_name: column_name,

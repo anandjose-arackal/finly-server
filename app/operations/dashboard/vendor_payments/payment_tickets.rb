@@ -73,33 +73,33 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               ]
             },
             {
-              title: "In Progress",
-              count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
-              filters: [
-                {filter_status: 'in_progress'}
-              ]
+                title: "In Progress",
+                count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
+                filters: [
+                    {filter_status: 'in_progress'}
+                ]
             },
             {
-              title: "Partially Completed",
-              count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
-              filters: [
-                {filter_status: 'partially_completed'}
-              ]
+                title: "Partially Completed",
+                count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
+                filters: [
+                    {filter_status: 'partially_completed'}
+                ]
             },
 
             {
-              title: "Completed",
-              count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
-              filters: [
-                {filter_status: 'completed'}
-              ]
+                title: "Completed",
+                count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
+                filters: [
+                    {filter_status: 'completed'}
+                ]
             },
             {
-              title: "Failed",
-              count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
-              filters: [
-                {filter_status: 'failed'}
-              ]
+                title: "Failed",
+                count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
+                filters: [
+                    {filter_status: 'failed'}
+                ]
             }
           ]
         }
@@ -139,42 +139,42 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               ]
             },
             {
-              title: "Credited",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'credited'})&.count,
-              filters: [
-                {filter_status: 'credited'}
-              ]
+                title: "Credited",
+                count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'credited'})&.count,
+                filters: [
+                    {filter_status: 'credited'}
+                ]
             },
             {
-              title: "In Progress",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'in_progress'})&.count,
-              filters: [
-                {filter_status: 'in_progress'}
-              ]
+                title: "In Progress",
+                count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'in_progress'})&.count,
+                filters: [
+                    {filter_status: 'in_progress'}
+                ]
             },
             {
-              title: "Partially Completed",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'partially_completed'})&.count,
-              filters: [
-                {filter_status: 'partially_completed'}
-              ]
+                title: "Partially Completed",
+                count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'partially_completed'})&.count,
+                filters: [
+                    {filter_status: 'partially_completed'}
+                ]
             },
 
             {
-              title: "Completed",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'completed'})&.count,
-              filters: [
-                {filter_status: 'completed'}
-              ]
+                title: "Completed",
+                count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'completed'})&.count,
+                filters: [
+                    {filter_status: 'completed'}
+                ]
             },
             {
-              title: "Failed",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'failed'})&.count,
-              filters: [
-                {filter_status: 'failed'}
-              ]
+                title: "Failed",
+                count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'failed'})&.count,
+                filters: [
+                    {filter_status: 'failed'}
+                ]
             }
-          ]       
+          ]
         }
         self.counts.push(personal_data)
 
@@ -216,68 +216,68 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
 
     def payment_ticket_dashboard_data
       [
-        {
-          title: "Total",
-          count: apply_scopes(payment_tickets, {filter_user_id: user.id})&.count,
-          filters: [
-            {filter_user_name: user.name},
-            {filter_user_id: user.id}
-          ]
-        },
-        {
-          title: "Processing",
-          count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'processing'})&.count,
-          filters: [
-            {filter_status: 'processing'},
-            {filter_user_name: user.name},
-            {filter_user_id: user.id}
-          ]
-        },
-        {
-          title: "Approved",
-          count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'approved'})&.count,
-          filters: [
-            {filter_status: 'approved'},
-            {filter_user_name: user.name},
-            {filter_user_id: user.id}
-          ]
-        },
-        {
-          title: "Credited",
-          count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
-          filters: [
-            {filter_status: 'credited'}
-          ]
-        },
-        {
-          title: "In Progress",
-          count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
-          filters: [
-            {filter_status: 'in_progress'}
-          ]
-        },
-        {
-          title: "Partially Completed",
-          count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
-          filters: [
-            {filter_status: 'partially_completed'}
-          ]
-        },
+          {
+              title: "Total",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id})&.count,
+              filters: [
+                  {filter_user_name: user.name},
+                  {filter_user_id: user.id}
+              ]
+          },
+          {
+              title: "Processing",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'processing'})&.count,
+              filters: [
+                  {filter_status: 'processing'},
+                  {filter_user_name: user.name},
+                  {filter_user_id: user.id}
+              ]
+          },
+          {
+              title: "Approved",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'approved'})&.count,
+              filters: [
+                  {filter_status: 'approved'},
+                  {filter_user_name: user.name},
+                  {filter_user_id: user.id}
+              ]
+          },
+          {
+              title: "Credited",
+              count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
+              filters: [
+                  {filter_status: 'credited'}
+              ]
+          },
+          {
+              title: "In Progress",
+              count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
+              filters: [
+                  {filter_status: 'in_progress'}
+              ]
+          },
+          {
+              title: "Partially Completed",
+              count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
+              filters: [
+                  {filter_status: 'partially_completed'}
+              ]
+          },
 
-        {
-          title: "Completed",
-          count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
-          filters: [
-            {filter_status: 'completed'}
-          ]
-        },
-        {
-          title: "Failed",
-          count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
-          filters: [
-            {filter_status: 'failed'}
-          ]
-        }
+          {
+              title: "Completed",
+              count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
+              filters: [
+                  {filter_status: 'completed'}
+              ]
+          },
+          {
+              title: "Failed",
+              count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
+              filters: [
+                  {filter_status: 'failed'}
+              ]
+          }
       ]
     end
   end

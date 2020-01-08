@@ -5,7 +5,7 @@ module Sequenced
     attr_reader :record, :scope, :column, :start_at, :skip
 
     def initialize(record, options = {})
-      raise "Sequenced: #{record.class.name} does not have #{company_id} defined" unless record.has_attribute?("company_id")
+      raise "Sequenced: #{record.class.name} does not have #{company_id} defined" unless record.has_attribute?('company_id')
       raise "Sequenced: #{record.class.name} purpose does not exist" unless Purpose.id_for(options[:purpose]).present?
 
       @record = record

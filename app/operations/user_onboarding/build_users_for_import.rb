@@ -1,7 +1,7 @@
 # returns users which can be invited or whose roles can be defined after invitation.
 # 
 class UserOnboarding::BuildUsersForImport < BaseOperation
-  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign, :common_emails, 
+  attr_accessor :policy_user_roles, :user_roles, :users, :common_mails, :new_mails, :input_emails, :bulk_assign, :common_emails,
                 :new_emails, :existing_emails
 
 
@@ -28,7 +28,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       # this one is used after invitation. if users are to be configured in some other policies
       self.users = user.company.users.with_id(bulk_assign[:user_ids])
 
-    # used for invitation
+      # used for invitation
     elsif bulk_assign[:user_emails]
 
       violating_emails = []
@@ -68,7 +68,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     elsif bulk_assign[:user_emails]
       self.users = process_users
     end
-      
+
   end
 
   def process
@@ -123,7 +123,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     # finds email already invited or in other group companies. You can also use this to tell FE if the user already invited
     self.common_emails = self.input_emails & self.users.pluck(:email)
     # finds which users are to be actually invited
-    self.new_emails = self.input_emails - ( user.company.users.pluck(:email) + self.common_emails )
+    self.new_emails = self.input_emails - (user.company.users.pluck(:email) + self.common_emails)
 
 
     # return if self.new_mails.blank? and self.common_emails.blank?
@@ -188,5 +188,5 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       end
     end
   end
-  
+
 end

@@ -4466,6 +4466,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
@@ -4871,6 +4872,13 @@ Rails.application.routes.draw do
   # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'
   # get 'expenses/all_expense_types' => 'expenses#all_expense_types'
 
+
+  scope :task_workflows do
+    get 'documents', to: "task_workflows#documents"
+    get 'config', to: 'task_workflows#configuration'
+  end
+  resources :task_workflows
+
   get 'receipts/export', to: 'receipts#export'
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
@@ -4986,9 +4994,9 @@ Rails.application.routes.draw do
         get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
         get '/:id/generate_template_file', to: 'settlement/money_requests#generate_template_file'
         post '/:id/process_template_file', to: 'settlement/money_requests#process_template_file'
-      	get '/:id', to: 'settlement/money_requests#processing_show'
+        get '/:id', to: 'settlement/money_requests#processing_show'
         patch '/:id', to: 'settlement/money_requests#processing_update'
-      	get '/:id/items', to: 'settlement/money_requests#processing_show_items'
+        get '/:id/items', to: 'settlement/money_requests#processing_show_items'
       end
       get 'completed', to: 'settlement/money_requests#completed_index'
       get 'completed/count', to: 'settlement/money_requests#completed_count'
@@ -5013,6 +5021,8 @@ Rails.application.routes.draw do
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
+
+  get 'exports/:type', to: 'export#processor'
 
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
@@ -5045,6 +5055,7 @@ Rails.application.routes.draw do
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
+  get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
@@ -5118,11 +5129,11 @@ Rails.application.routes.draw do
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
   # keep this above
-  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'  
-  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'  
-  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'  
+  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'
+  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'
+  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'
   # keep this above
-  
+
   resources :locations
 
   resources :departments
@@ -5176,7 +5187,7 @@ Rails.application.routes.draw do
 
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
-  get 'export/agreement_based_payment',to: 'export#agreement_based_payment'
+  get 'export/agreement_based_payment', to: 'export#agreement_based_payment'
 
   get 'agreements', to: 'agreements#index'
   get 'agreements/validate', to: 'agreements#validate'
@@ -5243,7 +5254,7 @@ Rails.application.routes.draw do
   get 'inward_invoice_action_config', to: 'bank_transfer/inward_invoices#actions_configuration'
   get 'inventory_line_item_action_config', to: 'invoicing/inventory_line_items#actions_configuration'
   get 'non_po_action_config', to: 'procure/purchase_orders#actions_configuration'
-  get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
+  get 'procurement_action_config', to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
   get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
   post 'bulk_assign_policy', to: 'policy_user_roles#bulk_assign'
@@ -5293,7 +5304,7 @@ Rails.application.routes.draw do
     resources :bank_payment_requests do
       get 'edit_config', to: 'bank_payment_requests#edit_config', as: :edit_config
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
-      patch 'review', to: 'bank_payment_requests#review', as: :review      
+      patch 'review', to: 'bank_payment_requests#review', as: :review
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'add_invoice', to: 'bank_payment_requests#add_invoice', as: :add_invoice
@@ -5307,7 +5318,6 @@ Rails.application.routes.draw do
       get 'payments_count', to: 'bank_payment_requests#payments_count'
       delete 'remove_attachment', to: 'bank_payment_requests#remove_attachment', as: :remove_attachment
     end
-
 
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
@@ -5431,7 +5441,7 @@ Rails.application.routes.draw do
     put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
     get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
     get 'inventory_line_items/export', to: 'inventory_line_items#export'
-    resources :inventory_line_items do 
+    resources :inventory_line_items do
       put 'upload_attachments', to: 'inventory_line_items#upload_attachments'
       put 'destroy_attachments', to: 'inventory_line_items#destroy_attachments'
       get 'procurements', to: 'inventory_line_items#procurements'
@@ -5686,6 +5696,13 @@ Rails.application.routes.draw do
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
+
+    get 'em/expenses', to: 'expense_management#expenses'
+    get 'em/reports', to: 'expense_management#reports'
+    get 'em/money_requests', to: 'expense_management#money_requests'
+    get 'em/trips', to: 'expense_management#trips'
+    get 'em/awaiting_action', to: 'expense_management#awaiting_action'
+    get 'em/configs', to: 'expense_management#configs'
   end
   ######## Dashbaord Ends ##############
 
@@ -5756,60 +5773,106 @@ Rails.application.routes.draw do
   end
 
 
+  # get 'form_entities', to: 'form_entities#index'
+  # resources :form_entities
+  resources :forms
+
+  resources :insights
+
+  # Utility Bill Payments / BBPS Start #
+  namespace :bbps do
+    get 'subscriptions/edit_config', to: 'subscriptions#edit_config'
+    get 'subscriptions/biller_type_config', to: 'subscriptions#biller_type_config'
+    get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
+    get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
+    get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
+    resources :subscriptions do
+      patch 'review', to: 'subscriptions#review'
+      put 'update_and_submit', to: 'subscriptions#update_and_submit'
+      patch 'add_bill', to: 'subscriptions#add_bill'
+      get 'fetch_bill', to: 'subscriptions#fetch_bill'
+    end
+
+    get 'bills/edit_config', to: 'bills#edit_config'
+    get 'bills/actions_config', to: 'bills#actions_config'
+    get 'bills/filters_config', to: 'bills#filters_config'
+    get 'bills/payables', to: 'bills#payable_bills'
+    resources :bills do
+      patch 'review', to: 'bills#review'
+      put 'update_and_submit', to: 'bills#update_and_submit'
+      patch 'bill_validate', to: 'bills#bill_validate'
+      get 'download_receipt', to: 'bills#download_receipt'
+    end
+
+    resources :complaints
+  end
+  # Utility Bill Payments / BBPS Ends  #
+
+  # New Route for P2P
+  # Credit Note
+  get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
+  get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
+  get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+
+  resources :credit_notes do
+    patch 'review', to: 'credit_notes#review'
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
-# The priority is based upon order of creation: first created -> highest priority.
-# See how all your routes lay out with "rake routes".
+  # The priority is based upon order of creation: first created -> highest priority.
+  # See how all your routes lay out with "rake routes".
 
-# You can have the root of your site routed with "root"
-# root 'welcome#index'
+  # You can have the root of your site routed with "root"
+  # root 'welcome#index'
 
-# Example of regular route:
-#   get 'products/:id' => 'catalog#view'
+  # Example of regular route:
+  #   get 'products/:id' => 'catalog#view'
 
-# Example of named route that can be invoked with purchase_url(id: product.id)
-#   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+  # Example of named route that can be invoked with purchase_url(id: product.id)
+  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
-# Example resource route (maps HTTP verbs to controller actions automatically):
-#   resources :products
+  # Example resource route (maps HTTP verbs to controller actions automatically):
+  #   resources :products
 
-# Example resource route with options:
-#   resources :products do
-#     member do
-#       get 'short'
-#       post 'toggle'
-#     end
-#
-#     collection do
-#       get 'sold'
-#     end
-#   end
+  # Example resource route with options:
+  #   resources :products do
+  #     member do
+  #       get 'short'
+  #       post 'toggle'
+  #     end
+  #
+  #     collection do
+  #       get 'sold'
+  #     end
+  #   end
 
-# Example resource route with sub-resources:
-#   resources :products do
-#     resources :comments, :sales
-#     resource :seller
-#   end
+  # Example resource route with sub-resources:
+  #   resources :products do
+  #     resources :comments, :sales
+  #     resource :seller
+  #   end
 
-# Example resource route with more complex sub-resources:
-#   resources :products do
-#     resources :comments
-#     resources :sales do
-#       get 'recent', on: :collection
-#     end
-#   end
+  # Example resource route with more complex sub-resources:
+  #   resources :products do
+  #     resources :comments
+  #     resources :sales do
+  #       get 'recent', on: :collection
+  #     end
+  #   end
 
-# Example resource route with concerns:
-#   concern :toggleable do
-#     post 'toggle'
-#   end
-#   resources :posts, concerns: :toggleable
-#   resources :photos, concerns: :toggleable
+  # Example resource route with concerns:
+  #   concern :toggleable do
+  #     post 'toggle'
+  #   end
+  #   resources :posts, concerns: :toggleable
+  #   resources :photos, concerns: :toggleable
 
-# Example resource route within a namespace:
-#   namespace :admin do
-#     # Directs /admin/products/* to Admin::ProductsController
-#     # (app/controllers/admin/products_controller.rb)
-#     resources :products
-#   end
+  # Example resource route within a namespace:
+  #   namespace :admin do
+  #     # Directs /admin/products/* to Admin::ProductsController
+  #     # (app/controllers/admin/products_controller.rb)
+  #     resources :products
+  #   end
 end

@@ -305,6 +305,8 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     when 'bulk_beneficiary'
       # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
       create_bulk_beneficiary_ticket(current_user, params)
+    when 'bill_payment'
+      create_bill_payment(current_user, params)
     else
       respond response: :failure, message: "Invalid ticket type provided. Please provide one of either 'invoice', 'po_advance', 'beneficiary' or 'bulk_beneficiary'"
     end
@@ -512,6 +514,29 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
       end
     end
   end
+
+  def create_bill_payment(current_user, params)
+    @result = BankTransfer::PaymentRequest::UtilityBills::CreateUtilityBillsTicket.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          bank_payment_request_id: @result.bank_payment_request.id,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 
 end
 

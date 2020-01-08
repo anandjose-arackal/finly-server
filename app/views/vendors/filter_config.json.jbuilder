@@ -27,10 +27,10 @@ json.custom_fields do
     json.field_type fc.field_type
     json.field_key fc.field_key
     case fc.field_type_id
-      when FieldType.id_for(:drop_down)
-        json.drop_down_items fc.drop_down_items
-      when FieldType.id_for(:multiselect)
-        json.drop_down_items fc.multiselect_items
+    when FieldType.id_for(:drop_down)
+      json.drop_down_items fc.drop_down_items
+    when FieldType.id_for(:multiselect)
+      json.drop_down_items fc.multiselect_items
     end
   end
 end
