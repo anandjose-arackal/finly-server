@@ -135,7 +135,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # payment_order.update(initiating_account_type: initiating_account.class.name) # this probably doesn't make sense here because each individual payment now can be initiated from anywhere
     self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
-
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
     unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
@@ -225,6 +224,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           user.company.kotak_bank_company_account
         when "YesBankCompanyAccount"
           return user.company.yes_bank_company_account
+        when "UtilityBillsAccount"
+          return user.company.utility_bills_account
         else
           return user.company.yes_bank_company_account
         end
@@ -259,6 +260,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
         when "YesBankCompanyAccount"
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "UtilityBillsAccount"
+          return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(user.company.utility_bills_account)
         else
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

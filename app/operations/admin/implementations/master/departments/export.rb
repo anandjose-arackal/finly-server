@@ -3,7 +3,7 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.export'
 
-  headers ({
+  headers({
       :id => "ID",
       :parent_id =>  "Parent Department NAME",
       :name => "Departmet Name",

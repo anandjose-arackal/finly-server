@@ -12,9 +12,9 @@ class MultiEntityLogin::TokenController < Oauth::TokenController
 
     merged_params = params.merge(
         {
-          user_device: session.user_device,
-          user_ip: session.user_ip,
-          user_agent_client: session.user_agent_client
+            user_device: session.user_device,
+            user_ip: session.user_ip,
+            user_agent_client: session.user_agent_client
         }
     )
     sessions_result = UserSessions::Create.(:authorized, merged_params)

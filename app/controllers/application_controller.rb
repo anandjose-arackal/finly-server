@@ -8,6 +8,8 @@ class ApplicationController < ActionController::Base
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
   include Helpers::RequestImpressionHelper
+  include Transactions::Endpoint::Controller
+
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 

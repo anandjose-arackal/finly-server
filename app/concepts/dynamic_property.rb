@@ -1,3 +1,4 @@
+# DEPRICATED -> Please use DynamicAttributes
 module DynamicProperty
 
   def self.included(base)

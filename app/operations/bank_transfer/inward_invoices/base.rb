@@ -28,7 +28,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                     :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
                                     :vendor_id, :advance_amount_required, :bank_account_id,
-                                    :po_number, :narration,
+                                    :po_number, :narration, :rcm_enabled,
                                     original_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
@@ -41,8 +41,10 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                         :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
                                         :category_id, :description, :id, :remove_line_item,
                                         :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :purchase_order_item_id,
-                                        # :billable_amount
-                                    ], custom_fields: [])
+                                    # :billable_amount
+                                    ], custom_fields: [],
+                                    credit_note_adjustments_attributes: [:id, :_destroy, :credit_note_id, amount_attributes: [:value, :currency_id]]
+    )
   end
 
   def calculate_tax_and_discounts(invoice, invoice_params)

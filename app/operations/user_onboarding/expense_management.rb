@@ -34,7 +34,7 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
     if urm_user_role_ids.present?
       flow(pre_process_urm)
       self.urm_unassignable_roles = self.unassignable_roles
-      self.urm_columns, self.urm_values = setup_urm(assignable_roles) 
+      self.urm_columns, self.urm_values = setup_urm(assignable_roles)
     end
 
     if pur_user_role_ids.present?
@@ -67,12 +67,12 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
       self.unassignable_roles = self.pur_unassignable_roles.to_a
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
 
-      params[:unassignable_roles] = self.unassignable_roles.map do |role| 
+      params[:unassignable_roles] = self.unassignable_roles.map do |role|
         policy = policies.find {|policy| policy if policy.id == role.first}
         user = users.find {|u| u if u.id == role.second}
         roles = UserRole::VALUES.invert[role.third]
-        pur = [{id: policy.id, name:policy.name}, {id: user.id, email: user.email}, {id: role.last, name: roles.to_s}]
-        fields.zip(pur).to_h 
+        pur = [{id: policy.id, name: policy.name}, {id: user.id, email: user.email}, {id: role.last, name: roles.to_s}]
+        fields.zip(pur).to_h
       end
     end
 
