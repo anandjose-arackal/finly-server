@@ -37,8 +37,8 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
       bbps_bills = BbpsBill.none
     end
 
-    page ||= 1
-    per_page ||= 30
+    page = params[:page] || 1
+    per_page = params[:per_page] || 30
 
     bbps_bills = apply_scopes(bbps_bills, params)
     result = {
