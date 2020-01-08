@@ -252,7 +252,6 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   def team
     return nil unless user.manager? || user.finance_manager?
     user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
-    end
   end
 
   def documents_section
