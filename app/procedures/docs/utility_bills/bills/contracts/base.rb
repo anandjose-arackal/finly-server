@@ -16,6 +16,9 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :tax_rate_id
   property :hsn_sac
 
+  property :order_number
+  property :order_number_type
+
   # Should be used in update
   property :policy_id
   property :user_id

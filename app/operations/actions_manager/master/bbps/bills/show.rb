@@ -64,8 +64,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   # end
 
   def destroy
-    !bbps_bill.autofetched && ((BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)) ||
-        user.vendor_payment_admin?)
+    !bbps_bill.autofetched && (BbpsBill.open_statuses.include?(bbps_bill.status_id) && (bbps_bill.subscription.pocs.include?(user) || user.vendor_payment_admin?))
   end
 
   def raise_dispute
@@ -79,7 +78,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def bill_validate
-    bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user))
+    bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user) || bbps_bill.get_reviewers.include?(user))
   end
 
   def download_receipt

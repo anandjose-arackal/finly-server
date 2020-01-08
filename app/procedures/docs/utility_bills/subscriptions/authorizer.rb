@@ -23,7 +23,7 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc?
+    (@user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc?) && (@model.company_id == @user.company_id)
   end
 
   def reject?
@@ -46,9 +46,9 @@ class Docs::UtilityBills::Subscriptions::Authorizer
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
 
-  # def return_control?
-  #   @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
-  # end
+  def return_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.include?(@user)
+  end
 
   def deactivate?
     @user.vendor_payment_admin? && (@model.approved? || @model.auto_approved? || @model.reactivated?)
