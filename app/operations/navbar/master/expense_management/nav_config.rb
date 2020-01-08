@@ -90,7 +90,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def travel_request_bookings
     return nil if user.admin? || user.auditor? || !user.is_travel_manager?
-    {name: 'Trip Bookings', id: 'trip-bookings', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
+    {name: 'Bookings', id: 'trip-bookings', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
