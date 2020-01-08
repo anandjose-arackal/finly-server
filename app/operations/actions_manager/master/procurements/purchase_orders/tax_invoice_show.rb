@@ -182,7 +182,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def create_credit_note
-    InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id) && user.has_policy_role?(:credit_note_initiator) && invoice.credit_note.blank?
+    InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id) && user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) && invoice.credit_note.blank?
   end
 
 end

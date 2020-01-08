@@ -97,6 +97,14 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:retracted))
     when 'rejected', :rejected
       where(status_id: BbpsBillStatus.id_for(:rejected))
+    when 'open', :open
+      where(status_id: BbpsBillStatus.id_for(:open))
+    when 'voided', :voided
+      where(status_id: BbpsBillStatus.id_for(:voided))
+    when 'paid', :paid
+      where(status_id: BbpsBillStatus.id_for(:paid))
+    when 'payment_ticket_created', :payment_ticket_created
+      where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
     else
       # do nothing
     end
