@@ -64,8 +64,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   # end
 
   def destroy
-    !bbps_bill.autofetched && ((BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)) ||
-        user.vendor_payment_admin?)
+    !bbps_bill.autofetched && (BbpsBill.open_statuses.include?(bbps_bill.status_id) && (bbps_bill.subscription.pocs.include?(user) || user.vendor_payment_admin?))
   end
 
   def raise_dispute
