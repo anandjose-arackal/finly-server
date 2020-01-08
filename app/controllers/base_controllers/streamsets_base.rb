@@ -13,4 +13,8 @@ class BaseControllers::StreamsetsBase < ApplicationController
   	User.find_by id: params[:user_id], company_id: params[:company_id]
   end
 
+  def skip_finly_authorize?
+  	true
+  end
+
 end
