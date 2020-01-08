@@ -46,8 +46,14 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # a 200 OK response
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed),
                                 bbps_ref_id: result.bbps_ref_id)
-        
+
+        # clearing old system messages as well
+        payment.system_messages.destroy_all
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+
+        # add a success system message?
+        payment.system_messages.build(content: "The payment has been accepted by BBPS. Awaiting credit confirmation from the service provider",
+                                      system_message_type_id: SystemMessageType.id_for(:success)).save
       end
       op.error do |result|
         puts "Error:Result: #{result}"
