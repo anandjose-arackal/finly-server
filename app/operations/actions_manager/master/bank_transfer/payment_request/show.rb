@@ -429,7 +429,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def edit_payment_history
     # Security deposit is non editable. There will always be one payment attached to security deposit
-    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit'
+    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit' || bank_payment_request.payment_order.payments.first.parent_type == 'BbpsBill'
       return false
     end
     ############# Admin logic start ####################

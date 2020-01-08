@@ -4466,6 +4466,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
@@ -5760,6 +5761,7 @@ Rails.application.routes.draw do
   get 'exports/:type', to: 'export_jobs#create'
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
+  get 'maps/config/:type', to: 'google_maps#maps_config'
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities

@@ -10,7 +10,6 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  bank         :string(255)
-#  deleted_at   :datetime
 #
 
 class ItzCashCardProgram < ApplicationRecord
