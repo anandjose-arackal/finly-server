@@ -352,11 +352,11 @@ class BbpsBill < ApplicationRecord
   # this methid will set the quickpay attribute based on a
   # bunch of parameters that are present in the biller
   def set_quick_pay
-    type = self.biller.biller_mode
-    ad_hoc = self.biller.biller_accepts_adhoc
-    fetch_requirement = self.biller.fetch_requirement
-    validation_support = self.biller.support_bill_validation
-    if (fetch_requirement == validation_support) && (validation_support == "NOT_SUPPORTED")
+    type = self.biller&.biller_mode
+    ad_hoc = self.biller&.biller_accepts_adhoc
+    fetch_requirement = self.biller&.fetch_requirement
+    validation_support = self.biller&.support_bill_validation
+    if (fetch_requirement == "NOT_SUPPORTED") && (validation_support == "NOT_SUPPORTED")
       self.quick_pay = "Y"
     end
   end

@@ -785,6 +785,16 @@ class Payment < ApplicationRecord
       end
     end
 
+    if self.processing?
+      case self.parent_type
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:payment_initiated))
+      else
+        # do nothing?
+      end
+    end
+
     if PaymentStatus.all_except_failed.exclude? self.payment_status_id
       case self.parent_type
       when 'Invoice'
