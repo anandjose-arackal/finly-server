@@ -432,6 +432,13 @@ class Payment < ApplicationRecord
     includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
   }
 
+  scope :include_for_streamsets, -> {
+        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+                  receiving_account: [:account_owner],
+                  invoice: [:category, :cost_center, :invoice_status, :invoice_type],
+                  payment_order: [bank_payment_request: [:status]])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}

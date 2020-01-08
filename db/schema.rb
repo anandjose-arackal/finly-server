@@ -902,6 +902,111 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.boolean "early_payment_fee_selected", default: false
     t.boolean "late_payment_fee_selected", default: false
     t.boolean "convenience_fee_selected", default: false
+    t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
+    t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
+    t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
+    t.index ["cost_center_id"], name: "index_bbps_bills_on_cost_center_id"
+    t.index ["department_id"], name: "index_bbps_bills_on_department_id"
+    t.index ["location_id"], name: "index_bbps_bills_on_location_id"
+    t.index ["policy_id"], name: "index_bbps_bills_on_policy_id"
+    t.index ["sequence_id"], name: "index_bbps_bills_on_sequence_id"
+    t.index ["status_id"], name: "index_bbps_bills_on_status_id"
+    t.index ["subscription_id"], name: "index_bbps_bills_on_subscription_id"
+    t.index ["user_id"], name: "index_bbps_bills_on_user_id"
+  end
+
+  create_table "bbps_subscription_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "label"
+    t.string "value"
+    t.integer "subscription_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "biller_id"
+    t.index ["label"], name: "index_bbps_subscription_fields_on_label"
+    t.index ["subscription_id"], name: "index_bbps_subscription_fields_on_subscription_id"
+    t.index ["value"], name: "index_bbps_subscription_fields_on_value"
+  end
+
+  create_table "bbps_subscription_pocs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "subscription_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["subscription_id"], name: "index_bbps_subscription_pocs_on_subscription_id"
+    t.index ["user_id"], name: "index_bbps_subscription_pocs_on_user_id"
+  end
+
+  create_table "bbps_yes_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "message_code"
+    t.string "status"
+    t.string "error_code"
+    t.string "error_desc"
+    t.string "ref_no"
+    t.string "agent_institution_id"
+    t.string "channel_id"
+    t.string "bbps_ref_id"
+    t.string "agent_id"
+    t.string "customer_name"
+    t.string "customer_mobile"
+    t.string "customer_email"
+    t.string "customer_aadhar_no"
+    t.string "customer_pan_id"
+    t.string "biller_id"
+    t.string "amount"
+    t.string "bill_date"
+    t.string "due_date"
+    t.string "bill_number"
+    t.string "bill_period"
+    t.string "convenience_fee"
+    t.string "convenience_fee_desc"
+    t.string "late_payment_fee"
+    t.string "early_payment_fee"
+    t.string "additional_field"
+    t.integer "bill_id"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "transfer_status_id"
+    t.integer "amount_id"
+    t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
+    t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
+  end
+
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.string "sequence_id"
+    t.integer "department_id"
+    t.integer "cost_center_id"
+    t.integer "location_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.integer "status_id"
+    t.integer "amount_id"
+    t.boolean "autofetched", default: false
+    t.date "expected_due_date"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.text "note"
+    t.integer "company_id"
+    t.integer "category_id"
+    t.date "due_date"
+    t.date "bill_date"
+    t.string "bill_number"
+    t.date "paid_on_date"
+    t.string "transaction_id"
+    t.string "bbps_id"
+    t.string "bill_period"
+    t.integer "late_payment_fee_id"
+    t.integer "early_payment_fee_id"
+    t.integer "convenience_fee_id"
+    t.boolean "quick_pay", default: true
+    t.integer "total_amount_id"
+    t.boolean "early_payment_fee_selected", default: false
+    t.boolean "late_payment_fee_selected", default: false
+    t.boolean "convenience_fee_selected", default: false
     t.integer "bbps_biller_id"
     t.boolean "bill_validation_required"
     t.string "order_number"
@@ -2078,8 +2183,6 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.string "legal_entity_name"
     t.boolean "show_custom_fields_in_pdf", default: true
     t.boolean "show_po_approved_trail", default: false
-    t.datetime "deleted_at"
-    t.boolean "email_purchase_order_initiator"
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
     t.index ["default_card_expense_category_id"], name: "index_company_configurations_on_default_card_expense_category_id"
@@ -4498,8 +4601,6 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.string "agreement_item_type"
     t.integer "agreement_item_id"
     t.boolean "payable", default: false
-    t.boolean "rcm_enabled", default: false
-    t.integer "cn_adjusted_amount_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -5261,7 +5362,6 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.integer "status_id", default: 1
     t.text "message"
     t.integer "admin_user_id"
-    t.string "authentication_type", default: "password"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -8681,9 +8781,6 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.integer "bank_transaction_type_id"
     t.boolean "account_name_check", default: false
     t.string "beneficiary_full_name"
-    t.integer "beneficiary_verification_retry_count"
-    t.datetime "deleted_at"
-    t.integer "transfer_mode_id"
     t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
     t.index ["beneficiary_bank_account_id"], name: "index_yes_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_yes_bank_transactions_on_company_id"

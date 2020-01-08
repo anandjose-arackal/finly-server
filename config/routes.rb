@@ -5763,6 +5763,16 @@ Rails.application.routes.draw do
   resources :export_jobs, only: [:index]
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
+  scope :streamsets do
+    scope :v1 do
+      post 'auth', to: 'streamsets/v1/token#create'
+      get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+      get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
+      get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
+    end
+  end
+
+
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms
