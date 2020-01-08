@@ -1,6 +1,7 @@
 class Export::Reports::Background::Base < BackgroundOperation
   attr_accessor :company, :preference, :loose_headers,  :custom_field_data
 
+  sidekiq_options queue: :report_export_queue
 
   # class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
   #   attr_accessor :data, :header, :report_names
@@ -130,7 +131,7 @@ class Export::Reports::Background::Base < BackgroundOperation
   def extract_custom_field_names(reports)
     # now extract the custom fields from each expense that is a part of all the report
     field_names = []
-    reports.each do |report|
+    reports.find_each(batch_size: 1000) do |report|
       report.expenses.each do |expense|
         # this gets all the custom field names from all different types of expenses
         if expense.custom_field_names.present?

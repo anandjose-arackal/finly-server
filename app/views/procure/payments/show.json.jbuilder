@@ -47,7 +47,8 @@ if payment.invoice.present?
   json.invoice do
     json.id invoice.id
     json.advance invoice.advance
-    json.advance_amount precision_value invoice.advance_amount&.value
+    advance_amount = (invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)) ? invoice.po_adjusted_advance&.value : invoice.advance_amount&.value
+    json.advance_amount precision_value advance_amount
     json.tax_amount precision_value invoice.tax_amount&.value
     json.tds_amount precision_value invoice.tds_amount&.value
     json.tax precision_value invoice.tax

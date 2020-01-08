@@ -11,6 +11,7 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  amount_id        :integer
+#  deleted_at       :datetime
 #
 
 class RateContractLineItem < ApplicationRecord

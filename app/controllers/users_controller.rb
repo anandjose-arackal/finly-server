@@ -1,6 +1,6 @@
 class UsersController < BaseControllers::WebBase
 
-  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login
+  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login, :saml_validator
   before_action :load_global_variables, only: :lookup
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
@@ -202,6 +202,11 @@ class UsersController < BaseControllers::WebBase
   # this will be in the cog menu, the list of companies will be part of the cog menu
   def group_entities_after_login
     @result = User::GroupEntities.(current_user, params)
+    respond
+  end
+
+  def saml_validator
+    @result = Users::SamlValidator.(current_user, params)
     respond
   end
 

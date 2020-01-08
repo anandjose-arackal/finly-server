@@ -19,6 +19,7 @@
 #  client_id                    :integer
 #  client_type                  :string(255)
 #  user_finly_id                :string(255)
+#  deleted_at                   :datetime
 #
 
 class UserDevice < ApplicationRecord
