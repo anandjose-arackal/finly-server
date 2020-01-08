@@ -7,6 +7,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  default_company_id :integer
+#  deleted_at         :datetime
 #
 
 class CompanyGroup < ApplicationRecord

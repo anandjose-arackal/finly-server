@@ -2,7 +2,7 @@
 # For now this only supports SAML based authentication, but it can support others in the future
 class Authenticator::Providers::Sso < Authenticator::Providers::Base
 
-  attr_accessor :username, :sso_response, :sso_config_id
+  attr_accessor :username, :sso_response, :sso_config_id, :company_id
 
   def self.accept?(request)
     scopes = request.params[:scope]
@@ -16,7 +16,9 @@ class Authenticator::Providers::Sso < Authenticator::Providers::Base
 
   def authenticate
     self.sso_config_id = params[:sso_config_id]
+    self.company_id = params[:company_id]
 
+    # i.e. setting the sso_config as the first one as a fallback
     self.sso_config_id = 1 if self.sso_config_id.blank?
 
     fail_with_event :on_invalid_sso_config, "Invalid configuration passed for SSO"
@@ -27,6 +29,14 @@ class Authenticator::Providers::Sso < Authenticator::Providers::Base
     fail_with_event :on_blank_username, "Invalid username"
 
     self.authenticated_user = unauthenticated_user
+  end
+
+  # this is the user that will be created once the
+  # company is passed
+  def unauthenticated_user
+    raise "Model has not been defined" if model.nil?
+
+    self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: self.company_id)
   end
 
   def on_invalid_saml_session(message)
