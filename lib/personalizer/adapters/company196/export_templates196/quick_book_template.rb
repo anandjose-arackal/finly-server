@@ -50,8 +50,7 @@ class Personalizer::Adapters::Company196::ExportTemplates196::QuickBookTemplate 
           'TDS':inv.tds_amount.value,
           'Net Invoice Value': inv.net_amount&.value,
           'Project Code': get_project_code(inv) ,
-          'Invoice Link': ''
-
+          'Invoice Link': inv.attachments&.first&.file&.url
       }.each do |k, v|
         row.add k, v
       end
@@ -65,7 +64,7 @@ class Personalizer::Adapters::Company196::ExportTemplates196::QuickBookTemplate 
   end
 
   def get_project_code(inv)
-    inv.custom_fields.with_field_key('project_code')&.first&.value&.value
+    inv.custom_fields.with_field_key('project_code')&.first&.value&.value&.name
   end
 
 end
