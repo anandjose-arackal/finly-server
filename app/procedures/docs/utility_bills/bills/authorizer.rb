@@ -44,6 +44,10 @@ class Docs::UtilityBills::Bills::Authorizer
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
 
+  def return_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.include?(@user)
+  end
+
   # def return_control?
   #
   # end
