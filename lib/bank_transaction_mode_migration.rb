@@ -1,9 +1,9 @@
 class BankTransactionModeMigration
 	def self.run
-  	yes_all = YesBankTransaction.all
+  	# yes_all = YesBankTransaction.all
   	objects = []
-  	puts "YesBankTransaction count - #{yes_all.count}"
-  	yes_all.each do |yes|
+  	# puts "YesBankTransaction count - #{yes_all.count}"
+  	YesBankTransaction.find_each do |yes|
   		print "."
   		tm = yes.company.transfer_modes.fetch_modes
   		pm = yes.transfer_type
@@ -12,10 +12,10 @@ class BankTransactionModeMigration
   	end;nil
   	YesBankTransaction.import objects, on_duplicate_key_update: [:transfer_mode_id], validate: false
 
-  	icici_all = IciciBankTransaction.all
+  	# icici_all = IciciBankTransaction.all
   	objects = []
-  	puts "IciciBankTransaction count - #{icici_all.count}"
-  	icici_all.each do |icici|
+  	# puts "IciciBankTransaction count - #{icici_all.count}"
+  	IciciBankTransaction.find_each do |icici|
   		print "."
   		tm = icici.company.transfer_modes.fetch_modes
   		pm = icici.transfer_type

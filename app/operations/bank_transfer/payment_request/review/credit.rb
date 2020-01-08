@@ -135,7 +135,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # payment_order.update(initiating_account_type: initiating_account.class.name) # this probably doesn't make sense here because each individual payment now can be initiated from anywhere
     self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
-
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
     unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one

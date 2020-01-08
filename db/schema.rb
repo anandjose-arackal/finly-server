@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_03_104831) do
+ActiveRecord::Schema.define(version: 2020_01_07_135155) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -814,6 +814,7 @@ ActiveRecord::Schema.define(version: 2020_01_03_104831) do
     t.integer "tax_rate_id"
     t.integer "category_id"
     t.string "hsn_sac"
+    t.string "quick_pay", default: "N"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -973,6 +974,7 @@ ActiveRecord::Schema.define(version: 2020_01_03_104831) do
     t.datetime "updated_at", null: false
     t.integer "transfer_status_id"
     t.integer "amount_id"
+    t.string "quick_pay", default: "N"
     t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
     t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end
@@ -3385,6 +3387,14 @@ ActiveRecord::Schema.define(version: 2020_01_03_104831) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "status_id", null: false
+    t.datetime "deleted_at"
+    t.string "master"
+    t.string "description"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.text "crash_stacktrace"
+    t.text "message"
+    t.text "note"
     t.index ["company_id"], name: "index_export_jobs_on_company_id"
     t.index ["completed_at"], name: "index_export_jobs_on_completed_at"
     t.index ["completed_records"], name: "index_export_jobs_on_completed_records"
@@ -3393,6 +3403,7 @@ ActiveRecord::Schema.define(version: 2020_01_03_104831) do
     t.index ["created_by_id"], name: "index_export_jobs_on_created_by_id"
     t.index ["export_type"], name: "index_export_jobs_on_export_type"
     t.index ["name"], name: "index_export_jobs_on_name"
+    t.index ["record_type", "record_id"], name: "index_export_jobs_on_record_type_and_record_id"
     t.index ["total_records"], name: "index_export_jobs_on_total_records"
     t.index ["updated_at"], name: "index_export_jobs_on_updated_at"
   end

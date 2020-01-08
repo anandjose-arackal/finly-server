@@ -279,6 +279,7 @@ class Bbps::BillPay < Bbps::Api
             convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
             late_payment_fee: result['response.parsed']['late_payment_fee'],
             early_payment_fee: result['response.parsed']['early_payment_fee'],
+            bbps_ref_id: result['response.parsed']['bbps_ref_id']
         }
     )
   end

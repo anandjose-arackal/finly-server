@@ -14,6 +14,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  description       :text(65535)
+#  deleted_at        :datetime
 #
 
 class Attachment < ApplicationRecord

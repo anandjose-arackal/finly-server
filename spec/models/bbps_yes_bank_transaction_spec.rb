@@ -34,6 +34,7 @@
 #  updated_at           :datetime         not null
 #  transfer_status_id   :integer
 #  amount_id            :integer
+#  quick_pay            :string(255)      default("N")
 #
 
 require 'rails_helper'

@@ -46,6 +46,7 @@
 #  tax_rate_id             :integer
 #  category_id             :integer
 #  hsn_sac                 :string(255)
+#  quick_pay               :string(255)      default("N")
 #
 
 require 'rails_helper'
