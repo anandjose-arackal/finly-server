@@ -5775,6 +5775,7 @@ Rails.application.routes.draw do
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
+      put 'update_and_submit', to: 'subscriptions#update_and_submit'
       patch 'add_bill', to: 'subscriptions#add_bill'
       get 'fetch_bill', to: 'subscriptions#fetch_bill'
     end
@@ -5785,6 +5786,7 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'
     end

@@ -24,6 +24,11 @@ class Bbps::BillsController < BaseControllers::WebBase
     end
   end
 
+  def update_and_submit
+    params[:id] = params[:id] || params[:_id]
+    endpoint Docs::UtilityBills::Bills::Ops::UpdateAndSubmit
+  end
+
   def index
     endpoint Docs::UtilityBills::Bills::Ops::Index
     respond_to do |format|
