@@ -334,8 +334,6 @@ class BbpsBill < ApplicationRecord
   def resolve_bill_validation
     if self.amount.present? && self.amount.changes.keys.include?("value") && self.biller.present? && (self.biller.support_bill_validation == "MANDATORY" || self.biller.support_bill_validation == "OPTIONAL")
       self.bill_validation_required = true
-    elsif not autofetched
-      self.bill_validation_required = true
     end
   end
 end
