@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
+  register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
                     :return_control, :destroy, :view_payment_ticket, :raise_dispute,
                     :bill_validate, :download_receipt]
 
@@ -19,7 +19,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
     end
   end
 
-  def submit
+  def update_and_submit
     !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
