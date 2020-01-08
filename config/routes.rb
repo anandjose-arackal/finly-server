@@ -5746,6 +5746,14 @@ Rails.application.routes.draw do
   resources :export_jobs, only: [:index]
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
+  scope :streamsets do
+    scope :v1 do
+      post 'auth', to: 'streamsets/v1/token#create'
+      get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+    end
+  end
+
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 # The priority is based upon order of creation: first created -> highest priority.
