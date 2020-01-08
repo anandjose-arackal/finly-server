@@ -440,7 +440,6 @@ class ApplicationController < ActionController::Base
   def set_tokens_in_header
     if self.class.required_header_token_actions.include?(action_name) or self.class.required_header_token_actions.include?(action_name&.to_sym)
       access_token = request.cookies["access_token"]
-      access_token = "eaa52ae3100842bf77551cc8b7b6265d8ca2fc1aa927bd9cbd0cb54fd8a17d1b"
       if access_token.present?
         request.headers["Authorization"] = "Bearer #{access_token}"
         RequestStoreUtil.set_skip_x_finly_rp_check
