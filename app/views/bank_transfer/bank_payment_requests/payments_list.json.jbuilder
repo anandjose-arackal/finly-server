@@ -12,6 +12,7 @@ json.payments do
       json.name payment.receiving_account&.name
       json.account_number payment.receiving_account&.account_number
       json.ifsc payment.receiving_account&.ifsc
+      json.editable false # because a bbps bill can never be edited from the payment ticket screen
     else
       json.owner_name payment.receiving_account&.account_owner&.name
       json.beneficiary_id payment.receiving_account&.account_owner&.id
