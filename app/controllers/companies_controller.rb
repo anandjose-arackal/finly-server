@@ -35,6 +35,7 @@ class CompaniesController < BaseControllers::WebBase
     # else
     #   company = Company.first
     # end
+    # company = Company.second
     if company.blank?
       # redirect to the login page, because they don't have any configurations
       @sso_configs = []

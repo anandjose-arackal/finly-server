@@ -11,6 +11,7 @@
 #  distance_unit_id    :integer
 #  policy_id           :integer          not null
 #  enforce_category    :boolean          default(FALSE)
+#  deleted_at          :datetime
 #
 
 class DistanceExpenseConfig < ApplicationRecord

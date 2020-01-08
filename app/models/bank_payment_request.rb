@@ -34,6 +34,9 @@
 #  otp_attempts                 :integer
 #  otp_count                    :integer
 #  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
