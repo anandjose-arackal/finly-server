@@ -31,7 +31,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   def index!(options, params:, current_user:, **)
     if current_user.vendor_payment_admin?
       bbps_bills = BbpsBill.role_based_admin_associated_items(current_user, UserRole.id_for(:admin)).or(current_user.bbps_bills)
-    elsif user.policy_user_roles.pluck(:user_role_id).uniq.present?
+    elsif current_user.policy_user_roles.pluck(:user_role_id).uniq.present?
       bbps_bills = BbpsBill.associated_items(current_user, ::BbpsBill.roles) || BbpsBill.none
     else
       bbps_bills = BbpsBill.none

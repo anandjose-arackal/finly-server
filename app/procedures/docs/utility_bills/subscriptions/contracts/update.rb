@@ -27,6 +27,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
   collection :subscription_pocs, populator: :subscription_pocs! do
     property :user_id, validates: {presence: true}
     property :subscription_id
+    property :_destroy, virtual: true
   end
 
   # Virtual Properties
@@ -46,6 +47,12 @@ class Docs::UtilityBills::Subscriptions::Contracts::Update < Reform::Form
 
   validate :company_entities # Checks for departments
   validate :validate_customer_params
+
+  validate :poc_presence
+
+  def poc_presence
+    errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
+  end
 
 
   def company_entities

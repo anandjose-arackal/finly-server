@@ -316,21 +316,16 @@ class BbpsBill < ApplicationRecord
       user.send("#{self.table_name}")
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.send("#{self.table_name}").where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      user.company.send("#{self.table_name}").where(policy_id: policy_ids, status_id: finance_associated_status_ids)
     end
   end
 
   def self.finance_associated_status_ids
-    BbpsBill.status_ids %i( approved auto_approved payment_ticket_created payment_initiated failed paid voided )
+    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided)
   end
 
   def self.status_ids(*statuses)
-    status_ids = []
-    statuses.each do |status|
-      status_ids.push BbpsBillStatus.id_for(status)
-    end
-
-    status_ids.reject {|status_id| status_id.nil?}
+    BbpsBillStatus.ids_for(statuses)
   end
 
   def self.open_statuses
