@@ -156,7 +156,6 @@ class Reports::Index < Reports::Base
       self.reports = params[:reports]
 
       get_counts
-      return unless self.reports.present?
       self.reports = apply_scopes(self.reports, params)
       if self.reports.present?
         if params[:filter_status].present?
