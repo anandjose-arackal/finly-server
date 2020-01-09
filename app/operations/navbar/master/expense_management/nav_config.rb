@@ -4,7 +4,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   register_structure(
       :tabs,
       [
-          #:dashboard,
+          :dashboard,
           :expenses,
           :receipts,
           :trips,
