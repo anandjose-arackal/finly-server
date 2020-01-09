@@ -15,9 +15,9 @@
 #  verification_failed_attempts :integer
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  message                      :text(65535)
 #  client_id                    :integer
 #  client_type                  :string(255)
+#  message                      :text(65535)
 #  user_finly_id                :string(255)
 #
 

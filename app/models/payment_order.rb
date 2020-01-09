@@ -28,7 +28,6 @@
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
 #  deleted_at                :datetime
-#  deleted_at                :datetime
 #  transfer_mode_id          :integer
 #
 

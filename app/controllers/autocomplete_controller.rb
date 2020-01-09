@@ -13,6 +13,13 @@ class AutocompleteController < BaseControllers::WebBase
     end
   end
 
+  def employees
+    @op = Autocomplete::Users.(current_user, params)
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def card
     @result = Autocomplete::Cards.(current_user, params)
     respond
