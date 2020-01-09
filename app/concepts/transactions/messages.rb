@@ -30,6 +30,8 @@ module Transactions::Messages
   end
 
   def add_message(options, type, key, message)
+    # type = [:info, :success, :error]
+    # key => key for any field | pass 'base' if its not associated with any field key
     Transactions::API.add_message options, type, key, message
   end
 

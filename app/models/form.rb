@@ -16,7 +16,7 @@ class Form < ApplicationRecord
 
   has_many :sections, class_name: 'FormSection', dependent: :destroy
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         sections: sections

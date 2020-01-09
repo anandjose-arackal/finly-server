@@ -74,7 +74,6 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
       self.crediting_payments = self.crediting_payments.failed
     end
 
-
     self.crediting_payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && ([PaymentStatus.id_for(:completed)].include?(payment.payment_status_id))

@@ -19,6 +19,7 @@
 #  bank_transaction_type_id    :integer
 #  account_name_check          :boolean          default(FALSE)
 #  beneficiary_full_name       :string(255)
+#  transfer_mode_id            :integer
 #
 
 class YesBankTransaction < ApplicationRecord

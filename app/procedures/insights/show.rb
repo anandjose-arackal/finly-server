@@ -8,7 +8,7 @@ class Insights::Show < Transactions::API
   step :generate_token
   step :set_filters
 
-  def parse_filters(options, params:,current_user:, model:, **)
+  def parse_filters(options, params:, current_user:, model:, **)
     filters = {}
 
     filters[:company_id] = current_user.company_id

@@ -1,5 +1,6 @@
 class Bbps::Api < ServiceApi
-
+  include Transactions::BackgroundWorker
+  sidekiq_options queue: :yes_bank_bbps
   # Matcher = Dry::Matcher.new(
   #     success: Dry::Matcher::Case.new(
   #         match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
@@ -15,25 +16,35 @@ class Bbps::Api < ServiceApi
   class_attr :request_fields, default: []
   class_attr :response_fields, default: []
   class_attr :success_object
+  class_attr :encryption_key, default: Rails.application.config_for(:bbps_config)&.dig('encryption_key')
   skip_user_authorization!
   http_method :post
   mime_type "application/json"
-  url "https://uatsky.yesbank.in:444/app/uat/bbps"
-  header 'X-IBM-Client-Id', "9e10ff7b-3141-4b0c-aa56-d110148c0fe7"
-  header 'X-IBM-Client-Secret', "cK7bT1nN7eK2gQ0vS2cT4uI0oP7mN7dB2tG4tN3jB0sY2uQ2mW"
+  url Rails.application.config_for(:bbps_config)&.dig('base_url')
+  header 'X-IBM-Client-Id', Rails.application.config_for(:bbps_config)&.dig('client_id')
+  header 'X-IBM-Client-Secret', Rails.application.config_for(:bbps_config)&.dig('client_secret')
   body -> (user, params) { body }
   client -> (user, params) { client }
   parse -> (user, params, response) { parse_response(user, params, response) }
-  matcher Dry::Matcher.new(
-    success: Dry::Matcher::Case.new(
-      match: -> (result) { result['response.parsed']&.dig(:status) == 'Y' },
-      resolve: -> (result) { handle_success(result) }
-    ),
-    failure: Dry::Matcher::Case.new(
-      match: -> (result) { true },
-      resolve: -> (result) { result.errors }
+
+  matcher :build_matcher
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Success", result; result['response.parsed']&.dig('status') == 'Y'},
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Error", result; result['response.parsed']&.dig('status') == 'N'},
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {p "Matcher:Failure", result; true},
+            resolve: -> (result) {result}
+        )
     )
-  )
+  end
 
   def body
     message = generate_message
@@ -53,13 +64,13 @@ class Bbps::Api < ServiceApi
   end
 
   # Todo load from YAML
-  def encryption_key
-    '4d5390bef3ef1ee3d4a7e77fd42238cb'
-  end
+  # def self.encryption_key
+  #   ''
+  # end
 
   def encrypt(message)
     result = nil
-    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{encryption_key}\"") do |stdin, stdout, strerr|
+    Open3.popen3("java UPISecurity.java \"#{message}\" \"#{self.class.encryption_key}\"") do |stdin, stdout, strerr|
       result = stdout.read
     end
     result
@@ -113,6 +124,10 @@ class Bbps::Api < ServiceApi
     result
   end
 
+  def self.handle_error(data)
+    data
+  end
+
   def client
     # adding the ssl options here for the request
     # verify certificate only in production
@@ -149,21 +164,26 @@ class Bbps::Api < ServiceApi
   end
 
   def agent_institution_id
-    'YS01'
+    Rails.application.config_for(:bbps_config)&.dig('agent_institution_id')
   end
 
   def channel_id
-    'C1001'
+    Rails.application.config_for(:bbps_config)&.dig('channel_id')
   end
 
   def agent_id
-    "18798"
+    Rails.application.config_for(:bbps_config)&.dig('agent_id')
   end
 
   def customer_param_for(param)
     return "NA" if params[param].blank?
 
     "#{params[param][:key]}=#{params[param][:value]}"
+  end
+
+  def amount_for(param)
+    return "NA" if params[param].blank?
+    params[param].to_f * 100
   end
 
   def self.format(obj)

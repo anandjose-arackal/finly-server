@@ -52,8 +52,8 @@ class Expense::Base < BaseOperation
       case params[:expense_type_id]
         when ExpenseType.id_for(:manual)
           amount = params[:amount_attributes][:value]&.to_f
-          # currency_id = Currency.find_by(id: params[:amount_attributes][:currency_id])
-          # rate = CurrencyConversionRate.find_by(date: date)
+        # currency_id = Currency.find_by(id: params[:amount_attributes][:currency_id])
+        # rate = CurrencyConversionRate.find_by(date: date)
         when ExpenseType.id_for(:per_diem)
           expense = user.expenses.build(params)
           amount = expense.calculate_amount_value(self.per_diem.configurable)

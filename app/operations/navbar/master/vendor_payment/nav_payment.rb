@@ -17,13 +17,13 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
       :users,
       :load_company_balance, :statements,
       :organization_account
-      ]
+  ]
   )
 
   register_structure(
       :cog_modules, [
       :finly_expense_management, :finly_disburse, :finly_collect, :finly_insights
-      ]
+  ]
   )
 
   def self.accept?
@@ -61,7 +61,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   end
 
   def analytics
-    { name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+    {name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
   end
 
 end

@@ -86,9 +86,16 @@ class Bbps::TransactionStatus < Bbps::Api
   def self.handle_success(result)
     OpenStruct.new(
         {
-            amount: result['response.parsed']['amount']
+            amount: result['response.parsed']['amount'],
+            error_code: result['response.parsed']['error_code'],
+            error_desc: result['response.parsed']['error_desc'],
+
         }
     )
+  end
+
+  def self.handle_error(data)
+    data
   end
 
 end

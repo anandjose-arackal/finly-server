@@ -98,6 +98,8 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new virtual_account.receiving_account
       when CashOnHand.name
         return AccountManager::CashOnHand::CashOnHandAdapter.new virtual_account.receiving_account
+      when BillingAccount.name
+        return AccountManager::BbpsBiller::BillingAccountAdapter.new virtual_account.receiving_account
     end
   end
 

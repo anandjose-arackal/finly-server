@@ -4,18 +4,18 @@ class Admin::Implementations::Master::Departments::Export < Admin::Implementatio
   subscribe 'dashboards.export'
 
   headers({
-      :id => "ID",
-      :name => "Name",
-      :description => "Description",
-      :priority => "Priority",
-      :application => "App",
-      :active => "Active",
-      :dashboard => "Dashboard ID",
-      :user_role_id => "User Role",
-      :policy_id => "Policy",
-      :user_id => "User",
-      :destroy => "Destroy"
-  })
+              :id => "ID",
+              :name => "Name",
+              :description => "Description",
+              :priority => "Priority",
+              :application => "App",
+              :active => "Active",
+              :dashboard => "Dashboard ID",
+              :user_role_id => "User Role",
+              :policy_id => "Policy",
+              :user_id => "User",
+              :destroy => "Destroy"
+          })
 
   def valid_request
 

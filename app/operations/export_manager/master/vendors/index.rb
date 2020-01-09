@@ -52,15 +52,15 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
         authorized.
         preload(:bank_accounts, :state_code, :created_by, :vendor_type).
         left_joins(:gstin_locations)
-        # .
-        # select('
-        #                       yes_bank_vendors.*,
-        #                       gstin_locations.address,
-        #                       gstin_locations.location,
-        #                       gstin_locations.gstin,
-        #                       gstin_locations.poc_name,
-        #                       gstin_locations.poc_email
-        #                     ')
+    # .
+    # select('
+    #                       yes_bank_vendors.*,
+    #                       gstin_locations.address,
+    #                       gstin_locations.location,
+    #                       gstin_locations.gstin,
+    #                       gstin_locations.poc_name,
+    #                       gstin_locations.poc_email
+    #                     ')
 
     vendors
   end
@@ -149,49 +149,49 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
     self.vendor_ba = nil if self.vendor_ba != vendor.bank_accounts
     self.vendor_ba ||= vendor.bank_accounts
 
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.first
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.first
     account = self.vendor_ba.first if account.blank?
     account&.account_number
   end
 
   def default_account_ifsc(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.first
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.first
     account = self.vendor_ba.first if account.blank?
     account&.ifsc
   end
 
   def second_account_number(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.second
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.second
     account = self.vendor_ba.second if account.blank?
     account&.account_number
   end
 
   def second_account_ifsc(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.second
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.second
     account = self.vendor_ba.second if account.blank?
     account&.ifsc
   end
 
   def third_account_number(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.third
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.third
     account = self.vendor_ba.third if account.blank?
     account&.account_number
   end
 
   def third_account_ifsc(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.third
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.third
     account = self.vendor_ba.third if account.blank?
     account&.ifsc
   end
 
   def fourth_account_number(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.fourth
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
     account = self.vendor_ba.fourth if account.blank?
     account&.account_number
   end
 
   def fourth_account_ifsc(vendor)
-    account = self.vendor_ba.map { |ba| ba if ba.default_account }.compact.fourth
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
     account = self.vendor_ba.fourth if account.blank?
     account&.ifsc
   end
@@ -202,7 +202,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
 
   def tds_percentage(vendor)
     if vendor.vendor_tds_rates.present?
-      tds_rates_list = vendor.vendor_tds_rates.collect { |vtr| vtr.tds_rates.name + "(#{vtr.tds_rates.tds})" } rescue nil
+      tds_rates_list = vendor.vendor_tds_rates.collect {|vtr| vtr.tds_rates.name + "(#{vtr.tds_rates.tds})"} rescue nil
       tds_rates_list.join("| ") rescue nil
     end
   end

@@ -2,7 +2,7 @@ class Procurements::Comments::Index < Procurements::Comments::Base
   attr_accessor :comments, :document
 
   def init
-    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
+    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice credit_note )
     document_type = params[:document_type]
     document_id = params[:document_id]
 

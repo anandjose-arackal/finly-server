@@ -13,7 +13,7 @@ class Vendors::Update < Vendors::Base
   def init
     # id = params[:id] || params[:yes_bank_vendor_id] || params[:vendor_id]
     self.vendor_parameters = vendor_attributes
-    self.vendor_changes ={}
+    self.vendor_changes = {}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
     # self.vendor_parameters.delete(:policy_id)

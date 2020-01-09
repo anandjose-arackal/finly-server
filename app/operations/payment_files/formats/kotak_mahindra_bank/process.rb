@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::KotakMahindraBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code,:bank_code_indicator,:hide_note
+  attr_accessor :payment_requests, :debit_account_number, :client_code, :product_code, :bank_code_indicator, :hide_note
 
   def pre_validate
     return if has_errors?

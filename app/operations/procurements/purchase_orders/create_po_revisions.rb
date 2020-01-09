@@ -138,7 +138,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
         purchase_request = item.purchase_request
         item.update(purchase_order_id: duplicate_po.id, status_id: PurchaseRequestItemStatus.id_for(:po_created))
         Trail.create(parent_type: 'PurchaseRequestItem', parent_id: item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_revised))
-          update_purchase_request_status(purchase_request)
+        update_purchase_request_status(purchase_request)
       end
     end
   end

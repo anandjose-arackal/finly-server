@@ -224,5 +224,4 @@ class Policy < ApplicationRecord
     self.build_cash_expense_config(enabled: true).save
     self.build_card_expense_config(enabled: true).save
   end
-
 end

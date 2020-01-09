@@ -89,28 +89,28 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     end
   end
 
-   def invite(data)
-     invited_user = self.company.users.find_by id: data[:id]
-     unless invited_user.present?
-       return result false, "User not found"
-     end
+  def invite(data)
+    invited_user = self.company.users.find_by id: data[:id]
+    unless invited_user.present?
+      return result false, "User not found"
+    end
 
-     unless invited_user.email.present?
-       return result false, "User not have an email"
-     end
+    unless invited_user.email.present?
+      return result false, "User not have an email"
+    end
 
-     user_params = {user_id: invited_user.id}
-     presenter = Admin::Users::WelcomeMail.(AdminUser.all.first, user_params)
-     if presenter.messages[:error].present?
-       return result false, presenter.messages[:error].join(' ,')
-     elsif presenter.messages[:failure].present?
-       return result false, presenter.messages[:failure].join(' ,')
-     elsif presenter.messages[:success].present?
-       return result true, "User Invited Successfully"
-     end
-   end
+    user_params = {user_id: invited_user.id}
+    presenter = Admin::Users::WelcomeMail.(AdminUser.all.first, user_params)
+    if presenter.messages[:error].present?
+      return result false, presenter.messages[:error].join(' ,')
+    elsif presenter.messages[:failure].present?
+      return result false, presenter.messages[:failure].join(' ,')
+    elsif presenter.messages[:success].present?
+      return result true, "User Invited Successfully"
+    end
+  end
 
-   def set_params(data)
+  def set_params(data)
     messages = []
     role_mapping_attributes = []
     if data[:expense_management] == 'Y'

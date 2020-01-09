@@ -6,6 +6,8 @@ if ['aws_production', 'foreground_production', 'api_production',
     'background_production_bgpc', 'yes_bank_balance_poller',
     'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
+elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
+  load_secure_storage(:background_production_console)
 end
 
 set :application, 'finly-server'
@@ -25,7 +27,7 @@ when :itzcash_production
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production, :foreground_production, :console_production,
-    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc
+    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -101,10 +103,13 @@ linked_files = %w{
   config/gstin_verification_config.yml
   config/redis_config.yml
   config/mattermost_config.yml
+  config/integrations.yml
   config/insights_config.yml
+  config/bbps_config.yml
 }
 case fetch(:stage)
-when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production
+when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
   # linked_files << "config/sentry.yml"

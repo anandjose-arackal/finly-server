@@ -1,4 +1,4 @@
-Dir["#{Rails.root}/app/concepts/forms/definitions/types/*.rb"].each { |file| load file }
+Dir["#{Rails.root}/app/concepts/forms/definitions/types/*.rb"].each {|file| load file}
 class Forms::Definitions::Section
   include DynamicAttributes
   include Forms::Definitions::Registry

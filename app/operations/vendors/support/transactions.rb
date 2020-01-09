@@ -9,7 +9,7 @@ class Vendors::Support::Transactions < Vendors::Support::Base
       page = params[:page] || 1
       per_page = params[:per_page] || 30
 
-      self.transactions = self.vendor.receiving_payments.with_receiving_user_type(self.vendor.class.name).with_receiving_account_type("BankAccount").with_application(RequestStore.store[:current_app])#.successful_and_failed_only
+      self.transactions = self.vendor.receiving_payments.with_receiving_user_type(self.vendor.class.name).with_receiving_account_type("BankAccount").with_application(RequestStore.store[:current_app]) #.successful_and_failed_only
       self.count = self.transactions.count
       self.paginated_transactions = self.transactions.paginate(page: page, per_page: per_page)
     end

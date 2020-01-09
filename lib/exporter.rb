@@ -231,10 +231,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
             else
               format = workbook.add_format
               if item.present? && item.is_a?(String) && item[0] == "'"
-               item.slice!(0)
-               worksheet.write_string((1 + index), inner_index, item, format)
+                item.slice!(0)
+                worksheet.write_string((1 + index), inner_index, item, format)
               else
-                worksheet.write((1 + index), inner_index, (item.present? ? item&.to_s: ''))
+                worksheet.write((1 + index), inner_index, (item.present? ? item&.to_s : ''))
               end
             end
           end

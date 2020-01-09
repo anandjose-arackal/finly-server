@@ -13,7 +13,7 @@
 #  payable_amount_id               :integer
 #  inclusive_of_taxes              :boolean
 #  gst_type_id                     :integer
-#  tax                             :decimal(10, )
+#  tax                             :decimal(10, 3)
 #  tds_slab_id                     :integer
 #  company_id                      :integer
 #  sub_department_id               :integer
@@ -41,32 +41,32 @@
 #  payment_agreement_upcoming_date :date
 #
 
-    #                 :id => :integer,
-    #               :name => :string,
-    #          :vendor_id => :integer,
-    #    :bank_account_id => :integer,
-    #        :category_id => :integer,
-    #      :department_id => :integer,
-    # :original_amount_id => :integer,
-    #      :tax_amount_id => :integer,
-    #  :payable_amount_id => :integer,
-    # :inclusive_of_taxes => :boolean,
-    #        :gst_type_id => :integer,
-    #                :tax => :decimal,
-    #        :tds_slab_id => :integer,
-    #         :company_id => :integer,
-    #  :sub_department_id => :integer,
-    #         :created_at => :datetime,
-    #         :updated_at => :datetime,
-    #          :status_id => :integer,
-    #      :tds_amount_id => :integer,
-    #     :balance_due_id => :integer,
-    #      :net_amount_id => :integer,
-    #    :gross_amount_id => :integer,
-    #    :roundoff_amount => :decimal
-    #     :invoice_number => :text,
-    #       :invoice_date => :date,
-    #   :invoice_due_date => :date
+#                 :id => :integer,
+#               :name => :string,
+#          :vendor_id => :integer,
+#    :bank_account_id => :integer,
+#        :category_id => :integer,
+#      :department_id => :integer,
+# :original_amount_id => :integer,
+#      :tax_amount_id => :integer,
+#  :payable_amount_id => :integer,
+# :inclusive_of_taxes => :boolean,
+#        :gst_type_id => :integer,
+#                :tax => :decimal,
+#        :tds_slab_id => :integer,
+#         :company_id => :integer,
+#  :sub_department_id => :integer,
+#         :created_at => :datetime,
+#         :updated_at => :datetime,
+#          :status_id => :integer,
+#      :tds_amount_id => :integer,
+#     :balance_due_id => :integer,
+#      :net_amount_id => :integer,
+#    :gross_amount_id => :integer,
+#    :roundoff_amount => :decimal
+#     :invoice_number => :text,
+#       :invoice_date => :date,
+#   :invoice_due_date => :date
 
 
 

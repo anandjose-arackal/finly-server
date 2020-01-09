@@ -8,26 +8,6 @@ class Transactions::API < Trailblazer::Operation
   extend Trailblazer::Activity::TaskBuilder
   include Dry::Monads[:result]
 
-  module Transactions::API::BackgroundWorker
-    extend ActiveSupport::Concern
-
-    included do
-      include Sidekiq::Worker
-    end
-
-    class_methods do
-      def call_async(payload)
-        encoded_data = Events::Serializer.encode(payload)
-        self.perform_async(encoded_data)
-      end
-    end
-
-    def perform(payload)
-      decoded_data = Events::Serializer.decode(payload)
-      self.class.call(decoded_data)
-    end
-  end
-
   # Dummy step to help define schema after operation has started
   step ->(context, options) { true }, id: 'operations.start'
 
@@ -41,20 +21,23 @@ class Transactions::API < Trailblazer::Operation
     end
   end
 
-  def self.call(options = {}, *dependencies, &handlers)
-    result = super(options, *dependencies)
-    if matcher.present?
-      matcher.(result, &handlers) if block_given?
-    end
+  def self.call(options = {}, &handlers)
+    result = super(options)
+    match_result(options, result, &handlers)
+    # if matcher.present?
+    #   if matcher.is_a?(Symbol)
+    #     matcher_klass = self.send(matcher, options, result)
+    #   else
+    #     matcher_klass = matcher
+    #   end
+    #   matcher_klass.(result, &handlers) if block_given?
+    # end
     result
   end
 
   class Transactions::API::Background < Transactions::API
     # include Trailblazer::Operation::Worker
-
     # Todo
-
-
   end
 
 end

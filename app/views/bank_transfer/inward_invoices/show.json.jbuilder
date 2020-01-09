@@ -14,6 +14,7 @@ json.invoice do
   else
     json.original_amount precision_value invoice.original_amount&.value
   end
+  json.rcm_enabled invoice&.rcm_enabled
   json.raw_amount precision_value invoice&.amount&.value
   json.advance_amount precision_value invoice.advance_amount&.value
   json.tax_amount precision_value invoice.tax_amount&.value
@@ -100,6 +101,7 @@ json.invoice do
     json.name invoice.vendor&.name
     json.email invoice.vendor&.email
     json.id invoice.vendor&.id
+    json.rcm_enabled invoice.vendor&.rcm_enabled
 
     json.selected_bank_account do
       json.account_number invoice.receiving_account&.account_number

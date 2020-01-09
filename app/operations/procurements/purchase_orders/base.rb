@@ -38,10 +38,10 @@ class Procurements::PurchaseOrders::Base < BaseOperation
     )
   end
 
-  def update_purchase_request_status(purchase_request=nil)
+  def update_purchase_request_status(purchase_request = nil)
     if purchase_request.present?
       if purchase_request.purchase_request_items.where(status_id: [PurchaseRequestItemStatus.id_for(:po_closed), PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.
-        id_for(:rejected)]).present?
+          id_for(:rejected)]).present?
         # Partially Close
         unless purchase_request.partially_closed?
           params[:aasm_event] = 'partially_close'

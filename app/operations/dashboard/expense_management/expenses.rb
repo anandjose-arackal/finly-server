@@ -26,15 +26,15 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
       self.counts = []
 
       personal_expense_data = {
-        type: 'personal_expense',
-        data: [
-          {
-            title: "Unreported",
-            count: apply_scopes(self.expenses, {filter_status: 2})&.count,
-            total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
-            filters: [{filter_status: 2}]
-          }
-        ]
+          type: 'personal_expense',
+          data: [
+              {
+                  title: "Unreported",
+                  count: apply_scopes(self.expenses, {filter_status: 2})&.count,
+                  total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
+                  filters: [{filter_status: 2}]
+              }
+          ]
 
       }
 

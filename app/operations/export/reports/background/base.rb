@@ -1,6 +1,7 @@
 class Export::Reports::Background::Base < BackgroundOperation
   attr_accessor :company, :preference, :loose_headers,  :custom_field_data
 
+  #sidekiq_options queue: :report_export_queue
 
   # class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
   #   attr_accessor :data, :header, :report_names
@@ -39,107 +40,96 @@ class Export::Reports::Background::Base < BackgroundOperation
     user = expense.user
     preferences.each do |pref|
       case pref.export_field_id
-        when ExportField.type_report_id
+      when ExportField.type_report_id
           data_arr << report&.id
-        when ExportField.type_report_name
+      when ExportField.type_report_name
           data_arr << report&.name
-        when ExportField.type_report_status
+      when ExportField.type_report_status
           data_arr << report&.status&.name
-        when ExportField.type_employee_name
+      when ExportField.type_employee_name
           data_arr << user.name
-        when ExportField.type_employee_id
+      when ExportField.type_employee_id
           data_arr << user.employee_id
-        when ExportField.type_payroll_id
+      when ExportField.type_payroll_id
           data_arr << user.payroll_id
-        when ExportField.type_expense_id
+      when ExportField.type_expense_id
           data_arr << expense.id
-        when ExportField.type_expense_merchant
+      when ExportField.type_expense_merchant
           data_arr << expense.merchant_name
-        when ExportField.type_expense_category_name
+      when ExportField.type_expense_category_name
           data_arr << expense.category&.full_name
-        when ExportField.type_expense_currency
+      when ExportField.type_expense_currency
           data_arr << expense.amount&.currency&.country_code
-        when ExportField.type_expense_amount
+      when ExportField.type_expense_amount
           data_arr << expense.amount&.value
-        when ExportField.type_expense_date
+      when ExportField.type_expense_date
           data_arr << expense.date
-        when ExportField.type_expense_note
+      when ExportField.type_expense_note
           data_arr << expense.note
-        when ExportField.type_expense_status
+      when ExportField.type_expense_status
           data_arr << expense.expense_status&.name&.humanize
-        when ExportField.id_for(:employee_email)
+      when ExportField.id_for(:employee_email)
           data_arr << expense.user.email
-        when ExportField.id_for(:employee_mobile_number)
+      when ExportField.id_for(:employee_mobile_number)
           data_arr << expense.user.mobile_number
-        when ExportField.id_for(:distance_expense_locations)
+      when ExportField.id_for(:distance_expense_locations)
           if expense.distance_expense?
             data_arr << expense.distance_expense&.locations&.pluck(:name).join(', ')
           else
             data_arr << ''
           end
-        when ExportField.id_for(:distance_in_km)
+      when ExportField.id_for(:distance_in_km)
           if expense.distance_expense?
             data_arr << expense.distance_expense.distance_value
           else
             data_arr << ''
           end
-        when ExportField.id_for(:maps_distance_in_km)
+      when ExportField.id_for(:maps_distance_in_km)
           if expense.distance_expense?
             data_arr << expense.distance_expense.maps_distance_value
           else
             data_arr << ''
           end
-        when ExportField.id_for(:expense_type)
+      when ExportField.id_for(:expense_type)
           data_arr << expense.expense_type&.exportable_name
-        when ExportField.id_for(:expense_reimbursement)
+      when ExportField.id_for(:expense_reimbursement)
           data_arr << expense.reimbursable ? 'YES' : 'NO'
-        when ExportField.id_for(:spent_from_account)
+      when ExportField.id_for(:spent_from_account)
           data_arr << (expense.spent_from.present? ? expense.spent_from&.name : "NONE")
-        when ExportField.id_for(:policy)
+      when ExportField.id_for(:policy)
           data_arr << expense&.report&.policy&.name
-        when ExportField.id_for(:report_submission_date)
+      when ExportField.id_for(:report_submission_date)
           data_arr << expense&.report&.submitted_at&.strftime("%H:%M, %d/%m/%Y")
-        when ExportField.id_for(:report_creation_date)
+      when ExportField.id_for(:report_creation_date)
           data_arr << expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
-        when ExportField.id_for(:receipt_link)
-          data_arr << expense&.receipts&.first&.image&.url
-        when ExportField.id_for(:igst)
-          data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value).round(2) : '') : '')
-        when ExportField.id_for(:cgst)
-          data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
-        when ExportField.id_for(:sgst)
-          data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value)/2).round(2) : '') : '') rescue '')
+      when ExportField.id_for(:receipt_link)
+        data_arr << expense&.receipts&.first&.image&.url
+      when ExportField.id_for(:igst)
+        data_arr << (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value).round(2) : '') : '')
+      when ExportField.id_for(:cgst)
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+      when ExportField.id_for(:sgst)
+        data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
       else
           data_arr << ''
       end
     end
     # now adding the custom field values for the respective expense
-    data_arr += retrieve_custom_field_values(expense,custom_field_column_names)
+    data_arr += retrieve_custom_field_values(expense, custom_field_column_names)
   end
 
-  def retrieve_custom_field_values(expense, custom_field_column_names )
-    records =[]
+  def retrieve_custom_field_values(expense, custom_field_column_names)
+    records = []
     custom_field_column_names.each do |cf_name|
       value = ''
-      expense.custom_fields.map{|ecf| value = (ecf.string_value || '') if ecf.field_configuration.field_name == cf_name}
+      expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
       records << value
     end
     records
   end
 
-  def extract_custom_field_names(reports)
-    # now extract the custom fields from each expense that is a part of all the report
-    field_names = []
-    reports.each do |report|
-      report.expenses.each do |expense|
-        # this gets all the custom field names from all different types of expenses
-        if expense.custom_field_names.present?
-          field_names += expense.custom_field_names
-        end
-      end
-    end
-    field_names.uniq! || []
+  def extract_custom_field_names
+    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense) ]
+    FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
-
-
 end

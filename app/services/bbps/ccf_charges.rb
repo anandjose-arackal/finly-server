@@ -52,4 +52,8 @@ class Bbps::CCFCharges < Bbps::Api
     )
   end
 
+  def self.handle_error(data)
+    data
+  end
+
 end

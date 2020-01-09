@@ -20,7 +20,7 @@ class FormSection < ApplicationRecord
   belongs_to :form
   has_many :entities, class_name: 'FormEntity', dependent: :destroy
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,

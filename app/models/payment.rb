@@ -51,6 +51,7 @@
 #  otp_attempts                   :integer
 #  on_hold                        :boolean
 #  disabled                       :boolean
+#  transfer_mode_id               :integer
 #
 
 class Payment < ApplicationRecord
@@ -230,7 +231,7 @@ class Payment < ApplicationRecord
   scope :cash_on_hand_credits, -> { where(receiving_account_type: "CashOnHand") }
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
-  scope :all_except_failed, -> { where payment_status_id: PaymentStatus.all_except_failed }
+  scope :all_except_failed, -> {where payment_status_id: PaymentStatus.all_except_failed}
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
@@ -301,7 +302,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order), PaymentPurpose.id_for(:utility_bill_payment)]
     end
   }
 
@@ -421,14 +422,21 @@ class Payment < ApplicationRecord
 
   scope :include_for_index, -> {
         includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
+                  :receiving_account,
                   invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
                   payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :reference_resource, :receiving_user, receiving_account: [:account_owner], payment_order: [bank_payment_request: [:status]])
+    includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
+  }
+
+  scope :include_for_streamsets, -> {
+        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+                  receiving_account: [:account_owner],
+                  invoice: [:category, :cost_center, :invoice_status, :invoice_type],
+                  payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true
@@ -609,6 +617,8 @@ class Payment < ApplicationRecord
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
     when 'SecurityDeposit'
       SecurityDeposit.find_by(id: self.parent_id).as_json
+    when 'BbpsBill'
+      BbpsBill.find_by(id: self.parent_id).as_json
     else
       if self.invoice.present?
         self.invoice.as_json
@@ -670,10 +680,6 @@ class Payment < ApplicationRecord
     if options[:payment_request_edit]
       return payment_request_show_json(self.parent_type)
     end
-  end
-
-  def mode
-    self.transfer_mode&.mode&.name
   end
 
   def payment_mode
@@ -758,6 +764,9 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    when "BbpsBill"
+      parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+      parent.update(status_id: BbpsBillStatus.id_for(:approved))
     end
   end
 
@@ -777,6 +786,19 @@ class Payment < ApplicationRecord
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:paid))
+      end
+    end
+
+    if self.processing?
+      case self.parent_type
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:payment_initiated))
+      else
+        # do nothing?
       end
     end
 
@@ -835,7 +857,7 @@ class Payment < ApplicationRecord
       account_number: { number: self.receiving_account&.account_number },
       ifsc: { code: self.receiving_account&.ifsc },
       beneficiary_type: { type: get_beneficiary_type },
-      field_details: get_field_details('PurchaseOrder') 
+      field_details: get_field_details('PurchaseOrder')
     }
   end
 
@@ -959,21 +981,21 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
     {
-      total_amount: { value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false }, # TOTAL
-      inclusive_of_taxes: "",
-      discount: "",
-      tax: "",
-      tds: { tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds },
-      advance_amount: "", # Advance
-      freight_amount: "",
-      net_payable_amount: "",
-      net_total: { value: self.amount&.value, editable: false }, #Net Total
-      roundoff_amount: { value: 0, editable: false },
-      tds_slabs: tds_slabs,
-      tax_rates: self.purchase_order.company.tax_rates,
-      #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false}, 
-      payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
-      balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
+        total_amount: {value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false}, # TOTAL
+        inclusive_of_taxes: "",
+        discount: "",
+        tax: "",
+        tds: { tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds },
+        advance_amount: "", # Advance
+        freight_amount: "",
+        net_payable_amount: "",
+        net_total: { value: self.amount&.value, editable: false }, #Net Total
+        roundoff_amount: { value: 0, editable: false },
+        tds_slabs: tds_slabs,
+        tax_rates: self.purchase_order.company.tax_rates,
+        #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
+        payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+        balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
     }
   end
 
@@ -981,23 +1003,23 @@ class Payment < ApplicationRecord
     parameters = RequestStore.store[:params]
     tds_slabs = TdsSlabs::Index.(self.parent.creator, parameters).tds_slabs rescue nil
     {
-      total_amount: { value: precision_value(self.parent&.original_amount&.value), editable: true }, # TOTAL
-      inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
-      #discount: "",
-      #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
-      tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
-      tax_rate: {tax_rate_id: self.parent.tax_rate_id, editable: true},
-      tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true, tds_slab_rate: self.parent&.tds_slab&.tds },
-      advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: true }, # Advance
-      freight_amount: "",
-      net_payable_amount: "",
-      net_total: { value: precision_value(self.parent.net_amount&.value), editable: true }, #Net Total
-      roundoff_amount: { value: self.parent.roundoff_amount, editable: true },
-      tds_slabs: tds_slabs,
-      tax_rates: self.invoice.company.tax_rates,
-      gst_type_id: {value: self.invoice.gst_type_id, editable: true},
-      payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
-      balance_due:{ value: self.parent.balance_due&.value, editable: true } # Invoice AMOUNT
+        total_amount: {value: precision_value(self.parent&.original_amount&.value), editable: true}, # TOTAL
+        inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
+        #discount: "",
+        #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
+        tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
+        tax_rate: {tax_rate_id: self.parent.tax_rate_id, editable: true},
+        tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true, tds_slab_rate: self.parent&.tds_slab&.tds },
+        advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: true }, # Advance
+        freight_amount: "",
+        net_payable_amount: "",
+        net_total: { value: precision_value(self.parent.net_amount&.value), editable: true }, #Net Total
+        roundoff_amount: { value: self.parent.roundoff_amount, editable: true },
+        tds_slabs: tds_slabs,
+        tax_rates: self.invoice.company.tax_rates,
+        gst_type_id: {value: self.invoice.gst_type_id, editable: true},
+        payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
+        balance_due:{ value: self.parent.balance_due&.value, editable: true } # Invoice AMOUNT
     }
   end
 
@@ -1013,22 +1035,22 @@ class Payment < ApplicationRecord
     end
 
     {
-      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-      total_amount: { value: precision_value(self.parent&.item_amounts_total), editable: false }, # TOTAL
-      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
-      discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
-      tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
-      tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
-      advance_amount: { value: invoice_advance, editable: false }, # Advance
-      freight_amount: { value: self.parent.freight_amount&.value, editable: false },
-      net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
-      net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
-      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
-      tds_slabs: tds_slabs,
-      tax_rates: self.parent.company.tax_rates,
-      gst_type_id: { value: self.parent.gst_type_id, editable: false },
-      payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
-      balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
+        tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
+        total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
+        inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+        discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+        tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
+        tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
+        advance_amount: { value: invoice_advance, editable: false }, # Advance
+        freight_amount: { value: self.parent.freight_amount&.value, editable: false },
+        net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
+        net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
+        roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
+        tds_slabs: tds_slabs,
+        tax_rates: self.parent.company.tax_rates,
+        gst_type_id: { value: self.parent.gst_type_id, editable: false },
+        payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+        balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
     }
   end
 

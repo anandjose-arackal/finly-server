@@ -1,6 +1,6 @@
 class UsersController < BaseControllers::WebBase
 
-  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login
+  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp, :group_entities_login, :saml_validator
   before_action :load_global_variables, only: :lookup
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
@@ -205,6 +205,11 @@ class UsersController < BaseControllers::WebBase
     respond
   end
 
+  def saml_validator
+    @result = Users::SamlValidator.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type = nil)
@@ -215,40 +220,40 @@ class UsersController < BaseControllers::WebBase
     operation = nil
     success_message = nil
     case type
-      when 'password'
+    when 'password'
         operation = User::Configuration::UpdatePassword.new(current_user, params)
         success_message = 'Password updated'
-      when 'team'
+    when 'team'
         operation = User::Team::Mappings::Set.new(current_user, params)
         success_message = 'User team updated'
-      when 'role'
+    when 'role'
         operation = User::Role::Set.new(current_user, params)
         success_message = 'Role updated'
-      when 'details'
+    when 'details'
         operation = User::Configuration::UpdateDetails.new(current_user, params)
         success_message = 'Details updated'
-      when 'state', 'status'
+    when 'state', 'status'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
-      when 'auto_submit'
+    when 'auto_submit'
         operation = User::Configuration::AutoSubmit::Update.new(current_user, params)
         success_message = 'Configuration updated'
-      when 'enforce_policy'
+    when 'enforce_policy'
         operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
         success_message = 'Configuration Updated'
-      when 'auto_reload'
+    when 'auto_reload'
         operation = User::Configuration::AutoReload::Update.new(current_user, params)
         success_message = 'Auto reload configuration uploaded'
-      when 'groups'
+    when 'groups'
         operation = User::Group::Set.new(current_user, params)
         success_message = 'User Group Configuration Updated'
-      when 'panel_subscriptions'
+    when 'panel_subscriptions'
         operation = User::Configuration::PanelSubscription::Update.new(current_user, params)
         success_message = "Subscriptions Updated"
-      when 'profile_details'
-        operation = User::Update.new(current_user, params)
-        success_message = "User Details Updated"
-      else
+    when 'profile_details'
+      operation = User::Update.new(current_user, params)
+      success_message = "User Details Updated"
+    else
         # do nothing, ha!
     end
     unless operation.present?

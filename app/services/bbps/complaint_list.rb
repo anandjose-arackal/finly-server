@@ -50,4 +50,8 @@ class Bbps::ComplaintList < Bbps::Api
     list.map { |item| OpenStruct.new(item) }
   end
 
+  def self.handle_error(data)
+    data
+  end
+
 end

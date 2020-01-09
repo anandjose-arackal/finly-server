@@ -5,7 +5,7 @@ module Seedable
     scope :with_id, -> (id) {where id: id}
     scope :with_name, -> (name) {where name: name}
 
-    # refresh_cache
+    refresh_cache
   end
 
   class_methods do
