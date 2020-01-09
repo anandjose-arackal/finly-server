@@ -17,7 +17,7 @@ class Dashboard::ExpenseManagement::MoneyRequestsDashboard < Dashboard::ExpenseM
   class Dashboard::ExpenseManagement::MoneyRequestsDashboard::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_requests, :counts
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {

@@ -17,7 +17,7 @@ class Dashboard::ExpenseManagement::ReportsDashboard < Dashboard::ExpenseManagem
   class Dashboard::ExpenseManagement::ReportsDashboard::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reports, :counts
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {
