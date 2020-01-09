@@ -65,11 +65,34 @@ class Bbps::TransactionStatus < Bbps::Api
       [
           :message_code, :status, :error_code, :error_desc, :ref_no, :agent_institution_id, :channel_id,
           :bbps_ref_id, :agent_id, :transaction_details,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
-          :additional_field, :additional_field, :additional_field, :additional_field, :additional_field,
+          :additional_field_1, :additional_field_2, :additional_field_3, :additional_field_4, :additional_field_5,
+          :additional_field_6, :additional_field_7, :additional_field_8, :additional_field_9, :additional_field_10,
+          :additional_field_11, :additional_field_12, :additional_field_13, :additional_field_14, :additional_field_15,
       ]
   )
+
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {
+              parsed_response = result['response.parsed'] || {}
+              parsed_response['status'] == 'Y' and
+                  parsed_response&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'SUCCESS'
+            },
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {
+              result['response.parsed']&.dig('status') == 'N'
+            },
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) { true },
+            resolve: -> (result) { result }
+        )
+    )
+  end
 
   def message_code
     'B4000'
@@ -84,14 +107,35 @@ class Bbps::TransactionStatus < Bbps::Api
   end
 
   def self.handle_success(result)
-    OpenStruct.new(
-        {
-            amount: result['response.parsed']['amount'],
-            error_code: result['response.parsed']['error_code'],
-            error_desc: result['response.parsed']['error_desc'],
-
-        }
-    )
+    OpenStruct.new(result['response.parsed'])
+    #     {
+    #         message_code: result['response.parsed']['message_code'],
+    #         status: result['response.parsed']['status'],
+    #         error_code: result['response.parsed']['error_code'],
+    #         error_desc: result['response.parsed']['error_desc'],
+    #         ref_no: result['response.parsed']['ref_no'],
+    #         agent_institution_id: result['response.parsed']['agent_institution_id'],
+    #         channel_id: result['response.parsed']['channel_id'],
+    #         bbps_ref_id: result['response.parsed']['bbps_ref_id'],
+    #         agent_id: result['response.parsed']['agent_id'],
+    #         transaction_details: result['response.parsed']['transaction_details'],
+    #         additional_field_1: result['response.parsed']['additional_field_1'],
+    #         additional_field_2: result['response.parsed']['additional_field_2'],
+    #         additional_field_3: result['response.parsed']['additional_field_3'],
+    #         additional_field_4: result['response.parsed']['additional_field_4'],
+    #         additional_field_5: result['response.parsed']['additional_field_5'],
+    #         additional_field_6: result['response.parsed']['additional_field_6'],
+    #         additional_field_7: result['response.parsed']['additional_field_7'],
+    #         additional_field_8: result['response.parsed']['additional_field_8'],
+    #         additional_field_9: result['response.parsed']['additional_field_9'],
+    #         additional_field_10: result['response.parsed']['additional_field_10'],
+    #         additional_field_11: result['response.parsed']['additional_field_11'],
+    #         additional_field_12: result['response.parsed']['additional_field_12'],
+    #         additional_field_13: result['response.parsed']['additional_field_13'],
+    #         additional_field_14: result['response.parsed']['additional_field_14'],
+    #         additional_field_15: result['response.parsed']['additional_field_15'],
+    #     }
+    # )
   end
 
   def self.handle_error(data)

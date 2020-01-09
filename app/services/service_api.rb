@@ -25,6 +25,8 @@ class ServiceApi < Transactions::API
   step :validate_api
   step :execute
   step :parse
+  pass :log!
+  fail :log!, id: "failure.log"
 
   def self.header(key, value)
     headers[key] = value
@@ -33,6 +35,7 @@ class ServiceApi < Transactions::API
   def init(options, params:, current_user:, **)
     self.params = options[:params]
     self.user = current_user
+    log_generator.merge({user: self.user&.as_json, params: params, service_api: self.class.name})
     true
   end
 
@@ -41,7 +44,10 @@ class ServiceApi < Transactions::API
   end
 
   def execute(options, params:, current_user:, **)
+    start_time = Time.now
     options['response'] = get_response
+    end_time = Time.now
+    log_generator.merge({duration: (end_time - start_time)})
     puts "Response: #{options[:response]&.body}"
     true
   end
@@ -51,12 +57,21 @@ class ServiceApi < Transactions::API
     parser = self.class.parse
 
     result = instance_exec(current_user, params, response, &parser) if parser.present?
-    return on_error options, :base, result.failure if result.is_a?(Failure)
+    if result.is_a?(Failure)
+      log_generator.merge({response: {body: response.body, status: response.status}})
+      log_generator.merge({error: result.failure})
+      return on_error options, :base, result.failure
+    end
 
     # options['response.status_code'] = response.status_code
     options['response.status_code'] = response.status
     options['response.parsed'] = result
+    log_generator.merge({response: {parsed: result, status: response.status}})
     true
+  end
+
+  def log!(ctx, options)
+    log_generator.log!
   end
 
   protected
@@ -77,12 +92,21 @@ class ServiceApi < Transactions::API
   def endpoint
     url = fetch(:url)
     url += "/" unless url.blank? or url.ends_with?("/")
-    url + fetch(:path)
+    endpoint = url + fetch(:path)
+    endpoint
   end
 
   def get_response
-    fetch(:client).send(fetch(:http_method)) do |request|
-      request.url endpoint
+    method = fetch(:http_method)
+    ep = endpoint
+    log_generator.merge(
+        {
+            method: method,
+            endpoint: ep
+        }
+    )
+    fetch(:client).send(method) do |request|
+      request.url ep
       request.params = fetch(:query_params) if fetch(:query_params)
       request.body = fetch(:body).to_json if fetch(:body)
       puts "Body: #{request.body}"
@@ -99,4 +123,9 @@ class ServiceApi < Transactions::API
   def required_data
     [:http_method, :url, :path, :client]
   end
+
+  def log_generator
+    @log_generator ||= LogGenerator.new("services")
+  end
+
 end
