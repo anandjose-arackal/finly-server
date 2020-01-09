@@ -282,7 +282,7 @@ class User::Balances::Show < User::Base
       balance_data = {
           name: pocket.name,
           type: pocket.user_pocket_type&.name&.humanize,
-          balance: self.user_pockets_info[pocket.id],
+          balance: precision_value(self.user_pockets_info[pocket.id]),
           base_currency: pocket.base_currency
       }
 
