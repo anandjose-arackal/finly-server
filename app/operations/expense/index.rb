@@ -64,7 +64,7 @@ class Expense::Index < Expense::Base
       end
     end
 
-    if self.expenses.present?
+    unless self.expenses.nil?
       self.expenses = self.expenses.exclude_deleted rescue self.expenses
     end
   end
@@ -102,7 +102,7 @@ class Expense::Index < Expense::Base
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.expenses = params[:expenses]
-      if expenses.present?
+      unless expenses.nil?
         self.expenses = apply_scopes(expenses, params)
 
         ## excluding personal and cancelled expenses if it's an expense/index action
