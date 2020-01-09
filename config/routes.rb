@@ -5022,7 +5022,7 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
-  get 'exports/:type', to: 'export#processor'
+  # get 'exports/:type', to: 'export#processor'
 
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
@@ -5763,6 +5763,16 @@ Rails.application.routes.draw do
   resources :export_jobs, only: [:index]
   get 'maps/config/:type', to: 'google_maps#maps_config'
 
+  scope :streamsets do
+    scope :v1 do
+      post 'auth', to: 'streamsets/v1/token#create'
+      get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+      get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
+      get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
+    end
+  end
+
+
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms
@@ -5790,6 +5800,7 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      get 'transaction_status', to: 'bills#transaction_status'
       put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'

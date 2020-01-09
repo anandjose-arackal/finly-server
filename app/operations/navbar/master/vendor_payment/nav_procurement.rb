@@ -134,7 +134,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def utility_bills
-    return nil unless user.company.utility_bills_enabled?
+    return nil unless user.company.utility_bills_enabled? &&
+        (
+        user.vendor_payment_admin? ||
+            user.is_utility_bill_master_initiator? ||
+            user.is_utility_bill_master_reviewer? ||
+            user.is_utility_bill_initiator? ||
+            user.is_utility_bill_reviewer? ||
+            user.is_bank_payment_request_initiator? ||
+            user.is_bank_payment_request_reviewer? ||
+            user.is_bank_payment_request_creditor? ||
+            user.is_bank_payment_request_auditor?
+        )
     {name: 'Utility Bills', id: 'payables', url: 'utility_bills'}
   end
 
@@ -164,7 +175,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def utility_bill_masters
-    return nil unless user.company.utility_bills_enabled?
+    return nil unless user.company.utility_bills_enabled? &&
+        (
+        user.vendor_payment_admin? ||
+            user.is_utility_bill_master_initiator? ||
+            user.is_utility_bill_master_reviewer? ||
+            user.is_utility_bill_initiator? ||
+            user.is_utility_bill_reviewer? ||
+            user.is_bank_payment_request_initiator? ||
+            user.is_bank_payment_request_reviewer? ||
+            user.is_bank_payment_request_creditor? ||
+            user.is_bank_payment_request_auditor?
+        )
     {name: 'Utility Bill Masters', id: 'manage', url: 'utility_bill_masters/params={"tabName": "agreements"}'}
   end
 

@@ -103,6 +103,7 @@ linked_files = %w{
   config/gstin_verification_config.yml
   config/redis_config.yml
   config/mattermost_config.yml
+  config/integrations.yml
   config/insights_config.yml
   config/bbps_config.yml
 }
