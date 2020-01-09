@@ -8,24 +8,21 @@
 #  finly_ref_updated_at                  :datetime
 #  is_reimbursement                      :boolean
 #  reimbursement_on_id                   :integer
-#  status                                :string(255)
 #  description                           :string(255)
 #  detailed_description                  :text(65535)
+#  parent_cost_center_id                 :integer
 #  cost_center_id                        :integer
+#  parent_location_id                    :integer
 #  location_id                           :integer
+#  parent_department_id                  :integer
 #  department_id                         :integer
+#  parent_category_id                    :integer
 #  category_id                           :integer
 #  policy_id                             :integer
 #  owner_id                              :integer
 #  service_period_start_id               :integer
 #  service_period_end_id                 :integer
 #  date_id                               :integer
-#  payable_created_at_id                 :integer
-#  payable_submitted_at_id               :integer
-#  payable_approved_at_id                :integer
-#  rejection_count                       :integer
-#  has_violation                         :boolean
-#  violation_description                 :string(255)
 #  is_employee_expense                   :boolean
 #  is_vendor_payment                     :boolean
 #  vendor_id                             :integer
@@ -73,6 +70,8 @@
 #  quantity_paid_percentage              :decimal(10, )
 #  is_exceeding_budget                   :boolean
 #  item_type                             :string(255)
+#  item_id                               :integer
+#  asset_type                            :string(255)
 #  amount_id                             :integer
 #  basic_amount_id                       :integer
 #  tax_amount_id                         :integer
