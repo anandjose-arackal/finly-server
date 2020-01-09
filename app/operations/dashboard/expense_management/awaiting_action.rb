@@ -15,7 +15,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         finance_manager_trips: false,
         travel_manager_trips: false
     }
-
+    params[:view] = get_relevant_view
     self.document_types[:manager_reports] = true if user.manager?
     self.document_types[:finance_manager_reports] = true if user.finance_manager?
 
@@ -71,7 +71,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     if self.document_types[:manager_money_requests]
       data = {
           title: "Money Requests awaiting approval",
-          type: 'money_requests',
+          type: 'requests',
           count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
           filters: [{view: 'manager', filter_status: 99}],
           awaiting_action: true # FE requires this to handle some logic in UI
@@ -91,36 +91,36 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     end
 
     # trips
-    if self.document_types[:manager_trips]
-      data = {
-          title: "Trips awaiting approval",
-          type: 'trips',
-          count: TravelRequest.reviewer_associated_items(user).or(TravelRequest.reviewer_associated_booking_items(user)).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-          filters: [{view: 'manager', filter_status: 'processing'}],
-          awaiting_action: true # FE requires this to handle some logic in UI
-      }
-      self.result.push data
-    end
-    if self.document_types[:finance_manager_trips]
-      data = {
-          title: "Trips awaiting credit",
-          type: 'trips',
-          count: TravelRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-          filters: [{view: 'finance_manager', filter_status: 'booking_confirmed'}],
-          awaiting_action: true # FE requires this to handle some logic in UI
-      }
-      self.result.push data
-    end
-    if self.document_types[:travel_manager_trips]
-      data = {
-          title: "Trips pending booking",
-          type: 'trips',
-          count: TravelRequest.travel_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-          filters: [{view: 'travel_manager', filter_status: 'booking_pending'}],
-          awaiting_action: true # FE requires this to handle some logic in UI
-      }
-      self.result.push data
-    end
+    # if self.document_types[:manager_trips]
+    #   data = {
+    #       title: "Trips awaiting approval",
+    #       type: 'travel_requests',
+    #       count: TravelRequest.reviewer_associated_items(user).or(TravelRequest.reviewer_associated_booking_items(user)).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+    #       filters: [{view: 'manager', filter_status: 'processing'}],
+    #       awaiting_action: true # FE requires this to handle some logic in UI
+    #   }
+    #   self.result.push data
+    # end
+    # if self.document_types[:finance_manager_trips]
+    #   data = {
+    #       title: "Trips awaiting credit",
+    #       type: 'trips',
+    #       count: TravelRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+    #       filters: [{view: 'finance_manager', filter_status: 'booking_confirmed'}],
+    #       awaiting_action: true # FE requires this to handle some logic in UI
+    #   }
+    #   self.result.push data
+    # end
+    # if self.document_types[:travel_manager_trips]
+    #   data = {
+    #       title: "Trips pending booking",
+    #       type: 'trips',
+    #       count: TravelRequest.travel_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
+    #       filters: [{view: 'travel_manager', filter_status: 'booking_pending'}],
+    #       awaiting_action: true # FE requires this to handle some logic in UI
+    #   }
+    #   self.result.push data
+    # end
   end
 
   def success
