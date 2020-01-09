@@ -14,6 +14,8 @@ class BbpsBillStatusChecker < ApplicationJob
         op.success do |result|
           puts "SUCCESS: #{result}"
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          payment.payment_order.update_order_status
+          payment.payment_order.update_processed_amount
           bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
         end
         op.error do |result|

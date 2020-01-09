@@ -19,8 +19,6 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
   end
 
   def balance(options = {})
-    # TODO - TEMPORARY BECAYSE FUCK YOU EBIX
-    return 0
     op = ItzCash::VirtualAccountBalance.(account.company)
     if op.success?
       balance = op.wallets.first[:balance] # original balance from ItzCash's servers
