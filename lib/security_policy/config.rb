@@ -9,7 +9,7 @@ class SecurityPolicy::Config
           concurrent_logins: 2
       },
       password: {
-          minimum_score: 3,
+          minimum_score: 2,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,

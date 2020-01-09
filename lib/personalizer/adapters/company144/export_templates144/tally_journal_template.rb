@@ -1,7 +1,7 @@
 class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTemplate < Personalizer::Adapters::ExportBase
   attr_accessor :headers, :contents, :reports
 
-  has_scope :filter_approved_date, using: [:from, :to], type: :hash
+  has_scope :filter_date, using: [:from, :to], type: :hash
 
 
   def pre_validate
