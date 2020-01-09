@@ -10,9 +10,9 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           :trips,
           :reports,
           :money_requests,
-          :travel_request_bookings,
+          #:travel_request_bookings,
           {approvals: [:money_requests_awaiting_approval, :reports_awaiting_approval, :trips_awaiting_approval]},
-          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips]},
+          {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips, :travel_request_bookings]},
           {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
           {auditor: [:analytics, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
           # :analytics,
@@ -251,9 +251,21 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     RequestStoreUtil.current_company&.analytics_system_enabled? ? analytics&.merge({name: 'Auditor'}) : company_money_requests&.merge({name: 'Auditor'})
   end
 
+  # def team
+    # return nil unless user.manager? || user.finance_manager?
+    # user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
+
+  # end
+
   def team
-    return nil unless user.manager? || user.finance_manager?
-    user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
+    return nil unless user.manager? || user.finance_manager? || user.is_travel_manager? 
+    if user.finance_manager?
+      team_settlements&.merge({name: "Team"})
+    elsif user.manager?
+      team_users&.merge({name: "Team"})
+    elsif user.is_travel_manager?
+      travel_request_bookings&.merge({name: "Team"})
+    end   
   end
 
   def documents_section
