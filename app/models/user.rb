@@ -1564,6 +1564,30 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
   end
 
+  def is_utility_bill_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_initiator), document)
+  end
+
+  def is_utility_bill_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_reviewer), document)
+  end
+
+  def is_utility_bill_master_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer), document)
+  end
+
+  def is_utility_bill_master_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator), document)
+  end
+
+  def is_credit_note_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_initiator), document)
+  end
+
+  def is_credit_note_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_reviewer), document)
+  end
+
   def access_locked?
     locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
