@@ -10,10 +10,14 @@ class Docs::UtilityBills::Bills::Contracts::Base < Reform::Form
   property :location_id
   property :company_id, validates: {presence: true}
   property :autofetched
+  property :bill_validation_required
 
   property :category_id
   property :tax_rate_id
   property :hsn_sac
+
+  property :order_number
+  property :order_number_type
 
   # Should be used in update
   property :policy_id

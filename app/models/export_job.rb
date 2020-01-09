@@ -61,6 +61,13 @@ class ExportJob < ApplicationRecord
     status_id == ExportJobStatus.id_for(:failed)
   end
 
+  def retry
+    return false unless failed?
+
+    ExportManager::DSL::Generator::Background.call_async(user, {export_job_id:self.id})
+    true
+  end
+
   def as_json(options = {})
     {
         id: id,

@@ -14,7 +14,6 @@
 #  ip_addr    :string(255)
 #  user_agent :string(255)
 #  link_tags  :string(255)
-#  deleted_at :datetime
 #
 
 require 'rails_helper'

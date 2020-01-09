@@ -19,7 +19,6 @@
 #  updated_at               :datetime         not null
 #  sequence_number          :integer
 #  payment_id               :bigint
-#  deleted_at               :datetime
 #
 
 class TransactionDetail < ApplicationRecord

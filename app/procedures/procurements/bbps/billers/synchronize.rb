@@ -27,6 +27,9 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
       m.success do |result|
         context['billers'] = result
       end
+      m.error do |result|
+        return on_error options, :base, 'Could not fetch billers'
+      end
       m.failure do |result|
         # Todo raise alert as this API cannot fail
         return on_error options, :base, 'Could not fetch billers'
@@ -52,6 +55,11 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
             deactivate(biller_config['biller_id'])
             options['billers.failed'] << biller_config.merge({errors: error_message})
           end
+        end
+
+        m.error do |result|
+          deactivate(biller_config['biller_id'])
+          options['billers.failed'] << biller_config.merge({errors: result})
         end
 
         m.failure do |result|

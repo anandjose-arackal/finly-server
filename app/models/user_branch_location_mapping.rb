@@ -7,7 +7,6 @@
 #  branch_location_id :integer          not null
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  deleted_at         :datetime
 #
 
 class UserBranchLocationMapping < ApplicationRecord

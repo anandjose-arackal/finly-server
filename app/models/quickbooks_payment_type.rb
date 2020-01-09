@@ -12,7 +12,6 @@
 #  quickbooks_updated_at             :datetime
 #  active                            :boolean
 #  quickbooks_additional_information :text(65535)
-#  deleted_at                        :datetime
 #
 
 class QuickbooksPaymentType < ApplicationRecord

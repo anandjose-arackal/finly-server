@@ -48,3 +48,6 @@ Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}
 Crono.perform(ExpenseStatusUpdate).every 30.minutes
+
+# status checker for BBPS Bill Payments
+Crono.perform(BbpsBillStatusChecker).every 30.minutes

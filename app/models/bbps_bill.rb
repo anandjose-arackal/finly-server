@@ -34,7 +34,7 @@
 #  late_payment_fee_id        :integer
 #  early_payment_fee_id       :integer
 #  convenience_fee_id         :integer
-#  quick_pay                  :boolean          default(TRUE)
+#  quick_pay                  :string(255)      default("N")
 #  total_amount_id            :integer
 #  early_payment_fee_selected :boolean          default(FALSE)
 #  late_payment_fee_selected  :boolean          default(FALSE)
@@ -54,6 +54,7 @@ class BbpsBill < ApplicationRecord
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
 
   before_save :resolve_bill_validation
+  before_save :set_quick_pay
 
   belongs_to :subscription, class_name: 'BbpsBillerSubscription', foreign_key: :subscription_id, optional: true
   belongs_to :biller, class_name: 'BbpsBiller', foreign_key: :bbps_biller_id, optional: true
@@ -84,7 +85,7 @@ class BbpsBill < ApplicationRecord
   scope :filter_status, -> (status) {
     case status
     when 'payables', :payables
-      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved)).joins(:amount).where("amounts.value > ?", 0)
     when 'approved', :approved
       where(status_id: BbpsBillStatus.id_for(:approved))
     when 'auto_approved', :auto_approved
@@ -97,6 +98,16 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:retracted))
     when 'rejected', :rejected
       where(status_id: BbpsBillStatus.id_for(:rejected))
+    when 'open', :open
+      where(status_id: BbpsBillStatus.id_for(:open))
+    when 'voided', :voided
+      where(status_id: BbpsBillStatus.id_for(:voided))
+    when 'paid', :paid
+      where(status_id: BbpsBillStatus.id_for(:paid))
+    when 'failed', :failed
+      where(status_id: BbpsBillStatus.id_for(:failed))
+    when 'payment_ticket_created', :payment_ticket_created
+      where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
     else
       # do nothing
     end
@@ -136,7 +147,8 @@ class BbpsBill < ApplicationRecord
 
   scope :filter_payable_bills, -> (enabled) {
     if enabled
-      where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      # where(status_id: BbpsBill.status_ids(:approved, :auto_approved))
+      where(status_id: BbpsBill.status_ids(:approved, :auto_approved)).joins(:amount).where("amounts.value > ?", 0)
     end
   }
 
@@ -249,12 +261,25 @@ class BbpsBill < ApplicationRecord
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
       data[:show_payment_details] = true
-      data[:paid_on_date] = self.paid_on_date
-      data[:transaction_id] = self.transaction_id
-      data[:bbps_id] = self.bbps_id
+      data[:receipt] = generate_receipt
     end
 
     data
+  end
+
+  def generate_receipt
+    {
+        biller_name: subscription.biller&.biller_name,
+        mobile_number: subscription.mobile_number,
+        bill_number: bill_number,
+        bill_date: bill_date,
+        due_date: due_date,
+        transaction_ref_id: payments&.first&.reference_resource&.bbps_ref_id,
+        payment_mode: "BSC",
+        bill_amount: payments&.first&.amount.as_json,
+        transaction_date: payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y"),
+        status: payments&.first&.payment_status&.name
+    }
   end
 
   def bill_validation_required?
@@ -291,21 +316,41 @@ class BbpsBill < ApplicationRecord
       user.send("#{self.table_name}")
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.send("#{self.table_name}").where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+      user.company.send("#{self.table_name}").where(policy_id: policy_ids, status_id: finance_associated_status_ids)
     end
+  end
+
+  def self.role_based_associated_status_ids(user)
+    self.status_ids(*self.role_based_statuses(user))
+    # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if UserRole.ids_for(:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_auditor, :bank_payment_request_creditor).include?(role_id.to_i)
+          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        elsif UserRole.ids_for(:utility_bill_master_initator, :utility_bill_master_reviewer, :utility_bill_initator, :utility_bill_reviewer).include?(role_id.to_i)
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        end
+      end
+    end
+    return statuses.uniq
   end
 
   def self.finance_associated_status_ids
-    BbpsBill.status_ids %i( approved auto_approved payment_ticket_created payment_initiated failed paid voided )
+    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:open, :rejected, :retracted, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
   end
 
   def self.status_ids(*statuses)
-    status_ids = []
-    statuses.each do |status|
-      status_ids.push BbpsBillStatus.id_for(status)
-    end
-
-    status_ids.reject {|status_id| status_id.nil?}
+    BbpsBillStatus.ids_for(statuses)
   end
 
   def self.open_statuses
@@ -323,4 +368,17 @@ class BbpsBill < ApplicationRecord
       self.bill_validation_required = true
     end
   end
+
+  # this methid will set the quickpay attribute based on a
+  # bunch of parameters that are present in the biller
+  def set_quick_pay
+    type = self.biller&.biller_mode
+    ad_hoc = self.biller&.biller_accepts_adhoc
+    fetch_requirement = self.biller&.fetch_requirement
+    validation_support = self.biller&.support_bill_validation
+    if (fetch_requirement == "NOT_SUPPORTED") && (validation_support == "NOT_SUPPORTED")
+      self.quick_pay = "Y"
+    end
+  end
+
 end

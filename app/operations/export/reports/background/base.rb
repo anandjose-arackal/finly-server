@@ -1,7 +1,7 @@
 class Export::Reports::Background::Base < BackgroundOperation
   attr_accessor :company, :preference, :loose_headers,  :custom_field_data
 
-  sidekiq_options queue: :report_export_queue
+  #sidekiq_options queue: :report_export_queue
 
   # class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
   #   attr_accessor :data, :header, :report_names
@@ -122,25 +122,14 @@ class Export::Reports::Background::Base < BackgroundOperation
     records = []
     custom_field_column_names.each do |cf_name|
       value = ''
-      expense.custom_fields.map {|ecf| value = (ecf.string_value || '') if ecf.field_configuration.field_name == cf_name}
+      expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
       records << value
     end
     records
   end
 
-  def extract_custom_field_names(reports)
-    # now extract the custom fields from each expense that is a part of all the report
-    field_names = []
-    reports.find_each(batch_size: 1000) do |report|
-      report.expenses.each do |expense|
-        # this gets all the custom field names from all different types of expenses
-        if expense.custom_field_names.present?
-          field_names += expense.custom_field_names
-        end
-      end
-    end
-    field_names.uniq! || []
+  def extract_custom_field_names
+    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense) ]
+    FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
-
-
 end

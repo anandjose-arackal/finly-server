@@ -80,7 +80,6 @@
 #  kyc_2_back_updated_at      :datetime
 #  kyc_1_number               :string(255)
 #  kyc_2_number               :string(255)
-#  deleted_at                 :datetime
 #
 
 require 'fileutils'

@@ -13,7 +13,6 @@
 #  updated_at           :datetime         not null
 #  bank_type_id         :integer
 #  is_active            :boolean          default(TRUE)
-#  deleted_at           :datetime
 #
 
 class CompanyFundsLoadRequest < ApplicationRecord

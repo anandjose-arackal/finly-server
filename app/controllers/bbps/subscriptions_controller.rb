@@ -42,9 +42,6 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def update
     endpoint Docs::UtilityBills::Subscriptions::Ops::Update
-    respond_to do |format|
-      format.json {}
-    end
   end
 
   def index
@@ -63,6 +60,11 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
 
   def fetch_bill
     endpoint Docs::UtilityBills::Subscriptions::Ops::FetchBill
+  end
+
+  def update_and_submit
+    params[:id] = params[:id] || params[:_id]
+    endpoint Docs::UtilityBills::Subscriptions::Ops::UpdateAndSubmit
   end
 
   def review

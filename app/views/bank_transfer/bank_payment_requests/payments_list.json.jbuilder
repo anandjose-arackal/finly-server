@@ -2,6 +2,7 @@ json.payments do
   json.array!(@result.paginated_payments.include_for_index) do |payment|
     if payment.receiving_account&.is_a?(BbpsBiller)
       json.owner_name payment.receiving_account&.biller_name
+      json.editable false # because a bbps bill can never be edited from the payment ticket screen
     elsif payment.receiving_account&.account_owner&.is_a?(YesBankVendor)
       json.owner_name payment.receiving_account&.account_owner&.display_name
       json.owner_business_name payment&.receiving_account&.account_owner&.business_name

@@ -1,7 +1,7 @@
 class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate < Personalizer::Adapters::ExportBase
   attr_accessor :headers, :contents, :reports
 
-  has_scope :filter_approved_date, using: [:from, :to], type: :hash
+  has_scope :filter_date, using: [:from, :to], type: :hash
 
 
   def pre_validate
@@ -33,8 +33,10 @@ class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate <
     self.contents = []
     reports.each do |report|
       narration = print_narration(report)
+      debit_rows = []
+      credit_rows = []
       report.expenses.each do |expense|
-        self.contents << [
+        debit_rows << [
             'JOURNAL',
             report.id,
             Date.today.strftime('%d-%b'),
@@ -49,9 +51,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate <
             '',
             narration
         ]
-      end
-      report.expenses.each do |expense|
-        self.contents << [
+        credit_rows << [
             'JOURNAL',
             report.id,
             Date.today.strftime('%d-%b'),
@@ -66,6 +66,9 @@ class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate <
             '',
             ''
         ]
+        self.contents += debit_rows
+        self.contents += credit_rows
+
       end
     end
   end

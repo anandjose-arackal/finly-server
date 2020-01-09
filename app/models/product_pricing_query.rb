@@ -14,7 +14,6 @@
 #  updated_at           :datetime         not null
 #  product              :string(255)
 #  prepaid_cards        :string(255)
-#  deleted_at           :datetime
 #
 
 class ProductPricingQuery < ApplicationRecord

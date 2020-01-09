@@ -27,7 +27,6 @@
 #  signature_file_size    :integer
 #  signature_updated_at   :datetime
 #  signature_title        :string(255)
-#  deleted_at             :datetime
 #
 
 class UserProfile < ApplicationRecord

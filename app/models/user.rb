@@ -59,7 +59,6 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
-#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -1563,6 +1562,30 @@ class User < ApplicationRecord
 
   def is_non_po_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
+  end
+
+  def is_utility_bill_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_initiator), document)
+  end
+
+  def is_utility_bill_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_reviewer), document)
+  end
+
+  def is_utility_bill_master_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer), document)
+  end
+
+  def is_utility_bill_master_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator), document)
+  end
+
+  def is_credit_note_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_initiator), document)
+  end
+
+  def is_credit_note_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_reviewer), document)
   end
 
   def access_locked?

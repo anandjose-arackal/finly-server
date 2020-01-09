@@ -6,11 +6,14 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       [
           :dashboard,
           {requests: [:pr_initiator, :pr_awaiting_approval, :pr_team, :pr_company]},
-          {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
+          # {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
+          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
-          {payables: [:po_advances, :divider, :invoices_section, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :divider, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters, :track_bbps_complaints]},
-          :analytics,
+          # {payables: [:po_advances, :divider, :invoices_section, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :divider, :payment_tickets]},
+          {payables: [:po_advances, :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices, :utility_bills, :payment_tickets]},
+          # {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters, :track_bbps_complaints]},
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :utility_bill_masters]},
+          # :analytics,
           :download_manager,
           :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
@@ -132,7 +135,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def utility_bills
-    return nil unless user.company.utility_bills_enabled?
+    return nil unless user.company.utility_bills_enabled? &&
+        (
+        user.vendor_payment_admin? ||
+            user.is_utility_bill_master_initiator? ||
+            user.is_utility_bill_master_reviewer? ||
+            user.is_utility_bill_initiator? ||
+            user.is_utility_bill_reviewer? ||
+            user.is_bank_payment_request_initiator? ||
+            user.is_bank_payment_request_reviewer? ||
+            user.is_bank_payment_request_creditor? ||
+            user.is_bank_payment_request_auditor?
+        )
     {name: 'Utility Bills', id: 'payables', url: 'utility_bills'}
   end
 
@@ -162,7 +176,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def utility_bill_masters
-    return nil unless user.company.utility_bills_enabled?
+    return nil unless user.company.utility_bills_enabled? &&
+        (
+        user.vendor_payment_admin? ||
+            user.is_utility_bill_master_initiator? ||
+            user.is_utility_bill_master_reviewer? ||
+            user.is_utility_bill_initiator? ||
+            user.is_utility_bill_reviewer? ||
+            user.is_bank_payment_request_initiator? ||
+            user.is_bank_payment_request_reviewer? ||
+            user.is_bank_payment_request_creditor? ||
+            user.is_bank_payment_request_auditor?
+        )
     {name: 'Utility Bill Masters', id: 'manage', url: 'utility_bill_masters/params={"tabName": "agreements"}'}
   end
 

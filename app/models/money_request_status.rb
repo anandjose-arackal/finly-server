@@ -7,7 +7,6 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  order      :integer          default(1), not null
-#  deleted_at :datetime
 #
 
 class MoneyRequestStatus < ApplicationRecord

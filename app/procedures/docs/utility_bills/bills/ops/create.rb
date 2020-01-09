@@ -36,8 +36,16 @@ class Docs::UtilityBills::Bills::Ops::Create < Transactions::API
     bill['due_date'] = params[:due_date]
     bill['bill_period'] = params[:bill_period]
 
+    bill['order_number'] = params[:order_number] if params[:order_number].present?
+    bill['order_number_type'] = params[:order_number_type] if params[:order_number_type].present?
+
+    bill['category_id'] = subscription.category_id
+    bill['tax_rate_id'] = subscription.tax_rate_id
+    bill['hsn_sac'] = subscription.hsn_sac
+
     bill['subscription_id'] = subscription.id
     bill['autofetched'] = autofetched
+    bill['bill_validation_required'] = !autofetched
 
     bill['late_payment_fee'] = {
         value: late_payment_fee,

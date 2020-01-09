@@ -34,6 +34,7 @@
 #  updated_at           :datetime         not null
 #  transfer_status_id   :integer
 #  amount_id            :integer
+#  quick_pay            :string(255)      default("N")
 #
 
 class BbpsYesBankTransaction < ApplicationRecord
@@ -41,7 +42,6 @@ class BbpsYesBankTransaction < ApplicationRecord
   has_one :payment, as: :reference_resource
   belongs_to :transfer_status, class_name: "BankTransferStatus"
   belongs_to :amount
-  belongs_to :biller, class_name: "BbpsBillerSubscription"
   belongs_to :company
 
   accepts_nested_attributes_for :amount

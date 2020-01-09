@@ -32,6 +32,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   collection :subscription_pocs, populator: :subscription_pocs! do
     property :user_id, validates: {presence: true}
     property :subscription_id
+    property :_destroy, virtual: true
   end
 
   property :fetch_requirement
@@ -60,30 +61,22 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :customer_param_key_5
   property :customer_param_value_5
 
-  # collection :customer_fields, populator: :customer_fields! do
-  #   property :subscription_id, validates: {presence: true}
-  #   property :label, validates: {presence: true}
-  #   property :value, validates: {presence: true}
-  # end
-
-  # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
-  #   property :level_id, validates: {presence: true}
-  #   property :reviewer_id
-  # end
-
-  # validates :expected_due_day inclusion: { in: (1..31).to_a,
-  #                                             message: "%{value} is not a valid day" }
-
   validate :company_entities # Checks for departments
   # validate :related_entities # Checks for associated agreements, users provided inside pocs
   validate :validate_customer_params
+
+  validate :poc_presence
+
+  def poc_presence
+    errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
+  end
 
   # validate :company_specific_entities
 
   def company_entities
     params = {filter_role_id: [UserRole.id_for(:utility_bill_master_initiator)], current_app: :vp}
-    # errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
-    # errors.add(:cost_center_id, "Invalid Cost Center") unless current_user.company.cost_centers&.pluck(:id).include?(cost_center_id.to_i)
+    errors.add(:department_id, "Invalid Department") unless Company::Departments::Index.(current_user, params).policy_department_filter_mapping&.leaves&.pluck(:id)&.include?(department_id.to_i)
+    errors.add(:cost_center_id, "Invalid Cost Center") unless current_user.company.cost_centers&.pluck(:id).include?(cost_center_id.to_i)
     errors.add(:location_id, "Invalid Location") unless Company::Locations::Index.(current_user, params).policy_location_filter_mapping&.leaves&.pluck(:id)&.include?(location_id.to_i)
     errors.add(:policy_id, "Invalid Policy") unless ::Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: policy_id).present?
 
@@ -91,10 +84,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
       errors.add(:agreement_id, "Invalid Agreement Details") unless current_user.company.payment_agreements.find_by(id: agreement_id).present?
     end
   end
-
-  # def related_entities
-  #
-  # end
 
 
   def validate_customer_params
@@ -215,12 +204,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     item = subscription_pocs.find {|subscription_poc| subscription_poc.id.to_s == fragment["id"].to_s}
     # item = (BbpsSubscriptionPoc.find_by(id: fragment["id"]) || BbpsSubscriptionPoc.new) if validate_or_assign_role(fragment)
 
-    validate_or_assign_role(fragment)
-
     if fragment["_destroy"]
       subscription_pocs.destroy(item)
       return skip!
     end
+
+    validate_or_assign_role(fragment)
+
 
     item || subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
 

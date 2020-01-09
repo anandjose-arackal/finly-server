@@ -175,7 +175,6 @@
 #  ZMK        :decimal(20, 5)
 #  ZMW        :decimal(20, 5)
 #  ZWL        :decimal(20, 5)
-#  deleted_at :datetime
 #
 
 class CurrencyConversionRate < ApplicationRecord

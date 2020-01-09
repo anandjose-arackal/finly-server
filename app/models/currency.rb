@@ -8,7 +8,6 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  symbol       :string(255)
-#  deleted_at   :datetime
 #
 
 

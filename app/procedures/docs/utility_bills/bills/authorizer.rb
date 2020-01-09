@@ -19,13 +19,32 @@ class Docs::UtilityBills::Bills::Authorizer
   end
 
   def index?
-    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
-        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
+    @user.vendor_payment_admin? ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || (@user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) && @model.subscription.pocs.include?(@user)) ||
-        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
+    (@model.company_id == @user.company_id) &&
+        (
+        @user.vendor_payment_admin? ||
+            @model.user_id == @user.id ||
+            reviewing_user? ||
+            @model.subscription.pocs.include?(@user) ||
+            @user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+            @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
+            @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
+            @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
+            @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
+            @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) ||
+            @user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor))
+        )
   end
 
   def reject?
@@ -42,6 +61,10 @@ class Docs::UtilityBills::Bills::Authorizer
 
   def take_control?
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+  end
+
+  def return_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.include?(@user)
   end
 
   # def return_control?

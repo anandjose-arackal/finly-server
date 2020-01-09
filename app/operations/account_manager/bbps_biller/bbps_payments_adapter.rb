@@ -26,19 +26,17 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
     params = {
         amount: bank_transaction.amount_value,
-        customer_name: bank_transaction.customer_name,
         mobile_number: bank_transaction.customer_mobile,
         bill_date: bank_transaction.bill_date,
         due_date: bank_transaction.due_date,
         bill_number: bank_transaction.bill_number,
         bill_period: bank_transaction.bill_period,
         biller_id: bank_transaction.biller_id,
-        order_number: bank_transaction.order_number,
-        customer_param_1: {
-            key: bill.subscription.customer_param_key_1,
-            value: bill.subscription.customer_param_value_1,
-        }
+        quick_pay: bank_transaction.quick_pay,
+        order_number: bank_transaction.order_number
     }
+
+    params.merge!(customer_params(bill.subscription))
 
     Bbps::BillPay.(params: params, current_user: payment.initiating_user) do |op|
       op.success do |result|
@@ -46,18 +44,26 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         # here we are assuming that the bill gets paid through the BillPay API
         # have to add a check for cases when it's a timeout or any other status other than
         # a 200 OK response
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), bbps_ref_id: result.bbps_ref_id)
-        
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing),
+                                bbps_ref_id: result.bbps_ref_id)
+
+        # clearing old system messages as well
+        payment.system_messages.destroy_all
+        payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+
+        # add a success system message?
+        payment.system_messages.build(content: "The payment has been accepted by BBPS. Awaiting credit confirmation from the service provider",
+                                      system_message_type_id: SystemMessageType.id_for(:success)).save
       end
       op.error do |result|
         puts "Error:Result: #{result}"
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+        payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         result.errors.each do |error|
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
+        return false
       end
       op.failure do |result|
         puts "Failure:Result: #{result}"
@@ -67,6 +73,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
           payment.system_messages.build(content: error,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
+        return false
       end
     end
 
@@ -120,6 +127,7 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         bill_period: payment.parent.bill_period,
         due_date: payment.parent.due_date,
         bill_number: payment.parent.bill_number,
+        quick_pay: bill.subscription.quick_pay,
         customer_name: bill.subscription.customer_name,
         customer_email: bill.subscription.customer_email,
         customer_mobile: bill.subscription.mobile_number,
@@ -151,6 +159,22 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
 
   def generate_order_number
     "O#{DateTime.now.strftime("%d%m%y%H%M%S")}#{rand(10000..99999)}"
+  end
+
+  def customer_params(subscription)
+    parameters = {}
+
+    (1..5).to_a.each do |i|
+      key = subscription.send("customer_param_key_#{i}")
+      value = subscription.send("customer_param_value_#{i}")
+      if key.present? && value.present?
+        parameters["customer_param_#{i}"] = {
+            key: key,
+            value: value
+        }
+      end
+    end
+    parameters.symbolize_keys!
   end
 
 end
