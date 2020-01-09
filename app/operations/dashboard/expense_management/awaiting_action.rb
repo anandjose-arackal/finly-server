@@ -71,7 +71,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     if self.document_types[:manager_money_requests]
       data = {
           title: "Money Requests awaiting approval",
-          type: 'money_requests',
+          type: 'requests',
           count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
           filters: [{view: 'manager', filter_status: 99}],
           awaiting_action: true # FE requires this to handle some logic in UI
@@ -94,7 +94,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
     if self.document_types[:manager_trips]
       data = {
           title: "Trips awaiting approval",
-          type: 'trips',
+          type: 'travel_requests',
           count: TravelRequest.reviewer_associated_items(user).or(TravelRequest.reviewer_associated_booking_items(user)).not_open.exclude_deleted.awaiting_action_items(user.id).count,
           filters: [{view: 'manager', filter_status: 'processing'}],
           awaiting_action: true # FE requires this to handle some logic in UI
