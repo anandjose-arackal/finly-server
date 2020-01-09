@@ -325,6 +325,10 @@ class BbpsBill < ApplicationRecord
     # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
   end
 
+  def self.open_status_ids(user)
+    []
+  end
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
