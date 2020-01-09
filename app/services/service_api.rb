@@ -44,7 +44,10 @@ class ServiceApi < Transactions::API
   end
 
   def execute(options, params:, current_user:, **)
+    start_time = Time.now
     options['response'] = get_response
+    end_time = Time.now
+    log_generator.merge({duration: (end_time - start_time)})
     puts "Response: #{options[:response]&.body}"
     true
   end
@@ -90,7 +93,6 @@ class ServiceApi < Transactions::API
     url = fetch(:url)
     url += "/" unless url.blank? or url.ends_with?("/")
     endpoint = url + fetch(:path)
-    log_generator.merge({url: endpoint})
     endpoint
   end
 
