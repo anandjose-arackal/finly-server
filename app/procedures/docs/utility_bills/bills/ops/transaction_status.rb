@@ -23,7 +23,7 @@ class Docs::UtilityBills::Bills::Ops::TransactionStatus < Transactions::API
     true
   end
 
-  def set_params(options, model:, subscription:, biller:, params:, **)
+  def set_params(options, model:, params:, **)
     param = {
         order_number: model.order_number
     }
