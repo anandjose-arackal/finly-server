@@ -27,7 +27,7 @@ class Export::Reports::AsCsv < Export::Reports::Base
       self.reports = self.reports&.with_id(id)
     end
     self.default_column_names = user.company.export_preferences.pluck(:name)
-    self.custom_field_column_names = extract_custom_field_names(reports)
+    self.custom_field_column_names = extract_custom_field_names
     self.preferences = user.company.export_preferences
   end
 
