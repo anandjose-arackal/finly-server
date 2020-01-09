@@ -15,7 +15,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         finance_manager_trips: false,
         travel_manager_trips: false
     }
-
+    params[:view] = get_relevant_view
     self.document_types[:manager_reports] = true if user.manager?
     self.document_types[:finance_manager_reports] = true if user.finance_manager?
 
