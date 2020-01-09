@@ -27,89 +27,197 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     return if has_errors?
 
     invoices = invoices_presenter.invoices
-    # InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
   def generate_rows
+    generate_headers
     sl_no = 1
     data.find_each do |inv|
-      row = Row.new(record: inv, header: header)
-      {
-          'S. NO.': sl_no,
-          'Report ID': inv.invoice_id,
-          'Voucher Type': 'BP',
-          'Period': inv.date&.strftime("%Y%m"),
-          'Voucher Date': inv.date&.strftime("%d/%m/%Y"),
-          'Description': get_description(inv),
-          'Invoice amount': '',
-          'Invoice Number': '',
-          'Invoice Date': '',
-          'Invoice Type': '',
-          'State': '',
-          'Supplier GSTN': '',
-          'Place Of Supply': '',
-          'Account': '43181001',
-          'Sub Account': '',
-          'Department': '',
-          'Cost Center': '',
-          'Tax': '',
-          'Tax Exemption(%)': '',
-          'Base Amount': '',
-          'Debit': (inv.paid_amount&.value || 0.0),
-          'Credit': '',
-          'Comments': '',
-          'Supplier': inv.receiving_account_id,
-          'Reference Code': inv.payments&.first&.reference_resource&.bank_reference_number,
-          'SAC': "",
-          'Ref. Invoice No.': "",
-          'Remarks/Notes/Explanation': "",
-      }.each do |k, v|
-        row.add k, v
+      items_with_tax = with_tax(inv.invoice_items)
+       row_ap_entries(items_with_tax,inv,sl_no).map{|entry| rows << entry} if items_with_tax.present?
+
+      items_without_tax = without_tax(inv.invoice_items)
+      row_jv_entries(items_without_tax, inv,sl_no).map{|entry| rows << entry} if items_without_tax.present?
+      inv.payments do |payment|
+
       end
-      row = Row.new(record: inv, header: header)
-      rows << row
-      {
-          'S. NO.': sl_no,
-          'Report ID': inv.invoice_id,
-          'Voucher Type': 'BP',
-          'Period': inv.date&.strftime("%Y%m"),
-          'Voucher Date': inv.date&.strftime("%d/%m/%Y"),
-          'Description': get_description(inv),
-          'Invoice amount': '',
-          'Invoice Number': '',
-          'Invoice Date': '',
-          'Invoice Type': '',
-          'State': '',
-          'Supplier GSTN': '',
-          'Place Of Supply': '',
-          'Account': '61110004',
-          'Sub Account': inv.created_by&.name,
-          'Department': '',
-          'Cost Center': '',
-          'Tax': '',
-          'Tax Exemption(%)': '',
-          'Base Amount': '',
-          'Debit': '',
-          'Credit': (inv.paid_amount&.value || 0.0),
-          'Comments': '',
-          'Supplier': inv.receiving_account_id,
-          'Reference Code': inv.payments&.first&.reference_resource&.bank_reference_number,
-          'SAC': "",
-          'Ref. Invoice No.': "",
-          'Remarks/Notes/Explanation': "",
-      }.each do |k, v|
-        row.add k, v
-      end
-      rows << row
       progress_update sl_no
       sl_no += 1
     end
+  end
+
+
+  ##########   AP Entries ##########
+  #  invoices items with TAX component goes under ledger entry AP
+  #  invoices have TDS includes comes under here
+  # ################################
+
+  def row_ap_entries(inv_items, invoice,sl_no)
+    ap_entries=[]
+    inv_items.each do |item|
+      row = Row.new(record: item, header: header)
+      {
+          'S. NO.': sl_no,
+          'Report ID': invoice.id,
+          'Voucher Type': 'AP',
+          'Period': invoice.date&.strftime("%Y%m"),
+          'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+          'Description': get_description('ap',invoice),
+          'Account': item.category&.gl_code,
+          'Sub Account': '',
+          'Department':invoice.created_by.gl_config&.dig(:location_code),
+          'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
+          'Debit': item.taxable_amount&.value,
+        }.each do |k, v|
+        row.add k, v
+        end
+        ap_entries << row
+        row = Row.new(record: item, header: header)
+        {
+            'S. NO.': sl_no,
+            'Report ID': invoice.id,
+            'Voucher Type': 'AP',
+            'Period': invoice.date&.strftime("%Y%m"),
+            'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+            'Description': get_description('ap',invoice),
+            'Account': '31329011',
+            'Sub Account': invoice&.gstin_location&.state&.state_code,
+            'Tax': item.tax_rate&.rate&.to_f,
+            'Base Amount':item.taxable_amount&.value,
+            'Debit': (item.sgst+item.cgst+item.igst),
+            'Comments': '',
+            'SAC': '00440294'
+        }.each do |k, v|
+          row.add k, v
+        end
+       ap_entries << row
+    end
+    ########## Vendor Total Bill Amount, against all ap entries
+    row = Row.new(record: invoice, header: header)
+    {
+        'S. NO.': sl_no,
+        'Report ID': invoice.id,
+        'Voucher Type': 'AP',
+        'Period': invoice.date&.strftime("%Y%m"),
+        'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+        'Description': get_description('ap',invoice),
+        'Invoice amount': inv_items.joins(:net_amount).sum('amounts.value').round(2),
+        'Invoice Number': invoice.invoice_number,
+        'Invoice Date': invoice.date.strftime("%d-%m-%Y"),
+        'State': invoice&.gstin_location&.state&.state_code,
+        'Supplier GSTN': invoice&.gstin_location&.gstin,
+        'Place Of Supply': invoice&.gstin_location&.state&.state_code,
+        'Account': '43181001',
+        'Supplier': invoice.vendor.vendor_id,
+        'Sub Account': '',
+        'Credit': inv_items.joins(:net_amount).sum('amounts.value'),
+    }.each do |k, v|
+      row.add k, v
+    end
+    ap_entries << row
+    ap_entries
+  end
+
+  ##########  JV Entries ########
+  # Invoices items without tax component goes under ledger entry JV
+  # ###############################
+  def row_jv_entries(inv_items,invoice, sl_no)
+    ap_entries=[]
+    inv_items.each do |item|
+      row = Row.new(record: item, header: header)
+      {
+          'S. NO.': sl_no,
+          'Report ID': invoice.id,
+          'Voucher Type': 'JV',
+          'Period': invoice.date&.strftime("%Y%m"),
+          'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+          'Description': get_description('ap',invoice),
+          'Account': item.category&.gl_code,
+          'Sub Account': '',
+          'Department':invoice.created_by.gl_config&.dig(:location_code),
+          'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
+          'Debit': item.net_amount&.value,
+      }.each do |k, v|
+        row.add k, v
+      end
+
+      ap_entries << row
+    end
+    row = Row.new(record: invoice, header: header)
+    {
+        'S. NO.': sl_no,
+        'Report ID': invoice.id,
+        'Voucher Type': 'JV',
+        'Period': invoice.date&.strftime("%Y%m"),
+        'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+        'Description': get_description('ap',invoice),
+        'Account': '31352001',
+        'Credit': inv_items.joins(:net_amount).sum('amounts.value').round(2),
+        'Supplier': invoice.receiving_account_id,
+    }.each do |k, v|
+      row.add k, v
+    end
+    ap_entries << row
+  end
+
+  def generate_headers
+        [ 'S. NO.',
+         'Report ID',
+         'Voucher Type',
+         'Period',
+         'Voucher Date',
+         'Description',
+         'Invoice amount',
+         'Invoice Number',
+         'Invoice Date',
+         'Invoice Type',
+         'State',
+         'Supplier GSTN',
+         'Place Of Supply',
+         'Account',
+         'Sub Account',
+         'Department',
+         'Cost Center',
+         'Tax',
+         'Tax Exemption(%)',
+         'Base Amount',
+         'Debit',
+         'Credit',
+         'Comments',
+         'Supplier',
+         'Reference Code',
+         'SAC',
+         'Ref. Invoice No.',
+         'Remarks/Notes/Explanation',
+     ].each do |k|
+       header.add k
+     end
+  end
+
+  def has_tds?(inv)
 
   end
 
-  def get_description(inv)
-    payment_ids = inv.payments&.pluck(:id)&.join(',')
-    "Being Payment made against various Payment IDs #{payment_ids}"
+  def has_gst?(inv)
+
+  end
+
+  def with_tax(items)
+    items.where('sgst > 0 || cgst > 0 || igst > 0')
+  end
+
+  def without_tax(items)
+   items.where('sgst = 0 AND cgst = 0 AND igst = 0')
+  end
+
+
+  def get_description(v_type, inv)
+    case v_type
+    when 'ap'
+      return "Being expenses settled against report ID #{inv.id} of #{inv.created_by.name} with #{inv.created_by.profile.employee_id}"
+    when 'jv'
+      ''
+    end
   end
 
 end
