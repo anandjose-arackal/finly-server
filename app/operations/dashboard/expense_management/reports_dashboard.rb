@@ -3,6 +3,7 @@ class Dashboard::ExpenseManagement::ReportsDashboard < Dashboard::ExpenseManagem
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"reports"}, "page"=>"1", "per_page"=>"30"}
+    params[:view] = get_relevant_view
     self.reports = ::Reports::Index.(user, params)
 
   end

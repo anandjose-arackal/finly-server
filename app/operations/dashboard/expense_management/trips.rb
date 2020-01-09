@@ -3,6 +3,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"trips"}, "page"=>"1", "per_page"=>"30"}
+    params[:view] = get_relevant_view
     self.trips = TravelRequests::Index.(user, params)
 
   end

@@ -2,6 +2,7 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
   attr_accessor :expenses
 
   def init
+    params[:view] = get_relevant_view
     self.expenses = Expense::Index.(user, params)
   end
 

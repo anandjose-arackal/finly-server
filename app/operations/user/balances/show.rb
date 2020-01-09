@@ -201,16 +201,19 @@ class User::Balances::Show < User::Base
       }
     end
     # adding finly money
-    self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
-    self.balances[:finly_money] << {
-        name: "Card Transfer Pocket",
-        type: "card",
-        balance: self.wallet_info[:itz_cash][:balance]
-    }
+    if selected_user.cards.present?
+      self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
+      self.balances[:finly_money] << {
+          name: "Card Transfer Pocket",
+          type: "card",
+          balance: self.wallet_info[:itz_cash][:balance]
+      }
+    end
   end
 
   def set_yes_bank_balances
     if selected_user.vendor_payments_admin? || selected_user.is_bank_payment_request_creditor? || (selected_user.company.bank_reimbursement_enabled? && selected_user.admin?)
+      return if current_app  == 'em' && !user.admin? 
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Bank Transfer Credits",

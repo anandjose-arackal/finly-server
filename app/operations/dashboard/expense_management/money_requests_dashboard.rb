@@ -3,6 +3,7 @@ class Dashboard::ExpenseManagement::MoneyRequestsDashboard < Dashboard::ExpenseM
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"reports"}, "page"=>"1", "per_page"=>"30"}
+    params[:view] = get_relevant_view
     self.money_requests = MoneyRequests::Index.(user, params)
 
   end
