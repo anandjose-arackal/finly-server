@@ -71,6 +71,27 @@ class Bbps::TransactionStatus < Bbps::Api
       ]
   )
 
+  def self.build_matcher(options, result)
+    Dry::Matcher.new(
+        success: Dry::Matcher::Case.new(
+            match: -> (result) {
+              result['response.parsed']&.dig('status') == 'Y'
+            },
+            resolve: -> (result) { handle_success(result) }
+        ),
+        error: Dry::Matcher::Case.new(
+            match: -> (result) {
+              result['response.parsed']&.dig('status') == 'N'
+            },
+            resolve: -> (result) { handle_error(result['response.parsed']) }
+        ),
+        failure: Dry::Matcher::Case.new(
+            match: -> (result) {true},
+            resolve: -> (result) {result}
+        )
+    )
+  end
+
   def message_code
     'B4000'
   end
