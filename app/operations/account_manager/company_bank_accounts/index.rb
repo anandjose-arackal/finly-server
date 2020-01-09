@@ -24,7 +24,8 @@ class AccountManager::CompanyBankAccounts::Index < AccountManager::CompanyBankAc
     all_bank_accounts = [
       {account: user.company.yes_bank_company_account},
       {account: user.company.icici_bank_company_account},
-      {account: user.company.kotak_bank_company_account}
+      {account: user.company.kotak_bank_company_account},
+      {account: user.company.utility_bills_account}
     ]
 
     all_bank_accounts.each do |bank_account|
@@ -37,7 +38,7 @@ class AccountManager::CompanyBankAccounts::Index < AccountManager::CompanyBankAc
 
         if self.balance_requested
           if bank_account[:account].class.name == 'KotakBankCompanyAccount'
-            # todo - kotak : Sending text as balance api is not there | instead of showing 9999999999 its gonna dispaly the test on frontend
+            # todo - kotak : Sending text as balance api is not there | instead of showing 9999999999 its gonna display the test on frontend
             account_data[:balance] = 'Not Available'
           else
             account_data[:balance] = retrieve_balance(bank_account[:account])
@@ -74,6 +75,8 @@ class AccountManager::CompanyBankAccounts::Index < AccountManager::CompanyBankAc
       adapter = AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter.new(user.company.icici_bank_company_account)
     when "KotakBankCompanyAccount"
       adapter = AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
+    when "UtilityBillsAccount"
+      adapter = AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(user.company.utility_bills_account)
     else
       adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
     end

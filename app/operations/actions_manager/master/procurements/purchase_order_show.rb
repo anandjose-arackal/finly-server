@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::Master::Base
 
   register_handle :proc_purchase_order_show
-  validate :input
+  # validate :data_provider
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,

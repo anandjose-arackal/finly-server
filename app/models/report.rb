@@ -38,10 +38,9 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
+#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
-#  location_id                        :integer
-#  cost_center_id                     :integer
 #
 
 class Report < ApplicationRecord
@@ -462,7 +461,8 @@ class Report < ApplicationRecord
       end
     end
     currency_code = options&.dig(:currency_code) || self.base_currency_code
-    precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
+    # precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
+    precision_value(temp_expenses.map {|expense| expense.amount.public_send(currency_code.to_sym)}.compact.sum)
   end
 
   def reimbursable_expenses(options = {})

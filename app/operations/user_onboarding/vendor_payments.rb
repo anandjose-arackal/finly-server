@@ -60,15 +60,15 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
       fields = [:policy, :user, :user_role]
       # params[:unassignable_roles] = self.unassignable_roles.map {|role| fields.zip(role).to_h }
 
-      params[:unassignable_roles] = self.pur_unassignable_roles.map do |role| 
+      params[:unassignable_roles] = self.pur_unassignable_roles.map do |role|
         policy = policies.find {|policy| policy if policy.id == role.first}
         user = users.find {|u| u if u.id == role.second}
         roles = UserRole::VALUES.invert[role.third]
-        pur = [{id: policy&.id, name:policy&.name}, {id: user&.id, email: user&.email}, {id: role.last, name: roles.to_s}]
-        fields.zip(pur).to_h 
+        pur = [{id: policy&.id, name: policy&.name}, {id: user&.id, email: user&.email}, {id: role.last, name: roles.to_s}]
+        fields.zip(pur).to_h
       end
     end
-    
+
     return false if has_errors?
 
   end
@@ -111,7 +111,7 @@ class UserOnboarding::VendorPayments < UserOnboarding::Base
 
   private
 
-  def flow(preprocessor, check=false)
+  def flow(preprocessor, check = false)
     # we are using check since for all vp user, we got create entry in urm and make them initiator, otherwise they can;t login
     # check tells us, to skip error if already made employee but going to give him some other role
     # 

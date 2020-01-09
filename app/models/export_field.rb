@@ -6,7 +6,6 @@
 #  name       :string(255)      not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #
 
 class ExportField < ApplicationRecord
@@ -14,7 +13,7 @@ class ExportField < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
 
-  scope :ordered_by_name, -> { reorder(name: :asc) }
+  scope :ordered_by_name, -> {reorder(name: :asc)}
 
   VALUES = {
       1 => "Employee Name",

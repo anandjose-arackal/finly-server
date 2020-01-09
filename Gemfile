@@ -11,6 +11,10 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'parslet', '~> 1.8.2'
 
+gem 'rufus-scheduler'
+gem 'clockwork'
+gem 'dry-monads', '~> 1.3.0'
+
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
 # gem 'stomp', '~> 1.4.8'
@@ -29,6 +33,22 @@ gem 'devise_zxcvbn', '4.4.1'
 gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
+gem 'dry-validation', '~> 1.3'
+gem 'trailblazer', '~> 2.1'
+gem 'trailblazer-rails', '~> 2.1'
+gem 'trailblazer-activity', '~> 0.1'
+gem 'trailblazer-activity-dsl-linear', '~> 0.2'
+gem 'trailblazer-context', '~> 0.2'
+gem 'trailblazer-operation', '~> 0.6'
+gem 'trailblazer-macro', '~> 2.1'
+gem 'trailblazer-macro-contract', '~> 2.1'
+gem 'trailblazer-developer', '~> 0.0.1'
+gem 'reform', '~> 2.2'
+gem 'reform-rails', '~> 0.1'
+gem 'pundit', '~> 2.1'
+gem 'uuidtools', '~> 2.1'
+gem 'dry-matcher', '~> 0.8'
+
 gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
@@ -36,7 +56,7 @@ gem 'figaro', '~> 1.1.1'
 gem 'puma', '~> 3.12.0'
 
 gem 'resque', '~> 2.0.0'
-
+# gem 'ransack'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
 gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
@@ -74,6 +94,10 @@ gem 'mysql2', '~> 0.5.2'
 
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
+
+gem 'sneakers'
+
+gem 'jwt'
 
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
@@ -161,7 +185,7 @@ gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
 
 # gem for devise authentication
-gem 'devise', '~> 4.7.1'
+gem 'devise', '~> 4.5.0'
 
 gem 'devise_invitable', '~> 1.7.5'
 gem 'doorkeeper', '~> 5.0.2'
@@ -178,8 +202,6 @@ gem 'snowplow-tracker', '~> 0.6.1'
 gem 'maxminddb', '~> 0.1.22'
 gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
-
-gem 'uuidtools', '~> 2.1'
 
 # gem 'logstasher', '~> 1.3.0'
 gem 'lograge', '~> 0.10.0'
@@ -207,7 +229,6 @@ gem 'awesome_print', '~> 1.8.0'
 gem 'fuzzy-string-match', '1.0.1'
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
   gem 'rb-readline'

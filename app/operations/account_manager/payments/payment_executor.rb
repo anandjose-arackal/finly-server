@@ -24,6 +24,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     self.source_account_adapter = retrieve_adapter(payment.initiating_account, self.payment)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
     self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
+
   end
 
   def validate
@@ -129,18 +130,17 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     debit_adapter = nil
     credit_adapter = nil
     case payment.payment_type_id
-      when PaymentType.id_for(:credit)
-        debit_adapter = source_account_adapter
-        credit_adapter = receiving_account_adapter
-      when PaymentType.id_for(:debit)
-        credit_adapter = source_account_adapter
-        debit_adapter = receiving_account_adapter
-      else
-        add_message :error, 'Invalid Payment Type'
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        return
+    when PaymentType.id_for(:credit)
+      debit_adapter = source_account_adapter
+      credit_adapter = receiving_account_adapter
+    when PaymentType.id_for(:debit)
+      credit_adapter = source_account_adapter
+      debit_adapter = receiving_account_adapter
+    else
+      add_message :error, 'Invalid Payment Type'
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      return
     end
-
 
     # Debit funds from account
     unless debit_adapter.blank? or debit_adapter.debit(payment, options)
@@ -155,7 +155,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       debit_adapter.on_failure(payment: self.payment)
       return
     end
-
 
     # Credit funds to account
     unless credit_adapter.blank? or credit_adapter.credit(payment, options)

@@ -138,7 +138,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
   def current_user(doorkeeper_token)
     if doorkeeper_token.present? && doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?("web") || scopes.include?("mobile") || scopes.include?("chrome") || scopes.include?("api") || scopes.include?("admin_bypass")
+      if scopes.include?("web") || scopes.include?("mobile") || scopes.include?("chrome") || scopes.include?("api") || scopes.include?("admin_bypass") || scopes.include?("streamsets")
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])

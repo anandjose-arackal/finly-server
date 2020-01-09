@@ -120,7 +120,7 @@ class Reports::Index < Reports::Base
 
   def post_process
     if self.reports.present?
-      self.reports = self.reports.exclude_deleted.includes(:expenses, :policy, :status) rescue self.reports
+      self.reports = self.reports.exclude_deleted.includes(:policy, :status, expenses: [:amount]) rescue self.reports
     end
     if params[:ref] == '1' and params[:n_id].present?
       Event::EReport::Unset.(user, params)
@@ -175,7 +175,7 @@ class Reports::Index < Reports::Base
     end
 
     def get_counts
-      type_counts = reports.group(:report_status_id)
+      type_counts = reports.group(:report_status_id).count
       self.counts = {}
       counts[:open] = (type_counts[ReportStatus.open_id] or 0)
       counts[:processing] = (type_counts[ReportStatus.processing_id] or 0)

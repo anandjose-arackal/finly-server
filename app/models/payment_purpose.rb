@@ -6,7 +6,6 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #
 
 class PaymentPurpose < ApplicationRecord
@@ -53,7 +52,8 @@ class PaymentPurpose < ApplicationRecord
         :collect_funds_withdrawal,
         :settlement_against_advance,
         :advance_against_purchase_order,
-        :account_number_check
+        :account_number_check,
+        :utility_bill_payment,
     ]
   end
 

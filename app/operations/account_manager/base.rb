@@ -32,6 +32,10 @@ class AccountManager::Base < BackgroundOperation
       when 'UserPocket'
         op = AccountManager::UserPockets::UserPocketsAdapter.new(account, payment)
         return op.pockets_adapter
+      when 'UtilityBillsAccount'
+        return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(account, payment)
+      when 'BbpsBiller'
+        return AccountManager::BbpsBiller::BbpsPaymentsAdapter.new(account, payment)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

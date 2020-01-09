@@ -13,8 +13,8 @@
 #  dependent_parent_id    :integer
 #  dependent_parent_type  :string(255)
 #  field_key              :string(255)
+#  company_id             :integer
 #  configured_field_value :text(65535)
-#  deleted_at             :datetime
 #
 
 class CustomField < ApplicationRecord
@@ -244,8 +244,8 @@ class CustomField < ApplicationRecord
 
   def report_mailer_show
     {
-      label: field_configuration.field_name,
-      value: self.value
+        label: field_configuration.field_name,
+        value: self.value
     }
   end
 

@@ -6,8 +6,6 @@
 #  name                    :string(255)      not null
 #  export_type             :string(255)
 #  created_by_id           :integer
-#  company_id              :bigint           not null
-#  request_params          :text(4294967295)
 #  completed_at            :datetime
 #  total_records           :integer
 #  completed_records       :integer
@@ -19,9 +17,13 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  status_id               :integer          not null
+#  company_id              :bigint           not null
+#  request_params          :text(4294967295)
 #  deleted_at              :datetime
 #  master                  :string(255)
 #  description             :string(255)
+#  processing_record_type  :string(255)
+#  processing_record_id    :bigint
 #  record_type             :string(255)
 #  record_id               :bigint
 #  crash_stacktrace        :text(65535)
@@ -39,7 +41,7 @@ class ExportJob < ApplicationRecord
   has_attached_file :attachment, :use_timestamp => false
   do_not_validate_attachment_file_type :attachment
 
-  scope :created_after, -> (datetime) { where 'created_at > ?', datetime}
+  scope :created_after, -> (datetime) {where 'created_at > ?', datetime}
 
   serialize :request_params, JSON
 
@@ -61,7 +63,14 @@ class ExportJob < ApplicationRecord
     status_id == ExportJobStatus.id_for(:failed)
   end
 
-  def as_json(options={})
+  def retry
+    return false unless failed?
+
+    ExportManager::DSL::Generator::Background.call_async(user, {export_job_id:self.id})
+    true
+  end
+
+  def as_json(options = {})
     {
         id: id,
         name: name,

@@ -1,0 +1,2 @@
+module Streamsets::AccountingHelper
+end

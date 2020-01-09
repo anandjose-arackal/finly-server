@@ -66,11 +66,14 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
-#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
+#  discount_type_id             :integer
 #  rejection_note               :text(65535)
+#  vendor_poc_id                :integer
+#  vlpm_id                      :integer
+#  vendor_note                  :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -438,7 +441,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_po_approver_id, -> (approver_id){
+  scope :filter_po_approver_id, -> (approver_id) {
     if approver_id.present?
       ids = self.awaiting_action_items(approver_id)&.pluck(:id)
       where(id: ids)

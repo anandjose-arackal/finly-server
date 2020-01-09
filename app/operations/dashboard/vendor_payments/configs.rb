@@ -6,18 +6,18 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
     self.policies = Policy::VendorPayments::Index.(user, params).policies
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.request_types = {
-      awaiting_action: false,
-      payment_tickets: false,
-      purchase_requests: false,
-      purchase_orders: false,
-      non_po_invoices: false,
-      po_invoices: false,
-      budgets: false,
-      po_advances: false,
-      grns: false,
-      vendors: false,
-      payment_agreements: false,
-      approved_purchase_request_items: false
+        awaiting_action: false,
+        payment_tickets: false,
+        purchase_requests: false,
+        purchase_orders: false,
+        non_po_invoices: false,
+        po_invoices: false,
+        budgets: false,
+        po_advances: false,
+        grns: false,
+        vendors: false,
+        payment_agreements: false,
+        approved_purchase_request_items: false
     }
 
     reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
