@@ -157,12 +157,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def settlements
     return nil unless user.finance_manager? || user.admin?
-    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance_manager"}'}
   end
 
   def team_settlements
     return nil unless user.finance_manager?
-    {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance", "main_tab": "team"}'}
+    {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance_manager", "main_tab": "team"}'}
   end
 
   def company_settlements
@@ -176,8 +176,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_exports
-    return nil unless user.manager? || user.admin? || user.finance_manager?
-    {name: 'Export', id: 'team', url: 'export/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.finance_manager?
+    {name: 'Export', id: 'team', url: 'export/params={"view":"finance_manager", "main_tab": "team"}'}
   end
 
   def company_exports
