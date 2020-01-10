@@ -127,7 +127,12 @@ json.result do
     #   end
     # end
 
-    json.custom_fields expense.custom_fields.map {|cf| {name: cf.field_configuration.field_name, value: cf.string_value}}
+    custom_fields = expense.custom_fields.map {|cf| {name: cf.field_configuration.field_name, value: cf.string_value}}
+    json.custom_fields custom_fields
+
+    custom_fields.each do |custom_field|
+      json.set! custom_field[:name], custom_field[:value]
+    end
 
     json.system_messages do
       json.array!(expense.system_messages.pluck(:content))
