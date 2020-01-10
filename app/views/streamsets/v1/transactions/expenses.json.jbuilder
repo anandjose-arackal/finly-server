@@ -4,7 +4,12 @@ json.result do
                   :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                   :expense_tax_type_id
     json.created_at expense.created_at.strftime("%d-%b-%Y")
+    json.updated_at expense.updated_at&.strftime("%Y:%m:%d %H:%M:%S")
     json.user expense.user
+    json.user_employee_id expense.user&.profile&.employee_id
+    json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
+    json.expense_type expense.expense_type&.name
+    
     json.usage_dates do
       json.type expense.usage_date_type
       json.start DateUtils.date_formatted expense.usage_date_start
@@ -12,8 +17,8 @@ json.result do
     end
 
     json.parent_category do
-      json.id expense.category&.parent.id
-      json.name expense.category&.parent.name
+      json.id expense.category&.parent&.id
+      json.name expense.category&.parent&.name
       json.gl_code expense.category&.gl_code
     end
 
@@ -71,6 +76,7 @@ json.result do
       json.partial! 'shared/amount', amount: expense.base_amount
     end
 
+  # flag to show whether a particular expense has been converted or not
     json.converted expense.converted?
     json.conversion_rate expense.conversion_rate
 
@@ -78,13 +84,16 @@ json.result do
       json.original_merchant_name expense.card_expense&.card_transaction&.merchant_name
     end
 
-# flag to show whether a particular expense has been converted or not
-    json.converted @result.converted
+    json.parent_department do
+      json.code expense.user&.department&.department_code
+      json.id expense.user&.department&.id
+      json.name expense.user.department&.name
+    end
 
-    json.per_diems @result.per_diems do |per_diem|
-      json.id per_diem.id
-      json.name "#{per_diem.configurable.name} - #{per_diem.name}"
-      json.rate_value per_diem.rate_value
+    json.parent_cost_center do
+      json.code expense.user&.cost_center&.cost_center_code
+      json.id expense.user&.cost_center&.id
+      json.name expense.user&.cost_center&.name
     end
 
     json.receipts expense.receipts do |receipt|
@@ -102,21 +111,23 @@ json.result do
     json.cancellable expense.cancellable?
     json.cancelled expense.cancelled?
 
-    json.custom_fields do
-      expense = expense
-      case expense.expense_type_id
-      when ExpenseType.id_for(:manual)
-        json.array! expense.manual_expense.custom_fields
-      when ExpenseType.id_for(:card)
-        json.array! expense.card_expense.custom_fields
-      when ExpenseType.id_for(:distance)
-        json.array! expense.distance_expense.custom_fields
-      when ExpenseType.id_for(:time)
-        json.array! expense.time_expense.custom_fields
-      when ExpenseType.id_for(:per_diem)
-        json.array! expense.per_diem_expense.custom_fields
-      end
-    end
+    # json.custom_fields do
+    #   expense = expense
+    #   case expense.expense_type_id
+    #   when ExpenseType.id_for(:manual)
+    #     json.array! expense.manual_expense.custom_fields
+    #   when ExpenseType.id_for(:card)
+    #     json.array! expense.card_expense.custom_fields
+    #   when ExpenseType.id_for(:distance)
+    #     json.array! expense.distance_expense.custom_fields
+    #   when ExpenseType.id_for(:time)
+    #     json.array! expense.time_expense.custom_fields
+    #   when ExpenseType.id_for(:per_diem)
+    #     json.array! expense.per_diem_expense.custom_fields
+    #   end
+    # end
+
+    json.custom_fields expense.custom_fields.map {|cf| {name: cf.field_configuration.field_name, value: cf.string_value}}
 
     json.system_messages do
       json.array!(expense.system_messages.pluck(:content))
@@ -151,6 +162,9 @@ json.result do
 
 # Tax details for this expense
     json.tax_details do
+      gst_applicable = expense.category&.gst_applicable
+      json.gst_applicable gst_applicable
+      json.expense_tax_type (gst_applicable ? expense.expense_tax_type&.name&.humanize : '')
       json.merchant_gstin expense.gstin_location&.gstin
       json.merchant_state_id expense.gstin_location&.state_id
       json.merchant_registered_name expense.gstin_location&.gstin_master&.legal_name_of_business
@@ -161,6 +175,17 @@ json.result do
       json.state_of_expense_id expense.state_of_expense_id
       json.tax_rate_id expense.tax_rate_id
       json.gstin_location_id expense.gstin_location_id
+      json.gst_percentage (gst_applicable ? expense.gst_percentage : nil)
+      json.gst_type (gst_applicable ? expense.gst_type&.name&.humanize&.upcase : nil)
+      json.gst_amount (gst_applicable ? expense.gst_amount&.value&.round(2) : nil)
+      json.igst_amount (gst_applicable ? (expense.gst_type&.name == 'igst' ? expense.gst_amount&.value : nil) : nil)
+      json.cgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : nil) : nil) rescue nil)
+      json.sgst_amount ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : nil) : nil) rescue nil)
+      json.net_total_amount (gst_applicable ? ((expense.amount&.value || 0) - (expense.gst_amount&.value&.round(2) || 0))&.round(2) : expense.amount&.value)
+      json.gst_location (gst_applicable ? expense.gstin_location&.location : '')
+      json.merchant_state (gst_applicable ? expense.gstin_location&.state&.name : '')
+      json.state_of_expense (gst_applicable ? expense.state_of_expense&.name : '')
+      json.tax_rate (gst_applicable ? expense.tax_rate&.rate&.to_f : '')
     end
 
     # report details
@@ -169,6 +194,10 @@ json.result do
     json.report_created_at expense.report&.created_at&.strftime("%d-%b-%Y")
     json.report_note expense.report.memo
 
+
+    # exxtra fields
+    fm = expense.report.policy.policy_user_roles.where(user_role_id: 2).first&.user
+    json.finance_manager "#{fm&.first_name} #{fm&.last_name}"
   end
 end
 json.count @result.expenses.count

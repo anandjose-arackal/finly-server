@@ -6,19 +6,19 @@ class Streamsets::Transactions::Expenses < BaseOperation
   end
 
   def init
-  	op = Report::Index.(current_user, params)
+  	op = ::Reports::Index.(user, params)
   	if op.failure?
   		add_message :error, op.messages[:error]
   		return
   	end
-  	reports = op.reports.where(created_at: (Time.zone.yesterday.beginning_of_day)..(Time.zone.yesterday.end_of_day))
-  	self.expenses = Expense.where(company_id: user.company_id, report_id: reports.pluck(:id))
+  	reports = op.reports.where(report_status_id: ReportStatus.ids_for([:approved, :auto_approved, :settlement_confirmed, :closed, :settled]))
+  	self.expenses = Expense.where(report_id: reports.pluck(:id)).include_details
 
   end
 
   def success
   	params[:expenses] = self.expenses
-  	Streamsets::Transactions::Expenses.new(user, params, messages)
+  	Streamsets::Transactions::ExpensesPresenter.new(user, params, messages)
   end
 
   class Streamsets::Transactions::ExpensesPresenter < BaseOperation::BasePresenter::SuccessPresenter

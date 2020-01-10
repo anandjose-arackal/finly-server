@@ -1,7 +1,7 @@
 class Streamsets::V1::TransactionsController < BaseControllers::StreamsetsBase
 
   def expenses
-    @result = Report::Index.(current_user, params)
+    @result = Streamsets::Transactions::Expenses.(current_user, params)
     respond
   end
 
