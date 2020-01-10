@@ -1,4 +1,4 @@
-class CreateOlapFactsSpendDocuments < ActiveRecord::Migration[5.2]
+class CreateOlapFactsSpendTransactions < ActiveRecord::Migration[5.2]
   def change
     create_table :olap_facts_spend_transactions do |t|
       t.olap_references
