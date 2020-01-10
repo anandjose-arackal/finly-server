@@ -3,30 +3,24 @@ json.result do
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
                   :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                   :expense_tax_type_id
+    json.created_at expense.created_at.strftime("%d-%b-%Y")
     json.user expense.user
     json.usage_dates do
       json.type expense.usage_date_type
       json.start DateUtils.date_formatted expense.usage_date_start
       json.end DateUtils.date_formatted expense.usage_date_end
     end
-    if expense.category.parent.present?
-      json.parent_category do
-        json.id expense.category.parent.id
-        json.name expense.category.parent.name
-        json.gl_code expense.category.gl_code
-      end
+
+    json.parent_category do
+      json.id expense.category&.parent.id
+      json.name expense.category&.parent.name
+      json.gl_code expense.category&.gl_code
     end
 
-    if expense.spent_from.present?
-      json.pocket do
-        json.name expense.spent_from&.name
-        json.id expense.spent_from&.id
-        json.balance expense.spent_from&.name
-      end
-    end
-
-    if expense.report.present?
-      json.report_id expense.report_id
+    json.pocket do
+      json.name expense.spent_from&.name
+      json.id expense.spent_from&.id
+      json.balance expense.spent_from&.name
     end
 
     json.distance do
@@ -170,7 +164,10 @@ json.result do
     end
 
     # report details
-    json.report_approved_at expense.report.approved_at&.strftime("%d-%b-%Y")
+    json.report_id expense.report_id
+    json.report_approved_at expense.report&.approved_at&.strftime("%d-%b-%Y")
+    json.report_created_at expense.report&.created_at&.strftime("%d-%b-%Y")
+    json.report_note expense.report.memo
 
   end
 end
