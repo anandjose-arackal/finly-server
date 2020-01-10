@@ -1029,7 +1029,7 @@ class Payment < ApplicationRecord
       gst_type_id: { value: self.parent.gst_type_id, editable: false },
       payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
       balance_due:{ value: self.parent.balance_due&.value, editable: false }, # Invoice AMOUNT
-      available_credits: { value: self.parent.available_credits, editable: false }
+      available_credits: available_credits_amount
     }
   end
 
@@ -1108,5 +1108,10 @@ class Payment < ApplicationRecord
       configurations = initiating_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
       custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
+  end
+
+  def available_credits_amount
+    adj_amount =  self.parent.credit_note_adjustments.joins(:amount).pluck('amounts.value').sum rescue nil
+    precision_value(adj_amount)
   end
 end
