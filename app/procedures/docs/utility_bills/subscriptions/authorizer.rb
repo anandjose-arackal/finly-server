@@ -19,7 +19,15 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def index?
-    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer) || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)))
+    @user.vendor_payment_admin? ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor))
   end
 
   def show?
