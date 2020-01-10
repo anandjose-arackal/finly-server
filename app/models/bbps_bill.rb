@@ -77,7 +77,7 @@ class BbpsBill < ApplicationRecord
 
   accepts_nested_attributes_for :amount
 
-  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
+  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, to: :status
   delegate :amount_value, to: :amount
 
   default_scope {order('bbps_bills.created_at DESC')}
@@ -108,6 +108,10 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:failed))
     when 'payment_ticket_created', :payment_ticket_created
       where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
+    when 'payment_initiated', :payment_initiated
+      where(status_id: BbpsBillStatus.id_for(:payment_initiated))
+    when 'payment_ticket_deleted', :payment_ticket_deleted
+      where(status_id: BbpsBillStatus.id_for(:payment_ticket_deleted))
     else
       # do nothing
     end
@@ -323,6 +327,10 @@ class BbpsBill < ApplicationRecord
   def self.role_based_associated_status_ids(user)
     self.status_ids(*self.role_based_statuses(user))
     # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
+  end
+
+  def self.open_status_ids(user)
+    []
   end
 
   def self.role_based_statuses(user)

@@ -5052,6 +5052,7 @@ Rails.application.routes.draw do
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
+  get 'autocomplete/employees'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'

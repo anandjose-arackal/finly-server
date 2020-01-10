@@ -70,17 +70,17 @@ class Navbar::Master::Base
   end
 
   def load_company_balance
-    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
+    return nil unless RequestStoreUtil.current_user.company_admin? || RequestStoreUtil.current_user.finance_manager?
     {name: 'Load Company Balance', id: 'load-company-balance', url: '#load-company-balance'}
   end
 
   def statements
-    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
+    return nil unless RequestStoreUtil.current_user.company_admin?
     {name: 'Statements', id: 'statements', url: '#statements'}
   end
 
   def organization_account
-    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
+    return nil unless RequestStoreUtil.current_user.company_admin?
     {name: 'Organization Account', id: 'organization_account', url: '#organization_account'}
   end
 
@@ -105,7 +105,7 @@ class Navbar::Master::Base
   end
 
   def finly_insights
-    return nil unless RequestStoreUtil.current_company.feature_subscription.budgeting_system # && RequestStoreUtil.current_user.is_budget_manager?
+    return nil unless RequestStoreUtil.current_company.feature_subscription.budgeting_system  && RequestStoreUtil.current_user.is_budget_manager?
     {name: 'Finly Insights', id: 'insights', url: '/insights'}
   end
 

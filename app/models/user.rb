@@ -1596,6 +1596,12 @@ class User < ApplicationRecord
 
   # ************ User Role for vendor payments ******************
 
+  # ************ User Role for expense management ************
+    def is_travel_manager?(document=nil)
+      self.has_policy_role?(UserRole.id_for(:travel_manager), document)
+    end
+  # ************ User Role for expense management ************
+
   def relevant
     {
         email: self.email,
