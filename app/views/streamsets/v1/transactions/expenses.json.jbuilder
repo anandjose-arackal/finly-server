@@ -13,6 +13,7 @@ json.result do
       json.parent_category do
         json.id expense.category.parent.id
         json.name expense.category.parent.name
+        json.gl_code expense.category.gl_code
       end
     end
 
@@ -167,6 +168,10 @@ json.result do
       json.tax_rate_id expense.tax_rate_id
       json.gstin_location_id expense.gstin_location_id
     end
+
+    # report details
+    json.report_approved_at expense.report.approved_at&.strftime("%d-%b-%Y")
+
   end
 end
-json.count @result.count
+json.count @result.expenses.count
