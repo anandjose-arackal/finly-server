@@ -53,7 +53,6 @@ class LogGenerator
   def log!(type: :info)
     return unless data.present?
 
-    debugger
     self.class.logger(filename).send(type, data)
   end
 
