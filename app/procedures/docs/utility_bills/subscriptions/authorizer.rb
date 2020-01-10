@@ -31,7 +31,16 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def show?
-    (@user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc? || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) && (@model.company_id == @user.company_id))
+    (@model.company_id == @user.company_id) &&
+        @user.vendor_payment_admin? ||
+        @model.user_id == @user.id ||
+        reviewing_user? ||
+        poc? ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def reject?
