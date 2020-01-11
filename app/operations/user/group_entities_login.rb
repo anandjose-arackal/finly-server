@@ -32,18 +32,18 @@ class User::GroupEntitiesLogin < User::Base
         return
       end
       unless user&.valid_password?(params[:password])
-        add_message :error, 'Invalid Username or Password'
+        add_message :error, 'The email / mobile or password you entered is incorrect'
         return
       end
     end
 
     if user.blank?
-      add_message :error, "User not found"
+      add_message :error, "The email / mobile or password you entered is incorrect"
       return
     end
 
     if self.company.blank?
-      add_message :error, "Company not found"
+      add_message :error, "The email / mobile or password you entered is incorrect"
       return
     end
 
