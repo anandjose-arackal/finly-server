@@ -37,7 +37,7 @@ class User::GroupEntities < User::Base
   end
 
   def process
-    group_companies = self.group.companies
+    group_companies = self.group.companies.where(status_id: CompanyStatus.ids_for(:active, :partial_block, :deactivated, :hidden))
     users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
     self.companies = Company.with_id(users.pluck(:company_id))
   end
