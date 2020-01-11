@@ -1,23 +1,23 @@
 class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
 
   property :id
-  property :bbps_biller_id, presence: true
-  property :name, presence: true
+  property :bbps_biller_id, validates: {presence: true}
+  property :name, validates: {presence: true}
   property :company_id
   property :sequence_id
-  property :mobile_number, presence: true
+  property :mobile_number, validates: {presence: true}
 
   property :department_id
   property :cost_center_id
   property :location_id
-  property :policy_id, presence: true
+  property :policy_id, validates: {presence: true}
 
   property :category_id
   property :tax_rate_id
   property :hsn_sac
 
   property :note
-  property :user_id, presence: true
+  property :user_id, validates: {presence: true}
   property :active
 
   property :agreement_id
@@ -30,8 +30,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :customer_aadhar_number
 
   collection :subscription_pocs, populator: :subscription_pocs! do
-    property :user_id, presence: true
+    property :user_id, validates: {presence: true}
     property :subscription_id
+    property :_destroy, virtual: true
   end
 
   property :fetch_requirement
@@ -39,7 +40,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :auto_generate_bill
 
   # collection :subscription_pocs, populate_if_empty: BbpsSubscriptionPoc do
-  #   property :user_id, presence: true
+  #   property :user_id, validates: {presence: true}
   #   property :subscription_id
   # end
 
@@ -60,23 +61,15 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :customer_param_key_5
   property :customer_param_value_5
 
-  # collection :customer_fields, populator: :customer_fields! do
-  #   property :subscription_id, presence: true
-  #   property :label, presence: true
-  #   property :value, presence: true
-  # end
-
-  # collection :document_reviewer_mappings, virtual: true, populator: :document_reviewer_mappings! do
-  #   property :level_id, presence: true
-  #   property :reviewer_id
-  # end
-
-  # validates :expected_due_day inclusion: { in: (1..31).to_a,
-  #                                             message: "%{value} is not a valid day" }
-
   validate :company_entities # Checks for departments
   # validate :related_entities # Checks for associated agreements, users provided inside pocs
   validate :validate_customer_params
+
+  validate :poc_presence
+
+  def poc_presence
+    errors.add(:subscription_pocs, "You need to provide at least One POC") if subscription_pocs.blank?
+  end
 
   # validate :company_specific_entities
 
@@ -91,10 +84,6 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
       errors.add(:agreement_id, "Invalid Agreement Details") unless current_user.company.payment_agreements.find_by(id: agreement_id).present?
     end
   end
-
-  # def related_entities
-  #
-  # end
 
 
   def validate_customer_params
@@ -215,14 +204,17 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     item = subscription_pocs.find {|subscription_poc| subscription_poc.id.to_s == fragment["id"].to_s}
     # item = (BbpsSubscriptionPoc.find_by(id: fragment["id"]) || BbpsSubscriptionPoc.new) if validate_or_assign_role(fragment)
 
-    validate_or_assign_role(fragment)
-
     if fragment["_destroy"]
-      subscription_pocs.delete(item)
+      subscription_pocs.destroy(item)
       return skip!
     end
 
-    item ? subscription_pocs.insert(index, item.model) : subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
+    validate_or_assign_role(fragment)
+
+
+    item || subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
+
+      # item ? subscription_pocs.insert(index, item.model) : subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
   end
 
   def validate_or_assign_role(params)

@@ -69,7 +69,7 @@ class VirtualBankAccount < ApplicationRecord
 
   validates :purpose, presence: true
   validates :receiving_account_id, presence: true
-  validates :receiving_account_type, presence: true, :inclusion => {:in => [YesBankCompanyAccount.name, VendorPaymentWallet.name, CashOnHand.name]}
+  validates :receiving_account_type, presence: true, :inclusion => {:in => [YesBankCompanyAccount.name, VendorPaymentWallet.name, CashOnHand.name, UtilityBillsAccount.name]}
 
   scope :cash_on_hand_returns, -> { where purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return) }
   scope :payment_receivables, -> { where purpose_id: VirtualAccountPurpose.id_for(:payment_receivable) }

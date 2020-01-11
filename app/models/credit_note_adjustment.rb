@@ -44,7 +44,6 @@ class CreditNoteAdjustment < ApplicationRecord
   end
 
   def calculate_adjustable_amount
-    # debugger
     # if self.invoice_id.blank?
     if credit_note.previously_adjusted_amount.present?
       previously_adjusted_amount = credit_note.previously_adjusted_amount.value

@@ -18,8 +18,10 @@ module TrailblazerErrorTracker
     unless type
       messages = {
           success: (messages(:success)&.values&.flatten || []),
-          errors: (messages(:errors)&.values&.flatten || []),
-          errors_meta: (messages(:errors) || [])
+          # errors: (messages(:errors)&.values&.flatten || []),
+          errors: errors&.values&.flatten || [],
+          # errors_meta: (messages(:errors) || [])
+          errors_meta: errors || {}
       }
       return messages
     end
@@ -39,3 +41,4 @@ module TrailblazerErrorTracker
   end
 end
 Trailblazer::Operation::Result.include TrailblazerErrorTracker
+Trailblazer::Operation::Railway::Result.include TrailblazerErrorTracker

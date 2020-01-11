@@ -108,7 +108,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
           '',
           ((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(po) : ''),
           item&.cgst,
-          ((item&.sgst.present? && item&.sgst  > 0) ? get_sgst_ledger(po) : ''),
+          ((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(po) : ''),
           item&.sgst,
           ((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(po) : ''),
           item.igst,

@@ -80,3 +80,4 @@ config/sidekiq.yml
 .ruby-version
 
 public/tmp
+config/integrations.yml

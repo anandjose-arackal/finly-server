@@ -34,6 +34,9 @@
 #  otp_attempts                 :integer
 #  otp_count                    :integer
 #  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -265,7 +268,7 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,{receiving_account: :account_owner},:initiating_user,{amount: :currency},
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
   invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
@@ -335,7 +338,7 @@ class BankPaymentRequest < ApplicationRecord
   #   end
   # }
 
-  scope :filter_payment_ids, -> (payment_ids){
+  scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
     if payment_ids.present?
       joins(payment_order: :payments).where("payments.id IN (?)", payment_ids)

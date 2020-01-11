@@ -19,6 +19,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
   })
 
   attr_accessor :providers, :total_count, :headings
+
   def valid_request
 
   end
@@ -35,7 +36,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
   def contents
     contents = {}
     self.headings = {}
-    providers =%w(
+    providers = %w(
              ReportProvider
              MoneyRequestProvider
              TravelRequestProvider
@@ -54,7 +55,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
       if %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider).include?(provider)
         policies.each do |policy|
           users = policy.users.includes(:profile)
-          levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings:[reviewer: :profile]},{level_reviewer_mappings:[reviewer: :profile]}).order(level_number: :asc)
+          levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings: [reviewer: :profile]}, {level_reviewer_mappings: [reviewer: :profile]}).order(level_number: :asc)
           users.each do |emp|
             policy_details = {"Policy" => policy.name}
             policy_details["Employee ID"] = "#{emp.profile&.employee_id}"
@@ -65,22 +66,22 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
               if mappings.empty?
                 mappings = level.level_reviewer_mappings.non_deleted
               end
-                reviewer_count = 1
-                mappings.each do |mapping|
-                  key = "level #{level.level_number}_reviewer#{reviewer_count}"
-                  policy_details["#{key}employee_id"] = mapping.reviewer&.profile&.employee_id
-                  policy_details["#{key}name"] = mapping.reviewer&.name
-                  policy_details["#{key}mobile_number"] = mapping.reviewer&.mobile_number
-                  policy_details["#{key}email"] = mapping.reviewer&.email
-                  reviewer_count+=1
-                end
+              reviewer_count = 1
+              mappings.each do |mapping|
+                key = "level #{level.level_number}_reviewer#{reviewer_count}"
+                policy_details["#{key}employee_id"] = mapping.reviewer&.profile&.employee_id
+                policy_details["#{key}name"] = mapping.reviewer&.name
+                policy_details["#{key}mobile_number"] = mapping.reviewer&.mobile_number
+                policy_details["#{key}email"] = mapping.reviewer&.email
+                reviewer_count += 1
+              end
             end
             result_hash << policy_details
           end
         end
       end
-      all_header_key = result_hash.map{|hash| hash.keys}.flatten.uniq.sort
-      all_header_key.map{|keys| self.headings[provider] << keys.humanize}
+      all_header_key = result_hash.map {|hash| hash.keys}.flatten.uniq.sort
+      all_header_key.map {|keys| self.headings[provider] << keys.humanize}
       contents[provider] = convert_hash_to_result_array(all_header_key, result_hash)
     end
     contents
@@ -88,11 +89,11 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
 
   def export(headers, contents)
     file = Tempfile.new(['effective_approval_export', '.xlsx'])
-    workbook  = ::WriteXLSX.new(file)
-    contents.each  do |name, sheet|
+    workbook = ::WriteXLSX.new(file)
+    contents.each do |name, sheet|
       worksheet = workbook.add_worksheet(name)
       headers[name].each_with_index do |item, index|
-        worksheet.write( 0, index, item )
+        worksheet.write(0, index, item)
       end
       sheet.each_with_index do |items, row|
         items.each_with_index do |item, column|
@@ -108,12 +109,12 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
   end
 
   def convert_hash_to_result_array(headers_key, result_hash)
-    data=[]
+    data = []
     result_hash.each do |result|
-       row=[]
-       headers_key.each do |key|
-         row << (result[key].present? ? result[key] : '')
-       end
+      row = []
+      headers_key.each do |key|
+        row << (result[key].present? ? result[key] : '')
+      end
       data << row
     end
     data

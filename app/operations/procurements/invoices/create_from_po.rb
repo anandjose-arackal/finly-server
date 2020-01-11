@@ -267,7 +267,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id#,
+          purchase_order_item_id: item.id #,
           # billable_amount_attributes: {
           #     value: get_billable_amount(item),
           #     currency_id: 1

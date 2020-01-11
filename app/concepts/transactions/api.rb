@@ -37,10 +37,7 @@ class Transactions::API < Trailblazer::Operation
 
   class Transactions::API::Background < Transactions::API
     # include Trailblazer::Operation::Worker
-
     # Todo
-
-
   end
 
 end

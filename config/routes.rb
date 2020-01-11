@@ -60,6 +60,7 @@
 #                                    user_password_expired GET    /users/password_expired(.:format)                                                                                   devise/password_expired#show
 #                                                          PATCH  /users/password_expired(.:format)                                                                                   devise/password_expired#update
 #                                                          PUT    /users/password_expired(.:format)                                                                                   devise/password_expired#update
+#                                      users_saml_validate POST   /users/saml/validate(.:format)                                                                                      users#saml_validator
 #                                       users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       single_sign_on#saml
 #                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#create
 #                                        users_saml_logout DELETE /users/saml/logout(.:format)                                                                                        single_sign_on#saml_logout
@@ -4307,6 +4308,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
 
+  post 'users/saml/validate', to: 'users#saml_validator'
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
   post 'users/saml/auth', to: 'single_sign_on#create'
   delete 'users/saml/logout', to: 'single_sign_on#saml_logout'
@@ -4464,6 +4466,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
@@ -5019,6 +5022,8 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  # get 'exports/:type', to: 'export#processor'
+
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
@@ -5047,6 +5052,7 @@ Rails.application.routes.draw do
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
+  get 'autocomplete/employees'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
@@ -5756,6 +5762,17 @@ Rails.application.routes.draw do
   get 'exports/:type', to: 'export_jobs#create'
   post 'exports/:type', to: 'export_jobs#create'
   resources :export_jobs, only: [:index]
+  get 'maps/config/:type', to: 'google_maps#maps_config'
+
+  scope :streamsets do
+    scope :v1 do
+      post 'auth', to: 'streamsets/v1/token#create'
+      get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+      get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
+      get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
+    end
+  end
+
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
@@ -5773,6 +5790,7 @@ Rails.application.routes.draw do
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
+      put 'update_and_submit', to: 'subscriptions#update_and_submit'
       patch 'add_bill', to: 'subscriptions#add_bill'
       get 'fetch_bill', to: 'subscriptions#fetch_bill'
     end
@@ -5783,7 +5801,10 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      get 'transaction_status', to: 'bills#transaction_status'
+      put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
+      get 'download_receipt', to: 'bills#download_receipt'
     end
 
     resources :complaints

@@ -41,7 +41,7 @@ class ExportJob < ApplicationRecord
   has_attached_file :attachment, :use_timestamp => false
   do_not_validate_attachment_file_type :attachment
 
-  scope :created_after, -> (datetime) { where 'created_at > ?', datetime}
+  scope :created_after, -> (datetime) {where 'created_at > ?', datetime}
 
   serialize :request_params, JSON
 
@@ -63,7 +63,14 @@ class ExportJob < ApplicationRecord
     status_id == ExportJobStatus.id_for(:failed)
   end
 
-  def as_json(options={})
+  def retry
+    return false unless failed?
+
+    ExportManager::DSL::Generator::Background.call_async(created_by, {export_job_id:self.id})
+    true
+  end
+
+  def as_json(options = {})
     {
         id: id,
         name: name,

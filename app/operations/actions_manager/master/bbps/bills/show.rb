@@ -3,9 +3,9 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
+  register_actions [:update_and_submit, :submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
                     :return_control, :destroy, :view_payment_ticket, :raise_dispute,
-                    :bill_validate]
+                    :bill_validate, :download_receipt, :transaction_status]
 
   def initialize(user = nil, params = {})
     super
@@ -19,8 +19,12 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
     end
   end
 
+  def update_and_submit
+    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && bbps_bill.autofetched
+  end
+
   def submit
-    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
+    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && !bbps_bill.autofetched
   end
 
   def edit
@@ -64,8 +68,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   # end
 
   def destroy
-    !bbps_bill.autofetched && ((BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)) ||
-        (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user)) || user.vendor_payment_admin?)
+    !bbps_bill.autofetched && (BbpsBill.open_statuses.include?(bbps_bill.status_id) && (bbps_bill.subscription.pocs.include?(user) || user.vendor_payment_admin?))
   end
 
   def raise_dispute
@@ -79,7 +82,14 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def bill_validate
-    bbps_bill.bill_validation_required?
+    bbps_bill.bill_validation_required? && (bbps_bill.subscription.user_id == user.id || bbps_bill.subscription.pocs.include?(user) || bbps_bill.get_reviewers.include?(user))
   end
 
+  def download_receipt
+    BbpsBill.status_ids(:failed, :paid).include?(bbps_bill.status_id)
+  end
+
+  def transaction_status
+    BbpsBill.status_ids(:payment_initiated, :paid, :failed).include?(bbps_bill.status_id)
+  end
 end

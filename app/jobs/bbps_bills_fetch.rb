@@ -34,15 +34,25 @@ class BbpsBillsFetch < ApplicationJob
       bill_period = result.bill_period
       bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
 
+      return if result.ref_no.blank?
+
       # Do not create bill if bill for same year and period exists
-      return if bill.present?
+      # Update bill's reference number
+      if bill.present?
+        bill.update(order_number: result.ref_no, order_number_type: "BillFetch")
+        return
+      end
+
+      bill_period = result.bill_period
+
+      bill_period = Date.today.strftime("%B").upcase if bill_period == "NA"
 
       params = {
           amount: (result.amount.to_f / 100),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,
-          bill_period: result.bill_period,
+          bill_period: bill_period,
           convenience_fee: get_amount_from_response(result.convenience_fee),
           convenience_fee_desc: result.convenience_fee_desc,
           early_payment_fee: get_amount_from_response(result.early_payment_fee),

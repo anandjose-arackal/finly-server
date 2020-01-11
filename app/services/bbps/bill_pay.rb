@@ -168,6 +168,14 @@ class Bbps::BillPay < Bbps::Api
     0
   end
 
+  def split_pay
+    "N"
+  end
+
+  def split_pay_amount
+    0
+  end
+
   def quick_pay
     params[:quick_pay] || "N"
   end
@@ -196,6 +204,10 @@ class Bbps::BillPay < Bbps::Api
     params[:bill_date]
   end
 
+  def due_date
+    params[:due_date]
+  end
+
   def bill_number
     params[:bill_number]
   end
@@ -204,13 +216,25 @@ class Bbps::BillPay < Bbps::Api
     params[:bill_period]
   end
 
+  # this is because the payments need to be sent in paisa
   def amount
-    params[:amount]
+    (params[:amount]&.to_f * 100).round(0)
+  end
+
+  def payment_mode
+    # currently hard coded, but will become dynamically done based on the
+    # beneficiary's details in the future
+    "NEFT:<IFSC=SBIN0001114~AccountNo=34968635304>"
   end
 
   def initiating_channel
     # "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
     "BSC:<TERMINAL_ID=1042~MOBILE=9723468155~GEOCODE=28.6139,78.5555~POSTAL_CODE=400004>"
+  end
+
+  def debit_account_number
+    # todo - have to fetch this from a YAML in the future
+    "002281300008292"
   end
 
   def customer_param_for(param)
@@ -255,6 +279,7 @@ class Bbps::BillPay < Bbps::Api
             convenience_fee_desc: result['response.parsed']['convenience_fee_desc'],
             late_payment_fee: result['response.parsed']['late_payment_fee'],
             early_payment_fee: result['response.parsed']['early_payment_fee'],
+            bbps_ref_id: result['response.parsed']['bbps_ref_id']
         }
     )
   end

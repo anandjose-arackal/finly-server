@@ -418,6 +418,10 @@ class Company < ApplicationRecord
     end
   end
 
+  def analytics_system_enabled?
+    self.feature_subscription.analytics_system
+  end
+
 
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
