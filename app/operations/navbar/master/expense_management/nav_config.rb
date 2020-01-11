@@ -70,30 +70,36 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def trips
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     {name: 'Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
   end
 
   def your_trips
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     {name: 'Your Trips', id: 'trips', url: 'travel_requests/params={"view":"personal"}'}
   end
 
   def trips_awaiting_approval
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     return nil unless user.manager? || user.admin?
     {name: 'Trips', id: 'approvals', url: 'travel_requests/params={"view":"manager", "filter_status":"processing", "main_tab": "approvals"}'}
   end
 
   def team_trips
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     return nil unless user.manager? || user.finance_manager?
     view = user.finance_manager? ? "finance_manager" : "manager"
     {name: 'Trips', id: 'team', url: "travel_requests/params={\"view\":\"#{view}\", \"main_tab\": \"team\"}"}
   end
 
   def travel_request_bookings
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     return nil unless user.is_travel_manager?
     {name: 'Bookings', id: 'trip-bookings', url: 'travel_requests/params={"view":"travel_manager", "filter_status":"booking_pending"}'}
   end
 
   def company_trips
+    return nil unless user.company.feature_subscription.travel_request && user.user_panel_subscription.travel_request
     return nil unless user.admin? || user.auditor?
     view = user.admin? ? "admin" : "auditor"
     {name: 'Trips', id: "#{view}", url: "travel_requests/params={\"view\": \"#{view}\", \"main_tab\": \"#{view}\"}"}
@@ -157,12 +163,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def settlements
     return nil unless user.finance_manager? || user.admin?
-    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance"}'}
+    {name: 'Settlements', id: 'settlements', url: 'settlements_dashboard/params={"view":"finance_manager"}'}
   end
 
   def team_settlements
     return nil unless user.finance_manager?
-    {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance", "main_tab": "team"}'}
+    {name: 'Settlements', id: 'team', url: 'settlements_dashboard/params={"view":"finance_manager", "main_tab": "team"}'}
   end
 
   def company_settlements
@@ -176,8 +182,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   def team_exports
-    return nil unless user.manager? || user.admin? || user.finance_manager?
-    {name: 'Export', id: 'team', url: 'export/params={"view":"manager", "main_tab": "team"}'}
+    return nil unless user.finance_manager?
+    {name: 'Export', id: 'team', url: 'export/params={"view":"finance_manager", "main_tab": "team"}'}
   end
 
   def company_exports
