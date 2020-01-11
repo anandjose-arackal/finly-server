@@ -38,8 +38,8 @@ class Olap::Dimensions::User < OlapRecord
   events 'user.update', 'user.create', 'user.destroy'
 
   map :email
-  map :employee_id do record.profile.employee_id end
-  map :kyc_verified do record.profile.kyc_verified end
+  map :employee_id do |input, record| record.profile&.employee_id end
+  map :kyc_verified do |input, record| record.profile&.kyc_verified end
   map :company_id
   map :mobile_number
   map :active

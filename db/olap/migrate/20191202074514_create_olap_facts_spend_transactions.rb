@@ -32,8 +32,8 @@ class CreateOlapFactsSpendTransactions < ActiveRecord::Migration[5.2]
       t.integer :transaction_created_at_id
       t.integer :transaction_submitted_at_id
       t.integer :transaction_approved_at_id
-      t.integer :transaction_rejected_at_id, index: true
-      t.integer :transaction_rejection_count, index: true
+      t.integer :transaction_rejected_at_id, index: {name: "index_facts_spend_transactions_rejected_at"}
+      t.integer :transaction_rejection_count, index: {name: "index_facts_spend_transactions_rejection_count"}
       t.boolean :has_violation, index: true
       t.string :violation_description, index: true
 
@@ -50,7 +50,7 @@ class CreateOlapFactsSpendTransactions < ActiveRecord::Migration[5.2]
       t.boolean :is_composite_vendor, index: true
       t.integer :vendor_confirmed_at_id
       t.integer :days_for_confirmation, index: true
-      t.integer :payment_mode, index: true
+      t.string :payment_mode, index: true
 
       # Item
       t.decimal :quantity, index: true
@@ -60,10 +60,10 @@ class CreateOlapFactsSpendTransactions < ActiveRecord::Migration[5.2]
       t.boolean :has_on_time_delivery, index: true
       t.boolean :has_late_delivery, index: true
       t.integer :delivery_delayed_days, index: true
-      t.decimal :quantity_delivered_on_time, index: true
-      t.decimal :quantity_delivered_on_time_percentage, index: true
-      t.decimal :quantity_delivered_late, index: true
-      t.decimal :quantity_delivered_late_percentage, index: true
+      t.decimal :quantity_delivered_on_time, index: {name: "index_facts_spend_transactions_delivered_on_time"}
+      t.decimal :quantity_delivered_on_time_percentage, index: {name: "index_facts_spend_transactions_delivered_on_time_percentage"}
+      t.decimal :quantity_delivered_late, index: {name: "index_facts_spend_transactions_delivered_late"}
+      t.decimal :quantity_delivered_late_percentage, index: {name: "index_facts_spend_transactions_delivered_late_percentage"}
       t.boolean :is_exceeding_budget, index: true
       t.string :item_type, index: true # Goods/Service
       t.integer :item_id
@@ -86,7 +86,7 @@ class CreateOlapFactsSpendTransactions < ActiveRecord::Migration[5.2]
       t.integer :advance_amount_paid_id
       t.decimal :advance_percentage, index: true
       t.integer :credit_days, index: true
-      t.decimal :reimbursement_amount_id
+      t.integer :reimbursement_amount_id
 
       t.timestamps index: true
     end

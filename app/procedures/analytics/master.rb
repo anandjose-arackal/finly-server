@@ -4,6 +4,12 @@ class Analytics::Master
     registry(model) << olap_model
   end
 
+  def self.load!
+    file_path = "#{Rails.root}/app/models/olap/**/*.rb"
+    Dir[file_path].each { |f| load f }
+    registry
+  end
+
   def self.registry(model = nil)
     @registry ||= {}
     return @registry unless model.present?
@@ -37,5 +43,7 @@ class Analytics::Master
       end
     end
   end
+
+
 
 end

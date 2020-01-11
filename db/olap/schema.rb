@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_29_183327) do
+ActiveRecord::Schema.define(version: 2020_01_11_135924) do
 
   create_table "amounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "finly_ref_id", null: false
@@ -193,9 +193,11 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_amounts_on_created_at"
     t.index ["currency"], name: "index_amounts_on_currency"
+    t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
     t.index ["finly_ref_created_at"], name: "index_amounts_on_finly_ref_created_at"
     t.index ["finly_ref_id"], name: "index_amounts_on_finly_ref_id"
     t.index ["finly_ref_updated_at"], name: "index_amounts_on_finly_ref_updated_at"
+    t.index ["is_deleted"], name: "index_amounts_on_is_deleted"
     t.index ["updated_at"], name: "index_amounts_on_updated_at"
     t.index ["value"], name: "index_amounts_on_value"
   end
@@ -237,6 +239,33 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.index ["tds_applicable"], name: "index_olap_dimensions_categories_on_tds_applicable"
     t.index ["updated_at"], name: "index_olap_dimensions_categories_on_updated_at"
     t.index ["vendor_payments"], name: "index_olap_dimensions_categories_on_vendor_payments"
+  end
+
+  create_table "olap_dimensions_companies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "finly_ref_id", null: false
+    t.datetime "finly_ref_created_at"
+    t.datetime "finly_ref_updated_at"
+    t.string "name"
+    t.boolean "active"
+    t.integer "base_currency_id"
+    t.integer "status"
+    t.boolean "test_account"
+    t.string "subdomain"
+    t.integer "group_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_olap_dimensions_companies_on_active"
+    t.index ["base_currency_id"], name: "index_olap_dimensions_companies_on_base_currency_id"
+    t.index ["created_at"], name: "index_olap_dimensions_companies_on_created_at"
+    t.index ["finly_ref_created_at"], name: "index_olap_dimensions_companies_on_finly_ref_created_at"
+    t.index ["finly_ref_id"], name: "index_olap_dimensions_companies_on_finly_ref_id"
+    t.index ["finly_ref_updated_at"], name: "index_olap_dimensions_companies_on_finly_ref_updated_at"
+    t.index ["group_id"], name: "index_olap_dimensions_companies_on_group_id"
+    t.index ["name"], name: "index_olap_dimensions_companies_on_name"
+    t.index ["status"], name: "index_olap_dimensions_companies_on_status"
+    t.index ["subdomain"], name: "index_olap_dimensions_companies_on_subdomain"
+    t.index ["test_account"], name: "index_olap_dimensions_companies_on_test_account"
+    t.index ["updated_at"], name: "index_olap_dimensions_companies_on_updated_at"
   end
 
   create_table "olap_dimensions_cost_centers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -585,30 +614,151 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.index ["verified"], name: "index_olap_dimensions_users_on_verified"
   end
 
-  create_table "olap_facts_spends", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "olap_facts_spend_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "finly_ref_id", null: false
     t.datetime "finly_ref_created_at"
     t.datetime "finly_ref_updated_at"
-    t.boolean "is_reimbursement"
-    t.integer "reimbursement_on_id"
+    t.string "document_type"
+    t.integer "document_id"
+    t.string "parent_document_type"
+    t.integer "parent_document_id"
+    t.boolean "is_reimbursable"
+    t.integer "reimbursed_on_id"
     t.string "status"
     t.string "description"
     t.text "detailed_description"
+    t.integer "parent_cost_center_id"
     t.integer "cost_center_id"
+    t.integer "parent_location_id"
     t.integer "location_id"
+    t.integer "parent_department_id"
     t.integer "department_id"
+    t.integer "parent_category_id"
     t.integer "category_id"
     t.integer "policy_id"
     t.integer "owner_id"
     t.integer "service_period_start_id"
     t.integer "service_period_end_id"
     t.integer "date_id"
-    t.integer "payable_created_at_id"
-    t.integer "payable_submitted_at_id"
-    t.integer "payable_approved_at_id"
-    t.integer "rejection_count"
+    t.integer "transaction_created_at_id"
+    t.integer "transaction_submitted_at_id"
+    t.integer "transaction_approved_at_id"
+    t.integer "transaction_rejected_at_id"
+    t.integer "transaction_rejection_count"
     t.boolean "has_violation"
     t.string "violation_description"
+    t.boolean "is_employee_expense"
+    t.boolean "is_vendor_payment"
+    t.integer "vendor_id"
+    t.integer "vendor_location_id"
+    t.string "vendor_name"
+    t.integer "shipping_location_id"
+    t.integer "billing_location_id"
+    t.boolean "is_gst_registered"
+    t.boolean "is_msme_registered"
+    t.boolean "is_composite_vendor"
+    t.integer "vendor_confirmed_at_id"
+    t.integer "days_for_confirmation"
+    t.string "payment_mode"
+    t.decimal "quantity", precision: 10
+    t.integer "estimated_delivery_date_id"
+    t.integer "delivery_completed_on_id"
+    t.boolean "is_delivered_on_time"
+    t.boolean "has_on_time_delivery"
+    t.boolean "has_late_delivery"
+    t.integer "delivery_delayed_days"
+    t.decimal "quantity_delivered_on_time", precision: 10
+    t.decimal "quantity_delivered_on_time_percentage", precision: 10
+    t.decimal "quantity_delivered_late", precision: 10
+    t.decimal "quantity_delivered_late_percentage", precision: 10
+    t.boolean "is_exceeding_budget"
+    t.string "item_type"
+    t.integer "item_id"
+    t.string "asset_type"
+    t.integer "amount_id"
+    t.integer "basic_amount_id"
+    t.integer "tax_amount_id"
+    t.integer "tds_amount_id"
+    t.string "tax_type"
+    t.decimal "tax_percentage", precision: 10
+    t.integer "cgst_amount_id"
+    t.integer "sgst_amount_id"
+    t.integer "igst_amount_id"
+    t.decimal "cgst_percentage", precision: 10
+    t.decimal "sgst_percentage", precision: 10
+    t.decimal "igst_percentage", precision: 10
+    t.integer "advance_amount_requested_id"
+    t.integer "advance_amount_paid_id"
+    t.decimal "advance_percentage", precision: 10
+    t.integer "credit_days"
+    t.integer "reimbursement_amount_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["advance_percentage"], name: "index_olap_facts_spend_transactions_on_advance_percentage"
+    t.index ["cgst_percentage"], name: "index_olap_facts_spend_transactions_on_cgst_percentage"
+    t.index ["created_at"], name: "index_olap_facts_spend_transactions_on_created_at"
+    t.index ["credit_days"], name: "index_olap_facts_spend_transactions_on_credit_days"
+    t.index ["days_for_confirmation"], name: "index_olap_facts_spend_transactions_on_days_for_confirmation"
+    t.index ["delivery_delayed_days"], name: "index_olap_facts_spend_transactions_on_delivery_delayed_days"
+    t.index ["description"], name: "index_olap_facts_spend_transactions_on_description"
+    t.index ["document_id"], name: "index_olap_facts_spend_transactions_on_document_id"
+    t.index ["document_type"], name: "index_olap_facts_spend_transactions_on_document_type"
+    t.index ["finly_ref_created_at"], name: "index_olap_facts_spend_transactions_on_finly_ref_created_at"
+    t.index ["finly_ref_id"], name: "index_olap_facts_spend_transactions_on_finly_ref_id"
+    t.index ["finly_ref_updated_at"], name: "index_olap_facts_spend_transactions_on_finly_ref_updated_at"
+    t.index ["has_late_delivery"], name: "index_olap_facts_spend_transactions_on_has_late_delivery"
+    t.index ["has_on_time_delivery"], name: "index_olap_facts_spend_transactions_on_has_on_time_delivery"
+    t.index ["has_violation"], name: "index_olap_facts_spend_transactions_on_has_violation"
+    t.index ["igst_percentage"], name: "index_olap_facts_spend_transactions_on_igst_percentage"
+    t.index ["is_composite_vendor"], name: "index_olap_facts_spend_transactions_on_is_composite_vendor"
+    t.index ["is_delivered_on_time"], name: "index_olap_facts_spend_transactions_on_is_delivered_on_time"
+    t.index ["is_employee_expense"], name: "index_olap_facts_spend_transactions_on_is_employee_expense"
+    t.index ["is_exceeding_budget"], name: "index_olap_facts_spend_transactions_on_is_exceeding_budget"
+    t.index ["is_gst_registered"], name: "index_olap_facts_spend_transactions_on_is_gst_registered"
+    t.index ["is_msme_registered"], name: "index_olap_facts_spend_transactions_on_is_msme_registered"
+    t.index ["is_reimbursable"], name: "index_olap_facts_spend_transactions_on_is_reimbursable"
+    t.index ["is_vendor_payment"], name: "index_olap_facts_spend_transactions_on_is_vendor_payment"
+    t.index ["item_type"], name: "index_olap_facts_spend_transactions_on_item_type"
+    t.index ["parent_document_id"], name: "index_olap_facts_spend_transactions_on_parent_document_id"
+    t.index ["parent_document_type"], name: "index_olap_facts_spend_transactions_on_parent_document_type"
+    t.index ["payment_mode"], name: "index_olap_facts_spend_transactions_on_payment_mode"
+    t.index ["quantity"], name: "index_olap_facts_spend_transactions_on_quantity"
+    t.index ["quantity_delivered_late"], name: "index_facts_spend_transactions_delivered_late"
+    t.index ["quantity_delivered_late_percentage"], name: "index_facts_spend_transactions_delivered_late_percentage"
+    t.index ["quantity_delivered_on_time"], name: "index_facts_spend_transactions_delivered_on_time"
+    t.index ["quantity_delivered_on_time_percentage"], name: "index_facts_spend_transactions_delivered_on_time_percentage"
+    t.index ["sgst_percentage"], name: "index_olap_facts_spend_transactions_on_sgst_percentage"
+    t.index ["status"], name: "index_olap_facts_spend_transactions_on_status"
+    t.index ["tax_percentage"], name: "index_olap_facts_spend_transactions_on_tax_percentage"
+    t.index ["tax_type"], name: "index_olap_facts_spend_transactions_on_tax_type"
+    t.index ["transaction_rejected_at_id"], name: "index_facts_spend_transactions_rejected_at"
+    t.index ["transaction_rejection_count"], name: "index_facts_spend_transactions_rejection_count"
+    t.index ["updated_at"], name: "index_olap_facts_spend_transactions_on_updated_at"
+    t.index ["vendor_name"], name: "index_olap_facts_spend_transactions_on_vendor_name"
+    t.index ["violation_description"], name: "index_olap_facts_spend_transactions_on_violation_description"
+  end
+
+  create_table "olap_facts_spends", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "finly_ref_id", null: false
+    t.datetime "finly_ref_created_at"
+    t.datetime "finly_ref_updated_at"
+    t.boolean "is_reimbursement"
+    t.integer "reimbursement_on_id"
+    t.string "description"
+    t.text "detailed_description"
+    t.integer "parent_cost_center_id"
+    t.integer "cost_center_id"
+    t.integer "parent_location_id"
+    t.integer "location_id"
+    t.integer "parent_department_id"
+    t.integer "department_id"
+    t.integer "parent_category_id"
+    t.integer "category_id"
+    t.integer "policy_id"
+    t.integer "owner_id"
+    t.integer "service_period_start_id"
+    t.integer "service_period_end_id"
+    t.integer "date_id"
     t.boolean "is_employee_expense"
     t.boolean "is_vendor_payment"
     t.integer "vendor_id"
@@ -656,6 +806,8 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.decimal "quantity_paid_percentage", precision: 10
     t.boolean "is_exceeding_budget"
     t.string "item_type"
+    t.integer "item_id"
+    t.string "asset_type"
     t.integer "amount_id"
     t.integer "basic_amount_id"
     t.integer "tax_amount_id"
@@ -686,14 +838,16 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.decimal "reimbursement_amount_id", precision: 10
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "type"
     t.index ["advance_percentage"], name: "index_olap_facts_spends_on_advance_percentage"
+    t.index ["asset_type"], name: "index_olap_facts_spends_on_asset_type"
     t.index ["cgst_percentage"], name: "index_olap_facts_spends_on_cgst_percentage"
     t.index ["created_at"], name: "index_olap_facts_spends_on_created_at"
     t.index ["credit_days"], name: "index_olap_facts_spends_on_credit_days"
     t.index ["days_for_confirmation"], name: "index_olap_facts_spends_on_days_for_confirmation"
     t.index ["delivery_delayed_days"], name: "index_olap_facts_spends_on_delivery_delayed_days"
     t.index ["description"], name: "index_olap_facts_spends_on_description"
-    t.index ["estimated_deviation_percentage"], name: "olap_facts_spends_est_deviation_perentage"
+    t.index ["estimated_deviation_percentage"], name: "olap_facts_spends_est_deviation_percentage"
     t.index ["finly_ref_created_at"], name: "index_olap_facts_spends_on_finly_ref_created_at"
     t.index ["finly_ref_id"], name: "index_olap_facts_spends_on_finly_ref_id"
     t.index ["finly_ref_updated_at"], name: "index_olap_facts_spends_on_finly_ref_updated_at"
@@ -704,7 +858,6 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.index ["has_on_time_delivery"], name: "index_olap_facts_spends_on_has_on_time_delivery"
     t.index ["has_purchase_order"], name: "index_olap_facts_spends_on_has_purchase_order"
     t.index ["has_purchase_request"], name: "index_olap_facts_spends_on_has_purchase_request"
-    t.index ["has_violation"], name: "index_olap_facts_spends_on_has_violation"
     t.index ["igst_percentage"], name: "index_olap_facts_spends_on_igst_percentage"
     t.index ["is_composite_vendor"], name: "index_olap_facts_spends_on_is_composite_vendor"
     t.index ["is_delivered_on_time"], name: "index_olap_facts_spends_on_is_delivered_on_time"
@@ -736,14 +889,11 @@ ActiveRecord::Schema.define(version: 2019_11_29_183327) do
     t.index ["quantity_received"], name: "index_olap_facts_spends_on_quantity_received"
     t.index ["quantity_received_percentage"], name: "index_olap_facts_spends_on_quantity_received_percentage"
     t.index ["quantity_requested"], name: "index_olap_facts_spends_on_quantity_requested"
-    t.index ["rejection_count"], name: "index_olap_facts_spends_on_rejection_count"
     t.index ["sgst_percentage"], name: "index_olap_facts_spends_on_sgst_percentage"
-    t.index ["status"], name: "index_olap_facts_spends_on_status"
     t.index ["tax_percentage"], name: "index_olap_facts_spends_on_tax_percentage"
     t.index ["tax_type"], name: "index_olap_facts_spends_on_tax_type"
     t.index ["updated_at"], name: "index_olap_facts_spends_on_updated_at"
     t.index ["vendor_name"], name: "index_olap_facts_spends_on_vendor_name"
-    t.index ["violation_description"], name: "index_olap_facts_spends_on_violation_description"
   end
 
 end

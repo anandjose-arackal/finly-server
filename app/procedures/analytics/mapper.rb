@@ -60,7 +60,7 @@ module Analytics::Mapper
       klass = self
       @contract = Class.new(Transactions::Contract) do
         klass.field_mappings.each do |field|
-          property field[:primary_key], deserialize(-> (input, represented, record:, **) do
+          property field[:primary_key], deserializer: -> (input, represented, record:, **) do
             if field.has_key?(:block)
               # Pick value from block
               value = field[:block].call(input, record)
@@ -72,7 +72,7 @@ module Analytics::Mapper
               raise "#{self.name}: Value for field #{field[:primary_key]} not found for #{transaction_model}"
             end
             represented.send("#{field[:primary_key]}=", value)
-          end)
+          end
         end
 
         validates :finly_ref_id, presence: true, unique: true
@@ -101,13 +101,9 @@ module Analytics::Mapper
     def events(*list)
       raise "Event is already defined" if @events.present?
 
-      klass = self
       @events = list
       list.each do |event|
-        Class.new(self) do
-          consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", sync: sync?)
-          olap_model(klass)
-        end
+        EventHandler.build(self, event)
       end
     end
 
@@ -116,17 +112,41 @@ module Analytics::Mapper
     end
   end
 
-  def on_event(user, payload)
-    olap_model = self.class.olap_model || self.class
-    input = olap_model.input.call(user, payload)
-    input = [input] unless input.respond_to?(:each)
-    input.each do |record|
-      sync = Analytics::Synchronizer.(params: {record: record, olap_model: olap_model})
-      if sync.failure? and not sync[:in_sync]
-        # Todo log failure with reason
-        raise "Sync Error: #{sync.errors}}"
+  def in_sync?(record)
+    finly_ref_updated_at == record.updated_at
+  end
+
+  class EventHandler
+    include Events::Consumer
+    include DynamicAttributes
+
+    class_attr :mapper_klass
+
+    def self.build(mapper, event)
+      Class.new(EventHandler) do
+        consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", sync: mapper.sync?)
+        mapper_klass(mapper)
       end
     end
-    Success()
+
+    def mapper_klass
+      self.class.mapper_klass
+    end
+
+    def on_event(user, payload)
+      olap_model = mapper_klass.olap_model || self.mapper_klass
+      input = olap_model.input.call(user, payload)
+      input = [input] unless input.respond_to?(:each)
+      input.each do |record|
+        sync = Analytics::Synchronizer.(params: {record: record, olap_model: olap_model})
+        if sync.failure? and not sync[:in_sync]
+          # Todo log failure with reason
+          raise "Sync Error: #{sync.errors}}"
+        end
+      end
+      Success()
+    end
   end
+
+
 end

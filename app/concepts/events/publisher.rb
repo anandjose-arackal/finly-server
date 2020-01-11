@@ -8,7 +8,7 @@ class Events::Publisher
   def self.broadcast(routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false)
     raise "Consumer key cannot be nil" if consumer_key.nil?
 
-    #Async.(routing_key, message, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
+    Async.(routing_key, message, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
     Sync.(routing_key, message, current_user: current_user, ignore_failure: ignore_failure, consumer_key: consumer_key)
   end
 

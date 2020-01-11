@@ -5,6 +5,8 @@ class Analytics::Synchronizer < Transactions::API
       required(:record).filled
       required(:olap_model)
       optional(:olap_record)
+      optional(:skip_find)
+      optional(:persist)
     end
   end
 
@@ -24,13 +26,21 @@ class Analytics::Synchronizer < Transactions::API
   end
 
   def init_model(context, params:, olap_model:, olap_record:, record:, **)
-    context[:model] = olap_record || olap_model.find_or_initialize_by(finly_ref_id: record.id)
+    context[:model] = olap_record
+    return true if context[:model]
+
+    if params[:skip_find]
+      context[:model] = olap_model.new(finly_ref_id: record.id)
+    else
+      context[:model] = olap_model.find_or_initialize_by(finly_ref_id: record.id)
+    end
+
     return on_error context, :base, 'Model could not be initialized' if context[:model].nil?
     true
   end
 
   def can_update_check(context, model:, record:, **)
-    if model.finly_ref_updated_at == record.updated_at
+    if model.in_sync?(record)
       context[:in_sync] = true
       return false
     end

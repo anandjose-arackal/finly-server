@@ -102,6 +102,7 @@
 #  reimbursement_amount_id               :decimal(10, )
 #  created_at                            :datetime         not null
 #  updated_at                            :datetime         not null
+#  type                                  :string(255)
 #
 
 class Olap::Facts::Spend < OlapRecord
