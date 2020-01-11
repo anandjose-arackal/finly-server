@@ -28,19 +28,19 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
 
     self.result = []
 
-    reports_presenter = ::Reports::Index.(user, params)
-    unless reports_presenter.success?
-      add_message :error, reports_presenter.messages[:error]
-      return
-    end
-    self.reports = reports_presenter.reports.approved.without_associated_processor
+    # reports_presenter = ::Reports::Index.(user, params)
+    # unless reports_presenter.success?
+    #   add_message :error, reports_presenter.messages[:error]
+    #   return
+    # end
+    # self.reports = reports_presenter.reports.approved.without_associated_processor
 
-    money_requests_presenter = Object.const_get('::MoneyRequests::Index').(user, params)
-    unless money_requests_presenter.success?
-      add_message :error, money_requests_presenter.messages[:error]
-      return
-    end
-    self.money_requests = money_requests_presenter.money_requests.approved.without_associated_processor
+    # money_requests_presenter = Object.const_get('::MoneyRequests::Index').(user, params)
+    # unless money_requests_presenter.success?
+    #   add_message :error, money_requests_presenter.messages[:error]
+    #   return
+    # end
+    # self.money_requests = money_requests_presenter.money_requests.approved.without_associated_processor
   end
 
   def process
@@ -60,7 +60,8 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
           title: "Reports awaiting credit",
           type: 'settle_reports',
           # count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-          count: self.reports.count,
+          # count: self.reports.count,
+          count: Report.finance_associated_items(user).not_open.exclude_deleted.approved.not_settled.count,
           filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
           awaiting_action: true # FE requires this to handle some logic in UI
       }
@@ -83,7 +84,8 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
           title: "Money Requests awaiting credit",
           type: 'settle_money_requests',
           # count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-          count: self.money_requests.count,
+          # count: self.money_requests.count,
+          count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.approved.not_settled.count,
           filters: [{view: 'finance_manager', menu: {main: "settlements_dashboard"}}],
           awaiting_action: true # FE requires this to handle some logic in UI
       }
