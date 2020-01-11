@@ -13,7 +13,7 @@
 #  payable_amount_id               :integer
 #  inclusive_of_taxes              :boolean
 #  gst_type_id                     :integer
-#  tax                             :decimal(10, )
+#  tax                             :decimal(10, 3)
 #  tds_slab_id                     :integer
 #  company_id                      :integer
 #  sub_department_id               :integer
