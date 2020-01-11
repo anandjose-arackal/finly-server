@@ -55,7 +55,7 @@ class User::GroupEntitiesLogin < User::Base
 
   def process
     self.group = self.company.group
-    group_companies = self.group.companies
+    group_companies = self.group.companies.where(status_id: CompanyStatus.ids_for(:active, :partial_block, :hidden))
     users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
     self.companies = Company.with_id(users.pluck(:company_id))
   end
