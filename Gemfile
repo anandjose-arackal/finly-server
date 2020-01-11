@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '~> 2.6.1'
+ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
@@ -11,8 +11,8 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'parslet', '~> 1.8.2'
 
-gem 'rufus-scheduler'
-gem 'clockwork'
+gem 'rufus-scheduler', '~> 3.6'
+gem 'clockwork', '~> 2.0'
 gem 'dry-monads', '~> 1.3.0'
 
 # adding gems for activeMQ
@@ -60,7 +60,7 @@ gem 'resque', '~> 2.0.0'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
 gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
-gem 'gyoku'
+gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
 gem 'slack-notifier', '~> 2.3'
@@ -73,9 +73,9 @@ gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref
 gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
 
 # gem for SAML SSO
-gem 'ruby-saml'
-gem 'omniauth-saml'
-gem 'omniauth-multi-provider'
+gem 'ruby-saml', '~> 1.11'
+gem 'omniauth-saml', '~> 1.10'
+gem 'omniauth-multi-provider', '~> 0.2'
 
 gem 'rubyzip', '~> 1.2.2'
 
@@ -83,7 +83,7 @@ gem 'rubyzip', '~> 1.2.2'
 gem 'roo', '~> 2.7.1'
 gem 'roo-xls', '~> 1.2.0'
 gem 'write_xlsx', '~> 0.85.6'
-gem 'saxlsx'
+gem 'saxlsx', '~> 1.9'
 # Gem to show db schema in model file
 gem 'annotate', '~> 2.7'
 
@@ -95,9 +95,9 @@ gem 'mysql2', '~> 0.5.2'
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
 
-gem 'sneakers'
+gem 'sneakers', '~> 2.12'
 
-gem 'jwt'
+gem 'jwt', '~> 2.2'
 
 # gem for jquery ui in rails app
 gem 'jquery-ui-rails', '~> 6.0.1'
@@ -172,9 +172,9 @@ gem 'font-awesome-rails', '~> 4.7.0.4'
 
 gem 'has_scope', '~> 0.7.2'
 
-gem 'sendgrid-ruby'#, '~> 5.3.0'
-gem 'griddler'#, '~> 1.5.2'
-gem 'griddler-sendgrid'#, '~> 1.1.0'
+gem 'sendgrid-ruby', '~> 6.0'
+gem 'griddler', '~> 1.5'
+gem 'griddler-sendgrid', '~> 1.2'
 
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
@@ -231,7 +231,7 @@ gem 'fuzzy-string-match', '1.0.1'
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
-  gem 'rb-readline'
+  gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'
   gem 'capistrano-rails', '~> 1.4.0', require: false
