@@ -1,7 +1,7 @@
 class Events::Registry
 
   def self.add_event(klass, event, consumer_key)
-    raise "Key #{key} is already taken" if find_by_consumer_key(consumer_key).present?
+    raise "Key #{consumer_key} is already taken" if find_by_consumer_key(consumer_key).present?
 
     events(event)[consumer_key] = klass
   end

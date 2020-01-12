@@ -37,6 +37,8 @@ class Olap::Dimensions::User < OlapRecord
   transaction_model ::User
   events 'user.update', 'user.create', 'user.destroy'
 
+  required_relationships([:profile])
+
   map :email
   map :employee_id do |input, record| record.profile&.employee_id end
   map :kyc_verified do |input, record| record.profile&.kyc_verified end

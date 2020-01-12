@@ -11,6 +11,7 @@ module Analytics::Mapper
     class_attr :transaction_model
     class_attr :field_mappings
     class_attr :olap_model
+    class_attr :required_relationships, default: []
     class_attr :input, default: -> (user, payload) { payload[:record] }
 
     define_singleton_method :field_mappings do
@@ -110,6 +111,10 @@ module Analytics::Mapper
     def sync(after: nil)
       Analytics::Master.sync(self, after: after)
     end
+  end
+
+  def build_contract(record)
+    self.class.contract.new(self)
   end
 
   def in_sync?(record)

@@ -5,8 +5,6 @@ class Analytics::Synchronizer < Transactions::API
       required(:record).filled
       required(:olap_model)
       optional(:olap_record)
-      optional(:skip_find)
-      optional(:persist)
     end
   end
 
@@ -17,7 +15,7 @@ class Analytics::Synchronizer < Transactions::API
   step :can_update_check
   step Contract::Build(builder: :contract_builder)
   step Contract::Validate()
-  step Contract::Persist()
+
 
   def init(context, params:, **)
     context[:record] = params[:record]
@@ -29,11 +27,7 @@ class Analytics::Synchronizer < Transactions::API
     context[:model] = olap_record
     return true if context[:model]
 
-    if params[:skip_find]
-      context[:model] = olap_model.new(finly_ref_id: record.id)
-    else
-      context[:model] = olap_model.find_or_initialize_by(finly_ref_id: record.id)
-    end
+    context[:model] = olap_model.find_or_initialize_by(finly_ref_id: record.id)
 
     return on_error context, :base, 'Model could not be initialized' if context[:model].nil?
     true
@@ -47,10 +41,16 @@ class Analytics::Synchronizer < Transactions::API
     true
   end
 
-  protected
+  def contract_builder(context, olap_record:, record:, **)
+    olap_record.build_contract(record)
+  end
 
-  def contract_builder(context, olap_model:, **)
-    olap_model.contract.new(context[:model])
+  class Analytics::Synchronizer::Persist < Analytics::Synchronizer
+    step Contract::Persist()
+  end
+
+  class Analytics::Synchronizer::Sync < Analytics::Synchronizer
+    step Contract::Persist(method: :sync)
   end
 
 end
