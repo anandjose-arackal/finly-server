@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/inventionlabsSydney/capistrano-sneakers.git
+  revision: 448cd6273cdfb5ae78fb76a13cf6ac281d3fd2ed
+  specs:
+    capistrano-sneakers (0.2.0)
+      capistrano (>= 3.9.0)
+      sneakers (>= 2.6)
+
+GIT
   remote: git://github.com/sinatra/sinatra.git
   revision: a4dd24add24f2dd0e7299b9e68e12038138294d3
   branch: master
@@ -729,6 +737,7 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.1.4)
   capistrano-rvm (~> 0.1.2)
   capistrano-sidekiq (~> 1.0.2)
+  capistrano-sneakers!
   capistrano3-puma (~> 3.1.1)
   capybara (~> 3.29)
   clockwork (~> 2.0)

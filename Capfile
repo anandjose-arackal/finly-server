@@ -29,6 +29,7 @@ install_plugin Capistrano::Puma  # Default puma tasks
 
 require 'capistrano/crono'
 require 'capistrano/sidekiq'
+require 'capistrano/sneakers'
 require 'capistrano/rails/console'
 
 # adding rollbar capistrano for deploy tracking
