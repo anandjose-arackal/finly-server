@@ -26,11 +26,6 @@ namespace :sneakers do
           rake "sneakers:run #{args}"
         end
       end
-      # within release_path do
-      #   with rack_env: fetch(:sneakers_env) do
-      #     rake('sneakers:run')# unless process_exists?(pid_file)
-      #   end
-      # end
     end
   end
 
