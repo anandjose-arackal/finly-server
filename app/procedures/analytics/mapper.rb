@@ -82,7 +82,7 @@ module Analytics::Mapper
       raise "Event is already defined" if @events.present?
 
       @events = list
-      list.each do |event|
+      @events.each do |event|
         EventHandler.build(self, event)
       end
     end

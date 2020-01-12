@@ -8,34 +8,37 @@ class Events::Publisher
   def self.broadcast(routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false)
     raise "Consumer key cannot be nil" if consumer_key.nil?
 
-    Async.(routing_key, message, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
-    Sync.(routing_key, message, current_user: current_user, ignore_failure: ignore_failure, consumer_key: consumer_key)
+    payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), type: :event}
+    payload.reject! { |k, v| v.nil? } # Remove all nil values
+
+    Async.(routing_key, payload, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
+    Sync.(routing_key, payload, current_user: current_user, ignore_failure: ignore_failure, consumer_key: consumer_key)
   end
 
   # Broadcasting the message synchronously to all listeners
   class Sync
     extend Dry::Monads[:result]
 
-    def self.call(routing_key, message, current_user: nil, ignore_failure: false, consumer_key:)
+    def self.call(routing_key, payload, current_user: nil, ignore_failure: false, consumer_key:)
       if consumer_key != NoObject
         consumer = Events::Registry.find_by_consumer_key(consumer_key)
-        execute_consumer(consumer, message, current_user) if consumer
+        execute_consumer(consumer, payload, current_user) if consumer
       else
-        execute_all_consumers(routing_key, message, current_user, ignore_failure)
+        execute_all_consumers(routing_key, payload, current_user, ignore_failure)
       end
     end
 
-    def self.execute_consumer(consumer, message, current_user)
+    def self.execute_consumer(consumer, payload, current_user)
       return Failure("Consumer not found") if consumer.nil?
 
-      consumer.new.receive(:event, current_user, message)
+      consumer.new.perform(payload)
     end
 
-    def self.execute_all_consumers(routing_key, message, current_user, ignore_failure)
+    def self.execute_all_consumers(routing_key, payload, current_user, ignore_failure)
       results = []
       has_failure = false
       Events::Registry.sync_events(routing_key).each do |consumer|
-        result = execute_consumer(consumer, message, current_user)
+        result = execute_consumer(consumer, payload, current_user)
         result ||= Failure("Could not process the event")
         data = {result: result, consumer: consumer, success: result.success?}
 
@@ -53,12 +56,9 @@ class Events::Publisher
     end
   end
 
-  # Broadcasting the message asynchronously to all listeners
+  # Broadcasting the payload asynchronously to all listeners
   class Async
-    def self.call(routing_key, message, current_user: nil, persistence: true, consumer_key:)
-      payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), type: :event}
-      payload.reject! { |k, v| v.nil? } # Remove all nil values
-
+    def self.call(routing_key, payload, current_user: nil, persistence: true, consumer_key:)
       if consumer_key == NoObject
         publish_to_all_consumers(routing_key, payload, persistence)
       else

@@ -1,11 +1,11 @@
-class EventHandler
+class Analytics::Mapper::EventHandler
   include Events::Consumer
   include DynamicAttributes
 
   class_attr :mapper_klass
 
   def self.build(mapper, event)
-    Class.new(EventHandler) do
+    Class.new(self) do
       consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", sync: mapper.sync?)
       mapper_klass(mapper)
     end
