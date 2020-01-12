@@ -5,8 +5,8 @@ namespace :deploy do
     # end
     on roles :olap do
       within release_path do
-        with rack_env: fetch(:rails_env) do
-          execute("DB=olap rails db:migrate")
+        with rack_env: fetch(:rails_env),db: :olap do
+          rake("db:migrate")
         end
       end
     end
