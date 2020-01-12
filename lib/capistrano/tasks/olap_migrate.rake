@@ -3,7 +3,7 @@ namespace :deploy do
     # on roles fetch(:sneakers_migration) do
     #   run "DB=olap cd #{current_path}; RAILS_ENV=#{rails_env} rake db:migrate"
     # end
-    on roles fetch(:olap) do
+    on roles :olap do
       within release_path do
         with rack_env: fetch(:rails_env) do
           execute("DB=olap rails db:migrate")
