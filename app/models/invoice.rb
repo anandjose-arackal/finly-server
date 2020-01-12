@@ -105,18 +105,6 @@ class Invoice < ApplicationRecord
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
-  enum cost_allocation_type: {header: 1, line_items: 2}
-
-  # form Documents::Invoices::Form
-  # policy Documents::Invoices::Policy
-  # state_machine Documents::Invoices::StateMachine
-  # resolver :admin, Documents::Invoices::Policy::Scope
-  # resolver Documents::Invoices::Policy::Scope
-  # produces_event!
-  # event_channel 'invoice'
-  # record_events 'submit', 'approve', 'show'
-  # collection_events 'index'
-
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
   belongs_to :gross_amount, optional: true, class_name: "Amount"

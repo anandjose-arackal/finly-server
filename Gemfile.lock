@@ -788,9 +788,9 @@ DEPENDENCIES
   nokogiri (~> 1.10.0)
   oj (~> 3.7.6)
   omniauth (~> 1.9.0)
-  omniauth-multi-provider
+  omniauth-multi-provider (~> 0.2)
   omniauth-quickbooks (~> 0.0.2)
-  omniauth-saml
+  omniauth-saml (~> 1.10)
   paperclip (~> 6.1.0)
   parallel (~> 1.18)
   paranoia (~> 2.4)
@@ -804,7 +804,7 @@ DEPENDENCIES
   rails (~> 5.2.2)
   rails-perftest (~> 0.0.7)
   rake (~> 12.3.2)
-  rb-readline
+  rb-readline (~> 0.5)
   reform (~> 2.2)
   reform-rails (~> 0.1)
   remotipart (~> 1.4)
@@ -817,7 +817,7 @@ DEPENDENCIES
   roo-xls (~> 1.2.0)
   rspec-rails (~> 3.8)
   ruby-prof (~> 0.17.0)
-  ruby-saml
+  ruby-saml (~> 1.11)
   rubyzip (~> 1.2.2)
   rufus-scheduler (~> 3.6)
   sass-rails (~> 5.0.7)
@@ -830,7 +830,7 @@ DEPENDENCIES
   sinatra (~> 2.0.5)!
   skylight (~> 3.1)
   slack-notifier (~> 2.3)
-  sneakers (~> 2.11)
+  sneakers (~> 2.12)
   snowplow-tracker (~> 0.6.1)
   spring (~> 2.0.0)
   spring-commands-rspec (~> 1.0.4)

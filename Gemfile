@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '~> 2.6.1'
+ruby '~> 2.6'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
@@ -76,9 +76,9 @@ gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref
 gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
 
 # gem for SAML SSO
-gem 'ruby-saml'
-gem 'omniauth-saml'
-gem 'omniauth-multi-provider'
+gem 'ruby-saml', '~> 1.11'
+gem 'omniauth-saml', '~> 1.10'
+gem 'omniauth-multi-provider', '~> 0.2'
 
 gem 'rubyzip', '~> 1.2.2'
 
@@ -98,7 +98,7 @@ gem 'mysql2', '~> 0.5'
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
 
-gem 'sneakers', '~> 2.11'
+gem 'sneakers', '~> 2.12'
 
 gem 'jwt', '~> 2.2'
 
@@ -234,7 +234,7 @@ gem 'fuzzy-string-match', '1.0.1'
 group :development, :test do
   gem 'byebug'
   gem 'pry', '~> 0.12.2'
-  gem 'rb-readline'
+  gem 'rb-readline', '~> 0.5'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'
   gem 'capistrano-rails', '~> 1.4.0', require: false
