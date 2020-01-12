@@ -43,9 +43,9 @@ when :yes_bank_balance_poller
   set :rails_env, 'production'
 when :background_production_olap
   branch = fetch :branch
-  unless ['master', :master].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
+  # unless ['master', :master].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
   set :deploy_to, '/home/centos/app_olap'
   set :rails_env, 'production'
 when :itzcash
