@@ -23,7 +23,7 @@ namespace :sneakers do
       pid_file = fetch(:sneakers_pid)
       within release_path do
         with rack_env: fetch(:sneakers_env) do
-          execute('rake sneakers:run') unless process_exists?(pid_file)
+          execute('bundle exec rake sneakers:run') unless process_exists?(pid_file)
         end
       end
     end
