@@ -10,6 +10,16 @@ class Analytics::Master
     registry
   end
 
+  def self.olap_models
+    return @olap_models if @olap_models.present?
+
+    @olap_models = []
+    registry.values.each do |list|
+      @olap_models += list
+    end
+    @olap_models
+  end
+
   def self.registry(model = nil)
     @registry ||= {}
     return @registry unless model.present?

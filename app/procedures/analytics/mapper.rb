@@ -143,7 +143,7 @@ module Analytics::Mapper
       input = olap_model.input.call(user, payload)
       input = [input] unless input.respond_to?(:each)
       input.each do |record|
-        sync = Analytics::Synchronizer.(params: {record: record, olap_model: olap_model})
+        sync = Analytics::Synchronizer::Persist.(params: {record: record, olap_model: olap_model})
         if sync.failure? and not sync[:in_sync]
           # Todo log failure with reason
           raise "Sync Error: #{sync.errors}}"

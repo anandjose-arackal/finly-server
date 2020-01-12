@@ -41,8 +41,8 @@ class Analytics::Synchronizer < Transactions::API
     true
   end
 
-  def contract_builder(context, olap_record:, record:, **)
-    olap_record.build_contract(record)
+  def contract_builder(context, model:, record:, **)
+    model.build_contract(record)
   end
 
   class Analytics::Synchronizer::Persist < Analytics::Synchronizer

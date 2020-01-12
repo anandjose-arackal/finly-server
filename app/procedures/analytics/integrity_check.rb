@@ -18,9 +18,7 @@ class Analytics::IntegrityCheck < Transactions::API
     if params[:olap_model]
       options[:olap_models] << params[:olap_model]
     else
-      Analytics::Master.registry.values.each do |list|
-        options[:olap_models] += list
-      end
+      options[:olap_models] = Analytics::Master.olap_models
     end
   end
 
