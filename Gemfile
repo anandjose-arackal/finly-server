@@ -9,6 +9,8 @@ gem 'wkhtmltopdf-binary', '~> 0.12.4'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
+gem 'fiscali', '~> 2.4'
+
 gem 'parslet', '~> 1.8.2'
 
 gem 'rufus-scheduler', '~> 3.6'
@@ -48,6 +50,7 @@ gem 'reform-rails', '~> 0.1'
 gem 'pundit', '~> 2.1'
 gem 'uuidtools', '~> 2.1'
 gem 'dry-matcher', '~> 0.8'
+gem 'multiverse', '~> 0.2'
 
 gem 'health-monitor-rails', '~> 8.4.0'
 
@@ -90,7 +93,7 @@ gem 'annotate', '~> 2.7'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'
 # Use mysql as the database for Active Record
-gem 'mysql2', '~> 0.5.2'
+gem 'mysql2', '~> 0.5'
 
 #Bundles for pagination
 gem 'will_paginate', '~> 3.1.6'
@@ -142,7 +145,7 @@ gem 'gcm', '~> 0.1.1'
 
 # gem 'backbone-on-rails'
 
-gem 'bootstrap-will_paginate'
+gem 'bootstrap-will_paginate', '~> 1.0'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 # Bundle for Bootstrap
@@ -240,6 +243,7 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.1.4'
   gem 'capistrano-crono', '~> 0.1.2'
   gem 'capistrano-sidekiq', '~> 1.0.2'
+  # gem 'capistrano-sneakers', github: 'inventionlabsSydney/capistrano-sneakers'
   gem 'capistrano-rails-console', '~> 2.3.0', require: false
   gem 'hirb', '~> 0.7.3'
   # gem 'meta_request'
@@ -254,7 +258,7 @@ group :development, :test do
 
   gem 'rspec-rails', '~> 3.8'
   gem 'spring-commands-rspec', '~> 1.0.4'
-  gem 'capybara'
+  gem 'capybara', '~> 3.29'
 
 end
 
