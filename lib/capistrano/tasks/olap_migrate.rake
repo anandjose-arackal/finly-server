@@ -5,7 +5,9 @@ namespace :deploy do
     # end
     on roles fetch(:olap) do
       within release_path do
-        execute("DB=olap rails db:migrate") unless process_exists?(pid_file)
+        with rack_env: fetch(:rails_env) do
+          execute("DB=olap rails db:migrate")
+        end
       end
     end
   end

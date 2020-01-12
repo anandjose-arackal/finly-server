@@ -20,12 +20,15 @@ namespace :sneakers do
   desc 'Start Sneakers'
   task :start do
     on roles fetch(:sneakers_role) do
-      pid_file = fetch(:sneakers_pid)
-      within release_path do
-        with rack_env: fetch(:sneakers_env) do
-          execute('bundle exec rake sneakers:run') unless process_exists?(pid_file)
-        end
+      args = "#{fetch(:sneakers_runner)} >> #{fetch(:sneakers_log)} 2>&1 & echo $! > #{fetch(:sneakers_pid)}"
+      with rails_env: fetch(:sneakers_env) do
+        rake "sneakers:run #{args}"
       end
+      # within release_path do
+      #   with rack_env: fetch(:sneakers_env) do
+      #     rake('sneakers:run')# unless process_exists?(pid_file)
+      #   end
+      # end
     end
   end
 
