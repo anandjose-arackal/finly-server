@@ -34,7 +34,6 @@ set :sneakers_env, fetch(:rack_env, fetch(:rails_env, fetch(:stage)))
 set :sneakers_log, File.join(shared_path, 'log', 'sneakers.log')
 set :sneakers_roles, :sneakers
 set :sneakers_processes, 1
-set :sneakers_workers, ['worker1', 'worker2']
 
 # set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 # set :sidekiq_roles, :sidekiq_app
