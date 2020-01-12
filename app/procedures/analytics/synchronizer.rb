@@ -5,6 +5,7 @@ class Analytics::Synchronizer < Transactions::API
       required(:record).filled
       required(:olap_model)
       optional(:olap_record)
+      optional(:payload)
     end
   end
 
@@ -21,6 +22,7 @@ class Analytics::Synchronizer < Transactions::API
     context[:record] = params[:record]
     context[:olap_model] = params[:olap_model]
     context[:olap_record] = params[:olap_record]
+    context[:payload] = params[:payload]
   end
 
   def init_model(context, params:, olap_model:, olap_record:, record:, **)
@@ -33,8 +35,8 @@ class Analytics::Synchronizer < Transactions::API
     true
   end
 
-  def can_update_check(context, model:, record:, **)
-    if model.in_sync?(record)
+  def can_update_check(context, model:, record:,payload: **)
+    if model.in_sync?(record, payload)
       context[:in_sync] = true
       return false
     end
