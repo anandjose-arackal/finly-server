@@ -39,12 +39,12 @@ user:
   <% if current_user.admin? %>
   - id: admin
     name: Admin
-    default_url: 'expenses/params={"view":"admin"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.auditor? %>
   - id: auditor
     name: Auditor
-    default_url: 'expenses/params={"view":"auditor"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.finance_manager? %>
   - id: finance_manager
@@ -64,7 +64,7 @@ user:
   <% if current_user.employee? %>
   - id: personal
     name: 'Personal'
-    default_url: 'expenses/params={"view":"personal"}'
+    default_url: 'dashboard'
   <% end %>
 
 views:
