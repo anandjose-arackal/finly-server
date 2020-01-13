@@ -41,7 +41,11 @@ class InvoiceLineItemsCalculationUtils
         calculate_billable_amount(item) # this is mainly if item is a service
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
-        self.net_amount = self.gross_amount + self.tax_amount
+        if invoice.rcm_enabled?
+          self.net_amount = self.gross_amount
+        else
+          self.net_amount = self.gross_amount + self.tax_amount
+        end
       end
       self.invoice_total += self.net_amount
       total_invoice_discount = (self.service_item) ? 0 : self.discount_amount
@@ -187,7 +191,9 @@ class InvoiceLineItemsCalculationUtils
       self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
       self.tax_amount = self.net_amount - self.gross_amount
     else
+      # debugger
       if item.parent&.rcm_enabled?
+        # debugger
         self.net_amount = self.gross_amount
         # if RCM doesn't apply, we shall have to calculate the tax using a "pseudo" net amount
         # i.e. calculate tax as though RCM wasn't there and then tabulate it differently

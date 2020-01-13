@@ -45,6 +45,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :tds_nature
     attribute :tds_percentage
     attribute :tds_amount
+    attribute :rcm_enabled
   end
 
   section :item_details do
@@ -273,6 +274,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   def tds_amount(invoice_line_item)
     return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_amount&.value || 0.0
+  end
+
+  def rcm_enabled(invoice_line_item)
+    return invoice_line_item.parent.rcm_enabled
   end
 
   def tds_percentage(invoice_line_item)
