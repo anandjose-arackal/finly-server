@@ -8,7 +8,7 @@ class Transactions::Resolver
 
   class Resolve
     def self.with(options, model, scope, filter, paginate, includes)
-      options[:'model.index'] = model.resolve(
+      options['model.index'] = model.resolve(
           options[:current_user],
           params: options[:params],
           scope: scope,
