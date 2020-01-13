@@ -1,7 +1,7 @@
 class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTemplate < Personalizer::Adapters::ExportBase
   attr_accessor :headers, :contents, :reports
 
-  has_scope :filter_approved_date, using: [:from, :to], type: :hash
+  has_scope :filter_date, using: [:from, :to], type: :hash
 
 
   def pre_validate
@@ -12,7 +12,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
     users = user.company.users
     self.reports = Report.where(user_id: users.pluck(:id)).settlement_viewable
     self.reports = apply_scopes(self.reports, params)
-    self.reports = self.reports.includes({user: :profile}, {dlrms: [:reviewer, :action_taken_by, :forwarded_by]}, expenses: [:category, :amount, {manual_expense: [custom_fields: [:value]]}, {card_expense: [custom_fields: [:value]]}, {distance_expense: [custom_fields: [:value]]}, {time_expense: [custom_fields: [:value]]}])
+    self.reports = self.reports.includes(:policy,{user: :profile}, {dlrms: [:reviewer, :action_taken_by, :forwarded_by]}, expenses: [:category, :amount,{manual_expense:[:custom_fields]},{card_expense:[:custom_fields]},{distance_expense:[:custom_fields]},{time_expense:[:custom_fields]}])
 
     self.headers = [
         'VOUCHER Type Name',
@@ -71,19 +71,19 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
   end
 
   def print_department(expense)
-    expense.custom_fields.map {|cf| cf.string_value if cf.field_key == 'department'}&.first
+    expense.custom_fields.map {|cf| cf.configured_field_value if cf.field_key == 'department'}&.first
   end
 
   def print_market(expense)
-    expense.custom_fields.map {|cf| cf.string_value if cf.field_key == 'market'}&.first
+    expense.custom_fields.map {|cf| cf.configured_field_value if cf.field_key == 'market'}&.first
   end
 
   def print_hostel(expense)
-    expense.custom_fields.map {|cf| cf.string_value if cf.field_key == 'hostel'}&.first
+    expense.custom_fields.map {|cf| cf.configured_field_value if cf.field_key == 'hostel'}&.first
   end
 
   def print_city(expense)
-    expense.custom_fields.map {|cf| cf.string_value if cf.field_key == 'city'}&.first
+    expense.custom_fields.map {|cf| cf.configured_field_value if cf.field_key == 'city'}&.first
   end
 
   def print_ledger_name(expense)
@@ -111,7 +111,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
 
   def print_narration(report)
     approved_by = retrieve_approved_by(report)
-    "Being Exp of #{report&.expenses&.first&.user&.name} Approved by #{approved_by} Against Report ID# #{report.id}"
+    "Being Exp of #{report&.user&.name} Approved by #{approved_by} Against Report ID# #{report.id}"
   end
 
   def retrieve_approved_by(report)

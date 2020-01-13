@@ -41,7 +41,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def init
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
+      if params[:filter_ids] and not params[:filter_ids].respond_to?(:each)
         params[:filter_ids] = params[:filter_ids].first.split(",")
       end
       # Todo temp workaround because of frontend format issue - END

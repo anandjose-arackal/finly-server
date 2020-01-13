@@ -55,7 +55,7 @@ json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
-                :cost_allocation_items, :narration, :discount_type_id
+                :cost_allocation_items, :narration, :discount_type_id, :rcm_enabled
 
   json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
@@ -70,6 +70,7 @@ json.invoice do
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
   json.user invoice.created_by.as_json rescue nil
+  json.available_credits invoice.available_credits
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -135,6 +136,16 @@ json.invoice do
   json.net_payable_amount invoice.balance_due&.value
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
   json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+
+  json.credit_note_adjustments do
+    json.array! invoice.credit_note_adjustments do |cna|
+      json.id cna.id
+      json.credit_note_id cna.credit_note.id
+      json.credit_note_number cna.credit_note.credit_note_number
+      json.credit_note_sequence_id cna.credit_note.sequence_id
+      json.amount cna.amount.as_json
+    end
+  end
 
   # invoice items
   json.invoice_items do
@@ -238,7 +249,7 @@ json.tds_slabs do
 end
 
 json.attachments do
-  json.array! invoice.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
+  json.array! invoice.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -347,3 +358,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

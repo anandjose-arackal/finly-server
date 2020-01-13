@@ -2,6 +2,7 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
   attr_accessor :expenses
 
   def init
+    params[:view] = get_relevant_view
     self.expenses = Expense::Index.(user, params)
   end
 
@@ -14,7 +15,7 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
   class Dashboard::ExpenseManagement::Expenses::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expenses, :counts
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {
@@ -26,15 +27,15 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
       self.counts = []
 
       personal_expense_data = {
-        type: 'personal_expense',
-        data: [
-          {
-            title: "Unreported",
-            count: apply_scopes(self.expenses, {filter_status: 2})&.count,
-            total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
-            filters: [{filter_status: 2}]
-          }
-        ]
+          type: 'personal_expense',
+          data: [
+              {
+                  title: "Unreported",
+                  count: apply_scopes(self.expenses, {filter_status: 2})&.count,
+                  total_amount: apply_scopes(self.expenses, {filter_status: 2})&.map {|expense| expense.amount_value}&.compact&.sum,
+                  filters: [{filter_status: 2}]
+              }
+          ]
 
       }
 

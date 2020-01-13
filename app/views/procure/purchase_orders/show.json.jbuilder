@@ -292,3 +292,5 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

@@ -42,7 +42,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     # Format as required by PaymentFiles::Generate
     payment_params = []
 
-    if [2, 164].include? user.company.id # Satin CreditCare or L&C
+    if [ 164].include? user.company.id # Satin CreditCare or L&C
       load_data = satin_data
     else
       load_data = general_data
@@ -68,13 +68,15 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   def data_points(mapping)
     data = {}
     first_report = mapping&.reports&.first
-    data[:beneficiary_account_name] = mapping.processor_accountable.name
+    ifsc = mapping.processor_accountable&.ifsc
+    ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
+    data[:beneficiary_account_name] = BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name
     data[:beneficiary_account_number] = mapping.processor_accountable.account_number
     data[:receiving_user_name] = mapping.user.name
     data[:amount] = mapping.amount.value
     data[:payment_mode] = 'NEFT'
     data[:date] = Date.today
-    data[:beneficiary_ifsc] = mapping.processor_accountable.ifsc
+    data[:beneficiary_ifsc] = ifsc
     data[:ifsc] = mapping.processor_accountable.ifsc
     data[:email] = mapping.user.email
     data[:receiving_mobile_number] = mapping.user.mobile_number
@@ -84,19 +86,28 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     data[:report_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount
     data[:reimbursable_amount] = mapping.reports.find_by(id: data[:report_id])&.total_amount([:reimbursable])
     data[:employee_id] = mapping.user.profile.employee_id
-    data[:approved_by] = retrieve_approved_by(first_report)
-    data[:cost_center] = mapping&.user&.cost_center&.name
-    data[:period] = retrieve_period(first_report)
+    if [ 1,2,144].include? user.company.id # StanzaCare or L&C
+      data[:description] = retrieve_description(first_report)
+      data[:approved_by] = retrieve_approved_by(first_report)
+      data[:department] = retrieve_department(first_report)
+      data[:period] = retrieve_period(first_report)
+    end
     data
   end
 
   def retrieve_period(report)
-    report.expenses&.pluck(:date)&.each {|dt| dt.strftime("%B")}&.uniq&.to_sentence(last_word_connector: " and ")
+    min = report&.expenses&.pluck(:date).min
+    max = report&.expenses&.pluck(:date).max
+    (min.month != max.month ? "#{min.strftime("%B %Y")} to #{max.strftime("%B %Y")}" : min.strftime("%B %Y"))
+  end
+
+  def retrieve_description(report)
+    report&.expenses&.first&.category&.name
   end
 
   def retrieve_approved_by(report)
-    return '' if report.dlrms.blank?
-    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).last
+    return '' if report&.dlrms.blank?
+    dlrm = report.dlrms.where(action_id: TrailAction.id_for(:approve)).first
     if dlrm&.taken_control_by_id&.present?
       return dlrm.taken_control_by&.name
     elsif dlrm&.forwarded_by_id&.present?
@@ -105,6 +116,10 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
       return dlrm.reviewer&.name
     end
     ''
+  end
+
+  def retrieve_department(report)
+    report&.expenses&.first&.custom_fields&.map { |cf| cf.configured_field_value if cf.field_key == 'department' }&.first
   end
 
 end

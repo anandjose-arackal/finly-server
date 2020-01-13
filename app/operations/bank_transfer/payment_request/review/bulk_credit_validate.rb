@@ -63,7 +63,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           id: payment_request.id,
           name: payment_request.name,
           payment_request: payment_request,
-          allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil) ,
+          allowed: is_transfer_within_timeframe(payment_request) ,
           next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
           total_amount: payment_request.payment_order.amount_requested&.value,
           created_at: payment_request.created_at.strftime("%d-%m-%Y"),
@@ -97,7 +97,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           minimum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).first.min_amount
           maximum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).first.max_amount || 999999999999999999999999
 
-          max_payment_value = payment_request.payments.joins(:amount).pluck(:amount).max || 0
+          max_payment_value = payment_request.payments.joins(:amount).pluck(:value).max || 0
           if  max_payment_value > maximum
             hash[:selectable] = false
             self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
@@ -192,6 +192,16 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
       else
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    end
+  end
+
+  def is_transfer_within_timeframe(payment_request)
+    # Timeframes are defines only for NEFT, IMPS, RTGS
+    if TransferMode.common_modes.include?(payment_request.payment_order&.transfer_mode&.mode_id)
+      TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil)
+    else
+      # Custom transfer mode does not depend on transfer timings 
+      true
     end
   end
 

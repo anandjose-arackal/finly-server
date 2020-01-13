@@ -43,7 +43,6 @@ set :email_tracker_role, :email_tracker_role
 # role :db,  %w{deploy@example.com}
 
 
-
 # Configuration
 # =============
 # You can set any configuration variable like in config/deploy.rb
@@ -51,7 +50,6 @@ set :email_tracker_role, :email_tracker_role
 # For available Capistrano configuration variables see the documentation page.
 # http://capistranorb.com/documentation/getting-started/configuration/
 # Feel free to add new variables to customise your setup.
-
 
 
 # Custom SSH Options

@@ -5,7 +5,8 @@ class Authenticator::Processor
       Authenticator::Providers::Application,
       Authenticator::Providers::Admin,
       Authenticator::Providers::AdminBypass,
-      Authenticator::Providers::MultiEntityLogin
+      Authenticator::Providers::MultiEntityLogin,
+      Authenticator::Providers::Sso
   ]
 
   def initialize(request)

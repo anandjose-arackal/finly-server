@@ -11,8 +11,6 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  purpose_id                 :integer
-#  parent_id                  :integer
-#  code                       :string(255)
 #  expense_management         :boolean
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
@@ -28,9 +26,12 @@ class Category < ApplicationRecord
   include AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
+
+  event_channel 'category'
 
   belongs_to :company, optional: true
 

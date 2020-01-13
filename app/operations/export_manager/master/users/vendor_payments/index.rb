@@ -1,18 +1,19 @@
-class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Users::VendorPayments::Index < ExportManager::Builders::Spreadsheet
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :vp_users
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+
+  label 'Export'
+  description 'Users Export'
+  configurable true
+  system :vp
+  screen 'users.vp.index'
+  handle :vp_users
   validate :input
-  fields [
-          employee_id: {spreadsheet: true},
-          name: {spreadsheet: true},
-          email: {spreadsheet: true},
-          mobile_number: {spreadsheet: true},
-          status: {spreadsheet: true}
-        ]
 
+  attribute :employee_id
+  attribute :name
+  attribute :email
+  attribute :mobile_number
+  attribute :status
 
   def input
     result = ::BankTransfer::Users::Index.(user, params)

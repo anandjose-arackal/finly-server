@@ -6,13 +6,13 @@ class Dashboard::ExpenseManagement::Configs < Dashboard::ExpenseManagement::Base
     self.policies = user.policies.with_application(current_app).non_default.non_deleted
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.request_types = {
-      awaiting_action: false,
-      reports: false,
-      money_requests: false,
-      trips: false
+        awaiting_action: false,
+        reports: false,
+        money_requests: false,
+        trips: false
     }
     subscription = user.company.feature_subscription
-    
+
     self.request_types[:reports] = subscription.expense_management_enabled
     self.request_types[:money_requests] = subscription.expense_management_enabled
     self.request_types[:trips] = subscription.travel_request

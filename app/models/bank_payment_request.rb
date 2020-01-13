@@ -28,12 +28,15 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
-#  rejection_note               :text(65535)
 #  bank_account_provider_id     :integer
 #  otp                          :string(255)
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
 #  otp_count                    :integer
+#  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -53,6 +56,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
   belongs_to :company, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -72,6 +76,13 @@ class BankPaymentRequest < ApplicationRecord
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, :pending?, :creation_in_progress?, to: :status, allow_nil: true
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
+
+  enum ticket_type: {
+    beneficiary: 'beneficiary_payment',
+    invoice: 'invoice',
+    purchase_order: 'purchase_order',
+    security_deposit: 'security_deposit'
+  }
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
@@ -257,7 +268,7 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,{receiving_account: :account_owner},:initiating_user,{amount: :currency},
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
   invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
@@ -316,22 +327,42 @@ class BankPaymentRequest < ApplicationRecord
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
+  # scope :filter_payment_ids, -> (payment_ids) {
+  #   payment_ids = payment_ids.split(",").each {|e| e.strip!}
+  #   all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
+  #   if all_payments.where(id: payment_ids).any?
+  #     payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+  #     where(payment_order_id: payment_order_ids)
+  #   else
+  #     BankPaymentRequest.none
+  #   end
+  # }
+
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
-    all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    if all_payments.where(id: payment_ids).any?
-      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-      where(payment_order_id: payment_order_ids)
-    else
-      BankPaymentRequest.none
+    if payment_ids.present?
+      joins(payment_order: :payments).where("payments.id IN (?)", payment_ids)
     end
   }
 
+  # scope :filter_vendor_id, -> (vendor_id) {
+  #   payment_order_ids = self.pluck(:payment_order_id)
+  #   payments = Payment.where(payment_order_id: payment_order_ids)
+  #   payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
+  #   where(payment_order_id: payment_order_ids)
+  # }
+
   scope :filter_vendor_id, -> (vendor_id) {
-    payment_order_ids = self.pluck(:payment_order_id)
-    payments = Payment.where(payment_order_id: payment_order_ids)
-    payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    joins(payment_order: :payments).where("payments.receiving_user_type = ? AND payments.receiving_user_id = ?", "YesBankVendor", vendor_id)
+  }
+
+  scope :filter_ticket_type, -> (type) {
+    type = type.to_s.underscore
+    where ticket_type: type
+  }
+
+  scope :filter_transfer_mode, -> (id) {
+    where transfer_mode_id: id
   }
 
   attr_accessor :cache_users
@@ -522,6 +553,12 @@ class BankPaymentRequest < ApplicationRecord
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
     end
   end
+
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
+  end
+
+
 
   private
 

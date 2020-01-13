@@ -34,7 +34,7 @@ class WorkflowManager::Base < BaseOperation
         self.aasm_document = ::WorkflowManager::Aasm::PoInvoiceProvider.new user, workflow_input
       elsif provider_name == 'NonPoInvoiceProvider'
         self.aasm_document = ::WorkflowManager::Aasm::NonPoInvoiceProvider.new user, workflow_input
-      end 
+      end
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input
     when 'MoneyRequest'
@@ -60,6 +60,12 @@ class WorkflowManager::Base < BaseOperation
       self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
     when 'PaymentAgreement'
       self.aasm_document = ::WorkflowManager::Aasm::PaymentAgreementProvider.new user, workflow_input
+    when 'BbpsBillerSubscription'
+      self.aasm_document = ::WorkflowManager::Aasm::BbpsBillerSubscriptionProvider.new user, workflow_input
+    when 'BbpsBill'
+      self.aasm_document = ::WorkflowManager::Aasm::BbpsBillProvider.new user, workflow_input
+    when 'CreditNote'
+      self.aasm_document = ::WorkflowManager::Aasm::CreditNoteProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

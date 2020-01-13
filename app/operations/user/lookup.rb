@@ -85,7 +85,7 @@ class User::Lookup < User::Base
         self.otp_verified = true
         self.set_password = false
       end
-      self.multi_entity_enabled = params[:multi_entity_enabled]
+      self.multi_entity_enabled = !!params[:multi_entity_enabled]
     end
 
   end

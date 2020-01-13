@@ -1,6 +1,7 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
                 :id_current_attachments, :po_revision, :inv_items, :grn_enabled, :grn_disabled, :srn_enabled, :srn_disabled
+
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -327,7 +328,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
-    if ( billable_amount.to_f + inward_document_item.previously_billed_amount.to_f ) > inward_document_item.order_amount.to_f
+    if (billable_amount.to_f + inward_document_item.previously_billed_amount.to_f) > inward_document_item.order_amount.to_f
       add_message :error, "For item - #{inward_document_item.description}, billable amount has exceeded the order amount"
       return
     end

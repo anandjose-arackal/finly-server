@@ -3,6 +3,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"trips"}, "page"=>"1", "per_page"=>"30"}
+    params[:view] = get_relevant_view
     self.trips = TravelRequests::Index.(user, params)
 
   end
@@ -16,7 +17,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
   class Dashboard::ExpenseManagement::Trips::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :trips, :counts
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {
@@ -26,36 +27,36 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
       self.trips = self.trips.travel_requests.includes(:reports, :bookings, {policy: [:base_currency]}, {money_requests: [items: [{money_request: [:payment_mode, {destination_pocket: :base_currency}]}, {amount: [:currency]}]]})
       self.counts = []
       personal_travel_data = {
-        type: 'personal_travel',
-        data: [
-          {
-            title: "Pending",
-            count: self.trips.filter_status('booking_pending')&.count,
-            total_amount: self.trips.filter_status('booking_pending').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: [{filter_status: 'booking_pending'}]
-          },
+          type: 'personal_travel',
+          data: [
+              {
+                  title: "Pending",
+                  count: self.trips.filter_status('booking_pending')&.count,
+                  total_amount: self.trips.filter_status('booking_pending').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
+                  filters: [{filter_status: 'booking_pending'}]
+              },
 
-          {
-            title: "Processing",
-            count: self.trips.filter_status('processing')&.count,
-            total_amount: self.trips.filter_status('processing').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: [{filter_status: 'processing'}]
-          },
+              {
+                  title: "Processing",
+                  count: self.trips.filter_status('processing')&.count,
+                  total_amount: self.trips.filter_status('processing').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
+                  filters: [{filter_status: 'processing'}]
+              },
 
-          {
-            title: "Confirmed",
-            count: self.trips.filter_status('booking_confirmed')&.count,
-            total_amount: self.trips.filter_status('booking_confirmed').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: [{filter_status: 'booking_confirmed'}]
-          },
+              {
+                  title: "Confirmed",
+                  count: self.trips.filter_status('booking_confirmed')&.count,
+                  total_amount: self.trips.filter_status('booking_confirmed').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
+                  filters: [{filter_status: 'booking_confirmed'}]
+              },
 
-          {
-            title: "Rejected",
-            count: self.trips.filter_status('rejected')&.count,
-            total_amount: self.trips.filter_status('rejected').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
-            filters: [{filter_status: 'rejected'}]
-          }
-        ]
+              {
+                  title: "Rejected",
+                  count: self.trips.filter_status('rejected')&.count,
+                  total_amount: self.trips.filter_status('rejected').map {|tr| tr.summary[:trip_cost].value}&.compact&.sum,
+                  filters: [{filter_status: 'rejected'}]
+              }
+          ]
 
       }
 

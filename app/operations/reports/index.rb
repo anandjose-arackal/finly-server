@@ -119,7 +119,7 @@ class Reports::Index < Reports::Base
   end
 
   def post_process
-    if self.reports.present?
+    unless self.reports.nil?
       self.reports = self.reports.exclude_deleted.includes(:policy, :status, expenses: [:amount]) rescue self.reports
     end
     if params[:ref] == '1' and params[:n_id].present?
@@ -156,9 +156,8 @@ class Reports::Index < Reports::Base
       self.reports = params[:reports]
 
       get_counts
-      return unless self.reports.present?
       self.reports = apply_scopes(self.reports, params)
-      if self.reports.present?
+      unless self.reports.nil?
         if params[:filter_status].present?
           self.reports = self.reports.filter_status(params[:filter_status], user.id)
         end
@@ -175,7 +174,7 @@ class Reports::Index < Reports::Base
     end
 
     def get_counts
-      type_counts = reports.group(:report_status_id)
+      type_counts = reports.group(:report_status_id).count
       self.counts = {}
       counts[:open] = (type_counts[ReportStatus.open_id] or 0)
       counts[:processing] = (type_counts[ReportStatus.processing_id] or 0)

@@ -125,9 +125,4 @@ class ExportController < BaseControllers::WebBase
     respond
   end
 
-  def processor
-    @result = ExportManager::RequestHandler.(current_user, params)
-    respond
-  end
-
 end
