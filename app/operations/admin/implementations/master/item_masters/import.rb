@@ -31,7 +31,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
 
   def update_record(data)
 
-    item = self.company.items.find_by id: data[:id]
+    item = self.company.items.non_deleted.find_by id: data[:id]
     unless item
       return result false, "item not found"
     end
@@ -48,7 +48,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
   end
 
   def destroy_records(data)
-   item = self.company.items.find_by id: data[:id]
+   item = self.company.items.non_deleted.find_by id: data[:id]
    unless item
     return result false, "item not found"
    end

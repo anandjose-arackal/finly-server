@@ -7,7 +7,7 @@ class AuditTrails::Index < AuditTrails::Base
 
     # WARNING: Make sure all the classes go below belongs_to Company model
     # Check validation
-    document_types = %w( PurchaseOrder Invoice Report)
+    document_types = %w( PurchaseOrder Invoice Report YesBankVendor)
 
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id

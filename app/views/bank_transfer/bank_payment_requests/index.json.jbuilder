@@ -1,4 +1,3 @@
-json.count @result.payment_requests&.count
 json.results do
   json.array! @result.paginated_payment_requests.each do |payment_request|
 
@@ -49,16 +48,22 @@ json.results do
 
     json.payments_count payment_request.payment_order.payments.size
 
-    payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
-    json.payments do
-      json.array!(payments) do |payment|
-        json.id payment.id
-        json.beneficiary_name payment.receiving_account&.account_owner&.name
-        json.payment_mode payment.payment_mode&.upcase
-        json.date payment.date.strftime('%d %b %Y')
-        json.amount payment.amount_value
-        json.utr payment.reference_resource&.bank_reference_number
-        json.payment_status payment.payment_status_name
+    unless [168, 169, 174, 175].include?(current_user.company_id)
+      payments = payment_request.payment_order.payments.limit(5).includes(:payment_status, receiving_account: [:account_owner])
+      json.payments do
+        json.array!(payments) do |payment|
+          json.id payment.id
+          json.beneficiary_name payment.receiving_account&.account_owner&.name
+          json.payment_mode payment.payment_mode&.upcase
+          json.date payment.date.strftime('%d %b %Y')
+          json.amount payment.amount_value
+          json.utr payment.reference_resource&.bank_reference_number
+          json.payment_status payment.payment_status_name
+          if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)
+            json.business_name payment&.receiving_account&.account_owner&.business_name
+            json.trade_name payment&.receiving_account&.account_owner&.trade_name
+          end
+        end
       end
     end
   end

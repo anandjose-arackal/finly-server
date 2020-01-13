@@ -53,6 +53,8 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
     # skipping validations because users from the mobile number invite flow won't have their details filled in yet
     selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     selected_user.save(validate: false)
+    # For group entity, otp verify all accounts
+    selected_user.associated_group_users.update_all(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     RequestStoreUtil.current_session.verify(:otp)
   end
 

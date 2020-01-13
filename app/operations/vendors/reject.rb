@@ -23,7 +23,7 @@ class Vendors::Reject < Vendors::Base
       return
     end
 
-    self.vendor.update(reject_note: params[:reject_note])
+    self.vendor.update(reject_note: params[:note])
 
     self.workflow_output = op.workflow_output
   end

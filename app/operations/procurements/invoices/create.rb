@@ -36,6 +36,11 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     unless self.vendor.present?
       add_message :error, 'Vendor not found'
     end
+
+    unless user.is_non_po_invoice_initiator?
+      add_message :error, 'You do not have permission for this action'
+      return
+    end
   end
 
   def process
@@ -46,12 +51,12 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     else
       self.invoice = procurement.invoices.build
     end
-    receiving_account = self.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
+    # receiving_account = self.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
     self.invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     self.invoice.created_by = user
     self.invoice.company = user.company
     self.invoice.invoice_type_id = self.inward_invoice_type
-    self.invoice.receiving_account = receiving_account
+    # self.invoice.receiving_account = receiving_account # let the user select bank accounts
     self.invoice.controlling_user = user
     self.invoice.vendor = vendor
     if self.vendor.payment_term_id.present?

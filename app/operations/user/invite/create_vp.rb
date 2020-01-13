@@ -1,7 +1,7 @@
 class User::Invite::CreateVp < User::Invite::Base
 
   attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles, :admin,
-                :existing_emails
+                :existing_emails, :common_users
 
   def pre_validate
     if params.blank? or user.blank?
@@ -38,6 +38,12 @@ class User::Invite::CreateVp < User::Invite::Base
         end
       else
         # do nothing
+    end
+
+    if user.company.feature_subscription.group_entity_structure
+      gc = current_company.group
+      # prevent sql injection
+      self.common_users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', invite_params[:email]) rescue Company.none
     end
   end
 
@@ -89,6 +95,7 @@ class User::Invite::CreateVp < User::Invite::Base
           messages[:error] << "#{email} is not a valid email format"
           return false
         end
+        next if group_users(email).present?
         if User.with_company_id(user.company_id).find_by_email(email).present?
           violating_emails << email
         end
@@ -162,6 +169,10 @@ class User::Invite::CreateVp < User::Invite::Base
         invite_params[:email] = email
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
+        if user.company.feature_subscription.group_entity_structure
+          u = group_users(email)
+          invite_params = u.attributes
+        end
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.invitation_note = params[:pending_invite][:note]
           self.policy_roles.each do |role|
@@ -226,6 +237,10 @@ class User::Invite::CreateVp < User::Invite::Base
 
   def create_invite_params_vp
     params.require(:pending_invite).permit(:email, :mobile, :mobile_number, :company_id, :policy_id)
+  end
+
+  def group_users(email)
+    self.common_users.find {|u| u if u.email.strip.downcase == email.strip.downcase}
   end
 
 end

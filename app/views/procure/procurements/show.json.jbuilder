@@ -54,6 +54,7 @@ json.trail do
       json.invoice_details do
         json.proforma_advance item.proforma_advance&.value
         json.amount item.balance_due&.value
+        json.inv_number item.invoice_number
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
@@ -64,6 +65,7 @@ json.trail do
     elsif item.is_a?(Invoice)
       json.invoice_details do
         json.amount item.balance_due&.value
+        json.inv_number item.invoice_number
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name

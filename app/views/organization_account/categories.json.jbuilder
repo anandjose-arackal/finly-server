@@ -7,7 +7,7 @@ json.categories do
     json.gst_applicable category.gst_applicable
     if category.children.present?
       json.sub_categories do
-        json.array!(category.children) do |sub_category|
+        json.array!(category.children.active) do |sub_category|
           json.id sub_category.id
           json.name sub_category.name
           json.gl_code sub_category.gl_code

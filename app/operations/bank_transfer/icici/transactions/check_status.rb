@@ -16,7 +16,7 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
   end
 
   def validate
-    unless self.bank_transaction.pending_utr? || self.bank_transaction.processing? || self.bank_transaction.pending_for_processing? || self.bank_transaction.possible_failure?
+    unless self.bank_transaction.pending_utr? || self.bank_transaction.processing? || self.bank_transaction.pending_for_processing? || self.bank_transaction.possible_failure? || self.bank_transaction.suspect?
       add_message :error, "This transaction is not in processing state"
       return
     end

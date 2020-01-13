@@ -3,6 +3,8 @@ class PasswordMailer < ApplicationMailer
   def notify_password_change(data)
     @email = data[:to]
     @user_agent = data[:user_agent]
+    device = DeviceDetector.new(@user_agent) if @user_agent
+    @device_name = device&.name
     @ip = data[:ip]
     @timestamp = data[:timestamp]
 

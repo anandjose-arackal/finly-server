@@ -31,12 +31,14 @@
 #  vendor_empanelment_workflow    :boolean          default(FALSE)
 #  purchase_requisition_system    :boolean
 #  bank_service_provider          :string(255)
-#  request_encryption_enabled     :boolean          default(FALSE)
 #  group_entity_structure         :boolean          default(FALSE)
+#  vendor_portal                  :boolean          default(FALSE)
 #  grn_enabled                    :boolean          default(TRUE)
 #  srn_enabled                    :boolean          default(FALSE)
 #  agreement_based_payment_system :boolean          default(FALSE)
-#  gstin_verification_eabled      :boolean          default(FALSE)
+#  gstin_verification_enabled     :boolean          default(FALSE)
+#  user_level_custom_fields       :boolean          default(FALSE)
+#  request_encryption_enabled     :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ApplicationRecord

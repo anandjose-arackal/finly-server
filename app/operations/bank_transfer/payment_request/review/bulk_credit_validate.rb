@@ -110,6 +110,14 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         end
       end
 
+      payment_request.payment_order.payments.each do |payment|
+        if payment.receiving_account.blank? or payment.receiving_account.disabled
+          errors << "Payment #{payment.id} bank account is not present or is disabled."
+          self.unprocessable_amount += payment.amount&.value
+          hash[:selectable] = false
+        end
+      end
+
       hash[:errors] = errors
       self.result << hash
     end

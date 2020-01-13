@@ -98,7 +98,7 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
   end
 
   def created_at(item)
-    item.created_at.strftime('%d-%b-%Y')
+    item.created_at&.strftime('%d-%b-%Y')
   end
 
 

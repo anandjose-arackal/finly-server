@@ -39,7 +39,8 @@
 class BankPaymentRequest < ApplicationRecord
   include SoftDeletable,
           FindByOrderedIds,
-          Transitionable
+          Transitionable,
+          CustomFieldFilterSupport
   include LiquidDroppable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
@@ -113,6 +114,12 @@ class BankPaymentRequest < ApplicationRecord
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
         with_id(ids)
       end
+    when 'in_progress'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:in_progress))
+    when 'partially_completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:partially_completed))
+    when 'completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     else
       # all
     end
@@ -181,14 +188,14 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
-                                                        {payments: [
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :controlling_level, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+                                                                                                                                                                                                                                            {payments: [
                                                             {amount: [:currency]},
                                                             :payment_status,
                                                             :invoice,
                                                             {payment_order: [bank_payment_request: [:status]]},
                                                             :payment_order]},
-                                                        {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
+                                                                                                                                                                                                                                            {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
 
   scope :include_for_index_meesho, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           # {payments: [
@@ -275,6 +282,19 @@ class BankPaymentRequest < ApplicationRecord
       raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
       field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
       invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_text_value(value).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+      po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+      bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+      where(id: bpr_ids)
+    end
+  }
+
+  scope :filter_custom_field_dropdown, -> (key, selected_value_id) {
+    if selected_value_id.present?
+      raw_po_ids = self.pluck(:payment_order_id)
+      raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+      field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_parent(raw_invoice_ids, "Invoice").joins("INNER JOIN field_drop_down_selections ON custom_fields.value_id = field_drop_down_selections.id AND custom_fields.value_type = 'FieldDropDownSelection'").where('field_drop_down_selections.value_id = ?', selected_value_id).pluck(:parent_id)
+
       po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
       bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
       where(id: bpr_ids)

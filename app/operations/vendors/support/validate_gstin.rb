@@ -1,12 +1,13 @@
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
-  attr_accessor :gstin_params, :connection, :api_response, :response_body,
-    :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
+  attr_accessor :gstin_params, :connection, :api_response, :response_body, :state,
+                :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
-                  :gstin_master, :trade_name_match_percentile
+                  :gstin_master, :trade_name_match_percentile, :state
 
     def init
+      self.state = params[:state]
       self.gstin_master = params[:gstin_master]
       self.response_body = params[:response_body]
       self.match_percentile = params[:match_percentile]
@@ -85,6 +86,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     params[:response_body] = self.response_body
     params[:match_percentile] = self.match_percentile || 0
     params[:trade_name_match_percentile] = self.trade_name_match_percentile || 0
+    params[:state] = self.state
     Vendors::Support::ValidateGstin::ValidatePresenter.new(user, params, messages)
   end
 
@@ -104,17 +106,19 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
     legal_name_of_business = response_body[:data][:lgnm]
 
+    self.state = GstStateCode.with_state_code(response_body[:data][:gstin][0..1]).first
+
     data = {
-      gstin: response_body[:data][:gstin],
-      api_response: response_body,
-      legal_name_of_business: response_body[:data][:lgnm],
-      state: response_body[:data][:stj],
-      date_of_registration: response_body[:data][:rgdt],
-      constitution_of_business: response_body[:data][:ctb],
-      status: response_body[:data][:sts],
-      trade_name: response_body[:data][:tradeNam],
-      api_provider: response_body[:data][:masters_india],
-      address: addr_array.join(", ")
+        gstin: response_body[:data][:gstin],
+        api_response: response_body,
+        legal_name_of_business: response_body[:data][:lgnm],
+        state: self.state&.name,
+        date_of_registration: response_body[:data][:rgdt],
+        constitution_of_business: response_body[:data][:ctb],
+        status: response_body[:data][:sts],
+        trade_name: response_body[:data][:tradeNam],
+        api_provider: response_body[:data][:masters_india],
+        address: addr_array.join(", ")
     }
   end
 

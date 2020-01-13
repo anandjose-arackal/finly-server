@@ -64,7 +64,7 @@ class UserDevices::FindOrCreate < BaseOperation
     user_device = user.user_devices.valid.find_by(client: client)
     return user_device if user_device.present?
     # If not found
-    user_device = UserDevice.new user:user, company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified)
+    user_device = UserDevice.new company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified), user_finly_id: user.finly_id, user_id: user.id
     unless client.complete?
       user_device.status_id = client.status_id
       user_device.message = client.message

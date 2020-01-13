@@ -70,7 +70,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def user_id(lurm)
-    lurm.user.email.present? ? lurm.user.email : lurm.user.mobile_number
+    lurm.user&.email&.present? ? lurm.user&.email : lurm.user&.mobile_number
   end
 
   def min(lurm)
@@ -105,12 +105,15 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
              )
 
 
+    if params[:with_id] == 'all'
+      params[:with_id] = company.policies.pluck(:id)
+    end
     providers.each do |provider|
       total_count = 0
       contents[provider] = []
       policy_ids = apply_scopes(company.policies).pluck(:id)
       level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity_type: provider).pluck(:id)
-      data = LevelUserReviewerMapping.where(level_id: level_ids)
+      data = LevelUserReviewerMapping.where(level_id: level_ids).where.not(user_id: nil)
       total_count += data.count
       self.implementation_request.update(requested_items: data.count)
       data.each_with_index do |entry, index|

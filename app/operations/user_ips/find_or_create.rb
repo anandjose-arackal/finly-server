@@ -37,7 +37,7 @@ class UserIps::FindOrCreate < BaseOperation
     ip = user.user_ips.find_by_ip(ip_addr)
     return ip if ip.present?
 
-    ip = user.user_ips.build ip: ip_addr, ip_type: ip_type, status_id: UserIpStatus.id_for(:unverified)
+    ip = user.user_ips.build ip: ip_addr, ip_type: ip_type, status_id: UserIpStatus.id_for(:unverified), user_finly_id: user.finly_id, user_id: user.id
     unless ip.valid?
       add_message :error, ip.errors.full_messages
       return

@@ -73,7 +73,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
       params[:report_processor_group_mapping].delete(:reports_attributes)
 
       # if utr is there, we automatically assume the item can be marked as completed
-      request_params[:marked_as_completed] = true
+      # request_params[:marked_as_completed] = true
     end
 
     request_params[:marked_as_completed] = !!StringUtils.to_bool(request_params[:marked_as_completed])
@@ -92,6 +92,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     self.mapping.assign_attributes(request_params)
     if self.mapping.valid?
       self.mapping.save
+      update_status
       update_mapping_data if request_params[:marked_as_completed] # only update report and its tracks if mapping is not completed
     else
       add_message :error, self.mapping.errors.full_messages
@@ -107,9 +108,9 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
 
   def post_process
     add_message :success, 'Updated Successfully'
-    if self.pending_mappings.blank?
-      add_message :success, "All items credited. Batch status now set to Completed."
-    end
+    # if self.pending_mappings.blank?
+    #   add_message :success, "All items credited. Batch status now set to Completed."
+    # end
   end
 
   def success
@@ -137,6 +138,9 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     event = 'settle'
 
     self.mapping.reports.each do |report|
+      
+      next if (report.bank_reference_number.blank? and report.source_account.blank?)
+
       parameters = {
         document: report,
         aasm_event: event
@@ -175,7 +179,8 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     partially_complete_status = ReportProcessorGroupStatus.id_for(:partially_completed)
     self.pending_mappings = self.report_processor_group.mappings.not_completed
     
-    set_status = (self.pending_mappings.blank?) ? completed_status : partially_complete_status
+    # set_status = (self.pending_mappings.blank?) ? completed_status : partially_complete_status
+    set_status = partially_complete_status
 
     if self.report_processor_group.processed_amount.blank?
       processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
@@ -185,7 +190,7 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount&.value
 
     self.report_processor_group.update(status_id: set_status, completed_at: DateTime.now,
-                                          marked_as_completed: true,processed_amount: processed_amount)
+                                          marked_as_completed: false,processed_amount: processed_amount)
   end
 
   def validate_utr(utr)
@@ -193,4 +198,13 @@ class Settlement::SReport::Processing::Update < Settlement::SReport::Processing:
     ( /\A[a-zA-Z0-9]*\Z/.match(utr) ) ? true : false
   end
 
+  def update_status
+    return false if self.mapping.completed?
+
+    data = self.mapping.reports.pluck(:bank_reference_number).reject(&:blank?)
+    if data.compact.present? and (data.compact.count == self.mapping.reports.count)
+      status = ReportProcessorGroupStatus.id_for(:completed)
+      self.mapping.update status_id: status
+    end
+  end
 end

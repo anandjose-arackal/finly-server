@@ -3,24 +3,20 @@
 # Invoice freqency is allowed to be monthy only, hence considering 'month' as default period
 class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
 
-  # :first_reference_invoice is the reference invoice for creating first fixed_periodic invoice template
-  # :new_upcoming_invoice => Upcoming invoice that  act as a template for the new actual invoice
-  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoice, :first_reference_invoice, :invoice_type, :vendor_id, :escalated_reference_invoice
+  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoices, :invoice_type, :vendor_id, :escalated_reference_invoice, :effective_end_date, :reference_invoice_type, :upcoming_invoice_params, :reference_invoice_ids, :base_start_date, :current_month_end_date, :count, :ordered_upcoming_invoice_dates
 
   def init
     payment_agreement_id = params[:payment_agreement_id]
     self.payment_agreement = user.company.payment_agreements.find_by_id payment_agreement_id
-    self.first_reference_invoice = params[:first_reference_invoice] || false
-    self.invoice_type = params[:first_reference_invoice_type] 
-    # previous_upcoming_invoice is not required for first invoice
-    # previous_upcoming_invoice is previous invoice template
-    unless first_reference_invoice.present?
-      self.previous_upcoming_invoice = params[:previous_upcoming_invoice]
-      self.escalated_reference_invoice = params[:escalated_reference_invoice]
-    end
-
-    self.vendor_id = params[:vendor_id] || (first_reference_invoice.present? ? first_reference_invoice.vendor_id : previous_upcoming_invoice.vendor_id)
-    # self.partial_invoice_ids = []
+    self.reference_invoice_type = params[:reference_invoice_type]
+    self.invoice_type = params[:reference_invoice_type]
+    self.vendor_id = params[:vendor_id]
+    self.reference_invoice_ids = params[:reference_invoice_ids]
+    self.upcoming_invoice_params = []
+    self.base_start_date = Date.parse("01 Aug 2019")
+    self.current_month_end_date = get_current_month_end_date #Date.today.end_of_month
+    self.count = 1
+    self.ordered_upcoming_invoice_dates = {}
   end
 
   def validate
@@ -35,29 +31,17 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
       return
     end
 
-    if first_reference_invoice.present? && invoice_type.blank?
-      add_message :error, "First upcoming invoice type cannot be black"
+    if reference_invoice_type.blank?
+      add_message :error, "Reference invoice type cannot be blank"
     end
 
-    unless first_reference_invoice.present?
-      if self.previous_upcoming_invoice.blank?
-        add_message :error, "General and rental invoice both are not found"
-        return
-      end
-      # Upcoming invoice creation is only allowed for agreement invoices with billing type fixed period
-      unless self.previous_upcoming_invoice.billing_type.fixed_periodic?
-        add_message :error, "Only fixed periodic agreement invoices can be auto-created"
-        return
-      end
+    if payment_agreement.terminated?
+      add_message :error, 'Payment Agreement has been terminated, unable to create upcoming invoices'
     end
-
-    # Invoice frequency should not cross expiration date of payment agreement
-    # next_upcoming_invoice_required(previous_upcoming_invoice)
   end
 
   def process
-    previous_upcoming_invoice_type = first_reference_invoice.present? ? first_reference_invoice.class.name : self.previous_upcoming_invoice.class.name
-    case previous_upcoming_invoice_type
+    case reference_invoice_type.camelize
     when "GeneralInvoice"
       create_upcoming_general_invoice
     when "RentalInvoice"
@@ -66,344 +50,394 @@ class PaymentAgreements::CreateUpcomingInvoice < PaymentAgreements::Base
   end
 
   def success
-    params[:new_upcoming_invoice] = self.new_upcoming_invoice
+    params[:new_upcoming_invoices] = self.new_upcoming_invoices
     PaymentAgreements::CreateUpcomingInvoice::CreateUpcomingInvoicePresenter.new(user, params, messages)
   end
 
   class PaymentAgreements::CreateUpcomingInvoice::CreateUpcomingInvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :new_upcoming_invoice
+    attr_accessor :new_upcoming_invoices
 
     def init
-      self.new_upcoming_invoice = params[:new_upcoming_invoice]
+      self.new_upcoming_invoices = params[:new_upcoming_invoices]
     end
 
   end
 
   def create_upcoming_general_invoice
-    #First invoice ends at end of month of the invoice frequency period
-    if first_reference_invoice
-      create_first_upcoming_invoice('general_invoice', first_reference_invoice)
-    else
-      create_next_upcoming_invoice('general_invoice', previous_upcoming_invoice)
+    upcoming_invoice_parameters = generate_upcoming_invoice_params(reference_invoice_ids, 'general_invoice')
+    self.new_upcoming_invoices = user.company.general_invoices.create(upcoming_invoice_parameters)
+    # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+    if self.new_upcoming_invoices.blank?
+      add_message :error, 'Some error occurred during generation of upcoming general invoice'
     end
-  end
-
-  def create_first_upcoming_invoice(invoice_type, reference_invoice)
-    # First invoice can start from any date of month
-    invoice_parameters = setup_invoice_params
-    upcoming_invoice = invoice_type.camelize.constantize.new(invoice_parameters)
-    # if upcoming_invoice.save
-      map_line_items(reference_invoice, upcoming_invoice, {first_invoice: true})
-    # end
-    update_taxable_and_orig_amount_value(upcoming_invoice)
-    upcoming_invoice.items.map(&:update_taxable_amount_value)
-    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, upcoming_invoice)
-    if upcoming_invoice.save
-      if upcoming_invoice.tds_slab_id.present?
-        apply_tds_on_amount(upcoming_invoice)
-      end
-      update_balance_due_amount(upcoming_invoice, upcoming_invoice.net_amount.value)
-    end
-  end
-
-  def map_line_items(reference_invoice, upcoming_invoice, options={})
-    reference_invoice.invoice_items.each do |item|
-      new_line_item = upcoming_invoice.invoice_items.new
-      InvoiceLineItem::TEMPLATE_COLUMNS.each do |column_name|
-        new_line_item.send("#{column_name}=", item.send(column_name.to_sym))
-      end
-
-      InvoiceLineItem::CLONE_RECORDS.each do |column_name|
-        new_line_item.send("#{column_name}=", item.send(column_name.to_sym).dup)
-      end
-      new_line_item.parent_type = reference_invoice.class.name
-      if options[:first_invoice]
-        new_line_item.rate = get_first_invoice_rate(reference_invoice, item.rate)
-      end
-    end
-    if upcoming_invoice.save
-      self.new_upcoming_invoice = upcoming_invoice
-    end
-  end
-
-  def get_first_invoice_rate(reference_invoice, reference_invoice_item_rate)
-    invoice_frequency_number = reference_invoice.invoice_frequency.number
-    # This rate is for invoice frequency period
-    rate = reference_invoice_item_rate
-    one_month_rate = reference_invoice_item_rate/invoice_frequency_number
-    # First invoice can have partial month
-    partial_month_rate = calculate_partial_month_rate(reference_invoice.start_date, one_month_rate)
-    effective_frequency_period_rate = partial_month_rate + one_month_rate*(invoice_frequency_number-1)
-    return effective_frequency_period_rate
-  end
-
-  def calculate_partial_month_rate(date, one_month_rate)
-    # Add one to adjust current day
-    effective_days_count = date.end_of_month.day - date.day + 1
-    days_in_month = date.end_of_month.day - date.beginning_of_month.day + 1
-    effective_rate = (one_month_rate/days_in_month)*effective_days_count
-    return effective_rate
-  end
-
-
-  def create_next_general_invoice
-  end
-
-
-  def create_upcoming_rental_invoice
-    #First invoice ends at end of month of the invoice frequency period
-    if first_reference_invoice
-      create_first_upcoming_invoice('rental_invoice', first_reference_invoice)
-    else
-      create_next_upcoming_invoice('rental_invoice', previous_upcoming_invoice)
-    end
-  end
-
-  # def next_upcoming_invoice_required(previous_upcoming_invoice)
-  #   invoice_upcoming_date(previous_upcoming_invoice)
-  #   if self.next_invoice_due_date.blank?
-  #     add_message :error, "Period or upcoming date is not defined for #{previous_upcoming_invoice.class.name.titleize} "
-  #     return
-  #   end
-
-  #   unless self.payment_agreement.no_expiration 
-  #     if self.next_invoice_due_date.to_date > self.payment_agreement.expiration_date.to_date
-  #       # Keep this partial invoice ids for future reference as this condition is not currently handled
-  #       self.partial_invoice_ids.push(previous_upcoming_invoice.id)
-  #       add_message :error, 'Next upcoming invoice due date cannot be after agreement expiration'
-  #       return
-  #     end
-  #   end
-  #   true
-  # end
-
-  # Return next upcoming date w.r.t the previous invoice and that will be previous invoice upcoming date + invoice frequency - 1 day
-  # 1 month is complete when same date arrives in the next month
-  # def invoice_upcoming_date(previous_upcoming_invoice)
-  #   number = previous_upcoming_invoice.invoice_frequency.number
-  #   period_id = previous_upcoming_invoice.invoice_frequency.period_id
-  #   case period_id
-  #   when Period.id_for(:month)
-  #     self.next_invoice_due_date = previous_upcoming_invoice.payment_agreement_upcoming_date.to_date + number.to_i.month - 1.day
-  #     return
-  #   end
-  #   return nil
-  # end
-
-  # Check which invoice hold next_invoice_due_date between start date and end date
-  # Duplicate that invoice, this duplicated invoice will be new upcoming_invoice
-  # This is valid only for fixed periodic invoices
-  # def create_upcoming_general_invoice
-  #   get_valid_amount_general_invoice
-  #   if self.valid_amount_invoice.present?
-  #     upcoming_general_invoice = self.valid_amount_invoice.amoeba_dup
-  #     upcoming_general_invoice.template_invoice_id = self.valid_amount_invoice.id
-  #     unless upcoming_general_invoice.save
-  #       add_message :error, "Unable to create upcoming general invoice"
-  #       return
-  #     end
-  #     self.new_upcoming_invoice = upcoming_general_invoice
-  #   end
-  # end
-
-  # def create_upcoming_rental_invoice
-  #   get_valid_amount_rental_invoice
-  #   if self.valid_amount_invoice.present?
-  #     upcoming_rental_invoice = self.valid_amount_invoice.amoeba_dup
-  #     upcoming_rental_invoice.template_invoice_id = self.valid_amount_invoice.id
-  #     unless upcoming_rental_invoice.save
-  #       add_message :error, "Unable to create upcoming general invoice"
-  #       return
-  #     end
-  #     self.new_upcoming_invoice = upcoming_rental_invoice
-  #   end
-  # end
-
-  # def get_valid_amount_general_invoice
-  #   self.payment_agreement.general_invoices.each do |general_invoice|
-  #     if self.next_invoice_due_date >= general_invoice.start_date.to_date && self.next_invoice_due_date.to_date <= general_invoice.end_date.to_date
-  #       self.valid_amount_invoice = general_invoice
-  #       return
-  #     end
-  #   end
-  #   # No agreement invoice is found with next_invoice_due_date in between start date and end date  
-  #   if self.valid_amount_invoice.blank?
-  #     add_message :error, "Valid amount general invoice is not found to creating upcoming invoice"
-  #     return
-  #   end
-  # end
-
-  # def get_valid_amount_rental_invoice
-  #   self.payment_agreement.rental_invoices.each do |rental_invoice|
-  #     if self.next_invoice_due_date >= rental_invoice.start_date.to_date && self.next_invoice_due_date.to_date <= rental_invoice.end_date.to_date
-  #       self.valid_amount_invoice = rental_invoice
-  #       return
-  #     end
-  #   end
-  #   # No agreement invoice is found with next_invoice_due_date in between start date and end date  
-  #   if self.valid_amount_invoice.blank?
-  #     add_message :error, "Valid amount rental invoice is not found to creating upcoming invoice"
-  #     return
-  #   end
-  # end
-
-
-  def create_upcoming_invoice
-    
-  end
-
-  def first_invoice_start_date
-    first_fixed_periodic_invoice.start_date
-  end
-
-  def first_invoice_end_date
-    first_fixed_periodic_invoice.end_date
-  end
-
-  def invoice_frequency_based_end_date(invoice_start_date, invoice_frequency)
-    if invoice_frequency == 1
-      return invoice_start_date.end_of_month
-    else
-      return (invoice_start_date + invoice_frequency.month-1.month).end_of_month
-    end
-  end
-
-  def setup_invoice_params
-    reference_invoice = get_reference_invoice
-    invoice_frequency = get_invoice_frequency(self.invoice_type)
-    due_date = get_invoice_due_date(reference_invoice)
-    invoice_params = {
-      start_date: upcoming_invoice_start_date,
-      end_date: upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency),
-      vendor_id: reference_invoice.vendor_id,
-      department_id: reference_invoice.department_id,
-      location_id: reference_invoice.location_id,
-      cost_center_id: reference_invoice.cost_center_id,
-      payment_term_id: reference_invoice.payment_term_id,
-      note: reference_invoice.note,
-      billing_type_id: reference_invoice.billing_type_id,
-      due_date: due_date,
-      tax_type_id: reference_invoice.tax_type_id,
-      discount_type_id: reference_invoice.discount_type_id,
-      gross_amount: get_gross_amount(reference_invoice.gross_amount),
-      net_amount: get_net_amount(reference_invoice.net_amount),
-      amount: get_amount(reference_invoice.amount),
-      discount_amount: get_discount_amount(reference_invoice.discount_amount),
-      tds_amount: get_tds_amount(reference_invoice.tds_amount),
-      tax_amount: get_tax_amount(reference_invoice.tax_amount),
-      original_amount: get_original_amount(reference_invoice.original_amount),
-      advance_amount: get_advance_amount(reference_invoice.advance_amount),
-      balance_due: get_balance_due(reference_invoice.balance_due),
-      taxable_amount: get_taxable_amount(reference_invoice.taxable_amount),
-      company_id: reference_invoice.company_id,
-      created_by_user_id: reference_invoice.created_by_user_id,
-      payment_agreement_id: reference_invoice.payment_agreement_id,
-      bank_account_id: reference_invoice.bank_account_id,
-      vendor_location_id: reference_invoice.vendor_location_id,
-      prepaid: reference_invoice.prepaid,
-      invoice_frequency_id: reference_invoice.invoice_frequency_id, # TODO - Remove is whenever invoice is editable, its referencing same record
-      fixed_periodic_template: true,
-      payment_agreement_upcoming_date: get_payment_agreement_upcoming_date(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid),
-      is_payment_agreement_upcoming_invoice: check_if_upcoming_invoice(reference_invoice, upcoming_invoice_start_date, upcoming_invoice_end_date(upcoming_invoice_start_date, invoice_frequency), reference_invoice.prepaid)
-    }
-    return invoice_params
-  end
-
-  # def setup_next_invoice_params
-  # end
-
-  def first_fixed_periodic_invoice
-    self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.order(:start_date).first
-  end
-
-  # TODO -  change this
-  def get_invoice_due_date(first_reference_invoice)
-    if first_reference_invoice.present?
-      if first_reference_invoice.payment_term.days_after.present?
-        if first_reference_invoice.prepaid
-          due_date = first_reference_invoice.start_date + first_reference_invoice.payment_term.days_after
-        else
-          due_date = first_reference_invoice.end_date + first_reference_invoice.payment_term.days_after
-        end
-      else
-        add_message :error, "Configuration issue, payment term is incorrect"
+    self.new_upcoming_invoices.each do |invoice|
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+      unless invoice.save
+        add_message :error, 'Some error occurred during calculation'
         return
       end
-    else
-      # For next invoice
-    end
-    return due_date
-  end
-
-  def get_reference_invoice
-    if self.first_reference_invoice.present?
-      first_reference_invoice
-    else
-      next_reference_invoice
     end
   end
 
-  def next_reference_invoice
-    escalated_reference_invoice.present? ? escalated_reference_invoice : previous_upcoming_invoice
+  def create_upcoming_rental_invoice
+    upcoming_invoice_parameters = generate_upcoming_invoice_params(reference_invoice_ids, 'rental_invoice')
+    self.new_upcoming_invoices = user.company.rental_invoices.create(upcoming_invoice_parameters)
+    # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+    if self.new_upcoming_invoices.blank?
+      add_message :error, 'Some error occurred during generation of upcoming rental invoice'
+    end
+    self.new_upcoming_invoices.each do |invoice|
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts({}, nil, invoice)
+      unless invoice.save
+        add_message :error, 'Some error occurred during calculation'
+        return
+      end
+    end
   end
 
-  def upcoming_invoice_start_date
-    # First invoice start date or next start of month for previous_upcoming_invoice 
-    first_reference_invoice.present? ? first_reference_invoice.start_date : previous_upcoming_invoice.end_date + 1
+  def setup_invoice_params(options={})
+    invoice_params = {
+      start_date: options[:invoice_start_date],
+      end_date: options[:invoice_end_date],
+      vendor_id: options[:vendor_id],
+      department_id: options[:department_id],
+      location_id: options[:location_id],
+      cost_center_id: options[:cost_center_id],
+      payment_term_id: options[:payment_term_id],
+      #note: ,
+      billing_type_id: options[:billing_type_id],
+      due_date: options[:due_date],
+      tax_type_id: options[:tax_type_id],
+      discount_type_id: options[:discount_type_id],
+      gross_amount: options[:gross_amount],
+      net_amount: options[:net_amount],
+      amount: options[:amount],
+      discount_amount: options[:discount_amount],
+      tds_amount: options[:tds_amount],
+      tax_amount: options[:tax_amount],
+      original_amount: options[:original_amount],
+      advance_amount: options[:advance_amount],
+      balance_due: options[:balance_due],
+      taxable_amount: options[:taxable_amount],
+      company_id: options[:company_id],
+      created_by_user_id: options[:created_by_user_id],
+      payment_agreement_id: self.payment_agreement.id,
+      bank_account_id: options[:bank_account_id],
+      vendor_location_id: options[:vendor_location_id],
+      prepaid: options[:prepaid],
+      invoice_frequency_id: options[:invoice_frequency_id],
+      fixed_periodic_template: options[:fixed_periodic_template],
+      payment_agreement_upcoming_date: options[:payment_agreement_upcoming_date],
+      is_payment_agreement_upcoming_invoice: options[:is_payment_agreement_upcoming_invoice],
+      tds_slab_id: options[:tds_slab_id],
+      invoice_items_attributes: get_invoice_item_params(options[:invoice_start_date], options[:invoice_end_date])
+    }
   end
 
-  def upcoming_invoice_end_date(invoice_start_date, invoice_frequency)
-    invoice_frequency_based_end_date(invoice_start_date, invoice_frequency)
+  def get_invoice_item_params(start_date, end_date)
+    invoice_item_params = []
+    reference_invoices = get_reference_invoices
+    # Reference invoices that are valid for the date range from start date to end date
+    effective_start_date = get_reference_invoices.where("DATE(start_date) <= ?", start_date).order(:start_date).last.start_date
+    effective_start_date = (effective_start_date < start_date) ? effective_start_date : start_date
+    # effective_end_date = get_reference_invoices.where("DATE(end_date) >= ?", start_date).order(:end_date).last.end_date
+    reference_invocies_in_range = get_reference_invoices_in_range(effective_start_date, current_month_end_date)
+    # reference_invocies_in_range = get_reference_invoices_in_range(base_start_date, current_month_end_date) # TODO change
+    # Initial reference invoice is used to get the common attributes line department, location etc
+    initial_reference_invoice = reference_invocies_in_range.first
+    # All rerefernce invoices will have same items in line items
+    initial_reference_invoice.invoice_items.each do |invoice_item|
+      item_params = invoice_item_params_data(initial_reference_invoice, invoice_item, start_date, end_date)
+      invoice_item_params.push(item_params)
+    end
+    return invoice_item_params
   end
 
-  def get_gross_amount(amount)
-    create_invoice_amount(amount)
+  def invoice_item_params_data(initial_reference_invoice, invoice_item, start_date, end_date)
+    {
+      description: invoice_item.description,
+      quantity: invoice_item.quantity,
+      rate: calculate_item_rate(start_date, end_date, invoice_item),
+      tax: invoice_item.tax,
+      discount: invoice_item.discount,
+      category_id: invoice_item.inventory_line_item.category_id,
+      gst_type_id: invoice_item.gst_type_id,
+      hsn_sac: invoice_item.inventory_line_item.hsn_sac,
+      parent_type: initial_reference_invoice.class.name,
+      # parent_id:
+      inventory_line_item_id: invoice_item.inventory_line_item_id,
+      # item_info:
+      account: invoice_item.account,
+      tax_rate_id: invoice_item.tax_rate_id,
+      cost_center_id: invoice_item.cost_center_id,
+      unit_of_measurement: invoice_item.unit_of_measurement,
+      department_id: invoice_item.department_id,
+      sgst: invoice_item.sgst,
+      cgst: invoice_item.cgst,
+      igst: invoice_item.igst#,
+      # Entities to be cloned to avoid single reference. Editing single reference will edit it for all places where is it pointed to. Hence AVOID!!
+      # TODO -  Update these fields using invoice calculation util
+
+      # tax_amount_id: get_item_tax_amount(invoice_item.tax_amount),
+      # discount_amount_id: get_item_discount_amount(invoice_item.discount_amount),
+      # amount_id: get_item_amount()
+      # net_amount_id:
+      # taxable_amount_id:
+      # billable_amount_id:
+    }
   end
 
-  def get_net_amount(amount)
-    create_invoice_amount(amount)
+  def calculate_item_rate(start_date, end_date, invoice_item)
+    effective_start_date = get_reference_invoices.where("DATE(start_date) <= ?", start_date).order(:start_date).last.start_date
+    effective_start_date = (effective_start_date < start_date) ? effective_start_date : start_date
+    # reference_invocies_in_range = get_reference_invoices_between_dates(start_date, end_date)
+    # if reference_invocies_in_range.blank?
+      reference_invocies_in_range = get_reference_invoices_in_range(effective_start_date, current_month_end_date)
+    # end
+    reference_invoice = reference_invocies_in_range.where(start_date: start_date).first
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where(end_date: end_date).first
+    end
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where("DATE(start_date) <= ?", start_date).order(:start_date).last
+    end
+    if reference_invoice.blank?
+      reference_invoice = reference_invocies_in_range.where("DATE(end_date) <= ?", end_date).order(:start_date).first
+    end
+    # reference_invocies_in_range.each do |reference_invoice|
+      # Do not allow multiple line item of similar inventory, else this will fail
+      item = reference_invoice.items.where(inventory_line_item_id: invoice_item.inventory_line_item_id).first
+      # if reference_invoice.start_date <= start_date && reference_invoice.end_date >= end_date
+      #   return rate = item.rate
+      # else
+        # days_in_month = (end_date.end_of_month - start_date.beginning_of_month).to_i + 1
+        days_in_month = ((start_date.beginning_of_month + reference_invoice.invoice_frequency.number.month) - start_date.beginning_of_month)
+        # Example: Invoice frequency is 1 month. Upcoming invoice is for Aug 2019. If reference invoice template has invoice start date as 26 Sept 2019 and invoice end date as 9 Aug 2019, then effective days for the Aug invoice is 01 Aug to 09 Aug 2019. Base condition: Invoice starts from start of month and ends on end_of_month(excluding first and last invoice)
+        effective_days_count = (end_date - start_date).to_i + 1
+        # In months
+        invoice_occurance_rate = reference_invoice.invoice_frequency.number
+        one_month_rate = item.rate/reference_invoice.invoice_frequency.number
+        effective_rate = (item.rate/days_in_month)*effective_days_count
+        return ActionController::Base.helpers.number_with_precision(effective_rate, precision: 2)
+      # end
+    # end
   end
 
-  def get_amount(amount)
-    create_invoice_amount(amount)
+  def setup_invoice_items_params(options={})
   end
 
-  def get_discount_amount(amount)
-    # create_invoice_amount(amount)
+  def get_reference_invoices_between_dates(start_date, end_date)
+    get_reference_invoices.where("DATE(start_date) = ? AND DATE(end_date) = ?", start_date, end_date)
   end
 
-  def get_tds_amount(amount)
-    create_invoice_amount(amount)
+  def get_reference_invoices_in_range(start_date, end_date)
+    get_reference_invoices.where("DATE(start_date) >= ? AND DATE(start_date) <= ?", start_date, end_date)
   end
 
-  def get_tax_amount(amount)
 
+
+  def get_reference_invoices
+    self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids).order(:start_date)
   end
 
-  def get_original_amount(amount)
+  def get_due_date(start_date, end_date, prepaid, payment_term_days)
+      prepaid ? start_date + payment_term_days : end_date + payment_term_days
   end
 
-  def get_advance_amount(amount)
-  end
-
-  def get_balance_due(amount)
-  end
-
-  def get_taxable_amount(amount)
-  end
-
-  def get_payment_agreement_upcoming_date(reference_invoice, start_date, end_date, prepaid)
+  def get_payment_agreement_upcoming_date(start_date, end_date, prepaid)
     # return start_date # FOR TESTING ONLY
-    prepaid ? start_date : end_date
-  end
-
-  def check_if_upcoming_invoice(reference_invoice, start_date, end_date, prepaid)
-    # return true # FOR TESTING ONLY
-    prepaid ? start_date <= Date.today : end_date <= Date.today
+    prepaid ? start_date : (end_date + 1)
   end
 
   def create_invoice_amount(amount)
     Amount.create(value: amount.value, currency_id: amount.currency_id)
+  end
+
+  def generate_upcoming_invoice_params(reference_invoice_ids, invoice_type)
+    reference_invoices = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(id: reference_invoice_ids).order(:start_date)
+    invoice_frequency_number = reference_invoices.first.invoice_frequency.number
+    initial_start_date = reference_invoices.first.start_date
+    # upcoming_invoices_count = get_upcoming_invoice_count(invoice_frequency_number, initial_start_date, current_month_end_date)
+    upcoming_invoice_dates = get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, current_month_end_date, reference_invoices)
+    options = {
+      # invoice_frequency_number: invoice_frequency_number,
+      # initial_start_date: initial_start_date,
+      # current_month_end_date: current_month_end_date,
+      upcoming_invoice_dates: upcoming_invoice_dates.values
+    }
+    return setup_upcoming_invoices_params(reference_invoice_ids, options)
+  end
+
+  def setup_upcoming_invoices_params(reference_invoice_ids, options={})
+    # This invoice gets common values like department location etc
+    initial_reference_invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids).order(:start_date).first
+    upcoming_invoice_dates = options[:upcoming_invoice_dates]
+    upcoming_invoice_dates.each do |upcoming_invoice_date|
+      options[:invoice_start_date] = upcoming_invoice_date[0]
+      options[:invoice_end_date] = upcoming_invoice_date[1]
+      options[:vendor_id] = self.vendor_id
+      options[:department_id] = initial_reference_invoice.department_id
+      options[:location_id] = initial_reference_invoice.location_id
+      options[:cost_center_id] = initial_reference_invoice.cost_center_id
+      options[:payment_term_id] = initial_reference_invoice.payment_term_id
+      options[:billing_type_id] = initial_reference_invoice.billing_type_id
+      options[:prepaid] = initial_reference_invoice.prepaid
+      options[:due_date] = get_due_date(upcoming_invoice_date[0], upcoming_invoice_date[1], initial_reference_invoice.prepaid, initial_reference_invoice.payment_term.days_after)
+      options[:tax_type_id] = initial_reference_invoice.tax_type_id # TODO check
+      options[:discount_type_id] = initial_reference_invoice.discount_type_id
+      # options[:gross_amount] = get_gross_amount(initial_reference_invoice.gross_amount) # TODO check
+      # options[:net_amount] = get_net_amount(initial_reference_invoice.net_amount) # TODO check
+      # options[:amount] = get_amount(initial_reference_invoice.amount) # TODO check
+      # options[:discount_amount] = get_discount_amount(initial_reference_invoice.discount_amount) #TODO check
+      # options[:tds_amount] = get_tds_amount(initial_reference_invoice.tds_amount) # TODO check
+      # options[:tax_amount] = get_tax_amount(initial_reference_invoice.tax_amount) # TODO check
+      # options[:original_amount] = get_original_amount(initial_reference_invoice.original_amount) # TODO check
+      # options[:advance_amount] = get_advance_amount(initial_reference_invoice.advance_amount) # TODO checl
+      # options[:balance_due] = get_balance_due(initial_reference_invoice.balance_due) # TODO check
+      # options[:taxable_amount] = get_taxable_amount(initial_reference_invoice.taxable_amount) # TODO check
+      options[:company_id] = initial_reference_invoice.company_id
+      options[:created_by_user_id] = self.payment_agreement.creator_id # Some invoices will be auto generated, hence autogeneration should be set true
+      options[:payment_agreement_id] = initial_reference_invoice.payment_agreement_id
+      options[:bank_account_id] = initial_reference_invoice.bank_account_id
+      options[:vendor_location_id] = initial_reference_invoice.vendor_location_id
+      options[:prepaid] = initial_reference_invoice.prepaid
+      options[:invoice_frequency_id] = dup_invoice_frequency(initial_reference_invoice.invoice_frequency)
+      options[:fixed_periodic_template] = true
+      options[:payment_agreement_upcoming_date] = get_payment_agreement_upcoming_date(upcoming_invoice_date[0], upcoming_invoice_date[1], initial_reference_invoice.prepaid)
+      options[:is_payment_agreement_upcoming_invoice] = true
+      options[:tds_slab_id] = initial_reference_invoice.tds_slab_id
+      self.upcoming_invoice_params.push(setup_invoice_params(options))
+    end
+    return upcoming_invoice_params
+  end
+
+  def get_upcoming_invoice_count(invoice_frequency_number, start_date, end_date)
+    months_count = month_between_dates(start_date, end_date)
+    upcoming_invoices_count = months_count.zero? ? 0 : months_count.fdiv(invoice_frequency_number).ceil
+  end
+
+  
+  # Invoices are be generated at the end of the month
+  # Irrespective or prepaid/postpaid, this will have date range of all invoices created
+  # This upcoming date is till current month for prepaid 
+  def get_upcoming_invoice_dates(invoice_frequency_number, start_date, end_date, reference_invoices)
+    # ordered_upcoming_invoice_dates key is for sorting. Helps to find which invoice is to be generated first
+    # First start date
+    initial_start_date = start_date
+    # Last end date can before current month
+    i_end_date = reference_invoices.where("(Date(start_date) >= ? AND DATE(start_date) <= ?) OR (Date(end_date) >= ? AND DATE(end_date) <= ?)", start_date, end_date, start_date, end_date).order(:start_date).last.end_date
+     last_end_date = (i_end_date <= end_date) ? i_end_date : end_date
+    months_count = month_between_dates(start_date, end_date)
+    invoice_frequency_number = reference_invoices.first.invoice_frequency.number # In months
+    # Break the loop if last end date is reached
+    # Counter for order of invoice
+    (1..months_count).to_a.each do |counter|
+      #For first invoice(start date is not start of month)
+      # if counter == 1
+      #   # Start date will always be first of month except for first invoice
+      #   invoice_start_date = initial_start_date
+      #   # End date will always be last of month except for last invoice
+      #   invoice_end_date =  (initial_start_date + invoice_frequency_number.month - 1).end_of_month <= last_end_date ? (initial_start_date + invoice_frequency_number.month - 1).end_of_month : last_end_date
+      #   # Override above start date end end date as there can be escalation within invoice frequency period
+      #   # This will help find if there is escalation in the frequency range
+      #     upcoming_invoice_date = get_upcoming_invoice_start_end_date(invoice_start_date, invoice_end_date)
+      #     self.count += 1
+      #     ordered_upcoming_invoice_dates[count] = upcoming_invoice_date
+      #     break if upcoming_invoice_date >= last_end_date
+      #   end
+      # else
+        if counter == 1
+          invoice_start_date = initial_start_date
+        else
+          prev_start_date = ordered_upcoming_invoice_dates.fetch(ordered_upcoming_invoice_dates.keys.sort.last)[0]
+          prev_end_date = ordered_upcoming_invoice_dates.fetch(ordered_upcoming_invoice_dates.keys.sort.last)[1]
+          invoice_start_date = prev_end_date + 1
+        end
+
+
+        invoice_end_date =  (invoice_start_date + invoice_frequency_number.month - 1.month).end_of_month <= last_end_date ? (invoice_start_date + invoice_frequency_number.month - 1.month).end_of_month : last_end_date
+        get_upcoming_invoice_start_end_date(invoice_start_date, invoice_end_date, reference_invoices)
+        break if ordered_upcoming_invoice_dates.fetch(ordered_upcoming_invoice_dates.keys.sort.last)[1] >= last_end_date
+      # end
+    end
+    ordered_upcoming_invoice_dates
+  end
+
+  def get_upcoming_invoice_start_end_date(start_date, end_date, reference_invoices)
+    invoice_dates = reference_invoices.where("(Date(start_date) >= ? AND DATE(start_date) <= ?) OR (Date(end_date) >= ? AND DATE(end_date) <= ?)", start_date, end_date, start_date, end_date).collect{|i| [i.start_date, i.end_date]}
+    i_start_date = start_date
+    if invoice_dates.blank?
+      self.ordered_upcoming_invoice_dates[count] = [start_date, end_date]
+      self.count += 1
+    else
+      invoice_dates.each do |date_range|
+        s_date = i_start_date
+        e_date = date_range[1]
+        if e_date > end_date
+          e_date = end_date
+        end
+        self.ordered_upcoming_invoice_dates[count] = [s_date, e_date]
+        self.count += 1
+        i_start_date = e_date + 1
+      end
+    end
+    return ordered_upcoming_invoice_dates
+  end
+
+  def order_of_month(start_date, end_date)
+    months_count = month_between_dates(start_date, end_date)
+    start_date_month = start_date.month
+    months = []
+    (1..months_count).to_a.each do |counter|
+      months << start_date_month
+      start_date_month += 1
+    end
+    months
+  end
+
+  def validate_start_and_end_date(start_date, end_date)
+    if start_date > end_date
+      add_message :error, 'Start date cannot be greater than end date'
+      return
+    end
+  end 
+
+
+  # Inclusive of current month
+  def month_between_dates(start_date, end_date)
+    if end_date >= start_date
+      ((end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month) + 1)
+    else
+      add_message :error, 'End date cannot be less than start date'
+    end
+  end
+
+  def dup_invoice_frequency(invoice_frequency)
+    new_invoice_frequency = invoice_frequency.dup
+    unless new_invoice_frequency.save
+      add_message :error, 'Some error occurred while duplicating the frequency'
+      return nil
+    end
+    new_invoice_frequency.id
+  end
+
+  def get_current_month_end_date
+    reference_invoices = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(id: reference_invoice_ids).order(:start_date)
+    initial_start_date = reference_invoices.first.start_date
+    invoice_frequency_number = reference_invoices.first.invoice_frequency.number
+    # Find out the end date
+    # Base assumption - 20 is the max distance w.r.t. frequency
+    valid_end_date = nil
+    start_date = initial_start_date
+    (1..20).each do |counter|
+      next_date = (start_date + invoice_frequency_number.month - 1.month).end_of_month
+      if next_date >= Date.today.end_of_month
+        valid_end_date = next_date
+        break
+      end
+      start_date = next_date + 1
+    end
+    valid_end_date
   end
 
 end

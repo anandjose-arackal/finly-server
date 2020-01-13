@@ -116,6 +116,12 @@ class BeneficiaryPayment < ApplicationRecord
   # after_commit :calculate_tax_and_amount
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
+  delegate :paid?, to: :status
+
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) {where.not(id: id)}
+  scope :only_unpaid, -> {where.not status_id: BeneficiaryPaymentStatus.id_for(:paid)}
+  scope :only_paid, -> {where status_id: BeneficiaryPaymentStatus.id_for(:paid)}
 
   def tax_rate
   	self.tax
@@ -318,7 +324,7 @@ class BeneficiaryPayment < ApplicationRecord
       tds_amount: precision_value(self.tds_amount&.value),
       tax: precision_value(self.tax),
       tds: precision_value(self.tds_slab&.tds),
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name, trade_name: self.vendor&.trade_name},
       bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       department_attributes: { id: self.department_id, name: self.department&.name },

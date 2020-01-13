@@ -25,6 +25,18 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
   end
 
+  def pre_process
+    if self.purchase_order_params[:procurement_term_id].blank?
+      terms = current_company.procurement_terms.with_default&.first
+      if terms.blank?
+        terms = current_company.procurement_terms.first
+      end
+      return if terms.blank?
+      self.purchase_order_params[:procurement_term_id] = terms.id
+      self.purchase_order_params[:procurement_term_text] = terms.description
+    end
+  end
+
   def process
     if params[:template_id].present?
       load_po_from_template
@@ -32,6 +44,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     else
       self.purchase_order = procurement.build_purchase_order(purchase_order_params)
     end
+
     self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
     self.purchase_order.user = user
     self.purchase_order.company = user.company

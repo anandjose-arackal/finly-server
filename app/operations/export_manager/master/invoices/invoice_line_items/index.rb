@@ -16,6 +16,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
     description: {spreadsheet: true, pdf: true},
     comment: {spreadsheet: true, pdf: true},
     category: {spreadsheet: true, pdf: true},
+    policy: {spreadsheet: true, pdf: true},
     hsn_sac: {spreadsheet: true, pdf: true},
     quantity: {spreadsheet: true, pdf: true},
     rate: {spreadsheet: true, pdf: true},
@@ -56,7 +57,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   end
 
   def invoice_date(item)
-    invoice(item)&.date&.strftime "%d-%b-%Y"
+    invoice(item)&.date&.strftime("%d-%b-%Y")
   end 
 
   def created_by(item)
@@ -108,6 +109,10 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   def total_amount(item)
     value = item.net_amount&.value || 0
     precision_value(value)
+  end
+
+  def policy(item)
+    item&.parent&.policy&.name
   end
 
   protected

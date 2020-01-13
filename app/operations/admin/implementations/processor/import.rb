@@ -97,10 +97,13 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
   def process_row(data)
     id = data[:id]
     destroy_action = data[:destroy]
+    invite_action = data[:invite]
     if destroy_action&.to_s&.downcase == 'y'
       response = destroy_records(data)
     elsif destroy_action&.to_s&.downcase == 'activate'
       response =destroy_records(data)
+    elsif invite_action.to_s.downcase == 'y'
+      response = invite(data)
     elsif id.present?
       response =update_record(data)
     else
@@ -119,6 +122,10 @@ class Admin::Implementations::Processor::Import < Admin::Implementations::Proces
 
   def create_record(data)
     result success: false, message: "Create action cant perform"
+  end
+
+  def invite(data)
+    result sucess:  false, message: "Create action cant perform"
   end
 
   def result(success, message = nil)

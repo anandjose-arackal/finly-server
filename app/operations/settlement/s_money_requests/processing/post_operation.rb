@@ -62,6 +62,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
     rejected = self.money_request_processor.rejected?
+    update_documents = !!params&.dig(:update_documents)
 
     if rejected
       request_status = MoneyRequestStatus.id_for(:rejected)
@@ -73,15 +74,35 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
       ::MoneyRequest.transaction do
         MoneyRequestTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if rejected or marked_as_completed or mapping.payment.completed?
+            if rejected or marked_as_completed or mapping.payment&.completed? or update_documents
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed)
-              mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
-                                                controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                                status_id: request_status, payment_id: mapping.payment&.id)
+              # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+              #                marked_as_completed: marked_as_completed)
+              # mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
+              #                                   controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+              #                                   status_id: request_status, payment_id: mapping.payment&.id)
+
+              update_mapping = true
+              money_request_ids = []
               mapping.money_requests.each do |money_request|
-                money_request.update(bank_reference_number: self.utr[money_request.id], source_account: self.source_account[money_request.id])
+
+                money_request.bank_reference_number = self.utr[money_request.id] if self.utr[money_request.id].present?
+                money_request.source_account = self.source_account[money_request.id] if self.source_account[money_request.id].present?
+                money_request.save if (self.utr[money_request.id].present? or self.source_account[money_request.id].present?)
+
+                # temp workaround for satin a*hles
+                # if we do not update the utr or source_account, we dont settle the money_request from update or process template file operation
+                # only when the op is called from the mark_as_paid op, we settle the money_requests
+                # 
+
+                if update_documents and (money_request.bank_reference_number.blank? or money_request.source_account.blank?)
+                  update_mapping = false
+                  next
+                end
+
+                money_request_ids << money_request.id
+
+
                 money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
                                             action_user_role_id: self.money_request_processor.created_by_user_role_id,
                                             money_request_tracking_action_id: request_tracking_status,
@@ -89,10 +110,20 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
                                             payment: mapping.payment
                 # generate_comment(money_request, mapping, request_comment_action, rejected)
               end
+
+              mapping.money_requests.where(id: money_request_ids).update_all(controlling_user_id: nil, controlling_user_role_id: nil,
+                                                controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                                status_id: request_status, payment_id: mapping.payment&.id)
+
+              if update_mapping
+                mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed)
+              end
+
               if self.money_request_processor.process_outside_finly? or self.money_request_processor.bank_transfer?
                 add_source_pocket(mapping)
               end
-            elsif mapping.payment.failed?
+            elsif mapping.payment&.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
             end
@@ -112,7 +143,10 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     elsif has_success and self.remaining_mappings.present?
       self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                           marked_as_completed: marked_as_completed, processed_amount: processed_amount)
-    elsif has_success and self.remaining_mappings.blank?
+    elsif has_success and self.remaining_mappings.blank? and update_documents
+      self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                          marked_as_completed: marked_as_completed, processed_amount: processed_amount)
+    elsif has_success and self.remaining_mappings.blank? and not update_documents
       self.money_request_processor.update(status_id: group_completed_status, completed_at: DateTime.now,
                                           marked_as_completed: marked_as_completed,processed_amount: processed_amount)
     elsif has_failure and self.remaining_mappings.blank?

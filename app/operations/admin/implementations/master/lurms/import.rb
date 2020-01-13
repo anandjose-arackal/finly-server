@@ -6,10 +6,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             :id => 'ID',
             :policy => 'Policy Name',
             :policy_creation_flag => 'For New Policy Y / or Blank',
-            :user_id => 'User Email / Mobile',
+            :user_id => 'User Email / Mobile / Employee ID',
             :level_name => 'Level Name',
             :level_number => 'Level Number',
-            :reviewer_email_mobile => 'Reviewer Email / Mobile',
+            :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
             :with_exception => 'With Exception Y/N',
             :without_exception => 'Without Exception Y/N',
             :min => "Minimum Threshold",
@@ -17,8 +17,9 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
             :destroy => 'Destroy'
   })
 
-  attr_accessor :lurm_params, :provider, :application, :policy, :level
+  attr_accessor :lurm_params, :provider, :application, :policy, :level, :user_profiles
   def process
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -30,22 +31,22 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
-        begin
+        #begin
           result = process_row(row)
           unless result.is_a?(Admin::Implementations::Processor::Import::Result)
             item_complete false
-            raise "invalid result"
+            #raise "invalid result"
           end
-        rescue Exception => e
-           result false, "#{e.message}"
-         end
+        #rescue Exception => e
+           #result false, ""
+        #end
 
-        unless result.success?
+        unless result&.success?
           item_complete false
           row << result.message
           failed = true
         end
-        if result.success?
+        if result&.success?
           row << result.message
           item_complete true
         end
@@ -94,7 +95,34 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   end
 
   def update_record(data)
-    result success: false, message: "Update action cant perform"
+    lurm_params = set_params(data)
+    lurm = LevelUserReviewerMapping.find_by id: lurm_params[:id]
+    unless lurm.present?
+      return result  false, message: "Mapping not found"
+    end
+    self.policy = lurm.policy
+
+    if lurm_params[:min].present? && lurm_params[:max].present?
+      if lurm_params[:min] >= lurm_params[:max]
+        return result false, "Max Threshold should be greater than Min"
+      end
+    end
+
+    if lurm_params[:reviewer_email].present?
+      reviewer_email = clean_up_data lurm_params[:reviewer_email]
+      reviewer = get_reviewer(reviewer_email, application)&.id
+      unless  reviewer.present?
+        return result false, "Reviewer Not Found"
+      end
+    else
+      reviewer = nil
+    end
+    lurm_params[:reviewer_id] = reviewer
+
+    unless lurm.update(lurm_params.except(:reviewer_email,:policy_name,:policy_creation_flag,:user_email))
+      return result false, lurm.errors.full_messages
+    end
+    result true, 'Updated Successfully'
   end
 
   def create_record(data)
@@ -170,21 +198,36 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     policy_name = row[import_fields[:policy_name]].to_s
     user_email = row[import_fields[:user_email]]
     policy_creation_flag = row[import_fields[:policy_creation_flag]]
+    reviewer_email = row[import_fields[:reviewer_email]]
+    exception = row[import_fields[:exception]]&.to_s&.upcase == 'N' ? false : true
+    wo_exception = row[import_fields[:wo_exception]]&.to_s&.upcase == 'N' ? false : true
+    min = row[import_fields[:min]]
+    max = row[import_fields[:max]]
 
     params = {
         id: id,
         policy_name: policy_name,
         policy_creation_flag: (policy_creation_flag.to_s.upcase == 'Y' ? true : false),
-        user_email: user_email
+        user_email: user_email,
+        reviewer_email: reviewer_email,
+        exception: exception,
+        wo_exception: wo_exception,
+        min: (min.present? ? min.to_i : 0),
+        max: (max.present? ? max.to_i : nil)
     }
   end
 
   def import_fields
     {
-        :id =>0,
+        :id => 0,
         :policy_name => 1,
         :policy_creation_flag => 2,
-        :user_email => 3
+        :user_email => 3,
+        :reviewer_email => 6,
+        :exception => 7,
+        :wo_exception => 8,
+        :min => 9,
+        :max => 10
     }
   end
 
@@ -250,6 +293,8 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
       user = company.users.find_by_email identifier
     elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
       user = company.users.find_by_mobile_number identifier
+    else
+      user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
     end
 
     user

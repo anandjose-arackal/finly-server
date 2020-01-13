@@ -158,6 +158,13 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
+      if purchase_order.bank_account&.disabled
+        row_details << "This vendor has a bank account which is disabled. Payment can only be processed to active bank accounts."
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
       self.contents << row_details
       self.total_advance_amount += advance_amount.to_f
     end

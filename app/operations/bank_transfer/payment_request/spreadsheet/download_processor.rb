@@ -1,7 +1,8 @@
 class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundOperation
+  sidekiq_options queue: :payments_creation
 
   attr_accessor :view_role, :bank_payment_requests,
-                :headers, :field_configurations, :include_attachments, :download_url, :file_name
+                :headers, :field_configurations, :include_attachments, :download_url, :file_name, :sheets
 
   def pre_validate
     if params&.dig(:bank_payment_request_id).blank?
@@ -29,7 +30,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def process
     headers = retrieve_headers
     content = retrieve_data
-    exported_xls = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages).spreadsheet_exporter.generate_xls
+    sheets =[{
+        item_headers: headers,
+        item_contents: content,
+        name: "Payment Tickets"
+    }]
+    exported_xls = Exporter.new(user, {xlsx: {headers: headers, contents: content, sheets: sheets }}, messages).xlsx_exporter.export_file_path
     exportable_file = exported_xls
     self.file_name = 'export.xls'
     if include_attachments
@@ -61,8 +67,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
       end
       exportable_file = Exporter::AsZip.new(user, {files: files}, messages).generate_zip
       self.file_name = 'export.zip'
+      exportable_file = create_temporary_link(exportable_file)
     end
-    self.download_url = create_temporary_link(exportable_file)
+    self.download_url = exportable_file
   end
 
   def post_process
@@ -122,12 +129,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Invoice Date",
                "Invoice ID"]
     headers += retrieve_custom_field_headers
-    headers += ["Invoice Amount",
+    headers += ["Original Amount",
+                "Advance Amount",
                 "Discount",
                 "Tax",
                 "TDS",
-                "Advance",
-                "Net Amount",
+                "Net Payable Amount",
                 "Bank Reference Number",
                 "Note",
                 "Payment Status",
@@ -151,38 +158,57 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
             vendor.present? ? vendor.vendor_id : '',
-            payment.receiving_account&.account_number,
+            "'#{payment.receiving_account&.account_number}",
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
             payment.initiating_user.name,
             payment.initiating_user.email,
             payment.payment_order.bank_payment_request.status&.name&.humanize,
-            payment.payment_order.scheduled_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
+            payment.payment_order.scheduled_at&.strftime("%d-%b-%Y"),
+            payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%b-%Y"),
+            payment.payment_order.processed_at&.strftime("%d-%b-%Y"),
             # payment.payment_order.bank_payment_request.controlling_user&.name,
             reviewer_names,
             pr.policy&.name,
             purchase_order.present? ? purchase_order&.po_number: '',
             payment.invoice&.invoice_number,
-            payment.invoice&.due_date&.strftime("%d-%m-%Y"),
-            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            payment.invoice&.due_date&.strftime("%d-%b-%Y"),
+            payment.invoice&.date&.strftime("%d-%b-%Y"),
             payment.invoice&.invoice_id
         ]
         payment_details += retrieve_custom_fields(payment)
-        tds_amount = 0.0
-        if payment.parent_type == 'PurchaseOrder' && purchase_order.present?
-          tds_amount = (purchase_order.advance_tds_amount&.value || 0)
+        case payment.parent_type
+        when 'PurchaseOrder'
+          po = payment.parent
+          payment_details += [
+              precision_value(po&.total_after_tax&.value),
+              precision_value(po&.advance_amount&.value),
+              0.0,
+              0.0,
+              (po&.advance_tds_slab&.tds || 0.0),
+              (payment.amount&.value || 0.0)
+          ]
+        when 'BeneficiaryPayment'
+          bp = payment.parent
+          payment_details += [
+              (bp&.original_amount&.value|| 0.0),
+              (bp&.advance_amount&.value||0.0),
+              0.0,
+              (bp&.tax_amount&.value|| 0),
+              (bp&.tds_amount&.value || 0),
+              (payment.amount&.value || 0)
+          ]
         else
-          (payment.invoice&.tds_amount&.value || 0)
+          payment_details += [
+              original_amount_invoice(payment),
+              (payment.invoice&.advance_amount&.value || 0.0),
+              (payment.invoice&.discount_amount&.value || 0.0),
+              (payment.invoice&.tax || 0.0),
+              (payment.invoice&.tds || 0.0),
+              (payment.amount&.value || 0.0)
+          ]
         end
         payment_details += [
-            (payment.invoice&.amount&.value || 0),
-            (payment.invoice&.discount_amount&.value || 0),
-            (payment.invoice&.tax_amount&.value || 0),
-            tds_amount,
-            (payment.invoice&.advance_amount&.value || 0),
-            (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
             payment.note,
             payment.payment_status&.name&.humanize,
@@ -211,5 +237,30 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
       end
     end
     values
+  end
+
+  def original_amount_invoice(payment)
+     original_amount = 0.0
+     if payment.invoice.present?
+       invoice = payment.invoice
+       if invoice&.invoice_items.present?
+         original_amount = (invoice.amount&.value || 0.0)
+       else
+         original_amount = (invoice&.original_amount&.value || 0.0)
+       end
+     else
+       original_amount = (payment&.amount&.value || 0.0)
+     end
+     original_amount
+  end
+
+  def tds_amount(payment)
+    tds_amount = 0.0
+    if payment.parent_type == 'PurchaseOrder'
+      tds_amount = (payment.parent.advance_tds_amount&.value || 0.0)
+    else
+      tds_amount = (payment.invoice&.tds_amount&.value || 0.0)
+    end
+    tds_amount
   end
 end

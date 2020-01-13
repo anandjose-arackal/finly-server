@@ -3,6 +3,7 @@ parent = payment.parent rescue nil
 json.owner_name payment.receiving_account&.account_owner&.name
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
+json.disabled payment.receiving_account&.disabled
 json.ifsc payment.receiving_account.ifsc
 json.amount precision_value payment.amount_value
 json.payment_amount payment.amount_value

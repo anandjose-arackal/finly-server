@@ -57,7 +57,7 @@ class CustomField::SetFields < CustomField::Base
         # For reports and money requests
         self.field_configurations = item.user.company.field_configurations.exclude_deleted
       elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item),
-             FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:vendor), FieldParentType.id_for(:purchase_request), FieldParentType.id_for(:purchase_request_item), FieldParentType.id_for(:general_invoice), FieldParentType.id_for(:rental_invoice)].include?(parent_type_id)
+             FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:yes_bank_vendor), FieldParentType.id_for(:purchase_request), FieldParentType.id_for(:purchase_request_item), FieldParentType.id_for(:general_invoice), FieldParentType.id_for(:rental_invoice), FieldParentType.id_for(:payment_agreement)].include?(parent_type_id)
         self.field_configurations = current_company.field_configurations.exclude_deleted
       elsif FieldParentType.expense_ids.include?(parent_type_id)
         # For expenses

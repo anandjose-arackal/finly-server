@@ -105,9 +105,13 @@ class Company < ApplicationRecord
   has_many :purchase_requests
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
+
+  
   has_many :payment_agreements
   has_many :general_invoices
   has_many :rental_invoices
+  has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
+  has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
 
   has_many :departments
   has_many :company_pocket_templates

@@ -10,7 +10,7 @@ class Event::EVendors::Update < Event::EVendors::Base
 
   def affected_users
     # [self.bank_payment_request.owner, self.bank_payment_request.reload.controlling_user]
-    users = self.document.affected_users(:approve)
+    self.document.affected_users(:approve)
   end
 
 

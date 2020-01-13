@@ -122,6 +122,13 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
   end
 
+  def count_with_filters
+    @result = BankTransfer::PaymentRequest::CountWithFilters.(current_user, params)
+    # render json: @result.as_json
+    render json: {count: @result.count}
+  end
+
+
   def add_beneficiary
     @result = BankTransfer::PaymentRequest::Beneficiary::Add.(current_user, params)
     respond

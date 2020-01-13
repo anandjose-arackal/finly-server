@@ -37,11 +37,11 @@
 #  approved_at              :datetime
 #  vedor_code               :string(255)
 #  trade_name               :string(255)
-#  reject_note              :string(255)
+#  reject_note              :text(65535)
 #
 
 class YesBankVendor < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
 
@@ -56,6 +56,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User"
   belongs_to :vendor_type, optional: true
   belongs_to :status, class_name: "VendorStatus", optional: true # todo remove optional after creation of migration
+  belongs_to :tds_rates_list, optional: true
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
@@ -83,7 +84,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :budget_trails, as: :vendor
-
+  has_many :trails, as: :parent
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 
@@ -198,6 +199,8 @@ class YesBankVendor < ApplicationRecord
     where id: ids
   }
 
+  scope :without_id, -> (id) {where.not(id: id)}
+
   # Scopes for ordering ends
 
   before_validation do
@@ -245,10 +248,11 @@ class YesBankVendor < ApplicationRecord
         state: state,
         state_code_id: state_code_id,
         tds_id: tds_rates_list_id,
-        bank_accounts: bank_accounts,
+        bank_accounts: bank_accounts.enabled,
         state_code: state_code&.state_code,
         address: address,
-        trade_name: trade_name
+        trade_name: trade_name,
+        custom_fields: self.custom_fields
     }
   end
 

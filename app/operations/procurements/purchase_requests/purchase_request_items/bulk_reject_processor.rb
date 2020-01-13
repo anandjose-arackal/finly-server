@@ -32,6 +32,7 @@ class Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor 
         PurchaseRequestItem.where(id: purchase_request_item_ids).update_all(status_id: purchase_request_item.status_id, rejected: false)
         break
       else
+        reject_purchase_request(purchase_request_item)
         data_success[:purchase_request_item_id] = purchase_request_item&.id
         self.result[:success].push(data_success)
       end
@@ -40,5 +41,12 @@ class Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor 
 
   def post_process
     # Notifications to be done later
+  end
+
+  def reject_purchase_request(purchase_request_item)
+    if self.purchase_request_item.purchase_request.purchase_request_items.where.not(status_id: PurchaseRequestItemStatus.id_for(:rejected)).blank?
+      params[:purchase_request_id] = purchase_request_item.purchase_request
+      Procurements::PurchaseRequests::Reject.(user, params)
+    end
   end
 end

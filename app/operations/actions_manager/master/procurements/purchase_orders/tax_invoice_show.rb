@@ -35,7 +35,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def reject
-    if invoice.is_non_po_reviewing_user?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
       invoice.processing? && user_in_level?
     end
   end
@@ -45,7 +45,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   # end
 
   def approve
-    if invoice.is_non_po_reviewing_user?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
       invoice.processing? && user_in_level?
     end
   end

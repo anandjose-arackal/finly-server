@@ -4,10 +4,10 @@ class Admin::Implementations::Master::Vendors::ImportTemplates < Admin::Implemen
   subscribe 'vendors.import_template'
   headers ({
       :id => "ID",
-      :name => "Vendor NAme",
+      :business_name => "Legal Name",
       :vendor_type => "Vendor Type",
       :vendor_id => "Vendor Code",
-      :business_name => "Business Name",
+      :trade_name => "Trade Name",
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",

@@ -245,6 +245,9 @@ class UsersController < BaseControllers::WebBase
       when 'panel_subscriptions'
         operation = User::Configuration::PanelSubscription::Update.new(current_user, params)
         success_message = "Subscriptions Updated"
+      when 'profile_details'
+        operation = User::Update.new(current_user, params)
+        success_message = "User Details Updated"
       else
         # do nothing, ha!
     end

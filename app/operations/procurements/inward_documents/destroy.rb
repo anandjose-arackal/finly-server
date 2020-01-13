@@ -73,6 +73,8 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
   def post_process
     add_message :success, 'Successfully deleted Receipt Note'
+    params[:procurement_id] = self.procurement.id
+    params[:purchase_order_id] = self.procurement.try(:purchase_order).try(:id)
   end
 
   private
@@ -97,13 +99,29 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     po_item_params = {}
 
     if user.company.feature_subscription.grn_enabled
-      po_item_params[:accepted] = [(purchase_order_item.accepted - item.accepted), 0].max
-      po_item_params[:rejected] = [(purchase_order_item.rejected.to_f - item.rejected.to_f), 0].max
-      po_item_params[:delivered] = [(purchase_order_item.delivered - item.delivered), 0].max
+      # po_item_params[:accepted] = [(purchase_order_item.accepted - item.accepted), 0].max
+      # po_item_params[:rejected] = [(purchase_order_item.rejected.to_f - item.rejected.to_f), 0].max
+      # po_item_params[:delivered] = [(purchase_order_item.delivered - item.delivered), 0].max
+
+      other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
+      items = other_receipt_notes.joins(:items).select('inward_document_items.accepted, inward_document_items.delivered, inward_document_items.rejected, inward_document_items.purchase_order_item_id as poi_id')
+      previously_accepted = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:accepted).sum.to_f
+      previously_rejected = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:rejected).sum.to_f
+      previously_delivered = items.collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:delivered).sum.to_f
+
+
+      po_item_params[:accepted] = previously_accepted
+      po_item_params[:rejected] = previously_rejected
+      po_item_params[:delivered] = previously_delivered
     end
 
     if user.company.feature_subscription.srn_enabled
-      po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount.to_f
+      # po_item_params[:previously_billed_amount] = purchase_order_item.previously_billed_amount - item.billable_amount.to_f
+
+      other_receipt_notes = self.procurement.inward_documents.where.not(id: self.inward_document.id)
+      previously_billed_amount = other_receipt_notes.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id').collect {|ii| ii if ii.poi_id == purchase_order_item.id}.compact.pluck(:billable_amount).sum.to_f
+
+      po_item_params[:previously_billed_amount] = previously_billed_amount
     end
 
     purchase_order_item.assign_attributes(po_item_params)

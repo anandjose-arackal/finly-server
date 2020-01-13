@@ -37,6 +37,7 @@ class Item < ApplicationRecord
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
+  default_scope {unscope(where: :deleted_at)}
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
@@ -50,6 +51,7 @@ class Item < ApplicationRecord
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
@@ -133,7 +135,8 @@ class Item < ApplicationRecord
       item_expense_type_name: item_expense_type&.name,
       tds_applicable: tds_applicable,
       tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description
+      custom_description: get_custom_description,
+      custom_fields: self.custom_fields
 
     }
   end

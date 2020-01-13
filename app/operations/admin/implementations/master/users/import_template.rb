@@ -25,6 +25,7 @@ class Admin::Implementations::Master::Users::ImportTemplates < Admin::Implementa
       :disburse  => "Disburse Y for enable",
       :vendor_payments => "Vendor Payments Y for enable",
       :enforce_policy => 'Enforce Policy',
+      :invite => 'Sent Invite',
       :destroy => 'Deactivate (Y for Deactivate/ activate for Activation'
   })
 

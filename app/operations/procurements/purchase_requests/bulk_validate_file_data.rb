@@ -41,7 +41,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
 
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
-    self.company_items = user.company.items
+    self.company_items = user.company.items.non_deleted
 
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
     Rails.logger.fatal "FROM BulkValidateFileData LOCATION INIT,\n #{self.locations.inspect}"

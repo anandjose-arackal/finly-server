@@ -4,7 +4,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
   subscribe 'policy_user_role.import'
   headers({
            "Vendor Payments" => {:policy_name => 'Policy Name',
-                    :user_id => 'User Email / Mobile',
+                    :user_id => 'User Email / Mobile / Employee Id',
                     :purchase_request_initiator => 'Purchase Request Initiator',
                     :purchase_request_reviewer => 'Purchase Request Reviewer' ,
                     :purchase_request_auditor => 'Purchase Request Auditor',
@@ -41,8 +41,9 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
            }
   })
 
-  attr_accessor :policy_user_params, :application, :policy
+  attr_accessor :policy_user_params, :application, :policy, :user_profiles
   def process
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -123,7 +124,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
     end
 
     entity_user_id = clean_up_data policy_user_params[:user_id]
-    entity_user = company.users.where(mobile_number: entity_user_id).or(company.users.where(email: entity_user_id)).first
+    entity_user = get_user_entity(entity_user_id)
     unless entity_user.present?
       return result false,  "User Not Found"
     end
@@ -305,5 +306,18 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
       text&.strip
     end
   end
+
+  def get_user_entity(identifier)
+    user = nil
+    if Constants::VALID_EMAIL_FORMAT.match?(identifier)
+      user = company.users.find_by_email identifier
+    elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
+      user = company.users.find_by_mobile_number identifier
+    else
+      user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
+    end
+    user
+  end
+
 
 end

@@ -1,6 +1,6 @@
 class Procurements::Grn::Pending::Index < Procurements::Base
 
-  attr_accessor :procurements, :filter_procurement_type
+  attr_accessor :procurements, :filter_procurement_type, :filter_awaiting_action
 
   def pre_validate
     unless user.company.feature_subscription.grn_enabled || user.company.feature_subscription.srn_enabled
@@ -11,6 +11,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
   
   def init
     self.filter_procurement_type = params[:filter_procurement_type]
+    self.filter_awaiting_action = !!StringUtils.to_bool(params[:filter_awaiting_action])
   end
 
   def validate
@@ -32,7 +33,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
         # Get all policies where user has goods receiver role
         received_pending_ids = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
         
-        if user.vendor_payments_admin?
+        if user.vendor_payments_admin? && !filter_awaiting_action
           pr_ids = user.company.procurements.pluck(:id)
         else
           policy_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ? AND user_id = ?', UserRole.id_for(:goods_receiver), user.id).pluck(:id).uniq rescue []
@@ -78,7 +79,8 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     has_scope :filter_grn_due_today
     has_scope :filter_grn_overdue
     has_scope :filter_policy_id
-
+    has_scope :filter_pr_number
+    has_scope :filter_pr_creator_id
 
     def init
       self.procurements = params[:procurements]
@@ -163,6 +165,8 @@ class Procurements::Grn::Pending::Index < Procurements::Base
           }
         when 'invoice_id'
           params[:filter_invoice_id] = params[:search_query]
+        when 'pr_number'
+          params[:filter_pr_number] = params[:search_query]
         else
           # do nothing
       end

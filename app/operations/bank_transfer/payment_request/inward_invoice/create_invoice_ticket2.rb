@@ -101,7 +101,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     invalid_invoices = []
     self.inward_invoices.each do |invoice|
-      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      # invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      invalid_invoices << invoice unless invoice.payable
     end
 
     if invalid_invoices.present?
@@ -121,7 +122,14 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
-      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      invoice_amount = invoice.balance_due&.value.to_f
+      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+      total_payments = (payable_amount.to_f + 0.99) + previous_payments
+
+      # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      remaining_amount = (invoice_amount - previous_payments).round(2)
+
       if remaining_amount.blank?
         next
       end
@@ -134,8 +142,24 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return
       end
 
+      if invoice.bank_account&.disabled
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, has a bank account which is disabled. Payment can only be processed to active bank accounts."
+        return
+      end
+
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
+        return false
+      end
+
+      if total_payments >= invoice_amount.round(2)
+        invoice.update payable: false
+      end
+
+      if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
+        invoice.update payable: false
+        add_message :error, "Invoice has been credited."
+        return
       end
       self.requested_amount += payable_amount
     end
@@ -152,6 +176,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
+        self.inward_invoices.update_all(payable: true)
         self.bank_payment_request.destroy
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return

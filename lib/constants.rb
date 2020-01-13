@@ -5,9 +5,10 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
-  VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
+  VALID_IFSC = /\A[A-Za-z]{4}[a-zA-Z0-9]{7}\z/i
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
   VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
+  VALID_PAN = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/
 
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
@@ -29,7 +30,8 @@ module Constants
   MIGRATING_COMPANIES = []
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['ankit.bazari@finly.io', 'chandra.reddy@finly.io', 'dini.jose@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
@@ -79,9 +81,9 @@ module Constants
   # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   # using the below one because the above one's monthly quota was crossed
   if Rails.env.production?
-    # CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
-    # temporary because the above ran out #todo - change by end of month
-    CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+    CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
+    # above and below are the two keys we use. In case one runs out, please comment it out and use the other temporarily
+    # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   else
     CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   end

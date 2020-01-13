@@ -228,6 +228,7 @@ class Payment < ApplicationRecord
   scope :cash_on_hand_credits, -> { where(receiving_account_type: "CashOnHand") }
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
+  scope :all_except_failed, -> { where payment_status_id: PaymentStatus.all_except_failed }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
@@ -727,7 +728,14 @@ class Payment < ApplicationRecord
     case self.parent_type
     when 'Invoice'
       parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
-      parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+      options = {}
+      if parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2) < parent_details.balance_due.value.to_f
+        options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid), payable: true}
+      else
+        options = {invoice_status_id: InwardInvoiceStatus.id_for(:unpaid)}
+      end
+
+      parent_details.update options
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
@@ -745,10 +753,24 @@ class Payment < ApplicationRecord
       case self.parent_type
       when 'Invoice'
         parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
-        parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+        # parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+        parent_details.update_invoice_status
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      end
+    end
+
+    if PaymentStatus.all_except_failed.exclude? self.payment_status_id
+      case self.parent_type
+      when 'Invoice'
+        parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+        total_payments = parent_details.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+        invoice_amount = parent_details.balance_due&.value.to_f
+
+        if total_payments < invoice_amount
+          parent_details.update payable: true
+        end
       end
     end
   end

@@ -26,6 +26,7 @@
 #  latitude                          :decimal(20, 10)
 #  longitude                         :decimal(20, 10)
 #  accuracy_radius                   :integer
+#  user_finly_id                     :string(255)
 #
 
 FactoryBot.define do

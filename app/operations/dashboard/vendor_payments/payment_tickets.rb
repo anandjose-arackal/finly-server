@@ -41,7 +41,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
       self.payment_tickets = apply_scopes(self.payment_tickets, general_filter_params)
       self.counts = []
 
-      if user.vendor_payments_admin?
+      if user.vendor_payments_admin? || user.is_bank_payment_request_auditor?
         admin_data = {
           type: 'admin',
           title: "Company Payment Tickets",
@@ -70,6 +70,35 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
               filters: [
                 {filter_status: 'credited'}
+              ]
+            },
+            {
+              title: "In Progress",
+              count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
+              filters: [
+                {filter_status: 'in_progress'}
+              ]
+            },
+            {
+              title: "Partially Completed",
+              count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
+              filters: [
+                {filter_status: 'partially_completed'}
+              ]
+            },
+
+            {
+              title: "Completed",
+              count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
+              filters: [
+                {filter_status: 'completed'}
+              ]
+            },
+            {
+              title: "Failed",
+              count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
+              filters: [
+                {filter_status: 'failed'}
               ]
             }
           ]
@@ -108,8 +137,44 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
                 {filter_user_name: user.name},
                 {filter_user_id: user.id}
               ]
+            },
+            {
+              title: "Credited",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'credited'})&.count,
+              filters: [
+                {filter_status: 'credited'}
+              ]
+            },
+            {
+              title: "In Progress",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'in_progress'})&.count,
+              filters: [
+                {filter_status: 'in_progress'}
+              ]
+            },
+            {
+              title: "Partially Completed",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'partially_completed'})&.count,
+              filters: [
+                {filter_status: 'partially_completed'}
+              ]
+            },
+
+            {
+              title: "Completed",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'completed'})&.count,
+              filters: [
+                {filter_status: 'completed'}
+              ]
+            },
+            {
+              title: "Failed",
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'failed'})&.count,
+              filters: [
+                {filter_status: 'failed'}
+              ]
             }
-          ]
+          ]       
         }
         self.counts.push(personal_data)
 
@@ -147,6 +212,73 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
     #     }
     #     self.counts.push(reviewer_data)
     #   end
+    end
+
+    def payment_ticket_dashboard_data
+      [
+        {
+          title: "Total",
+          count: apply_scopes(payment_tickets, {filter_user_id: user.id})&.count,
+          filters: [
+            {filter_user_name: user.name},
+            {filter_user_id: user.id}
+          ]
+        },
+        {
+          title: "Processing",
+          count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'processing'})&.count,
+          filters: [
+            {filter_status: 'processing'},
+            {filter_user_name: user.name},
+            {filter_user_id: user.id}
+          ]
+        },
+        {
+          title: "Approved",
+          count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'approved'})&.count,
+          filters: [
+            {filter_status: 'approved'},
+            {filter_user_name: user.name},
+            {filter_user_id: user.id}
+          ]
+        },
+        {
+          title: "Credited",
+          count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
+          filters: [
+            {filter_status: 'credited'}
+          ]
+        },
+        {
+          title: "In Progress",
+          count: apply_scopes(payment_tickets, {filter_status: 'in_progress'})&.count,
+          filters: [
+            {filter_status: 'in_progress'}
+          ]
+        },
+        {
+          title: "Partially Completed",
+          count: apply_scopes(payment_tickets, {filter_status: 'partially_completed'})&.count,
+          filters: [
+            {filter_status: 'partially_completed'}
+          ]
+        },
+
+        {
+          title: "Completed",
+          count: apply_scopes(payment_tickets, {filter_status: 'completed'})&.count,
+          filters: [
+            {filter_status: 'completed'}
+          ]
+        },
+        {
+          title: "Failed",
+          count: apply_scopes(payment_tickets, {filter_status: 'failed'})&.count,
+          filters: [
+            {filter_status: 'failed'}
+          ]
+        }
+      ]
     end
   end
 end

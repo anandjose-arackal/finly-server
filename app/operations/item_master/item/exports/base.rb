@@ -6,7 +6,7 @@ class ItemMaster::Item::Exports::Base < ItemMaster::Item::Base
     unless ids.is_a?(Array) or ids.blank?
       ids = ids.split(',')
     end
-    self.items = user.company.items.includes_for_export
+    self.items = user.company.items.non_deleted.includes_for_export
     self.items = self.items.where(id: ids) if ids.present?
     self.headers = default_headers
   end

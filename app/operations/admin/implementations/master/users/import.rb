@@ -25,6 +25,7 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       :disburse  => "Disburse Y for enable",
       :vendor_payments => "Vendor Payments Y for enable",
       :enforce_policy => 'Enforce Policy',
+      :invite => 'Sent Invite',
       :destroy => 'Deactivate (Y for Deactivate / activate for Activation)'
   })
 
@@ -88,6 +89,27 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
       return result true, "Activated Successfully"
     end
   end
+
+   def invite(data)
+     invited_user = self.company.users.find_by id: data[:id]
+     unless invited_user.present?
+       return result false, "User not found"
+     end
+
+     unless invited_user.email.present?
+       return result false, "User not have an email"
+     end
+
+     user_params = {user_id: invited_user.id}
+     presenter = Admin::Users::WelcomeMail.(AdminUser.all.first, user_params)
+     if presenter.messages[:error].present?
+       return result false, presenter.messages[:error].join(' ,')
+     elsif presenter.messages[:failure].present?
+       return result false, presenter.messages[:failure].join(' ,')
+     elsif presenter.messages[:success].present?
+       return result true, "User Invited Successfully"
+     end
+   end
 
    def set_params(data)
     messages = []
@@ -185,7 +207,18 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
   end
 
   def generate_default_password
-    SecureRandom.base64 13
+    char_array = [("a".."z").to_a,
+                  ("A".."Z").to_a,
+                  ("0".."9").to_a,
+                  %q(#?!@$%^&*-).chars]
+    all_values  = char_array.flatten
+    arr=[]
+    6.times.map do
+      arr = char_array.map(&:sample)
+      (5 - char_array.size).times{ arr << all_values.sample}
+      arr.shuffle.join
+    end
+    "#{arr.join()}#{SecureRandom.base64(10)}"
   end
 
 end

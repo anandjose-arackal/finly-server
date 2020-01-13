@@ -25,6 +25,12 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       return
     end
 
+    receiving_account = self.invoice.receiving_account
+    if receiving_account&.disabled
+      add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
+      return
+    end
+
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     # this will apply only if this invoice is part of a non-PO
@@ -85,7 +91,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
-    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
+    # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
   end
 end

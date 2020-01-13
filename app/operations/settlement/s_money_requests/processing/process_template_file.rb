@@ -140,7 +140,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
 
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
-      result = Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
+      result = Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {update_documents: true, marked_as_completed: false, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
       unless result.success?
         self.just_show_excel = false
         add_message :error, result.messages[:error]

@@ -1,5 +1,5 @@
 class Event::EPurchaseOrder::Base < Event::SetNotifier
-  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id, :include_attachments
+  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id, :include_attachments, :purchase_request_creator
 
   def pre_validate
     unless user.present?
@@ -25,6 +25,9 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     self.controlling_users = []
     self.role_id = params[:role_id]
     self.include_attachments = self.purchase_order&.approved?
+    if self.purchase_order.present? && self.purchase_order.purchase_request_items.present?
+      self.purchase_request_creator = self.purchase_order.purchase_request_items.first.purchase_request.creator
+    end
   end
 
   def validate

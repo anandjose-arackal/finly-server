@@ -1,5 +1,5 @@
 class Export::MoneyRequest::Base < Export::Base
-  attr_accessor :company, :preference
+  attr_accessor :company, :preference, :item_categories
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -24,6 +24,7 @@ class Export::MoneyRequest::Base < Export::Base
     data_arr << money_request.name
     data_arr << money_request.user.first_name
     data_arr << money_request.status&.name
+    data_arr += retrieve_category_item_value(money_request.items)
     data_arr << money_request.base_currency&.country_code
     data_arr << money_request.total_amount
     data_arr << money_request.processed_amount&.currency
@@ -36,7 +37,18 @@ class Export::MoneyRequest::Base < Export::Base
   end
 
   def header
-    %w(ID Name User Status Requested\ Amount\ Currency Requested\ Amount Processed\ Amount\ Currency Processed\ Amount Required\ By\ Date Purpose Destination\ Account Payment\ Type)
+   header= %w(ID Name User Status Requested\ Amount\ Currency Requested\ Amount Processed\ Amount\ Currency Processed\ Amount Required\ By\ Date Purpose Destination\ Account Payment\ Type)
+    self.item_categories = user.company.money_request_item_categories
+    header.insert(4, *(item_categories.pluck(:name)))
+  end
+
+  def retrieve_category_item_value(money_request_items)
+    item_amounts = []
+    item_categories.each do |item_category|
+      money_request_item  = money_request_items.find{|mr| mr.money_request_item_category_id == item_category.id}
+      item_amounts << (money_request_item.present? ? money_request_item.amount.value : '0.0')
+    end
+    item_amounts
   end
 
 end

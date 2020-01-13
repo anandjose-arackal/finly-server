@@ -37,6 +37,8 @@ json.status do
   json.extract! invoice.invoice_status, :id, :name
 end
 
+json.invoice_payment_status invoice.invoice_payment_status
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true
@@ -55,6 +57,7 @@ json.invoice do
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
                 :cost_allocation_items, :narration, :discount_type_id
 
+  json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
@@ -177,25 +180,27 @@ json.invoice do
       json.ifsc invoice.receiving_account&.ifsc
       json.name invoice.receiving_account&.name
       json.id invoice.receiving_account&.id
+      json.disabled invoice.receiving_account&.disabled
     end
 
     if invoice.vendor&.bank_accounts.present?
       json.bank_accounts do
-        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+        json.array!(invoice.vendor&.bank_accounts.enabled) do |bank_account|
           json.id bank_account.id
           json.name bank_account.name
           json.account_number bank_account.account_number
           json.ifsc bank_account.ifsc
           json.default bank_account.default_account
           json.selected invoice.receiving_account&.id == bank_account.id
+          json.disabled bank_account.disabled
         end
       end
     end
   end
 end
 
-json.invoice_categories current_company.categories.vendor_payments_only
-json.invoice_item_categories current_company.categories.inward_invoice_items_only
+json.invoice_categories current_company.categories.vendor_payments_only.active
+json.invoice_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.cost_centers do
   # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
@@ -233,7 +238,7 @@ json.tds_slabs do
 end
 
 json.attachments do
-  json.array! invoice.attachments do |attachment|
+  json.array! invoice.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -245,7 +250,7 @@ end
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
-    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
+    json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end
 end
 

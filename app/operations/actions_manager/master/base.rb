@@ -16,7 +16,6 @@ class ActionsManager::Master::Base
     inventory_line_item_index: '::ActionsManager::Master::Invoicing::InventoryLineItem::Index',
     inventory_line_item_show: '::ActionsManager::Master::Invoicing::InventoryLineItem::Show',
     templates_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Templates::Index',
-    non_po_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Index',
     non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
     non_po_inward_document_show: '::ActionsManager::Master::Procurements::PurchaseOrders::InwardDocumentShow',
     non_po_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow',
@@ -40,7 +39,10 @@ class ActionsManager::Master::Base
     security_deposit_make_payment: '::ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment',
     beneficiary_payment_make_payment: '::ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment',
     rental_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment',
-    general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment'
+    general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment',
+    non_po_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index',
+    po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
+    agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index'
 
   }.with_indifferent_access
 

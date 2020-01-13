@@ -43,7 +43,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
 
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
-    self.company_items = user.company.items
+    self.company_items = user.company.items.non_deleted
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
 

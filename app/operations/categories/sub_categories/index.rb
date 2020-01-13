@@ -9,7 +9,7 @@ class Categories::SubCategories::Index < Categories::Base
   end
 
   def process
-    self.sub_categories = self.category.children
+    self.sub_categories = self.category.children.active
     if expense_management?
       self.sub_categories = self.sub_categories.expense_management_only
     end

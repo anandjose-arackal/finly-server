@@ -75,6 +75,11 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				end
 				yes = user.company.yes_bank_vendors.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
+				display_name = yes.business_name || yes.name
+				if ba&.first&.disabled
+					add_message :error, "This vendor, #{display_name}, has an inactive bank account. Payment can only be processed to active accounts."
+					break
+				end
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
@@ -149,7 +154,12 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
       update_status if self.from_payment_agreement # Setting up this status for payment agreement
-			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+      if [168, 169, 174, 175].include?(user.company.id)
+				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+			else
+				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+			end
+			# end
 	end
 
 	def success

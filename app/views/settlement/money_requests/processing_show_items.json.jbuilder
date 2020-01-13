@@ -18,7 +18,7 @@ json.items do
     json.utr utr
     json.actions @result.item_actions(item)
     json.money_requests do
-      json.array! item.money_requests do |money_request|
+      json.array! item.money_requests.sort do |money_request|
 
         request_count += 1
         json.extract! money_request, :id, :policy

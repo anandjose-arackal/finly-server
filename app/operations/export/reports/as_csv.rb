@@ -43,13 +43,11 @@ class Export::Reports::AsCsv < Export::Reports::Base
 
   def process
     # custom field data
-    cf_data = generate_custom_field_data reports
-    cf_headers = cf_data[:headers]
     self.result = CSV.generate do |csv|
-      csv << (default_column_names + cf_headers)
+      csv << (default_column_names + custom_field_column_names)
       reports.each do |r|
         r.expenses.each do |e|
-          csv << retrieve_data(preferences, r, e, cf_data)
+          csv << retrieve_data(preferences, r, e, custom_field_column_names)
         end
       end
     end

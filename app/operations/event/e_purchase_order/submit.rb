@@ -30,7 +30,10 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
     #   end
     # end
     # users
-    self.purchase_order.affected_users(:submit)
+    affected_users = self.purchase_order.affected_users(:submit)
+    if purchase_order.purchase_request_items.present?
+      affected_users += [purchase_request_creator]
+    end
   end
 
   # def get_token(user)
@@ -76,6 +79,8 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
   def mailer_body(user)
     if user.id == purchase_order.user.id
       "Congratulations, you have successfully submitted the purchase order : #{self.purchase_order.po_number}"
+    elsif purchase_request_creator.present? && user.id == purchase_request_creator.id
+      "#{self.purchase_order.user.name} has submitted purchase order: #{self.purchase_order.po_number} and is currently awaiting approval."
     else
       "#{self.purchase_order.user.name} has submitted purchase order: #{self.purchase_order.po_number} and is currently awaiting your approval."
     end

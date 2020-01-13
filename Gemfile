@@ -61,7 +61,7 @@ gem 'roo-xls', '~> 1.2.0'
 gem 'write_xlsx', '~> 0.85.6'
 gem 'saxlsx'
 # Gem to show db schema in model file
-gem 'annotate', '~> 2.7.5'
+gem 'annotate', '~> 2.7'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'
@@ -88,7 +88,7 @@ gem 'jquery-rails', '~> 4.3.3'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.8.0'
+gem 'jbuilder', '~> 2.9.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 # gem 'sdoc', group: :doc
 
@@ -157,7 +157,7 @@ gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
 
 # gem for devise authentication
-gem 'devise', '~> 4.5.0'
+gem 'devise', '~> 4.7.1'
 
 gem 'devise_invitable', '~> 1.7.5'
 gem 'doorkeeper', '~> 5.0.2'
@@ -175,6 +175,8 @@ gem 'maxminddb', '~> 0.1.22'
 gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
 
+gem 'uuidtools', '~> 2.1'
+
 # gem 'logstasher', '~> 1.3.0'
 gem 'lograge', '~> 0.10.0'
 gem 'logstash-event', '~> 1.2.02'
@@ -185,6 +187,9 @@ gem 'ancestry', '~> 3.0.5'
 
 gem 'aasm', '~> 5.0.1'
 
+gem 'activerecord-import', '~> 1.0', '>= 1.0.3'
+gem 'parallel', '~> 1.18'
+gem 'string_pattern', '~> 2.2', '>= 2.2.1'
 # gem 'slackistrano'
 
 # adding aws-sdk gem for using their API enabled services

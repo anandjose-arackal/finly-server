@@ -63,4 +63,9 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
     @result = Dashboard::VendorPayments::PaymentAgreements.(current_user, params)
     respond
   end
+
+  def purchase_request_approved_items
+    @result = Dashboard::VendorPayments::PurchaseRequestApprovedItems.(current_user, params)
+    respond
+  end
 end

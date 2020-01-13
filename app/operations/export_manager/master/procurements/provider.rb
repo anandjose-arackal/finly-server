@@ -25,7 +25,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
              approval_pending_level_name: {spreadsheet: true, pdf: false},
              approval_pending_reviewers: {spreadsheet: true, pdf: false},
              approved_reviewers: {spreadsheet: true, pdf:false},
-             policy: {spreadsheet: false, pdf: true},
+             policy: {spreadsheet: true, pdf: true},
              department: {spreadsheet: true, pdf: true},
              sub_department: {spreadsheet: true, pdf: true},
              cost_center: {spreadsheet: true, pdf: true},
@@ -85,7 +85,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
       add_message :error, result.messages[:error]
       return
     end
-    result.purchase_orders.includes(:vendor,:gstin_location,:controlling_level,:level,:department, :sub_department,:cost_center,:user, :status, :total_before_tax,procurement:[invoices:[:gst_type, :tax_amount, :tds_slab,:discount_amount,:net_amount,:invoice_items]])
+    result.purchase_orders.includes(:policy,:vendor,:gstin_location,:controlling_level,:level,:department, :sub_department,:cost_center,:user, :status, :total_before_tax,procurement:[invoices:[:gst_type, :tax_amount, :tds_slab,:discount_amount,:net_amount,:invoice_items]])
   end
 
   def procurement_name(purchase_order)
@@ -129,7 +129,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def approved_reviewers(purchase_order)
-    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.map{|dlr| dlr.reviewer.name}&.join(" ,")
+    purchase_order&.dlrms&.where(action_id: TrailAction.id_for(:approve))&.includes(:reviewer)&.map{|dlr| dlr.reviewer.name}&.join(" ,")
   end
 
   def vendor_tds_rate(purchase_order)
@@ -191,11 +191,11 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_delivery_date(purchase_order)
-    DateUtils.date_formatted purchase_order&.delivery_date
+     purchase_order&.delivery_date&.strftime("%d-%b-%Y")
   end
 
   def po_date(purchase_order)
-    DateUtils.date_formatted purchase_order&.created_at
+    purchase_order&.created_at&.strftime("%d-%b-%Y")
   end
 
   def po_submitted_on(purchase_order)

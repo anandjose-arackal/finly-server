@@ -26,6 +26,7 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
       :disburse  => "Disburse Y for enable",
       :vendor_payments => "Vendor Payments Y for enable",
       :enforce_policy => 'Enforce Policy',
+      :invite => 'Sent Invite',
       :destroy => 'Deactivate (Y for Deactivate/ activate for Activation'
   })
 
@@ -127,6 +128,10 @@ class Admin::Implementations::Master::Users::Export < Admin::Implementations::Pr
 
   def destroy(user)
     ''
+  end
+
+  def invite(user)
+    user.default_password? ? '' : 'Already logined to system'
   end
 
   def post_process

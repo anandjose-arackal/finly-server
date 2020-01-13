@@ -70,8 +70,8 @@ json.invoice do
   json.item_amounts_total invoice.item_amounts_total&.round(2)
 
   json.net_payable_amount invoice.balance_due&.value
-  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value).round(2)
+  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
 
   # invoice items
   json.invoice_items do
@@ -110,13 +110,14 @@ json.invoice do
 
     if invoice.vendor&.bank_accounts.present?
       json.bank_accounts do
-        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+        json.array!(invoice.vendor&.bank_accounts.enabled) do |bank_account|
           json.id bank_account.id
           json.name bank_account.name
           json.account_number bank_account.account_number
           json.ifsc bank_account.ifsc
           json.default bank_account.default_account
           json.selected invoice.receiving_account&.id == bank_account.id
+          json.disabled bank_account.disabled
         end
       end
     end

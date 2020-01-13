@@ -10,7 +10,7 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
       :location_code => 'LocationCode',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
-      :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
       :with_exception => 'With Exception Y/N',
       :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",

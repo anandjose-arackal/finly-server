@@ -13,7 +13,8 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
   end
 
   def process
-
+    # agreement_related_operations
+    # return
     params[:document] = self.payment_agreement
     params[:aasm_event] = 'approve'
 
@@ -36,46 +37,44 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
       update_one_time_invoice
       if self.payment_agreement.general_invoices.fixed_periodic_type.present?
         vendor_ids = self.payment_agreement.general_invoices.pluck(:vendor_id).uniq
-        vendor_ids.each do |vendor_id|
-          # create_upcoming_invoice(vendor_id, 'general_invoice')
-          create_first_invoice(vendor_id, 'general_invoice')
+        if vendor_ids.present?
+          vendor_ids.each do |vendor_id|
+            create_upcoming_invoice(vendor_id, 'general_invoice')
+            # create_first_invoice(vendor_id, 'general_invoice')
+          end
         end
       end
 
       if self.payment_agreement.rental_invoices.fixed_periodic_type.present?
         vendor_ids = self.payment_agreement.rental_invoices.pluck(:vendor_id).uniq
-        vendor_ids.each do |vendor_id|
-          # create_upcoming_invoice(vendor_id, 'rental_invoice')
-          create_first_invoice(vendor_id, 'rental_invoice')
+        if vendor_ids.present?
+          vendor_ids.each do |vendor_id|
+            create_upcoming_invoice(vendor_id, 'rental_invoice')
+            # create_first_invoice(vendor_id, 'rental_invoice')
+          end
         end
       end
     end
   end
 
-  # After approval, first upcoming invoice is created
-  # def create_upcoming_invoice(vendor_id, invoice_type)
-  #   execution_date = self.payment_agreement.execution_date.to_date
-  #   if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).present?
-  #     self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).order(:start_date).each_with_index do |agreement_invoice, index|
-  #       if index.zero?
-  #         create_first_invoice(agreement_invoice)
-  #       end
-  #     end
-  #   end
-  # end
-
-  def create_first_invoice(vendor_id, invoice_type)
+  # After approval, upcoming invoices till date are created
+  # Base date is 01 Aug 2019. Invoice cannot be before this date
+  def create_upcoming_invoice(vendor_id, invoice_type)
     execution_date = self.payment_agreement.execution_date.to_date
-    if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).present?
-      invoice = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id, start_date: execution_date).first
-      params[:vendor_id] = invoice.vendor_id
-      params[:first_reference_invoice] = invoice
-      params[:first_reference_invoice_type] = invoice.class.name.underscore
+    if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).where("Date(start_date) >= ? AND DATE(start_date) <= ?", Date.parse("01 Aug 2019"), Date.today.end_of_month).present?
+      reference_invoice_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).where("Date(start_date) >= ? AND DATE(start_date) <= ?", Date.parse("01 Aug 2019"), Date.today.end_of_month).pluck(:id)
+      params[:reference_invoice_ids] = reference_invoice_ids
+      params[:vendor_id] = vendor_id
+      params[:reference_invoice_type] = invoice_type
+      params[:payment_agreement_id] = self.payment_agreement.id
       upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoice.(user, params)
       unless upcoming_invoice_op.success?
-        add_message :error, "Error occurred, first upcoming invoice is not created"
+        add_message :error, "Error occurred, 1 or more upcoming invoices are not created"
         return
       end
+
+      # self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).where("Date(start_date) >= ? AND DATE(start_date) <= ?", Date.parse("01 Aug 2019"), Date.today.end_of_month).order(:start_date).each_with_index do |agreement_invoice, index|
+      # end
     end
   end
 

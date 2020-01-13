@@ -81,6 +81,9 @@ staging:
 development:
   <<: *default
 
+uat:
+  <<: *default
+
 local_vm:
   <<: *default
 

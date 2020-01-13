@@ -41,7 +41,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                         :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
                                         :category_id, :description, :id, :remove_line_item,
                                         :hsn_sac, :comment, :_destroy, :inventory_line_item_id, :purchase_order_item_id,
-                                        :billable_amount
+                                        # :billable_amount
                                     ], custom_fields: [])
   end
 

@@ -35,10 +35,10 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
   def success
     params[:procurements] = self.procurements
-    Procurements::Index::IndexPresenter.new(user, params, messages)
+    Procurements::Grn::Received::Index::IndexPresenter.new(user, params, messages)
   end
 
-  class Procurements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Grn::Received::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
@@ -64,7 +64,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_policy_id
-
+    has_scope :filter_pr_number
+    has_scope :filter_pr_creator_id
 
     def init
       self.procurements = params[:procurements]
@@ -146,6 +147,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
           }
         when 'invoice_id'
           params[:filter_invoice_id] = params[:search_query]
+        when 'pr_number'
+          params[:filter_pr_number] = params[:search_query]
         else
           # do nothing
       end

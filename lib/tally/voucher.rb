@@ -73,7 +73,7 @@ class Tally::Voucher < NonPersistentModel
       sum += ledger.amount
     end
 
-    errors.add :base, "Sum of ledgers is not zero. Sum : #{sum}" unless sum == 0
+    errors.add :base, "Sum of ledgers is not zero. Sum : #{sum}" unless sum.to_f.round(2) == 0
   end
 
   def ledgers_validation

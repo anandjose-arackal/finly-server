@@ -2,7 +2,7 @@
   attr_accessor :file_format, :adapter, :payment_file_params
 
   def authorized_user_types
-    [:company_admin, :auditor, :finance_manager, :vendor_payments_admin]
+    [:vendor_payments_admin, :vendor_payments_reviewer, :vendor_payments_creditor, :vendor_payments_initiator, :auditor]
   end
 
   def pre_validate

@@ -98,10 +98,17 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  # Invoices for each agreement
   def upcoming_invoices
     @result = PaymentAgreements::UpcomingInvoices.(current_user, params)
     respond
   end
+
+  # Invocies for all agreements
+  def all_upcoming_invoices
+    @result = PaymentAgreements::AllUpcomingInvoices.(current_user, params)
+    respond
+  end  
 
   def attachments
     @result = PaymentAgreements::Attachments.(current_user, params)
@@ -113,5 +120,10 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  # Manually terminate agreement
+  def terminate
+    @result = PaymentAgreements::Terminate.(current_user, params)
+    respond
+  end
 
 end

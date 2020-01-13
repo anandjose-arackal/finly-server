@@ -23,10 +23,9 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
       self.paginated_line_items = self.inventory_line_items&.order(created_at: :desc)&.paginate(page: params[:page], per_page: per_page)
     end
   end
-
   def init
     # if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor? || user.is_purchase_request_initiator? || current_app == :fc || user.is_purchase_order_initiator? || user.is_invoice_initiator?
-      self.inventory_line_items = user.company.items
+      self.inventory_line_items = user.company.items.non_deleted.includes(:category,:tax_rate,:supply_item_type, :item_expense_type,:user)
     # end
   end
 
