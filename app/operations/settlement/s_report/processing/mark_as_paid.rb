@@ -1,3 +1,5 @@
+# This settles all reports explicitly even when no details are supplied
+# 
 class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Processing::Base
   attr_accessor :report_group_processor, :pending_mappings
 

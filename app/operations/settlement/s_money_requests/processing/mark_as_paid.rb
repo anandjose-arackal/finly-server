@@ -1,3 +1,5 @@
+# This settles all money requests explicitly even when no details are supplied
+# 
 class Settlement::SMoneyRequests::Processing::MarkAsPaid < Settlement::SMoneyRequests::Processing::Base
   attr_accessor :money_request_processor, :pending_mappings
 

@@ -35,6 +35,8 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
       self.pending_mappings = self.money_request_processor.mappings.not_completed
     end
 
+    self.completed_mappings = self.money_request_processor.mappings.completed
+
     if self.pending_mappings.blank?
       add_message :error, "No Money Request found which can be processed."
       return
@@ -131,6 +133,12 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
         end
       end
     end
+
+    # explicitly settle money requests of completed mappings when called from batch level
+    # 
+    update_mapping_data
+    # 
+
     if self.money_request_processor.processed_amount.blank?
       processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
     else
@@ -166,6 +174,28 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, purpose)
     payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, destination_pocket, amount, reference_resource: mapping.payment))
     AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+  end
+
+  def update_mapping_data
+    request_status = MoneyRequestStatus.id_for(:credited)
+    request_tracking_status = MoneyRequestTrackingAction.id_for(:credited)
+
+    self.completed_mappings.each do |mapping|
+      money_request_ids = []
+      mapping.money_requests.each do |money_request|
+        next if money_request.credited?  # explicitly settle money request when called from batch level
+        money_request_ids << money_request.id
+        money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
+                                    action_user_role_id: self.money_request_processor.created_by_user_role_id,
+                                    money_request_tracking_action_id: request_tracking_status,
+                                    status_id: request_status,
+                                    payment: mapping.payment
+      end
+
+      mapping.money_requests.where(id: money_request_ids).update_all(controlling_user_id: nil, controlling_user_role_id: nil,
+                                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                            status_id: request_status, payment_id: mapping.payment&.id)
+    end
   end
 
 end
