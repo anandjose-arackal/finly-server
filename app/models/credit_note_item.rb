@@ -83,8 +83,8 @@ class CreditNoteItem < ApplicationRecord
   end
 
   def get_tax_amount(rate = nil)
-    rate = rate || tax_rate.rate *
-        get_taxable_amount * rate / 100
+    rate = rate || tax_rate.rate
+    get_taxable_amount * rate / 100
   end
 
   def get_total_amount
