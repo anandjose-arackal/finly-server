@@ -344,6 +344,7 @@ class Invoice < ApplicationRecord
     where('date = ?', from)
   }
 
+
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
