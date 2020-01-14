@@ -16,7 +16,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     property :tax_rate_id, validates: {presence: true}
   end
 
-  validate :item_validation
+  validate :items_validation
 
   validate :company_entities # Checks for departments
 
@@ -40,7 +40,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     true
   end
 
-  def items_validations
+  def items_validation
     # debugger
     true
   end
