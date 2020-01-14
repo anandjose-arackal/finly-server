@@ -60,8 +60,7 @@ class Events::Publisher
   class Async
     def self.call(routing_key, payload, current_user: nil, persistence: true, consumer_key:)
       if consumer_key == NoObject
-        # TODO - Remove this before commit
-        # publish_to_all_consumers(routing_key, payload, persistence)
+        publish_to_all_consumers(routing_key, payload, persistence)
       else
         publish_to_consumer(consumer_key, payload)
       end
