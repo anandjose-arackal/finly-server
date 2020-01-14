@@ -44,18 +44,18 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     credit_account
     return if has_errors?
     case self.virtual_account.purpose_id
-      when VirtualAccountPurpose.id_for(:payment_receivable)
-        AccountManager::Collect::PaymentReceivable::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
-      when VirtualAccountPurpose.id_for(:invoice)
-        # this will take the respective payment for the invoice and mark it as paid or partially paid accordingly
-        op = AccountManager::Collect::Invoice::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
-        # if this operation isn't successful, update the virtual account transaction as not reconciled
-        unless op.success?
-          self.virtual_account_transaction.update(processed: false)
-          self.virtual_account_transaction.log_state(:error, 'Invoice payment not reconciled')
-        end
-      else
-        # do nothing?
+    when VirtualAccountPurpose.id_for(:payment_receivable)
+      AccountManager::Collect::PaymentReceivable::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
+    when VirtualAccountPurpose.id_for(:invoice)
+      # this will take the respective payment for the invoice and mark it as paid or partially paid accordingly
+      op = AccountManager::Collect::Invoice::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
+      # if this operation isn't successful, update the virtual account transaction as not reconciled
+      unless op.success?
+        self.virtual_account_transaction.update(processed: false)
+        self.virtual_account_transaction.log_state(:error, 'Invoice payment not reconciled')
+      end
+    else
+      # do nothing?
     end
   end
 
@@ -66,40 +66,45 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     # trigger the api call for Webhooks
     # setting the body of the webhook
     body = {
-      "beneficiary_account_no": self.virtual_account.account_number,
-      "beneficiary_account_ifsc": self.virtual_account.ifsc,
-      "beneficiary_full_name": self.virtual_account.company.name,
-      "transfer_type": self.virtual_account_transaction.transfer_type,
-      "transfer_id": self.virtual_account_transaction.transfer_id,
-      "transfer_timestamp": self.virtual_account_transaction.transfer_timestamp,
-      "transfer_currency": self.virtual_account_transaction.transfer_currency,
-      "transfer_amount": self.virtual_account_transaction.transfer_amount,
-      "remitter_account_no": self.virtual_account_transaction.remitter_account_no,
-      "remitter_account_ifsc": self.virtual_account_transaction.remitter_account_ifsc,
-      "remitter_account_type": self.virtual_account_transaction.remitter_account_type,
-      "remitter_full_name": self.virtual_account_transaction.remitter_full_name,
-      "remitter_address": self.virtual_account_transaction.remitter_address,
-      "note": self.virtual_account_transaction.note,
-      "transfer_status": "CREDITED",
-      "credited_at": self.virtual_account_transaction.credited_at,
-      "returned_at": nil,
-      "attempt_no": 1,
-      "reject_reason": nil
+        "beneficiary_account_no": self.virtual_account.account_number,
+        "beneficiary_account_ifsc": self.virtual_account.ifsc,
+        "beneficiary_full_name": self.virtual_account.company.name,
+        "transfer_type": self.virtual_account_transaction.transfer_type,
+        "transfer_id": self.virtual_account_transaction.transfer_id,
+        "transfer_timestamp": self.virtual_account_transaction.transfer_timestamp,
+        "transfer_currency": self.virtual_account_transaction.transfer_currency,
+        "transfer_amount": self.virtual_account_transaction.transfer_amount,
+        "remitter_account_no": self.virtual_account_transaction.remitter_account_no,
+        "remitter_account_ifsc": self.virtual_account_transaction.remitter_account_ifsc,
+        "remitter_account_type": self.virtual_account_transaction.remitter_account_type,
+        "remitter_full_name": self.virtual_account_transaction.remitter_full_name,
+        "remitter_address": self.virtual_account_transaction.remitter_address,
+        "note": self.virtual_account_transaction.note,
+        "transfer_status": "CREDITED",
+        "credited_at": self.virtual_account_transaction.credited_at,
+        "returned_at": nil,
+        "attempt_no": 1,
+        "reject_reason": nil
     }
     op = Webhook::Process.(nil, {company: self.virtual_account.company, body: body, web_hook_event_id: WebHookEvent.id_for('collect.transaction')})
   end
 
   protected
+
   def adapter_for(virtual_account)
     case virtual_account&.receiving_account_type
-      when YesBankCompanyAccount.name
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new virtual_account.receiving_account
-      when VendorPaymentWallet.name
-        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new virtual_account.receiving_account
-      when CashOnHand.name
-        return AccountManager::CashOnHand::CashOnHandAdapter.new virtual_account.receiving_account
-      when BillingAccount.name
-        return AccountManager::BbpsBiller::BillingAccountAdapter.new virtual_account.receiving_account
+    when YesBankCompanyAccount.name
+      return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new virtual_account.receiving_account
+    when VendorPaymentWallet.name
+      return AccountManager::BankWallet::VendorPaymentWalletAdapter.new virtual_account.receiving_account
+    when CashOnHand.name
+      return AccountManager::CashOnHand::CashOnHandAdapter.new virtual_account.receiving_account
+    when UtilityBillsAccount.name
+      return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new virtual_account.receiving_account
+      # when BillingAccount.name
+      #   return AccountManager::BbpsBiller::BillingAccountAdapter.new virtual_account.receiving_account
+    else
+      raise "Invalid receiving_account_type #{virtual_account&.receiving_account_type}"
     end
   end
 
