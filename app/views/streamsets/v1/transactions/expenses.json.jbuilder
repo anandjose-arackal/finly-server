@@ -3,8 +3,8 @@ json.result do
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
                   :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                   :expense_tax_type_id
-    json.created_at expense.created_at.strftime("%d-%b-%Y")
-    json.updated_at expense.updated_at&.strftime("%Y:%m:%d %H:%M:%S")
+    json.created_at expense.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    json.updated_at expense.updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.user expense.user
     json.user_employee_id expense.user&.profile&.employee_id
     json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
@@ -56,14 +56,17 @@ json.result do
       json.quantity_value expense.per_diem_quantity_value
     end
 
-    json.date expense.date.strftime("%d %b %Y")
-    json.formatted_date expense.date.strftime("%Y-%m-%d")
+    json.date expense.date.strftime("%Y-%m-%d %H:%M:%S")
+    json.formatted_date expense.date.strftime("%Y-%m-%d %H:%M:%S")
 
     json.amount do
       json.partial! 'shared/amount', amount: expense.original_amount
     end
     json.reimbursable_amount do
       json.partial! 'shared/amount', amount: expense&.reimbursable_amount
+    end
+    json.total_amount do
+      json.partial! 'shared/amount', amount: expense.amount
     end
 
     json.tds_slab do
@@ -195,8 +198,8 @@ json.result do
 
     # report details
     json.report_id expense.report_id
-    json.report_approved_at expense.report&.approved_at&.strftime("%d-%b-%Y")
-    json.report_created_at expense.report&.created_at&.strftime("%d-%b-%Y")
+    json.report_approved_at expense.report&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.report_created_at expense.report&.created_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.report_note expense.report.memo
 
 

@@ -7,7 +7,7 @@ json.result do
 
     json.order_number (invoice.po_number || invoice.invoice_id)
     
-    json.invoice_date invoice.date&.strftime("%d-%b-%y")
+    json.invoice_date invoice.date&.strftime("%Y-%m-%d %H:%M:%S")
     json.delivery_location invoice.delivery_location&.name
     json.vendor_id invoice.vendor_id
     json.total_tax invoice_line_item.tax_amount&.value
@@ -17,8 +17,8 @@ json.result do
     json.vendor_name invoice.vendor&.display_name
     json.vendor_ref_no invoice.vendor&.vendor_id
     json.vendor_gstin invoice.gstin_location&.gstin
-    json.transaction_period_from invoice.transaction_service_period_from&.strftime("%d-%b-%y")
-    json.transaction_period_to invoice.transaction_service_period_from&.strftime("%d-%b-%y")
+    json.transaction_period_from invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
+    json.transaction_period_to invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
     json.invoice_status invoice.status&.name&.humanize
     json.category invoice_line_item.category&.name
     json.quantity invoice_line_item.quantity
@@ -56,10 +56,10 @@ json.result do
     json.advance_amount value.round(2)
 
     json.invoice_net_payable_amount invoice.balance_due&.value || 0
-    json.finance_approved_date invoice.approved_at&.strftime("%d-%b-%Y")
+    json.finance_approved_date invoice.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.created_by invoice.created_by&.name
-    json.created_at invoice.created_at&.strftime("%d-%b-%Y")
-    json.po_date invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%d-%b-%Y")
+    json.created_at invoice.created_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.po_date invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.gl_code invoice_line_item.inventory_line_item.category.gl_code rescue nil
     json.gst_type invoice.gst_type&.name&.titleize rescue nil
 
