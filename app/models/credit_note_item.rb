@@ -66,6 +66,7 @@ class CreditNoteItem < ApplicationRecord
         taxable_amount: taxable_amount.as_json,
         original_tax_rate: original_tax_rate.as_json,
         tax_rate: tax_rate.as_json,
+        tds_applicable: tds_applicable?,
         total_amount: total_amount.as_json
     }
   end
@@ -82,8 +83,12 @@ class CreditNoteItem < ApplicationRecord
     quantity * rate
   end
 
-  def get_tax_amount(rate = nil)
-    rate = rate || tax_rate.rate
+  def get_tax_amount
+    if self.credit_note_item_type_id == CreditNoteItemType.id_for(:gst_change)
+      rate = original_tax_rate.rate - tax_rate.rate
+    else
+      rate = original_tax_rate.rate
+    end
     get_taxable_amount * rate / 100
   end
 
@@ -165,15 +170,15 @@ class CreditNoteItem < ApplicationRecord
     end
 
     if self.tax_amount.present?
-      self.tax_amount.update(value: get_tax_amount(tax_rate_to_apply))
+      self.tax_amount.update(value: get_tax_amount)
     else
-      self.tax_amount = Amount.create(value: get_tax_amount(tax_rate_to_apply), currency_id: currency_id)
+      self.tax_amount = Amount.create(value: get_tax_amount, currency_id: currency_id)
     end
 
     if self.total_amount.present?
-      self.total_amount.update(value: get_tax_amount(tax_rate_to_apply))
+      self.total_amount.update(value: get_tax_amount)
     else
-      self.total_amount = Amount.create(value: get_tax_amount(tax_rate_to_apply), currency_id: currency_id)
+      self.total_amount = Amount.create(value: get_tax_amount, currency_id: currency_id)
     end
   end
 

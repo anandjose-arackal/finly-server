@@ -77,9 +77,6 @@ class CreditNote < ApplicationRecord
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
 
-
-  # before_validation { debugger; puts "Hello"}
-
   delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
 
   def as_json(options = {})
