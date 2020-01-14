@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account
+  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account, :completed_mappings
 
   def pre_validate
     if object.blank?
