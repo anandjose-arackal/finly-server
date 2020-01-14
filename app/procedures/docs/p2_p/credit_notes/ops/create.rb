@@ -63,6 +63,10 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   end
 
   def validate(options, current_user:, invoice:, **)
+    unless InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id)
+      add_message(options, :error, :invoice_id, "Cannot Create Credit Note at this State")
+      return
+    end
     if invoice.credit_note.present?
       credit_note = invoice.credit_note
       add_message(options, :error, :invoice_id, "Credit Note with sequence id #{credit_note.sequence_id} already exists for the invoice")

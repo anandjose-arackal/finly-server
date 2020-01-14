@@ -322,12 +322,18 @@ class CreditNote < ApplicationRecord
     currency_id = company&.base_currency_id || 1
 
     # Gross Receivable Amount
-    gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
+    # Only picks from the items where item type is QTY Change / Price Drop
+    gross_receivable_amount_value = items.
+        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map {|item| item.taxable_amount&.value}.compact.sum
+
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
       self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
+
+
     # Tax Amount (GST)
     tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     if tax_amount.present?
@@ -336,10 +342,15 @@ class CreditNote < ApplicationRecord
       self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
     end
 
+    # Where TDS Applicable is yes
+    # Only picks from the items where item type is QTY Change / Price Drop
+    tds_applicable_amount = items.
+        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map {|item| item.taxable_amount&.value}.compact.sum
     tds_amount_value = 0
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
-      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+      tds_amount_value = tds_applicable_amount * tds_rate_percentage / 100
 
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
@@ -363,16 +374,20 @@ class CreditNote < ApplicationRecord
   def calculate_from_item_methods
     currency_id = company&.base_currency_id || 1
 
-    # items = items.as_json
-
     # Gross Receivable Amount
     # gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
-    gross_receivable_amount_value = items.map(&:get_taxable_amount).compact.sum
+    # Only picks from the items where item type is QTY Change / Price Drop
+    gross_receivable_amount_value = items.
+        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map(&:get_taxable_amount).compact.sum
+
+
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
       self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
+
     # Tax Amount (GST)
     # tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     tax_amount_value = items.map(&:get_tax_amount).compact.sum
@@ -382,10 +397,16 @@ class CreditNote < ApplicationRecord
       self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
     end
 
+    # Where TDS Applicable is yes
+    # Only picks from the items where item type is QTY Change / Price Drop
+    tds_applicable_amount = items.
+        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map(&:get_taxable_amount).compact.sum
+
     tds_amount_value = 0
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
-      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+      tds_amount_value = tds_applicable_amount * tds_rate_percentage / 100
 
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
