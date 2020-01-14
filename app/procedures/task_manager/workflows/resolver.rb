@@ -1,6 +1,6 @@
-class TaskManager::Workflows::Resolver < ApplicationPolicy::Scope
+class TaskManager::Workflows::Resolver < Transactions::Resolver::Scope
 
-  def resolve(filters: {})
+  def load(params)
     scope.where(user: @user)
   end
 

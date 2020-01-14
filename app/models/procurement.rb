@@ -11,7 +11,7 @@
 #  updated_at            :datetime         not null
 #  user_id               :integer
 #  company_id            :integer
-#  note                  :text(65535)
+#  note                  :text(16777215)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
@@ -40,6 +40,7 @@ class Procurement < ApplicationRecord
   has_many :delivery_challans, dependent: :destroy
   has_many :e_way_bills, dependent: :destroy
   has_many :procurement_status_taggables, dependent: :destroy
+  has_many :credit_notes
 
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable, dependent: :destroy
 
@@ -413,10 +414,9 @@ class Procurement < ApplicationRecord
     joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.order_number LIKE ?', "%#{pr_number}%")
   }
 
-  scope :filter_pr_creator_id, -> (creator_id){
+  scope :filter_pr_creator_id, -> (creator_id) {
     joins(purchase_order: {purchase_request_item: :purchase_request}).where('purchase_requests.creator_id = ?', creator_id)
   }
-
 
 
   def awaiting_action?(user)
@@ -609,9 +609,9 @@ class Procurement < ApplicationRecord
 
   def as_json
     {
-      id: self.id,
-      purchase_order_id: self.purchase_order&.id,
-      invoice_id: self.invoices&.first&.id
+        id: self.id,
+        purchase_order_id: self.purchase_order&.id,
+        invoice_id: self.invoices&.first&.id
     }
   end
 

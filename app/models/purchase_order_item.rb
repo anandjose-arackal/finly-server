@@ -6,7 +6,7 @@
 #  purchase_order_id        :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :string(255)
+#  description              :text(65535)
 #  hsn_sac                  :string(255)
 #  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
@@ -91,8 +91,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      ids = joins(:inventory_line_item).where("items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
-      where(id: ids)
+      where(category_id: category_ids)
     end
   }
 

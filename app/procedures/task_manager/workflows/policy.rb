@@ -1,9 +1,9 @@
 require "#{Rails.root}/app/policies/application_policy"
 class TaskManager::Workflows::Policy < ApplicationPolicy
 
-  class TaskManager::Workflows::Policy::Scope < ApplicationPolicy::Scope
+  class TaskManager::Workflows::Policy::Scope < Transactions::Resolver::Scope
 
-    def resolve(filters: {})
+    def resolve(params)
       scope.where(user: @user)
     end
 

@@ -6,7 +6,6 @@ class Bbps::BillersList < Bbps::Api
     end
   end
 
-  setup_defaults
   path "getBillerList"
   parse -> (user, params, response) { parse_json_response(:billers_list, user, params, response) }
 
@@ -43,6 +42,10 @@ class Bbps::BillersList < Bbps::Api
   def self.handle_success(result)
     list = JSON.parse(result['response.parsed']['billers_list'])
     list.map { |item| format(item) }
+  end
+
+  def self.handle_error(data)
+    data
   end
 
 end

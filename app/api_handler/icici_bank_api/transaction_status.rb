@@ -65,7 +65,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
       when 404
 
       when 500
-        self.transaction_status_response = self.parsed_response["STATUS"]
+        self.transaction_status_response = (self.parsed_response["Response"] || self.parsed_response["RESPONSE"])
         case self.transaction_status_response&.upcase
         when "FAILURE"
           self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
@@ -74,7 +74,9 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         end
       when 200
         self.transaction_status_response = self.parsed_response["STATUS"]
-        case self.transaction_status_response&.upcase
+        api_response = (self.parsed_response["RESPONSE"] || self.parsed_response["Response"])
+        if api_response&.upcase == "SUCCESS"
+          case self.transaction_status_response&.upcase
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
             # This is because only IMPS and RTGS transactions return the URT in the API
@@ -97,6 +99,12 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
           else
             # do nothing?
+          end
+        else
+          message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
+          if message == "Invalid Inquiry Req id or unique Id"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          end
         end
       else
         # handle it gracefully

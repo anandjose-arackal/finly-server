@@ -1,5 +1,5 @@
 class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
-  attr_accessor :approving_user
+  attr_accessor :approving_user, :po_initiators
 
   def init
     super
@@ -22,7 +22,14 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   end
 
   def affected_users
-    self.purchase_request.affected_users(:approve)
+    if purchase_request.approved? && purchase_request.company.configuration.email_purchase_order_initiator
+      # If PR is approved, send email to all PO initiators in that policy
+      po_initiators_in_pr_policy = purchase_request.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id) rescue []
+      self.po_initiators = user.company.users.where(id: po_initiators_in_pr_policy)
+      self.purchase_request.affected_users(:approve) + po_initiators
+    else
+      self.purchase_request.affected_users(:approve)
+    end
   end
 
   def notification_affected_users
@@ -47,16 +54,20 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   def mailer_subject(user)
     if user == self.approving_user
       "You approved the purchase request : #{self.purchase_request.order_number}"
+    elsif po_initiators.present? && po_initiators.include?(user)
+      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
     else
-      "#{approving_user.name} has approveed the purchase request: #{self.purchase_request.order_number}"
+      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
     end
   end
 
   def mailer_body(user)
     if user == self.approving_user
       "You have approved the purchase request: #{self.purchase_request.order_number}"
+    elsif po_initiators.present? && po_initiators.include?(user)
+      "#{approving_user.name} has approved the purchase request: #{self.purchase_request.order_number} and is awaiting your action in approved items"
     else
-      "#{self.approving_user.name} has approveed the purchase request: #{self.purchase_request.order_number}"
+      "#{self.approving_user.name} has approved the purchase request: #{self.purchase_request.order_number}"
     end
   end
 

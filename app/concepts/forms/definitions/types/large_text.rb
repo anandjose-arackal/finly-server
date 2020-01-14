@@ -1,16 +1,10 @@
-module Forms
-  module Definitions
-    module Types
-      class LargeText < Entity
-        register :large_text
-        hint "Enter value"
+class Forms::Definitions::Types::LargeText < Forms::Definitions::Entity
+  register :large_text
+  hint "Enter value"
 
-        option :char_limit, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
+  option :char_limit, default: 65535 #{numericality: {greater_than_or_equal_to: 0, less_than_or_equal_to: 255, only_integer: true}}
 
-        contract do
-          required(:char_limit).value(:int?, lteq?: 65535)
-        end
-      end
-    end
+  contract do
+    required(:char_limit).value(:int?, lteq?: 65535)
   end
 end

@@ -29,15 +29,13 @@ class Export::Reports::WithReceipts < Export::Reports::Base
   end
 
   def process
-    cf_data = generate_custom_field_data reports
-    cf_headers = cf_data[:headers]
     self.files = []
-    headers = (default_column_names + cf_headers)
+    headers = (default_column_names + custom_field_column_names)
     contents = []
     # csv << column_names
     reports.each do |r|
       r.expenses.each do |expense|
-        contents << retrieve_data(preferences, r, expense, cf_data)
+        contents << retrieve_data(preferences, r, expense, custom_field_column_names)
         expense.receipts&.each do |receipt|
           self.files << {name: receipt.export_image_file_name, url: receipt.image.url, dir_path: expense.report_id}
         end

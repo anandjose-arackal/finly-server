@@ -21,18 +21,6 @@ class Admin::Users::Base < Admin::Base
         self.mapping << op.map
       end
 
-      # extracting the mapping separately
-      self.mapping_em = []
-      self.mapping_vp = []
-      self.policies.each do |policy|
-        op = Admin::Policy::Mappings::Show.(user, user: selected_user, policy: policy, purpose_id: Purpose.id_for(:expense_management))
-        self.mapping_em << op.map
-      end
-      self.policies.default.each do |policy|
-        op = Admin::Policy::Mappings::Show.(user, user: selected_user, policy: policy, purpose_id: Purpose.id_for(:vendor_payments))
-        self.mapping_vp << op.map
-      end
-
       self.managers = selected_user.company.users.signed_up.with_roles.only_managers
       self.finance_managers = selected_user.company.users.signed_up.with_roles.only_finance_managers
       self.reviewers = selected_user.company.users.signed_up.with_roles.only_vendor_payment_reviewers

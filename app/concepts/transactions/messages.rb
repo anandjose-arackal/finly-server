@@ -1,7 +1,9 @@
 module Transactions::Messages
 
   def self.SuccessMessage(message)
-    -> (options) {Transactions::API.on_success(options, :base, message)}
+    Transactions::Task.build id: "messages.success.add" do |context, **|
+      Transactions::API.on_success(context, :base, message)
+    end
   end
 
   def self.included(base)
@@ -32,6 +34,8 @@ module Transactions::Messages
   end
 
   def add_message(options, type, key, message)
+    # type = [:info, :success, :error]
+    # key => key for any field | pass 'base' if its not associated with any field key
     Transactions::API.add_message options, type, key, message
   end
 

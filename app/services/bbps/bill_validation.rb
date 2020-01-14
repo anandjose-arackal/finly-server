@@ -37,7 +37,6 @@ class Bbps::BillValidation < Bbps::Api
     end
   end
 
-  setup_defaults
   path "billValidate"
 
   # Message Code (B1100) | Order No | Agent institution Id | Channel Id | Agent Id | Customer mobile | Biller Id |
@@ -110,8 +109,36 @@ class Bbps::BillValidation < Bbps::Api
     customer_param_for(:customer_param_5)
   end
 
+  def additional_tag_1_name
+    amount_for(:amount_1)
+  end
+
+  def additional_tag_2_name
+    amount_for(:amount_2)
+  end
+
+  def additional_tag_3_name
+    amount_for(:amount_3)
+  end
+
+  def additional_tag_4_name
+    amount_for(:amount_4)
+  end
+
+  def additional_tag_5_name
+    amount_for(:amount_5)
+  end
+
   def self.handle_success(result)
-    true
+    OpenStruct.new(
+        {
+            # Add Order ID
+            order_number: result['response.parsed']['order_number'],
+            status: result['response.parsed']['status'],
+            error_code: result['response.parsed']['error_code'],
+            error_description: result['response.parsed']['error_desc']
+        }
+    )
   end
 
 end

@@ -5,45 +5,50 @@ class ActionsManager::Master::Base
   attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request, :payment_agreement, :security_deposit, :beneficiary_payment, :general_invoice, :rental_invoice
 
   MASTERS ||= {
-    payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
-    payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
-    beneficiaries_vendor_index: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex',
-    beneficiaries_vendor_show: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorShow',
-    beneficiaries_employee_index: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex',
-    beneficiaries_employee_show: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeShow',
-    inward_invoices_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::Index',
-    inward_invoices_show: '::ActionsManager::Master::BankTransfer::InwardInvoices::Show',
-    inventory_line_item_index: '::ActionsManager::Master::Invoicing::InventoryLineItem::Index',
-    inventory_line_item_show: '::ActionsManager::Master::Invoicing::InventoryLineItem::Show',
-    templates_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Templates::Index',
-    non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
-    non_po_inward_document_show: '::ActionsManager::Master::Procurements::PurchaseOrders::InwardDocumentShow',
-    non_po_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow',
-    non_po_tax_invoice_show: '::ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow',
-    procurements_index: '::ActionsManager::Master::Procurements::Index',
-    procurements_show: '::ActionsManager::Master::Procurements::Show',
-    proc_inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
-    proc_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
-    proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
-    proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
-    users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
-    users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
-    vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
-    purchase_request_show: '::ActionsManager::Master::Procurements::PurchaseRequests::Show',
-    purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
-    purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
-    vendor_show: '::ActionsManager::Master::Vendors::Show',
-    vendors_index: '::ActionsManager::Master::Vendors::Index',
-    payment_agreement_index: '::ActionsManager::Master::PaymentAgreements::Index',
-    payment_agreement_show: '::ActionsManager::Master::PaymentAgreements::Show',
-    security_deposit_make_payment: '::ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment',
-    beneficiary_payment_make_payment: '::ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment',
-    rental_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment',
-    general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment',
-    non_po_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index',
-    po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
-    agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index'
-
+      payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
+      payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
+      beneficiaries_vendor_index: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex',
+      beneficiaries_vendor_show: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorShow',
+      beneficiaries_employee_index: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex',
+      beneficiaries_employee_show: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeShow',
+      inward_invoices_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::Index',
+      inward_invoices_show: '::ActionsManager::Master::BankTransfer::InwardInvoices::Show',
+      inventory_line_item_index: '::ActionsManager::Master::Invoicing::InventoryLineItem::Index',
+      inventory_line_item_show: '::ActionsManager::Master::Invoicing::InventoryLineItem::Show',
+      templates_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Templates::Index',
+      non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
+      non_po_inward_document_show: '::ActionsManager::Master::Procurements::PurchaseOrders::InwardDocumentShow',
+      non_po_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow',
+      non_po_tax_invoice_show: '::ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow',
+      procurements_index: '::ActionsManager::Master::Procurements::Index',
+      procurements_show: '::ActionsManager::Master::Procurements::Show',
+      proc_inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
+      proc_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
+      proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
+      proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
+      users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
+      users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
+      vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
+      purchase_request_show: '::ActionsManager::Master::Procurements::PurchaseRequests::Show',
+      purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
+      purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
+      vendor_show: '::ActionsManager::Master::Vendors::Show',
+      vendors_index: '::ActionsManager::Master::Vendors::Index',
+      payment_agreement_index: '::ActionsManager::Master::PaymentAgreements::Index',
+      payment_agreement_show: '::ActionsManager::Master::PaymentAgreements::Show',
+      security_deposit_make_payment: '::ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment',
+      beneficiary_payment_make_payment: '::ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment',
+      rental_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::RentalInvoice::MakePayment',
+      general_invoice_make_payment: '::ActionsManager::Master::PaymentAgreements::GeneralInvoice::MakePayment',
+      non_po_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::NonPoInvoices::Index',
+      po_invoice_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Invoices::Index',
+      agreement_invoice_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::AgreementInvoices::Index',
+      bbps_subscriptions_show: '::ActionsManager::Master::Bbps::Subscriptions::Show',
+      bbps_subscriptions_index: '::ActionsManager::Master::Bbps::Subscriptions::Index',
+      bbps_bills_show: '::ActionsManager::Master::Bbps::Bills::Show',
+      bbps_bills_index: '::ActionsManager::Master::Bbps::Bills::Index',
+      credit_notes_index: '::ActionsManager::Master::CreditNotes::Index',
+      credit_note_show: '::ActionsManager::Master::CreditNotes::Show'
   }.with_indifferent_access
 
   def self.set_data_map
@@ -67,9 +72,11 @@ class ActionsManager::Master::Base
 
   def valid?
     # clear_messages
-    self.class.validations&.each do |method|
-      self.send method
-    end unless self.class.validations.blank?
+    unless self.class.validations.blank?
+      self.class.validations&.each do |method|
+        self.send method
+      end
+    end
     self.messages[:error].blank?
   end
 
@@ -127,7 +134,7 @@ class ActionsManager::Master::Base
     end
   end
 
-  def allowed_actions(actions=[])
+  def allowed_actions(actions = [])
     result = {}
     unless actions.blank?
       actions.each do |action|

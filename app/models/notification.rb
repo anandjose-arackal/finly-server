@@ -409,7 +409,7 @@ class Notification < ApplicationRecord
         document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
           path = "purchase_orders"
-          suffix ="/params={"
+          suffix = "/params={"
         else
           path = "procure_purchase_order/#{document.id}"
           suffix = "/params={\"procurement_id\":#{document.procurement_id}"
@@ -418,9 +418,9 @@ class Notification < ApplicationRecord
         document = Invoice.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
           path = "new_payment_invoices"
-          suffix ="/params={"
+          suffix = "/params={"
         else
-          path= "procure_invoice/#{document.id}"
+          path = "procure_invoice/#{document.id}"
           if document.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
             suffix = "/params={\"procurement_id\":#{document.procurement_id }"
           elsif document.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)

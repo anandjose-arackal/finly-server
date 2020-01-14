@@ -14,7 +14,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at, :payment_notification_users, :security_deposit, :beneficiary_payment, :from_payment_agreement, :agreement_type, :transfer_mode_id,
+					:transfer_mode
 
 	def personalizer
 		{
@@ -25,42 +26,44 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	end
 
 	def pre_validate
-	    if user.blank?
-	      add_message :error, 'User not found'
-	      return
-	    end
-	    if params.blank?
-	      add_message :error, 'No params sent at all.'
-	      return
-	    end
-	    if params[:payments_attributes].blank?
-	      add_message :error, 'Vendor params not sent for processing.'
-	      return
-	    end
-	    unless params[:policy_id].present?
-	        add_message :error, 'Policy cannot be blank'
-	        return
-	    end
+    if user.blank?
+      add_message :error, 'User not found'
+      return
+    end
+    if params.blank?
+      add_message :error, 'No params sent at all.'
+      return
+    end
+    if params[:payments_attributes].blank?
+      add_message :error, 'Beneficiary payment details not sent for processing.'
+      return
+    end
+    unless params[:policy_id].present?
+      add_message :error, 'Policy cannot be blank'
+      return
+    end
 
-	    unless params[:scheduled_at].present?
-	    	add_message :error, 'Please specify a scheduled date for your payment ticket.'
-	    	return
-	    end
-	    valid_date = Date.parse(params[:scheduled_at]) rescue false 
-	    unless valid_date
-	        add_message :error, 'Invalid date provided'
-	        return
-	    end
+    unless params[:scheduled_at].present?
+      add_message :error, 'Please specify a scheduled date for your payment ticket.'
+      return
+    end
+    valid_date = Date.parse(params[:scheduled_at]) rescue false
+    unless valid_date
+      add_message :error, 'Invalid date provided'
+      return
+    end
 
-	    unless (Date.parse(params[:scheduled_at]) >= Date.today)
-	    	add_message :error, 'Cannot create back dated payment tickets'
-	    	return
-	    end
+    unless (Date.parse(params[:scheduled_at]) >= Date.today)
+      add_message :error, 'Cannot create back dated payment tickets'
+      return
+    end
 	end
 
 	def init
 		
 		self.payment_mode = params[:payment_mode] || params[:transfer_type]
+		self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
@@ -83,83 +86,80 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
-		self.from_payment_agreement = params[:created_from_payment_agreement]
-		self.agreement_type = params[:agreement_type]
-		self.security_deposit = user.company.security_deposits.find_by_id(params[:document_id]) if self.agreement_type == 'security_deposit'
-		self.beneficiary_payment = user.company.beneficiary_payments.find_by_id(params[:document_id]) if self.agreement_type == 'beneficiary'
+      self.from_payment_agreement = params[:created_from_payment_agreement]
+      self.agreement_type = params[:agreement_type]
+      self.security_deposit = user.company.security_deposits.find_by_id(params[:document_id]) if self.agreement_type == 'security_deposit'
+      self.beneficiary_payment = user.company.beneficiary_payments.find_by_id(params[:document_id]) if self.agreement_type == 'beneficiary'
 		end
-
 
 		self.payments_attributes = params[:payments_attributes]
 	end
 
 	def validate
-	    if payments_attributes.blank?
-	      add_message :error, 'Nothing to process'
-	      return
-	    end
+    if payments_attributes.blank?
+      add_message :error, 'Nothing to process'
+      return
+    end
 
-	    if self.payment_mode.blank?
-	      add_message :error, "Payment mode cannot be blank"
-	      return
-	    end
+    if self.payment_mode.blank? or self.transfer_mode.blank?
+      add_message :error, "Payment mode cannot be blank"
+      return
+    end
 
-	    unless self.policy.present?
-				add_message :error, 'Policy not found'
-				return
-	    end
+    unless self.policy.present?
+      add_message :error, 'Policy not found'
+      return
+    end
 
-	    if from_payment_agreement
-	    	if self.beneficiary_payment.blank? && self.security_deposit.blank?
-	    		add_message :error, 'Document not found, unable to process'
-	    		return
-	    	end
-	    end
+    if from_payment_agreement
+      if self.beneficiary_payment.blank? && self.security_deposit.blank?
+        add_message :error, 'Document not found, unable to process'
+        return
+      end
+    end
 
-	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes, from_payment_agreement: self.from_payment_agreement})
+    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes, from_payment_agreement: self.from_payment_agreement})
 
-
-	    if validate_operation.success?
-	    	# total of all individual payments
-	    	# to be set in bpr
-	      self.total_amount = validate_operation.requested_amount
-	    else
-	      self.contents = validate_operation.contents
-	      self.headers = validate_operation.headers
-	      self.issues = validate_operation.issues
-	      add_message :error, "Some of the vendor data were found to have issues. Please correct them."
-	    end
-
+    if validate_operation.success?
+      # total of all individual payments
+      # to be set in bpr
+      self.total_amount = validate_operation.requested_amount
+    else
+      self.contents = validate_operation.contents
+      self.headers = validate_operation.headers
+      self.issues = validate_operation.issues
+      add_message :error, "Some of the vendor data were found to have issues. Please correct them."
+    end
 	end
 
 	def process
-	    # if the validation of the data is successful, it will create a payment order and
-	    # asynchronously add payments to it one by one
-	    self.bank_payment_request_params = parse_payment_order_data
-	    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
+    # if the validation of the data is successful, it will create a payment order and
+    # asynchronously add payments to it one by one
+    self.bank_payment_request_params = parse_payment_order_data
+    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
 
-	    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
-	    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
+    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
+    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
 
-	    # Create Document Level Reviewer Mapping
-	    # For setting level specific reviewers from reviewal chain for a document
-	    params[:reviewal_document] = self.bank_payment_request.reload
-	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-	    unless document_reviewer_mappings_op.success?
-	      self.bank_payment_request.destroy
-	      add_message :error, document_reviewer_mappings_op.messages[:error]
-	      return
-	    end
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      self.bank_payment_request.destroy
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
 
-	    # Delegate payment creation to the background operation
-      # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-      update_status if self.from_payment_agreement # Setting up this status for payment agreement
-      if [168, 169, 174, 175].include?(user.company.id)
-				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
-			else
-				::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
-			end
-			# end
+    # Delegate payment creation to the background operation
+    # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    update_status if self.from_payment_agreement # Setting up this status for payment agreement
+    if [168, 169, 174, 175].include?(user.company.id)
+      ::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+    else
+      ::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details, created_from_payment_agreement: from_payment_agreement, agreement_type: agreement_type, document_id: params[:document_id], ticket_type: params[:ticket_type]})
+    end
+    # end
 	end
 
 	def success
@@ -208,6 +208,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
+		    transfer_mode_id: self.transfer_mode_id,
 		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: initiating_account&.class&.name,
 		    receiving_account_type: BankAccount.name,
@@ -231,7 +232,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    policy_id: self.policy&.id,
 		    description: self.description,
 		    payment_order_attributes: payment_order_attributes,
-		    api_initiated: false
+		    api_initiated: false,
+		    expected_payments: self.validate_operation.order_details.count,
+		    ticket_type: params[:ticket_type],
+		    transfer_mode_id: self.transfer_mode_id
 		}
 		bpr_attributes
 	end

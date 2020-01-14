@@ -33,6 +33,7 @@ module Transactions
         return
       end
       matcher.(result, &handlers) # then, generic Rails handlers in controller context.
+      result
     end
 
     def matcher
@@ -57,7 +58,7 @@ module Transactions
           # m.unauthenticated {|result| unauthenticated(result)}
           m.created {|result| created(result)}
           m.success {|result| success(result)}
-          m.invalid {|result| invalid(result)}
+          m.failure {|result| failure(result)}
         end
       end
 
@@ -74,41 +75,43 @@ module Transactions
       end
 
       def created(result)
-        unless respond_with_representer(result)
+        # unless respond_with_representer(result)
           response = {
               id: (result["model"].respond_to?(:uuid) ? result["model"].uuid : result["model"].id)
           }
           controller.render json: response, status: 200
-        end
+        # end
       end
 
       def success(result)
-        unless respond_with_representer(result)
-          controller.render json: {success: true}, status: 200
-        end
+        # controller.render json: result['result'], status: 200
+        # unless respond_with_representer(result)
+        #   controller.render json: {success: true}, status: 200
+        # end
       end
 
-      def invalid(result)
-        controller.render json: {success: false, errors: result.errors.as_json}, status: 422
+      def failure(result)
+        controller.render json: {success: false, messages: result.messages.as_json}, status: 422
       end
 
-      def respond_with_representer(result)
-        return false unless self.representer.present?
-
-        name = self.representer[:name]
-        representer = self.representer[:class]
-        data_key = self.representer[:data_key]
-        return false unless (name.present? or representer.present?) and data_key.present?
-
-        representer = result["representer.#{name}.class"] if representer.blank?
-        data = result[data_key]
-        return false if representer.blank?
-        return false if data.blank?
-        data = data.to_a if data.is_a?(ActiveRecord::Relation)
-
-        controller.render json: representer.represent(data).to_json, status: 200
-        true
-      end
+      # Todo deprecated
+      # def respond_with_representer(result)
+      #   return false unless self.representer.present?
+      #
+      #   name = self.representer[:name]
+      #   representer = self.representer[:class]
+      #   data_key = self.representer[:data_key]
+      #   return false unless (name.present? or representer.present?) and data_key.present?
+      #
+      #   representer = result["representer.#{name}.class"] if representer.blank?
+      #   data = result[data_key]
+      #   return false if representer.blank?
+      #   return false if data.blank?
+      #   data = data.to_a if data.is_a?(ActiveRecord::Relation)
+      #
+      #   controller.render json: representer.represent(data).to_json, status: 200
+      #   true
+      # end
 
     end
 
@@ -117,8 +120,10 @@ module Transactions
       #   m.not_found { |result| .. }
       # end
       def endpoint(operation_class, options = {}, &block)
+        options[:args] = [params: params.to_unsafe_h, current_user: current_user] if options[:args].nil?
+
         handlers = Handlers.new(self, options, &block).()
-        Endpoint.(self, operation_class, handlers, *options[:args], &block)
+        @op = Endpoint.(self, operation_class, handlers, *options[:args], &block)
       end
     end
   end

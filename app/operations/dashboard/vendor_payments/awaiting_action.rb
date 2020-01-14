@@ -254,11 +254,11 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "Receipt Note",
-        type: 'receive',
-        count: procurements.count,
-        # filters: [{filter_status_tags: [7]}]
-        filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)], filter_awaiting_action: true}]
+          title: "Receipt Note",
+          type: 'receive',
+          count: procurements.count,
+          # filters: [{filter_status_tags: [7]}]
+          filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)], filter_awaiting_action: true}]
       }
 
       if params[:filter_date_from].present?

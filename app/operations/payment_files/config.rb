@@ -20,7 +20,8 @@ class PaymentFiles::Config
         {name: 'Denave', key: :denave, operation: PaymentFiles::Formats::Denave::Process, validator: PaymentFiles::Formats::Denave::ValidateConfig},
         {name: 'Axis Bank', key: :axis_bank, operation: PaymentFiles::Formats::AxisBank::Process, validator: PaymentFiles::Formats::AxisBank::ValidateConfig},
         {name: 'IDFC Bank', key: :idfc_bank, operation: PaymentFiles::Formats::IdfcBank::Process, validator: PaymentFiles::Formats::IdfcBank::ValidateConfig},
-        {name: 'Citi Bank', key: :citi_bank, operation: PaymentFiles::Formats::CitiBank::Process, validator: PaymentFiles::Formats::CitiBank::ValidateConfig}
+        {name: 'Citi Bank', key: :citi_bank, operation: PaymentFiles::Formats::CitiBank::Process, validator: PaymentFiles::Formats::CitiBank::ValidateConfig},
+        {name: 'Stanza Payment', key: :stanza, operation: PaymentFiles::Formats::Stanza::Process, validator: PaymentFiles::Formats::Stanza::ValidateConfig}
     ]
   end
 

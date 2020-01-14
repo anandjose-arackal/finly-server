@@ -3,13 +3,15 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.import'
 
-  headers ({
-              :id => "ID",
-              :parent_id =>  "Parent Department NAME",
-              :name => "Departmet Name",
-              :department_code => "Department Code",
-              :destroy => "Destroy"
-  })
+  headers(
+      {
+          :id => "ID",
+          :parent_id => "Parent Department NAME",
+          :name => "Department Name",
+          :department_code => "Department Code",
+          :destroy => "Destroy"
+      }
+  )
 
   def create_record(data)
     if data[:parent_id].present?
@@ -27,7 +29,7 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
       return result false, "Department Name Missing"
     end
 
-    sub_department = company.departments.new data.except(:id, :parent_id,:destroy)
+    sub_department = company.departments.new data.except(:id, :parent_id, :destroy)
     sub_department.parent_id = parent_department&.id rescue nil
 
     if sub_department.save
@@ -56,15 +58,15 @@ class Admin::Implementations::Master::Departments::Import < Admin::Implementatio
     end
     result true, 'Updated Successfully'
   end
-  
-   def destroy_records(data)
-     departments = self.company.departments.find_by id: data[:id]
-     unless departments
+
+  def destroy_records(data)
+    departments = self.company.departments.find_by id: data[:id]
+    unless departments
       return result false, "Department not found"
-     end
-     unless departments.destroy
-       return result false, departments.errors.full_messages
-     end
-     result true, "Destroyed Successfully"
-   end
+    end
+    unless departments.destroy
+      return result false, departments.errors.full_messages
+    end
+    result true, "Destroyed Successfully"
+  end
 end

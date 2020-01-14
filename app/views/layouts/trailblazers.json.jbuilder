@@ -1,2 +1,3 @@
 json.merge! JSON.parse yield rescue nil
-json.success @result.success?
+json.success @op.success?
+json.messages @op.messages

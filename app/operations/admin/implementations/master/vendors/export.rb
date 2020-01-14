@@ -5,10 +5,10 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
 
   headers ({
       :id => "ID",
-      :name => "Vendor NAme",
+      :business_name => "Legal Name",
       :vendor_type => "Vendor Type",
       :vendor_id => "Vendor Code",
-      :business_name => "Business Name",
+      :trade_name => "Trade Name",
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",
@@ -35,8 +35,8 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
     vendor.id
   end
 
-  def name(vendor)
-    vendor.name
+  def business_name(vendor)
+    vendor.business_name
   end
 
   def vendor_type(vendor)
@@ -47,8 +47,8 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
     vendor.vendor_id
   end
 
-  def business_name(vendor)
-    vendor.business_name
+  def trade_name(vendor)
+    vendor.trade_name
   end
 
   def mobile_number(vendor)

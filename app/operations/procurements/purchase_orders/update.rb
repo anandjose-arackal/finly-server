@@ -174,6 +174,28 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     validate_document_access
     # Validate if user has access to PO update
     validate_association
+
+    # docon does not new items to be added in a po if created from pr
+    if [203, 2].include?(self.purchase_order.company_id) && (self.purchase_order.items.pluck(:purchase_request_item_id).present?)
+      if purchase_order_params[:items_attributes].pluck(:id, :_destroy).any? {|id, des| (id == "" || id == nil) && !!StringUtils.to_bool(des) == false}
+        add_message :error, "New items cannot be added if this PO was created from PR."
+        return
+      end
+      items = purchase_order_params[:items_attributes].select {|pa| pa if pa[:id].present? && !pa[:_destroy]}
+      if items.count != self.purchase_order.items.count
+        add_message :error, "Existing items in the PO, which came from PR, cannot be deleted."
+        return
+      end
+
+      item_hash = self.purchase_order.items.pluck(:id, :quantity).to_h
+      purchase_order_params[:items_attributes].each do |item|
+        next if item[:_destroy]
+        if item[:quantity].to_i != item_hash[item[:id].to_i]
+          add_message :error, "Quantity should remain the same if this PO was created from PR."
+          return
+        end
+      end
+    end
   end
 
   def pre_process
@@ -335,9 +357,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
           return
         end
       end
-    # rescue => e
-    #   add_message :error, messages
-    # end
+      # rescue => e
+      #   add_message :error, messages
+      # end
 
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 

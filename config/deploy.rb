@@ -1,8 +1,13 @@
 # config valid only for current version of Capistrano
 lock '~> 3.11'
 
-if ['aws_production','foreground_production', 'background_production', 'yes_bank_balance_poller', 'console_production'].include?(fetch(:stage)&.to_s)
+if ['aws_production', 'foreground_production', 'api_production',
+    'background_production', 'background_production_bgg', 'background_production_bgp',
+    'background_production_bgpc', 'yes_bank_balance_poller',
+    'console_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
+elsif ['background_production_console'].include?(fetch(:stage)&.to_s)
+  load_secure_storage(:background_production_console)
 end
 
 set :application, 'finly-server'
@@ -21,7 +26,8 @@ when :itzcash_production
   # set :deploy_to, '/home/viveka/app'
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-when :aws_production, :background_production, :foreground_production, :console_production
+when :aws_production, :background_production, :foreground_production, :console_production,
+    :api_production, :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_console
   branch = fetch :branch
   # unless ['master', :master].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -34,6 +40,13 @@ when :yes_bank_balance_poller
     raise 'This branch cannot be deploy to production. Please select the correct branch'
   end
   set :deploy_to, '/home/centos/app_yb_balance'
+  set :rails_env, 'production'
+when :background_production_olap
+  branch = fetch :branch
+  # unless ['master', :master].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
+  set :deploy_to, '/home/centos/app_olap'
   set :rails_env, 'production'
 when :itzcash
   set :deploy_to, '/usr/local/app'
@@ -74,6 +87,9 @@ when :migrated_test_2
 when :uat
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'uat'
+when :uat_2
+  set :deploy_to, '/home/centos/app_2'
+  set :rails_env, 'uat'
 when :feature_testing
   # branch = fetch :branch
   # unless ['feature-testing', :'feature-testing'].include?(branch)
@@ -94,16 +110,22 @@ linked_files = %w{
   config/gstin_verification_config.yml
   config/redis_config.yml
   config/mattermost_config.yml
+  config/integrations.yml
+  config/insights_config.yml
+  config/bbps_config.yml
 }
 case fetch(:stage)
-when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production
+when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
+  linked_files << 'config/bunny.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
+  linked_files << 'config/bunny.yml'
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
 end
@@ -121,10 +143,10 @@ set :keep_releases, 5
 
 # setting up rollbar environment variables for deploy tracking
 set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
-set :rollbar_env, Proc.new {fetch :stage}
-set :rollbar_role, Proc.new {:app}
+set :rollbar_env, Proc.new { fetch :stage }
+set :rollbar_role, Proc.new { :app }
 
-set :puma_rackup, -> {File.join(current_path, 'config.ru')}
+set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
 set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock" #accept array for multi-bind
@@ -138,7 +160,6 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
-
 
 set :slackistrano, {
     channel: '#general',

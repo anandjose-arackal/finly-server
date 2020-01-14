@@ -7,7 +7,7 @@
 #  inward_document_id       :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :string(255)
+#  description              :text(65535)
 #  quantity                 :decimal(20, 5)
 #  delivered                :decimal(20, 5)
 #  accepted                 :decimal(20, 5)
@@ -35,7 +35,7 @@ class InwardDocumentItem < ApplicationRecord
 
 
   def per_unit_price
-    price= self.purchase_order_item&.taxable_amount&.value/self.purchase_order_item.quantity rescue nil
+    price = self.purchase_order_item&.taxable_amount&.value / self.purchase_order_item.quantity rescue nil
     price.round(2) if price.present?
   end
 end

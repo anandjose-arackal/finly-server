@@ -4,33 +4,33 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
   subscribe 'policy_user_role.import'
   headers({
            "Vendor Payments" => {:policy_name => 'Policy Name',
-                    :user_id => 'User Email / Mobile',
-                    :purchase_request_initiator => 'Purchase Request Initiator',
-                    :purchase_request_reviewer => 'Purchase Request Reviewer' ,
-                    :purchase_request_auditor => 'Purchase Request Auditor',
-                    :purchase_order_initiator => 'Purchase Order Intiator',
-                    :purchase_order_reviewer => 'Purchase Order Reviwer',
-                    :purchase_order_auditor => 'Purchase Order Auditor',
-                    :goods_receiver => 'Goods Receiver',
-                    :po_invoice_initiator => "PO Invoice Initiator",
-                    :po_invoice_reviewer => "PO Invoice Reviewer",
-                    :po_invoice_auditor => "PO Invoice Auditor",
-                    :non_po_invoice_initiator => "Non PO Invoice Initiator",
-                    :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
-                    :non_po_invoice_auditor => "Non PO INvoice Auditor",
-                    :bank_payment_request_initiator => 'Bank Payment Request Initiator',
-                    :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
-                    :bank_payment_request_creditor => 'Bank Payment Request Creditor',
-                    :bank_payment_request_auditor => 'Bank Payment Request Auditor',
-                    :item_master_manager => 'Item Master Manager',
-                    :inventory_manager => 'Inventory Manager',
-                    :vendor_creator => 'Vendor Creator',
-                    :vendor_reviewer => 'Vendor Reviewer',
-                    :vendor_auditor => 'Vendor Auditor',
-                    :payment_agreement_initiator => "Payment Agreement Initiator",
-                    :payment_agreement_reviewer => "Payment Agreement Reviewer" ,
-                    :payment_agreement_auditor => "Payement Agreement Auditor",
-                    :budget_manager => 'Budget Manager'},
+                                 :user_id => 'User Email / Mobile / Employee Id',
+                                 :purchase_request_initiator => 'Purchase Request Initiator',
+                                 :purchase_request_reviewer => 'Purchase Request Reviewer',
+                                 :purchase_request_auditor => 'Purchase Request Auditor',
+                                 :purchase_order_initiator => 'Purchase Order Intiator',
+                                 :purchase_order_reviewer => 'Purchase Order Reviwer',
+                                 :purchase_order_auditor => 'Purchase Order Auditor',
+                                 :goods_receiver => 'Goods Receiver',
+                                 :po_invoice_initiator => "PO Invoice Initiator",
+                                 :po_invoice_reviewer => "PO Invoice Reviewer",
+                                 :po_invoice_auditor => "PO Invoice Auditor",
+                                 :non_po_invoice_initiator => "Non PO Invoice Initiator",
+                                 :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
+                                 :non_po_invoice_auditor => "Non PO INvoice Auditor",
+                                 :bank_payment_request_initiator => 'Bank Payment Request Initiator',
+                                 :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
+                                 :bank_payment_request_creditor => 'Bank Payment Request Creditor',
+                                 :bank_payment_request_auditor => 'Bank Payment Request Auditor',
+                                 :item_master_manager => 'Item Master Manager',
+                                 :inventory_manager => 'Inventory Manager',
+                                 :vendor_creator => 'Vendor Creator',
+                                 :vendor_reviewer => 'Vendor Reviewer',
+                                 :vendor_auditor => 'Vendor Auditor',
+                                 :payment_agreement_initiator => "Payment Agreement Initiator",
+                                 :payment_agreement_reviewer => "Payment Agreement Reviewer",
+                                 :payment_agreement_auditor => "Payement Agreement Auditor",
+                                 :budget_manager => 'Budget Manager'},
 
            "Expense Management" => {
                :policy_name => 'Policy Name',
@@ -41,8 +41,9 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
            }
   })
 
-  attr_accessor :policy_user_params, :application, :policy
+  attr_accessor :policy_user_params, :application, :policy, :user_profiles
   def process
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?', company.id)
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)
     output = {}
@@ -123,7 +124,7 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
     end
 
     entity_user_id = clean_up_data policy_user_params[:user_id]
-    entity_user = company.users.where(mobile_number: entity_user_id).or(company.users.where(email: entity_user_id)).first
+    entity_user = get_user_entity(entity_user_id)
     unless entity_user.present?
       return result false,  "User Not Found"
     end
@@ -305,5 +306,18 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
       text&.strip
     end
   end
+
+  def get_user_entity(identifier)
+    user = nil
+    if Constants::VALID_EMAIL_FORMAT.match?(identifier)
+      user = company.users.find_by_email identifier
+    elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
+      user = company.users.find_by_mobile_number identifier
+    else
+      user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
+    end
+    user
+  end
+
 
 end

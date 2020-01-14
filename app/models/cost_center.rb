@@ -19,6 +19,9 @@ class CostCenter < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'cost_center'
 
   acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 

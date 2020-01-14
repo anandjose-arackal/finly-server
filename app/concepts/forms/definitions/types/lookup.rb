@@ -1,12 +1,6 @@
-module Forms
-  module Definitions
-    module Types
-      class Lookup < Entity
-        register :lookup
-        hint 'Select value'
+class Forms::Definitions::Types::Lookup < Forms::Definitions::Entity
+  register :lookup
+  hint 'Select value'
 
-        consumes_choices!
-      end
-    end
-  end
+  consumes_choices!
 end

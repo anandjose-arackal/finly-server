@@ -1,18 +1,10 @@
 require "#{Rails.root}/app/policies/application_policy"
 class ExportTemplates::Policy < ApplicationPolicy
 
-  class ExportTemplates::Policy::Scope < ApplicationPolicy::Scope
+  class ExportTemplates::Policy::Scope < Transactions::Resolver::Scope
 
-    def personal
+    def load(params)
       scope.where(created_by_user: @user)
-    end
-
-    def team
-      scope
-    end
-
-    def admin
-      scope
     end
 
   end

@@ -2,13 +2,12 @@ module Documents::Invoices::Consumers::Submit
   module Processing
     class OwnerAction < TaskManager::Actions::DummyAction
       def run(user, message, input)
-        # debugger
       end
     end
 
     class OwnerActions < TaskManager::API
       record Invoice
-      consumes_event! 'invoice.submit', consumer_key: "Invoice.Submit.OwnerActions", name: "Report Submit Mailer"
+      # consumes_event! 'invoice.submit', consumer_key: "Invoice.Submit.OwnerActions", name: "Report Submit Mailer"
       # scheduled! name: "Report Submit Schedule",every: 1.minute, hour: 12, minute: 00, day_of_the_week: :monday, day_of_the_month: :last
       validate_payload -> (user, message) do
         message[:record].present? #message[:invoice]&.status_id == InwardInvoiceStatus.id_for(:processing)}
@@ -22,6 +21,7 @@ module Documents::Invoices::Consumers::Submit
       action(
           TaskManager::Actions::DummyAction.define_action("UserSubmitOwnerMailer") do
             run -> (user, message, input) do
+              # debugger
             end
           end
       )

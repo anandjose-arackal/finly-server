@@ -1,5 +1,5 @@
 class TaskManager::Documents::Configuration < Transactions::API
-  extend Representer::DSL
+  # extend Representer::DSL
 
   schema do
     params do

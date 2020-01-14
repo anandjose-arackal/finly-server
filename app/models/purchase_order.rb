@@ -152,6 +152,7 @@ class PurchaseOrder < ApplicationRecord
   scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
   scope :not_open, -> {where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
+  scope :filter_ids, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
@@ -437,7 +438,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_po_approver_id, -> (approver_id){
+  scope :filter_po_approver_id, -> (approver_id) {
     if approver_id.present?
       ids = self.awaiting_action_items(approver_id)&.pluck(:id)
       where(id: ids)

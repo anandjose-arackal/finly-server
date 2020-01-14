@@ -20,7 +20,7 @@ class User::Update < User::Base
   end
 
   def authorized_user_types
-    [:company_admin, :admin]
+    [:company_admin, :admin, :vendor_payments_admin]
   end
 
   def init
@@ -67,23 +67,23 @@ class User::Update < User::Base
   private
 
   def parse_user_params
-    user_params = params.require(:user).permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name, profile_attributes: [:date_of_birth, :gender, :address_1,
-                                                     :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
+    user_params = params.require(:user).permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name, profile_attributes: [:id, :date_of_birth, :gender, :address_1,
+                                                                                                                                           :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
     user_params
   end
 
-  def split_name( full_name )
+  def split_name(full_name)
     name_array = full_name.split(' ')
 
     if name_array.count > 1
-      first_name  = name_array.shift
+      first_name = name_array.shift
       last_name = name_array.join(' ')
     else
       first_name = name_array.first
-      last_name  = ""
+      last_name = ""
     end
 
-    return [ first_name, last_name ]
+    return [first_name, last_name]
   end
 
 end

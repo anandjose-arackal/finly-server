@@ -6,7 +6,6 @@ class Bbps::ComplaintList < Bbps::Api
     end
   end
 
-  setup_defaults
   path "getComplaintList"
 
   # Message Code(B9000)| Ref No |Agent institution Id | Channel Id| Agent Id | Mobile No |
@@ -49,6 +48,10 @@ class Bbps::ComplaintList < Bbps::Api
   def self.handle_success(result)
     list = JSON.parse(result['response.parsed']['complaint_list'])
     list.map { |item| OpenStruct.new(item) }
+  end
+
+  def self.handle_error(data)
+    data
   end
 
 end

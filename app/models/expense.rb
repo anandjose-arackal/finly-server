@@ -40,6 +40,7 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
+#  company_id             :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -238,8 +239,8 @@ class Expense < ApplicationRecord
   scope :with_user_id, ->(user_id) {where user_id: user_id}
   scope :with_user_or_report, ->(user_id, report_id) {where 'user_id IN (?) OR report_id IN (?)', user_id, report_id}
   scope :date_before, -> (date) {where 'date < ?', date}
-  scope :without_usage_date_type, -> {where usage_date_type: nil}
-  scope :with_usage_date_type, -> {where.not usage_date_type: nil}
+  scope :without_usage_date_type, -> {where usage_date_type: [nil, "none"]}
+  scope :with_usage_date_type, -> {where.not usage_date_type: [nil, "none"]}
   scope :usage_date_within, ->(start_date, end_date) {where.not('usage_date_start > ? OR usage_date_end < ? ', end_date, start_date)}
 
   scope :filter_expense_type_id, ->(type_id) do
@@ -1053,7 +1054,7 @@ class Expense < ApplicationRecord
       end
     else
       if self.gst_amount.present?
-        self.gst_amount.value = value
+        self.gst_amount.update_attributes(value: value)
       else
         self.build_gst_amount(value: value, currency_id: Currency.id_for(:INR))
       end

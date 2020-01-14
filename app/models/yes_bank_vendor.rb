@@ -28,6 +28,7 @@
 #  vendor_id                :string(255)
 #  disabled                 :boolean          default(FALSE)
 #  deleted_at               :datetime
+#  vedor_code               :string(255)
 #  msme_registered          :boolean          default(FALSE)
 #  msme_registration_number :string(255)
 #  status_id                :integer
@@ -35,9 +36,9 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
-#  vedor_code               :string(255)
 #  trade_name               :string(255)
 #  reject_note              :text(65535)
+#  rcm_enabled              :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
@@ -69,6 +70,7 @@ class YesBankVendor < ApplicationRecord
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
+  has_many :credit_notes, foreign_key: :vendor_id
 
 
   default_scope { unscope(:where) }
@@ -252,6 +254,7 @@ class YesBankVendor < ApplicationRecord
         state_code: state_code&.state_code,
         address: address,
         trade_name: trade_name,
+        rcm_enabled: rcm_enabled,
         custom_fields: self.custom_fields
     }
   end

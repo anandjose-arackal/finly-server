@@ -117,12 +117,12 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def payment_details
-    transactions =[]
+    transactions = []
     utrs = self.new_transactions.pluck :bank_reference_number
     newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
     transactions = []
     utrs.each do |utr|
-      transactions << newly_created_transactions.find { |transaction| transaction if transaction.bank_reference_number == utr }
+      transactions << newly_created_transactions.find {|transaction| transaction if transaction.bank_reference_number == utr}
     end
     return false if transactions.blank?
 

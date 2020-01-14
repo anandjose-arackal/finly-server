@@ -16,7 +16,7 @@ class SecurityPolicy::Manager
     self.user = user
     # Consider roles across all user objects in-case of group entity structure
     self.user_role_names = UserRole.with_id(user.associated_group_role_ids).pluck(:name)
-    self.user_role_names = user_role_names.map { |role| role.gsub(" ", "_").underscore }
+    self.user_role_names = user_role_names.map {|role| role.gsub(" ", "_").underscore}
     user_role_names.uniq!
     self.user_role_names << 'employee' if self.user_role_names.blank?
     init_config

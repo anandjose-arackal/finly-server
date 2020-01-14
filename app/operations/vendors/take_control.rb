@@ -1,5 +1,15 @@
 class Vendors::TakeControl < Vendors::Base
 
+  # def authorized_user_types
+  #   [:vendor_payment_admin]
+  # end
+
+  def validate
+    unless user.vendor_payment_admin?
+      add_message :error, "You are not authorized to take control"
+    end
+  end
+
   def process
     params[:document] = self.vendor
     params[:aasm_event] = 'take_control'
@@ -14,6 +24,6 @@ class Vendors::TakeControl < Vendors::Base
   end
 
   def post_process
-    add_message :success, "You've taken control"
+    add_message :success, "You've taken control of this Vendor"
   end
 end
