@@ -154,7 +154,7 @@ class Vendors::Update < Vendors::Base
       self.vendor_parameters[:vendor_id] = self.vendor.vendor_id
     end
     vendor_id = self.vendor_parameters[:vendor_id]
-    duplicate_vendors = current_company_vendors.filter_vendor_id(vendor_id).without_id(self.vendor.id)
+    duplicate_vendors = current_company_vendors.where(vendor_id: vendor_id).without_id(self.vendor.id)
     if vendor_id.present? && duplicate_vendors.present?
       add_message :error, "There is a similar vendor added with the same vendor ID in our records."
       return
