@@ -111,6 +111,15 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
       else
         rate = item.rate
       end
+
+      if item.inventory_line_item.service?
+        quantity = 1
+        original_quantity = 1
+        rate = item.billable_amount.value
+      else
+        quantity = item.quantity
+        original_quantity = item.quantity
+      end
       item_attr = {
           item_id: item.inventory_line_item_id,
           invoice_item_id: item.id,
