@@ -12,7 +12,7 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 gem 'fiscali', '~> 2.4'
 
 gem 'parslet', '~> 1.8.2'
-
+gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
 gem 'clockwork', '~> 2.0'
 gem 'dry-monads', '~> 1.3.0'
