@@ -14,7 +14,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
       add_message :error, invoices_presenter.messages[:error]
       return
     end
-    invoices =invoices_presenter.invoices.where(invoice_type: [InwardInvoiceStatus.id_for(:tax_invoice),InwardInvoiceStatus.id_for(:non_po_invoice)])
+    invoices =invoices_presenter.invoices.where(invoice_type: [InwardInvoiceType.id_for(:tax_invoice),InwardInvoiceType.id_for(:non_po_invoice)])
     self.headers = [
         'Vch Type',
         'Tally VoucherVch No.',
@@ -108,11 +108,11 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
             '',
             '',
             '',
-            ((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(po) : ''),
+            ((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(invoice) : ''),
             item&.cgst,
-            ((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(po) : ''),
+            ((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(invoice) : ''),
             item&.sgst,
-            ((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(po) : ''),
+            ((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(invoice) : ''),
             item.igst,
             '',
             '',
