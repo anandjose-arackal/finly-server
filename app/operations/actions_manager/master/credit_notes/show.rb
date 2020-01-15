@@ -3,7 +3,7 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
   attr_accessor :credit_note
 
   register_handle :credit_note_show
-  register_actions [:submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
+  register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control, :return_control,
                     :void, :destroy, :tds_editable]
 
   def initialize(user = nil, params = {})
@@ -18,7 +18,7 @@ class ActionsManager::Master::CreditNotes::Show < ActionsManager::Master::Base
     end
   end
 
-  def submit
+  def update_and_submit
     CreditNoteStatus.ids_for(:draft, :rejected, :retracted).include?(credit_note.status_id) && credit_note.user_id == user.id
   end
 
