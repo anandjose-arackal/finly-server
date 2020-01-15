@@ -3,7 +3,6 @@ json.array!(@result.paginated_receipts) do |receipt|
   # json.url receipt.image.url
   json.user_name "#{receipt.user&.name} - #{receipt.user&.company&.name}"
   json.image_updated_at receipt.image_updated_at.strftime("%b %d, %Y")
-  json.custom_fields @result.custom_fields_for(receipt)
   categories = receipt.user.company.categories.active
   json.categories do
     json.array!(categories) do |category|
