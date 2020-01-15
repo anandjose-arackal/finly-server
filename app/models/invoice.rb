@@ -344,6 +344,12 @@ class Invoice < ApplicationRecord
     where('date = ?', from)
   }
 
+  #scope for exportar screen
+  scope :filter_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
+  }
 
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
