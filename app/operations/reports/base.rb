@@ -302,7 +302,8 @@ class Reports::Base < BaseOperation
 
         if item_expenses.present?
           item_name = DateUtils.date_formatted date
-          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          # item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
+          item_sum = precision_value item_expenses.map {|e| e.amount.public_send(report.base_currency_code)}.compact.sum
           date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
