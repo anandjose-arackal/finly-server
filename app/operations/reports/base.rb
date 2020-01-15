@@ -117,7 +117,8 @@ class Reports::Base < BaseOperation
       # end
 
       if self.actions[:reviewal_chain_editable][:value]
-        self.policies = retrieve_policies
+        # self.policies = retrieve_policies
+        self.policies = Policy::Index.(user, params).policies
         self.reviewal_chains = []
         params[:reviewal_document] = report
 
