@@ -126,8 +126,8 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
           category_id: item.category_id,
           comment: item.description,
           hsn_sac: item.hsn_sac,
-          original_quantity: item.quantity,
-          quantity: item.quantity,
+          original_quantity: quantity,
+          quantity: quantity,
           original_rate: rate,
           rate: rate,
           original_taxable_amount: {
