@@ -197,7 +197,6 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def credit_notes
-    return nil unless user.company.utility_bills_enabled?
     return nil unless (
     user.vendor_payment_admin? ||
         user.is_purchase_order_initiator? ||
