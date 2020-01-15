@@ -116,9 +116,11 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
         quantity = 1
         original_quantity = 1
         rate = item.billable_amount.value
+        taxable_amount = item.billable_amount.value
       else
         quantity = item.quantity
         original_quantity = item.quantity
+        taxable_amount = item.taxable_amount.value
       end
       item_attr = {
           item_id: item.inventory_line_item_id,
@@ -131,11 +133,11 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
           original_rate: rate,
           rate: rate,
           original_taxable_amount: {
-              value: item.taxable_amount.value,
+              value: taxable_amount,
               currency_id: item.taxable_amount.currency_id
           },
           taxable_amount: {
-              value: item.taxable_amount.value,
+              value: taxable_amount,
               currency_id: item.taxable_amount.currency_id
           },
           original_tax_rate_id: item.tax_rate_id,
