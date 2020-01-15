@@ -15,12 +15,6 @@ class Transcriber::Receipts::Index < Transcriber::Base
       self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 10)
     end
 
-    def custom_fields_for(receipt)
-      # Get custom fields of the company for manual expense
-      configurations = receipt.user.company.field_configurations.exclude_deleted
-      custom_field = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
-    end
-
   end
 
   def pre_validate
@@ -45,15 +39,17 @@ class Transcriber::Receipts::Index < Transcriber::Base
 
   def process
     user_ids = []
-    companies.each do |company|
-      user_ids += company.users.pluck(:id)
-    end
     if params[:filter_parent] == '1'
-      self.receipts = Receipt.untranscribed.without_parent.with_user_id(user_ids).reorder("#{self.sort_by} #{self.sort_order}")
+      self.receipts = Receipt.untranscribed.joins(:user => [:company])
+                          .where('companies.id IN (?)', companies.pluck(:id))
+                          .reorder("#{self.sort_by} #{self.sort_order}")
     elsif params[:filter_parent] == '2'
-      expense_ids = Expense.transcribed.with_user_id(user_ids).pluck(:id)
-      self.receipts = Receipt.with_expense_id(expense_ids).reorder("#{self.sort_by} #{self.sort_order}")
+      self.receipts = Receipt.joins(:user => [:company,:expenses])
+                          .where('companies.id IN (?)',companies.pluck(:id))
+                          .where('expenses.transcribed = true')
+                          .reorder("expenses.updated_at #{self.sort_order}")
     end
+    self.receipts = receipts.paginate(page: params[:page], per_page: params[:per_page] || 30)
   end
 
 
