@@ -67,7 +67,8 @@ class CreditNoteItem < ApplicationRecord
         original_tax_rate: original_tax_rate.as_json,
         tax_rate: tax_rate.as_json,
         tds_applicable: tds_applicable?,
-        total_amount: total_amount.as_json
+        total_amount: total_amount.as_json,
+        product_type_id: item.product_type_id
     }
   end
 
