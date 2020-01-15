@@ -5,7 +5,7 @@ module TrailblazerErrorTracker
     policy_errors = self['result.policy.default']&.errors || {}
     roles_auth_errors = {}
     if self['result.authorization']&.failure?
-      roles_auth_errors.merge(base: 'You cannot perform the following action')
+      roles_auth_errors.merge!(base: 'You cannot perform the following action')
     end
     if self['result.policy.default'].present? and self['result.policy.default']['message'] == 'Breach'
       policy_errors.merge!({base: 'You cannot perform the following action'})

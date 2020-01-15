@@ -66,7 +66,7 @@ class ExportJob < ApplicationRecord
   def retry
     return false unless failed?
 
-    ExportManager::DSL::Generator::Background.call_async(user, {export_job_id:self.id})
+    ExportManager::DSL::Generator::Background.call_async(created_by, {export_job_id: self.id})
     true
   end
 

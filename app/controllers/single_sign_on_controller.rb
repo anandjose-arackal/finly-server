@@ -34,11 +34,18 @@ class SingleSignOnController < Oauth::TokenController
     set_scope
     super()
     @token.update_columns(authentication_type: "sso")
-    RequestStoreUtil.current_session.verify('sso')
   end
 
   def saml_logout
     # yet to be implemented. When though?
+  end
+
+  protected
+
+  def on_session_create
+    # SSO Sessions are always verified and do not require further OTP verification for device, IP or user agent
+    RequestStoreUtil.current_session.verify('sso')
+    super()
   end
 
   private

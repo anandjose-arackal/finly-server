@@ -40,6 +40,7 @@
 #  utility_bills_enabled          :boolean          default(FALSE)
 #  request_encryption_enabled     :boolean          default(FALSE)
 #  user_level_custom_fields       :boolean          default(FALSE)
+#  analytics_system               :boolean
 #
 
 class FeatureSubscription < ApplicationRecord
