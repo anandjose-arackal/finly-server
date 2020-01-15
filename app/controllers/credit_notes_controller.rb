@@ -19,14 +19,13 @@ class CreditNotesController < BaseControllers::WebBase
   end
 
   def update_and_submit
-    params[:id] = params[:id] || params[:_id]
+    params[:id] = params[:id] || params[:_id] || params[:credit_note_id]
     endpoint Docs::P2P::CreditNotes::Ops::UpdateAndSubmit
   end
 
   def destroy;
     endpoint Docs::P2P::CreditNotes::Ops::Destroy;
   end
-
 
   # Configs
   def edit_config;
