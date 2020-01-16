@@ -8,7 +8,6 @@
 #  updated_at  :datetime         not null
 #  name        :string(255)      not null
 #  application :string(255)
-#  deleted_at  :datetime
 #
 
 class UserTeam < ApplicationRecord

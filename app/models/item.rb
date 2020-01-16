@@ -34,6 +34,9 @@ class Item < ApplicationRecord
   include SoftDeletable
   include Sequenced::ActsAsSequenced
   include MathUtil
+  include EventProducer
+
+  event_channel 'item'
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 

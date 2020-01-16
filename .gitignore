@@ -32,6 +32,7 @@ config/bbps_config.yml
 erd.pdf
 !/log/.keep
 /tmp
+/public/system/export_jobs/*
 /public/system/receipts/*
 /public/system/receipt_emails/*
 /public/system/company_configurations/*
@@ -79,3 +80,4 @@ config/sidekiq.yml
 .ruby-version
 
 public/tmp
+config/integrations.yml

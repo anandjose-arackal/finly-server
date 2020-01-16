@@ -14,7 +14,6 @@
 #  base_currency_id           :integer
 #  company_pocket_template_id :integer
 #  active                     :boolean          default(TRUE)
-#  deleted_at                 :datetime
 #
 
 class UserPocket < ApplicationRecord

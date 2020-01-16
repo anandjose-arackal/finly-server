@@ -22,7 +22,7 @@ class Event::EPurchaseRequest::Approve < Event::EPurchaseRequest::Base
   end
 
   def affected_users
-    if purchase_request.approved?
+    if purchase_request.approved? && purchase_request.company.configuration.email_purchase_order_initiator
       # If PR is approved, send email to all PO initiators in that policy
       po_initiators_in_pr_policy = purchase_request.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id) rescue []
       self.po_initiators = user.company.users.where(id: po_initiators_in_pr_policy)

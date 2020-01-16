@@ -72,9 +72,11 @@ class ActionsManager::Master::Base
 
   def valid?
     # clear_messages
-    self.class.validations&.each do |method|
-      self.send method
-    end unless self.class.validations.blank?
+    unless self.class.validations.blank?
+      self.class.validations&.each do |method|
+        self.send method
+      end
+    end
     self.messages[:error].blank?
   end
 
@@ -132,7 +134,7 @@ class ActionsManager::Master::Base
     end
   end
 
-  def allowed_actions(actions=[])
+  def allowed_actions(actions = [])
     result = {}
     unless actions.blank?
       actions.each do |action|

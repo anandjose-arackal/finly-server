@@ -34,7 +34,7 @@
 #  late_payment_fee_id        :integer
 #  early_payment_fee_id       :integer
 #  convenience_fee_id         :integer
-#  quick_pay                  :boolean          default(TRUE)
+#  quick_pay                  :string(255)      default("N")
 #  total_amount_id            :integer
 #  early_payment_fee_selected :boolean          default(FALSE)
 #  late_payment_fee_selected  :boolean          default(FALSE)
@@ -43,6 +43,8 @@
 #  bill_validation_required   :boolean
 #  order_number               :string(255)
 #  order_number_type          :string(255)
+#  tax_rate_id                :integer
+#  hsn_sac                    :string(255)
 #
 
 require 'rails_helper'

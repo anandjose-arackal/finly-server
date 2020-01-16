@@ -12,7 +12,6 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  attachment_type            :string(255)
-#  deleted_at                 :datetime
 #
 
 class VendorAttachment < ApplicationRecord

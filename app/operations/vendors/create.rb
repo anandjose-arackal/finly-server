@@ -321,6 +321,7 @@ class Vendors::Create < Vendors::Base
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
       validate_duplicate_bank_account
+      validate_default_bank_account
       return if has_errors?
       self.vendor.authorized = true
       validate_custom_fields(true)

@@ -1,39 +1,18 @@
 class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
-  # schema do
-  #   params do
-  #     # Todo filled from user
-  #     required(:subscription) do
-  #       required(:subscription_pocs) do
-  #         hash do
-  #           required(:user_id).filled
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
-
   step :set_default_params
+
   step Model(BbpsBillerSubscription, :find_by)
+
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :update? )
-  fail :check
-  step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Base)
+
+  step Contract::Build(constant: Docs::UtilityBills::Subscriptions::Contracts::Update)
+
   step Contract::Validate(key: 'subscription')
 
   step Contract::Persist()
-  fail :check2
-  step :test
+
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
-
-  def check(options, **)
-  end
-
-  def check2(options, **)
-  end
-
-  def test(options, **)
-    true
-  end
 
   def set_default_params(options, params:, current_user:, **)
     params[:subscription][:current_user] = current_user

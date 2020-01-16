@@ -80,7 +80,6 @@
 #  kyc_2_back_updated_at      :datetime
 #  kyc_1_number               :string(255)
 #  kyc_2_number               :string(255)
-#  deleted_at                 :datetime
 #
 
 require 'fileutils'
@@ -113,7 +112,7 @@ class IndividualKyc < ApplicationRecord
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :id_proof, content_type: CONTENT_TYPES
+  #validates_attachment :id_proof, content_type: CONTENT_TYPES
 
   has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES

@@ -14,8 +14,8 @@ class SingleSignOnController < Oauth::TokenController
     sign_on_type = SingleSignOnType.id_for(action_name.to_sym)
     config = company&.single_sign_on_configurations&.with_single_sign_on_type(sign_on_type)&.with_id(sso_config_id)&.first
     ################## only for development sakes ###################
-    # company = Company.first
-    # config = company.single_sign_on_configurations.first
+    # company = Company.second
+    # config = company.single_sign_on_configurations.second
     #################################################################
     if company.present? and config.present?
       settings = saml_settings(config)
@@ -33,10 +33,18 @@ class SingleSignOnController < Oauth::TokenController
     set_grant_type
     set_scope
     super()
+    @token.update_columns(authentication_type: "sso")
   end
 
   def saml_logout
     # yet to be implemented. When though?
+  end
+
+  protected
+  def on_session_create
+    # SSO Sessions are always verified and do not require further OTP verification for device, IP or user agent
+    RequestStoreUtil.current_session.verify('sso')
+    super()
   end
 
   private

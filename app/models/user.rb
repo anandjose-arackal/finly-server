@@ -59,12 +59,14 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
-#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
   include OperationCallbacks
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'user'
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -79,9 +81,6 @@ class User < ApplicationRecord
   devise :password_expirable, :password_archivable, :expirable #, :session_limitable, :secure_validatable
   # zxcvb-js gem
   devise :zxcvbnable
-
-  # making user model authenticable with SSO
-  devise :saml_authenticatable
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
@@ -139,6 +138,8 @@ class User < ApplicationRecord
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
   has_many :user_pockets
+
+  has_many :export_jobs, foreign_key: :created_by_id
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
@@ -1566,6 +1567,30 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
   end
 
+  def is_utility_bill_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_initiator), document)
+  end
+
+  def is_utility_bill_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_reviewer), document)
+  end
+
+  def is_utility_bill_master_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer), document)
+  end
+
+  def is_utility_bill_master_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator), document)
+  end
+
+  def is_credit_note_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_initiator), document)
+  end
+
+  def is_credit_note_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_reviewer), document)
+  end
+
   def access_locked?
     locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
@@ -1573,6 +1598,12 @@ class User < ApplicationRecord
   alias_method :locked?, :access_locked?
 
   # ************ User Role for vendor payments ******************
+
+  # ************ User Role for expense management ************
+    def is_travel_manager?(document=nil)
+      self.has_policy_role?(UserRole.id_for(:travel_manager), document)
+    end
+  # ************ User Role for expense management ************
 
   def relevant
     {

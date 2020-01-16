@@ -183,4 +183,10 @@ class Vendors::Base < BaseOperation
     end
   end
 
+  def validate_default_bank_account
+    unless vendor.bank_accounts.collect(&:default_account).include?(true)
+      add_message :error, "Please set one bank account as default"
+    end
+  end
+
 end

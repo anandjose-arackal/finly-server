@@ -30,8 +30,39 @@
 #                      api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                                                                      api/v1/configuration/category#index
 #                            api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                                                                            api/v1/configuration#category
 #                                          email_processor POST   /email/incoming(.:format)                                                                                           griddler/emails#create
+#                                         new_user_session GET    /users/sign_in(.:format)                                                                                            sessions#new
+#                                             user_session POST   /users/sign_in(.:format)                                                                                            sessions#create
+#                                     destroy_user_session DELETE /users/sign_out(.:format)                                                                                           sessions#destroy
+#                                        new_user_password GET    /users/password/new(.:format)                                                                                       passwords#new
+#                                       edit_user_password GET    /users/password/edit(.:format)                                                                                      passwords#edit
+#                                            user_password PATCH  /users/password(.:format)                                                                                           passwords#update
+#                                                          PUT    /users/password(.:format)                                                                                           passwords#update
+#                                                          POST   /users/password(.:format)                                                                                           passwords#create
+#                                 cancel_user_registration GET    /users/cancel(.:format)                                                                                             devise_invitable/registrations#cancel
+#                                    new_user_registration GET    /users/sign_up(.:format)                                                                                            devise_invitable/registrations#new
+#                                   edit_user_registration GET    /users/edit(.:format)                                                                                               devise_invitable/registrations#edit
+#                                        user_registration PATCH  /users(.:format)                                                                                                    devise_invitable/registrations#update
+#                                                          PUT    /users(.:format)                                                                                                    devise_invitable/registrations#update
+#                                                          DELETE /users(.:format)                                                                                                    devise_invitable/registrations#destroy
+#                                                          POST   /users(.:format)                                                                                                    devise_invitable/registrations#create
+#                                    new_user_confirmation GET    /users/confirmation/new(.:format)                                                                                   devise/confirmations#new
+#                                        user_confirmation GET    /users/confirmation(.:format)                                                                                       devise/confirmations#show
+#                                                          POST   /users/confirmation(.:format)                                                                                       devise/confirmations#create
+#                                          new_user_unlock GET    /users/unlock/new(.:format)                                                                                         devise/unlocks#new
+#                                              user_unlock GET    /users/unlock(.:format)                                                                                             devise/unlocks#show
+#                                                          POST   /users/unlock(.:format)                                                                                             devise/unlocks#create
+#                                   accept_user_invitation GET    /users/invitation/accept(.:format)                                                                                  devise/invitations#edit
+#                                   remove_user_invitation GET    /users/invitation/remove(.:format)                                                                                  devise/invitations#destroy
+#                                      new_user_invitation GET    /users/invitation/new(.:format)                                                                                     devise/invitations#new
+#                                          user_invitation PATCH  /users/invitation(.:format)                                                                                         devise/invitations#update
+#                                                          PUT    /users/invitation(.:format)                                                                                         devise/invitations#update
+#                                                          POST   /users/invitation(.:format)                                                                                         devise/invitations#create
+#                                    user_password_expired GET    /users/password_expired(.:format)                                                                                   devise/password_expired#show
+#                                                          PATCH  /users/password_expired(.:format)                                                                                   devise/password_expired#update
+#                                                          PUT    /users/password_expired(.:format)                                                                                   devise/password_expired#update
+#                                      users_saml_validate POST   /users/saml/validate(.:format)                                                                                      users#saml_validator
 #                                       users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       single_sign_on#saml
-#                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#saml_auth
+#                                          users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#create
 #                                        users_saml_logout DELETE /users/saml/logout(.:format)                                                                                        single_sign_on#saml_logout
 #                               native_oauth_authorization GET    /oauth/authorize/native(.:format)                                                                                   doorkeeper/authorizations#show
 #                                      oauth_authorization GET    /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#new
@@ -667,6 +698,9 @@
 #                          organization_account_categories GET    /organization_account/categories(.:format)                                                                          organization_account#categories
 #                         organization_account_departments GET    /organization_account/departments(.:format)                                                                         organization_account#departments
 #                   organization_account_all_expense_types GET    /organization_account/all_expense_types(.:format)                                                                   organization_account#all_expense_types
+#                      organization_account_transfer_modes GET    /organization_account/transfer_modes(.:format)                                                                      organization_account#transfer_modes
+#               organization_account_create_transfer_modes POST   /organization_account/create_transfer_modes(.:format)                                                               organization_account#create_transfer_modes
+#              organization_account_destroy_transfer_modes DELETE /organization_account/destroy_transfer_modes(.:format)                                                              organization_account#destroy_transfer_modes
 #                  organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                                                  organization_account#export_preferences
 #                                              state_codes GET    /state_codes(.:format)                                                                                              organization_account#gst_state_codes
 #                                             add_category POST   /add_category(.:format)                                                                                             organization_account#add_category
@@ -957,7 +991,6 @@
 #                       statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                                                       statements#company_balance_summary
 #                  statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                                                  statements#company_transactions_summary
 #                      statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                                                      statements#company_policies_summary
-#                                                          GET    /exports/:type(.:format)                                                                                            export#processor
 #                                  statements_user_summary GET    /statements/user_summary(.:format)                                                                                  statements#user_summary
 #                           statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                                           statements#user_summary_export
 #                                                          POST   /statements/user_summary(.:format)                                                                                  statements#user_summary
@@ -1220,6 +1253,7 @@
 #                                                          PATCH  /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#update
 #                                                          PUT    /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#update
 #                                                          DELETE /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#destroy
+#                                   bank_transfer_progress GET    /bank_transfer/bank_payment_requests/progress(.:format)                                                             bank_transfer/bank_payment_requests#progress
 #                                      bank_transfer_count GET    /bank_transfer/bank_payment_requests/count(.:format)                                                                bank_transfer/bank_payment_requests#count
 #                         bank_transfer_count_with_filters GET    /bank_transfer/bank_payment_requests/count_with_filters(.:format)                                                   bank_transfer/bank_payment_requests#count_with_filters
 #                  bank_transfer_get_company_bank_accounts GET    /bank_transfer/payment_requests/get_company_bank_accounts(.:format)                                                 bank_transfer/bank_payment_requests#get_company_bank_accounts
@@ -1236,6 +1270,7 @@
 #                               bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                                               bank_transfer/bank_payment_requests#bulk_approve
 #                          bank_transfer_bulk_take_control PATCH  /bank_transfer/bulk_take_control(.:format)                                                                          bank_transfer/bank_payment_requests#bulk_take_control
 #                                bank_transfer_bulk_reject PATCH  /bank_transfer/bulk_reject(.:format)                                                                                bank_transfer/bank_payment_requests#bulk_reject
+#                               bank_transfer_bulk_actions POST   /bank_transfer/bulk_actions(.:format)                                                                               bank_transfer/bank_payment_requests#bulk_actions
 #                                     bank_transfer_new_pr POST   /bank_transfer/new_pr(.:format)                                                                                     bank_transfer/bank_payment_requests#new_pr
 #                     bank_transfer_unified_payment_ticket POST   /bank_transfer/unified_payment_ticket(.:format)                                                                     bank_transfer/bank_payment_requests#unified_payment_ticket
 #                      bank_transfer_create_invoice_ticket POST   /bank_transfer/create_invoice_ticket(.:format)                                                                      bank_transfer/bank_payment_requests#create_invoice_ticket
@@ -1262,6 +1297,7 @@
 #      bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)                            bank_transfer/bank_payment_requests#within_timeframe
 #        bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)                              bank_transfer/bank_payment_requests#update_payment
 #          bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)                                    bank_transfer/bank_payment_requests#payments_list
+#         bank_transfer_bank_payment_request_payments_info GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_info(.:format)                               bank_transfer/bank_payment_requests#payments_info
 #        bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)                              bank_transfer/bank_payment_requests#payments_count
 #     bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_attachment
 #                      bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#index
@@ -1831,6 +1867,10 @@
 #                                       user_onboarding_em POST   /user_onboarding/em(.:format)                                                                                       pending_invites#em_onboarding
 #                                       user_onboarding_vp POST   /user_onboarding/vp(.:format)                                                                                       pending_invites#vp_onboarding
 #                       user_onboarding_configuration_data GET    /user_onboarding/configuration_data(.:format)                                                                       pending_invites#configuration_data
+#                                           exports_config GET    /exports/config(.:format)                                                                                           export_jobs#export_jobs_config
+#                                                          GET    /exports/:type(.:format)                                                                                            export_jobs#create
+#                                                          POST   /exports/:type(.:format)                                                                                            export_jobs#create
+#                                              export_jobs GET    /export_jobs(.:format)                                                                                              export_jobs#index
 #                                       rails_service_blob GET    /rails/active_storage/blobs/:signed_id/*filename(.:format)                                                          active_storage/blobs#show
 #                                rails_blob_representation GET    /rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format)                            active_storage/representations#show
 #                                       rails_disk_service GET    /rails/active_storage/disk/:encoded_key/*filename(.:format)                                                         active_storage/disk#show
@@ -4265,9 +4305,10 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  # devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
+  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   # devise_for :users, skip: [:session, :password]
 
+  post 'users/saml/validate', to: 'users#saml_validator'
   get 'users/saml/sign_in', to: 'single_sign_on#saml'
   post 'users/saml/auth', to: 'single_sign_on#create'
   delete 'users/saml/logout', to: 'single_sign_on#saml_logout'
@@ -4425,6 +4466,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      get 'maps/config/:type', to: 'google_maps#maps_config'
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :show, :update]
@@ -4980,7 +5022,7 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
-  get 'exports/:type', to: 'export#processor'
+  # get 'exports/:type', to: 'export#processor'
 
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
@@ -5010,6 +5052,7 @@ Rails.application.routes.draw do
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
+  get 'autocomplete/employees'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
@@ -5714,6 +5757,23 @@ Rails.application.routes.draw do
   post 'user_onboarding/em', to: 'pending_invites#em_onboarding'
   post 'user_onboarding/vp', to: 'pending_invites#vp_onboarding'
   get 'user_onboarding/configuration_data', to: 'pending_invites#configuration_data'
+
+  get 'exports/config', to: 'export_jobs#export_jobs_config'
+  get 'exports/:type', to: 'export_jobs#create'
+  post 'exports/:type', to: 'export_jobs#create'
+  resources :export_jobs, only: [:index]
+  get 'maps/config/:type', to: 'google_maps#maps_config'
+
+  scope :streamsets do
+    scope :v1 do
+      post 'auth', to: 'streamsets/v1/token#create'
+      get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
+      get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
+      get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
+    end
+  end
+
+
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
   resources :forms
@@ -5730,6 +5790,7 @@ Rails.application.routes.draw do
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
+      put 'update_and_submit', to: 'subscriptions#update_and_submit'
       patch 'add_bill', to: 'subscriptions#add_bill'
       get 'fetch_bill', to: 'subscriptions#fetch_bill'
     end
@@ -5740,7 +5801,10 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      get 'transaction_status', to: 'bills#transaction_status'
+      put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
+      get 'download_receipt', to: 'bills#download_receipt'
     end
 
     resources :complaints

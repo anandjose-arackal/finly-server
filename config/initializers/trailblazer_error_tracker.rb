@@ -5,7 +5,7 @@ module TrailblazerErrorTracker
     policy_errors = self['result.policy.default']&.errors || {}
     roles_auth_errors = {}
     if self['result.authorization']&.failure?
-      roles_auth_errors.merge(base: 'You cannot perform the following action')
+      roles_auth_errors.merge!(base: 'You cannot perform the following action')
     end
     if self['result.policy.default'].present? and self['result.policy.default']['message'] == 'Breach'
       policy_errors.merge!({base: 'You cannot perform the following action'})
@@ -18,8 +18,10 @@ module TrailblazerErrorTracker
     unless type
       messages = {
           success: (messages(:success)&.values&.flatten || []),
-          errors: (messages(:errors)&.values&.flatten || []),
-          errors_meta: (messages(:errors) || [])
+          # errors: (messages(:errors)&.values&.flatten || []),
+          errors: errors&.values&.flatten || [],
+          # errors_meta: (messages(:errors) || [])
+          errors_meta: errors || {}
       }
       return messages
     end
@@ -39,3 +41,4 @@ module TrailblazerErrorTracker
   end
 end
 Trailblazer::Operation::Result.include TrailblazerErrorTracker
+Trailblazer::Operation::Railway::Result.include TrailblazerErrorTracker

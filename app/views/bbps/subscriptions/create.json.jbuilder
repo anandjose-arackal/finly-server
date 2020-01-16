@@ -1,1 +1,3 @@
-json.id @op['model']&.id
+if @op.success?
+  json.id @op['model']&.id
+end

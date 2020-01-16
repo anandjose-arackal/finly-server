@@ -33,6 +33,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :show_only_invoices_which_are_forwarded
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     # Sorting
     has_scope :sort_invoice_id
@@ -41,7 +42,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def init
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
+      if params[:filter_ids] and not params[:filter_ids].respond_to?(:each)
         params[:filter_ids] = params[:filter_ids].first.split(",")
       end
       # Todo temp workaround because of frontend format issue - END
@@ -99,28 +100,11 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
         params.delete(:filter_reviewer_awaiting_approval)
       end
     end
-    check_payable
   end
 
   def success
     params[:invoices] = self.invoices
     BankTransfer::InwardInvoices::Index::InwardInvoicesPresenter.new(user, params, messages)
-  end
-
-  private
-
-  def check_payable
-    ids = []
-    self.invoices.includes(:balance_due, payments: [:amount]).each do |invoice|
-      invoice_amount = invoice.balance_due&.value.to_f - 0.99
-      paid_amount = invoice.payments.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum.round(2)
-      previous_payments = invoice.payments.map {|p| p.amount.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum.round(2)
-
-      if (paid_amount >= invoice_amount) || (previous_payments >= invoice_amount)
-        ids << invoice.id if invoice.payable
-      end
-    end
-    self.invoices.where(id: ids).update_all(payable: false) if ids.present?
   end
 
 end

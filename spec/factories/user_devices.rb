@@ -3,7 +3,7 @@
 # Table name: user_devices
 #
 #  id                           :bigint           not null, primary key
-#  user_id                      :integer
+#  user_id                      :integer          not null
 #  company_id                   :integer
 #  fingerprint                  :string(255)
 #  status_id                    :integer          not null
@@ -19,7 +19,6 @@
 #  client_type                  :string(255)
 #  message                      :text(65535)
 #  user_finly_id                :string(255)
-#  deleted_at                   :datetime
 #
 
 FactoryBot.define do

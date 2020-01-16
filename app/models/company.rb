@@ -12,13 +12,14 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
-#  deleted_at       :datetime
-#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord
   include Constants
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'company'
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
@@ -418,6 +419,10 @@ class Company < ApplicationRecord
     else
       return false
     end
+  end
+
+  def analytics_system_enabled?
+    self.feature_subscription.analytics_system
   end
 
 

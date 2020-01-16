@@ -24,7 +24,6 @@
 #  travel_request_retract :boolean
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  deleted_at             :datetime
 #
 
 class UserDelegateMapping < ActiveRecord::Base

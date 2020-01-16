@@ -28,7 +28,14 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   step Transactions::Messages::SuccessMessage('Utility Bill Master created successfully')
 
-  def check(params, **)
+  def check(ctx, options, **)
+    # ctx['result.contract.default'].errors.present?
+    #
+    # ctx['result.contract.default'].errors.keys.each do |key|
+    #   add_message options, :error, key, ctx['result.contract.default'].errors[key]
+    # end
+
+    true
   end
 
   def setup_dlrm(options, current_user:, params:, model:, **)

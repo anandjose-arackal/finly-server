@@ -38,7 +38,6 @@
 #  is_mobile              :boolean
 #  status_id              :integer          not null
 #  message                :text(65535)
-#  deleted_at             :datetime
 #
 FactoryBot.define do
   factory :user_device_browser do

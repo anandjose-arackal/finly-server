@@ -20,7 +20,6 @@
 #  updated_at                  :datetime         not null
 #  date                        :datetime
 #  sequence_number             :integer
-#  deleted_at                  :datetime
 #
 
 class FinlyTransaction < ApplicationRecord

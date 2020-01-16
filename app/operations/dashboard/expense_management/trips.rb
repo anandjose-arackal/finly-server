@@ -3,6 +3,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
 
   def init
     # {"view"=>"personal", "menu"=>{"main"=>"trips"}, "page"=>"1", "per_page"=>"30"}
+    params[:view] = get_relevant_view
     self.trips = TravelRequests::Index.(user, params)
 
   end
@@ -16,7 +17,7 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
   class Dashboard::ExpenseManagement::Trips::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :trips, :counts
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {

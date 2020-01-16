@@ -11,7 +11,6 @@
 #  reviewer                 :boolean          default(FALSE), not null
 #  admin_user_id            :integer          not null
 #  email_triggered_at       :datetime
-#  deleted_at               :datetime
 #
 
 class AdminReviewWorkflowLevel < ApplicationRecord
