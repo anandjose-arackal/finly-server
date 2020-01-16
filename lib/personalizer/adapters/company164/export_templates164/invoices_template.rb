@@ -155,7 +155,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Voucher Type': 'JV',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
-        'Description': get_description('ap',invoice),
+        'Description': get_description(invoice),
         'Invoice amount': invoice.net_amount.value,
         'Invoice Number': invoice.invoice_number,
         'Invoice Date': invoice.date.strftime("%d-%m-%Y"),
