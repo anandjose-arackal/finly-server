@@ -17,6 +17,7 @@ class Docs::P2P::CreditNotes::Ops::Index < Transactions::API
 
   has_scope :filter_invoice_id
   has_scope :filter_invoice_number
+  has_scope :filter_invoice_sequence_id
 
   has_scope :filter_date, using: [:from, :to], type: :hash
   has_scope :filter_created_on_date, using: [:from, :to], type: :hash
@@ -27,12 +28,6 @@ class Docs::P2P::CreditNotes::Ops::Index < Transactions::API
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :index?)
   # step Transactions::Resolver::Model(BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
   step :index!
-
-  # def check(options, params:, **)
-  # end
-  #
-  # def check2(options, params:, **)
-  # end
 
   def index!(options, params:, current_user:, **)
     if current_user.vendor_payment_admin?
