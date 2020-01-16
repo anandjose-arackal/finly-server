@@ -34,11 +34,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     sl_no = 1
     data.find_each do |inv|
       if with_tax(inv)
-        row_ap_entries(inv,sl_no).map{|entry| rows << entry}
+        row_ap_entries(inv, sl_no).map {|entry| rows << entry}
       end
 
       if without_tax(inv)
-        row_jv_entries(inv,sl_no).map{|entry| rows << entry}
+        row_jv_entries(inv, sl_no).map {|entry| rows << entry}
       end
       inv.payments do |payment|
 
@@ -54,7 +54,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   #  invoices have TDS includes comes under here
   # ################################
 
-  def row_ap_entries(invoice,sl_no)
+  def row_ap_entries(invoice, sl_no)
     ap_entries=[]
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
@@ -85,7 +85,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Account': '31329011',
           'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : ''),
           'Tax': item.tax_rate&.rate&.to_f,
-          'Base Amount':item.taxable_amount&.value,
+          'Base Amount': item.taxable_amount&.value,
           'Debit': total_tax_value(item),
           'Comments': 'Finly',
           'SAC': '00440294'
@@ -171,37 +171,35 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   end
 
 
-
-
   def generate_headers
-    [ 'S. NO.',
-      'Report ID',
-      'Voucher Type',
-      'Period',
-      'Voucher Date',
-      'Description',
-      'Invoice amount',
-      'Invoice Number',
-      'Invoice Date',
-      'Invoice Type',
-      'State',
-      'Supplier GSTN',
-      'Place Of Supply',
-      'Account',
-      'Sub Account',
-      'Department',
-      'Cost Center',
-      'Tax',
-      'Tax Exemption(%)',
-      'Base Amount',
-      'Debit',
-      'Credit',
-      'Comments',
-      'Supplier',
-      'Reference Code',
-      'SAC',
-      'Ref. Invoice No.',
-      'Payment_Mode',
+    ['S. NO.',
+     'Report ID',
+     'Voucher Type',
+     'Period',
+     'Voucher Date',
+     'Description',
+     'Invoice amount',
+     'Invoice Number',
+     'Invoice Date',
+     'Invoice Type',
+     'State',
+     'Supplier GSTN',
+     'Place Of Supply',
+     'Account',
+     'Sub Account',
+     'Department',
+     'Cost Center',
+     'Tax',
+     'Tax Exemption(%)',
+     'Base Amount',
+     'Debit',
+     'Credit',
+     'Comments',
+     'Supplier',
+     'Reference Code',
+     'SAC',
+     'Ref. Invoice No.',
+     'Payment_Mode',
     ].each do |k|
       header.add k
     end

@@ -7,7 +7,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def init
     users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount])
+    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile}, expenses: [:category, :amount])
     self.reports = apply_scopes(self.reports, params)
 
     self.headers = [

@@ -14,9 +14,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
       add_message :error, invoices_presenter.messages[:error]
       return
     end
-
-    invoices =invoices_presenter.invoices.where(invoice_type: [InwardInvoiceType.id_for(:tax_invoice),InwardInvoiceType.id_for(:non_po_invoice)])
-
+    invoices = invoices_presenter.invoices.where(invoice_type: [InwardInvoiceType.id_for(:tax_invoice), InwardInvoiceType.id_for(:non_po_invoice)])
     self.headers = [
         'Vch Type',
         'Tally VoucherVch No.',
