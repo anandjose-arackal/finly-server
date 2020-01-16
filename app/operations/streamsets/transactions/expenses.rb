@@ -11,10 +11,8 @@ class Streamsets::Transactions::Expenses < BaseOperation
   		add_message :error, op.messages[:error]
   		return
   	end
-    start_date = Date.parse(params[:start_date]).beginning_of_day rescue Time.zone.yesterday.beginning_of_day
-    end_date = Date.parse(params[:end_date]).end_of_day rescue Time.zone.yesterday.end_of_day
 
-  	reports = op.reports.where(created_at: start_date..end_date, report_status_id: ReportStatus.ids_for([:approved, :auto_approved, :settlement_confirmed, :closed, :settled]))
+    reports = op.reports.where(created_at: (Time.zone.yesterday.beginning_of_day)..(Time.zone.yesterday.end_of_day), report_status_id: ReportStatus.ids_for([:approved, :auto_approved, :settlement_confirmed, :closed, :settled]))
   	self.expenses = Expense.where(report_id: reports.pluck(:id)).include_details
 
   end
