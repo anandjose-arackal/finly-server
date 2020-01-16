@@ -11,6 +11,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   scope "production", 164, 'Satin Creditcare Network Ltd'
   validate :fetch_invoices
 
+  attr_accessor :categories
+
   def fetch_invoices
     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
 
@@ -30,6 +32,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   end
 
   def generate_rows
+    self.categories = user.company.categories
     generate_headers
     sl_no = 1
     data.find_each do |inv|
