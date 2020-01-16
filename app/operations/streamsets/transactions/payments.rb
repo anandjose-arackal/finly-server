@@ -11,8 +11,12 @@ class Streamsets::Transactions::Payments < BaseOperation
       add_message :error, op.messages[:error]
       return
     end
+
+    start_date = Date.parse(params[:start_date]).beginning_of_day rescue Time.zone.yesterday.beginning_of_day
+    end_date = Date.parse(params[:end_date]).end_of_day rescue Time.zone.yesterday.end_of_day
+
     ticket_type = params[:ticket_type] || ['invoice', 'purchase_order', "beneficiary", nil]
-	  bank_payment_requests = op.payment_requests.where(ticket_type: ticket_type, created_at: (Time.zone.yesterday.beginning_of_day)..(Time.zone.yesterday.end_of_day))
+	  bank_payment_requests = op.payment_requests.where(ticket_type: ticket_type, created_at: start_date..end_date)
 	  payment_order_ids = bank_payment_requests.pluck(:payment_order_id)
 
 	  self.payments = Payment.where(payment_order_id: payment_order_ids)
