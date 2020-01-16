@@ -26,7 +26,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
 
     return if has_errors?
 
-    invoices = invoices_presenter.invoices
+    invoices = invoices_presenter.invoices.where(invoice_status_id: Invoice.finance_associated_status_ids)
   end
 
   def generate_rows
@@ -222,7 +222,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   end
 
   def get_description(invoice)
-    "Being Invoice No. #{invoice.invoice_number} Invoice Date #{invoice.date.strftime("%d/%m/%Y")} of #{invoice.vendor&.business_name}"
+    "Being Invoice No. #{invoice.invoice_number} Invoice Date #{invoice.date&.strftime("%d/%m/%Y")} of #{invoice.vendor&.business_name}"
   end
 
 end
