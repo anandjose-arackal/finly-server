@@ -65,9 +65,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
-          'Account': item.category&.gl_code,
-          'Sub Account': '',
-          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "%05d" % invoice.created_by.gl_config&.dig(:location_code) : ''),
+          'Account': retrieve_account(item),
+          'Sub Account': retrieve_sub_account(item),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
       }.each do |k, v|
@@ -83,7 +83,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': '31329011',
-          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : ''),
+          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
           'Tax': item.tax_rate&.rate&.to_f,
           'Base Amount':item.taxable_amount&.value,
           'Debit': total_tax_value(item),
@@ -107,9 +107,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Invoice Number': invoice.invoice_number,
         'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
         'Invoice Type': 'I',
-        'State': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : '') ,
+        'State': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
         'Supplier GSTN': invoice&.gstin_location&.gstin,
-        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : ''),
+        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
         'Account': '43181001',
         'Supplier': invoice.vendor.vendor_id,
         'Sub Account': '',
@@ -126,7 +126,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   # Invoices items without tax component goes under ledger entry JV
   # ###############################
   def row_jv_entries(invoice, sl_no)
-    ap_entries=[]
+    jv_entries=[]
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
@@ -136,9 +136,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
-          'Account': item.category&.gl_code,
-          'Sub Account': '',
-          'Department':invoice.created_by.gl_config&.dig(:location_code),
+          'Account': retrieve_account(item),
+          'Sub Account': retrieve_sub_account(item),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.net_amount&.value,
           'Comments': 'Finly'
@@ -146,7 +146,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         row.add k, v
       end
 
-      ap_entries << row
+      jv_entries << row
     end
     row = Row.new(record: invoice, header: header)
     {
@@ -167,15 +167,15 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     }.each do |k, v|
       row.add k, v
     end
-    ap_entries << row
+    jv_entries << row
   end
 
   ##########  BP Entries ########
     # Invoices items without tax component goes under ledger entry JV
     # ###############################
     def row_bp_entries(invoice, sl_no)
-      ap_entries=[]
-        row = Row.new(record: item, header: header)
+      bp_entries=[]
+        row = Row.new(record: invoice, header: header)
         {
             'S. NO.': sl_no,
             'Report ID': invoice.id,
@@ -185,7 +185,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
             'Description': payment_description(invoice),
             'Account': '31352001',
             'Sub Account': '',
-            'Debit': (inv.paid_amount&.value || 0.0),
+            'Debit': (invoice.paid_amount&.value || 0.0),
             'Comments': 'Finly',
 
         }.each do |k, v|
@@ -202,7 +202,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': payment_description(invoice),
           'Account': '61110004',
           'Sub Account': '9992',
-          'Credit': inv.paid_amount&.value,
+          'Credit': invoice.paid_amount&.value,
           'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
           'Supplier': invoice.vendor&.vendor_id,
           'Comments': 'Finly'
@@ -278,6 +278,20 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     value += item.sgst unless item.sgst.nil?
     value += item.igst unless item.igst.nil?
     value
+  end
+
+  def retrieve_account(item)
+    parent_category_id = item.category&.ancestry
+    if parent_category_id.present?
+      parent = self.categories.find(parent_category_id.to_i)
+    else
+      parent = item.category
+    end
+    parent.gl_code
+  end
+
+  def retrieve_sub_account(item)
+    item.category&.gl_code
   end
 
 end
