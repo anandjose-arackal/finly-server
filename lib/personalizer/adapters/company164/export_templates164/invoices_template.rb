@@ -188,13 +188,13 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
             'Description': payment_description(invoice),
             'Account': '31352001',
             'Sub Account': '',
-            'Debit': (invoice.paid_amount&.value || 0.0),
+            'Debit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
             'Comments': 'Finly',
 
         }.each do |k, v|
           row.add k, v
-          bp_entries << row
-      end
+        end
+        bp_entries << row
       row = Row.new(record: invoice, header: header)
       {
           'S. NO.': sl_no,
@@ -205,7 +205,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': payment_description(invoice),
           'Account': '61110004',
           'Sub Account': '9992',
-          'Credit': invoice.paid_amount&.value,
+          'Credit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
           'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
           'Supplier': invoice.vendor&.vendor_id,
           'Comments': 'Finly'
