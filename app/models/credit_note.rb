@@ -227,9 +227,9 @@ class CreditNote < ApplicationRecord
     joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved))
   }
 
-  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', start_date, end_date)}
-  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
-  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', Date.parse(start_date), Date.parse(end_date))}
+  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
+  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
 
   scope :filter_amount, -> (gteq, lteq) do
     gteq = gteq.to_f
