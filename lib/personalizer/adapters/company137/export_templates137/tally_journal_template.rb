@@ -94,7 +94,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
             item&.tax&.to_f,
             'Purchase Taxable',
             item&.taxable_amount&.value,
-            'Office Expenses',
+            item&.category&.name,
             item&.net_amount&.value,
             '',
             '',
