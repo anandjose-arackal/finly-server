@@ -429,7 +429,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     adjusted_cn_total = credit_notes.map(&:amount).map(&:value).sum
 
-    if adjusted_cn_total > balance_due
+    if precision_value(adjusted_cn_total) > precision_value(balance_due)
       add_message :error, "Total Credit Note Adjustment Amount Cannot Exceed Invoice Balance Due"
       return
     end
