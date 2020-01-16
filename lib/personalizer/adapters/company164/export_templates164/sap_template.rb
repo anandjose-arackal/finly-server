@@ -1,5 +1,5 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents
+  attr_accessor :headers, :contents, :reports
 
   def pre_validate
 
