@@ -40,8 +40,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       if without_tax(inv)
         row_jv_entries(inv,sl_no).map{|entry| rows << entry}
       end
-      inv.payments do |payment|
-
+      if inv.payments.where(payment_status_id:  PaymentStatus.id_for(:completed)).present?
+        row_bp_entries(inv, sl_no).map{|entry| rows << entry}
       end
       progress_update sl_no
       sl_no += 1
@@ -170,8 +170,47 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     ap_entries << row
   end
 
+  ##########  BP Entries ########
+    # Invoices items without tax component goes under ledger entry JV
+    # ###############################
+    def row_bp_entries(invoice, sl_no)
+      ap_entries=[]
+        row = Row.new(record: item, header: header)
+        {
+            'S. NO.': sl_no,
+            'Report ID': invoice.id,
+            'Voucher Type': 'BP',
+            'Period': invoice.date&.strftime("%Y%m"),
+            'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+            'Description': payment_description(invoice),
+            'Account': '31352001',
+            'Sub Account': '',
+            'Debit': (inv.paid_amount&.value || 0.0),
+            'Comments': 'Finly',
 
-
+        }.each do |k, v|
+          row.add k, v
+          bp_entries << row
+      end
+      row = Row.new(record: invoice, header: header)
+      {
+          'S. NO.': sl_no,
+          'Report ID': invoice.id,
+          'Voucher Type': 'BP',
+          'Period': invoice.date&.strftime("%Y%m"),
+          'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+          'Description': payment_description(invoice),
+          'Account': '61110004',
+          'Sub Account': '9992',
+          'Credit': inv.paid_amount&.value,
+          'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
+          'Supplier': invoice.vendor&.vendor_id,
+          'Comments': 'Finly'
+      }.each do |k, v|
+        row.add k, v
+      end
+      bp_entries << row
+    end
 
   def generate_headers
     [ 'S. NO.',
@@ -228,6 +267,10 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     "Being Invoice No. #{invoice.invoice_number} Invoice Date #{invoice.date&.strftime("%d/%m/%Y")} of #{invoice.vendor&.business_name}"
   end
 
+  def payment_description(invoice)
+      payment_ids = invoice.payments&.pluck(:id)&.join(',')
+      "Being Payment made against various Payment IDs #{payment_ids}"
+  end
 
   def total_tax_value(item)
     value = 0
