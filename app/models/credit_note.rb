@@ -104,8 +104,8 @@ class CreditNote < ApplicationRecord
           user_name: user&.name,
           user_email: user&.email,
           user_employee_id: user.employee_id,
-          previously_adjusted_amount: previously_adjusted_amount.as_json,
-          net_adjustable_amount: net_adjustable_amount.as_json
+          previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
+          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true})
 
       }
     else
@@ -154,20 +154,24 @@ class CreditNote < ApplicationRecord
 
   scope :filter_status, -> (status) {
     case status
-    when 'approved', :approved
-      where(status_id: CreditNoteStatus.id_for(:approved))
-    when 'auto_approved', :auto_approved
-      where(status_id: CreditNoteStatus.id_for(:auto_approved))
-    when 'processing', :processing
-      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
-    when 'awaiting_approval', :awaiting_approval
-      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'draft', :draft
+      where(status_id: CreditNoteStatus.id_for(:draft))
     when 'retracted', :retracted
       where(status_id: CreditNoteStatus.id_for(:retracted))
     when 'rejected', :rejected
       where(status_id: CreditNoteStatus.id_for(:rejected))
-    when 'draft', :draft
-      where(status_id: CreditNoteStatus.id_for(:draft))
+    when 'processing', :processing
+      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'awaiting_approval', :awaiting_approval
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+    when 'approved', :approved
+      where(status_id: CreditNoteStatus.id_for(:approved))
+    when 'auto_approved', :auto_approved
+      where(status_id: CreditNoteStatus.id_for(:auto_approved))
+    when 'partially_adjusted', :partially_adjusted
+      where(status_id: CreditNoteStatus.id_for(:partially_adjusted))
+    when 'adjusted', :adjusted
+      where(status_id: CreditNoteStatus.id_for(:adjusted))
     when 'voided', :voided
       where(status_id: CreditNoteStatus.id_for(:voided))
     else
