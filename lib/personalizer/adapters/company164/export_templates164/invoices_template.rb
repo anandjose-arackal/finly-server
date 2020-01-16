@@ -103,9 +103,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
         'Description': get_description(invoice),
-        'Invoice amount': invoice.net_amount.value,
+        'Invoice amount': invoice.net_amount&.value,
         'Invoice Number': invoice.invoice_number,
-        'Invoice Date': invoice.date.strftime("%d-%m-%Y"),
+        'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
         'Invoice Type': 'I',
         'State': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : '') ,
         'Supplier GSTN': invoice&.gstin_location&.gstin,
@@ -158,10 +158,10 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Description': get_description(invoice),
         'Invoice amount': invoice.net_amount.value,
         'Invoice Number': invoice.invoice_number,
-        'Invoice Date': invoice.date.strftime("%d-%m-%Y"),
+        'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
         'Invoice Type': 'I',
         'Account': '31352001',
-        'Credit': invoice.net_amount.value,
+        'Credit': invoice.net_amount&.value,
         'Supplier': invoice.vendor&.vendor_id,
         'Comments': 'Finly'
     }.each do |k, v|
@@ -169,6 +169,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     end
     ap_entries << row
   end
+
+
+
 
   def generate_headers
     [ 'S. NO.',
@@ -224,6 +227,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   def get_description(invoice)
     "Being Invoice No. #{invoice.invoice_number} Invoice Date #{invoice.date&.strftime("%d/%m/%Y")} of #{invoice.vendor&.business_name}"
   end
+
 
   def total_tax_value(item)
     value = 0
