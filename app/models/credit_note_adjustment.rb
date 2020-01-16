@@ -25,6 +25,17 @@ class CreditNoteAdjustment < ApplicationRecord
   before_update :calculate_adjustable_amount
   after_destroy :calculate_adjustable_amount
 
+
+  def as_json
+    {
+      id: self.id,
+      credit_note_id: self.credit_note&.id,
+      credit_note_number: self.credit_note&.credit_note_number,
+      credit_note_sequence_id: self.credit_note&.sequence_id,
+      amount: self.amount.as_json
+    }
+  end
+
   private
 
   def calculate_credit_note_amounts
