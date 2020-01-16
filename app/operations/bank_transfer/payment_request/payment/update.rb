@@ -246,10 +246,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       # if there are, in fact, invoice items, use the invoice items library
       case payment.parent_type
       when 'Invoice'
-
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     return
@@ -269,8 +270,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       case payment.parent_type
       when 'Invoice'
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, payable_amount)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     self.payment.save
