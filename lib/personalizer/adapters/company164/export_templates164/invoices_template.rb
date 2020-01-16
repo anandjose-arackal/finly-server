@@ -34,11 +34,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     sl_no = 1
     data.find_each do |inv|
       if with_tax(inv)
-       row_ap_entries(items_with_tax,inv,sl_no).map{|entry| rows << entry}
+       row_ap_entries(inv,sl_no).map{|entry| rows << entry}
       end
 
       if without_tax(inv)
-       row_jv_entries(items_without_tax, inv,sl_no).map{|entry| rows << entry}
+       row_jv_entries(inv,sl_no).map{|entry| rows << entry}
       end
       inv.payments do |payment|
 
@@ -54,9 +54,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   #  invoices have TDS includes comes under here
   # ################################
 
-  def row_ap_entries(inv_items, invoice,sl_no)
+  def row_ap_entries(invoice,sl_no)
     ap_entries=[]
-    inv_items.each do |item|
+    invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
@@ -125,9 +125,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   ##########  JV Entries ########
   # Invoices items without tax component goes under ledger entry JV
   # ###############################
-  def row_jv_entries(inv_items,invoice, sl_no)
+  def row_jv_entries(invoice, sl_no)
     ap_entries=[]
-    inv_items.each do |item|
+    invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
@@ -207,16 +207,18 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
 
 
   def with_tax(invoice)
+    return false if invoice.tax_amount.nil?
     invoice.tax_amount&.value > 0 ? true : false
   end
 
   def without_tax(invoice)
+    return true if invoice.tax_amount.nil?
     invoice.tax_amount&.value <= 0 ? true : false
   end
 
   def with_tds(invoice)
+    return false if invoice.tds.nil?
     invoice.tds > 0 ? true : false
-
   end
 
   def get_description(v_type, inv)
