@@ -86,7 +86,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "%02d" % invoice&.gstin_location&.state&.state_code : ''),
           'Tax': item.tax_rate&.rate&.to_f,
           'Base Amount':item.taxable_amount&.value,
-          'Debit': (item.sgst+item.cgst+item.igst),
+          'Debit': total_tax_value(item),
           'Comments': 'Finly',
           'SAC': '00440294'
       }.each do |k, v|
@@ -223,6 +223,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
 
   def get_description(invoice)
     "Being Invoice No. #{invoice.invoice_number} Invoice Date #{invoice.date&.strftime("%d/%m/%Y")} of #{invoice.vendor&.business_name}"
+  end
+
+  def total_tax_value(item)
+    value = 0
+    value += item.cgst unless item.cgst.nil?
+    value += item.sgst unless item.sgst.nil?
+    value += item.igst unless item.igst.nil?
+    value
   end
 
 end
