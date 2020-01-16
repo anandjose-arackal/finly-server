@@ -1,14 +1,11 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports
-
-  def pre_validate
-
-  end
+  attr_accessor :headers, :contents, :reports,:categories
 
   def init
     users = user.company.users
     self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount])
     self.reports = apply_scopes(self.reports, params)
+    self.categories = user.company.categories
 
     self.headers = [
         'S. NO.',
@@ -54,15 +51,15 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             report.submitted_at.strftime("%Y%m"),
             expense.date.strftime("%d/%m/%Y"),
             "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
+            expense.amount.value,
+            expense.date.strftime("%d/%m/%Y"),
+            'I',
             '',
             '',
             '',
             '',
-            '',
-            '',
-            '',
-            expense.category.gl_code,
-            '',
+            retrieve_account(expense),
+            retrieve_sub_account(expense),
             "#{report.user.gl_config&.dig(:location_code)}",
             report.user.gl_config&.dig(:cost_center),
             '',
@@ -70,7 +67,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             '',
             expense.amount.value&.round(2),
             '',
-            '',
+            'Finly',
             '',
             '',
             '',
@@ -100,7 +97,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
           '',
           '',
           total_amount&.round(2),
-          '',
+          'Finly',
           report.user&.profile&.employee_id,
           '',
           '',
@@ -112,6 +109,20 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def invoice_number(expence)
     expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'invoice_number' }&.first
+  end
+
+  def retrieve_account(expense)
+    parent_category_id = expense.category&.ancestry
+    if parent_category_id.present?
+      parent = self.categories.find(parent_category_id.to_i)
+    else
+      parent = expense.category
+    end
+    parent.gl_code
+  end
+
+  def retrieve_sub_account(expense)
+    expense.category&.gl_code
   end
 
 
