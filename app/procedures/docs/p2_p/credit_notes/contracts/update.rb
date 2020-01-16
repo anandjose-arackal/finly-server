@@ -41,7 +41,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   end
 
   def items_validation
-    # debugger
+    debugger
     true
   end
 end

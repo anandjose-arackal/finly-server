@@ -112,7 +112,7 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
         rate = item.rate
       end
 
-      if item.inventory_line_item.service?
+      if item.inventory_line_item.service? && invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
         quantity = 1
         original_quantity = 1
         rate = item.billable_amount.value
