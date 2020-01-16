@@ -323,12 +323,13 @@ class InvoiceCalculationUtils
   def calculate_cn_adjustments(invoice_params, payment, invoice)
     return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
 
-    removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}
+    # Where credit note adjustments are removed from an invoice
+    removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}.compact
 
+    # Where credit note adjustments
     previously_adjusted_amount = invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
     adjustment_amount_to_add = invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
     # adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
-
 
 
     balance_due_amount = invoice.balance_due.value
@@ -338,7 +339,5 @@ class InvoiceCalculationUtils
     if invoice.balance_due.present?
       invoice.balance_due.value = balance_due_amount
     end
-
   end
-
 end

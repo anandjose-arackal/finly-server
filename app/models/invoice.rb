@@ -750,17 +750,18 @@ class Invoice < ApplicationRecord
 
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
 
+          credit_note_adjustments: self.credit_note_adjustments.as_json,
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
-        cost_center_id: self.cost_center_id,
-        cost_center_name: self.cost_center&.name,
+          cost_center_id: self.cost_center_id,
+          cost_center_name: self.cost_center&.name,
 
-        tds_slab_id: self.tds_slab_id,
-        tds_slab_name: self.tds_slab&.name,
-        tds_rate: self.tds,
+          tds_slab_id: self.tds_slab_id,
+          tds_slab_name: self.tds_slab&.name,
+          tds_rate: self.tds,
 
-        # invoice amounts total
-        item_amounts_total: self.item_amounts_total,
+          # invoice amounts total
+          item_amounts_total: self.item_amounts_total,
 
           # paid amount for this invoice
           # paid_amount: self.payments.successful.joins(:amount).sum(:value),
