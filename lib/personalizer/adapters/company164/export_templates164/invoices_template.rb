@@ -287,7 +287,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     else
       parent = item.category
     end
-    parent.gl_code
+    parent&.gl_code
   end
 
   def retrieve_sub_account(item)
