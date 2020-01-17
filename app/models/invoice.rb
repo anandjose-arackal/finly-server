@@ -465,6 +465,11 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_with_credit_note, -> (enabled) {
+    if enabled
+      joins(:credit_note_adjustments).where("credit_note_adjustments.id IS NOT NULL")
+    end
+  }
 
   scope :filter_year, -> (year) {
     if year.blank?

@@ -45,6 +45,10 @@ class Docs::P2P::CreditNotes::Authorizer
     @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
   end
 
+  def return_control?
+    @user.vendor_payment_admin? && @model.get_reviewers.include?(@user)
+  end
+
   def void?
     CreditNoteStatus.ids_for(:approved, :auto_approved).include?(@model.status_id) && (@user.vendor_payment_admin? || @model.user_id == @user.id)
   end
