@@ -1,0 +1,168 @@
+class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spreadsheet
+
+  label 'Gst Export'
+  description 'Gst Export'
+  configurable true
+  handle :gst_export
+  screen 'invoices.index'
+  system :vp
+  validate :fetch_invoices
+
+  attribute :invoice_number
+  attribute :invoice_id
+  attribute :finance_approved_date
+  attribute :vendor_gstin
+  attribute :billing_location
+  attribute :shipping_location
+  attribute :gl_code
+  attribute :description
+  attribute :invoice_net_payable_amount
+  attribute :invoice_base_amount
+  attribute :total_tax
+  attribute :item_igst_amount
+  attribute :item_cgst_amount
+  attribute :item_sgst_amount
+  attribute :item_igst_rate
+  attribute :item_cgst_rate
+  attribute :item_sgst_rate
+  attribute :hsn_sac
+  attribute :invoice_status
+  attribute :country
+  attribute :vendor_name
+  attribute :department_code
+
+  def fetch_invoices
+    invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
+
+    unless invoices_presenter.success?
+      add_message :error, invoices_presenter.messages[:error]
+      return
+    end
+    invoices_presenter
+  end
+
+  def input
+    invoices_presenter = fetch_invoices
+    return if has_errors?
+
+    # start_date = Date.parse(params[:start_date].beginning_of_day) rescue false
+    # end_date = Date.parse(params[:end_date].end_of_day) rescue false
+
+    # unless start_date && end_date
+    #   add_message :error, 'Invalid date provided'
+    #   return
+    # end
+
+
+    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :approved, :auto_approved, :initiated, :unpaid, :paid]))#, approved_at: start_date..end_date)
+
+    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+  end
+
+
+  def invoice_number(invoice_line_item)
+    invoice_line_item.parent.invoice_number
+  end
+
+  def invoice_id(invoice_line_item)
+    invoice_line_item.parent.invoice_id
+  end
+
+  def finance_approved_date(invoice_line_item)
+    invoice_line_item.parent&.approved_at&.strftime("%d-%b-%Y")
+  end
+
+  def vendor_gstin(invoice_line_item)
+    invoice_line_item.parent&.gstin_location&.gstin
+  end
+
+  def billing_location(invoice_line_item)
+    invoice_line_item.parent&.location&.name
+  end
+
+  def shipping_location(invoice_line_item)
+    invoice_line_item.parent&.delivery_location&.name
+  end
+
+  def gl_code(invoice_line_item)
+    invoice_line_item.category&.gl_code
+  end
+
+  def description(invoice_line_item)
+    invoice_line_item.description
+  end
+
+  def invoice_net_payable_amount(invoice_line_item)
+    invoice_line_item.parent&.balance_due&.value || 0
+  end
+
+  def invoice_base_amount(invoice_line_item)
+    invoice_line_item.parent.include_original_amount
+  end
+
+  def total_tax(invoice_line_item)
+    invoice_line_item.tax_amount&.value
+  end
+
+  def item_sgst_amount(invoice_line_item)
+    invoice_line_item.sgst || 0
+  end
+
+  def item_cgst_amount(invoice_line_item)
+    invoice_line_item.cgst || 0
+  end
+
+  def item_igst_amount(invoice_line_item)
+    invoice_line_item.igst || 0
+  end
+
+  def item_igst_rate(invoice_line_item)
+    invoice_line_item&.rate
+  end
+
+  def item_cgst_rate(invoice_line_item)
+    invoice_line_item&.rate / 2.0
+  end
+
+  def item_sgst_rate(invoice_line_item)
+    invoice_line_item&.rate / 2.0
+  end
+
+  # TODO ADD SGST state
+  # TODO ADD SGST ACCOUNT NUMBER
+
+  def hsn_sac(invoice_line_item)
+    invoice_line_item.hsn_sac
+  end
+
+  # TODO REVERSE CHARGE
+
+  def invoice_status(invoice_line_item)
+    invoice_line_item.parent&.status&.name&.humanize
+  end
+
+  # TODO ADD ITEM SERIAL NUMBER
+  # TODO ADD ITC QUALIFIED
+
+  def country(invoice_line_item)
+    invoice_line_item.amount.currency.country
+  end
+
+  def vendor_name(invoice_line_item)
+    invoice_line_item.parent.vendor&.display_name
+  end
+
+  # TODO COMPOSITION VENDOR
+
+  def department_code(invoice_line_item)
+    invoice_line_item.department&.department_code
+  end
+
+  def cost_center_code(invoice_line_item)
+    invoice_line_item.cost_center&.cost_center_code
+  end
+
+  # TODO ORIGINAL INVOICE TRANSACTION DATE
+  # TODO ORIGINAL INVOICE GSTIN
+
+end
