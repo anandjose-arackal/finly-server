@@ -4,7 +4,6 @@ module TrailblazerErrorTracker
     contract_errors = self['contract.default']&.errors&.messages || {}
     policy_errors = self['result.policy.default']&.errors || {}
     roles_auth_errors = {}
-    # debugger
     if self['result.authorization']&.failure?
       roles_auth_errors.merge!(base: 'You cannot perform the following action')
     end
