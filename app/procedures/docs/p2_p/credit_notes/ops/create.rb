@@ -120,6 +120,12 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
         quantity = item.quantity
         taxable_amount = item.taxable_amount.value
       end
+
+      if item.tax_rate_id.present?
+        tax_rate_id = item.tax_rate_id
+      else
+        tax_rate_id = current_user.company.tax_rates.with_rate(0)&.first&.id
+      end
       item_attr = {
           item_id: item.inventory_line_item_id,
           invoice_item_id: item.id,
@@ -138,8 +144,8 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
               value: taxable_amount,
               currency_id: item.taxable_amount.currency_id
           },
-          original_tax_rate_id: item.tax_rate_id,
-          tax_rate_id: item.tax_rate_id
+          original_tax_rate_id: tax_rate_id,
+          tax_rate_id: tax_rate_id
       }
       items.push(item_attr)
     end

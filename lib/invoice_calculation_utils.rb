@@ -90,6 +90,7 @@ class InvoiceCalculationUtils
       self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
     end
 
+
     # assign balance due
     if self.invoice.balance_due.present?
       self.invoice.balance_due.value = self.balance_due_amount

@@ -76,8 +76,9 @@ class CreditNote < ApplicationRecord
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
+  after_touch :update_adjustments
 
-  delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
+  delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
 
   def as_json(options = {})
     if options[:index]
@@ -170,6 +171,8 @@ class CreditNote < ApplicationRecord
       where(status_id: CreditNoteStatus.id_for(:auto_approved))
     when 'partially_adjusted', :partially_adjusted
       where(status_id: CreditNoteStatus.id_for(:partially_adjusted))
+    when 'unadjusted', :unadjusted
+      where(status_id: CreditNoteStatus.id_for(:unadjusted))
     when 'adjusted', :adjusted
       where(status_id: CreditNoteStatus.id_for(:adjusted))
     when 'voided', :voided
@@ -224,7 +227,7 @@ class CreditNote < ApplicationRecord
   }
 
   scope :filter_adjustables, -> (enabled = true) {
-    joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted))
+    joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted))
   }
 
   scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', Date.parse(start_date), Date.parse(end_date))}
@@ -376,6 +379,11 @@ class CreditNote < ApplicationRecord
     self.save(validation: false)
   end
 
+  def update_adjustments
+    update_adjustable_amount
+    update_status
+  end
+
   def calculate_from_item_methods
     currency_id = company&.base_currency_id || 1
 
@@ -446,6 +454,19 @@ class CreditNote < ApplicationRecord
     else
       self.net_adjustable_amount = Amount.create(value: net_adjustable_amount_value, currency_id: currency_id)
     end
+  end
+
+  def update_status
+    if precision_value(net_adjustable_amount.value) == 0
+      self.status_id = CreditNoteStatus.id_for(:adjusted)
+    elsif precision_value(net_adjustable_amount.value) < precision_value(net_receivable_amount.value)
+      self.status_id = CreditNoteStatus.id_for(:partially_adjusted)
+    elsif precision_value(net_adjustable_amount.value) == precision_value(net_receivable_amount.value)
+      self.status_id = CreditNoteStatus.id_for(:unadjusted)
+    end
+
+
+    save(validation: false)
   end
 
 end

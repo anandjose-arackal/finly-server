@@ -346,7 +346,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # Validate Credit Notes After Balance Due has been calculated
     return unless validate_credit_notes
     # Calculate the new balance_due based on credit notes
-    calculate_cn_adjustment
+    # calculate_cn_adjustment
 
 
     # fail
@@ -371,7 +371,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
 
-      calculate_cn_adjustment
+      # calculate_cn_adjustment
       inward_invoice.save
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
