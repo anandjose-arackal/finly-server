@@ -1,5 +1,6 @@
 class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
 
+
   step :set_default_params
   step Model(CreditNote, :find_by)
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :update?)

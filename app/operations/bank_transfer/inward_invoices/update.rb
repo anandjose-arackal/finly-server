@@ -343,8 +343,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice.assign_attributes(self.inward_invoice_params)
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
 
-    # Validate Credit Notes After Balance Due has been calculated
-    return unless validate_credit_notes
+
     # Calculate the new balance_due based on credit notes
     # calculate_cn_adjustment
 
@@ -368,8 +367,12 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # # Validate Credit Notes After Balance Due has been calculated
+    # return unless validate_credit_notes
+
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
+
 
       # calculate_cn_adjustment
       inward_invoice.save
