@@ -214,6 +214,10 @@ class CreditNote < ApplicationRecord
     where(invoice_id: id)
   }
 
+  scope :filter_sequence_id, -> (id) {
+    where("credit_notes.sequence_id like ?", "%#{id}%")
+  }
+
   scope :filter_invoice_sequence_id, -> (id) {
     joins(:invoice).where("invoices.invoice_id like ?", invoice_number)
   }
