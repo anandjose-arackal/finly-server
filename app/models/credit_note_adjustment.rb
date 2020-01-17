@@ -21,6 +21,7 @@ class CreditNoteAdjustment < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   # before_create :calculate_credit_note_amounts
+  # before_save :truncate_amounts
   #
   # # before_update :calculate_adjustable_amount
   # after_destroy :calculate_adjustable_amount

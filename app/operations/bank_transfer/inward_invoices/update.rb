@@ -337,6 +337,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
     self.inward_invoice.receiving_account = receiving_account
+
   end
 
   def process

@@ -1169,7 +1169,9 @@ class Invoice < ApplicationRecord
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
-        :bank_payment_request_auditor
+        :bank_payment_request_auditor,
+        :credit_note_initiator,
+        :credit_note_reviewer
     ]
   end
 
