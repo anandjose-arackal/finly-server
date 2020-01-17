@@ -91,6 +91,7 @@ if payment.invoice.present?
 
     json.cost_center_id invoice.cost_center_id
     json.cost_center_name invoice.cost_center&.name
+    json.credit_note_adjustments invoice.credit_note_adjustments
 
     json.tds_slab_id invoice.tds_slab_id
     json.tds_slab_name invoice.tds_slab&.name
