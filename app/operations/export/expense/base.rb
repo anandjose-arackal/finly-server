@@ -93,15 +93,21 @@ class Export::Expense::Base < Export::Base
     values
   end
 
-  def extract_custom_field_names(expenses)
-    # now extract the custom fields from each expense that is a part of all the report
-    field_names = []
-    expenses.each do |expense|
-      # this gets all the custom field names from all different types of expenses
-      if expense.custom_field_names.present?
-        field_names += expense.custom_field_names
-      end
-    end
-    field_names.uniq!
+  # def extract_custom_field_names(expenses)
+  #   # now extract the custom fields from each expense that is a part of all the report
+  #   field_names = []
+  #   expenses.each do |expense|
+  #     # this gets all the custom field names from all different types of expenses
+  #     if expense.custom_field_names.present?
+  #       field_names += expense.custom_field_names
+  #     end
+  #   end
+  #   field_names.uniq!
+  # end
+
+  def extract_custom_field_names(expenses=nil)
+    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense) ]
+    FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
+
 end
