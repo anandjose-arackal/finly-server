@@ -7,7 +7,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
       :item_master,
       :vendors,
       :payment_tickets,
-      :analytics,
+      # :analytics,
       {create: [:create_payment_ticket]}
   ]
   )

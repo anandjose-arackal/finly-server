@@ -76,8 +76,12 @@ class Bbps::TransactionStatus < Bbps::Api
         success: Dry::Matcher::Case.new(
             match: -> (result) {
               parsed_response = result['response.parsed'] || {}
-              parsed_response['status'] == 'Y' and
-                  parsed_response&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'SUCCESS'
+              if parsed_response['status'] == 'Y' and parsed_response['transaction_details'].present?
+                transaction_details = JSON.parse(parsed_response['transaction_details'])
+                transaction_details&.dig('TxnStatusComplainResp', 'txnList', 'txnDetail')&.first&.dig('txnStatus') == 'SUCCESS'
+              else
+                false
+              end
             },
             resolve: -> (result) { handle_success(result) }
         ),

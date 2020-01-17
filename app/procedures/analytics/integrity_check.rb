@@ -37,7 +37,7 @@ class Analytics::IntegrityCheck < Transactions::API
           # Initialize a new model here itself to prevent
           # find_or_initialize in Analytics::Synchronizer
           olap_record = olap_model.new(finly_ref_id: record.id) if olap_record.nil?
-          result = Analytics::Synchronizer::Sync.(params: {record: record, olap_model: olap_model, olap_record: olap_record, skip_find: true})
+          result = Analytics::Synchronizer::Sync.(params: {record: record, olap_model: olap_model, olap_record: olap_record})
           unless result.success?
             # Todo log error as sync failed
             next

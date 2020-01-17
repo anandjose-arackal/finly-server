@@ -96,7 +96,7 @@ module Analytics::Mapper
     self.class.contract.new(self)
   end
 
-  def in_sync?(record)
+  def in_sync?(record, payload = {})
     finly_ref_updated_at == record.updated_at
   end
 

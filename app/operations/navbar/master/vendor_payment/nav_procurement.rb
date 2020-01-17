@@ -11,7 +11,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {payables: [:po_advances,:divider, :invoices_section,  :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices,:divider, :utility_bills, :divider, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :utility_bill_masters]},
           :download_manager,
-          :analytics,
+          # :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
