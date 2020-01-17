@@ -207,7 +207,7 @@ class CreditNote < ApplicationRecord
   }
 
   scope :filter_location_id, -> (id) {
-    where(location_id: id)
+    where(shipping_location_id: id).or(where(billing_location_id: id))
   }
 
   scope :filter_invoice_id, -> (id) {
