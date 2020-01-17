@@ -86,7 +86,7 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
     marked_as_closed = false
     event = 'settle'
     self.completed_mappings.each do |mapping|
-      mapping.reports.where.not(status_id: [ReportStatus.settlement_confirmed_id, ReportStatus.settled_id]).each do |report|
+      mapping.reports.where.not(report_status_id: [ReportStatus.settlement_confirmed_id, ReportStatus.settled_id]).each do |report|
         # explicitly settle reports when called from batch level
         parameters = {
           document: report,
