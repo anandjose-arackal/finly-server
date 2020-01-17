@@ -938,6 +938,9 @@ class Invoice < ApplicationRecord
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
       user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    elsif [UserRole.id_for(:credit_note_initiator), UserRole.id_for(:credit_note_reviewer)].include?(role_id)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
     end
   end
 
