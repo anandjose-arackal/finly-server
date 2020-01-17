@@ -27,7 +27,7 @@ class CreditNoteAdjustment < ApplicationRecord
   # after_destroy :calculate_adjustable_amount
 
 
-  def as_json
+  def as_json(options = {})
     {
       id: self.id,
       credit_note_id: self.credit_note&.id,
