@@ -134,8 +134,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
 
       # Credit Note Check
-      if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
-        self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
+      if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
+        self.inward_invoice_params[:credit_note_adjustments_attributes].each do |cna|
           cn = CreditNote.find_by id: cna[:credit_note_id]
 
           unless cn.present? || (cn.company_id == inward_invoice.company_id)
