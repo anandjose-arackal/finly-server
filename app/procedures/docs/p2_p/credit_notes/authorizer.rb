@@ -18,11 +18,29 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def index?
-    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) || @user.has_policy_role?(UserRole.id_for(:credit_note_reviewer))
+    @user.vendor_payment_admin? ||
+        @user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) ||
+        @user.has_policy_role?(UserRole.id_for(:credit_note_reviewer)) ||
+        @user.is_bank_payment_request_initiator? ||
+        @user.is_bank_payment_request_reviewer? ||
+        @user.is_bank_payment_request_auditor? ||
+        @user.is_bank_payment_request_creditor? ||
+        @user.is_invoice_initiator? ||
+        @user.is_invoice_reviewer? ||
+        @user.is_invoice_auditor? ||
+        @user.is_payment_agreement_initiator? ||
+        @user.is_payment_agreement_reviewer? ||
+        @user.is_payment_agreement_auditor? ||
+        @user.is_po_invoice_initiator? ||
+        @user.is_po_invoice_reviewer? ||
+        @user.is_po_invoice_auditor? ||
+        @user.is_non_po_invoice_initiator? ||
+        @user.is_non_po_invoice_reviewer? ||
+        @user.is_non_po_invoice_auditor?
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user || poc?
+    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc?
   end
 
   def reject?
