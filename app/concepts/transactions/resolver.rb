@@ -1,4 +1,4 @@
-class Transactions::Resolver
+module Transactions::Resolver
   extend Dry::Container::Mixin
 
   # Todo deprecated
@@ -8,50 +8,28 @@ class Transactions::Resolver
   #   end
   # end
 
-  def self.Load(klass: nil, model: nil, builder: nil, scope: :default, config: {})
-    Transactions::Task.build id: "transactions.resolver.model" do |context, **|
-      if klass
-        Resolve.constant(context, klass, config)
-      elsif model
-        Resolve.model(context, model, scope, config)
+  def self.Load(klass: nil, model: nil, builder: nil, scope: :default, paginate: false, filter: true, includes: [])
+    Transactions::Task.build id: "transactions.resolver.model" do |context, flow_options, circuit_options|
+      if model
+        klass = model.resolver(scope)
       elsif builder
-        Resolve.builder(context, builder, config)
-      else
-        raise 'Resolver is not defined correctly'
+        klass = Trailblazer::Option(builder).(context, context, circuit_options)
       end
+
+      raise "Resolver is not defined correctly for #{circuit_options[:exec_context]&.class&.name}" unless klass.present?
+
+      Resolve.with(context, klass, paginate: paginate, filter: filter, includes: includes)
     end
   end
 
   class Resolve
-    def self.model(options, model, scope, config)
-      result = model.resolve(
-          options[:current_user],
+    def self.with(options, klass, paginate: false, filter: true, includes: [])
+      options['model.records'] = klass.new(options[:current_user]).resolve(
           params: options[:params],
-          scope: scope,
-          config: config
+          paginate: paginate,
+          filter: filter,
+          includes: includes
       )
-      unless result.success?
-        # Todo
-        return
-      end
-      options['model.records'] = result[:records]
-    end
-
-    def self.constant(options, klass, config)
-      result = klass.new(options[:current_user]).resolve(
-          params: options[:params],
-          config: config
-      )
-      unless result.success?
-        # Todo
-        return
-      end
-      options['model.records'] = result[:records]
-    end
-
-    def self.builder(options, builder, config)
-      klass = self.send(builder)
-      constant(options, klass, config)
     end
   end
 
@@ -63,93 +41,58 @@ class Transactions::Resolver
         Transactions::Resolver["#{event_channel}.#{scope.to_s}"]
       end
 
-      def resolve(user, scope: :default, params: {}, config: {})
-        resolver(scope)&.(params: params, config: config, current_user: user)
+      def resolve(user, scope: :default, params: {}, paginate: false, filter: true, includes: [])
+        resolver(scope)&.new(user)&.resolve(params: params, paginate: paginate, filter: filter, includes: includes)
       end
     end
 
   end
 
-  class Scope < Transactions::API
+  class Scope
+    attr_reader :user
 
-    class_attr :model
-    class_attr :scope, default: :default
-
-    def self.entity(model = nil, scope: :default)
-      if model
-        raise "Event Channel is not defined for #{self.model.name}" unless model.event_channel.present?
-
-        model(model)
-        Transactions::Resolver.register("#{model.event_channel}.#{scope}", self)
+    def self.entity(entity = NoObject, scope: :default)
+      unless entity == NoObject
+        @entity = entity
+        Transactions::Resolver.register "#{entity.event_channel}.#{scope}", self
       end
-      raise "Model is not defined for #{self.name}" unless model.present? unless model
-
-      model
+      @entity
     end
 
-    step :init
-    step :fetch
-    pass :filter
-    pass :paginate
-    pass :include
-
-    # def initialize(user)
-    #   @user = user
-    # end
-
-    def entity
-      self.class.entity
+    def initialize(user)
+      @user = user
     end
 
     def app
       RequestStoreUtil.current_app
     end
 
-    def init(context, options)
-      true
+    def resolve(params: {}, filter: true, paginate: false, includes: [])
+      collection = load params
+      collection = filter collection, params if filter
+      collection = paginate collection, params if paginate
+      collection = include collection, includes if includes.present?
+      collection
     end
 
-    def fetch(context, current_user:, params:, **)
-      result = resolve(current_user, params)
-      if result.class <= Dry::Monads::Result
-        return result unless result.success?
-
-        records = result.success
-      else
-        records = result
-      end
-
-      context[:records] = records
-      true
+    def load(params)
+      scope.all
     end
 
-    def resolve(current_user, params)
-      raise "Load is not implemented for #{self.name}"
+    def filter(collection, params)
+      collection.ransack(params[:q]).result(distinct: true)
     end
 
-    def filter(context, records:, params:, config: {}, **)
-      return true unless config[:do_not_filter] == true
-
-      context[:records] = records.ransack(params[:q]).result(distinct: true)
-      true
-    end
-
-    def paginate(context, records:, params:, config: {}, **)
-      return true unless config[:do_not_paginate] == true
-
+    def paginate(collection, params)
       page = params[:page] || 1
-      per_page = params[:per_page] || config[:per_page] || 30
-      context['records.paginated'] = records.paginate(page: page, per_page: per_page)
+      per_page = params[:per_page] || 30
+      collection.paginate(page: page, per_page: per_page)
     end
 
-    def include(context, includes: [], **)
-      return true unless includes.present?
-
-      context['records.paginated'] = context['records.paginated']&.includes(*includes)
-      context[:records] = context[:records]&.includes(*includes)
-      true
+    def include(collection, includes)
+      collection.includes(*includes) if includes.present?
+      collection
     end
-
   end
 
 end

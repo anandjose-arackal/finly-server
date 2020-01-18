@@ -3,7 +3,7 @@ class TaskManager::Workflows::Policy < ApplicationPolicy
 
   class TaskManager::Workflows::Policy::Scope < Transactions::Resolver::Scope
 
-    def resolve(user, params)
+    def load(user, params)
       scope.where(user: user)
     end
 

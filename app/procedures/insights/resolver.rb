@@ -1,6 +1,6 @@
 class Insights::Resolver < Transactions::Resolver::Scope
 
-  def resolve(user, params)
+  def load(user, params)
     # Conditions:
     # :company
     # :user
