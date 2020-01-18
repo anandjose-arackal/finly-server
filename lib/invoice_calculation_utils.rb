@@ -323,6 +323,7 @@ class InvoiceCalculationUtils
   def calculate_cn_adjustments(invoice_params, payment, invoice, calculation_from_payment)
     self.invoice = invoice || payment&.invoice
     # return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
+    return unless invoice.class.name == "Invoice"
 
     removed_cna_ids = []
     # Where credit note adjustments are removed from an invoice
