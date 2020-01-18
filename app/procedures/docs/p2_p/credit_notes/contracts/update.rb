@@ -55,11 +55,13 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   end
 
   def validate_qty_change(item, index)
+    errors.add(:base, "CN Quantity cannot be in negative for Item ##{index + 1}") if item.quantity.to_f < 0
     errors.add(:base, "CN Quantity cannot be greater than Invoice Quantity for Item ##{index + 1}") if item.quantity.to_f > item.model.original_quantity.to_f
     errors.add(:base, "Only Quantity can be changed for Item ##{index + 1}") if (item.rate.to_f != item.model.original_rate.to_f || item.tax_rate_id != item.model.original_tax_rate_id)
   end
 
   def validate_price_drop(item, index)
+    errors.add(:base, "CN Rate / Price cannot be in negative for Item ##{index + 1}") if item.rate.to_f < 0
     errors.add(:base, "CN Rate / Price cannot be greater than Invoice Rate / Price for Item ##{index + 1}") if item.rate.to_f > item.model.original_rate.to_f
     errors.add(:base, "Only Rate / Price can be changed for Item # #{index + 1}") if (item.quantity.to_f != item.model.original_quantity.to_f || item.tax_rate_id != item.model.original_tax_rate_id)
   end

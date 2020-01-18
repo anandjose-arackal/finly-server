@@ -9,6 +9,7 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
 
   step Contract::Persist()
   step :setup_dlrm
+  step :update_attachments
 
   step Transactions::Messages::SuccessMessage('Successfully Updated Credit Note')
 
@@ -24,6 +25,10 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
     })
 
     dlrm_validation_op.success?
+    true
+  end
+
+  def update_attachments(options, params:, model:, **)
     true
   end
 end
