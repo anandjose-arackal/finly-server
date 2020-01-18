@@ -298,7 +298,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
             if Rails.env.production?
               stream.write(open(file_details[:url]).read)
             else
-              stream.write(open("#{Rails.root}/public#{file_details[:url]}").read)
+              stream.write(open("#{Rails.root}/public#{file_details[:url]}"&.split("?")&.first).read)
             end
           end
 
