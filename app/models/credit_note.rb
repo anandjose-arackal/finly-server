@@ -107,7 +107,6 @@ class CreditNote < ApplicationRecord
           user_employee_id: user.employee_id,
           previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
           net_adjustable_amount: net_adjustable_amount.as_json({rounded: true})
-
       }
     else
       data = {
@@ -345,7 +344,6 @@ class CreditNote < ApplicationRecord
       self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
 
-
     # Tax Amount (GST)
     tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     if tax_amount.present?
@@ -468,8 +466,6 @@ class CreditNote < ApplicationRecord
     elsif precision_value(net_adjustable_amount.value) == precision_value(net_receivable_amount.value)
       self.status_id = CreditNoteStatus.id_for(:unadjusted)
     end
-
-
     save(validation: false)
   end
 

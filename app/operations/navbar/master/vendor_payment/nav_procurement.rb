@@ -200,6 +200,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def credit_notes
     return nil unless (
     user.vendor_payment_admin? ||
+        user.is_credit_note_initiator? ||
+        user.is_credit_note_reviewer? ||
         user.is_purchase_order_initiator? ||
         user.is_invoice_initiator? ||
         user.is_invoice_reviewer? ||
