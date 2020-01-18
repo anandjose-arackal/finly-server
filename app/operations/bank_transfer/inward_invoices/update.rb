@@ -148,7 +148,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
             next
           end
 
-          unless precision_value(cna[:advance_amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
+          unless precision_value(cna[:amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
             add_message :error, "Applied Credit Note with ID #{cn.sequence_id}  doesn't have enough credits"
             next
           end
