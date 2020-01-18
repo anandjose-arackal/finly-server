@@ -338,11 +338,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
     self.inward_invoice.receiving_account = receiving_account
 
-    if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
-      self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
-        cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
-      end
-    end
+      # if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
+      #   self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
+      #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+      #   end
+      # end
   end
 
   def process
