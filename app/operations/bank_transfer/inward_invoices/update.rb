@@ -131,30 +131,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         end
         processed_item_ids << po_item.id
       end
-
-
-      # Credit Note Check
-      if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
-        self.inward_invoice_params[:credit_note_adjustments_attributes].each do |cna|
-          cn = CreditNote.find_by id: cna[:credit_note_id]
-
-          unless cn.present? || (cn.company_id == inward_invoice.company_id)
-            add_message :error, "Credit Note Not Found"
-            next
-          end
-
-          unless cn.approved? || cn.auto_approved? || cn.partially_adjusted? || cn.unadjusted?
-            add_message :error, "Applied Credit Note with ID #{cn.sequence_id} is not in applicable at this state"
-            next
-          end
-
-          unless precision_value(cna[:amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
-            add_message :error, "Applied Credit Note with ID #{cn.sequence_id}  doesn't have enough credits"
-            next
-          end
-          # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
-        end
-      end
     end
 
     if self.inward_invoice_params[:transaction_service_period_from].present?
@@ -259,6 +235,29 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         if adjustment_attr[:amount][:value].to_f > credit_note.net_adjustable_amount&.value.to_f
           add_message :error, "Cannot adjust amount more than available credits in Credit Note #{credit_note.credit_note_number} "
         end
+      end
+    end
+
+    # Credit Note Check
+    if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
+      self.inward_invoice_params[:credit_note_adjustments_attributes].filter {|cna| !cna[:_destroy]}.each do |cna|
+        cn = CreditNote.find_by id: cna[:credit_note_id]
+
+        unless cn.present? || (cn.company_id == inward_invoice.company_id)
+          add_message :error, "Credit Note Not Found"
+          next
+        end
+
+        unless cn.approved? || cn.auto_approved? || cn.partially_adjusted? || cn.unadjusted?
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id} is not in applicable at this state"
+          next
+        end
+
+        if precision_value(cna[:amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id}  doesn't have enough credits"
+          next
+        end
+        # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
       end
     end
   end

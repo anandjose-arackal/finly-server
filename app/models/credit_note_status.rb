@@ -62,4 +62,8 @@ class CreditNoteStatus < ApplicationRecord
   def adjusted?
     self.id == CreditNoteStatus.id_for(:adjusted)
   end
+
+  def unadjusted?
+    self.id == CreditNoteStatus.id_for(:unadjusted)
+  end
 end
