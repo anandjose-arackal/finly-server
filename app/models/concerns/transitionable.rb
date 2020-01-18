@@ -728,7 +728,7 @@ module Transitionable
         when :credit_note_initiator, 'credit_note_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :credit_note_reviewer, 'credit_note_reviewer'
-          if self.table_name == 'Invoice'
+          if self.table_name == 'invoices'
             data = data.or(role_based_initiator_associated_items(user, role_id))
           else
             data = data.or(role_based_reviewer_associated_items(user, role_id))
