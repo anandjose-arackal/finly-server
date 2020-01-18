@@ -338,6 +338,7 @@ class InvoiceCalculationUtils
     balance_due_amount = self.invoice.balance_due.value
 
     balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
+    balance_due_amount = precision_value balance_due_amount
 
     if self.invoice.balance_due.present?
       self.invoice.balance_due.value = balance_due_amount
