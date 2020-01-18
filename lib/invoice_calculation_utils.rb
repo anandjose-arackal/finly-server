@@ -338,29 +338,29 @@ class InvoiceCalculationUtils
 
     balance_due_amount = self.invoice.balance_due.value
 
-    if calculation_from_payment
-      balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
-
-      if balance_due_amount < 0
-        amount_to_deduct = balance_due_amount.abs
-
-        self.invoice.credit_note_adjustments.reorder("created_at desc").each do |cna|
-          break if amount_to_deduct == 0
-          if amount_to_deduct >= cna.amount.value
-            amount_to_deduct -= cna.amount.value
-            cna.destroy
-          else
-            cna.amount.update(value: amount_to_deduct)
-            amount_to_deduct = 0
-          end
-        end
-      end
-      cna_added_amount = self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
-      cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
-
-      balance_due_amount = self.invoice.balance_due.value
-    end
-
+    # if calculation_from_payment
+    #   balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
+    #
+    #   if balance_due_amount < 0
+    #     amount_to_deduct = balance_due_amount.abs
+    #
+    #     self.invoice.credit_note_adjustments.reorder("created_at desc").each do |cna|
+    #       break if amount_to_deduct == 0
+    #       if amount_to_deduct >= cna.amount.value
+    #         amount_to_deduct -= cna.amount.value
+    #         cna.destroy
+    #       else
+    #         cna.amount.update(value: (cna.amount.value - amount_to_deduct))
+    #         amount_to_deduct = 0
+    #       end
+    #     end
+    #   end
+    #   cna_added_amount = self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
+    #   cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    #
+    #   balance_due_amount = self.invoice.balance_due.value
+    # end
+    #
 
     balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
     balance_due_amount = precision_value balance_due_amount
