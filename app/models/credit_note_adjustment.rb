@@ -15,7 +15,7 @@ class CreditNoteAdjustment < ApplicationRecord
   include SoftDeletable, MathUtil
 
   belongs_to :amount, optional: true
-  belongs_to :credit_note, optional: true, touch: true
+  belongs_to :credit_note, optional: true, touch: 'last_adjusted_at'
   belongs_to :invoice, optional: true
 
   accepts_nested_attributes_for :amount

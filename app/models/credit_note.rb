@@ -360,6 +360,9 @@ class CreditNote < ApplicationRecord
         filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
         map {|item| item.taxable_amount&.value}.compact.sum
 
+    gross_receivable_amount_value = precision_value(gross_receivable_amount_value)
+
+
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
@@ -391,7 +394,7 @@ class CreditNote < ApplicationRecord
       end
     end
 
-    net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
+    net_receivable_amount_value = precision_value(gross_receivable_amount_value + tax_amount_value - tds_amount_value)
     if self.net_receivable_amount.present?
       self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
@@ -464,7 +467,7 @@ class CreditNote < ApplicationRecord
 
   def update_adjustable_amount
     currency_id = net_receivable_amount.currency_id
-    previously_adjusted_amount_value = adjustments.joins(:amount).sum(:value)
+    previously_adjusted_amount_value = precision_value(adjustments.joins(:amount).sum(:value))
 
     if self.previously_adjusted_amount.present?
       self.previously_adjusted_amount.update(value: previously_adjusted_amount_value)
@@ -472,7 +475,7 @@ class CreditNote < ApplicationRecord
       self.previously_adjusted_amount = Amount.create(value: previously_adjusted_amount_value, currency_id: currency_id)
     end
 
-    net_adjustable_amount_value = net_receivable_amount&.value&.to_f - previously_adjusted_amount_value
+    net_adjustable_amount_value = precision_value(net_receivable_amount&.value&.to_f - previously_adjusted_amount_value)
     if self.net_adjustable_amount.present?
       self.net_adjustable_amount.update(value: net_adjustable_amount_value)
     else

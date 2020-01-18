@@ -120,7 +120,8 @@ class InvoiceLineItemsCalculationUtils
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
-    InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice)
+    calculation_from_payment = payment.present? ? true : false
+    InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice, calculation_from_payment)
     params
   end
 
