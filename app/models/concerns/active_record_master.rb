@@ -9,19 +9,6 @@ module ActiveRecordMaster
   end
 
   module ClassMethods
-    def resolver(key = :default, klass)
-      resolvers[key] = klass
-    end
-
-    def resolvers
-      @resolvers ||= {}
-    end
-
-    def resolve(user, scope: :default, params: {}, filter: false, paginate: false, includes: [])
-      collection = resolvers[scope]&.new(user, self)&.resolve(params: params, filter: filter, paginate: paginate, includes: includes)
-      collection
-    end
-
     def representers
       @representers ||= {}
     end

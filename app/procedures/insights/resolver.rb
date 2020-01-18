@@ -1,6 +1,6 @@
 class Insights::Resolver < Transactions::Resolver::Scope
 
-  def load(params)
+  def resolve(user, params)
     # Conditions:
     # :company
     # :user
@@ -8,7 +8,7 @@ class Insights::Resolver < Transactions::Resolver::Scope
     # :policy_user_role
     # :app
 
-    company = @user.company
+    company = user.company
     policy_role_map = {} # used for holding all combination of policies and roles
     policies = []
     roles = []
@@ -31,8 +31,8 @@ class Insights::Resolver < Transactions::Resolver::Scope
     query += " OR (company_id = #{company.id} AND user_id IS NULL and policy_id IS NULL and user_role_id IS NULL)"
 
     # user
-    # collection = collection.or(scope.where(company_id: company.id, user_id: @user.id, policy_id: nil, user_role_id: nil))
-    query += " OR (company_id = #{company.id} AND user_id = #{@user.id} and policy_id IS NULL and user_role_id IS NULL)"
+    # collection = collection.or(scope.where(company_id: company.id, user_id: user.id, policy_id: nil, user_role_id: nil))
+    query += " OR (company_id = #{company.id} AND user_id = #{user.id} and policy_id IS NULL and user_role_id IS NULL)"
 
     # nil user + policy + nil role
     query += " OR (company_id = #{company.id} AND user_id IS NULL and policy_id IN (#{policies.join(',')}) and user_role_id IS NULL)"
@@ -53,6 +53,6 @@ class Insights::Resolver < Transactions::Resolver::Scope
     end
     query += ")"
 
-    self.scope.where(query)
+    Success(self.scope.where(query))
   end
 end
