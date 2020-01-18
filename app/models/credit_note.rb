@@ -245,6 +245,26 @@ class CreditNote < ApplicationRecord
     joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
   end
 
+  scope :order_previously_adjustable_amount, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    joins(:previously_adjusted_amount).reorder("amounts.value #{order_type}")
+  }
+
+  scope :order_net_adjustable_amount, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    joins(:net_adjustable_amount).reorder("amounts.value #{order_type}")
+  }
+
+  scope :order_created_at, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    reorder("credit_notes.created_at #{order_type}")
+  }
+
+  def self.format_order_type(order_type)
+    order_type = "ASC" unless ["ASC", "DESC"].include?(order_type.to_s.upcase)
+    order_type
+  end
+
 
   # Transitionable Methods #
 
