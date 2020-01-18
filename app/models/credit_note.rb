@@ -72,6 +72,7 @@ class CreditNote < ApplicationRecord
   has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
   has_many :adjustments, class_name: 'CreditNoteAdjustment' #, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
@@ -122,7 +123,7 @@ class CreditNote < ApplicationRecord
           invoice_number: invoice&.invoice_number,
           # roundoff_amount: roundoff_amount,
 
-          # attachment: attachments.as_json,
+          attachments: attachments.as_json,
           # custom_fields: self.custom_fields,
           vendor: vendor.as_json,
           shipping_location: shipping_location.as_json,
