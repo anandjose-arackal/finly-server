@@ -47,16 +47,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    case self.payment.parent_type
-    when 'Invoice'
-      invoice = payment.parent
-      invoice_amount = invoice.balance_due&.value.to_f
-      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if payment_amount.to_f + previous_payments.to_f > invoice_amount
-        add_message :error, "Payable amount cannot be greater than balance due."
-        return
-      end
-    end
+    # case self.payment.parent_type
+    # when 'Invoice'
+    #   invoice = payment.parent
+    #   invoice_amount = invoice.balance_due&.value.to_f
+    #   previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
+    #   if payment_amount.to_f + previous_payments.to_f > invoice_amount
+    #     add_message :error, "Payable amount cannot be greater than balance due."
+    #     return
+    #   end
+    # end
   end
 
   def pre_process
