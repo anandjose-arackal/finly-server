@@ -18,7 +18,7 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def index?
-    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator)) || @user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer))
+    @user.vendor_payment_admin? || @user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) || @user.has_policy_role?(UserRole.id_for(:credit_note_reviewer))
   end
 
   def show?

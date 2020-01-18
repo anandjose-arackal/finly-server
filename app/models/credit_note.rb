@@ -146,7 +146,8 @@ class CreditNote < ApplicationRecord
           net_receivable_amount: net_receivable_amount.as_json,
           freight_amount: freight_amount.as_json,
           previously_adjusted_amount: previously_adjusted_amount.as_json,
-          net_adjustable_amount: net_adjustable_amount.as_json
+          net_adjustable_amount: net_adjustable_amount.as_json,
+          user: user.as_json
       }
     end
 

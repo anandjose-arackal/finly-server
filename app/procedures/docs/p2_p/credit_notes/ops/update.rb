@@ -28,7 +28,16 @@ class Docs::P2P::CreditNotes::Ops::Update < Transactions::API
     true
   end
 
-  def update_attachments(options, params:, model:, **)
+  def update_attachments(options, params:, current_user:, model:, **)
+    attachment_ids = params[:credit_note][:attachments]
+
+    cn_current_attachments = current_user.company.procurement_attachments.with_id(attachment_ids)
+
+    cn_old_attachments = model.attachments
+
+    cn_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
+
+    cn_current_attachments.update_all(procurement_document_id: model.id, procurement_document_type: model.class.name)
     true
   end
 end
