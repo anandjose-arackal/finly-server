@@ -55,12 +55,4 @@ class AutoComplete::API < Transactions::API
     self.class.resolver || self.class.model&.resolver
   end
 
-  def self.handle(handle = NoObject)
-    if handle.present?
-      @handle = handle
-      AutoComplete::API.register(handle, self)
-    end
-    @handle
-  end
-
 end

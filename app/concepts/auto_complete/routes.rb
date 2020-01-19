@@ -8,4 +8,5 @@ AutoComplete::Router.draw do
   #   route "departments", :department
   # end
   route "departments", Masters::Departments::AutoComplete
+  route "locations", Masters::Locations::AutoComplete
 end
