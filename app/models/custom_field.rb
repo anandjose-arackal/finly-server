@@ -15,6 +15,7 @@
 #  field_key              :string(255)
 #  company_id             :integer
 #  configured_field_value :text(65535)
+#  uuid                   :string(36)
 #
 
 class CustomField < ApplicationRecord

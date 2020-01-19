@@ -15,6 +15,7 @@
 #  note                    :string(255)
 #  company_id              :integer
 #  rate_contract_number    :string(255)
+#  uuid                    :string(36)
 #
 
 FactoryBot.define do

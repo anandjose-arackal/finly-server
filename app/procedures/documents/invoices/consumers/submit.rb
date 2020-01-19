@@ -5,10 +5,9 @@ module Documents::Invoices::Consumers::Submit
       end
     end
 
-    class ReportSubmit < TaskManager::API
+    class OwnerActions < TaskManager::API
       record Invoice
-      consumes_event! 'report.update', consumer_key: "Invoice.Submit.OwnerActions", name: "Report Submit Mailer"
-      sync!
+      # consumes_event! 'invoice.submit', consumer_key: "Invoice.Submit.OwnerActions", name: "Report Submit Mailer"
       # scheduled! name: "Report Submit Schedule",every: 1.minute, hour: 12, minute: 00, day_of_the_week: :monday, day_of_the_month: :last
       validate_payload -> (user, message) do
         message[:record].present? #message[:invoice]&.status_id == InwardInvoiceStatus.id_for(:processing)}

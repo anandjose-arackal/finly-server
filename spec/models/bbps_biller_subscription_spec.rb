@@ -48,6 +48,7 @@
 #  category_id              :integer
 #  hsn_sac                  :string(255)
 #  quick_pay                :string(255)      default("N")
+#  uuid                     :string(36)
 #
 
 require 'rails_helper'

@@ -38,6 +38,7 @@
 #  igst                     :decimal(20, 5)   default(0.0)
 #  taxable_amount_id        :integer
 #  previously_billed_amount :decimal(20, 5)   default(0.0)
+#  uuid                     :string(36)
 #
 
 class PurchaseOrderItem < ApplicationRecord

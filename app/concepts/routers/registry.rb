@@ -3,10 +3,6 @@ class Routers::Registry
 
   class_attr :registry, default: {}
 
-  # LOAD_PATHS = [
-  #     'app/concepts/auto_complete/routes.rb'
-  # ]
-
   def self.register(route, router = Router)
     registry[route] = router.new
   end
@@ -16,8 +12,17 @@ class Routers::Registry
     registry[route]
   end
 
-  # LOAD_PATHS.each do |path|
-  #   Dir[path].each { |f| load f }
-  # end
+  def self.routers
+    @routers ||= [
+        AutoComplete::Router
+    ]
+  end
+
+  def self.reload_all
+    routers.each do |router|
+      router.clear_map
+    end
+    Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
+  end
 
 end

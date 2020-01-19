@@ -3,4 +3,3 @@ class AutoComplete::Router < Routers::Base
 
 
 end
-require_dependency Rails.root.join("app/concepts/auto_complete/routes")

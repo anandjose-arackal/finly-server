@@ -74,6 +74,7 @@
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
+#  uuid                         :string(36)
 #
 
 class PurchaseOrder < ApplicationRecord

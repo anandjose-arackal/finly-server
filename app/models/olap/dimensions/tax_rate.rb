@@ -20,6 +20,7 @@
 #  sgst_internal_id     :string(255)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::TaxRate < OlapRecord

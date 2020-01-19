@@ -10,6 +10,7 @@
 #  configurable_mailer            :boolean          not null
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
+#  uuid                           :string(36)
 #
 
 

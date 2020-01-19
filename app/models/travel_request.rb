@@ -33,6 +33,7 @@
 #  controlling_level_id         :integer
 #  booking_submitted_at         :datetime
 #  booking_approved_at          :datetime
+#  uuid                         :string(36)
 #
 
 class TravelRequest < ApplicationRecord

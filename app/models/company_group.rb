@@ -7,6 +7,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  default_company_id :integer
+#  uuid               :string(36)
 #
 
 class CompanyGroup < ApplicationRecord

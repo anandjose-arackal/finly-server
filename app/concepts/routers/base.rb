@@ -30,7 +30,9 @@ class Routers::Base
 
   def self.route(key, *args, options: {})
     if not allow_multiple_associations? and map(key).present?
-      raise "#{key} is already defined for the router #{self.class.name}"
+      return if args.count == 1 and map(key).first.klass == args.first
+
+      raise "#{key} is already defined for the router #{self.name}"
     end
 
     args.each do |klass|
@@ -72,6 +74,10 @@ class Routers::Base
       opt.merge! o
     end
     opt
+  end
+
+  def self.clear_map
+    @map = {}
   end
 
   def self.map(key = NoObject)

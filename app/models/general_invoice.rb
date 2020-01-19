@@ -100,6 +100,7 @@
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
 #  include_tax_and_tds                   :boolean          default(FALSE)
+#  uuid                                  :string(36)
 #
 
 # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them

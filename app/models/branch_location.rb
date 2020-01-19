@@ -25,6 +25,7 @@
 #  billable_location     :boolean          default(TRUE)
 #  shippable_location    :boolean          default(TRUE)
 #  gl_code               :string(255)
+#  uuid                  :string(36)
 #
 
 class BranchLocation < ApplicationRecord

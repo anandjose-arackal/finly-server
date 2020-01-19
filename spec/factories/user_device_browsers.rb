@@ -38,6 +38,7 @@
 #  is_mobile              :boolean
 #  status_id              :integer          not null
 #  message                :text(65535)
+#  uuid                   :string(36)
 #
 FactoryBot.define do
   factory :user_device_browser do

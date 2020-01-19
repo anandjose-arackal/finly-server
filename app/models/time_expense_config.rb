@@ -10,6 +10,7 @@
 #  rate_id             :integer
 #  period_id           :integer
 #  policy_id           :integer          not null
+#  uuid                :string(36)
 #
 
 class TimeExpenseConfig < ApplicationRecord

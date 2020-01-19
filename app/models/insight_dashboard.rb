@@ -24,14 +24,15 @@
 
 class InsightDashboard < ApplicationRecord
   include UUIDHelper, SoftDeletable
+  include EventProducer
+
+  event_channel 'insight_dashboard'
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :policy, optional: true
   belongs_to :user_role, optional: true
   belongs_to :admin_user, optional: true
-
-  resolver Insights::Resolver
 
   validates :name, presence: true
   validates :dashboard, presence: true

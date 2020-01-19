@@ -9,4 +9,5 @@ AutoComplete::Router.draw do
   # end
   route "departments", Masters::Departments::AutoComplete
   route "locations", Masters::Locations::AutoComplete
+  route "cost_centers", Masters::CostCenters::AutoComplete
 end

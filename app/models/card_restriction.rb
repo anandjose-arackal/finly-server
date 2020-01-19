@@ -12,6 +12,7 @@
 #  channel_ecom_pos     :boolean
 #  mcc_group_id         :integer
 #  mcc_restriction_type :string(255)
+#  uuid                 :string(36)
 #
 
 class CardRestriction < ApplicationRecord

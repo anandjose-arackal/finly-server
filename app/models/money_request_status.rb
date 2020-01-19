@@ -7,6 +7,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  order      :integer          default(1), not null
+#  uuid       :string(36)
 #
 
 class MoneyRequestStatus < ApplicationRecord

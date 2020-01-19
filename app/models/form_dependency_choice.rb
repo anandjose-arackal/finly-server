@@ -12,6 +12,7 @@
 #  dependent_entity_editable :boolean
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  uuid                      :string(36)
 #
 
 class FormDependencyChoice < ApplicationRecord

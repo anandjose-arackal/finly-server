@@ -9,6 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  token      :string(255)
+#  uuid       :string(36)
 #
 
 class SsoKey < ApplicationRecord

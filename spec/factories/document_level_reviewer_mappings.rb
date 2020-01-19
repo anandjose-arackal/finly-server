@@ -27,6 +27,7 @@
 #  max                             :decimal(20, 5)
 #  rejected_by_id                  :integer
 #  action_taken_at                 :datetime
+#  uuid                            :string(36)
 #
 
 FactoryBot.define do

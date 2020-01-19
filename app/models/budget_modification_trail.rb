@@ -11,6 +11,7 @@
 #  previous_value      :string(255)
 #  current_value       :string(255)
 #  changed_column_name :string(255)
+#  uuid                :string(36)
 #
 
 class BudgetModificationTrail < ApplicationRecord

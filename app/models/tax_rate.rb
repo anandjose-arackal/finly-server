@@ -17,6 +17,7 @@
 #  igst_internal_id :string(255)
 #  cgst_internal_id :string(255)
 #  sgst_internal_id :string(255)
+#  uuid             :string(36)
 #
 
 class TaxRate < ApplicationRecord

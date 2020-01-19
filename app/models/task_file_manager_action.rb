@@ -7,6 +7,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  event_workflow_id  :integer          not null
+#  uuid               :string(36)
 #
 
 class TaskFileManagerAction < ApplicationRecord

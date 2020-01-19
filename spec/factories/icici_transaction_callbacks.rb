@@ -15,6 +15,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  reconciled :boolean          default(FALSE)
+#  uuid       :string(36)
 #
 
 FactoryBot.define do

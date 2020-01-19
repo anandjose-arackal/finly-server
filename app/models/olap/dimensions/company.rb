@@ -15,6 +15,7 @@
 #  group_id             :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::Company < OlapRecord
