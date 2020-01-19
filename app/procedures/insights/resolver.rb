@@ -1,4 +1,4 @@
-class Insights::Resolver < Transactions::Resolver::Scope
+class Insights::Resolver < Resolver::API
 
   def load(user, params)
     # Conditions:

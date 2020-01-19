@@ -8,7 +8,7 @@ class AutoComplete::API < Transactions::API
   class_attr :max_per_page, default: 10
 
   pass :define_pagination
-  step Transactions::Resolver::Load(builder: :resolver_builder, paginate: true)
+  step Resolver::Transactions::Load(builder: :resolver_builder, paginate: true)
   step :render
 
   def define_pagination(context, params:, **)

@@ -1,6 +1,6 @@
-class Masters::Locations::Resolver < Transactions::Resolver::Scope
+class Masters::Locations::Resolver < Resolver::API
 
-  entity BranchLocation, scope: :default
+  entity BranchLocation
 
   def load(params)
     if user.admin?

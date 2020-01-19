@@ -1,7 +1,7 @@
 require "#{Rails.root}/app/policies/application_policy"
 class ExportTemplates::Policy < ApplicationPolicy
 
-  class ExportTemplates::Policy::Scope < Transactions::Resolver::Scope
+  class ExportTemplates::Policy::Scope < Resolver::API
 
     def load(user, params)
       Success(scope.where(created_by_user: user))

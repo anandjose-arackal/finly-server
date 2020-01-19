@@ -1,6 +1,6 @@
-class Masters::Departments::Resolver < Transactions::Resolver::Scope
+class Masters::Departments::Resolver < Resolver::API
 
-  entity Department, scope: :default
+  entity Department
 
   def load(params)
     if user.admin?

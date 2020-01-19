@@ -1,6 +1,6 @@
-class Masters::CostCenters::Resolver < Transactions::Resolver::Scope
+class Masters::CostCenters::Resolver < Resolver::API
 
-  entity CostCenter, scope: :default
+  entity CostCenter
 
   def load(params)
     user.company.cost_centers

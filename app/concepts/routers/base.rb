@@ -41,6 +41,10 @@ class Routers::Base
     map(key)
   end
 
+  def self.[](key)
+    resolve(key)
+  end
+
   def self.resolve(key)
     map[key]
   end
@@ -77,11 +81,11 @@ class Routers::Base
   end
 
   def self.clear_map
-    @map = {}
+    @map = {}.with_indifferent_access
   end
 
   def self.map(key = NoObject)
-    @map ||= {}
+    @map ||= {}.with_indifferent_access
     return @map if key == NoObject
 
     @map[scoped_key(key)] ||= []

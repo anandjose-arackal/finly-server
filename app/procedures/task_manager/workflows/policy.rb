@@ -1,7 +1,7 @@
 require "#{Rails.root}/app/policies/application_policy"
 class TaskManager::Workflows::Policy < ApplicationPolicy
 
-  class TaskManager::Workflows::Policy::Scope < Transactions::Resolver::Scope
+  class TaskManager::Workflows::Policy::Scope < Resolver::API
 
     def load(user, params)
       scope.where(user: user)

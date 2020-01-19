@@ -14,7 +14,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
 
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )
-  # step Transactions::Resolver::Load(model: BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
+  # step Resolver::Transactions::Load(model: BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
   step :index!
 
   # def check(options, params:, **)

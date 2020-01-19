@@ -1,4 +1,4 @@
-class TaskManager::Workflows::Resolver < Transactions::Resolver::Scope
+class TaskManager::Workflows::Resolver < Resolver::API
 
   def load(user, params)
     Success(scope.where(user: user))
