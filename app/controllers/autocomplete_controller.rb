@@ -1,8 +1,18 @@
 class AutocompleteController < BaseControllers::WebBase
+
+  def route
+    result = AutoComplete::Router.dispatch(params[:entity], params: params.to_unsafe_h, current_user: current_user)
+    if result.success?
+      render json: result["model.records.json"]
+    else
+      # todo
+    end
+  end
+
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
     respond_to do |format|
-      format.json {render json: merchants.as_json }
+      format.json { render json: merchants.as_json }
     end
   end
 

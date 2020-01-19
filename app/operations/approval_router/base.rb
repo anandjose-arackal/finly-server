@@ -1,3 +1,3 @@
-class ApprovalRouter::Base < BaseOperation
+class ApprovalRouters::Base < BaseOperation
 
 end

@@ -25,6 +25,12 @@ module Transactions::Messages
     false
   end
 
+  def evaluate_result(options, result)
+    if result.errors.present?
+
+    end
+  end
+
   def on_schema_error(options, errors_list)
 
   end

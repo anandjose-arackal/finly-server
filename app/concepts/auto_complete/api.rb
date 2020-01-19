@@ -7,13 +7,14 @@ class AutoComplete::API < Transactions::API
   class_attr :json_builder
   class_attr :max_per_page, default: 10
 
-  pass :set_page_properties
+  pass :define_pagination
   step Transactions::Resolver::Load(builder: :resolver_builder, paginate: true)
   step :render
 
-  def set_page_properties(context, params:, **)
+  def define_pagination(context, params:, **)
     params[:page] = 1
-    params[:per_page] = self.class.max_per_page
+    params[:per_page] = self.class.max_per_page if params[:per_page].blank?
+    params[:per_page] = [params[:per_page], self.class.max_per_page].min
   end
 
   def render(context, options)

@@ -5057,6 +5057,7 @@ Rails.application.routes.draw do
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
   get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
+  get 'autocomplete/:entity', to: 'autocomplete#route'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
