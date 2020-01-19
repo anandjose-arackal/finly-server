@@ -52,10 +52,10 @@ class Routers::Base
   def self.dispatch(key, options)
     routes = map[key]
     # Todo raise exception?
-    return Failure() if routes.blank?
+    return Failure("Route not found") if routes.blank?
 
     results = []
-    map[key]&.each do |route|
+    resolve(key)&.each do |route|
       results << route.dispatch(options)
     end
     allow_multiple_associations? ? results : results.first
