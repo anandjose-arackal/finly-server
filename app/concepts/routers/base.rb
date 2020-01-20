@@ -99,36 +99,3 @@ class Routers::Base
   end
 
 end
-
-# class Router
-#
-#   def draw(&block)
-#     instance_exec &block
-#   end
-#
-#   def scopes
-#     @scopes ||= []
-#   end
-#
-#   def scope(key, &block)
-#     scopes.push key
-#     instance_exec &block
-#     scopes.pop
-#   end
-#
-#   def route(key, *args)
-#     args.each { |arg| map(key) << arg }
-#     map(key)
-#   end
-#
-#   def map(key = NoObject)
-#     @map ||= {}
-#     return @map if key == NoObject
-#
-#     if scopes.present?
-#       key = "#{scopes.join(".")}.#{key}"
-#     end
-#     @map[key] ||= []
-#   end
-#
-# end
