@@ -1,6 +1,8 @@
 class Insights::Resolver < Resolver::API
 
-  def load(user, params)
+  entity InsightDashboard
+
+  def load(params)
     # Conditions:
     # :company
     # :user
@@ -53,6 +55,6 @@ class Insights::Resolver < Resolver::API
     end
     query += ")"
 
-    Success(self.scope.where(query))
+    self.entity.where(query)
   end
 end

@@ -16,4 +16,8 @@ Resolver::Router.draw do
   scope :cost_center do
     route "default", Masters::CostCenters::Resolver
   end
+
+  scope :insight_dashboard do
+    route 'default', Insights::Resolver
+  end
 end

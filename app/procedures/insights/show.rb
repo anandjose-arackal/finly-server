@@ -27,8 +27,10 @@ class Insights::Show < Transactions::API
         :exp => Time.now.to_i + (60 * 10) # 2 minute expiration
     }
 
-    token = JWT.encode payload, INSIGHTS_CONFIG[:secret]
-    options['result'] = {url: INSIGHTS_CONFIG[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
+    insights_config = Rails.application.config_for(:insights_config)&.with_indifferent_access
+
+    token = JWT.encode payload, insights_config[:secret]
+    options['result'] = {url: insights_config[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
     true
   end
 

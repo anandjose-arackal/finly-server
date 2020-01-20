@@ -3,8 +3,8 @@ class ExportTemplates::Policy < ApplicationPolicy
 
   class ExportTemplates::Policy::Scope < Resolver::API
 
-    def load(user, params)
-      Success(scope.where(created_by_user: user))
+    def load(params)
+      entity.where(created_by_user: user)
     end
 
   end

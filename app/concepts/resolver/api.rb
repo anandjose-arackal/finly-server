@@ -29,8 +29,13 @@ class Resolver::API
     collection
   end
 
+  def entity
+    self.class.entity
+  end
+  alias_method :scope, :entity
+
   def load(params)
-    scope.all
+    entity.all
   end
 
   def filter(collection, params)

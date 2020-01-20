@@ -3,8 +3,8 @@ class TaskManager::Workflows::Policy < ApplicationPolicy
 
   class TaskManager::Workflows::Policy::Scope < Resolver::API
 
-    def load(user, params)
-      scope.where(user: user)
+    def load(params)
+      entity.where(user: user)
     end
 
   end

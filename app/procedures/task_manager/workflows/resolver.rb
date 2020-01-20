@@ -1,7 +1,7 @@
 class TaskManager::Workflows::Resolver < Resolver::API
 
-  def load(user, params)
-    Success(scope.where(user: user))
+  def load(params)
+    entity.where(user: user)
   end
 
 end

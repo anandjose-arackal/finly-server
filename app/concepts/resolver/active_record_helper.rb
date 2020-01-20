@@ -3,7 +3,7 @@ module Resolver::ActiveRecordHelper
 
   class_methods do
     def resolver(scope = :default)
-      Resolver::Router["#{event_channel}.#{scope.to_s}"]&.first
+      Resolver::Router["#{event_channel}.#{scope.to_s}"]&.first&.klass
     end
 
     def resolve(user, scope: :default, params: {}, paginate: false, filter: true, includes: [])
