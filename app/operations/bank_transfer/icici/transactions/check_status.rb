@@ -43,6 +43,12 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
         self.payment_order.update_order_status
         self.payment_order.update_processed_amount
       end
+    else
+      if self.bank_transaction.failed?
+        self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        self.payment_order.update_order_status
+        self.payment_order.update_processed_amount
+      end
     end
   end
 end
