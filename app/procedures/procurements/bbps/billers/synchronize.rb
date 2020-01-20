@@ -41,7 +41,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
 
   def disable_unlisted_billers(context, billers:, **)
     listed_biller_ids = billers.map {|b| b['biller_id']}
-    BbpsBiller.where.not(biller_id: listed_biller_ids).update_all(status_id: 'D')
+    BbpsBiller.where.not(biller_id: listed_biller_ids).update_all(status: 'D')
     true
   end
 
