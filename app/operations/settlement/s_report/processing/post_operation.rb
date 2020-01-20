@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account
+  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account, :completed_mappings
 
   def pre_validate
     if object.blank?
@@ -34,6 +34,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     else
       self.pending_mappings = self.report_processor_group.mappings.not_completed
     end
+
+    self.completed_mappings = self.report_processor_group.mappings.completed
 
     if self.pending_mappings.blank?
       add_message :error, "No Report found which can be processed."
@@ -160,6 +162,12 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
         end
       end
     end
+
+    # explicitly settle reports of completed mappings when called from batch level
+    # 
+    update_mapping_data
+    # 
+
     if self.report_processor_group.processed_amount.blank?
       processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
     else
@@ -200,6 +208,31 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
     report.comments.build(user: self.report_processor_group.created_by_user,
                           report_comment_action_id: report_comment_action, content: comment).save
+  end
+
+  def update_mapping_data
+    report_comment_action = ReportCommentAction.id_for(:report_settled)
+    marked_as_closed = false
+    event = 'settle'
+
+    self.completed_mappings.each do |mapping|
+      mapping.reports.each do |report|
+        next if report.settled? or report.settlement_confirmed? # explicitly settle reports when called from batch level
+        parameters = {
+          document: report,
+          aasm_event: event
+        }
+
+        created_by_user = User.find_by id: self.report_processor_group.created_by_user_id
+        op = WorkflowManager::Base.(created_by_user, parameters)
+
+        if op.success?
+          # Update the trail with payment info
+          op.workflow_output[:trail]&.update(payment_id: mapping.payment&.id)
+          generate_comment(report, mapping, report_comment_action, marked_as_closed)
+        end
+      end
+    end
   end
 
 end
