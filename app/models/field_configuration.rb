@@ -73,7 +73,8 @@ class FieldConfiguration < ApplicationRecord
   scope :with_id, -> (id) {where id: id}
 
   # scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
-  scope :with_parent_type, ->(type_id) {includes(:field_parent_mappings).where(field_parent_mappings: {field_parent_type_id: type_id})}
+  # scope :with_parent_type, ->(type_id) {includes(:field_parent_mappings).where(field_parent_mappings: {field_parent_type_id: type_id})}
+  scope :with_parent_type, ->(type_id) {joins(:field_parent_mappings).where(field_parent_mappings: {field_parent_type_id: type_id})}
   scope :enabled, -> {where enabled: true}
   scope :disabled, -> {where enabled: false}
   scope :filter_field_type_id, ->(type_id) {where field_type_id: type_id}
@@ -195,7 +196,8 @@ class FieldConfiguration < ApplicationRecord
   def as_json(options = {})
     options = []
     if field_type_id == FieldType.id_for(:drop_down)
-      options = drop_down_items.exclude_deleted
+      # options = drop_down_items.exclude_deleted
+      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi.is_deleted == false}.reject(&:nil?)
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
@@ -206,14 +208,16 @@ class FieldConfiguration < ApplicationRecord
                      name: field_type.name},
         mandatory: mandatory,
         global: self.global,
-        value: self.default_value,
+        # value: self.default_value,
         options: options,
         root_field: self.root_field
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      if self.drop_down_items.joins(:dependent_field_configurations).present?
-        result[:has_dependent_cf] = true
-      end
+      # if self.drop_down_items.joins(:dependent_field_configurations).present?
+      #   result[:has_dependent_cf] = true
+      # end
+      ddi = drop_down_items.pluck :id
+      result[:has_dependent_cf] = true if ParentDependentFieldConfigurationMapping.where(parent_id: ddi).present?
       # self.drop_down_items.each do |drop_down|
       #   if drop_down.dependent_field_configurations.present?
       #     result[:has_dependent_cf] = true
