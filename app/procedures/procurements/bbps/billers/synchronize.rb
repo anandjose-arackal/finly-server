@@ -3,6 +3,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
   skip_user_authorization!
 
   step :fetch_all_billers
+  step :disable_unlisted_billers
   step :synchronize_billers
 
   matcher Dry::Matcher.new(
