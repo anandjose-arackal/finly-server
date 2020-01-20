@@ -38,6 +38,12 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
     true
   end
 
+  def disable_unlisted_billers(context, billers:, **)
+    listed_biller_ids = billers.map {|b| b['biller_id']}
+    BbpsBiller.where.not(biller_id: listed_biller_ids).update_all(status_id: 'D')
+    true
+  end
+
   def synchronize_billers(options, billers:, **)
     options['billers.success'] = []
     options['billers.failed'] = []
