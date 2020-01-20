@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_08_143725) do
+ActiveRecord::Schema.define(version: 2020_01_16_073611) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3997,6 +3997,7 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.integer "total_invoice_amount_id"
     t.integer "available_invoice_amount_id"
     t.boolean "include_tax_and_tds", default: false
+    t.boolean "rcm_enabled"
     t.index ["template_invoice_id"], name: "index_general_invoices_on_template_invoice_id"
   end
 
@@ -6761,6 +6762,7 @@ ActiveRecord::Schema.define(version: 2020_01_08_143725) do
     t.boolean "fixed_periodic_template"
     t.float "escalation_percentage"
     t.string "override_invoice_id"
+    t.boolean "rcm_enabled"
     t.index ["advance_amount_id"], name: "index_rental_invoices_on_advance_amount_id"
     t.index ["advance_type_id"], name: "index_rental_invoices_on_advance_type_id"
     t.index ["amount_id"], name: "index_rental_invoices_on_amount_id"
