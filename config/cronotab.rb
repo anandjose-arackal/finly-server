@@ -51,3 +51,5 @@ Crono.perform(ExpenseStatusUpdate).every 30.minutes
 
 # status checker for BBPS Bill Payments
 Crono.perform(BbpsBillStatusChecker).every 30.minutes
+
+Crono.perform(BbpsBillerSync).every 1.day, at: {hour: 12, min: 10}

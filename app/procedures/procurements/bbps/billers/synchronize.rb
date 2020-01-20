@@ -3,6 +3,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
   skip_user_authorization!
 
   step :fetch_all_billers
+  step :disable_unlisted_billers
   step :synchronize_billers
 
   matcher Dry::Matcher.new(
@@ -35,6 +36,12 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
         return on_error options, :base, 'Could not fetch billers'
       end
     end
+    true
+  end
+
+  def disable_unlisted_billers(context, billers:, **)
+    listed_biller_ids = billers.map {|b| b['biller_id']}
+    BbpsBiller.where.not(biller_id: listed_biller_ids).update_all(status: 'D')
     true
   end
 
