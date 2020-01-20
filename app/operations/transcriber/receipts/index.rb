@@ -12,7 +12,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
-      self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 10)
+      self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: params[:per_page] || 30 )
     end
 
   end
@@ -29,8 +29,8 @@ class Transcriber::Receipts::Index < Transcriber::Base
       self.companies = Company.ocr_enabled
     end
     self.receipts = []
-    self.sort_by = params[:filter_sort_by] || 'id'
-    self.sort_order = params[:filter_sort_order] || 'desc'
+    self.sort_by = params[:sort_by] || 'id'
+    self.sort_order = params[:sort_order] || 'desc'
   end
 
   def authorize
@@ -46,10 +46,10 @@ class Transcriber::Receipts::Index < Transcriber::Base
     elsif params[:filter_parent] == '2'
       self.receipts = Receipt.joins(:user => [:company,:expenses])
                           .where('companies.id IN (?)',companies.pluck(:id))
-                          .where('expenses.transcribed = true')
-                          .reorder("expenses.updated_at #{self.sort_order}")
+                          .where(expenses:{transcribed: true})
+                          .where(expenses:{expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected])})
+                          .reorder(Arel.sql("expenses.updated_at  #{self.sort_order}"))
     end
-    self.receipts = receipts.paginate(page: params[:page], per_page: params[:per_page] || 30)
   end
 
 
