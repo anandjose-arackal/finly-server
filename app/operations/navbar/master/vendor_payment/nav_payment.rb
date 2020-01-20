@@ -7,15 +7,21 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
       :item_master,
       :vendors,
       :payment_tickets,
+      # :analytics,
       {create: [:create_payment_ticket]}
   ]
   )
 
   register_structure(
-      :cog, [
+      :cog_menu, [
       :users,
       :load_company_balance, :statements,
-      :organization_account,
+      :organization_account
+  ]
+  )
+
+  register_structure(
+      :cog_modules, [
       :finly_expense_management, :finly_disburse, :finly_collect, :finly_insights
   ]
   )
@@ -52,6 +58,10 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   def create_payment_ticket
     return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
     {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket/params={}'}
+  end
+
+  def analytics
+    {name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
   end
 
 end

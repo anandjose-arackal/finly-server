@@ -7,13 +7,13 @@
 # Processor -> Email, Direct Download, FTP etc
 Dir["#{Rails.root}/app/operations/export_manager/master/**/*.rb"].each {|file| require file}
 class ExportManager::RequestHandler < BaseOperation
-  attr_accessor :master, :type, :processor
+  attr_accessor :master, :type, :export_job
 
   class ExportManager::RequestHandler::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :file_url
+    attr_accessor :export_job
 
     def init
-      self.file_url = params[:file_url]
+      self.export_job = params[:export_job]
     end
 
   end
@@ -25,52 +25,43 @@ class ExportManager::RequestHandler < BaseOperation
       add_message :error, 'Invalid Type. Error while generating export'
       return
     end
-    # if params[:export_format].blank?
-    #   add_message :error, 'Invalid Format. Error while generating export'
-    #   return
-    # end
   end
 
   def init
     self.type = params[:type]
     self.master = init_master
-    return if self.master.blank?
-
-    self.processor = self.master.processor.new(user, params, master)
   end
 
   def validate
-    if self.master.blank? or self.processor.blank? or self.master.generator.blank?
+    if self.master.blank?
       add_message :error, 'Invalid Type. Error while generating export'
-      return
-    end
-    m = self.master.new(user, params)
-    unless m.valid?
-      add_message :error, m.errors
-      return
     end
   end
 
   def process
-    result = self.processor.run
-    if result[:success]
-      if result[:message].present?
-        add_message :success, result[:message]
-      end
-      params[:file_url] = result[:file_url]
-    else
-      add_message :error, (result[:message] || 'Unknown error')
-    end
+    master_obj = self.master.new(user, params)
+    master_obj.perform
+    self.export_job = master_obj.export_job
+    self.messages = master_obj.messages
+    # result = self.master.new(user, params).perform
+    # if result[:success]
+    #   if result[:message].present?
+    #     add_message :success, result[:message]
+    #   end
+    #   params[:file_url] = result[:file_url]
+    # else
+    #   add_message :error, (result[:message] || 'Unknown error')
+    # end
   end
 
   def success
-    ExportManager::RequestHandler::SuccessPresenter.new(user, params, messages)
+    ExportManager::RequestHandler::SuccessPresenter.new(user, {export_job: export_job}, messages)
   end
 
   protected
 
   def init_master
-    ExportManager::Master::BaseMaster.subscribers(self.type)&.first
+    ExportManager::Master.subscribers(self.type)&.first
   end
 
 

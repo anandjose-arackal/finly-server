@@ -19,6 +19,16 @@
 #  status_id               :integer          not null
 #  company_id              :bigint           not null
 #  request_params          :text(4294967295)
+#  deleted_at              :datetime
+#  master                  :string(255)
+#  description             :string(255)
+#  processing_record_type  :string(255)
+#  processing_record_id    :bigint
+#  record_type             :string(255)
+#  record_id               :bigint
+#  crash_stacktrace        :text(65535)
+#  message                 :text(65535)
+#  note                    :text(65535)
 #
 
 require 'rails_helper'

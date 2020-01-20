@@ -60,9 +60,8 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     unless messages.blank?
       return result false, messages.join(', ')
     end
-
     begin
-      unless user.update(user_params)
+      unless user.update(user_params.except(:password, :password_confirmation))
         return result false, user.errors.full_messages
       end
     rescue Exception => e
@@ -90,28 +89,28 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     end
   end
 
-   def invite(data)
-     invited_user = self.company.users.find_by id: data[:id]
-     unless invited_user.present?
-       return result false, "User not found"
-     end
+  def invite(data)
+    invited_user = self.company.users.find_by id: data[:id]
+    unless invited_user.present?
+      return result false, "User not found"
+    end
 
-     unless invited_user.email.present?
-       return result false, "User not have an email"
-     end
+    unless invited_user.email.present?
+      return result false, "User not have an email"
+    end
 
-     user_params = {user_id: invited_user.id}
-     presenter = Admin::Users::WelcomeMail.(AdminUser.all.first, user_params)
-     if presenter.messages[:error].present?
-       return result false, presenter.messages[:error].join(' ,')
-     elsif presenter.messages[:failure].present?
-       return result false, presenter.messages[:failure].join(' ,')
-     elsif presenter.messages[:success].present?
-       return result true, "User Invited Successfully"
-     end
-   end
+    user_params = {user_id: invited_user.id}
+    presenter = Admin::Users::WelcomeMail.(AdminUser.all.first, user_params)
+    if presenter.messages[:error].present?
+      return result false, presenter.messages[:error].join(' ,')
+    elsif presenter.messages[:failure].present?
+      return result false, presenter.messages[:failure].join(' ,')
+    elsif presenter.messages[:success].present?
+      return result true, "User Invited Successfully"
+    end
+  end
 
-   def set_params(data)
+  def set_params(data)
     messages = []
     role_mapping_attributes = []
     if data[:expense_management] == 'Y'
@@ -142,7 +141,11 @@ class Admin::Implementations::Master::Users::Import < Admin::Implementations::Pr
     end
 
     # generating a password for the user
-    generated_password = generate_default_password
+    if data[:id].blank?
+      generated_password = generate_default_password
+    else
+      generated_password = ''
+    end
     company = Company.find_by(id: data[:company_id])
     department_id = company&.departments&.find_by(name: data[:department_code])&.id
     location_id = company&.locations&.find_by(name: data[:location_code])&.id

@@ -334,7 +334,8 @@ class MoneyRequest < ApplicationRecord
   end
 
   def total_amount
-    return precision_value(self.items.with_amount.sum(:value)) if self.items.present?
+    # return precision_value(self.items.with_amount.sum(:value)) if self.items.present?
+    return precision_value(self.items.map {|item| item.amount&.value}.compact.sum) if self.items.present?
     0
   end
 

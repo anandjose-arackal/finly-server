@@ -38,6 +38,7 @@
 #  agreement_based_payment_system :boolean          default(FALSE)
 #  gstin_verification_enabled     :boolean          default(FALSE)
 #  user_level_custom_fields       :boolean          default(FALSE)
+#  analytics_system               :boolean
 #  request_encryption_enabled     :boolean          default(FALSE)
 #
 

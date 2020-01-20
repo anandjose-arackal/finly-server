@@ -413,7 +413,7 @@ class Expense < ApplicationRecord
   scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
   scope :with_split_link, -> (split_link) {where split_link: split_link}
   scope :filter_split_link, -> (split_link) {where split_link: split_link}
-  scope :includes_export, -> {includes(:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+  scope :includes_export, -> {includes(:category, :receipts, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
                                        :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
                                        {card_expense: [custom_fields: [:field_configuration]]},
                                        {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},

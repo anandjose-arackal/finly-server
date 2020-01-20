@@ -1,6 +1,6 @@
 class Personalizer::Adapters::Company200::Expense200::Manual200::Create200::Validate < Personalizer::Adapters::Base
 
-  attr_accessor :expense_params, :category,:validate_keys
+  attr_accessor :expense_params, :category, :validate_keys
 
   def init
     self.expense_params = op_instance.expense_params
@@ -20,12 +20,12 @@ class Personalizer::Adapters::Company200::Expense200::Manual200::Create200::Vali
           hash&.public_send(:[], expence_param.to_sym)
         end&.public_send(:[], field_keys.last)
         if user_value.blank?
-          field_name = field_keys.last&.gsub("id","")&.humanize rescue "Expense Field"
+          field_name = field_keys.last&.gsub("id", "")&.humanize rescue "Expense Field"
           add_message :error, "#{field_name} can't be blank"
         end
       end
 
-      unless validate_gstin(expense_params.dig(:gstin_location_attributes,:gstin))
+      unless validate_gstin(expense_params.dig(:gstin_location_attributes, :gstin))
         add_message :error, "GSTIN Invalid"
       end
     end

@@ -1,8 +1,11 @@
-class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Builders::Spreadsheet
 
-  subscribe :non_po_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Invoices Export'
+  configurable true
+  # screen 'invoices.index'
+  system :vp
+  handle :non_po_items
   validate :input
 
   attribute :procurement_name
@@ -22,10 +25,6 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
   attribute :tax
   attribute :tax_amount
   attribute :total_amount
-
-  def name
-    'Invoices'
-  end
 
   def input
     procurements_op = ::Procurements::Index.(user, params)

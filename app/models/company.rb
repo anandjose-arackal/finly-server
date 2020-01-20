@@ -17,6 +17,9 @@
 class Company < ApplicationRecord
   include Constants
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'company'
 
   belongs_to :base_currency, optional: true, class_name: 'Currency'
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
@@ -56,6 +59,8 @@ class Company < ApplicationRecord
   has_one :yes_bank_company_account
   has_one :icici_bank_company_account
   has_one :kotak_bank_company_account
+  has_one :utility_bills_account
+  has_one :billing_account, class_name: "UtilityBillsAccount"
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
@@ -66,6 +71,7 @@ class Company < ApplicationRecord
   has_many :beneficiary_payments
   has_many :security_deposits
   has_many :icici_statements
+  has_many :insight_dashboards
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -95,6 +101,10 @@ class Company < ApplicationRecord
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
+  has_many :single_sign_on_configurations
+
+  has_many :bbps_bills
+  has_many :bbps_yes_bank_transactions
 
   has_many :budgets
   has_many :procurements
@@ -113,6 +123,10 @@ class Company < ApplicationRecord
   has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
   has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
 
+  # Utility Bills
+  has_many :bbps_subscriptions, class_name: 'BbpsBillerSubscription'
+  has_many :bbps_bills
+
   has_many :departments
   has_many :company_pocket_templates
 
@@ -123,6 +137,8 @@ class Company < ApplicationRecord
 
   has_many :admin_implementation_requests
 
+  has_many :transfer_mode_company_mappings
+  alias_attribute :transfer_modes, :transfer_mode_company_mappings
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -387,6 +403,10 @@ class Company < ApplicationRecord
     self.feature_subscription.gstin_verification_enabled
   end
 
+  def utility_bills_enabled?
+    self.feature_subscription.utility_bills_enabled
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
@@ -399,6 +419,10 @@ class Company < ApplicationRecord
     else
       return false
     end
+  end
+
+  def analytics_system_enabled?
+    self.feature_subscription.analytics_system
   end
 
 
@@ -500,6 +524,7 @@ class Company < ApplicationRecord
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_icici_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_utility_bills_account(enabled: true, balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save

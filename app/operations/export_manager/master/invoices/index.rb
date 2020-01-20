@@ -1,63 +1,83 @@
-class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsheet
 
-  attr_accessor :input_data
+  label 'Export'
+  description 'Invoices Export'
+  configurable true
+  handle :invoices
+  screen 'invoices.index'
+  system :vp
+  # scope "development", 156, 'Bundl Technologies Pvt Ltd'
+  validate :fetch_invoices
 
-  subscribe :invoices
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
-  validate :input
+  section :header do
+    attribute :finly_ref_no
+    attribute :po_number
+    attribute :invoice_type
+    attribute :invoice_no
+    attribute :invoice_date
+    attribute :created_by
+    attribute :created_at
+    attribute :po_date
+    attribute :transaction_period_from
+    attribute :transaction_period_to
+    attribute :is_invoice_approved
+    attribute :invoice_status
+    attribute :policy
+    attribute :narration
+    attribute :advance_amount
+    attribute :invoice_net_payable_amount
+    attribute :approvers
+    attribute :finance_approved_date
+    attribute :due_date
+    attribute :invoice_discount
+  end
 
-  attribute :finly_ref_no
-  attribute :po_number
-  attribute :invoice_type
-  attribute :invoice_no
-  attribute :invoice_date
-  attribute :created_by
-  attribute :created_at
-  attribute :po_date
-  attribute :vendor_name
-  attribute :vendor_ref_no
-  attribute :vendor_gstin
-  attribute :delivery_location
-  attribute :transaction_period_from
-  attribute :transaction_period_to
-  attribute :is_invoice_approved
-  attribute :invoice_status
-  attribute :policy
-  attribute :category
-  attribute :quantity
-  attribute :rate
-  attribute :narration
-  attribute :city_name
-  attribute :city_code
-  attribute :department_name
-  attribute :department_code
-  attribute :gst_group
-  attribute :hsn_sac
-  attribute :tds_nature
-  attribute :tds_percentage
-  attribute :tds_amount
-  attribute :cost_center
-  attribute :nature_of_expense
-  attribute :nature_of_office
-  attribute :item_code
-  attribute :description
-  attribute :unit_of_measurement
-  attribute :total_amount
-  attribute :tax_amount
-  attribute :tax_rate
-  attribute :tax_type
-  attribute :invoice_discount
-  attribute :line_item_discount
-  attribute :line_item_sgst
-  attribute :line_item_cgst
-  attribute :line_item_igst
-  attribute :advance_amount
-  attribute :invoice_net_payable_amount
-  attribute :approvers
-  attribute :finance_approved_date
-  attribute :due_date
-  attribute :custom_fields, dynamic: true
+  section :purchase do
+    attribute :vendor_name
+    attribute :vendor_ref_no
+    attribute :vendor_gstin
+    attribute :vendor_state
+    attribute :billing_location
+    attribute :shipping_location
+  end
+
+  section :tax do
+    attribute :tds_nature
+    attribute :tds_percentage
+    attribute :tds_amount
+  end
+
+  section :item_details do
+    attribute :category
+    attribute :quantity
+    attribute :rate
+    attribute :location_name
+    attribute :location_code
+    attribute :department_name
+    attribute :department_code
+    attribute :gst_group
+    attribute :hsn_sac
+    attribute :line_item_discount
+    attribute :line_item_sgst
+    attribute :line_item_cgst
+    attribute :line_item_igst
+    attribute :cost_center
+    attribute :item_code
+    attribute :description
+    attribute :unit_of_measurement
+    attribute :total_amount
+    attribute :tax_amount
+    attribute :tax_rate
+    attribute :tax_type
+  end
+
+  section :custom_fields do
+    attribute :custom_fields, dynamic: true
+  end
+
+  # post_process -> do
+  #   debugger
+  # end
 
   def custom_fields(row, invoice_line_item)
     invoice_line_item.parent.custom_fields.includes(:field_configuration).each do |custom_field|
@@ -65,22 +85,22 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     end
   end
 
-  def name
-    'Invoices'
-  end
-
-  def input
-    return self.input_data unless self.input_data.nil?
-
+  def fetch_invoices
     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
 
     unless invoices_presenter.success?
       add_message :error, invoices_presenter.messages[:error]
       return
     end
+    invoices_presenter
+  end
+
+  def input
+    invoices_presenter = fetch_invoices
+    return if has_errors?
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
 
   def po_number(invoice_line_item)
@@ -91,7 +111,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent&.date&.strftime("%d-%b-%y")
   end
 
-  def delivery_location(invoice_line_item)
+  def billing_location(invoice_line_item)
+    invoice_line_item.parent&.location&.name
+  end
+
+  def shipping_location(invoice_line_item)
     invoice_line_item.parent&.delivery_location&.name
   end
 
@@ -137,6 +161,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent&.gstin_location&.gstin
   end
 
+  def vendor_state(invoice_line_item)
+    invoice_line_item.parent&.gstin_location&.state&.name
+  end
+
   # def vendor_gst(invoice_line_item)
   #   invoice_line_item
   # end
@@ -177,11 +205,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
     invoice_line_item.parent.narration
   end
 
-  def city_name(invoice_line_item)
+  def location_name(invoice_line_item)
     invoice_line_item.parent.location&.name
   end
 
-  def city_code(invoice_line_item)
+  def location_code(invoice_line_item)
     invoice_line_item.parent.location&.location_code
   end
 
@@ -207,14 +235,6 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def cost_center(invoice_line_item)
     invoice_line_item.cost_center&.name
-  end
-
-  def nature_of_expense(invoice_line_item)
-    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_expense' }&.first
-  end
-
-  def nature_of_office(invoice_line_item)
-    invoice_line_item.parent.custom_fields.map { |cf| cf.string_value if cf.field_key == 'nature_of_office' }&.first
   end
 
   def item_code(invoice_line_item)

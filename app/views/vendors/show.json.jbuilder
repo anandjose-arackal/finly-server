@@ -2,7 +2,7 @@ json.id @result.vendor.id
 json.vendor_approval_workflow @result.vendor_approval_workflow
 json.created_by @result.vendor.created_by&.json_for_trail({vendor_show: true})
 json.vendor do
-  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number
+  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :msme_registered, :msme_registration_number, :rcm_enabled
   if @result.vendor.is_a?(YesBankVendor)
     json.payment_term @result&.vendor&.payment_term&.as_json
     json.currency @result.vendor.currency

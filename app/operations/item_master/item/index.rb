@@ -3,20 +3,23 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   attr_accessor :inventory_line_items
 
   class ItemMaster::Item::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
+    include HasScope
     attr_accessor :inventory_line_items, :paginated_line_items, :offset
 
-    has_scope :search
+    has_scope :filter_search
     has_scope :filter_category_id
     has_scope :filter_item_type, type: :array #todo undo this after implementation
     has_scope :filter_active
     has_scope :filter_ids, type: :array
 
     def init
-      # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
+      if params[:search].present?
+        params[:filter_search] = params[:search]
       end
+      # Todo temp workaround because of frontend format issue - START
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
       per_page = params[:per_page] || 30

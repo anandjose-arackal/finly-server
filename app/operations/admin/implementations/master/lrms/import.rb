@@ -3,24 +3,24 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'lrms.import'
   headers ({
-            :id => 'ID',
-            :policy => 'Policy Name',
-            :policy_creation_flag => 'For New Policy Y / or Blank',
-            :department_code => 'DepartmentCode',
-            :location_code => 'LocationCode',
-            :level_name => 'Level Name',
-            :level_number => 'Level Number',
-            :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
-            :with_exception => 'With Exception Y/N',
-            :without_exception => 'Without Exception Y/N',
-            :min => "Minimum Threshold",
-            :max => "Max Threshold",
-            :destroy => 'Destroy'
+      :id => 'ID',
+      :policy => 'Policy Name',
+      :policy_creation_flag => 'For New Policy Y / or Blank',
+      :department_code => 'DepartmentCode',
+      :location_code => 'LocationCode',
+      :level_name => 'Level Name',
+      :level_number => 'Level Number',
+      :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
+      :with_exception => 'With Exception Y/N',
+      :without_exception => 'Without Exception Y/N',
+      :min => "Minimum Threshold",
+      :max => "Max Threshold",
+      :destroy => 'Destroy'
   })
 
   attr_accessor :lrm_params, :provider, :application, :policy, :level, :user_profiles
   def process
-    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?',company.id)
+    self.user_profiles = UserProfile.joins(:user).where('users.company_id = ?', company.id)
 
     path = Rails.env.production? ? self.implementation_request.request_file&.url : self.implementation_request.request_file&.path
     self.input = Roo::Spreadsheet.open(path)

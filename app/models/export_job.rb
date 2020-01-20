@@ -19,16 +19,29 @@
 #  status_id               :integer          not null
 #  company_id              :bigint           not null
 #  request_params          :text(4294967295)
+#  deleted_at              :datetime
+#  master                  :string(255)
+#  description             :string(255)
+#  processing_record_type  :string(255)
+#  processing_record_id    :bigint
+#  record_type             :string(255)
+#  record_id               :bigint
+#  crash_stacktrace        :text(65535)
+#  message                 :text(65535)
+#  note                    :text(65535)
 #
 
 class ExportJob < ApplicationRecord
+  include SoftDeletable
+
   belongs_to :status, class_name: 'ExportJobStatus'
   belongs_to :created_by, optional: true, class_name: 'User'
+  belongs_to :record, polymorphic: true, optional: true
 
   has_attached_file :attachment, :use_timestamp => false
   do_not_validate_attachment_file_type :attachment
 
-  scope :created_after, -> (datetime) { where 'created_at > ?', datetime}
+  scope :created_after, -> (datetime) {where 'created_at > ?', datetime}
 
   serialize :request_params, JSON
 
@@ -50,18 +63,26 @@ class ExportJob < ApplicationRecord
     status_id == ExportJobStatus.id_for(:failed)
   end
 
-  def as_json(options={})
+  def retry
+    return false unless failed?
+
+    ExportManager::DSL::Generator::Background.call_async(created_by, {export_job_id:self.id})
+    true
+  end
+
+  def as_json(options = {})
     {
         id: id,
         name: name,
         export_type: export_type,
-        completed_at: completed_at&.strftime("%I:%m%p, %d-%m-%Y"),
+        completed_at: completed_at&.strftime("%I:%M%p, %d-%m-%Y"),
         total_records: (total_records || 0),
         completed_records: (completed_records || 0),
         completion_percentage: (completion_percentage || 0),
         attachment: attachment&.url,
-        created_at: created_at&.strftime("%I:%m%p, %d-%m-%Y"),
+        created_at: created_at&.strftime("%I:%M%p, %d-%m-%Y"),
         status: status&.name,
+        note: note
     }
   end
 

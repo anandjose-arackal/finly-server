@@ -1,11 +1,9 @@
-class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::Spreadsheet
 
   attr_accessor :entities
 
   validate :input
-  subscribe :budget_entities
-  processor ExportManager::Processor::Asynchronous
-  generator ExportManager::Generator::Spreadsheet
+  handle :budget_entities
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type
@@ -23,10 +21,6 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   attribute :created_at
   attribute :created_by
   # attribute :custom_fields
-
-  def name
-    'Budgets'
-  end
 
   def input
     op = ::Budgets::Show.(user, params)

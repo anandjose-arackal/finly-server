@@ -20,6 +20,9 @@ class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'department'
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 

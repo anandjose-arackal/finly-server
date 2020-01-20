@@ -32,11 +32,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     #support for multiple gstin locations in import
     vendor = check_existing_vendor(vendor_params["vendor"])
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
-       vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
-       unless vendor.save
-         return result false, vendor.errors.full_messages
-       end
-       return result true, 'Created Successfully'
+      vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
+      unless vendor.save
+        return result false, vendor.errors.full_messages
+      end
+      return result true, 'Created Successfully'
     end
 
     vendor = self.company.yes_bank_vendors.build(vendor_params["vendor"])
@@ -147,20 +147,20 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
 
     gst_registered = (gstin.present? ? true : false)
-    params =  {"vendor"=>{"business_name"=> business_name,
-                          "authorized"=>"1",
-                          "mobile_number"=> mobile_number,
-                          "email"=> email ,
-                          "currency_id"=>"1",
-                          "trade_name"=> trade_name,
-                          "pan"=> pan,
-                          "description"=> description,
-                          "address"=> address,
-                          "status_id"=> 6,
-                          "created_by_id"=> created_by_id,
-                          "vendor_id" => vendor_id,
-                          "vendor_type_id" => vendor_type_id,
-                          "gst_registered" =>  gst_registered
+    params = {"vendor" => {"business_name" => business_name,
+                           "authorized" => "1",
+                           "mobile_number" => mobile_number,
+                           "email" => email,
+                           "currency_id" => "1",
+                           "trade_name" => trade_name,
+                           "pan" => pan,
+                           "description" => description,
+                           "address" => address,
+                           "status_id" => 6,
+                           "created_by_id" => created_by_id,
+                           "vendor_id" => vendor_id,
+                           "vendor_type_id" => vendor_type_id,
+                           "gst_registered" => gst_registered
     }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>account_name,

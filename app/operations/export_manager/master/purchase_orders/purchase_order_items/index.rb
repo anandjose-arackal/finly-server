@@ -1,9 +1,12 @@
-class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Builders::Spreadsheet
 
 
-  subscribe :purchase_order_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Purchase Orders Export'
+  configurable true
+  system :vp
+  # screen 'purchase_orders.index'
+  handle :purchase_order_items
   validate :input
 
   attribute :procurement_name
@@ -22,10 +25,6 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   attribute :tax
   attribute :tax_amount
   attribute :total_amount
-
-  def name
-    'Purchase Orders'
-  end
 
   def input
     procurements_op = ::Procurements::Index.(user, params)

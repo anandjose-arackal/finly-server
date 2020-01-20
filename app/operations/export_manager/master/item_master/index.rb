@@ -1,9 +1,12 @@
 require 'ostruct'
-class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spreadsheet
 
-  subscribe :inventory_items
-  generator ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Asynchronous
+  label 'Export'
+  description 'Item Master Export'
+  configurable true
+  system :vp
+  screen 'item_master.index'
+  handle :inventory_items
   validate :input
 
   attribute :item_number
@@ -22,10 +25,6 @@ class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubs
   attribute :unit_of_measurement
   attribute :created_user
   attribute :created_at
-
-  def name
-    'Item Master'
-  end
 
   def input
     result = ::ItemMaster::Item::Index.(user, params)

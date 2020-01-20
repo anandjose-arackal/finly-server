@@ -117,7 +117,7 @@ class IndividualKyc < ApplicationRecord
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :id_proof, content_type: CONTENT_TYPES
+  #validates_attachment :id_proof, content_type: CONTENT_TYPES
 
   has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES

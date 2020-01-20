@@ -19,6 +19,9 @@
 
 class Policy < ApplicationRecord
   include SoftDeletable
+  include EventProducer
+
+  event_channel 'policy'
 
   belongs_to :company, optional: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'
@@ -224,5 +227,4 @@ class Policy < ApplicationRecord
     self.build_cash_expense_config(enabled: true).save
     self.build_card_expense_config(enabled: true).save
   end
-
 end

@@ -63,7 +63,7 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
     if purchase_order.present? && purchase_order.purchase_request_items.present?
       if purchase_order.closed?
         purchase_order.purchase_request_items.where.not(status_id: PurchaseRequestItemStatus.id_for(:po_closed)).each do |purchase_request_item|
-            purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:po_closed))
+          purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:po_closed))
         end
       end
     end

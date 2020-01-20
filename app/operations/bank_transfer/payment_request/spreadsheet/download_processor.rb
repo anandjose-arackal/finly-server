@@ -30,12 +30,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def process
     headers = retrieve_headers
     content = retrieve_data
-    sheets =[{
-        item_headers: headers,
-        item_contents: content,
-        name: "Payment Tickets"
-    }]
-    exported_xls = Exporter.new(user, {xlsx: {headers: headers, contents: content, sheets: sheets }}, messages).xlsx_exporter.export_file_path
+    sheets = [{
+                  item_headers: headers,
+                  item_contents: content,
+                  name: "Payment Tickets"
+              }]
+    exported_xls = Exporter.new(user, {xlsx: {headers: headers, contents: content, sheets: sheets}}, messages).xlsx_exporter.export_file_path
     exportable_file = exported_xls
     self.file_name = 'export.xls'
     if include_attachments
@@ -156,8 +156,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             pr.name,
             payment.id,
             "#{payment.receiving_account&.account_owner&.name}",
-            "#{payment.receiving_account&.name}",
             vendor.present? ? vendor.vendor_id : '',
+            "#{payment.receiving_account&.name}",
             "'#{payment.receiving_account&.account_number}",
             payment.receiving_account&.ifsc,
             payment.payment_mode&.upcase,
@@ -191,10 +191,10 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
         when 'BeneficiaryPayment'
           bp = payment.parent
           payment_details += [
-              (bp&.original_amount&.value|| 0.0),
-              (bp&.advance_amount&.value||0.0),
+              (bp&.original_amount&.value || 0.0),
+              (bp&.advance_amount&.value || 0.0),
               0.0,
-              (bp&.tax_amount&.value|| 0),
+              (bp&.tax_amount&.value || 0),
               (bp&.tds_amount&.value || 0),
               (payment.amount&.value || 0)
           ]
@@ -240,18 +240,18 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   end
 
   def original_amount_invoice(payment)
-     original_amount = 0.0
-     if payment.invoice.present?
-       invoice = payment.invoice
-       if invoice&.invoice_items.present?
-         original_amount = (invoice.amount&.value || 0.0)
-       else
-         original_amount = (invoice&.original_amount&.value || 0.0)
-       end
-     else
-       original_amount = (payment&.amount&.value || 0.0)
-     end
-     original_amount
+    original_amount = 0.0
+    if payment.invoice.present?
+      invoice = payment.invoice
+      if invoice&.invoice_items.present?
+        original_amount = (invoice.amount&.value || 0.0)
+      else
+        original_amount = (invoice&.original_amount&.value || 0.0)
+      end
+    else
+      original_amount = (payment&.amount&.value || 0.0)
+    end
+    original_amount
   end
 
   def tds_amount(payment)

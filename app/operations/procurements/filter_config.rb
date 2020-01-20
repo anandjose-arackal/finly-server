@@ -26,7 +26,7 @@ class Procurements::FilterConfig < Procurements::Base
     department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
     department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
     self.departments = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
-    custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params )
+    custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params)
     self.po_custom_fields_config = custom_field_op.field_configurations
   end
 
@@ -61,9 +61,9 @@ class Procurements::FilterConfig < Procurements::Base
 
   def custom_field_filter_params
     {
-      filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
-      filter_parent_type_id: [FieldParentType.id_for(:purchase_order)]
-    }    
+        filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
+        filter_parent_type_id: [FieldParentType.id_for(:purchase_order)]
+    }
 
   end
 end
