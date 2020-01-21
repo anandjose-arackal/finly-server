@@ -20,4 +20,8 @@ Resolver::Router.draw do
   scope :insight_dashboard do
     route 'default', Insights::Resolver
   end
+
+  scope :category do
+    route 'default', Masters::Categories::Resolver
+  end
 end

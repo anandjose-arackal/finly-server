@@ -7,7 +7,7 @@ module Resolver::ActiveRecordHelper
     end
 
     def resolve(user, scope: :default, params: {}, paginate: false, filter: true, includes: [])
-      resolver(scope)&.klass&.new(user)&.resolve(params: params, paginate: paginate, filter: filter, includes: includes)
+      resolver(scope)&.new(user)&.resolve(params: params, paginate: paginate, filter: filter, includes: includes)
     end
   end
 
