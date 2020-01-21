@@ -100,7 +100,6 @@
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
 #  include_tax_and_tds                   :boolean          default(FALSE)
-#  rcm_enabled                           :boolean
 #
 
 FactoryBot.define do
