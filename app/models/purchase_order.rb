@@ -963,6 +963,7 @@ class PurchaseOrder < ApplicationRecord
         tds = self.advance_tds_slab&.tds
         new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
         tds_amount = self.requested_advance_amount.value - new_advance_amount
+        tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
         if self.advance_amount.nil?
