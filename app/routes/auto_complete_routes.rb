@@ -10,4 +10,6 @@ AutoComplete::Router.draw do
   route "departments", Masters::Departments::AutoComplete
   route "locations", Masters::Locations::AutoComplete
   route "cost_centers", Masters::CostCenters::AutoComplete
+  route "categories", Masters::Categories::AutoComplete
+  route "policies", Masters::Policies::AutoComplete
 end
