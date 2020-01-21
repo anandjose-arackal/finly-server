@@ -319,7 +319,7 @@ class BbpsBill < ApplicationRecord
     if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
       joins(subscription: [:pocs]).where("bbps_subscription_pocs.user_id = ?", user.id)
     elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
-      joins(:subscription).
+      ids = self.joins(:subscription).
           where("bbps_biller_subscriptions.user_id = ?", user.id).
           where(autofetched: true).
           or(
@@ -327,7 +327,8 @@ class BbpsBill < ApplicationRecord
                   where("bbps_biller_subscriptions.user_id = ?", user.id).
                   where(autofetched: false).
                   where.not(status_id: BbpsBillStatus.id_for(:open))
-          )
+          ).pluck("bbps_bills.id")
+      where(id: ids)
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       role_based_creditor_associated_items(user, role_id)
     end
@@ -340,10 +341,11 @@ class BbpsBill < ApplicationRecord
       super
     elsif UserRole.id_for(:utility_bill_master_reviewer)
       subscription_ids = BbpsBillerSubscription.role_based_reviewer_associated_items(user, role_id).pluck(:id)
-      joins(:subscription).
+      ids = self.joins(:subscription).
           where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?", true).or(
                   self.joins(:subscription).where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?" , false).where.not("bbps_bills.status_id = ?", BbpsBillStatus.id_for(:open))
-      )
+      ).pluck("bbps_bills.id")
+      where(id: ids)
     elsif UserRole.id_for(:bank_payment_request_reviewer)
       role_based_creditor_associated_items(user, role_id)
     end
