@@ -285,6 +285,7 @@ class CreditNote < ApplicationRecord
     CreditNoteStatus.ids_for(self.role_based_statuses(user))
   end
 
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
@@ -306,11 +307,45 @@ class CreditNote < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    CreditNoteStatus.ids_for(:approved, :auto_approved, :voided)
+    CreditNoteStatus.ids_for(:approved, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted)
   end
 
   def self.auditor_associated_status_ids
     CreditNoteStatus.ids_for([:approved, :auto_approved, :awaiting_approval, :rejected, :retracted, :voided])
+  end
+
+  def role_based_initiator_associated_items(user, role_id)
+    if UserRole.id_for(:credit_note_initiator) == role_id
+      super
+
+    elsif [UserRole.ids_for(:purchase_order_initiator,
+                            :purchase_order_reviewer,
+                            :purchase_order_auditor,
+                            :po_invoice_initiator,
+                            :po_invoice_reviewer,
+                            :po_invoice_auditor,
+                            :non_po_invoice_initiator,
+                            :non_po_invoice_reviewer,
+                            :non_po_invoice_auditor,
+                            :bank_payment_request_initiator,
+                            :bank_payment_request_reviewer,
+                            :bank_payment_request_auditor,
+                            :bank_payment_request_creditor,
+    )].include?(role_id)
+      policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
+      # Find all Credit notes post approved state in the respective policies
+      where(policy_id: policy_ids).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted, :adjusted, :voided))
+    else
+      # Nothing
+    end
+  end
+
+  def role_based_reviewer_associated_items(user, role_id)
+    if UserRole.id_for(:credit_note_reviewer) == role_id
+      super
+    else
+      role_based_initiator_associated_items(user, role_id)
+    end
   end
 
   def self.roles
