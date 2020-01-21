@@ -21,6 +21,7 @@ class Docs::P2P::CreditNotes::Authorizer
     @user.vendor_payment_admin? ||
         @user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) ||
         @user.has_policy_role?(UserRole.id_for(:credit_note_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:credit_note_auditor)) ||
         @user.is_bank_payment_request_initiator? ||
         @user.is_bank_payment_request_reviewer? ||
         @user.is_bank_payment_request_auditor? ||
