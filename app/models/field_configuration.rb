@@ -197,7 +197,7 @@ class FieldConfiguration < ApplicationRecord
     options = []
     if field_type_id == FieldType.id_for(:drop_down)
       # options = drop_down_items.exclude_deleted
-      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi.is_deleted == false}.reject(&:nil?)
+      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
