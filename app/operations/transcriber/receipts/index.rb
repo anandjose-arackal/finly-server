@@ -42,7 +42,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     if params[:filter_parent] == '1'
       self.receipts = Receipt.untranscribed.joins(:user => [:company])
                           .where('companies.id IN (?)', companies.pluck(:id))
-                          .reorder("#{self.sort_by} #{self.sort_order}")
+                          .reorder("receipts.#{self.sort_by} #{self.sort_order}")
     elsif params[:filter_parent] == '2'
       self.receipts = Receipt.joins(:user => [:company,:expenses])
                           .where('companies.id IN (?)',companies.pluck(:id))

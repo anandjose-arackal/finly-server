@@ -17,7 +17,8 @@ class ExportController < BaseControllers::WebBase
     respond_to do |format|
       format.csv {
         @report = Export::Reports::AsCsv.(current_user, params)
-        send_data @report.data, filename: "#{@report.report_names}.csv"
+        report_names = @report.report_names.blank? ? "report_#{Date.today.day}_#{Date.today.month}_#{Date.today.year}" : @report.report_names
+        send_data @report.data, filename: "#{report_names}.csv"
       }
       format.xls { # User for report/show export
         @report = Export::Reports::AsXml.(current_user, params)

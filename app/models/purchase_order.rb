@@ -70,6 +70,8 @@
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
+#  taxable_amount_id            :integer
+#  discount_type_id             :integer
 #  rejection_note               :text(65535)
 #  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
