@@ -25,7 +25,7 @@ class EmailProcessor
       #                                             sent_at: DateTime.parse(@email.headers['Date'])
 
       receipt_email = user.receipt_emails.create subject: StringUtils.force_utf_8_encoding(@email.subject),
-                                           sent_at: DateTime.parse(@email.headers['Date'])
+                                                 sent_at: DateTime.parse(@email.headers['Date'])
       id = receipt_email.id
       receipt_email.body = FakeFileIO.new("#{id}_body.txt", @email.body)
       receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)

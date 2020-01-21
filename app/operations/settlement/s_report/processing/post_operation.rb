@@ -219,8 +219,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       mapping.reports.each do |report|
         next if report.settled? or report.settlement_confirmed? # explicitly settle reports when called from batch level
         parameters = {
-          document: report,
-          aasm_event: event
+            document: report,
+            aasm_event: event
         }
 
         created_by_user = User.find_by id: self.report_processor_group.created_by_user_id

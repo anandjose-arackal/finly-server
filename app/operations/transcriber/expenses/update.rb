@@ -29,7 +29,7 @@ class Transcriber::Expenses::Update < Transcriber::Expenses::Base
       add_message :error, "Expense not found"
       return
     end
-    if expense.report_id.present? || (expense.transcribed && expense.updated_at > Time.now - 8.hours )
+    if expense.report_id.present? || (expense.transcribed && expense.updated_at > Time.now - 8.hours)
       add_message :error, "This expense cannot be edited"
     end
   end

@@ -89,8 +89,8 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
       mapping.reports.where.not(report_status_id: [ReportStatus.settlement_confirmed_id, ReportStatus.settled_id]).each do |report|
         # explicitly settle reports when called from batch level
         parameters = {
-          document: report,
-          aasm_event: event
+            document: report,
+            aasm_event: event
         }
 
         created_by_user = User.find_by id: self.report_group_processor.created_by_user_id

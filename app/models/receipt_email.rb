@@ -104,7 +104,7 @@ class ReceiptEmail < ApplicationRecord
 
     to_be_transcribed = false
     receipt_files&.each do |receipt_file|
-      receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense,receipt_email_id: self.id)
+      receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense, receipt_email_id: self.id)
       if self.expense_id.blank? and user.company.ocr_enabled?
         receipt.update(to_be_transcribed: true)
         to_be_transcribed = true

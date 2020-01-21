@@ -98,8 +98,8 @@ class Settlement::SMoneyRequests::Processing::MarkAsPaid < Settlement::SMoneyReq
       end
 
       mapping.money_requests.where(id: money_request_ids).update_all(controlling_user_id: nil, controlling_user_role_id: nil,
-                                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                            status_id: request_status, payment_id: mapping.payment&.id)
+                                                                     controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                                                     status_id: request_status, payment_id: mapping.payment&.id)
     end
   end
 

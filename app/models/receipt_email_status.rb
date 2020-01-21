@@ -17,7 +17,7 @@ class ReceiptEmailStatus < ApplicationRecord
       completed: 3
   }
 
-  scope :with_name, ->(name) { where name: name }
+  scope :with_name, ->(name) {where name: name}
 
   def self.id_for(key)
     VALUES[key]
