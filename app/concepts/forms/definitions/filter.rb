@@ -28,6 +28,18 @@ module Forms
       def filters
         self.class.filters
       end
+
+      def filter_form
+        filter = {
+            label: label,
+            hint: hint,
+            type: registered_type,
+        }
+        if self.class.consumes_choices?
+          filter[:choices] = choices
+        end
+        filter
+      end
     end
   end
 end

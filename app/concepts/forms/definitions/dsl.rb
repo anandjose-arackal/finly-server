@@ -26,9 +26,9 @@ module Forms
           sections << Section.new(self, name, &block)
         end
 
-        def collection(name, &block)
-          sections << Collection.new(self, name, &block)
-        end
+        # def collection(name, &block)
+        #   sections << Collection.new(self, name, &block)
+        # end
       end
     end
   end

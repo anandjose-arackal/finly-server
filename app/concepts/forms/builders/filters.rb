@@ -14,23 +14,23 @@ module Forms::Builders::Filters
     raise 'Invalid company' unless company.class.name == Company.name
     raise 'Invalid user' unless user.class.name == User.name
 
-    Build.with(api.properties, company, user)
+    Build.with(api.sections, company, user)
   end
 
   module Build
-    def self.with(properties, company, user)
+    def self.with(entities, company, user)
       response = []
 
-      properties.each do |property|
-        if property.association?
-          result = Build.with(property.properties, company, user)
+      entities.each do |entity|
+        if entity.entities.present?
+          result = Build.with(entity.entities, company, user)
           if result.respond_to?(:each)
             response += result
           else
             response << result
           end
         else
-          response << property.filter_form
+          response << entity.filter_form
         end
       end
       response

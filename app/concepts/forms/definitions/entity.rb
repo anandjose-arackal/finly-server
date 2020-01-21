@@ -128,6 +128,7 @@ module Forms
       def inspect
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
       end
+
     end
   end
 end
