@@ -25,8 +25,15 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   attribute :item_igst_rate
   attribute :item_cgst_rate
   attribute :item_sgst_rate
+  attribute :igst_account_number
+  attribute :cgst_account_number
+  attribute :sgst_account_number
   attribute :hsn_sac
+  attribute :reverse_charge
+  attribute :reverse_charge_tax_gl_account
+  attribute :calculate_tax_for_rct
   attribute :invoice_status
+  attribute :itc_qualified
   attribute :country
   attribute :vendor_name
   attribute :department_code
@@ -45,16 +52,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
     invoices_presenter = fetch_invoices
     return if has_errors?
 
-    # start_date = Date.parse(params[:start_date].beginning_of_day) rescue false
-    # end_date = Date.parse(params[:end_date].end_of_day) rescue false
-
-    # unless start_date && end_date
-    #   add_message :error, 'Invalid date provided'
-    #   return
-    # end
-
-
-    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :approved, :auto_approved, :initiated, :unpaid, :paid]))#, approved_at: start_date..end_date)
+    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :approved, :auto_approved, :initiated, :unpaid, :paid]))
 
     InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
   end
@@ -128,8 +126,20 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
     invoice_line_item&.rate / 2.0
   end
 
-  # TODO ADD SGST state
-  # TODO ADD SGST ACCOUNT NUMBER
+  # TODO ADD SGST state remove
+  # TODO ADD SGST ACCOUNT NUMBER internal id DONE
+
+  def igst_account_number
+    invoice_line_item.tax_rate&.igst_internal_id
+  end
+
+  def sgst_account_number
+    invoice_line_item.tax_rate&.sgst_internal_id
+  end
+
+  def cgst_account_number
+    invoice_line_item.tax_rate&.cgst_internal_id
+  end
 
   def hsn_sac(invoice_line_item)
     invoice_line_item.hsn_sac
@@ -137,12 +147,28 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
 
   # TODO REVERSE CHARGE
 
+  def reverse_charge
+    0
+  end
+
+  def reverse_charge_tax_gl_account
+    "N"
+  end
+
+  def calculate_tax_for_rct
+    "N"
+  end
+
   def invoice_status(invoice_line_item)
     invoice_line_item.parent&.status&.name&.humanize
   end
 
   # TODO ADD ITEM SERIAL NUMBER
-  # TODO ADD ITC QUALIFIED
+  # TODO ADD ITC QUALIFIED based on item gst DONE
+
+  def itc_qualified
+    invoice_line_item.parent.items.map {|i| i.tax_rate.present?}.compact.present?
+  end
 
   def country(invoice_line_item)
     invoice_line_item.amount.currency.country
@@ -152,8 +178,6 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
     invoice_line_item.parent.vendor&.display_name
   end
 
-  # TODO COMPOSITION VENDOR
-
   def department_code(invoice_line_item)
     invoice_line_item.department&.department_code
   end
@@ -161,8 +185,5 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   def cost_center_code(invoice_line_item)
     invoice_line_item.cost_center&.cost_center_code
   end
-
-  # TODO ORIGINAL INVOICE TRANSACTION DATE
-  # TODO ORIGINAL INVOICE GSTIN
 
 end

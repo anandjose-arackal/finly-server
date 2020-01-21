@@ -14,6 +14,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   attribute :created_by
   attribute :gl_code
   attribute :tds_payable
+  attribute :legal_status
   attribute :pan
   attribute :vendor_id
   attribute :vendor_name
@@ -39,16 +40,8 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   def input
     invoices_presenter = fetch_invoices
     return if has_errors?
-
-    # start_date = Date.parse(params[:start_date].beginning_of_day) rescue false
-    # end_date = Date.parse(params[:end_date].end_of_day) rescue false
-
-    # unless start_date && end_date
-    #   add_message :error, 'Invalid date provided'
-    #   return
-    # end
     
-    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :approved, :auto_approved, :initiated, :unpaid, :paid]))#, approved_at: start_date..end_date)
+    invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid]))
   end
 
   def invoice_id(invoice)
@@ -76,7 +69,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoice.tds
   end
 
-  # TODO VENDOR LEGAL STATUS
+  # TODO VENDOR LEGAL STATUS DONE
+
+  def legal_status
+    invoice.vendor_location&.gstin_master&.constitution_of_business
+  end
 
   def pan(invoice)
     invoice.vendor.pan
@@ -90,7 +87,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoice.vendor&.display_name
   end
 
-  # TODO PAYMENT DATE
+  # TODO PAYMENT DATE DONE
+
+  def payment_date
+    invoice.payments.order(created_at: :desc).first&.created_at&.strftime("%d-%b-%y")
+  end
 
   def amount_paid(invoice)
     invoice.payments.successful.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
@@ -104,7 +105,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoice.gst_type_id == GstType.id_for(:igst) ? invoice.tax_amount.value : 0
   end
 
-  # TODO ADD TOTAL INVOICE AMOUNT
+  # TODO ADD TOTAL INVOICE AMOUNT amt + gst DONE
+
+  def total_invoice_amount
+    invoice.gross_amount&.value + invoice.tax_amount&.value
+  end
 
   def invoice_number(invoice)
     invoice.invoice_number
@@ -118,8 +123,8 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoice.include_original_amount
   end
 
-  # TODO TDS TAX CODE
-  # TODO TDS TAX SECTION
+  # TODO TDS TAX CODE DONE merged to tds_name
+  # TODO TDS TAX SECTION DONE
 
   def tds_name(invoice)
     invoice.tds_slab.name
