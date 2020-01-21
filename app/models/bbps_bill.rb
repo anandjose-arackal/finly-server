@@ -317,7 +317,7 @@ class BbpsBill < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
-      self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
+      ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
       where(id: ids)
     elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       ids = self.joins(:subscription).
