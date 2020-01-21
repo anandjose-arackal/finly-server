@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_16_073611) do
+ActiveRecord::Schema.define(version: 2020_01_21_084928) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4284,10 +4284,14 @@ ActiveRecord::Schema.define(version: 2020_01_16_073611) do
     t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "can_filter_from", default: true
-    t.boolean "can_filter_to", default: true
+    t.boolean "can_filter_date", default: true
     t.text "description"
     t.integer "priority", default: 1, null: false
+    t.boolean "can_filter_policy", default: false
+    t.boolean "can_filter_department", default: false
+    t.boolean "can_filter_location", default: false
+    t.boolean "can_filter_cost_center", default: false
+    t.boolean "can_filter_category", default: false
     t.index ["active"], name: "index_insight_dashboards_on_active"
     t.index ["admin_user_id"], name: "index_insight_dashboards_on_admin_user_id"
     t.index ["application"], name: "index_insight_dashboards_on_application"
@@ -6677,6 +6681,13 @@ ActiveRecord::Schema.define(version: 2020_01_16_073611) do
     t.index ["user_id"], name: "index_receipt_email_parse_failures_on_user_id"
   end
 
+  create_table "receipt_email_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_receipt_email_statuses_on_name"
+  end
+
   create_table "receipt_emails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.text "subject"
     t.datetime "sent_at"
@@ -6708,7 +6719,9 @@ ActiveRecord::Schema.define(version: 2020_01_16_073611) do
     t.integer "original_source_file_size"
     t.datetime "original_source_updated_at"
     t.string "uuid", limit: 36
+    t.bigint "receipt_email_status_id"
     t.index ["expense_id"], name: "index_receipt_emails_on_expense_id"
+    t.index ["receipt_email_status_id"], name: "index_receipt_emails_on_receipt_email_status_id"
     t.index ["user_id"], name: "index_receipt_emails_on_user_id"
   end
 
@@ -6736,6 +6749,7 @@ ActiveRecord::Schema.define(version: 2020_01_16_073611) do
     t.index ["created_at"], name: "index_receipts_on_created_at"
     t.index ["created_by_id"], name: "index_receipts_on_created_by_id"
     t.index ["deleted_at"], name: "index_receipts_on_deleted_at"
+    t.index ["id", "user_id", "parent_id", "parent_type", "to_be_transcribed"], name: "index_receipts_id_user_parent_parent_id"
     t.index ["modified_by_id"], name: "index_receipts_on_modified_by_id"
     t.index ["parent_id"], name: "index_receipts_on_parent_id"
     t.index ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id"
@@ -9209,6 +9223,7 @@ ActiveRecord::Schema.define(version: 2020_01_16_073611) do
   add_foreign_key "quickbooks_payment_types", "companies"
   add_foreign_key "receipt_email_parse_failures", "users"
   add_foreign_key "receipt_emails", "expenses"
+  add_foreign_key "receipt_emails", "receipt_email_statuses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
   add_foreign_key "report_comments", "expenses"

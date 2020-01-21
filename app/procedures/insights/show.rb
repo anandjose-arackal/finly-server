@@ -12,8 +12,8 @@ class Insights::Show < Transactions::API
     filters = {}
 
     filters[:company_id] = current_user.company_id
-    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_from
-    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_to
+    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_date
+    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_date
 
     options['filters'] = filters
     true
