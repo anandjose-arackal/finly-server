@@ -214,8 +214,8 @@ class BbpsBillerSubscription < ApplicationRecord
     if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       super
     elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
-      ids = BbpsBill.role_based_initiator_associated_items(user, role_id).pluck(:id)
-      where(ids: ids)
+      ids = BbpsBill.role_based_initiator_associated_items(user, role_id).pluck(:subscription_id)
+      where(id: ids)
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       role_based_creditor_associated_items(user, role_id)
     end
