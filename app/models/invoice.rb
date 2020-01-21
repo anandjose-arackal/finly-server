@@ -752,6 +752,7 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+          rcm_enabled: self.rcm_enabled,
 
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
 
