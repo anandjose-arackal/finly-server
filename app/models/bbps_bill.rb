@@ -317,10 +317,35 @@ class BbpsBill < ApplicationRecord
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_initator)].include?(role_id)
-      user.send("#{self.table_name}")
+      joins(subscription: [:pocs]).where("bbps_subscription_pocs.user_id = ?", user.id)
+    elsif [UserRole.id_for(:utility_bill_master_initator)].include?(role_id)
+      joins(:subscription).
+          where("bbps_biller_subscriptions.user_id = ?", user.id).
+          where(autofetched: true).
+          or(
+              self.joins(:subscription).
+                  where("bbps_biller_subscriptions.user_id = ?", user.id).
+                  where(autofetched: false).
+                  where.not(status_id: BbpsBillStatus.id_for(:open))
+          )
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.send("#{self.table_name}").where(policy_id: policy_ids, status_id: finance_associated_status_ids)
+      role_based_creditor_associated_items(user, role_id)
+    end
+  end
+
+  def role_based_reviewer_associated_items(user, role_id, options={})
+    policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
+
+    if role_id == UserRole.id_for(:utility_bill_reviewer)
+      super
+    elsif UserRole.id_for(:utility_bill_master_reviewer)
+      subscription_ids = BbpsBillerSubscription.role_based_reviewer_associated_items(user, role_id).pluck(:id)
+      joins(:subscription).
+          where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?", true).or(
+                  self.joins(:subscription).where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?" , false).where.not("bbps_bills.status_id = ?", BbpsBillStatus.id_for(:open))
+      )
+    elsif UserRole.id_for(:bank_payment_request_reviewer)
+      role_based_creditor_associated_items(user, role_id)
     end
   end
 
