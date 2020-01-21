@@ -15,7 +15,7 @@ class Transcriber::Receipts::Count < Transcriber::Base
   def process
     op = Transcriber::Receipts::Index.(user, params)
     if op.success?
-      self.count = op.receipts.count
+      self.count = op.receipts.group('receipts.id').count&.count
     else
       add_message :error, op.messages[:error]
     end
