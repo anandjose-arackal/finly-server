@@ -78,7 +78,7 @@ class Receipt < ApplicationRecord
   scope :filter_user, -> (user_id) {where user_id: user_id}
 
   # this scope is basically to separately retrieve receipts from companies that have OCR enabled
-  scope :untranscribed, -> {where(to_be_transcribed: true)}
+  scope :untranscribed, -> {where(to_be_transcribed: true, parent_id: nil)}
 
   def receipt_file_name
     self.image_file_name

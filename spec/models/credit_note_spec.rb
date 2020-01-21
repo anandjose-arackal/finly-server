@@ -36,7 +36,7 @@
 #  submitted_at                  :datetime
 #  approved_at                   :datetime
 #  credit_note_number            :string(255)
-#  uuid                          :string(36)
+#  last_adjusted_at              :datetime
 #
 
 require 'rails_helper'

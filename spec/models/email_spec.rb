@@ -6,7 +6,6 @@
 #  entity_type          :string(255)
 #  entity_id            :bigint
 #  company_id           :integer
-#  user_id              :integer
 #  message_id           :string(255)
 #  sender               :string(255)
 #  recipient            :string(255)
