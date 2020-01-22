@@ -10,7 +10,7 @@ module Forms::Entity::Schema
       return @class_schema if @class_schema
 
       if self == Forms::Entity::Base
-        @class_schema ||= {}
+        @class_schema ||= {options: {}}
       else
         @class_schema ||= Forms::Entity::Base.schema.deep_dup
       end
@@ -33,6 +33,7 @@ module Forms::Entity::Schema
 
     # Options are type specific attributes
     def option(key, default: nil)
+      schema[:options][key] = default if default
       define_method key do |value = NoObject|
         self.schema_builder[:options][key] = value unless value == NoObject
         Transactions::Helper.execute_if_proc(self, schema_builder[:options][key])
@@ -65,7 +66,7 @@ module Forms::Entity::Schema
   end
 
   def schema_builder
-    @schema_builder ||= self.class.schema.deep_dup.merge(options: {})
+    @schema_builder ||= self.class.schema.deep_dup
   end
 
   def schema
@@ -106,14 +107,22 @@ module Forms::Entity::Schema
 
   alias_method :choices=, :choices
 
-  def auto_complete(route: nil, filters: {})
+  def scope(value = NoObject)
     return nil unless self.class.consumes_choices?
 
-    @auto_complete = {route: route, filters: filters} if route
-    @auto_complete
+    @scope = value unless value == NoObject
+    @scope
   end
+  alias_method :scope=, :scope
 
-  alias_method :auto_complete=, :auto_complete
+  # def auto_complete(route: nil, filters: {})
+  #   return nil unless self.class.consumes_choices?
+  #
+  #   @auto_complete = {route: route, filters: filters} if route
+  #   @auto_complete
+  # end
+  #
+  # alias_method :auto_complete=, :auto_complete
 
   def valid?
     self.class.valid_schema?(self.schema)

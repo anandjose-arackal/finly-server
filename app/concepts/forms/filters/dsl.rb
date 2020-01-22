@@ -40,11 +40,7 @@ module Forms::Filters::DSL
         multiple: multiple
     }
     if self.class.consumes_choices?
-      if (ch = choices).present?
-        filter[:choices] = ch
-      elsif (ac = auto_complete).present?
-        filter[:auto_complete] = ac
-      end
+      filter[:scope] = scope
     end
     filter
   end
