@@ -52,7 +52,7 @@ class BbpsBillsFetch < ApplicationJob
       #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
       # end
 
-      return if result.ref_no.blank?
+      return if result.ref_no.blank? || bill.blank?
 
       # Do not create bill if bill for same year and period exists
       # Update bill's reference number
