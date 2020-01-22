@@ -94,11 +94,10 @@ module Forms::Entity::Schema
     unless values == NoObject
       @choice_position ||= 0
       values.each do |value|
-        value = {value: value} if value.is_a?(String)
-        value[:id] = nil
-        value[:active] = true
+        raise "Invalid choice #{value}" unless value[:value].present? and value[:name].present?
+        value[:active] ||= true
         value[:position] = @choice_position
-        @choices << value
+        @choices << value.slice(:value, :name, :active, :position)
         @choice_position += 1
       end
     end
