@@ -20,8 +20,8 @@ class Event::EDocument::RemindAwaitingApproval < BaseOperation
     self.non_po_invoices = params[:non_po_invoices]
     self.non_po_awaiting_approval_columns = ["#", "NonPO#", "Created By", "Balance Due"]
 
-    self.po_invoices = params[:non_po_invoices]
-    self.po_invoice_awaiting_approval_columns = ["#", "NonPO#", "Created By", "Balance Due"]
+    self.po_invoices = params[:po_invoices]
+    self.po_invoice_awaiting_approval_columns = ["#", "PO#", "Created By", "Balance Due"]
 
     self.bank_payment_requests = params[:bank_payment_requests]
     self.bpr_awaiting_approval_columns = ["#", "PT #", "Initiating User", "Scheduled Date", "Requested Amount"]
