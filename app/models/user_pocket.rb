@@ -76,7 +76,8 @@ class UserPocket < ApplicationRecord
 
   scope :active, -> { where active: true }
 
-  scope :include_details, -> {includes :user_pocket_type, :base_currency, {balance: [:currency]}}
+  # scope :include_details, -> {includes :user_pocket_type, :base_currency, {balance: [:currency]}}
+  scope :include_details, -> {includes :base_currency, {balance: [:currency]}}
 
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
     initiating_account = self
