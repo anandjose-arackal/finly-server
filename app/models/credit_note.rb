@@ -121,6 +121,7 @@ class CreditNote < ApplicationRecord
           created_at: created_at.strftime('%d %b %Y'),
           updated_at: updated_at.strftime('%d %b %Y'),
           invoice_number: invoice&.invoice_number,
+          rcm_enabled: invoice&.rcm_enabled,
           # roundoff_amount: roundoff_amount,
 
           attachments: attachments.as_json,
