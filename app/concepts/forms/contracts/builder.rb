@@ -1,10 +1,7 @@
 module Forms::Contracts::Builder
+  extend ActiveSupport::Concern
 
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
+  class_methods do
     def contract(user, params = {})
       Forms::Contracts::Builder::Build(self, user: user, params: params)
     end
