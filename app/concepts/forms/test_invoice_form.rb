@@ -14,7 +14,7 @@ class Forms::TestInvoiceForm < Forms::API
     boolean :inclusive_of_taxes
     amount :amount, required: true
     number :tds
-    number :tds_slab_id, scope: Forms::Entity::Scope::Resolver(Masters::Tds::Resolver, :id, :name)
+    # number :tds_slab_id, scope: Forms::Entity::Scope::Resolver(Masters::Tds::Resolver, :id, :name)
   end
 
   section :line_items do
