@@ -332,8 +332,8 @@ class InvoiceCalculationUtils
     end
 
     # Where credit note adjustments
-    cna_added_amount = self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
-    cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    cna_added_amount = precision_value(self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value))
+    # cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
     # adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
 
 
@@ -367,12 +367,11 @@ class InvoiceCalculationUtils
     Rails.logger.fatal "**************************************************************************************************"
     Rails.logger.fatal "Invoice Balance Due - #{self.invoice.balance_due.value.to_f}"
     Rails.logger.fatal "Invoice Credit Note Adjustments - #{self.invoice.credit_note_adjustments.as_json.inspect}"
-    Rails.logger.fatal "CNA Added Amount #{cna_added_amount} \n CNA Removed Amount #{cna_removed_amount}"
-    Rails.logger.fatal "Balance Due Amount(#{balance_due_amount}) - CNA Added Amount(#{cna_added_amount}) + CNA Removed Amount(#{cna_removed_amount})"
-    # End of Debugging
+    Rails.logger.fatal "CNA Added Amount #{cna_added_amount}"
+    Rails.logger.fatal "Balance Due Amount(#{balance_due_amount}) - CNA Added Amount(#{cna_added_amount})"
     Rails.logger.fatal "**************************************************************************************************"
 
-    balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
+    balance_due_amount = balance_due_amount - cna_added_amount
     balance_due_amount = precision_value balance_due_amount
 
     if self.invoice.balance_due.present?
