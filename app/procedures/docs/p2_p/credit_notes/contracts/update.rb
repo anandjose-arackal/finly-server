@@ -72,7 +72,7 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
     errors.add(:base, "Only GST Tax Rate can be changed for Item # #{index + 1}") if (item.quantity.to_f != item.model.original_quantity.to_f || item.rate.to_f != item.model.original_rate.to_f)
   end
 
-  def validate_rcm_change(item, index)
+  def validate_rcm(item, index)
     errors.add(:base, "Cannot apply 'GST / Tax Rate Change' for Item ##{index + 1} as its from a RCM Invoice") if item.invoice_item.invoice.rcm_enabled
   end
 end
