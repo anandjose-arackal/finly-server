@@ -28,24 +28,24 @@ module Forms::Filters::DSL
   end
 
   def filter_form(options = {})
-    Forms::Filters::Cell.new(self).as_json
-    # filter_key = field_key
-    # filter_key = "#{options[:prefix]}_#{filter_key}" if options[:prefix]
-    # filter = {
-    #     label: label,
-    #     hint: hint,
-    #     type: registered_type,
-    #     filter_key: filter_key,
-    #     filters: filters,
-    #     multiple: multiple
-    # }
-    # if self.class.consumes_choices?
-    #   if (ch = choices).present?
-    #     filter[:choices] = ch
-    #   elsif (ac = auto_complete).present?
-    #     filter[:auto_complete] = ac
-    #   end
-    # end
-    # filter
+    # Forms::Filters::Cell.new(self).as_json
+    filter_key = field_key
+    filter_key = "#{options[:prefix]}_#{filter_key}" if options[:prefix]
+    filter = {
+        label: label,
+        hint: hint,
+        type: registered_type,
+        filter_key: filter_key,
+        filters: filters,
+        multiple: multiple
+    }
+    if self.class.consumes_choices?
+      if (ch = choices).present?
+        filter[:choices] = ch
+      elsif (ac = auto_complete).present?
+        filter[:auto_complete] = ac
+      end
+    end
+    filter
   end
 end
