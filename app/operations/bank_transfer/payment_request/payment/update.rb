@@ -334,7 +334,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def validate_payable_amount
     case self.payment.parent_type
     when 'BeneficiaryPayment'
-      if payment.invoice.balance_due.value.to_f < payment.amount_value.to_f
+      if precision_value(payment.invoice.balance_due.value.to_f) < precision_value(payment.amount_value.to_f)
         add_message :error, "Payable amount cannot be greater than balance due"
         return
       end
@@ -342,7 +342,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       invoice = payment.parent
       invoice_amount = invoice.balance_due&.value.round(2)
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if payment_amount.to_f + previous_payments.to_f > invoice_amount
+      if precision_value(payment_amount.to_f + previous_payments.to_f) > precision_value(invoice_amount)
         add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
