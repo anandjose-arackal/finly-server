@@ -44,7 +44,6 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
 
   step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
-
   def init(options, current_user:, params:, **)
     invoice_id = params[:credit_note][:invoice_id]
 
