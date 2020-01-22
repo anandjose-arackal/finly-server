@@ -325,14 +325,14 @@ class InvoiceCalculationUtils
     # return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
     return unless invoice.class.name == "Invoice"
 
-    removed_cna_ids = []
-    # Where credit note adjustments are removed from an invoice
-    if invoice_params[:credit_note_adjustments_attributes].present?
-      removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}.compact
-    end
+    # removed_cna_ids = []
+    # # Where credit note adjustments are removed from an invoice
+    # if invoice_params[:credit_note_adjustments_attributes].present?
+    #   removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}.compact
+    # end
 
     # Where credit note adjustments
-    cna_added_amount = precision_value(self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value))
+    cna_added_amount = precision_value(self.invoice.credit_note_adjustments.joins(:amount).sum(:value))
     # cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
     # adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
 
