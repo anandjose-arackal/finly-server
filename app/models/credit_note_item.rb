@@ -94,7 +94,11 @@ class CreditNoteItem < ApplicationRecord
   end
 
   def get_total_amount
-    get_taxable_amount + get_tax_amount
+    if self.invoice_item&.invoice&.rcm_enabled
+      get_taxable_amount
+    else
+      get_taxable_amount + get_tax_amount
+    end
   end
 
   private
@@ -103,9 +107,7 @@ class CreditNoteItem < ApplicationRecord
     # Reset Original Values if credit note item type has changed
     reset_original_values
 
-
     currency_id = parent&.company&.base_currency_id || Currency.id_for("INR")
-
     case credit_note_item_type_id
     when CreditNoteItemType.id_for(:qty_change), CreditNoteItemType.id_for(:price_drop)
       calculate_qty_rate_change
@@ -115,8 +117,6 @@ class CreditNoteItem < ApplicationRecord
       # Do nothing
       return
     end
-
-
   end
 
   def reset_original_values
@@ -144,6 +144,7 @@ class CreditNoteItem < ApplicationRecord
       self.taxable_amount = Amount.create(value: get_taxable_amount, currency_id: currency_id)
     end
 
+    # Check for RCM
     if self.tax_amount.present?
       self.tax_amount.update(value: get_tax_amount)
     else
@@ -179,9 +180,9 @@ class CreditNoteItem < ApplicationRecord
     end
 
     if self.total_amount.present?
-      self.total_amount.update(value: get_tax_amount)
+      self.total_amount.update(value: get_total_amount)
     else
-      self.total_amount = Amount.create(value: get_tax_amount, currency_id: currency_id)
+      self.total_amount = Amount.create(value: get_total_amount, currency_id: currency_id)
     end
   end
 

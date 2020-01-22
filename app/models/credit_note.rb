@@ -436,7 +436,12 @@ class CreditNote < ApplicationRecord
       end
     end
 
-    net_receivable_amount_value = precision_value(gross_receivable_amount_value + tax_amount_value - tds_amount_value)
+    if self.invoice.rcm_enabled
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value - tds_amount_value)
+    else
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value + tax_amount_value - tds_amount_value)
+    end
+
     if self.net_receivable_amount.present?
       self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
