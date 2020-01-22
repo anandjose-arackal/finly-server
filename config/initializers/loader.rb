@@ -6,4 +6,4 @@ Loader.watch! "Routes Loader" do
   Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
 end
 
-Loader.watch! "Forms Types", dir: 'app/concepts/forms/definitions/types/**/*.rb'
+Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'

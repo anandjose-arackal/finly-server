@@ -1,4 +1,4 @@
-class Forms::Definitions::Types::Formula < Forms::Definitions::Entity
+class Forms::Entity::Types::Formula < Forms::Entity::Base
   register :formula
   hint 'Auto-Generated'
   editable false

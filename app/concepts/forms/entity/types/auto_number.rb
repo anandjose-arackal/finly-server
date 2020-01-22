@@ -1,4 +1,4 @@
-class Forms::Definitions::Types::AutoNumber < Forms::Definitions::Entity
+class Forms::Entity::Types::AutoNumber < Forms::Entity::Base
   register :auto_number
   hint 'Select option'
 

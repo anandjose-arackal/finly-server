@@ -1,4 +1,4 @@
-module Forms::Builders::Filters
+module Forms::Filters::Builder
 
   def self.included(base)
     base.extend(ClassMethods)
@@ -6,7 +6,7 @@ module Forms::Builders::Filters
 
   module ClassMethods
     def filters(user)
-      Forms::Builders::Filters::Build(self, company: user.company, user: user)
+      Forms::Filters::Builder::Build(self, company: user.company, user: user)
     end
   end
 
@@ -18,19 +18,24 @@ module Forms::Builders::Filters
   end
 
   module Build
-    def self.with(entities, company, user)
+    def self.with(entities, company, user, prefix: nil)
       response = []
 
       entities.each do |entity|
         if entity.entities.present?
-          result = Build.with(entity.entities, company, user)
+          filter_key = nil
+          unless entity.class <= Forms::Entity::Section
+            filter_key = entity.field_key
+            filter_key = "#{prefix}_#{filter_key}" if prefix
+          end
+          result = Build.with(entity.entities, company, user, prefix: filter_key)
           if result.respond_to?(:each)
             response += result
           else
             response << result
           end
         else
-          response << entity.filter_form
+          response << entity.filter_form(prefix: prefix)
         end
       end
       response

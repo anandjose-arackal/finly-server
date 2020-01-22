@@ -1,6 +1,6 @@
-class Forms::Definitions::Section
+class Forms::Entity::Section
   include DynamicAttributes
-  include Forms::Definitions::Registry
+  include Forms::Entity::Registry
   attr_accessor :name, :block, :form
 
   def initialize(form, name, &block)

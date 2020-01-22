@@ -10,7 +10,8 @@ class Forms::TestForm < Forms::API
     collection :line_items do
       text :item_description, hint: "Please enter the name of the field", char_limit: 255
       dropdown :status_id, choices: ['Approved', 'Pending']
-      dropdown :status_id, data_provider: {klass: 'ReportStatus'}
+      dropdown :department_id, auto_complete: {route: 'departments', filters: {}}
+      # dropdown :location_id, choices: ReportStatus.all.as_json
     end
   end
 

@@ -1,4 +1,4 @@
-module Forms::Builders::Contract
+module Forms::Contracts::Builder
 
   def self.included(base)
     base.extend(ClassMethods)
@@ -6,7 +6,7 @@ module Forms::Builders::Contract
 
   module ClassMethods
     def contract(user, params = {})
-      Forms::Builders::Contract::Build(self, user: user, params: params)
+      Forms::Contracts::Builder::Build(self, user: user, params: params)
     end
   end
 

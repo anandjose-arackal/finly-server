@@ -1,4 +1,4 @@
-class Forms::Definitions::Types::LargeText < Forms::Definitions::Entity
+class Forms::Entity::Types::LargeText < Forms::Entity::Base
   register :large_text
   hint "Enter value"
 
