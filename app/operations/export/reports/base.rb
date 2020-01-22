@@ -123,7 +123,7 @@ class Export::Reports::Base < Export::Base
       end
     end
     # now adding the custom field values for the respective expense
-    data_arr += retrieve_custom_field_values(expense, report, custom_field_column_names)
+    data_arr += retrieve_custom_field_values(expense, report, custom_field_column_names, preferences)
   end
 
 
@@ -132,9 +132,10 @@ class Export::Reports::Base < Export::Base
     FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
 
-  def retrieve_custom_field_values(expense, report, custom_field_column_names)
+  def retrieve_custom_field_values(expense, report, custom_field_column_names, preferences)
     records = []
-    cf = expense&.custom_fields.to_a + report&.custom_fields.to_a
+    r = report&.custom_fields.to_a.reject {|c| preferences.include? c.field_configuration&.field_name }
+    cf = expense&.custom_fields.to_a + r
     custom_field_column_names.each do |cf_name|
       value = ''
       # expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}.reject(&:blank?)
