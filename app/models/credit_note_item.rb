@@ -88,7 +88,7 @@ class CreditNoteItem < ApplicationRecord
     if self.credit_note_item_type_id == CreditNoteItemType.id_for(:gst_change)
       rate = original_tax_rate.rate - tax_rate.rate
     else
-      rate = original_tax_rate.rate
+      rate = original_tax_rate&.rate || 0
     end
     get_taxable_amount * rate / 100
   end
