@@ -953,7 +953,8 @@ class Payment < ApplicationRecord
       narration: { value: self.note, editable: false, field_type: 'field_text_area' },
       categories: categories,
       cost_centers: cost_centers,
-      departments: departments
+      departments: departments,
+      rcm_enabled: self.invoice&.rcm_enabled
     }
   end
 
