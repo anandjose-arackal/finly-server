@@ -340,9 +340,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     when 'Invoice'
       invoice = payment.parent
-      invoice_amount = invoice.balance_due&.value.round
+      invoice_amount = invoice.balance_due&.value.round(2)
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if precision_value(payment_amount.to_f + previous_payments.to_f) > invoice_amount
+      if payment_amount.to_f + previous_payments.to_f > invoice_amount
         add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
