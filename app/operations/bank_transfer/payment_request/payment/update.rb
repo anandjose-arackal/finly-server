@@ -340,12 +340,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     when 'Invoice'
       invoice = payment.parent
-      invoice_amount = invoice.balance_due&.value.round(2)
+      invoice_amount = invoice.balance_due&.value.round
       previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      Rails.logger.fatal "********************************################################**********************************"
-      Rails.logger.fatal "Payable Amount(#{payment_amount} + Previous Payments(#{previous_payments}) > Invoice Amount(#{invoice_amount})"
-      Rails.logger.fatal "Invoice Amount RAW #{invoice.balance_due.value}"
-      if precision_value(payment_amount.to_f + previous_payments.to_f) > precision_value(invoice_amount)
+      if precision_value(payment_amount.to_f + previous_payments.to_f) > invoice_amount
         add_message :error, "Payable amount cannot be greater than balance due."
         return
       end
