@@ -1,31 +1,30 @@
 require 'ostruct'
-class ExportManager::Master::ItemMaster::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::ItemMaster::Index < ExportManager::Builders::Spreadsheet
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :inventory_items
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  label 'Export'
+  description 'Item Master Export'
+  configurable true
+  system :vp
+  screen 'item_master.index'
+  handle :inventory_items
   validate :input
 
-  fields [
-           item_number: {spreadsheet: true},
-           gl_code: {spreadsheet: true},
-           description: {spreadsheet: true},
-           product_type: {spreadsheet: true},
-           active: {spreadsheet: true},
-           category: {spreadsheet: true},
-           hsn_sac: {spreadsheet: true},
-           sku: {spreadsheet: true},
-           expense_type: {spreadsheet: true},
-           tds_applicable: {spreadsheet: true},
-           tax_rate: {spreadsheet: true},
-           item_rate: {spreadsheet: true},
-           supply_item_type: {spreadsheet: true},
-           unit_of_measurement: {spreadsheet: true},
-           created_user: {spreadsheet: true},
-           created_at: {spreadsheet: true}
-         ]
-
+  attribute :item_number
+  attribute :gl_code
+  attribute :description
+  attribute :product_type
+  attribute :active
+  attribute :category
+  attribute :hsn_sac
+  attribute :sku
+  attribute :expense_type
+  attribute :tds_applicable
+  attribute :tax_rate
+  attribute :item_rate
+  attribute :supply_item_type
+  attribute :unit_of_measurement
+  attribute :created_user
+  attribute :created_at
 
   def input
     result = ::ItemMaster::Item::Index.(user, params)

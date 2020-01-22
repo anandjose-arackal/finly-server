@@ -13,7 +13,7 @@ class Vendors::Update < Vendors::Base
   def init
     # id = params[:id] || params[:yes_bank_vendor_id] || params[:vendor_id]
     self.vendor_parameters = vendor_attributes
-    self.vendor_changes ={}
+    self.vendor_changes = {}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
     # self.vendor_parameters.delete(:policy_id)
@@ -149,12 +149,12 @@ class Vendors::Update < Vendors::Base
     end
 
     # checking for duplicates within this particular company
-    current_company_vendors = user.company.yes_bank_vendors
+    current_company_vendors = user.company.yes_bank_vendors.non_deleted.filter_active 
     if self.vendor_parameters[:vendor_id].blank?
       self.vendor_parameters[:vendor_id] = self.vendor.vendor_id
     end
     vendor_id = self.vendor_parameters[:vendor_id]
-    duplicate_vendors = current_company_vendors.filter_vendor_id(vendor_id).without_id(self.vendor.id)
+    duplicate_vendors = current_company_vendors.where(vendor_id: vendor_id).without_id(self.vendor.id)
     if vendor_id.present? && duplicate_vendors.present?
       add_message :error, "There is a similar vendor added with the same vendor ID in our records."
       return
@@ -224,6 +224,7 @@ class Vendors::Update < Vendors::Base
     validate_gstin_pan_number
     return if has_errors?
     validate_duplicate_bank_account
+    validate_default_bank_account
     return if has_errors?
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
@@ -288,4 +289,6 @@ class Vendors::Update < Vendors::Base
   def all_bank_accounts_disabled?
     self.vendor.bank_accounts.all? {|account| account.disabled }
   end
+
+
 end

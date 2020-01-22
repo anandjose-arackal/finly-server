@@ -6,7 +6,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id, :policy, :payments, :contents,
                 :description, :bank_payment_request, :total_advance_amount,
                 :payment_request_params, :receiving_account, :bank_payment_request_params,
-                :requested_amount, :all_purchase_orders
+                :requested_amount, :all_purchase_orders, :transfer_mode_id, :transfer_mode
 
   class Procurements::Payments::CreatePoAdvanceTicket::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -62,6 +62,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     self.scheduled_at = params[:scheduled_at]
     self.description = params[:description]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     # self.total_advance_amount = params[:total_advance_amount]
@@ -95,7 +97,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -270,6 +272,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
@@ -292,7 +295,10 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         policy_id: self.policy&.id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false,
-        description: self.description
+        description: self.description,
+        expected_payments: self.all_purchase_orders.count,
+        ticket_type: 'purchase_order',
+        transfer_mode_id: self.transfer_mode_id
     }
     bpr_attributes
   end
@@ -317,7 +323,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
           payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
           parent_type: purchase_order&.class.name,
           parent_id: purchase_order&.id,
-          advance_tds_slab_id: po_advance[:advance_tds_slab_id]
+          advance_tds_slab_id: po_advance[:advance_tds_slab_id],
+          transfer_mode_id: self.transfer_mode_id
       }
     end
     payment_params

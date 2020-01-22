@@ -45,15 +45,17 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
     # Format as required by PaymentFiles::Generate
     payment_params = []
     self.group_mappings.include_for_payment_file&.each do |mapping|
+      ifsc = mapping.processor_accountable&.ifsc
+      ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
       payment_params << {
-          beneficiary_account_name: mapping.processor_accountable.name,
+          beneficiary_account_name: BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
           receiving_user_name: mapping.user.name,
           amount: mapping.amount.value,
           payment_mode: 'NEFT',
           date: Date.today,
           beneficiary_ifsc: mapping.processor_accountable.ifsc,
-          ifsc: mapping.processor_accountable.ifsc,
+          ifsc: ifsc,
           email: mapping.user.email,
           receiving_mobile_number: mapping.user.mobile_number,
           note: mapping.note,

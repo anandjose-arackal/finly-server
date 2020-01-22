@@ -26,7 +26,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     event :take_control do
-      transitions :from => :awaiting_approval, :to => :awaiting_approval
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :user_is_admin?
     end
 
     event :return_control do
@@ -69,6 +69,9 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     !document.company.feature_subscription.vendor_empanelment_workflow
   end
 
+  def user_is_admin?
+    user.vendor_payment_admin?
+  end
 
   def reviewal_chain_present?
     document.dlrms.present?

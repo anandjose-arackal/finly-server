@@ -30,9 +30,9 @@ class UserOnboarding::Base < BaseOperation
   def init
     self.bulk_assign = params[:bulk_assign]
     self.policies = user.company.policies.with_id(bulk_assign[:policy_ids])
-    self.policy_ids = self.policies.pluck(:id) rescue nil
-    self.urm_user_role_ids = ( UserRole::VALUES_EM.except(:admin, :purchaser, :receiver).values & bulk_assign[:user_role_ids] ) rescue nil
-    self.pur_user_role_ids = ( UserRole::VP_ROLES.except(:admin, :policy_admin).values & bulk_assign[:user_role_ids] ) rescue nil
+    self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
+    self.urm_user_role_ids = (UserRole::VALUES_EM.except(:admin, :purchaser, :receiver).values & bulk_assign[:user_role_ids]) rescue nil
+    self.pur_user_role_ids = (UserRole::VP_ROLES.except(:admin, :policy_admin).values & bulk_assign[:user_role_ids]) rescue nil
     result = ::UserOnboarding::BuildUsersForImport.(current_user, params)
 
     unless result.success?
@@ -59,7 +59,7 @@ class UserOnboarding::Base < BaseOperation
     # -> collect all records
     # from the previous result, we only need to get and search for duplicate records based on combination of 3 columns
     all_roles = urm.pluck(:user_id, :user_role_id, :purpose_id)
-    
+
     # we got to do this shit. some genius decided to build two tables with totally different structure for same functionality and somehow it is a good idea to allow users to login to an app only if they have entry in this table, even though this table has nothing to do with vendor_payments. also sample this, for em this table is used. but travel manager needs to be setup in vendor_payment table. god hates you.
     # 
     if RequestStore.store[:vp_onboarding]
@@ -116,7 +116,7 @@ class UserOnboarding::Base < BaseOperation
   def setup_pur(assignable_roles)
     # setup data points for importing into table
     columns = [:policy_id, :user_id, :user_role_id]
-    values = assignable_roles.collect { |p_id, u_id, r_id| [p_id, u_id, r_id] }
+    values = assignable_roles.collect {|p_id, u_id, r_id| [p_id, u_id, r_id]}
 
     return columns, values
   end
@@ -130,9 +130,9 @@ class UserOnboarding::Base < BaseOperation
     else
       purpose_id = Purpose.id_for(:expense_management)
     end
-      
+
     columns = [:user_id, :user_role_id, :purpose_id]
-    values = assignable_roles.collect { |u_id, r_id| [u_id, r_id, purpose_id] }
+    values = assignable_roles.collect {|u_id, r_id| [u_id, r_id, purpose_id]}
     return columns, values
   end
 

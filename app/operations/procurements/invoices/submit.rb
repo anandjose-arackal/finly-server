@@ -20,9 +20,11 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       add_message :error, 'Invoice not found'
     end
 
-    if self.invoice.attachments.blank?
-      add_message :error, "Please attach an invoice document before submitting."
-      return
+    if invoice.payment_agreement_id.blank? || vendor_gstin_registered
+      if self.invoice.attachments.blank?
+        add_message :error, "Please attach an invoice document before submitting."
+        return
+      end
     end
 
     receiving_account = self.invoice.receiving_account
@@ -93,5 +95,9 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
     # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
+  end
+
+  def vendor_gstin_registered
+    self.invoice.vendor.gst_registered
   end
 end

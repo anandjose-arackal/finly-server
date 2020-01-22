@@ -35,6 +35,8 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
       return
     end
     if payment_request.update(request_params)
+      # Updating since attrs are being updated rather being assigned and then updated
+      payment_request.update(transfer_mode_id: params[:transfer_mode_id])
       if BankPaymentRequest.status_ids(:open, :retracted, :rejected).include?(payment_request.status_id) && payment_request.owner_id == user.id
         # Create Document Level Reviewer Mapping
         # For setting level specific reviewers from reviewal chain for a document
@@ -65,11 +67,13 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
       payment_order.payments.each do |payment|
         p[:payments_attributes] << {
             id: payment.id,
-            payment_mode: params[:bank_payment_request][:bank_transfer_type]
+            payment_mode: params[:bank_payment_request][:bank_transfer_type],
+            transfer_mode_id: params[:transfer_mode_id]
         }
       end
     end
     p[:payment_mode] = params[:bank_payment_request][:bank_transfer_type]
+    p[:transfer_mode_id] = params[:transfer_mode_id]
     p.permit!
   end
 

@@ -8,7 +8,7 @@ class Vendors::FilterConfig < Vendors::Base
       self.vendor_statuses = VendorStatus.all
       filter_role_ids = [UserRole.id_for(:vendor_creator), UserRole.id_for(:vendor_reviewer), UserRole.id_for(:vendor_manager)]
       self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: filter_role_ids}).policies
-      custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params )
+      custom_field_op = CustomField::Configuration::Index.(user, custom_field_filter_params)
       self.vendor_custom_fields_config = custom_field_op.field_configurations
     end
   end
@@ -44,9 +44,9 @@ class Vendors::FilterConfig < Vendors::Base
 
   def custom_field_filter_params
     {
-      filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
-      filter_parent_type_id: [FieldParentType.id_for(:yes_bank_vendor)]
-    }    
+        filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect), FieldType.id_for(:text)],
+        filter_parent_type_id: [FieldParentType.id_for(:yes_bank_vendor)]
+    }
 
   end
 end

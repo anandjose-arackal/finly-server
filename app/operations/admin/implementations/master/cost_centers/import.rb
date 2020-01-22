@@ -28,7 +28,6 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
 
   def update_record(data)
     cost_center_params, messages = set_params(data)
-
     unless messages.blank?
       return result false, messages.join(', ')
     end
@@ -37,7 +36,6 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
     unless cost_center
       return result false, "Cost Center not found"
     end
-
     unless cost_center.update(cost_center_params)
       return result false, cost_center.errors.full_messages
     end
@@ -69,7 +67,7 @@ class Admin::Implementations::Master::CostCenters::Import < Admin::Implementatio
       messages << "Name cant be blank"
     end
 
-    cost_center_code = data[:cost_center_code].blank? ? nil : data[:cost_center_code_code]
+    cost_center_code = data[:cost_center_code].blank? ? nil : data[:cost_center_code]
     application = 'vp'
     ancestry = parent&.to_s
 

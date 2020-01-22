@@ -22,6 +22,9 @@
 class TaxRate < ApplicationRecord
   include SoftDeletable
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'tax_rate'
 
   belongs_to :company, optional: true
 

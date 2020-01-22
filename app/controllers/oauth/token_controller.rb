@@ -24,12 +24,21 @@ class Oauth::TokenController < Doorkeeper::TokensController
       params[:user] = @user
       params[:response] = response
 
-      if create_user_sessions and on_session_create
-        on_create_success(response)
-        return
+      response_message = nil
+      if create_user_sessions
+        response_message = on_session_create
+        if response_message == true or (response_message.is_a?(Hash) and response_message[:success])
+          on_create_success(response)
+          return
+        end
       end
 
-      json_string = {error: "invalid_grant", error_description: "The email / mobile or password you entered is incorrect"}
+      error_message = "The email / mobile or password you entered is incorrect"
+      error_message = response_message[:message] if response_message.is_a?(Hash) and response_message[:message].present?
+      json_string = {
+          error: "invalid_grant",
+          error_description: error_message
+      }
       render json: json_string.to_json, status: 401
 
       # if verify_company_status(@user)
@@ -129,7 +138,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
   def current_user(doorkeeper_token)
     if doorkeeper_token.present? && doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?("web") || scopes.include?("mobile") || scopes.include?("chrome") || scopes.include?("api") || scopes.include?("admin_bypass")
+      if scopes.include?("web") || scopes.include?("mobile") || scopes.include?("chrome") || scopes.include?("api") || scopes.include?("admin_bypass") || scopes.include?("streamsets")
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
@@ -165,10 +174,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
         @user.update(last_activity_at: DateTime.now)
       end
 
-      return true
+      return {success: true}
     else
       invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
-      return false
+      return {success: false, message: result.response_message}
     end
   end
 end

@@ -147,7 +147,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Index::PaymentPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payment_requests, :paginated_payment_requests
+    attr_accessor :payment_requests, :paginated_payment_requests, :payments
 
     has_scope :filter_status
     has_scope :filter_date, using: [:from, :to], type: :hash
@@ -161,6 +161,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_ticket_type
+    has_scope :filter_transfer_mode
     # has_scope :filter_custom_text_selection, type: :array
     # has_scope :filter_custom_drop_down_selection, type: :array
 
@@ -203,12 +205,20 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = self.payment_requests.order_by(:submitted_at)
       # end
       self.paginated_payment_requests = self.payment_requests.paginate(page: page, per_page: per_page) rescue ::BankPaymentRequest.none
+
+      poid = self.paginated_payment_requests.pluck(:payment_order_id)
+      sql = poid.map { |id| "(SELECT * FROM payments WHERE payment_order_id = #{id} LIMIT 3)"}.join(" UNION ALL ")
+      payment_ids = ::Payment.find_by_sql(sql).pluck(:id) rescue []
+      self.payments = ::Payment.where(id: payment_ids).include_minimal_for_index
+      # self.payments = ActiveRecord::Associations::Preloader.new.preload(payments, payment_includes)
+
       if [168, 169, 174, 175].include?(user.company_id)
         self.paginated_payment_requests = self.paginated_payment_requests.include_for_index_meesho
       else
         self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
       end
 
+      
     end
 
     def set_scopes
@@ -229,18 +239,18 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
 
       result = {
-        all: 0,
-        draft: 0,
-        processing: 0,
-        approved: 0,
-        credited: 0,
-        failed: 0,
-        scheduled: 0,
-        pending: 0,
-        awaiting_approval: 0,
-        partially_completed: 0,
-        in_progress: 0,
-        completed: 0
+          all: 0,
+          draft: 0,
+          processing: 0,
+          approved: 0,
+          credited: 0,
+          failed: 0,
+          scheduled: 0,
+          pending: 0,
+          awaiting_approval: 0,
+          partially_completed: 0,
+          in_progress: 0,
+          completed: 0
       }
 
       BankPaymentRequestStatus.all.map do |status|

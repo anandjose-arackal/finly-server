@@ -1,29 +1,26 @@
-class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::Spreadsheet
 
   attr_accessor :entities
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :budget_entities
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
   validate :input
-  fields [
-                      entity_name: {spreadsheet: true, pdf: false},
-                      entity_type: {spreadsheet: true, pdf: false},
-                      po_number: {spreadsheet: true, pdf: false},
-                      invoice_number: {spreadsheet: true, pdf: false},
-                      payment_id: {spreadsheet: true, pdf: false},
-                      expense_id: {spreadsheet: true, pdf: false},
-                      category: {spreadsheet: true, pdf: false},
-                      department: {spreadsheet: true, pdf: false},
-                      cost_center: {spreadsheet: true, pdf: false},
-                      location: {spreadsheet: true, pdf: false},
-                      amount: {spreadsheet: true, pdf: false},
-                      vendor: {spreadsheet: true, pdf: false},
-                      merchant: {spreadsheet: true, pdf: false},
-                      created_at: {spreadsheet: true, pdf: false},
-                      created_by: {spreadsheet: true, pdf: false}
-                  ]
+  handle :budget_entities
+
+  attribute :entity_name #, column_name: "Entity Name", optional: false
+  attribute :entity_type
+  attribute :po_number
+  attribute :invoice_number
+  attribute :payment_id
+  attribute :expense_id
+  attribute :category
+  attribute :department
+  attribute :cost_center
+  attribute :location
+  attribute :amount
+  attribute :vendor
+  attribute :merchant
+  attribute :created_at
+  attribute :created_by
+  # attribute :custom_fields
 
   def input
     op = ::Budgets::Show.(user, params)
@@ -34,19 +31,19 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
     budget = op.budget
     processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
     items = processor_instance.spent_entities
-    all_items = items[0] + items[1] + items[2] + items[3]
+    items[0] + items[1] + items[2] + items[3]
   end
 
   def entity_name(item)
     case item.class.name
-      when "PurchaseOrderItem"
-        return item.description
-      when "InvoiceLineItem"
-        return item.description
-      when "Payment"
-        return "Payment to #{item.entity.receiving_user.name}"
-      when "Expense"
-        return "Expense at #{item.entity.merchant_name}"
+    when "PurchaseOrderItem"
+      return item.description
+    when "InvoiceLineItem"
+      return item.description
+    when "Payment"
+      return "Payment to #{item.entity.receiving_user.name}"
+    when "Expense"
+      return "Expense at #{item.entity.merchant_name}"
     end
   end
 
@@ -120,14 +117,14 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
       return item.category&.name || item.inventory_line_item&.category&.name
     elsif item.is_a?(Payment)
       case item.parent_type
-        when "Invoice"
-          return item.parent&.category&.name
-        when "BeneficiaryPayment"
-          return item.parent&.category&.name
-        when "PurchaseOrder"
-          return ""
-        else
-          return ""
+      when "Invoice"
+        return item.parent&.category&.name
+      when "BeneficiaryPayment"
+        return item.parent&.category&.name
+      when "PurchaseOrder"
+        return ""
+      else
+        return ""
       end
     end
     ""

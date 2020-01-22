@@ -8,6 +8,8 @@ class ApplicationController < ActionController::Base
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
   include Helpers::RequestImpressionHelper
+  include Transactions::Endpoint::Controller
+
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
@@ -117,6 +119,8 @@ class ApplicationController < ActionController::Base
         return :em
       when "fc", :fc
         return :fc
+      when "fi", :fi
+        return :fi
       end
     end
     # todo Referrer is jugaad as disburse is using expense management endpoints.
@@ -161,7 +165,7 @@ class ApplicationController < ActionController::Base
     @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api")
+      if scopes.include?("web") or scopes.include?("mobile") or scopes.include?("chrome") or scopes.include?("api") or scopes.include?("streamsets")
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?("admin")
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])

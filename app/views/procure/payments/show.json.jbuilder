@@ -1,6 +1,10 @@
 payment = @result.payment
 parent = payment.parent rescue nil
-json.owner_name payment.receiving_account&.account_owner&.name
+if payment.receiving_account&.account_owner_type == "YesBankVendor"
+  json.owner_name payment.receiving_account&.account_owner&.business_name
+else
+  json.owner_name payment.receiving_account&.account_owner&.name
+end
 json.name payment.receiving_account&.name
 json.account_number payment.receiving_account.account_number
 json.disabled payment.receiving_account&.disabled
@@ -15,6 +19,7 @@ json.note payment.note
 json.account_id payment.receiving_account.id
 json.beneficiary_id payment.receiving_account.account_owner&.id
 json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
+json.created_at payment.created_at.strftime("%b %d, %Y")
 if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
   json.beneficiary_type "authorized"
 else
@@ -42,7 +47,8 @@ if payment.invoice.present?
   json.invoice do
     json.id invoice.id
     json.advance invoice.advance
-    json.advance_amount precision_value invoice.advance_amount&.value
+    advance_amount = (invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)) ? invoice.po_adjusted_advance&.value : invoice.advance_amount&.value
+    json.advance_amount precision_value advance_amount
     json.tax_amount precision_value invoice.tax_amount&.value
     json.tds_amount precision_value invoice.tds_amount&.value
     json.tax precision_value invoice.tax
@@ -154,7 +160,6 @@ if @result.vendor.present?
       json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
     end
   end
-
 end
 
 json.comments do

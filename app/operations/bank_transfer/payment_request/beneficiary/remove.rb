@@ -15,6 +15,18 @@ class BankTransfer::PaymentRequest::Beneficiary::Remove < BankTransfer::PaymentR
     self.beneficiary_account = self.removed_payment.receiving_account
   end
 
+  def validate
+    if removed_payment.blank?
+      add_message :error, "Payment not found."
+      return
+    end
+
+    if payment_order.payments.count == 1
+      add_message :error, "This payment ticket has only one payment. You can remove it be deleting the entire payment ticket"
+      return
+    end
+  end
+
   def process
     unless self.removed_payment.destroy
       add_message :error, self.removed_payment.errors.full_messages

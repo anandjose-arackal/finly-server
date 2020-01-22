@@ -1,43 +1,42 @@
-class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :vendor_ba
 
-  bus ExportManager::Master::BaseMaster
-
-  subscribe :vendors
-
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  label 'Export'
+  description 'Vendor Export'
+  configurable true
+  system :vp
+  screen 'vendors.index'
+  handle :vendors
   validate :input
-  fields [
-                      vendor_business_name: {spreadsheet: true, pdf: false},
-                      vendor_trade_name: {spreadsheet: true, pdf: false},
-                      vendor_id: {spreadsheet: true, pdf: false},
-                      name: {spreadsheet: true, pdf: false},
-                      msme_registered: {spreadsheet: true, pdf: false},
-                      msme_registration_number: {spreadsheet: true, pdf: false},
-                      mobile_number: {spreadsheet: true, pdf: false},
-                      email: {spreadsheet: true, pdf: false},
-                      created_by: {spreadsheet: true, pdf: false},
-                      pan: {spreadsheet: true, pdf: false},
-                      poc_name: {spreadsheet: true, pdf: false},
-                      poc_email: {spreadsheet: true, pdf: false},
-                      gstin_location_address: {spreadsheet: true, pdf: false},
-                      gstin: {spreadsheet: true, pdf: false},
-                      tds_percentage: {spreadsheet: true, pdf: false},
-                      state_code: {spreadsheet: true, pdf: false},
-                      description: {spreadsheet: true, pdf: false},
-                      vendor_type: {spreadsheet: true, pdf: false},
-                      default_account_number: {spreadsheet: true, pdf: false},
-                      default_account_ifsc: {spreadsheet: true, pdf: false},
-                      second_account_number: {spreadsheet: true, pdf: false},
-                      second_account_ifsc: {spreadsheet: true, pdf: false},
-                      third_account_number: {spreadsheet: true, pdf: false},
-                      third_account_ifsc: {spreadsheet: true, pdf: false},
-                      fourth_account_number: {spreadsheet: true, pdf: false},
-                      fourth_account_ifsc: {spreadsheet: true, pdf: false},
-                      created_at: {spreadsheet: true, pdf: false},
-                      active: {spreadsheet: true, pdf: false}
-                      ]
+
+  attribute :vendor_business_name
+  attribute :vendor_trade_name
+  attribute :vendor_id
+  attribute :name
+  attribute :msme_registered
+  attribute :msme_registration_number
+  attribute :mobile_number
+  attribute :email
+  attribute :created_by
+  attribute :pan
+  attribute :poc_name
+  attribute :poc_email
+  attribute :gstin_location_address
+  attribute :gstin
+  attribute :tds_percentage
+  attribute :state_code
+  attribute :description
+  attribute :vendor_type
+  attribute :default_account_number
+  attribute :default_account_ifsc
+  attribute :second_account_number
+  attribute :second_account_ifsc
+  attribute :third_account_number
+  attribute :third_account_ifsc
+  attribute :fourth_account_number
+  attribute :fourth_account_ifsc
+  attribute :created_at
+  attribute :active
 
   def input
     result = ::Vendors::Index.(user, params)
@@ -48,19 +47,20 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
     end
 
     vendors = result.vendors.
-                            sort_for_index.
-                            non_deleted.
-                            authorized.
-                            preload(:bank_accounts, :state_code, :created_by, :vendor_type).
-                            left_joins(:gstin_locations).
-                            select('
-                              yes_bank_vendors.*,
-                              gstin_locations.address,
-                              gstin_locations.location,
-                              gstin_locations.gstin,
-                              gstin_locations.poc_name,
-                              gstin_locations.poc_email
-                            ')
+        sort_for_index.
+        non_deleted.
+        authorized.
+        preload(:bank_accounts, :state_code, :created_by, :vendor_type).
+        left_joins(:gstin_locations)
+    # .
+    # select('
+    #                       yes_bank_vendors.*,
+    #                       gstin_locations.address,
+    #                       gstin_locations.location,
+    #                       gstin_locations.gstin,
+    #                       gstin_locations.poc_name,
+    #                       gstin_locations.poc_email
+    #                     ')
 
     vendors
   end
@@ -90,7 +90,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def poc_name(vendor)
-    vendor.poc_name
+    vendor.gstin_locations&.first&.poc_name
   end
 
   def mobile_number(vendor)
@@ -102,7 +102,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def poc_email(vendor)
-    vendor.poc_email
+    vendor.gstin_locations&.first&.poc_email
   end
 
   def created_by(vendor)
@@ -114,7 +114,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def gstin(vendor)
-    vendor.gstin
+    vendor.gstin_locations&.first&.gstin
   end
 
   def state_code(vendor)
@@ -134,15 +134,15 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
   end
 
   def gstin_location_address(vendor)
-    vendor.address
+    vendor.gstin_locations&.first&.address
   end
 
   def address(vendor)
-    vendor.address
+    vendor.gstin_locations&.first&.address
   end
 
   def gstin_location(vendor)
-    vendor.location
+    vendor.gstin_locations&.first&.location
   end
 
   def default_account_number(vendor)
@@ -202,7 +202,7 @@ class ExportManager::Master::Vendors::Index < ExportManager::Master::BaseSubscri
 
   def tds_percentage(vendor)
     if vendor.vendor_tds_rates.present?
-      tds_rates_list = vendor.vendor_tds_rates.collect{|vtr| vtr.tds_rates.name + "(#{vtr.tds_rates.tds})"} rescue nil
+      tds_rates_list = vendor.vendor_tds_rates.collect {|vtr| vtr.tds_rates.name + "(#{vtr.tds_rates.tds})"} rescue nil
       tds_rates_list.join("| ") rescue nil
     end
   end

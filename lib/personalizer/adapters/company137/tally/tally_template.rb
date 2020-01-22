@@ -30,7 +30,7 @@ class Personalizer::Adapters::Company137::Tally::TallyTemplate
       ledger_name = ERB::Util.html_escape expense.category.gl_name
       expense_amount = expense.amount.INR
 
-      voucher_journal = 'Journal Vendor (18-19)'
+      voucher_journal = 'Journal Vendor (19-20)'
 
       if request[expense.report_id][voucher_journal].blank?
         request[expense.report_id][voucher_journal] = {

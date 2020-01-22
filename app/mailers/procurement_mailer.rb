@@ -41,7 +41,7 @@ class ProcurementMailer < ApplicationMailer
     @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
     if @include_attachments
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id })
+    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id, skip_for_mailer: true })
       if @result.success?
         @purchase_order = @data.purchase_order
         @curr_user = @data.user

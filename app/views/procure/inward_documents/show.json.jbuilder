@@ -66,10 +66,11 @@ json.items do
 end
 
 json.attachments do
-  json.array! @result.inward_document.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
+  json.array! @result.inward_document.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+    json.content_type attachment.file_content_type
     json.url attachment.file.url
   end
 end
@@ -131,7 +132,7 @@ json.purchase_order do
     end
   end
   json.attachments do
-    json.array! @result.purchase_order.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
+    json.array! @result.purchase_order.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
       json.extract! attachment, :id, :description
       json.file_name attachment.file_file_name
       json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"

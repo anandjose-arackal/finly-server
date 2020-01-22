@@ -36,6 +36,7 @@ Crono.perform(BankTransferProcessRetry).every 30.minutes
 Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}
 Crono.perform(IciciStatementsFetch).every 30.minutes
 Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
+Crono.perform(BbpsBillsFetch).every 1.day, at: {hour: 8, min: 00}
 # Crono.perform(FixSpuriousPayments).every 30.minutes
 
 # Always scope scheduled mailers to production env to avoid accidental email trigger via development/staging environment
@@ -47,3 +48,8 @@ Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 10, min: 00}
 # Crono.perform(ReminderSubmitPending).every 1.day, at: {hour: 17, min: 00}
 Crono.perform(ExpenseStatusUpdate).every 30.minutes
+
+# status checker for BBPS Bill Payments
+Crono.perform(BbpsBillStatusChecker).every 30.minutes
+
+Crono.perform(BbpsBillerSync).every 1.day, at: {hour: 12, min: 10}

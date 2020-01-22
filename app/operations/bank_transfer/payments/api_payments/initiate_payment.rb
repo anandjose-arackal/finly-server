@@ -3,7 +3,7 @@
 class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
-                :payment_mode, :company_id
+                :payment_mode, :company_id, :transfer_mode_id
 
   class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -107,6 +107,8 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
   def init
     self.company_id = user.company_id
     self.payment_mode = params[:mode]
+    mode_id = TransferMode.find_by(name: self.payment_mode.downcase)
+    self.transfer_mode_id = user.company.transfer_modes.find_by(mode_id: mode_id)&.id
     create_beneficiary
     create_bank_payment_request
   end
@@ -184,60 +186,63 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
 
   def create_bank_payment_request
     payment_params = {
-      payment_type_id: PaymentType.id_for(:credit),
-      application: "vp",
-      receiving_user_type: self.bank_account.account_owner.class.name,
-      receiving_user_id: self.bank_account.account_owner_id,
-      initiating_user_type: "User",
-      initiating_user_id: user.id,
-      initiating_account_type: YesBankCompanyAccount.name,
-      initiating_account_id: user.company.yes_bank_company_account.id,
-      receiving_account_type: "BankAccount",
-      receiving_account_id: self.bank_account.id,
-      payment_status_id: PaymentStatus.id_for(:pending_approval),
-      payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
-      payment_mode: params[:mode],
-      company_id: user.company_id,
-      amount_attributes: {
+        payment_type_id: PaymentType.id_for(:credit),
+        application: "vp",
+        receiving_user_type: self.bank_account.account_owner.class.name,
+        receiving_user_id: self.bank_account.account_owner_id,
+        initiating_user_type: "User",
+        initiating_user_id: user.id,
+        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_id: user.company.yes_bank_company_account.id,
+        receiving_account_type: "BankAccount",
+        receiving_account_id: self.bank_account.id,
+        payment_status_id: PaymentStatus.id_for(:pending_approval),
+        payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+        payment_mode: params[:mode],
+        company_id: user.company_id,
+        amount_attributes: {
           value: params[:amount],
           currency_id: Currency.first.id
       },
-      note: params[:note],
-      date: DateUtils.local_date,
-      external_reference_id: params[:external_reference_id],
-      api_initiated: true
+        note: params[:note],
+        date: DateUtils.local_date,
+        external_reference_id: params[:external_reference_id],
+        transfer_mode_id: transfer_mode_id,
+        api_initiated: true
     }
     payment_order_params = {
-      initiating_user_id: user.id,
-      payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
-      company_id: user.company_id,
-      amount_requested_attributes: {
+        initiating_user_id: user.id,
+        payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+        company_id: user.company_id,
+        amount_requested_attributes: {
           value: params[:amount],
           currency_id: 1
       },
-      payment_mode: params[:mode],
-      initiating_account_type: YesBankCompanyAccount.name,
-      receiving_account_type: BankAccount.name,
-      payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
-      application: "vp",
-      currency_id: Currency.first.id,
-      api_initiated: true,
-      payments_attributes: [
+        payment_mode: params[:mode],
+        initiating_account_type: YesBankCompanyAccount.name,
+        receiving_account_type: BankAccount.name,
+        payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+        application: "vp",
+        currency_id: Currency.first.id,
+        api_initiated: true,
+        transfer_mode_id: transfer_mode_id,
+        payments_attributes: [
           payment_params
       ]
     }
     payment_request_params = {
-      owner_id: user.id,
-      status_id: BankPaymentRequestStatus.id_for(:open),
-      controlling_user_id: user.id,
-      requested_amount_attributes: {
+        owner_id: user.id,
+        status_id: BankPaymentRequestStatus.id_for(:open),
+        controlling_user_id: user.id,
+        requested_amount_attributes: {
           value: params[:amount],
           currency_id: 1
       },
-      beneficiary_type_id: 2,
-      policy_id: user.company.policies.default.first.id,
-      api_initiated: true,
-      payment_order_attributes: payment_order_params
+        beneficiary_type_id: 2,
+        policy_id: user.company.policies.default.first.id,
+        transfer_mode_id: transfer_mode_id,
+        api_initiated: true,
+        payment_order_attributes: payment_order_params
     }
     self.bank_payment_request = BankPaymentRequest.new(payment_request_params)
     unless self.bank_payment_request.save

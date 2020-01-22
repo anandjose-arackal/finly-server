@@ -77,28 +77,31 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         api_response = (self.parsed_response["RESPONSE"] || self.parsed_response["Response"])
         if api_response&.upcase == "SUCCESS"
           case self.transaction_status_response&.upcase
-            when "SUCCESS"
-              utr = self.parsed_response["UTRNUMBER"]
-              # This is because only IMPS and RTGS transactions return the URT in the API
-              # Now all transactions give UTR in the transaction status API
-              if utr.present?
-                self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+          when "SUCCESS"
+            utr = self.parsed_response["UTRNUMBER"]
+            # This is because only IMPS and RTGS transactions return the URT in the API
+            # Now all transactions give UTR in the transaction status API
+            if utr.present?
+              if self.icici_bank_transaction.neft?
+                utr = "0#{utr}1"
               end
-            when "PENDING FOR PROCESSING"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
-            when "REJECTED", "RECALLED"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
-            when "SUSPECT"
-              # this seems to be a temporary status which can then swing either way after a while. So adding this to the list of statuses that we shall regularly scan for statuses later
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
-            when "PENDING"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
-            when "FAILURE"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-            when "CANCELLED"
-              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
-            else
-              # do nothing?
+              self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
+            end
+          when "PENDING FOR PROCESSING"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending_for_processing))
+          when "REJECTED", "RECALLED"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:rejected))
+          when "SUSPECT"
+            # this seems to be a temporary status which can then swing either way after a while. So adding this to the list of statuses that we shall regularly scan for statuses later
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:suspect))
+          when "PENDING"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:pending))
+          when "FAILURE"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          when "CANCELLED"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:cancelled))
+          else
+            # do nothing?
           end
         else
           message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]

@@ -14,6 +14,9 @@
 
 class TdsRatesList < ApplicationRecord
   include LiquidDroppable, SoftDeletable
+  include EventProducer
+
+  event_channel 'tds_rate'
 
   def self.seed_data(company_id)
     DEFAULTS.each do |rate|

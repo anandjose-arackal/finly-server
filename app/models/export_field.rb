@@ -13,7 +13,7 @@ class ExportField < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
 
-  scope :ordered_by_name, -> { reorder(name: :asc) }
+  scope :ordered_by_name, -> {reorder(name: :asc)}
 
   VALUES = {
       1 => "Employee Name",
@@ -46,7 +46,10 @@ class ExportField < ApplicationRecord
       31 => "Report Creation Date",
       32 => "IGST",
       33 => "CGST",
-      34 => "SGST"
+      34 => "SGST",
+      35 => "Department",
+      36 => "Location",
+      37 => "CostCenter"
   }
 
   def self.id_for(name_in_sym)

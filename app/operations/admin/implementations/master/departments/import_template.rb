@@ -2,7 +2,7 @@ class Admin::Implementations::Master::Departments::ImportTemplates < Admin::Impl
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'departments.import_template'
-  headers ({
+  headers({
       :id => "ID",
       :parent_id =>  "Parent Department NAME",
       :name => "Departmet Name",

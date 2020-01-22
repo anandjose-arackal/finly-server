@@ -19,6 +19,9 @@
 
 class Policy < ApplicationRecord
   include SoftDeletable
+  include EventProducer
+
+  event_channel 'policy'
 
   belongs_to :company, optional: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'
@@ -61,7 +64,13 @@ class Policy < ApplicationRecord
   scope :without_id, ->(id) {where.not id: id}
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
-  scope :with_application, -> (application) {where( application: application).or(default)}
+  scope :with_application, -> (application) do
+    if application == :fi
+      where( application: %w(em vp)).or(default)
+    else
+      where( application: application).or(default)
+    end
+  end
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
   scope :with_company_id, -> (company_id) {where company_id: company_id}
@@ -218,5 +227,4 @@ class Policy < ApplicationRecord
     self.build_cash_expense_config(enabled: true).save
     self.build_card_expense_config(enabled: true).save
   end
-
 end
