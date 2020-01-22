@@ -21,6 +21,7 @@ class Docs::P2P::CreditNotes::Authorizer
     @user.vendor_payment_admin? ||
         @user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) ||
         @user.has_policy_role?(UserRole.id_for(:credit_note_reviewer)) ||
+        @user.has_policy_role?(UserRole.id_for(:credit_note_auditor)) ||
         @user.is_bank_payment_request_initiator? ||
         @user.is_bank_payment_request_reviewer? ||
         @user.is_bank_payment_request_auditor? ||
@@ -40,7 +41,30 @@ class Docs::P2P::CreditNotes::Authorizer
   end
 
   def show?
-    @user.vendor_payment_admin? || @model.user_id == @user.id || reviewing_user? || poc?
+    index? &&
+        (@model.user_id == @user.id ||
+            @user.vendor_payment_admin? ||
+            (CreditNoteStatus.all.pluck(:id) - [CreditNoteStatus.id_for(:draft)].include?(@model.status_id) &&
+                (@model.validate_if_reviewer(user) || @model.validate_if_auditor(user))
+            ) ||
+            (CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :adjusted, :voided, :unadjusted).include?(@model.status_id) &&
+                (@user.has_policy_role?(:purchase_order_initiator, @model) ||
+                    @user.has_policy_role?(:purchase_order_reviewer, @model) ||
+                    @user.has_policy_role?(:purchase_order_auditor, @model) ||
+                    @user.has_policy_role?(:po_invoice_initiator, @model) ||
+                    @user.has_policy_role?(:non_po_invoice_initiator, @model) ||
+
+                    @user.has_policy_role?(:bank_payment_request_initiator, @model) ||
+                    @user.has_policy_role?(:bank_payment_request_reviewer, @model) ||
+                    @user.has_policy_role?(:bank_payment_request_auditor, @model) ||
+                    @user.has_policy_role?(:bank_payment_request_creditor, @model) ||
+
+                    @user.has_policy_role?(:payment_agreement_initiator, @model) ||
+                    @user.has_policy_role?(:payment_agreement_reviewer, @model) ||
+                    @user.has_policy_role?(:payment_agreemen_auditor, @model)
+                )
+            )
+        )
   end
 
   def reject?

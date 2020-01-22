@@ -269,6 +269,13 @@ class CreditNote < ApplicationRecord
 
   # Transitionable Methods #
 
+  def validate_if_auditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:credit_note_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
   def self.document_owner_attribute
     'user_id'
   end
