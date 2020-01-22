@@ -38,7 +38,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
     invoices = Invoice.with_procurement_id(procurements.pluck(:id))
 
-    invoice_line_items = InvoiceLineItem.with_parent_type('Invoice').with_parent_id(invoices.pluck(:id))
+    invoice_line_items = InvoiceLineItem.with_parent_type('Invoice').with_parent_id(invoices.pluck(:id)).order(parent_id: :asc)
 
     invoice_line_items
   end

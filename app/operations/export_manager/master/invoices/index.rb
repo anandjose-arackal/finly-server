@@ -100,7 +100,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     return if has_errors?
 
     invoices = invoices_presenter.invoices
-    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
   end
 
   def po_number(invoice_line_item)
@@ -289,14 +289,18 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def line_item_sgst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
     invoice_line_item.sgst || 0
   end
 
   def line_item_cgst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
+
     invoice_line_item.cgst || 0
   end
 
   def line_item_igst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
     invoice_line_item.igst || 0
   end
 
