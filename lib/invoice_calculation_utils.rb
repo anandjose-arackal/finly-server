@@ -363,6 +363,14 @@ class InvoiceCalculationUtils
     # end
     #
 
+    # For Debugging
+    Rails.logger.fatal "**************************************************************************************************"
+    Rails.logger.fatal "Invoice Balance Due - #{self.invoice.balance_due.amount.to_f}"
+    Rails.logger.fatal "Invoice Credit Note Adjustments - #{self.invoice.credit_note_adjustments.as_json.inspect}"
+    Rails.logger.fatal "CNA Added Amount #{cna_added_amount} \n CNA Removed Amount #{cna_removed_amount}"
+    # End of Debugging
+    Rails.logger.fatal "**************************************************************************************************"
+
     balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
     balance_due_amount = precision_value balance_due_amount
 
