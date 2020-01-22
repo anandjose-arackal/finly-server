@@ -151,8 +151,6 @@ class CreditNoteItem < ApplicationRecord
       self.tax_amount = Amount.create(value: get_tax_amount, currency_id: currency_id)
     end
 
-    debugger
-
     if self.total_amount.present?
       self.total_amount.update(value: get_total_amount)
     else
