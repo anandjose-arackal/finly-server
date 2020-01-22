@@ -4,7 +4,7 @@ module Forms
       extend Dry::Monads[:result]
       include Registry
       include Schema
-      include Forms::Contracts::DSL
+      include Forms::Entity::Contract::DSL
       include Forms::Filters::DSL
 
       attr_accessor :options

@@ -1,4 +1,16 @@
-class Forms::Contracts::EntityContract
+class Forms::Entity::Contract
+
+  module DSL
+    extend ActiveSupport::Concern
+
+    class_methods do
+      def contract(&block)
+        @contract = Forms::Entity::Contract.build(&block) if block_given?
+        @contract ||= Forms::Entity::Contract.build
+      end
+    end
+  end
+
   def self.build(&block)
     Class.new(Dry::Validation::Contract) do
       params do
