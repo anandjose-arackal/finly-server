@@ -38,7 +38,12 @@ class Export::Reports::Background::Base < BackgroundOperation
   def retrieve_data(preferences, report, expense, custom_field_column_names)
     data_arr = []
     user = expense.user
+
+    r_cf = report&.custom_fields.to_a.reject {|c| preferences.pluck(:name).exclude? c.field_configuration&.field_name }
+
     preferences.each do |pref|
+      h = {}
+      r_cf.map {|r| if pref.name == r.field_configuration&.field_name then h[:r] = r; h[:p] = pref end}
       case pref.export_field_id
       when ExportField.type_report_id
           data_arr << report&.id
@@ -116,21 +121,21 @@ class Export::Reports::Background::Base < BackgroundOperation
         data_arr << expense.user.location&.name
       when ExportField.id_for(:cost_center)
         data_arr << expense.user.cost_center&.name
+      when h[:p].try(:export_field_id)
+        data_arr << h[:r].try(:configured_field_value)
       else
           data_arr << ''
       end
     end
     # now adding the custom field values for the respective expense
-    data_arr += retrieve_custom_field_values(expense, report, custom_field_column_names)
+    data_arr += retrieve_custom_field_values(expense, custom_field_column_names)
   end
 
-  def retrieve_custom_field_values(expense, report, custom_field_column_names)
+  def retrieve_custom_field_values(expense, custom_field_column_names)
     records = []
-    cf = expense&.custom_fields.to_a + report&.custom_fields.to_a
     custom_field_column_names.each do |cf_name|
       value = ''
-      # expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
-      cf.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
+      expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
 
       records << value
     end
@@ -138,7 +143,7 @@ class Export::Reports::Background::Base < BackgroundOperation
   end
 
   def extract_custom_field_names
-    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense), FieldParentType.id_for(:report) ]
+    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense) ]
     FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
 end
