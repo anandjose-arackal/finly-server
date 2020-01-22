@@ -52,6 +52,7 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
+#  reference_payment_id           :integer
 #
 
 class Payment < ApplicationRecord

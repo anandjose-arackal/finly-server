@@ -35,6 +35,7 @@
 #  transfer_status_id   :integer
 #  amount_id            :integer
 #  quick_pay            :string(255)      default("N")
+#  reference_payment_id :integer
 #
 
 require 'rails_helper'

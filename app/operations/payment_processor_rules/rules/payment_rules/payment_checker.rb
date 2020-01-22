@@ -5,7 +5,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
 
     premise :checking_multiple_payments_against_document do
 
-      rule "Invoices cannot have payments that total more than it's total" do
+      rule "Invoices cannot have payments that total more than it's net total" do
         payment = params[:payment]
         if payment.parent_type == "Invoice"
           invoice = payment.parent
