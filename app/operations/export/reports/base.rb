@@ -112,6 +112,12 @@ class Export::Reports::Base < Export::Base
         data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
       when ExportField.id_for(:sgst)
         data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+      when ExportField.id_for(:department)
+        data_arr << expense.user.department&.name
+      when ExportField.id_for(:location)
+        data_arr << expense.user.location&.name
+      when ExportField.id_for(:cost_center)
+        data_arr << expense.user.cost_center&.name
       else
           data_arr << ''
       end
