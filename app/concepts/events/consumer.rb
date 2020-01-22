@@ -98,7 +98,9 @@ module Events::Consumer
   end
 
   def work(payload)
-    perform payload
+    ActiveRecord::Base.connection_pool.with_connection do
+      perform payload
+    end
     ack! if respond_to?(:ack!)
   end
 
