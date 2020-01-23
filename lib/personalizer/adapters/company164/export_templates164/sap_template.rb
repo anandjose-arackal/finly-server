@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def init
     users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount])
+    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount],report_processor_group_mapping:[:payment] )
     self.reports = apply_scopes(self.reports, params)
     self.categories = user.company.categories
 
@@ -52,15 +52,15 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             expense.date.strftime("%d/%m/%Y"),
             "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
             expense.amount.value,
+            '',
             expense.date.strftime("%d/%m/%Y"),
             'I',
             '',
             '',
             '',
-            '',
             retrieve_account(expense),
             retrieve_sub_account(expense),
-            "#{report.user.gl_config&.dig(:location_code)}",
+            (report.user.gl_config&.dig(:location_code).present? ? "'#{"%05d" % report.user.gl_config&.dig(:location_code)}" : ''),
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
@@ -103,6 +103,69 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
           '',
           ''
       ]
+      if [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id].include?(report.report_status_id)
+        if report.report_processor_group_mapping&.payment.present?
+          payment = report.report_processor_group_mapping.payment
+          self.contents << [
+              sl_no,
+              report.id,
+              'BP',
+              report.submitted_at.strftime("%Y%m"),
+              report.submitted_at.strftime("%Y%m"),
+              "Being Payment made against various Payment IDs #{payment.id}",
+              payment.amount.value,
+              '',
+              payment.date.strftime("%d/%m/%Y"),
+              '',
+              '',
+              '',
+              '',
+              '31352001',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              payment.amount.value&.round(2),
+              '',
+              'Finly',
+              '',
+              '',
+              '',
+              '',
+          ]
+          self.contents << [
+              sl_no,
+              report.id,
+              'BP',
+              report.submitted_at.strftime("%Y%m"),
+              report.submitted_at.strftime("%d/%m/%Y"),
+              "Being Payment made against various Payment IDs #{payment.id}",
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '61110004',
+              '9992',
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+              payment.amount.value&.round(2),
+              'Finly',
+              payment&.reference_resource&.bank_reference_number,
+              '',
+              '',
+              ''
+          ]
+        end
+      end
       sl_no += 1
     end
   end
@@ -115,14 +178,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
     parent_category_id = expense.category&.ancestry
     if parent_category_id.present?
       parent = self.categories.find(parent_category_id.to_i)
+      return "'#{parent.gl_code}"
     else
-      parent = expense.category
+      return "'#{expense.category.gl_code}"
     end
-    parent.gl_code
   end
 
   def retrieve_sub_account(expense)
-    expense.category&.gl_code
+    "'#{expense.category&.gl_code}"
   end
 
 
