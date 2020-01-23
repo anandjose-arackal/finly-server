@@ -178,7 +178,7 @@ class Invoice < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
-  has_many :credit_note_adjustments
+  has_many :credit_note_adjustments, dependent: :destroy
 
 
   accepts_nested_attributes_for :address
