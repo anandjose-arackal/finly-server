@@ -8,6 +8,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     {
         post_process: {
             after: Personalizer::Process.new([:procurements, :invoices, :update], :post_process, self)
+        },
+        validate: {
+            after: Personalizer::Process.new([:procurements, :invoices, :update], :validate, self)
         }
     }
   end
