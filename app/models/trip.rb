@@ -21,6 +21,8 @@
 #
 
 class Trip < ApplicationRecord
+  include Sequenced::ActsAsSequenced
+
   belongs_to :company
   belongs_to :created_by, class_name: 'User'
   belongs_to :status, class_name: 'TripStatus'
@@ -35,5 +37,11 @@ class Trip < ApplicationRecord
   has_many :passengers, class_name: 'TripPassenger'
   has_many :routes, class_name: 'TripRoute'
 
+  has_many :transport_request, class_name: "TripTransportRequest"
+  has_many :hotel_request, class_name: "TripHotelRequest"
+  has_many :local_conveyance_request, class_name: "TripLocalConveyanceRequest"
+
   acts_as_sequenced column: :trip_id, purpose: :trip, editable: false, prefix: 'TRF/'
+
+  scope :non_draft, -> { where.not status_id: TripStatus.id_for(:draft) }
 end

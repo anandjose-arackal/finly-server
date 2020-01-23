@@ -7789,7 +7789,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.integer "created_by_id", null: false
     t.integer "traveller_id", null: false
     t.bigint "company_id"
-    t.string "preferred_area"
+    t.string "preferred_location"
     t.datetime "checkin_at"
     t.datetime "checkout_at"
     t.text "description"
@@ -7810,9 +7810,9 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.integer "created_by_id", null: false
     t.integer "traveller_id", null: false
     t.bigint "company_id"
-    t.string "preferred_area"
-    t.datetime "checkin_at"
-    t.datetime "checkout_at"
+    t.string "pickup_location"
+    t.datetime "pickup_at"
+    t.datetime "drop_at"
     t.text "description"
     t.integer "budget_id"
     t.index ["budget_id"], name: "index_trip_local_conveyance_requests_on_budget_id"

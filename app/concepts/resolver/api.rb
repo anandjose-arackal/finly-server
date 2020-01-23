@@ -21,6 +21,10 @@ class Resolver::API
     RequestStoreUtil.current_app
   end
 
+  def personal_view?(params)
+    ViewHelper.personal?(params)
+  end
+
   def resolve(params: {}, filter: true, paginate: false, includes: [])
     collection = load params
     collection = filter collection, params if filter

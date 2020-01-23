@@ -4823,6 +4823,8 @@ Rails.application.routes.draw do
 
   ######################### TRAVEL REQUESTS API START ##########################
 
+  get 'trips', to: 'trips#index'
+
   get 'travel_requests/count', to: 'travel_requests#count'
   get 'travel_requests/config', to: 'travel_requests#configuration'
   resources :travel_requests do

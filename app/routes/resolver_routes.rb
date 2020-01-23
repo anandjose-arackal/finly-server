@@ -24,4 +24,9 @@ Resolver::Router.draw do
   scope :category do
     route 'default', Masters::Categories::Resolver
   end
+
+  scope :trips do
+    route 'default', Docs::Trips::Resolver
+  end
+
 end

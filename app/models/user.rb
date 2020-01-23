@@ -205,6 +205,9 @@ class User < ApplicationRecord
   has_many :travel_manager_travel_request_trails, -> {travel_manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
   has_many :travel_manager_travel_requests, -> {distinct}, source: :travel_request, through: :travel_manager_travel_request_trails
 
+  # Trips - New
+  has_many :trips, foreign_key: :created_by_id
+
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
