@@ -295,7 +295,8 @@ class PaymentAgreement < ApplicationRecord
         custom_fields: self.custom_fields,
         termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
         revised: self.revision_of_pa_id.present?,
-        revision_of_pa_id: self.revision_of_pa_id
+        revision_of_pa_id: self.revision_of_pa_id,
+        revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number
     }
   end
 
