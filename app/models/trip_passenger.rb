@@ -1,0 +1,2 @@
+class TripPassenger < ApplicationRecord
+end
