@@ -310,11 +310,26 @@ class CreditNote < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if [UserRole.id_for(:credit_note_initiator)]
-          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         elsif [UserRole.id_for(:credit_note_reviewer)]
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :voided]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :voided, :adjusted, :partially_adjusted, :unadjusted]
+        elsif UserRole.ids_for(:purchase_order_initiator,
+                               :purchase_order_reviewer,
+                               :purchase_order_auditor,
+                               :po_invoice_initiator,
+                               :po_invoice_reviewer,
+                               :po_invoice_auditor,
+                               :non_po_invoice_initiator,
+                               :non_po_invoice_reviewer,
+                               :non_po_invoice_auditor,
+                               :bank_payment_request_initiator,
+                               :bank_payment_request_reviewer,
+                               :bank_payment_request_auditor,
+                               :bank_payment_request_creditor,
+        ).include?(role_id)
+          status_ids += [:approved, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         end
       end
     end
