@@ -36,6 +36,8 @@ class KotakBankTransaction < ApplicationRecord
 
   has_one :payment, as: :reference_resource
 
+  belongs_to :reference_payment, class_name: "Payment"
+
   validates :unique_reference_number, presence: true
   # validates :amount_id, presence: true
 

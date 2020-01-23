@@ -46,6 +46,9 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       add_message :error, "You are not authorized to do this action"
       return
     end
+
+    # checking a difference of 5 minutes between each consecutive retry
+
   end
 
   def pre_process
@@ -53,6 +56,9 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
     if self.payment_mode.present?
       self.payment.update(payment_mode: self.payment_mode)
     end
+
+    # update the retry count for this particular payment
+    self.payment.update(retry_count: (payment.retry_count + 1))
   end
 
   def process

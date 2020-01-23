@@ -28,7 +28,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
-    bank_transaction = payment.reference_resource
+    bank_transaction = payment.reference_resources.first
 
 
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
@@ -190,14 +190,21 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
-    payment.with_lock do
-      if payment.reference_resource.present?
-        return false
-      end
-      unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
-    end
+
+     # now updating the bank transaction and associating it with the payment according to new
+     # structure
+     unless bank_transaction.update(reference_payment_id: payment.id)
+       Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
+     end
+
+    # payment.with_lock do
+    #   if payment.reference_resource.present?
+    #     return false
+    #   end
+    #   unless payment.update(reference_resource: bank_transaction)
+    #     Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+    #   end
+    # end
     bank_transaction
   end
 

@@ -53,6 +53,7 @@
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
 #  reference_payment_id           :integer
+#  last_retried_at                :datetime
 #
 
 class Payment < ApplicationRecord
@@ -86,6 +87,8 @@ class Payment < ApplicationRecord
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+
+  belongs_to :reference_payment, class_name: "Payment"
 
   has_one :payment, as: :reference_resource
 
@@ -686,6 +689,14 @@ class Payment < ApplicationRecord
   def payment_mode
     mode || super
   end
+
+  # adding this association to extract the related
+  # reference resources for this particular payment
+  def reference_resources
+    return [] if reference_resource_type.blank?
+    return reference_resource_type.constantize.where(reference_payment_id: self.id).reorder(created_at: :desc)
+  end
+
 
   private
 

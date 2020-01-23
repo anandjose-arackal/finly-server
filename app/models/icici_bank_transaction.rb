@@ -38,6 +38,7 @@ class IciciBankTransaction < ApplicationRecord
   belongs_to :company
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
+  belongs_to :reference_payment, class_name: "Payment"
 
   has_one :payment, as: :reference_resource
 

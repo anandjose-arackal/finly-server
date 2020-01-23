@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_22_125337) do
+ActiveRecord::Schema.define(version: 2020_01_23_122647) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5741,6 +5741,7 @@ ActiveRecord::Schema.define(version: 2020_01_22_125337) do
     t.boolean "disabled"
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
+    t.datetime "last_retried_at"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"

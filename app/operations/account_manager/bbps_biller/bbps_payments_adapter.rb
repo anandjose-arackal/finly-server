@@ -137,16 +137,22 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         })
     bank_transaction.save
 
-    payment.with_lock do
-      if payment.reference_resource.present?
-        return false
-      end
-      unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
+    # now updating the bank transaction and associating it with the payment according to new
+    # structure
+    unless bank_transaction.update(reference_payment_id: payment.id)
+      Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
     end
 
-    return bank_transaction
+    # payment.with_lock do
+    #   if payment.reference_resource.present?
+    #     return false
+    #   end
+    #   unless payment.update(reference_resource: bank_transaction)
+    #     Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+    #   end
+    # end
+
+    bank_transaction
   end
 
   # this particular method returns the order number if it's already generated,

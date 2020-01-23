@@ -40,6 +40,8 @@
 
 class BbpsYesBankTransaction < ApplicationRecord
 
+  belongs_to :reference_payment, class_name: "Payment"
+
   has_one :payment, as: :reference_resource
   belongs_to :transfer_status, class_name: "BankTransferStatus"
   belongs_to :amount
