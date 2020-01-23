@@ -1,3 +1,11 @@
+# == Schema Information
+#
+# Table name: trip_statuses
+#
+#  id   :bigint           not null, primary key
+#  name :string(255)      not null
+#
+
 class TripStatus < ApplicationRecord
   include Seedable
 

@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: trips
+#
+#  id                        :bigint           not null, primary key
+#  uuid                      :string(36)       not null
+#  company_id                :integer          not null
+#  created_by_id             :integer          not null
+#  status_id                 :integer          not null
+#  trip_id                   :string(255)
+#  policy_id                 :integer
+#  start_date                :date
+#  end_date                  :date
+#  purpose                   :text(65535)
+#  estimated_booking_cost_id :integer
+#  booking_cost_id           :integer
+#  advance_requested_id      :integer
+#  advance_processed_id      :integer
+#  expenses_total_id         :integer
+#  trip_type_id              :bigint
+#
+
 class Trip < ApplicationRecord
   belongs_to :company
   belongs_to :created_by, class_name: 'User'
