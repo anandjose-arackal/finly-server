@@ -12,8 +12,8 @@ class Insights::Show < Transactions::API
     filters = {}
 
     filters[:company_id] = current_user.company_id
-    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_from
-    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_to
+    filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_date
+    filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_date
 
     options['filters'] = filters
     true
@@ -27,8 +27,10 @@ class Insights::Show < Transactions::API
         :exp => Time.now.to_i + (60 * 10) # 2 minute expiration
     }
 
-    token = JWT.encode payload, INSIGHTS_CONFIG[:secret]
-    options['result'] = {url: INSIGHTS_CONFIG[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
+    insights_config = Rails.application.config_for(:insights_config)&.with_indifferent_access
+
+    token = JWT.encode payload, insights_config[:secret]
+    options['result'] = {url: insights_config[:base_url] + "/embed/dashboard/" + token + "#bordered=false&titled=false"}
     true
   end
 

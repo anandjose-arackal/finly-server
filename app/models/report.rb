@@ -40,6 +40,7 @@
 #  controlling_level_id               :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
+#  uuid                               :string(36)
 #
 
 class Report < ApplicationRecord

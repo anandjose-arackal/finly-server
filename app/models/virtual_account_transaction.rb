@@ -23,6 +23,7 @@
 #  processed                  :boolean
 #  receiving_account_credited :boolean
 #  beneficiary_account_no     :string(255)
+#  uuid                       :string(36)
 #
 
 class VirtualAccountTransaction < ApplicationRecord

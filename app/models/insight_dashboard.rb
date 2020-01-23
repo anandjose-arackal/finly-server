@@ -25,14 +25,15 @@
 
 class InsightDashboard < ApplicationRecord
   include UUIDHelper, SoftDeletable
+  include EventProducer
+
+  event_channel 'insight_dashboard'
 
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :policy, optional: true
   belongs_to :user_role, optional: true
   belongs_to :admin_user, optional: true
-
-  resolver Insights::Resolver
 
   validates :name, presence: true
   validates :dashboard, presence: true
@@ -48,7 +49,8 @@ class InsightDashboard < ApplicationRecord
     }
   end
 
-  FILTERS = [:can_filter_from, :can_filter_to]
+  FILTERS = [:can_filter_date, :can_filter_policy, :can_filter_department,
+  :can_filter_location, :can_filter_cost_center, :can_filter_category]
 
   def filter_config
     config = {}

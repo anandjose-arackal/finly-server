@@ -14,6 +14,7 @@
 #  dependent_parent_type  :string(255)
 #  field_key              :string(255)
 #  configured_field_value :text(65535)
+#  uuid                   :string(36)
 #
 
 class CustomField < ApplicationRecord

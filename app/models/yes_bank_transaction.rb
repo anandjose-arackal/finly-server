@@ -20,6 +20,7 @@
 #  account_name_check          :boolean          default(FALSE)
 #  beneficiary_full_name       :string(255)
 #  transfer_mode_id            :integer
+#  uuid                        :string(36)
 #
 
 class YesBankTransaction < ApplicationRecord

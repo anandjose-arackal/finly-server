@@ -16,6 +16,7 @@
 #  updated_at               :datetime         not null
 #  address                  :text(65535)
 #  trade_name               :string(255)
+#  uuid                     :string(36)
 #
 
 FactoryBot.define do

@@ -20,6 +20,7 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  status_id                       :integer
+#  uuid                            :string(36)
 #
 
 # Security deposit is required to create rental invoice in payment agreements

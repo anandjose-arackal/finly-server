@@ -6,7 +6,7 @@
 #  status_id                 :integer          not null
 #  is_deleted                :boolean          default(FALSE)
 #  payment_file_generated    :boolean          default(FALSE)
-#  payment_file_generated_at :datetime         default(NULL)
+#  payment_file_generated_at :datetime
 #  scheduled_at              :date
 #  completed_at              :datetime
 #  total_amount_id           :integer          not null
@@ -22,6 +22,7 @@
 #  payment_order_id          :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  uuid                      :string(36)
 #
 
 class MoneyRequestProcessor < ApplicationRecord

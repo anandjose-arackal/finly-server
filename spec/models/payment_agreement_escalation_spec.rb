@@ -12,6 +12,7 @@
 #  start_date           :datetime
 #  end_date             :datetime
 #  revised_amount_id    :integer
+#  uuid                 :string(36)
 #
 
 require 'rails_helper'

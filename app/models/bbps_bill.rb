@@ -45,6 +45,7 @@
 #  order_number_type          :string(255)
 #  tax_rate_id                :integer
 #  hsn_sac                    :string(255)
+#  uuid                       :string(36)
 #
 
 class BbpsBill < ApplicationRecord

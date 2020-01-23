@@ -17,6 +17,7 @@
 #  attempt_success   :boolean
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  uuid              :string(36)
 #
 
 class WebHookTrack < ApplicationRecord

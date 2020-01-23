@@ -10,6 +10,7 @@
 #  is_deleted  :boolean          default(FALSE)
 #  application :string(255)
 #  deleted_at  :datetime
+#  uuid        :string(36)
 #
 
 class UserGroup < ApplicationRecord

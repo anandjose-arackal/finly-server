@@ -14,6 +14,7 @@
 #  base_currency_id           :integer
 #  company_pocket_template_id :integer
 #  active                     :boolean          default(TRUE)
+#  uuid                       :string(36)
 #
 
 class UserPocket < ApplicationRecord

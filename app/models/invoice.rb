@@ -95,6 +95,7 @@
 #  payable                         :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  uuid                            :string(36)
 #
 
 class Invoice < ApplicationRecord

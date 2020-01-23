@@ -14,6 +14,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  description       :text(65535)
+#  uuid              :string(36)
 #
 
 class Attachment < ApplicationRecord

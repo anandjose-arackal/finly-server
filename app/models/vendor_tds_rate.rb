@@ -7,6 +7,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  tds_rates_list_id :integer
+#  uuid              :string(36)
 #
 
 class VendorTdsRate < ApplicationRecord

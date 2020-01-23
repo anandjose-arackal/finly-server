@@ -27,6 +27,7 @@
 #  crash_stacktrace        :text(65535)
 #  message                 :text(65535)
 #  note                    :text(65535)
+#  uuid                    :string(36)
 #
 
 require 'rails_helper'

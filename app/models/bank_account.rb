@@ -24,6 +24,7 @@
 #  deleted_at             :datetime
 #  on_hold                :boolean          default(FALSE)
 #  bank_account_master_id :integer
+#  uuid                   :string(36)
 #
 
 class BankAccount < ApplicationRecord

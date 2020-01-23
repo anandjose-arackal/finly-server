@@ -8,6 +8,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  state_code :string(255)
+#  uuid       :string(36)
 #
 
 class State < ApplicationRecord

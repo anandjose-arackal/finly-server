@@ -17,6 +17,7 @@
 #  parent_id    :integer
 #  address_name :string(255)
 #  landmark     :text(65535)
+#  uuid         :string(36)
 #
 
 class Address < ApplicationRecord

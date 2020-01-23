@@ -15,6 +15,7 @@
 #  created_at                        :datetime         not null
 #  updated_at                        :datetime         not null
 #  user_finly_id                     :string(255)
+#  uuid                              :string(36)
 #
 
 class UserAgentClient < ApplicationRecord

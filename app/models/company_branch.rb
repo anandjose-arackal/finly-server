@@ -16,6 +16,7 @@
 #  state_id                  :integer
 #  country                   :string(255)
 #  pin                       :string(255)
+#  uuid                      :string(36)
 #
 
 class CompanyBranch < ApplicationRecord
