@@ -43,6 +43,7 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
   belongs_to :terminated_by, optional: true, class_name: 'User'
+  belongs_to :revision_of_pa, optional: true, class_name: 'PaymentAgreement'
 
   has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
@@ -292,7 +293,9 @@ class PaymentAgreement < ApplicationRecord
         renewal_reminder_date: self.renewal_reminder_date,
         vendors: get_related_vendors(options),
         custom_fields: self.custom_fields,
-        termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name}
+        termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
+        revised: self.revision_of_pa_id.present?,
+        revision_of_pa_id: self.revision_of_pa_id
     }
   end
 

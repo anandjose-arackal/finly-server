@@ -19,19 +19,17 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
   end
 
   def process
+    params[:document] = self.payment_agreement
+    params[:aasm_event] = 'revise'
+
+    op = WorkflowManager::Base.(user, params)
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
+    end
+
+    self.workflow_output = op.workflow_output
     create_revised_agreement
-    # return
-    # params[:document] = self.payment_agreement
-    # params[:aasm_event] = 'revise'
-
-    # op = WorkflowManager::Base.(user, params)
-    # unless op.success?
-    #   add_message :error, op.messages[:error]
-    #   return
-    # end
-
-    # self.workflow_output = op.workflow_output
-    # create_revised_agreement
   end
 
   def success
@@ -56,6 +54,7 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
 
   def create_revised_agreement
     self.revised_agreement = self.payment_agreement.amoeba_dup
+    self.revised_agreement.revision_of_pa_id = self.payment_agreement.id
     self.revised_agreement.save
   end
 end

@@ -23,7 +23,8 @@ class PaymentAgreementStatus < ApplicationRecord
         :closed,
         :invoice_created,
         :payment_ticket_created,
-        :terminated
+        :terminated,
+        :revised
     ]
   end
 
