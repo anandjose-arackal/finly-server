@@ -137,10 +137,7 @@ class CreditNote < ApplicationRecord
           policy: policy.as_json,
           items: items.as_json,
           gross_receivable_amount: gross_receivable_amount.as_json,
-          after_tax_amount: {
-              currency: gross_receivable_amount&.currency.as_json,
-              value: gross_receivable_amount&.value.to_f + tax_amount&.value.to_f
-          },
+          after_tax_amount: after_tax_amount,
           tax_amount: tax_amount.as_json,
           tds_rate_id: tds_rate_id,
           tds_amount: tds_amount.as_json,
@@ -153,6 +150,20 @@ class CreditNote < ApplicationRecord
     end
 
     return data
+  end
+
+  def after_tax_amount
+    data = {
+        currency: gross_receivable_amount&.currency.as_json,
+    }
+
+    if self.invoice.rcm_enabled
+      data[:value] = gross_receivable_amount&.value.to_f
+    else
+      data[:value] = precision_value(gross_receivable_amount&.value.to_f + tax_amount&.value.to_f)
+    end
+
+    data
   end
 
   scope :filter_status, -> (status) {
