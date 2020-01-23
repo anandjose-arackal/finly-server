@@ -491,6 +491,15 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_rcm_enabled, -> (enabled) {
+    where(rcm_enabled: true) if StringUtils.to_bool(enabled)
+  }
+
+  scope :rcm_enabled, -> (enabled) {
+    where(rcm_enabled: true) if StringUtils.to_bool(enabled)
+  }
+
+
   # Sorting
   scope :sort_invoice_id, -> (type){
     type = type&.strip&.upcase
