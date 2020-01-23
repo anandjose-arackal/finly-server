@@ -1,7 +1,7 @@
 class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::Base
 
   register_handle :payment_agreement_show
-  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate ]
+  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate, :revise ]
 
   def initialize(user=nil, params=nil)
     super
@@ -172,6 +172,11 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def terminate
+    user.vendor_payments_admin? && payment_agreement.approved?
+  end
+
+  def revise
+    return true
     user.vendor_payments_admin? && payment_agreement.approved?
   end
 

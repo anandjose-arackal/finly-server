@@ -9,6 +9,7 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
     state :auto_approved
     state :closed
     state :terminated
+    state :revised
 
     event :submit do
       transitions from: [:open, :retracted, :rejected, :draft], to: :auto_approved, guard: :reviewers_not_present?
@@ -48,6 +49,10 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
 
     event :terminate do
       transitions :from => [:approved], :to => [:terminated]
+    end
+
+    event :revise do
+      transitions :from => [:approved], :to => [:revised]
     end
 
     after_all_events :change_state

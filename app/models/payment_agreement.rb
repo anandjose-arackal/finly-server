@@ -62,6 +62,17 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :attachments, as: :resource, dependent: :destroy
 
+  amoeba do
+    clone [:custom_fields, :general_invoices, :rental_invoices, :beneficiary_payments, :security_deposits, :notify_users]
+    exclude_association :trails
+    exclude_association :recurring_invoices
+    exclude_association :agreement_invoices
+    exclude_association :fixed_periodic_general_invoices
+    exclude_association :fixed_periodic_rental_invoices
+    exclude_association :document_level_reviewer_mappings
+    exclude_association :dlrms
+  end
+
   # validates_associated :invoices
   attr_accessor :selected_invoice_frequency_attributes
 
