@@ -659,7 +659,11 @@ module Transitionable
         when :purchase_request_auditor, 'purchase_request_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          end
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           # Get data for purchase order reviewer
           data = data.or(role_based_reviewer_associated_items(user, role_id))
