@@ -295,7 +295,11 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           elsif file_details[:file_contents].present?
             stream.write file_details[:file_contents]
           elsif file_details[:url].present?
-            stream.write(open(file_details[:url]).read)
+            if Rails.env.production?
+              stream.write(open(file_details[:url]).read)
+            else
+              stream.write(open("#{Rails.root}/public#{file_details[:url]}"&.split("?")&.first).read)
+            end
           end
 
         end

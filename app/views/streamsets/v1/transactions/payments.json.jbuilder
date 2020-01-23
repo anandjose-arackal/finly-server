@@ -4,7 +4,7 @@ json.result do
     # standard fields
     json.id payment.id
     json.amount payment.amount.value
-    json.created_at payment.created_at.strftime("%d-%b-%Y")
+    json.created_at payment.created_at.strftime("%Y-%m-%d %H:%M:%S")
     json.payment_ticket_id payment.payment_order&.bank_payment_request&.id
     json.payment_ticket_name payment.payment_order&.bank_payment_request&.name
     json.beneficiary_name payment.receiving_account&.account_owner&.name
@@ -15,11 +15,11 @@ json.result do
     json.initiated_by payment.initiating_user&.name
     json.initiater_email payment.initiating_user&.email
     json.payment_order_status payment.payment_order&.bank_payment_request.status&.name&.humanize
-    json.payment_order_schedule_date payment.payment_order&.scheduled_at&.strftime("%d-%b-%Y")
-    json.payment_order_submitted_date payment.payment_order&.bank_payment_request.submitted_at&.strftime("%d-%b-%Y")
-    json.payment_order_processed_date payment.payment_order&.processed_at&.strftime("%d-%b-%Y")
+    json.payment_order_schedule_date payment.payment_order&.scheduled_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.payment_order_submitted_date payment.payment_order&.bank_payment_request.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.payment_order_processed_date payment.payment_order&.processed_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%d-%b-%Y")
+    json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
 
     po_number = ''
@@ -31,8 +31,8 @@ json.result do
     # extra fields
     json.invoice_type payment.invoice&.invoice_type&.name&.titleize
     json.invoice_number payment.invoice&.invoice_number
-    json.invoice_due_date payment.invoice&.due_date&.strftime("%d-%b-%Y")
-    json.invoice_date payment.invoice&.date&.strftime("%d-%b-%Y")
+    json.invoice_due_date payment.invoice&.due_date&.strftime("%Y-%m-%d %H:%M:%S")
+    json.invoice_date payment.invoice&.date&.strftime("%Y-%m-%d %H:%M:%S")
     json.invoice_id payment.invoice&.invoice_id
     json.invoice_buyer_location_state payment.invoice.location&.state&.name rescue ""
     json.invoice_buyer_location_code payment.invoice.location&.location_code rescue ""
