@@ -337,6 +337,13 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
     self.inward_invoice.receiving_account = receiving_account
+
+    if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      if (inward_invoice_params[:tds_slab_id] != self.inward_invoice.tds_slab_id) && self.purchase_order.advance_amount_required
+        add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{self.purchase_order.advance_tds_slab&.name}"
+        return
+      end
+    end
   end
 
   def process

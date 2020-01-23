@@ -176,7 +176,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       gstin_location_id: self.purchase_order.gstin_location_id,
       cost_allocation_items: self.purchase_order.cost_allocation_items,
       po_number: self.purchase_order.po_number,
-      discount_type_id: self.purchase_order.discount_type_id
+      discount_type_id: self.purchase_order.discount_type_id,
+      tds_slab_id: self.purchase_order.advance_tds_slab_id
     }
 
     if self.advance.present?
