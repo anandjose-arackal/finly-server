@@ -1,9 +1,9 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports,:categories
+  attr_accessor :headers, :contents, :reports, :categories
 
   def init
     users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount])
+    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile}, expenses: [:category, :amount])
     self.reports = apply_scopes(self.reports, params)
     self.categories = user.company.categories
 

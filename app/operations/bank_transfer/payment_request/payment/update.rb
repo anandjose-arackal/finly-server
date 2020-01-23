@@ -47,16 +47,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    case self.payment.parent_type
-    when 'Invoice'
-      invoice = payment.parent
-      invoice_amount = invoice.balance_due&.value.to_f
-      previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
-      if payment_amount.to_f + previous_payments.to_f > invoice_amount
-        add_message :error, "Payable amount cannot be greater than balance due."
-        return
-      end
-    end
+    # case self.payment.parent_type
+    # when 'Invoice'
+    #   invoice = payment.parent
+    #   invoice_amount = invoice.balance_due&.value.to_f
+    #   previous_payments = payment.parent.payments.where.not(id: payment.id).all_except_failed.joins(:amount).sum(:value).round(2)
+    #   if payment_amount.to_f + previous_payments.to_f > invoice_amount
+    #     add_message :error, "Payable amount cannot be greater than balance due."
+    #     return
+    #   end
+    # end
   end
 
   def pre_process
@@ -246,10 +246,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       # if there are, in fact, invoice items, use the invoice items library
       case payment.parent_type
       when 'Invoice'
-
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     return
@@ -269,8 +270,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       case payment.parent_type
       when 'Invoice'
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, payable_amount)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
+        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     self.payment.save
@@ -331,7 +334,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def validate_payable_amount
     case self.payment.parent_type
     when 'BeneficiaryPayment'
-      if payment.invoice.balance_due.value.to_f < payment.amount_value.to_f
+      if precision_value(payment.invoice.balance_due.value.to_f) < precision_value(payment.amount_value.to_f)
         add_message :error, "Payable amount cannot be greater than balance due"
         return
       end
