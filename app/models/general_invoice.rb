@@ -363,8 +363,8 @@ class GeneralInvoice < ApplicationRecord
       vendor_id: self.vendor_id,
       agreement_number: self.payment_agreement&.get_agreement_number,
       start_date: self.start_date,
-      end_date: self.end_date
-
+      end_date: self.end_date,
+      allow_add_invoice: true
 
     }
   end
