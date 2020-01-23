@@ -8,8 +8,8 @@ class Personalizer::Adapters::Company2::Procurements2::Invoices2::Update2::Valid
   end
 
   def validate
-    if invoice_params[:due_date].blank?
-      add_message :error, "Invoice due date is mandatory"
+    if invoice_params[:date].blank?
+      add_message :error, "Invoice date is mandatory"
       return
     end
   end
