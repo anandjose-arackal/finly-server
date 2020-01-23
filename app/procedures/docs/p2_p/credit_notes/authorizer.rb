@@ -44,7 +44,7 @@ class Docs::P2P::CreditNotes::Authorizer
     index? &&
         (@model.user_id == @user.id ||
             @user.vendor_payment_admin? ||
-            (CreditNoteStatus.all.pluck(:id) - [CreditNoteStatus.id_for(:draft)].include?(@model.status_id) &&
+            ((CreditNoteStatus.all.pluck(:id) - [CreditNoteStatus.id_for(:draft)]).include?(@model.status_id) &&
                 (@model.validate_if_reviewer(user) || @model.validate_if_auditor(user))
             ) ||
             (CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :adjusted, :voided, :unadjusted).include?(@model.status_id) &&

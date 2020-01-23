@@ -322,10 +322,9 @@ class CreditNote < ApplicationRecord
     CreditNoteStatus.ids_for([:approved, :auto_approved, :awaiting_approval, :rejected, :retracted, :voided])
   end
 
-  def role_based_initiator_associated_items(user, role_id, options = {})
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
     if UserRole.id_for(:credit_note_initiator) == role_id
       super
-
     elsif UserRole.ids_for(:purchase_order_initiator,
                            :purchase_order_reviewer,
                            :purchase_order_auditor,
@@ -348,7 +347,7 @@ class CreditNote < ApplicationRecord
     end
   end
 
-  def role_based_reviewer_associated_items(user, role_id, options = {})
+  def self.role_based_reviewer_associated_items(user, role_id, options = {})
     if UserRole.id_for(:credit_note_reviewer) == role_id
       super
     else

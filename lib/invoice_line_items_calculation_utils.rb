@@ -193,9 +193,7 @@ class InvoiceLineItemsCalculationUtils
       self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
       self.tax_amount = self.net_amount - self.gross_amount
     else
-      # debugger
       if item.parent&.rcm_enabled?
-        # debugger
         self.net_amount = self.gross_amount
         # if RCM doesn't apply, we shall have to calculate the tax using a "pseudo" net amount
         # i.e. calculate tax as though RCM wasn't there and then tabulate it differently
