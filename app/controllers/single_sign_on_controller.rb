@@ -41,6 +41,7 @@ class SingleSignOnController < Oauth::TokenController
   end
 
   protected
+
   def on_session_create
     # SSO Sessions are always verified and do not require further OTP verification for device, IP or user agent
     RequestStoreUtil.current_session.verify('sso')
