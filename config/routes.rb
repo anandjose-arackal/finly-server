@@ -5476,6 +5476,7 @@ Rails.application.routes.draw do
       get 'filter_config', to: 'payment_agreements#filter_config'
       get 'payment_agreement_action_config', to: 'payment_agreements#actions_configuration'
       get 'all_upcoming_invoices', to: 'payment_agreements#all_upcoming_invoices'
+      get 'editable_fields', to: "payment_agreements#editable_fields", as: :editable_fields
     end
   end
 
