@@ -338,7 +338,7 @@ class Report < ApplicationRecord
     where report_status_id: filter_status
   }
 
-  delegate :status_name, to: :status
+
 
   delegate :submitted_amount_value, to: :submitted_amount
 
@@ -587,6 +587,10 @@ class Report < ApplicationRecord
 
   def controlling_user
     self.get_reviewers.first
+  end
+
+  def status_name
+    self.status.name&.split(/[_ ]/)&.map{|word| word.capitalize}&.join(" ")
   end
 
 
