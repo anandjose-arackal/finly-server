@@ -326,20 +326,20 @@ class CreditNote < ApplicationRecord
     if UserRole.id_for(:credit_note_initiator) == role_id
       super
 
-    elsif [UserRole.ids_for(:purchase_order_initiator,
-                            :purchase_order_reviewer,
-                            :purchase_order_auditor,
-                            :po_invoice_initiator,
-                            :po_invoice_reviewer,
-                            :po_invoice_auditor,
-                            :non_po_invoice_initiator,
-                            :non_po_invoice_reviewer,
-                            :non_po_invoice_auditor,
-                            :bank_payment_request_initiator,
-                            :bank_payment_request_reviewer,
-                            :bank_payment_request_auditor,
-                            :bank_payment_request_creditor,
-    )].include?(role_id)
+    elsif UserRole.ids_for(:purchase_order_initiator,
+                           :purchase_order_reviewer,
+                           :purchase_order_auditor,
+                           :po_invoice_initiator,
+                           :po_invoice_reviewer,
+                           :po_invoice_auditor,
+                           :non_po_invoice_initiator,
+                           :non_po_invoice_reviewer,
+                           :non_po_invoice_auditor,
+                           :bank_payment_request_initiator,
+                           :bank_payment_request_reviewer,
+                           :bank_payment_request_auditor,
+                           :bank_payment_request_creditor,
+    ).include?(role_id)
       policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
       # Find all Credit notes post approved state in the respective policies
       where(policy_id: policy_ids).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted, :adjusted, :voided))
