@@ -1144,7 +1144,6 @@ class Invoice < ApplicationRecord
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
-        elsif []
         elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif UserRole.id_for(:admin) == role_id.to_i
