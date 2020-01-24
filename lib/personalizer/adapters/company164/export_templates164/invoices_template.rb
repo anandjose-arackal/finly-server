@@ -37,14 +37,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     sl_no = 1
     data.find_each do |inv|
       if with_tax(inv)
-        row_ap_entries(inv, sl_no).map {|entry| rows << entry}
+        row_ap_entries(inv,sl_no).map{|entry| rows << entry}
       end
 
       if without_tax(inv)
-        row_jv_entries(inv, sl_no).map {|entry| rows << entry}
+        row_jv_entries(inv,sl_no).map{|entry| rows << entry}
       end
-      if inv.payments.where(payment_status_id: PaymentStatus.id_for(:completed)).present?
-        row_bp_entries(inv, sl_no).map {|entry| rows << entry}
+      if inv.payments.where(payment_status_id:  PaymentStatus.id_for(:completed)).present?
+        row_bp_entries(inv, sl_no).map{|entry| rows << entry}
       end
       progress_update sl_no
       sl_no += 1
@@ -57,7 +57,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   #  invoices have TDS includes comes under here
   # ################################
 
-  def row_ap_entries(invoice, sl_no)
+  def row_ap_entries(invoice,sl_no)
     ap_entries=[]
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
@@ -70,7 +70,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department': (invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
       }.each do |k, v|
@@ -88,7 +88,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Account': '31329011',
           'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
           'Tax': item.tax_rate&.rate&.to_f,
-          'Base Amount': item.taxable_amount&.value,
+          'Base Amount':item.taxable_amount&.value,
           'Debit': total_tax_value(item),
           'Comments': 'Finly',
           'SAC': '00440294'
@@ -110,7 +110,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Invoice Number': invoice.invoice_number,
         'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
         'Invoice Type': 'I',
-        'State': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
+        'State': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
         'Supplier GSTN': invoice&.gstin_location&.gstin,
         'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
         'Account': '43181001',
@@ -129,7 +129,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   # Invoices items without tax component goes under ledger entry JV
   # ###############################
   def row_jv_entries(invoice, sl_no)
-    jv_entries = []
+    jv_entries=[]
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
@@ -141,7 +141,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department': (invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.net_amount&.value,
           'Comments': 'Finly'
@@ -174,76 +174,76 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   end
 
   ##########  BP Entries ########
-  # Invoices items without tax component goes under ledger entry JV
-  # ###############################
-  def row_bp_entries(invoice, sl_no)
-    bp_entries = []
-    row = Row.new(record: invoice, header: header)
-    {
-        'S. NO.': sl_no,
-        'Report ID': invoice.id,
-        'Voucher Type': 'BP',
-        'Period': invoice.date&.strftime("%Y%m"),
-        'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
-        'Description': payment_description(invoice),
-        'Account': '31352001',
-        'Sub Account': '',
-        'Debit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
-        'Comments': 'Finly',
+    # Invoices items without tax component goes under ledger entry JV
+    # ###############################
+    def row_bp_entries(invoice, sl_no)
+      bp_entries=[]
+        row = Row.new(record: invoice, header: header)
+        {
+            'S. NO.': sl_no,
+            'Report ID': invoice.id,
+            'Voucher Type': 'BP',
+            'Period': invoice.date&.strftime("%Y%m"),
+            'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+            'Description': payment_description(invoice),
+            'Account': '31352001',
+            'Sub Account': '',
+            'Debit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
+            'Comments': 'Finly',
 
-    }.each do |k, v|
-      row.add k, v
+        }.each do |k, v|
+          row.add k, v
+        end
+        bp_entries << row
+      row = Row.new(record: invoice, header: header)
+      {
+          'S. NO.': sl_no,
+          'Report ID': invoice.id,
+          'Voucher Type': 'BP',
+          'Period': invoice.date&.strftime("%Y%m"),
+          'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
+          'Description': payment_description(invoice),
+          'Account': '61110004',
+          'Sub Account': '9992',
+          'Credit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
+          'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
+          'Supplier': invoice.vendor&.vendor_id,
+          'Comments': 'Finly'
+      }.each do |k, v|
+        row.add k, v
+      end
+      bp_entries << row
     end
-    bp_entries << row
-    row = Row.new(record: invoice, header: header)
-    {
-        'S. NO.': sl_no,
-        'Report ID': invoice.id,
-        'Voucher Type': 'BP',
-        'Period': invoice.date&.strftime("%Y%m"),
-        'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
-        'Description': payment_description(invoice),
-        'Account': '61110004',
-        'Sub Account': '9992',
-        'Credit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
-        'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
-        'Supplier': invoice.vendor&.vendor_id,
-        'Comments': 'Finly'
-    }.each do |k, v|
-      row.add k, v
-    end
-    bp_entries << row
-  end
 
   def generate_headers
-    ['S. NO.',
-     'Report ID',
-     'Voucher Type',
-     'Period',
-     'Voucher Date',
-     'Description',
-     'Invoice amount',
-     'Invoice Number',
-     'Invoice Date',
-     'Invoice Type',
-     'State',
-     'Supplier GSTN',
-     'Place Of Supply',
-     'Account',
-     'Sub Account',
-     'Department',
-     'Cost Center',
-     'Tax',
-     'Tax Exemption(%)',
-     'Base Amount',
-     'Debit',
-     'Credit',
-     'Comments',
-     'Supplier',
-     'Reference Code',
-     'SAC',
-     'Ref. Invoice No.',
-     'Payment_Mode',
+    [ 'S. NO.',
+      'Report ID',
+      'Voucher Type',
+      'Period',
+      'Voucher Date',
+      'Description',
+      'Invoice amount',
+      'Invoice Number',
+      'Invoice Date',
+      'Invoice Type',
+      'State',
+      'Supplier GSTN',
+      'Place Of Supply',
+      'Account',
+      'Sub Account',
+      'Department',
+      'Cost Center',
+      'Tax',
+      'Tax Exemption(%)',
+      'Base Amount',
+      'Debit',
+      'Credit',
+      'Comments',
+      'Supplier',
+      'Reference Code',
+      'SAC',
+      'Ref. Invoice No.',
+      'Payment_Mode',
     ].each do |k|
       header.add k
     end
@@ -271,8 +271,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
   end
 
   def payment_description(invoice)
-    payment_ids = invoice.payments&.pluck(:id)&.join(',')
-    "Being Payment made against various Payment IDs #{payment_ids}"
+      payment_ids = invoice.payments&.pluck(:id)&.join(',')
+      "Being Payment made against various Payment IDs #{payment_ids}"
   end
 
   def total_tax_value(item)
