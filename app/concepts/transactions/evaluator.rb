@@ -1,3 +1,4 @@
+# Used for evaluating procs, klasses and symbols
 class Transactions::Evaluator
 
   def self.eval(exec_context, function, *args, proc: true, klass: true, symbol: true)
