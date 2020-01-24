@@ -31,6 +31,8 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_policy_id
     has_scope :filter_invoice_id
     has_scope :show_only_invoices_which_are_forwarded
+    has_scope :rcm_enabled
+    has_scope :filter_rcm_enabled
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_date, using: [:from, :to], type: :hash
