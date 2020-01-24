@@ -289,10 +289,10 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     parent_category_id = item.category&.ancestry
     if parent_category_id.present?
       parent = self.categories.find(parent_category_id.to_i)
-      return "'#{parent&.gl_code}"
     else
-      return  "'#{item.category&.gl_code}"
+      parent = item.category
     end
+    "'#{parent&.gl_code}"
   end
 
   def retrieve_sub_account(item)

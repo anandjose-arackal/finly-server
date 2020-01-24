@@ -1,5 +1,5 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports,:categories
+  attr_accessor :headers, :contents, :reports, :categories
 
   def init
     users = user.company.users
@@ -180,7 +180,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
       parent = self.categories.find(parent_category_id.to_i)
       return "'#{parent.gl_code}"
     else
-      return "'#{expense.category.gl_code}"
+      return "'#{expense.category&.gl_code}"
     end
   end
 
