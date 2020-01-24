@@ -73,6 +73,6 @@ class Docs::P2P::CreditNotes::Contracts::Update < Reform::Form
   end
 
   def validate_rcm(item, index)
-    errors.add(:base, "Cannot apply 'GST / Tax Rate Change' for Item ##{index + 1} as its from a RCM Invoice") if item.invoice_item.invoice.rcm_enabled
+    errors.add(:base, "Cannot apply 'GST / Tax Rate Change' for Item ##{index + 1} as its from a RCM Invoice") if item.model.invoice_item.invoice.rcm_enabled
   end
 end
