@@ -63,7 +63,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': invoice.id,
+          'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -80,13 +80,13 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': invoice.id,
+          'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': '31329011',
-          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
+          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
           'Tax': item.tax_rate&.rate&.to_f,
           'Base Amount':item.taxable_amount&.value,
           'Debit': total_tax_value(item),
@@ -101,18 +101,18 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     row = Row.new(record: invoice, header: header)
     {
         'S. NO.': sl_no,
-        'Report ID': invoice.id,
+        'Report ID': "'#{invoice.id}",
         'Voucher Type': 'AP',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
         'Description': get_description(invoice),
         'Invoice amount': invoice.net_amount&.value,
         'Invoice Number': invoice.invoice_number,
-        'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
+        'Invoice Date': invoice.date&.strftime("%d/%m/%Y"),
         'Invoice Type': 'I',
-        'State': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
+        'State': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
         'Supplier GSTN': invoice&.gstin_location&.gstin,
-        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
+        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
         'Account': '43181001',
         'Supplier': invoice.vendor.vendor_id,
         'Sub Account': '',
@@ -134,7 +134,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': invoice.id,
+          'Report ID': "'#{invoice.id}",
           'Voucher Type': 'JV',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -154,14 +154,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     row = Row.new(record: invoice, header: header)
     {
         'S. NO.': sl_no,
-        'Report ID': invoice.id,
+        'Report ID': "'#{invoice.id}",
         'Voucher Type': 'JV',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
         'Description': get_description(invoice),
         'Invoice amount': invoice.net_amount.value,
         'Invoice Number': invoice.invoice_number,
-        'Invoice Date': invoice.date&.strftime("%d-%m-%Y"),
+        'Invoice Date': invoice.date&.strftime("%d/%m/%Y"),
         'Invoice Type': 'I',
         'Account': '31352001',
         'Credit': invoice.net_amount&.value,
@@ -181,7 +181,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         row = Row.new(record: invoice, header: header)
         {
             'S. NO.': sl_no,
-            'Report ID': invoice.id,
+            'Report ID': "'#{invoice.id}",
             'Voucher Type': 'BP',
             'Period': invoice.date&.strftime("%Y%m"),
             'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -189,7 +189,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
             'Account': '31352001',
             'Sub Account': '',
             'Debit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
-            'Comments': 'Finly',
+            'Comments': 'Finly'
 
         }.each do |k, v|
           row.add k, v
@@ -198,7 +198,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: invoice, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': invoice.id,
+          'Report ID': "'#{invoice.id}",
           'Voucher Type': 'BP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -208,7 +208,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Credit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
           'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
           'Supplier': invoice.vendor&.vendor_id,
-          'Comments': 'Finly'
+          'Comments': 'Finly',
+          'PAYMENT MODE': 'NEFT'
       }.each do |k, v|
         row.add k, v
       end
@@ -243,7 +244,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       'Reference Code',
       'SAC',
       'Ref. Invoice No.',
-      'Payment_Mode',
+      'PAYMENT MODE',
     ].each do |k|
       header.add k
     end
@@ -290,11 +291,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     else
       parent = item.category
     end
-    parent&.gl_code
+    "'#{parent&.gl_code}"
   end
 
   def retrieve_sub_account(item)
-    item.category&.gl_code
+    "'#{item.category&.gl_code}"
   end
 
 end
