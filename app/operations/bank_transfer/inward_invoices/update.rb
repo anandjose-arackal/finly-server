@@ -8,9 +8,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     {
         post_process: {
             after: Personalizer::Process.new([:procurements, :invoices, :update], :post_process, self)
-        },
-        validate: {
-            after: Personalizer::Process.new([:procurements, :invoices, :update], :validate, self)
         }
     }
   end
@@ -239,6 +236,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           add_message :error, "Cannot adjust amount more than available credits in Credit Note #{credit_note.credit_note_number} "
         end
       end
+    end
+
+    if self.inward_invoice_params[:date].blank?
+      add_message :error, "Invoice date is mandatory"
+      return
     end
   end
 
