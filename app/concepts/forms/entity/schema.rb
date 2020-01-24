@@ -21,7 +21,7 @@ module Forms::Entity::Schema
       schema[key] = default
       define_method key do |value = NoObject|
         self.schema_builder[key] = value unless value == NoObject
-        Transactions::Helper.execute_if_proc(self, schema_builder[key])
+        Transactions::Evaluator.eval_proc(self, schema_builder[key])
       end
       alias_method "#{ key }=", key
 
@@ -36,7 +36,7 @@ module Forms::Entity::Schema
       schema[:options][key] = default if default
       define_method key do |value = NoObject|
         self.schema_builder[:options][key] = value unless value == NoObject
-        Transactions::Helper.execute_if_proc(self, schema_builder[:options][key])
+        Transactions::Evaluator.eval_proc(self, schema_builder[:options][key])
       end
       alias_method "#{ key }=", key
 

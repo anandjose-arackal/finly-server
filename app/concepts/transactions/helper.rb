@@ -11,26 +11,27 @@ class Transactions::Helper
     arguments
   end
 
-  def self.execute_if_proc(context, function, *args)
-    if function.is_a?(Proc)
-      context.instance_eval(*args, &function)
-    else
-      function
-    end
-  end
+  # # Migrated to Transactions::Evaluator
+  # def self.execute_if_proc(exec_context, function, *args)
+  #   if function.is_a?(Proc)
+  #     exec_context.instance_eval(*args, &function)
+  #   else
+  #     function
+  #   end
+  # end
 
-  def self.execute_function(context, function, *args)
-    if function.is_a?(Proc)
-      execute_if_proc(context, function, *args)
-    elsif function.is_a?(Class)
-      function.call(*args)
-    elsif function.is_a?(Symbol)
-      raise "#{function} is not defined" unless self.respond_to?(function)
-      context.send(function, *args)
-    else
-      function
-      # raise "Invalid function #{function}"
-    end
-  end
+  # def self.execute_function(exec_context, function, *args)
+  #   if function.is_a?(Proc)
+  #     execute_if_proc(exec_context, function, *args)
+  #   elsif function.is_a?(Class)
+  #     function.call(*args)
+  #   elsif function.is_a?(Symbol)
+  #     raise "#{function} is not defined" unless self.respond_to?(function)
+  #     exec_context.send(function, *args)
+  #   else
+  #     function
+  #     # raise "Invalid function #{function}"
+  #   end
+  # end
 
 end
