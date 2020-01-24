@@ -44,7 +44,6 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
 
   step Transactions::Messages::SuccessMessage('Successfully Added Credit Note')
 
-
   def init(options, current_user:, params:, **)
     invoice_id = params[:credit_note][:invoice_id]
 
@@ -63,6 +62,10 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
   end
 
   def validate(options, current_user:, invoice:, **)
+    unless InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id)
+      add_message(options, :error, :invoice_id, "Cannot Create Credit Note at this State")
+      return
+    end
     if invoice.credit_note.present?
       credit_note = invoice.credit_note
       add_message(options, :error, :invoice_id, "Credit Note with sequence id #{credit_note.sequence_id} already exists for the invoice")
@@ -107,26 +110,41 @@ class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
       else
         rate = item.rate
       end
+
+      if item.inventory_line_item.service? && invoice.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+        quantity = 1
+        rate = item.billable_amount.value
+        taxable_amount = item.billable_amount.value
+      else
+        quantity = item.quantity
+        taxable_amount = item.taxable_amount.value
+      end
+
+      if item.tax_rate_id.present?
+        tax_rate_id = item.tax_rate_id
+      else
+        tax_rate_id = current_user.company.tax_rates.with_rate(0)&.first&.id
+      end
       item_attr = {
           item_id: item.inventory_line_item_id,
           invoice_item_id: item.id,
           category_id: item.category_id,
           comment: item.description,
           hsn_sac: item.hsn_sac,
-          original_quantity: item.quantity,
-          quantity: item.quantity,
+          original_quantity: quantity,
+          quantity: quantity,
           original_rate: rate,
           rate: rate,
           original_taxable_amount: {
-              value: item.taxable_amount.value,
+              value: taxable_amount,
               currency_id: item.taxable_amount.currency_id
           },
           taxable_amount: {
-              value: item.taxable_amount.value,
+              value: taxable_amount,
               currency_id: item.taxable_amount.currency_id
           },
-          original_tax_rate_id: item.tax_rate_id,
-          tax_rate_id: item.tax_rate_id
+          original_tax_rate_id: tax_rate_id,
+          tax_rate_id: tax_rate_id
       }
       items.push(item_attr)
     end

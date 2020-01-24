@@ -4029,6 +4029,7 @@ Rails.application.routes.draw do
 
   resources :credit_notes do
     patch 'review', to: 'credit_notes#review'
+    put 'update_and_submit', to: 'credit_notes#update_and_submit'
   end
 
 
