@@ -13,7 +13,7 @@ class Vendors::Update < Vendors::Base
   def init
     # id = params[:id] || params[:yes_bank_vendor_id] || params[:vendor_id]
     self.vendor_parameters = vendor_attributes
-    self.vendor_changes ={}
+    self.vendor_changes = {}
 
     # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
     # self.vendor_parameters.delete(:policy_id)
@@ -47,6 +47,15 @@ class Vendors::Update < Vendors::Base
       end
     end
 
+    if self.vendor.pan.blank? and self.vendor_parameters[:pan].blank?
+      # vendor_parameters[:gstin_locations_attributes] = []
+      vendor_parameters[:gstin_locations_attributes].each do |gstin|
+        gstin[:gstin] = nil
+        gstin[:gstin_id] = nil
+      end
+      add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
+    end
+
     if vendor_parameters[:gstin_locations_attributes].present?
       vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
         poc_email = gstin_location[:poc_email]
@@ -68,28 +77,30 @@ class Vendors::Update < Vendors::Base
     end
 
 
-    # TODO - check if this is required for all companies
-    unless user.company_id == 156
-      if vendor_parameters[:pan].blank? 
-        add_message :error, 'Please provide PAN to proceed'
-        return
-      end
+    # # TODO - check if this is required for all companies
+    # # unless user.company_id == 156
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #   unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+    #     add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+    #     return
+    #   end
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
       unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
         add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
-        return
       end
-
+      validate_attachment(vendor_parameters, :pan)
     end
 
 
-    if user.company_id == 156
+    if [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
 
-      unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
-      else
-        validate_attachment(vendor_parameters, :pan)
-      end
 
       # Remove Empty gstin locations
       if vendor_parameters[:gstin_locations_attributes].present?
@@ -112,14 +123,6 @@ class Vendors::Update < Vendors::Base
         # validate_pan(vendor_parameters)
       end
     end
-
-      vendor_pan = vendor_parameters[:pan]
-      if vendor_pan.present? && (vendor.pan != vendor_pan)
-        if user.company.yes_bank_vendors.where(pan: vendor_pan).present?
-          add_message :error, "Vendor already exists with pan number: #{vendor_pan}"
-          return
-        end
-      end
 
     if self.vendor_parameters[:bank_accounts_attributes].blank?
       add_message :error, "Please provide bank account details"
@@ -146,12 +149,12 @@ class Vendors::Update < Vendors::Base
     end
 
     # checking for duplicates within this particular company
-    current_company_vendors = user.company.yes_bank_vendors
+    current_company_vendors = user.company.yes_bank_vendors.non_deleted.filter_active
     if self.vendor_parameters[:vendor_id].blank?
       self.vendor_parameters[:vendor_id] = self.vendor.vendor_id
     end
     vendor_id = self.vendor_parameters[:vendor_id]
-    duplicate_vendors = current_company_vendors.filter_vendor_id(vendor_id).without_id(self.vendor.id)
+    duplicate_vendors = current_company_vendors.where(vendor_id: vendor_id).without_id(self.vendor.id)
     if vendor_id.present? && duplicate_vendors.present?
       add_message :error, "There is a similar vendor added with the same vendor ID in our records."
       return
@@ -221,6 +224,7 @@ class Vendors::Update < Vendors::Base
     validate_gstin_pan_number
     return if has_errors?
     validate_duplicate_bank_account
+    validate_default_bank_account
     return if has_errors?
     if vendor.valid?
       self.vendor_changes = detect_changes_in_vendor(vendor) # sends mail if bank accounts added or updated
@@ -285,4 +289,6 @@ class Vendors::Update < Vendors::Base
   def all_bank_accounts_disabled?
     self.vendor.bank_accounts.all? {|account| account.disabled }
   end
+
+
 end

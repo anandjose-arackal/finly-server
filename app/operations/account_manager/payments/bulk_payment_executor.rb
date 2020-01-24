@@ -45,7 +45,6 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def validate
-    # debugger # todo uncomment below
     unless self.payment_order.pending?
       add_message :error, "Payment order cannot be processed at this moment"
       return
@@ -74,7 +73,6 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
     if self.retry_attempt
       self.crediting_payments = self.crediting_payments.failed
     end
-
 
     self.crediting_payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
@@ -124,7 +122,9 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def post_process
-
+    if payment_order.failed? || payment_order.partially_completed?
+      Event::EBankPaymentRequest::EPayment::Failure.(user, bank_payment_request: bank_payment_request)
+    end
   end
 
   def execute_post_operations(success)

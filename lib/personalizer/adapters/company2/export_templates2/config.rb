@@ -10,6 +10,14 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
                 {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
+        },
+        tally_journal: {
+            class: Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate,
+            name: 'Tally Journal Uploader',
+            description: 'Tally exportable format.',
+            formats: [
+                {name: 'Export as XLS', extension: 'xls'}
+            ]
         }
     }
   end

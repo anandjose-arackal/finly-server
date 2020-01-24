@@ -31,8 +31,12 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_policy_id
     has_scope :filter_invoice_id
     has_scope :show_only_invoices_which_are_forwarded
+    has_scope :rcm_enabled
+    has_scope :filter_rcm_enabled
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_with_credit_note
 
     # Sorting
     has_scope :sort_invoice_id
@@ -41,7 +45,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def init
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
+      if params[:filter_ids] and not params[:filter_ids].respond_to?(:each)
         params[:filter_ids] = params[:filter_ids].first.split(",")
       end
       # Todo temp workaround because of frontend format issue - END

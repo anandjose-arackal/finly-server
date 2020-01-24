@@ -39,32 +39,32 @@ user:
   <% if current_user.admin? %>
   - id: admin
     name: Admin
-    default_url: 'expenses/params={"view":"admin"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.auditor? %>
   - id: auditor
     name: Auditor
-    default_url: 'expenses/params={"view":"auditor"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.finance_manager? %>
   - id: finance_manager
     name: 'Finance Manager'
-    default_url: 'reports/params={"view":"finance_manager"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.manager? %>
   - id: manager
     name: 'Manager'
-    default_url: 'reports/params={"view":"manager"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.travel_manager? %>
   - id: travel_manager
     name: 'Travel Manager'
-    default_url: 'travel_requests/params={"view":"travel_manager"}'
+    default_url: 'dashboard'
   <% end %>
   <% if current_user.employee? %>
   - id: personal
     name: 'Personal'
-    default_url: 'expenses/params={"view":"personal"}'
+    default_url: 'dashboard'
   <% end %>
 
 views:

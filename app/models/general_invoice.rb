@@ -102,10 +102,10 @@
 #  include_tax_and_tds                   :boolean          default(FALSE)
 #
 
-  # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
+# These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
 
-  # Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
-  # Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
+# Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
+# Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
 
 class GeneralInvoice < ApplicationRecord
   include SoftDeletable, MathUtil
@@ -310,40 +310,40 @@ class GeneralInvoice < ApplicationRecord
 
   def agreement_based_json
     {
-      id: self.id, 
-      invoice_type: self.invoice_type&.name,
-      department_attributes: { id: self.department_id, name: self.department&.name },
-      location_attributes: { id: self.location_id, name: self.location&.name },
-      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
-      payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
-      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name&.titleize},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id, trade_name: self.vendor&.trade_name},
-      bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
-      vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json,
-      note: self.note,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      invoice_frequency_attributes: get_invoice_frequency_attributes,
-      billing_start_date: self.billing_start_date&.to_date,
-      billing_day_of_month: billing_day_of_month,
-      due_date: self.due_date&.to_date,
-      start_date: self.start_date,
-      end_date: self.end_date,
-      lock_in_period: self.lock_in_period,
-      rent_free_period: self.rent_free_period,
-      tenancy_period: self.tenancy_period,
-      custom_fields: self.custom_fields,
-      already_exists: true,
-      prepaid: self.prepaid,
-      escalation_percentage: self.escalation_percentage,
-      total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
-      available_invoice_amount: get_available_invoice_amount,
-      invoice_number: self.get_invoice_number,
-      include_tax_and_tds: !!self.include_tax_and_tds
+        id: self.id,
+        invoice_type: self.invoice_type&.name,
+        department_attributes: { id: self.department_id, name: self.department&.name },
+        location_attributes: { id: self.location_id, name: self.location&.name },
+        cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+        payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
+        billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name&.titleize},
+        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+        notify_users: self.notify_users&.as_json,
+        vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id, trade_name: self.vendor&.trade_name},
+        bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
+        vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+        vendor_locations: fetch_vendor_locations.as_json,
+        bank_accounts: fetch_vendor_bank_accounts.as_json,
+        note: self.note,
+        tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+        invoice_frequency_attributes: get_invoice_frequency_attributes,
+        billing_start_date: self.billing_start_date&.to_date,
+        billing_day_of_month: billing_day_of_month,
+        due_date: self.due_date&.to_date,
+        start_date: self.start_date,
+        end_date: self.end_date,
+        lock_in_period: self.lock_in_period,
+        rent_free_period: self.rent_free_period,
+        tenancy_period: self.tenancy_period,
+        custom_fields: self.custom_fields,
+        already_exists: true,
+        prepaid: self.prepaid,
+        escalation_percentage: self.escalation_percentage,
+        total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
+        available_invoice_amount: get_available_invoice_amount,
+        invoice_number: self.get_invoice_number,
+        include_tax_and_tds: !!self.include_tax_and_tds
     }
   end
 

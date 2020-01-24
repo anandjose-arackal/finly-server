@@ -25,6 +25,7 @@ json.vendor do
         json.ifsc bank_account.ifsc
         json.selected @result.purchase_order.bank_account&.id == bank_account.id
         json.default bank_account.default_account
+        json.disabled bank_account.disabled
       end
     end
   end
@@ -291,3 +292,5 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

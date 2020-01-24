@@ -1,0 +1,50 @@
+<h4 class="text-center">Payment Receipt</h4>
+
+
+<img class="text-left" src="/api/<%= image_url('/logos/yes_bank.png') %>" style="height: 50px; width: 100px;"/>
+<img class="text-right" src="<%= image_url('/logos/b_assured.png') %>" style="height: 50px; width: 100px;float: right;"/>
+
+<table class="table table-bordered table-striped" style="margin-top: 15px;">
+  <tbody>
+  <tr>
+    <td>Name of Biller</td>
+    <td><%= @bill.biller.biller_name %></td>
+  </tr>
+  <tr>
+    <td>Mobile Number</td>
+    <td><%= @bill.subscription&.mobile_number %></td>
+  </tr>
+  <tr>
+    <td>Bill Number</td>
+    <td><%= @bill.bill_number || "--" %></td>
+  </tr>
+  <tr>
+    <td>Bill Date</td>
+    <td><%= @bill.bill_date&.strftime("%d %b %Y") %></td>
+  </tr>
+  <tr>
+    <td>Bill Due Date</td>
+    <td><%= @bill.due_date&.strftime("%d %b %Y") %></td>
+  </tr>
+  <tr>
+    <td>Transaction Ref ID</td>
+    <td><%= @bill.payments&.first&.reference_resource&.bbps_ref_id || "--" %></td>
+  </tr>
+  <tr>
+    <td>Payment Mode</td>
+    <td> Internet Banking</td>
+  </tr>
+  <tr>
+    <td>Bill Amount</td>
+    <td><%= "#{@bill.payments&.first&.amount&.currency&.symbol}#{@bill.payments&.first&.amount&.value}" %></td>
+  </tr>
+  <tr>
+    <td>Transaction Date &amp; Time</td>
+    <td><%= @bill.payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y") %></td>
+  </tr>
+  <tr>
+    <td>Status</td>
+    <td><%= @bill.payments&.first&.payment_status&.name&.upcase %></td>
+  </tr>
+  </tbody>
+</table>

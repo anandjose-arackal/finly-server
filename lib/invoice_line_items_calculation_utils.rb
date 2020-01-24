@@ -41,7 +41,11 @@ class InvoiceLineItemsCalculationUtils
         calculate_billable_amount(item) # this is mainly if item is a service
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
-        self.net_amount = self.gross_amount + self.tax_amount
+        if invoice.rcm_enabled?
+          self.net_amount = self.gross_amount
+        else
+          self.net_amount = self.gross_amount + self.tax_amount
+        end
       end
       self.invoice_total += self.net_amount
       total_invoice_discount = (self.service_item) ? 0 : self.discount_amount
@@ -120,6 +124,8 @@ class InvoiceLineItemsCalculationUtils
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
+    calculation_from_payment = payment.present? ? true : false
+    InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice, calculation_from_payment)
     params
   end
 
@@ -145,7 +151,7 @@ class InvoiceLineItemsCalculationUtils
           end
           item_amount = po_item.present? ? po_item_amount : self.invoice_item_amount
           rate = ((item.discount.to_f / item_amount) * 100).round(2) rescue 0
-          self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f)/100
+          self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
         else
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
       end
@@ -167,7 +173,7 @@ class InvoiceLineItemsCalculationUtils
       when 2
         # self.discount_amount = item.discount.to_f
         rate = ((item.discount.to_f / self.invoice_item_amount) * 100).round(2) rescue 0
-        self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f)/100
+        self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
       else
         self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
     end
@@ -185,10 +191,19 @@ class InvoiceLineItemsCalculationUtils
     end
     if item.parent.class.name == 'OutwardInvoice'
       self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
+      self.tax_amount = self.net_amount - self.gross_amount
     else
-      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+      if item.parent&.rcm_enabled?
+        self.net_amount = self.gross_amount
+        # if RCM doesn't apply, we shall have to calculate the tax using a "pseudo" net amount
+        # i.e. calculate tax as though RCM wasn't there and then tabulate it differently
+        net_if_tax_applied = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+        self.tax_amount = net_if_tax_applied - self.gross_amount
+      else
+        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+        self.tax_amount = self.net_amount - self.gross_amount
+      end
     end
-    self.tax_amount = self.net_amount - self.gross_amount
     # setting the SGST, CGST and IGST values for the invoice
     case item.parent.gst_type_id
       when GstType.id_for(:cgst_sgst)

@@ -4,10 +4,10 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   subscribe 'vendors.import'
   headers ({
       :id => "ID",
-      :name => "Vendor NAme",
+      :business_name => "Legal Name",
       :vendor_type => "Vendor Type",
       :vendor_id => "Vendor Code",
-      :business_name => "Business Name",
+      :trade_name => "Trade Name",
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",
@@ -29,6 +29,16 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     unless messages.blank?
       return result false, messages.join(', ')
     end
+    #support for multiple gstin locations in import
+    vendor = check_existing_vendor(vendor_params["vendor"])
+    if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
+      vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
+      unless vendor.save
+        return result false, vendor.errors.full_messages
+      end
+      return result true, 'Created Successfully'
+    end
+
     vendor = self.company.yes_bank_vendors.build(vendor_params["vendor"])
     unless vendor.validate
       return result false, vendor.errors.full_messages
@@ -97,11 +107,11 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   
   def set_params(data)
     messages =[]
-    name = data[:name].to_s
-    messages << "Name can't Blank" if name.blank?
+    business_name = data[:business_name].to_s
+    messages << "Legal Name can't Blank" if business_name.blank?
     mobile_number = clean_up_data data[:mobile_number]
     email = data[:email].to_s
-    business_name = data[:business_name].to_s
+    trade_name = data[:trade_name].to_s
     pan = data[:pan].to_s
     state =data[:state].to_s
     description = data[:description].to_s
@@ -137,20 +147,20 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     end
 
     gst_registered = (gstin.present? ? true : false)
-    params =  {"vendor"=>{"name"=> name,
-                          "authorized"=>"1",
-                          "mobile_number"=> mobile_number,
-                          "email"=> email ,
-                          "currency_id"=>"1",
-                          "business_name"=> business_name,
-                          "pan"=> pan,
-                          "description"=> description,
-                          "address"=> address,
-                          "status_id"=> 6,
-                          "created_by_id"=> created_by_id,
-                          "vendor_id" => vendor_id,
-                          "vendor_type_id" => vendor_type_id,
-                          "gst_registered" =>  gst_registered
+    params = {"vendor" => {"business_name" => business_name,
+                           "authorized" => "1",
+                           "mobile_number" => mobile_number,
+                           "email" => email,
+                           "currency_id" => "1",
+                           "trade_name" => trade_name,
+                           "pan" => pan,
+                           "description" => description,
+                           "address" => address,
+                           "status_id" => 6,
+                           "created_by_id" => created_by_id,
+                           "vendor_id" => vendor_id,
+                           "vendor_type_id" => vendor_type_id,
+                           "gst_registered" => gst_registered
     }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>account_name,
@@ -183,5 +193,10 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     else
       text&.strip
     end
+  end
+
+  def check_existing_vendor(vendor_params)
+    return false if vendor_params["vendor_id"].blank?
+    existing_vendor = company.yes_bank_vendors.non_deleted.find_by_vendor_id vendor_params["vendor_id"]
   end
 end

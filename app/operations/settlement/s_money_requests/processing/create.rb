@@ -264,9 +264,9 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
       config = params&.dig(:mappings, user_id.to_s)
       if config.present?
         grouped_request_ids = config[:money_request_ids]
-        currency_id = config&.dig("amount","currency_id")
-        user_processing_amount = config&.dig("amount","value")&.to_f || 0.0
-        pocket_currency = Currency.find_by_id(currency_id) || 1
+        currency_id = config&.dig("amount", "currency_id")
+        user_processing_amount = config&.dig("amount", "value")&.to_f || 0.0
+        pocket_currency = Currency.find_by_id(currency_id) || Currency.first
         user_requested_amount = MoneyRequestItem.with_money_request(grouped_request_ids).sum_amount(pocket_currency&.country_code)
         if user_requested_amount < user_processing_amount
           add_message :error, 'Entered amount is more than the actual requested amount'

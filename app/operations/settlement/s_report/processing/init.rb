@@ -124,12 +124,10 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         currency_report_ids = currency_reports.pluck(:id)
         expenses = Expense.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
         reimbursements = Expense.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
-
         self.reimbursement_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.reimbursement_total[settlement_currency_code].nil?
-        self.reimbursement_total[settlement_currency_code].value += expenses
+        self.reimbursement_total[settlement_currency_code].value += reimbursements
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?
-        self.expenses_total[settlement_currency_code].value += reimbursements
-
+        self.expenses_total[settlement_currency_code].value += expenses
         self.user_reports << {
             user: users_map[user_id],
             expenses_total: Amount.new(value: expenses, currency: settlement_currency),

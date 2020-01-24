@@ -17,10 +17,21 @@ class Expense::Base < BaseOperation
     self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
   end
 
-  def check_coh_availability_create(pocket, params = nil)
+  def check_coh_availability_create(pocket, params = {})
 
     unless pocket.cash_pocket?
       return
+    end
+
+    # first checking if the currencies of the expense and the pocket are the same
+    currency_id = params&.dig(:amount_attributes, :currency_id)&.to_i
+    pocket_currency_id = pocket.base_currency_id
+    # i.e. only if both the base currencies are present do we check for the pocket compatibility
+    if pocket_currency_id.present? && currency_id.present?
+      unless currency_id == pocket_currency_id
+        add_message :error, "Expense and spend account should be of the same currency. Please change the currency or choose a different spend account"
+        return
+      end
     end
 
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
@@ -41,6 +52,8 @@ class Expense::Base < BaseOperation
       case params[:expense_type_id]
         when ExpenseType.id_for(:manual)
           amount = params[:amount_attributes][:value]&.to_f
+        # currency_id = Currency.find_by(id: params[:amount_attributes][:currency_id])
+        # rate = CurrencyConversionRate.find_by(date: date)
         when ExpenseType.id_for(:per_diem)
           expense = user.expenses.build(params)
           amount = expense.calculate_amount_value(self.per_diem.configurable)
@@ -69,6 +82,16 @@ class Expense::Base < BaseOperation
 
     unless pocket&.cash_pocket?
       return
+    end
+
+    # first checking if the currencies of the expense and the pocket are the same
+    currency_id = params&.dig(:amount_attributes, :currency_id)&.to_i
+    pocket_currency_id = pocket.base_currency_id
+    if pocket_currency_id.present? && currency_id.present?
+      unless currency_id == pocket_currency_id
+        add_message :error, "Expense and spend account should be of the same currency. Please change the currency or choose a different spend account"
+        return
+      end
     end
 
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it

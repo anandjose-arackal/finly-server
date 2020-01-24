@@ -97,6 +97,10 @@ class SecurityDeposit < ApplicationRecord
     }
   end
 
+  def document_owner_attribute
+    'creator_id'
+  end
+
   private
   
   def fetch_vendor_locations

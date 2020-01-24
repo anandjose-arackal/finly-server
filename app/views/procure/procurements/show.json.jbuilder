@@ -48,7 +48,7 @@ json.trail do
         end
       end
     end
- 
+
     if item.is_a?(Invoice) && (item.invoice_type_id == InwardInvoiceType.id_for(:proforma_invoice) rescue false )
       json.invoice_type item.invoice_type&.name
       json.invoice_details do
@@ -122,8 +122,19 @@ json.trail do
           json.email item.initiating_user.email
           json.mobile_number item.initiating_user.mobile_number
         end
-        json.amount item.amount&.value
+        json.amount item.amount&.value.round(2) rescue 0
       end
+    elsif item.is_a?(CreditNote)
+      json.document_details do
+        json.amount item.net_adjustable_amount&.value
+        json.sequence_id item.sequence_id
+        json.credit_note_number item.credit_note_number
+        json.status do
+          json.id item.status&.id
+          json.name item.status&.name
+        end
+      end
+
     elsif item.is_a?(BillOfSupply)
       json.bill_of_supply_details do
         json.doc_number item.doc_number
@@ -154,7 +165,7 @@ json.trail do
 
       end
     elsif item.is_a?(DeliveryChallan)
-    end
+     end
   end
 end
 

@@ -12,7 +12,7 @@ class Event::EVendors::Retract < Event::EVendors::Base
 
   def affected_users
     # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.document, user_before: self.document.bank_payment_request_trails.last.modified_user)
-    users = self.document.affected_users(:retract)
+    self.document.affected_users(:retract)
   end
 
   def notification_affected_users

@@ -37,6 +37,15 @@ class Personalizer::Adapters::Company164::ExportTemplates164::Config
                 {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
+        },
+        lms_invoices: {
+            class: Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate,
+            name: 'L M S  Approved Invoices ',
+            description: 'LMS exportable format. Export invoices those are approved',
+            formats: [
+                {name: 'Export as CSV', extension: 'csv'},
+                {name: 'Export as XLS', extension: 'xls'}
+            ]
         }
 
     }

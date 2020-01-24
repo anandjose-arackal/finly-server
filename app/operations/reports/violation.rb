@@ -75,9 +75,25 @@ class Reports::Violation < Reports::Base
     selected_drop_down_items = nil
 
     # For performance optimization, filtering down budget rules based on selected report custom fields
+    # For performance optimization, filtering down budget rules based on selected report custom fields
+
+    expenses_selected_drop_down_items = []
+    report.expenses.each do |expense|
+      value_ids = expense.custom_fields.only_drop_downs.pluck(:value_id)
+      expenses_selected_drop_down_items << FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
+    end
+    expenses_selected_drop_down_items = expenses_selected_drop_down_items&.flatten&.uniq
+    rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
+    rule_ids = budget_rules.pluck(:id)
+    budgets_without_field_mappings = rule_ids - rule_field_mappings.pluck(:budget_rule_id)
+    rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: expenses_selected_drop_down_items).pluck(:budget_rule_id)
+    budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
+    # relevant_budget_rule_id = budget_rules
+
     if report.custom_fields.only_drop_downs.present?
       value_ids = report.custom_fields.only_drop_downs.pluck(:value_id)
       selected_drop_down_items = FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
+      selected_drop_down_items = selected_drop_down_items&.flatten
 
       rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
       rule_ids = budget_rules.pluck(:id)
@@ -86,7 +102,6 @@ class Reports::Violation < Reports::Base
       budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
       # relevant_budget_rule_id = budget_rules
     end
-
     report.expenses.each do |expense|
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy
@@ -235,9 +250,17 @@ class Reports::Violation < Reports::Base
       reports = Report.with_id(report_ids).filter_custom_drop_down_selection(field_drop_down_item_ids)
       report_ids = reports.pluck(:id)
     end
+    #checking for expense level custom_fields
+    expense_with_custom_field = []
+    if field_drop_down_item_ids.present?
+      expense.custom_fields.where(value_type: "FieldDropDownSelection").map {|cf| expense_with_custom_field << expense.id if field_drop_down_item_ids.include?(cf.value.value.id) }
+    end
 
-    expenses = Expense.with_report_id(report_ids)
-
+    if field_drop_down_item_ids.present?
+      reports = Report.with_id(report_ids).filter_custom_drop_down_selection(field_drop_down_item_ids)
+      report_ids = reports.pluck(:id)
+    end
+     expenses = Expense.with_report_id(report_ids).or(Expense.where(id: expense_with_custom_field))
     expense_arrays  = []
     expense_types = rule.expense_types.pluck(:id)
     expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)
@@ -247,7 +270,6 @@ class Reports::Violation < Reports::Base
     expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
 
     expenses = expenses.selected_expense_types(expense_arrays)
-
 
     # Expenses with different usage_date ranges from expense date
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
@@ -268,7 +290,6 @@ class Reports::Violation < Reports::Base
         total_expenses += cost_per_date * number_of_overlapping_days
       end
     end
-
     # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
     expenses = expenses.filter_category_id(categories&.pluck(:id))
 
@@ -292,7 +313,7 @@ class Reports::Violation < Reports::Base
 
   def check_budget(rule, expense)
     dates = []
-    if expense.usage_date_type.blank?
+    if expense.usage_date_type.blank? || expense.usage_date_type == "none"
       # Usage date is not set, so pick expense date for budget violation check
       dates << expense.date
     elsif expense.usage_date_end.blank?

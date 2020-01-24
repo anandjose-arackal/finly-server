@@ -51,14 +51,15 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     else
       self.invoice = procurement.invoices.build
     end
-    receiving_account = self.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
+    # receiving_account = self.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
     self.invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     self.invoice.created_by = user
     self.invoice.company = user.company
     self.invoice.invoice_type_id = self.inward_invoice_type
-    self.invoice.receiving_account = receiving_account
+    # self.invoice.receiving_account = receiving_account # let the user select bank accounts
     self.invoice.controlling_user = user
     self.invoice.vendor = vendor
+    self.invoice.rcm_enabled = vendor.rcm_enabled
     if self.vendor.payment_term_id.present?
       self.invoice.payment_term_id = self.vendor.payment_term_id
     end

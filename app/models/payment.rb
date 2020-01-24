@@ -51,6 +51,7 @@
 #  otp_attempts                   :integer
 #  on_hold                        :boolean
 #  disabled                       :boolean
+#  transfer_mode_id               :integer
 #
 
 class Payment < ApplicationRecord
@@ -101,6 +102,8 @@ class Payment < ApplicationRecord
 
   belongs_to :initiating_account, optional: true, polymorphic: true
   belongs_to :receiving_account, optional: true, polymorphic: true
+
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   has_many :system_messages, as: :messagable, dependent: :destroy
 
@@ -228,7 +231,7 @@ class Payment < ApplicationRecord
   scope :cash_on_hand_credits, -> { where(receiving_account_type: "CashOnHand") }
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
-  scope :all_except_failed, -> { where payment_status_id: PaymentStatus.all_except_failed }
+  scope :all_except_failed, -> {where payment_status_id: PaymentStatus.all_except_failed}
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
@@ -273,7 +276,7 @@ class Payment < ApplicationRecord
     user_ids = User.where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
 
     where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
-            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?)) OR id LIKE ?", bank_account_ids, vendor_ids, user_ids, "%#{term.to_i}%")
   }
 
   scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
@@ -299,7 +302,7 @@ class Payment < ApplicationRecord
 
   scope :filter_vendor_payments, -> (enabled){
     if StringUtils.to_bool(enabled)
-      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order)]
+      where payment_purpose_id: [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:advance_against_purchase_order), PaymentPurpose.id_for(:utility_bill_payment)]
     end
   }
 
@@ -419,14 +422,21 @@ class Payment < ApplicationRecord
 
   scope :include_for_index, -> {
         includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
+                  :receiving_account,
                   invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
                   payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_minimal_for_index, -> {
-        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+    includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
+  }
+
+  scope :include_for_streamsets, -> {
+        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+                  receiving_account: [:account_owner],
+                  invoice: [:category, :cost_center, :invoice_status, :invoice_type],
+                  payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true
@@ -607,6 +617,8 @@ class Payment < ApplicationRecord
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
     when 'SecurityDeposit'
       SecurityDeposit.find_by(id: self.parent_id).as_json
+    when 'BbpsBill'
+      BbpsBill.find_by(id: self.parent_id).as_json
     else
       if self.invoice.present?
         self.invoice.as_json
@@ -660,6 +672,19 @@ class Payment < ApplicationRecord
     self.payment_mode == "RTGS" || self.payment_mode == "rtgs"
   end
 
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
+  end
+
+  def as_json(options={})
+    if options[:payment_request_edit]
+      return payment_request_show_json(self.parent_type)
+    end
+  end
+
+  def payment_mode
+    mode || super
+  end
 
   private
 
@@ -739,6 +764,9 @@ class Payment < ApplicationRecord
     when 'PurchaseOrder'
       parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
       parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    when "BbpsBill"
+      parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+      parent.update(status_id: BbpsBillStatus.id_for(:approved))
     end
   end
 
@@ -758,6 +786,19 @@ class Payment < ApplicationRecord
       when 'PurchaseOrder'
         parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
         parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:paid))
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:paid))
+      end
+    end
+
+    if self.processing?
+      case self.parent_type
+      when "BbpsBill"
+        parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
+        parent.update(status_id: BbpsBillStatus.id_for(:payment_initiated))
+      else
+        # do nothing?
       end
     end
 
@@ -773,5 +814,327 @@ class Payment < ApplicationRecord
         end
       end
     end
+  end
+
+  def payment_request_show_json(document_type)
+    { document_type: document_type,
+      document_details: get_document_details(document_type),
+      amount_details: get_amount_details(document_type),
+      custom_fields: get_custom_fields(document_type),
+      custom_field_config: get_custom_field_config(document_type),
+      payment_id: self.id,
+      attachment_details: get_attachment_details(document_type)
+    }
+  end
+
+  def get_document_details(document_type)
+    case document_type
+    when 'Invoice'
+      return get_invoice_details
+    # PO Advance
+    when 'PurchaseOrder'
+      return get_po_advance_details
+    when 'BeneficiaryPayment'
+      return get_beneficiary_details
+    end
+  end
+
+  def get_invoice_details
+    {
+      document_type: 'Invoice',
+      owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
+      account_number: { number: self.receiving_account&.account_number },
+      ifsc: { code: self.receiving_account&.ifsc },
+      beneficiary_type: { type: get_beneficiary_type },
+      field_details: get_field_details('Invoice')
+    }
+  end
+
+  def get_po_advance_details
+    {
+      document_type: 'PoAdvance',
+      owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
+      account_number: { number: self.receiving_account&.account_number },
+      ifsc: { code: self.receiving_account&.ifsc },
+      beneficiary_type: { type: get_beneficiary_type },
+      field_details: get_field_details('PurchaseOrder')
+    }
+  end
+
+  def get_beneficiary_details
+    {
+      document_type: 'BeneficiaryPayment',
+      owner_name: {name: self.receiving_account&.account_owner&.display_name, label: 'Vendor'},
+      account_number: { number: self.receiving_account&.account_number },
+      ifsc: { code: self.receiving_account&.ifsc },
+      beneficiary_type: { type: get_beneficiary_type },
+      field_details: get_field_details('BeneficiaryPayment')
+    }
+  end
+
+  def get_field_details(document_type)
+    case document_type
+    when 'Invoice'
+      invoice_field_details
+    when 'PurchaseOrder'
+      po_advance_field_details
+    when 'BeneficiaryPayment'
+      get_beneficiary_field_details
+    end
+  end
+
+  def get_beneficiary_field_details
+    parameters = RequestStore.store[:params]
+    parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    departments = Company::Departments::Index.(self.parent.creator, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.parent.creator, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.parent.creator, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    cc_emails = self.parent.payment_notification_users["cc_emails"] rescue []
+    #parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    {
+      invoice_number: { value: self.invoice.invoice_number, editable: true, field_type: 'field_text' },
+      invoice_date: { value: self.invoice.date, editable: true, field_type: 'field_text' },
+      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: true },
+      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: true, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: true, field_type: 'field_drop_down_item' },
+      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: true, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: true, field_type: 'field_text_area' },
+      categories: categories,
+      cost_centers: cost_centers,
+      departments: departments,
+      cc_emails: { value: cc_emails, editable: true, field_type: 'multi_select'}
+    }
+  end
+
+  def po_advance_field_details
+    po = self&.purchase_order
+    parameters = RequestStore.store[:params]
+    parameters[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
+    departments = Company::Departments::Index.(self.purchase_order.user, parameters).policy_department_filter_mapping rescue nil
+    locations = Company::Locations::Index.(self.purchase_order.user, parameters).policy_location_filter_mapping
+    categories = Categories::Index.(self.purchase_order.user, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.purchase_order.user, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    {
+      po_number: { value: self.purchase_order.po_number, editable: false, field_type: 'field_text' },
+      invoice_number: "",
+      invoice_date: "",
+      due_date: "",
+      category: "",
+      cost_center: { id: self.purchase_order.cost_center_id, name: self.purchase_order&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
+      department: { id: self.purchase_order.department_id, name: self.purchase_order&.department&.name, editable: false, field_type: 'field_drop_down_item' },
+      location: { id: self.purchase_order.location_id, name: self.purchase_order&.location&.name, editable: false, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      categories: categories,
+      cost_centers: cost_centers,
+      departments: departments,
+      locations: locations
+    }
+  end
+
+  def invoice_field_details
+    po = self&.invoice&.procurement&.purchase_order
+    parameters = RequestStore.store[:params]
+    parameters[:filter_role_id] =  po.present? ? [UserRole.id_for(:po_invoice_initiator)] : [UserRole.id_for(:non_po_invoice_initiator)]
+    departments = Company::Departments::Index.(self.invoice.created_by, parameters).policy_department_filter_mapping rescue nil
+    categories = Categories::Index.(self.invoice.created_by, parameters).vp_categories rescue nil
+    cost_centers = CostCenters::Index.(self.invoice.created_by, parameters).cost_centers rescue nil
+    #Reassign filter role id in case parameters is being directly used
+    parameters[:filter_role_id] = [UserRole.id_for(:bank_payment_request_initiator)]
+    {
+      invoice_number: { value: self.invoice.invoice_number, editable: false, field_type: 'field_text' },
+      invoice_date: { value: self.invoice.date, editable: false, field_type: 'field_text' },
+      due_date: { value: self.invoice.due_date, field_type: 'field_text', editable: false },
+      category: { id: self.invoice.category_id, name: self.invoice&.category&.name, editable: false, field_type: 'field_drop_down_item' },
+      cost_center: { id: self.invoice.cost_center_id, name: self.invoice&.cost_center&.name, editable: false, field_type: 'field_drop_down_item' },
+      department: { id: self.invoice.department_id, name: self.invoice&.department&.name, editable: false, field_type: 'field_drop_down_item' },
+      narration: { value: self.note, editable: false, field_type: 'field_text_area' },
+      categories: categories,
+      cost_centers: cost_centers,
+      departments: departments,
+      rcm_enabled: self.invoice&.rcm_enabled
+    }
+  end
+
+  def get_beneficiary_type
+    if self.receiving_user&.is_a?(User) || self.receiving_user&.authorized
+      beneficiary_type = "authorized"
+    else
+      beneficiary_type = "unauthorized"
+    end
+    beneficiary_type
+  end
+
+  def get_amount_details(document_type)
+    case document_type
+    when 'Invoice'
+      get_invoice_amount_details
+    when 'PurchaseOrder'
+      get_po_advance_amount_details
+    when 'BeneficiaryPayment'
+      get_beneficiary_amount_details
+    end
+  end
+
+  def get_po_advance_amount_details
+    parameters = RequestStore.store[:params]
+    tds_slabs = TdsSlabs::Index.(self.purchase_order.user, parameters).tds_slabs rescue nil
+    {
+        total_amount: {value: precision_value(self.purchase_order&.requested_advance_amount&.value), editable: false}, # TOTAL
+        inclusive_of_taxes: "",
+        discount: "",
+        tax: "",
+        tds: { tds_slab_id: self.purchase_order.advance_tds_slab_id, tds_amount: self.purchase_order&.advance_tds_amount&.value, editable: true, tds_slab_rate: self.purchase_order&.advance_tds_slab&.tds },
+        advance_amount: "", # Advance
+        freight_amount: "",
+        net_payable_amount: "",
+        net_total: { value: self.amount&.value, editable: false }, #Net Total
+        roundoff_amount: { value: 0, editable: false },
+        tds_slabs: tds_slabs,
+        tax_rates: self.purchase_order.company.tax_rates,
+        #gst_type_id: {value: self.purchase_order.gst_type_id, editable: false},
+        payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+        balance_due:{ value: self.amount&.value, editable: false } # Invoice AMOUNT
+    }
+  end
+
+  def get_beneficiary_amount_details
+    parameters = RequestStore.store[:params]
+    tds_slabs = TdsSlabs::Index.(self.parent.creator, parameters).tds_slabs rescue nil
+    {
+        total_amount: {value: precision_value(self.parent&.original_amount&.value), editable: true}, # TOTAL
+        inclusive_of_taxes: { value: !!self.invoice.inclusive_of_taxes, editable: true},
+        #discount: "",
+        #tax_type_id: { value: self.invoice.tax_type_id, editable: true },
+        tax: { tax_type_id: self.invoice.gst_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.invoice.tax_rate), editable: true },
+        tax_rate: {tax_rate_id: self.parent.tax_rate_id, editable: true},
+        tds: { tds_slab_id: self.invoice.tds_type_id, tds_amount: precision_value(self.parent.tds_amount&.value), tds_slab_id: self.parent.tds_slab_id, editable: true, tds_slab_rate: self.parent&.tds_slab&.tds },
+        advance_amount: { value: precision_value(self.parent.advance_amount&.value), editable: true }, # Advance
+        freight_amount: "",
+        net_payable_amount: "",
+        net_total: { value: precision_value(self.parent.net_amount&.value), editable: true }, #Net Total
+        roundoff_amount: { value: self.parent.roundoff_amount, editable: true },
+        tds_slabs: tds_slabs,
+        tax_rates: self.invoice.company.tax_rates,
+        gst_type_id: {value: self.invoice.gst_type_id, editable: true},
+        payment_amount: { value: self.amount_value, editable: false }, #Payable Amount
+        balance_due:{ value: self.parent.balance_due&.value, editable: true } # Invoice AMOUNT
+    }
+  end
+
+  def get_invoice_amount_details
+    parameters = RequestStore.store[:params]
+    tds_slabs = TdsSlabs::Index.(self.invoice.created_by, parameters).tds_slabs rescue nil
+    if self.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+      invoice_advance = self.parent.po_adjusted_advance&.value&.to_f
+    elsif self.parent.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      invoice_advance = self.parent.advance_amount&.value&.to_f
+    else
+      invoice_advance = self.parent.advance_amount&.value&.to_f
+    end
+
+    {
+      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
+      total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
+      tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
+      advance_amount: { value: invoice_advance, editable: false }, # Advance
+      freight_amount: { value: self.parent.freight_amount&.value, editable: false },
+      net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
+      net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
+      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
+      tds_slabs: tds_slabs,
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: { value: self.parent.gst_type_id, editable: false },
+      payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+      balance_due:{ value: self.parent.balance_due&.value, editable: false }, # Invoice AMOUNT
+      available_credits: available_credits_amount
+    }
+  end
+
+  def get_custom_fields(document_type)
+    case document_type
+    when 'Invoice'
+      self.parent.custom_fields
+    when 'PurchaseOrder'
+      self.purchase_order.custom_fields
+    when 'BeneficiaryPayment'
+      self.invoice.custom_fields
+    end
+  end
+
+  def get_attachment_details(document_type)
+    case document_type
+    when 'Invoice'
+      {
+        url: self.parent.attachments.first&.file&.url,
+        thumb: self.parent.attachments.first&.file&.url(:thumb),
+        content_type: self.parent.attachments.first&.file&.content_type,
+        file_name: self.parent.attachments.first&.file&.original_filename
+      }
+    when 'PurchaseOrder'
+      {
+        url: self.parent.attachments.first&.file&.url,
+        thumb: self.parent.attachments.first&.file&.url(:thumb),
+        content_type: self.parent.attachments.first&.file&.content_type,
+        file_name: self.parent.attachments.first&.file&.original_filename
+      }
+    when 'BeneficiaryPayment'
+      {
+        url: nil,
+        thumb: nil,
+        content_type: nil,
+        file_name: nil
+      }
+    end
+  end
+
+  def calculate_tds_applicable_amount(document_type)
+    case document_type
+    when 'Invoice'
+      return calculate_tds_applicable_sum(self.invoice)
+    end
+  end
+
+  # Amount on which TDS is applied
+  def calculate_tds_applicable_sum(document)
+    amount_arr = []
+    case document.class.name
+    when 'Invoice'
+      # Get value from line items
+      if ["non_po_invoice", "recurring_invoice", "agreement_invoice"].include?(document.invoice_type.name)
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          amount_arr << item.taxable_amount&.value
+        end
+      elsif document.invoice_type.name == 'tax_invoice'
+        document.items.joins(:inventory_line_item).where('items.tds_applicable = ?', true).each do |item|
+          if item.inventory_line_item.product_type.goods?
+            amount_arr << item.taxable_amount&.value
+          else
+            amount_arr << item.billable_amount&.value
+          end
+        end
+      end
+    end
+    return precision_value(amount_arr.sum)
+  end
+
+  def get_custom_field_config(document_type)
+    case document_type
+    when 'BeneficiaryPayment'
+      invoice_cf_ids = self.invoice.custom_fields.pluck(:field_configuration_id)
+      # Non created custom fields in the config
+      configurations = initiating_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
+      custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
+    end
+  end
+
+  def available_credits_amount
+    adj_amount =  self.parent.credit_note_adjustments.joins(:amount).pluck('amounts.value').sum rescue nil
+    precision_value(adj_amount)
   end
 end

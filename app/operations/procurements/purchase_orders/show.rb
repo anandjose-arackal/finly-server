@@ -233,6 +233,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
     # Give access to grn initiator once PO is approved
     return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
+    return if params[:skip_for_mailer]
     raise_unauthorized_exception
   end
 end

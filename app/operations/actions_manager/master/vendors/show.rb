@@ -80,10 +80,20 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     # if vendor.get_reviewers.include?(user) && vendor.awaiting_approval?
     #   return true
     # end
-    if vendor.created_by_id == user.id
-      return vendor.draft? || vendor.rejected? || vendor.retracted?
-    end
 
+    if vendor.created_by_id == user.id && (vendor.draft? || vendor.rejected? || vendor.retracted?)
+      # If user is vendor initiator & vendor is in the above states
+      true
+    elsif (vendor.policy.present? || user.company.vendor_empanelment_workflow_enabled?) &&
+        (vendor.awaiting_approval? && (vendor.get_reviewers.include?(user) || user.vendor_payment_admin?))
+      # When vendor is in awaiting approval state & user is vendor payment admin or a reviewer
+      true
+    elsif (vendor.approved? || vendor.auto_approved?) && (user.vendor_payment_admin? || user.has_policy_role?(UserRole.id_for(:vendor_manager), vendor) || user.permission.create_beneficiaries)
+      # When vendor is approved and user is an admin or is a vendor manager, create beneficiaries for customer who have not taken vendor empanelment workflow
+      true
+    else
+      false
+    end
     # Allow admin to edit pan after taking control
     # if user.vendor_payments_admin? && ((vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id) || vendor.get_reviewers.include?(user))
     #   return  vendor.awaiting_approval?

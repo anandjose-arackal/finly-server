@@ -16,11 +16,13 @@ lib/tasks/aws.rake
 config/data_store.yml
 config/sentry.yml
 config/aws_config.yml
+config/insights_config.yml
 config/yes_bank_config.yml
 config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
 config/insights_config.yml
+config/bbps_config.yml
 .rubocop.yml
 .vscode/
 
@@ -30,6 +32,7 @@ config/insights_config.yml
 erd.pdf
 !/log/.keep
 /tmp
+/public/system/export_jobs/*
 /public/system/receipts/*
 /public/system/receipt_emails/*
 /public/system/company_configurations/*
@@ -77,3 +80,4 @@ config/sidekiq.yml
 .ruby-version
 
 public/tmp
+config/integrations.yml

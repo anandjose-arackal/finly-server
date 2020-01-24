@@ -1,4 +1,6 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
+# If no details are supplied then reports are not settled.
+# To settle it explicitly, call the mark_as_paid operation
 # 
 class Settlement::SReport::Processing::Update < Settlement::SReport::Processing::Base
   attr_accessor :report_processor_group, :mapping, :pending_mappings, :request_params

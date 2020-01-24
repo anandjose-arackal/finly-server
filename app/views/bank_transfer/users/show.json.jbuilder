@@ -7,6 +7,7 @@ json.user do
   json.gender @result.selected_user.profile&.gender
   json.employee_id @result.selected_user.profile&.employee_id
   json.editable @result.user.vendor_payments_admin?
+  json.profile_id @result&.selected_user&.profile&.id
 end
 
 json.user_delegate do

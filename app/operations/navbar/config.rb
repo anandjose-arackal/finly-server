@@ -40,7 +40,9 @@ class Navbar::Config < BaseOperation
   def process_master(klass)
     config = {}
     config[:nav_bar] = process_nav_bar(klass)
-    config[:cog] = process_cog(klass)
+    config[:cog_menu] = process_cog_menu(klass)
+    config[:cog_modules] = process_cog_modules(klass)
+    config[:cog] = config[:cog_menu] + config[:cog_modules]
     config
   end
 
@@ -76,9 +78,27 @@ class Navbar::Config < BaseOperation
     menu_data
   end
 
-  def process_cog(klass)
+  def process_cog_menu(klass)
     cog_data = []
-    structure = klass.structure(:cog)
+    structure = klass.structure(:cog_menu)
+    master = klass.new
+    structure.each do |item|
+      if item.is_a?(Symbol)
+        menu_key = item
+      else
+        raise 'Invalid type item'
+      end
+      conf = master.send menu_key
+      next if conf.nil?
+
+      cog_data << conf
+    end
+    cog_data
+  end
+
+  def process_cog_modules(klass)
+    cog_data = []
+    structure = klass.structure(:cog_modules)
     master = klass.new
     structure.each do |item|
       if item.is_a?(Symbol)

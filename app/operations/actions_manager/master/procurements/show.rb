@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
 
   register_handle :procurements_show
-  validate :input
+  # validate :data_provider
   register_actions [:add_document]
 
   def initialize(user=nil, params={})

@@ -112,11 +112,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def delete
     ############# Admin logic start #######################
-    if user.vendor_payments_admin?
-      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
-        return true
-      end
-    end
+    # if user.vendor_payments_admin?
+    #   if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    #     return true
+    #   end
+    # end
     ############# Admin logic end #######################
 
 
@@ -129,11 +129,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def submit
     ############# Admin logic start #######################
-    if user.vendor_payments_admin?
-      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
-        return true
-      end
-    end
+    # if user.vendor_payments_admin?
+    #   if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    #     return true
+    #   end
+    # end
     ############# Admin logic end #######################
 
     ############# Initiator logic start #######################
@@ -391,7 +391,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       # return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?)
 
 
-      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing? || bank_payment_request.retracted? || bank_payment_request.rejected?)
+      # if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing? || bank_payment_request.retracted? || bank_payment_request.rejected?)
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing?)
         if bank_payment_request.action_users(:return_control).include?(user)
           return true
         end
@@ -427,6 +428,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def edit_payment_history
+    # Security deposit is non editable. There will always be one payment attached to security deposit
+    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit' || bank_payment_request.payment_order.payments.first.parent_type == 'BbpsBill'
+      return false
+    end
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.processing?
@@ -456,6 +461,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def delete_payment_history
+    # Security deposit is non editable. There will always be one payment attached to security deposit
+    if bank_payment_request.blank? || bank_payment_request.payment_order.blank? || bank_payment_request.payment_order.payments.blank? || bank_payment_request.payment_order.payments.first.parent_type == 'SecurityDeposit'
+      return false
+    end
+
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
@@ -470,9 +480,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end ####################
 
     ############# Reviewer logic start ####################
-    if bank_payment_request.is_reviewing_user?
-      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
-    end
+    # if bank_payment_request.is_reviewing_user?
+    #   return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    # end
     ############# Reviewer logic end ####################
 
     ############# Initiator logic start ####################
@@ -699,7 +709,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Initiator logic start ####################
     # if bank_payment_request.is_initiating_user?
-    #   if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+    #   if bank_payment_request.payment_order.initiating_user_id == user.id
     #     return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
     #   end
     # end
@@ -788,6 +798,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Initiator logic end ######################
+
+    ############# Creditor logic start ######################
+    if bank_payment_request.is_crediting_user?
+      if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
   end
   
   def transfer_type
@@ -798,6 +818,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Admin logic end ######################
+
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
 
     ############# Creditor logic start ######################
     if bank_payment_request.is_crediting_user?
@@ -829,6 +855,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
     ############# Admin logic end ######################
 
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
+
     ############# Creditor logic start ######################
     if bank_payment_request.is_crediting_user?
       if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
@@ -858,6 +890,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Admin logic start ######################
+
+    ############# Reviewer logic start ####################
+    if bank_payment_request.is_reviewing_user?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+    end
+    ############# Reviewer logic end ####################
     
     ############# Initiator logic start ######################
     if bank_payment_request.is_initiating_user?
@@ -868,6 +906,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
     ############# Initiator logic end ######################
+
+    ############# Creditor logic start ######################
+    if bank_payment_request.is_crediting_user?
+      if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
   end
 
   def reviewal_flow

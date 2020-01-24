@@ -30,7 +30,7 @@ class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::Pay
   private
 
   def request_params
-    params.require(:bank_payment_request).permit(:attached_file, :description)
+    params.require(:bank_payment_request).permit(:attached_file, :description, :allow_delete)
   end
 end
 

@@ -32,11 +32,11 @@ class Dashboard::VendorPayments::PurchaseRequestApprovedItems < Dashboard::Vendo
 
     def init
       general_filter_params = {
-        filter_policy_id: params[:filter_policy],
-        filter_department_id: params[:filter_department],
-        filter_month: params[:filter_month],
-        filter_year: params[:filter_year],
-        filter_location_id: params[:filter_location]
+          filter_policy_id: params[:filter_policy],
+          filter_department_id: params[:filter_department],
+          filter_month: params[:filter_month],
+          filter_year: params[:filter_year],
+          filter_location_id: params[:filter_location]
       }
 
       # self.purchase_requests = params[:purchase_requests]
@@ -48,16 +48,16 @@ class Dashboard::VendorPayments::PurchaseRequestApprovedItems < Dashboard::Vendo
 
       if user.vendor_payments_admin?
         approved_items_data = {
-          type: 'admin',
-          data: [
-            {
-              title: "Total",
-              count: apply_scopes(self.approved_purchase_request_items)&.count,
-              filters: [
-                {}
-              ]
-            }
-          ]
+            type: 'admin',
+            data: [
+                {
+                    title: "Total",
+                    count: apply_scopes(self.approved_purchase_request_items)&.count,
+                    filters: [
+                        {}
+                    ]
+                }
+            ]
         }
         self.counts.push(approved_items_data)
       end
@@ -65,16 +65,16 @@ class Dashboard::VendorPayments::PurchaseRequestApprovedItems < Dashboard::Vendo
 
       if user.is_purchase_order_initiator? || user.is_inventory_manager?
         approved_items_data = {
-          type: 'personal',
-          data: [
-            {
-              title: "Total",
-              count: self.approved_purchase_request_items.role_based_filter(true)&.count,
-              filters: [
-                {role_based_filter: true}
-              ]
-            }
-          ]
+            type: 'personal',
+            data: [
+                {
+                    title: "Total",
+                    count: self.approved_purchase_request_items.role_based_filter(true)&.count,
+                    filters: [
+                        {role_based_filter: true}
+                    ]
+                }
+            ]
         }
         self.counts.push(approved_items_data)
       end
@@ -83,15 +83,15 @@ class Dashboard::VendorPayments::PurchaseRequestApprovedItems < Dashboard::Vendo
       # Done because the filters in index page and the filters passed in dashboard for date filters are different
       self.counts.each do |count_object|
         count_object[:data].each do |data|
-           if params[:filter_by_date_range].present? && params[:filter_by_date_range][:from].present?
-             filter_date = {'filter_by_date_range[from]': params[:filter_by_date_range][:from]}
-             data[:filters].push(filter_date)
-           end
+          if params[:filter_by_date_range].present? && params[:filter_by_date_range][:from].present?
+            filter_date = {'filter_by_date_range[from]': params[:filter_by_date_range][:from]}
+            data[:filters].push(filter_date)
+          end
 
           if params[:filter_by_date_range].present? && params[:filter_by_date_range][:to].present?
-             filter_date = {'filter_by_date_range[to]': params[:filter_by_date_range][:to]}
-             data[:filters].push(filter_date)
-           end
+            filter_date = {'filter_by_date_range[to]': params[:filter_by_date_range][:to]}
+            data[:filters].push(filter_date)
+          end
         end
       end
     end

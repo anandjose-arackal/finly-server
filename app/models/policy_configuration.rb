@@ -21,6 +21,7 @@
 #  booking_type_restaurant :boolean          default(TRUE)
 #  booking_type_other      :boolean          default(TRUE)
 #  trips_money_request     :boolean          default(TRUE)
+#
 
 class PolicyConfiguration < ApplicationRecord
   # include PolicyVersion

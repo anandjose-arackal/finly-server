@@ -29,7 +29,7 @@ class Export::Reports::AsXml < Export::Reports::Base
       self.reports = self.reports&.with_id(id)
     end
     self.default_column_names = user.company.export_preferences.pluck(:name)
-    self.custom_field_column_names = extract_custom_field_names(reports)
+    self.custom_field_column_names = extract_custom_field_names
     self.preferences = user.company.export_preferences
   end
 
@@ -40,13 +40,11 @@ class Export::Reports::AsXml < Export::Reports::Base
   end
 
   def process
-    cf_data = generate_custom_field_data reports
-    cf_headers = cf_data[:headers]
-    self.column_names = default_column_names + cf_headers
+    self.column_names = default_column_names + custom_field_column_names
     self.data = []
     reports.each do |r|
       r.expenses.each do |e|
-        self.data << retrieve_data(preferences, r, e, cf_data)
+        self.data << retrieve_data(preferences, r, e, custom_field_column_names)
       end
     end
   end

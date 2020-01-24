@@ -8,7 +8,7 @@
 #  latitude       :decimal(30, 15)
 #  longitude      :decimal(30, 15)
 #  name           :string(255)
-#  address        :text(65535)
+#  address        :text(16777215)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  order          :integer

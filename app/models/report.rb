@@ -335,7 +335,7 @@ class Report < ApplicationRecord
     where report_status_id: filter_status
   }
 
-  delegate :status_name, to: :status
+
 
   delegate :submitted_amount_value, to: :submitted_amount
 
@@ -460,7 +460,8 @@ class Report < ApplicationRecord
       end
     end
     currency_code = options&.dig(:currency_code) || self.base_currency_code
-    precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
+    # precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
+    precision_value(temp_expenses.map {|expense| expense.amount.public_send(currency_code.to_sym)}.compact.sum)
   end
 
   def reimbursable_expenses(options = {})
@@ -583,6 +584,10 @@ class Report < ApplicationRecord
 
   def controlling_user
     self.get_reviewers.first
+  end
+
+  def status_name
+    self.status.name&.split(/[_ ]/)&.map{|word| word.capitalize}&.join(" ")
   end
 
 
