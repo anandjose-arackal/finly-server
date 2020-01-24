@@ -35,7 +35,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
         'Reference Code',
         'SAC',
         'Ref. Invoice No.',
-        'Payment_Mode',
+        'PAYMENT MODE',
     ]
     self.contents = []
     sl_no = 1

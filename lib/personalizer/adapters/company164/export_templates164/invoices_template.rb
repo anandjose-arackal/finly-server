@@ -73,7 +73,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
-          'Comments': 'Finly'
       }.each do |k, v|
         row.add k, v
       end

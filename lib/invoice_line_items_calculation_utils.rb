@@ -41,7 +41,11 @@ class InvoiceLineItemsCalculationUtils
         calculate_billable_amount(item) # this is mainly if item is a service
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
-        self.net_amount = self.gross_amount + self.tax_amount
+        if invoice.rcm_enabled?
+          self.net_amount = self.gross_amount
+        else
+          self.net_amount = self.gross_amount + self.tax_amount
+        end
       end
       self.invoice_total += self.net_amount
       total_invoice_discount = (self.service_item) ? 0 : self.discount_amount
@@ -120,6 +124,8 @@ class InvoiceLineItemsCalculationUtils
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
+    calculation_from_payment = payment.present? ? true : false
+    InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice, calculation_from_payment)
     params
   end
 

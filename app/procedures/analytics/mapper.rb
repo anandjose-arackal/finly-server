@@ -12,7 +12,7 @@ module Analytics::Mapper
     class_attr :field_mappings
     class_attr :olap_model
     class_attr :required_relationships, default: []
-    class_attr :input, default: -> (user, payload) { payload[:record] }
+    class_attr :input, default: -> (user, payload) {payload[:record]}
 
     define_singleton_method :field_mappings do
       next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
@@ -62,11 +62,11 @@ module Analytics::Mapper
     end
 
     def validate_field_mappings
-      finly_ref_id = field_mappings.select { |f| f[:primary_key] == :finly_ref_id }
+      finly_ref_id = field_mappings.select {|f| f[:primary_key] == :finly_ref_id}
       raise "finly_ref_id is not defined for #{self.name}" unless finly_ref_id.present?
-      finly_ref_created_at = field_mappings.select { |f| f[:primary_key] == :finly_ref_created_at }
+      finly_ref_created_at = field_mappings.select {|f| f[:primary_key] == :finly_ref_created_at}
       raise "finly_ref_created_at is not defined for #{self.name}" unless finly_ref_created_at.present?
-      finly_ref_updated_at = field_mappings.select { |f| f[:primary_key] == :finly_ref_updated_at }
+      finly_ref_updated_at = field_mappings.select {|f| f[:primary_key] == :finly_ref_updated_at}
       raise "finly_ref_updated_at is not defined for #{self.name}" unless finly_ref_updated_at.present?
     end
 
