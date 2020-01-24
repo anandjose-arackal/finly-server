@@ -325,7 +325,7 @@ class RentalInvoice < ApplicationRecord
       agreement_number: self.payment_agreement&.get_agreement_number,
       start_date: self.start_date,
       end_date: self.end_date,
-      allow_add_invoice: true
+      allow_add_invoice: false
 
     }
   end
