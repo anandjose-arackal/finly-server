@@ -33,6 +33,7 @@
 #  original_source_file_size    :integer
 #  original_source_updated_at   :datetime
 #  uuid                         :string(36)
+#  receipt_email_status_id      :bigint
 #
 
 require 'fileutils'

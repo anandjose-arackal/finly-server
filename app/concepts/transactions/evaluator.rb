@@ -14,11 +14,19 @@ class Transactions::Evaluator
   end
 
   def self.eval_proc(exec_context, function, *args)
-    exec_context.instance_eval(*args, &function)
+    if function.is_a?(Proc)
+      exec_context.instance_eval(*args, &function)
+    else
+      function
+    end
   end
 
   def self.eval_class(klass, *args)
-    klass.call(*args)
+    if klass.is_a?(Class)
+      klass.call(*args)
+    else
+      klass
+    end
   end
 
   def self.eval_symbol(exec_context, function, *args)

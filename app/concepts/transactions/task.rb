@@ -14,4 +14,32 @@ class Transactions::Task
     config.merge({task: task})
   end
 
+  def self.Run(klass: nil, builder: nil, params_builder: nil)
+    Transactions::Task.build id: "messages.success.add" do |context, flow_options, circuit_options|
+      if klass
+
+      elsif builder
+
+      end
+    end
+  end
+
+  class Runner
+
+    def self.with_klass(klass, context, circuit_options, params_builder: nil)
+      if params_builder
+        params = circuit_options[:exec_context].send(params_builder)
+      else
+        params = {params: context[:params], current_user: context[:current_user]}
+      end
+      @op = klass.(params)
+      # Todo evaluation of the response for success/failure
+    end
+
+    def self.with_builder(builder, context, circuit_options, params_builder: nil)
+      @op = circuit_options[:exec_context].send(context)
+    end
+
+  end
+
 end

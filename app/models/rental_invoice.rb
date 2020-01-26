@@ -101,6 +101,7 @@
 #  escalation_percentage                 :float(24)
 #  override_invoice_id                   :string(255)
 #  uuid                                  :string(36)
+#  rcm_enabled                           :boolean
 #
 
 class RentalInvoice < ApplicationRecord
