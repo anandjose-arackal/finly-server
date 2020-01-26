@@ -1,6 +1,7 @@
-class Forms::Definitions::Types::DropDown < Forms::Definitions::Entity
-  register :dropdown
-  hint 'Select value'
+class Forms::Entity::Types::CheckBox < Forms::Entity::Base
+  register :checkbox
+  hint 'Select option'
+  multiple true
 
   consumes_choices!
 

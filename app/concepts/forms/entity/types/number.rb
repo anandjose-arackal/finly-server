@@ -1,4 +1,4 @@
-class Forms::Definitions::Types::Number < Forms::Definitions::Entity
+class Forms::Entity::Types::Number < Forms::Entity::Base
   register :number
   hint 'Enter value'
 

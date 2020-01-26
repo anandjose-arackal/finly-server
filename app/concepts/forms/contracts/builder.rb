@@ -1,28 +1,26 @@
-module Forms::Builders::Contract
+module Forms::Contracts::Builder
+  extend ActiveSupport::Concern
 
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
-    def contract(company, user)
-      Forms::Builders::Contract::Build(self, company: company, user: user)
+  class_methods do
+    def contract(user, params = {})
+      Forms::Contracts::Builder::Build(self, user: user, params: params)
     end
   end
 
-  def self.Build(api, company:, user:)
+  def self.Build(api, user:, params:)
+    company = user.company
     raise 'Invalid company' unless company.class.name == Company.name
     raise 'Invalid user' unless user.class.name == User.name
 
-    Build.with(api.properties, api.validations, functions: api.functions, model: api.field_class)
+    Build.with(api.entities, api.validations, functions: api.functions, model: api.field_class, params: params)
   end
 
   module Build
-    def self.with(properties, validations, functions: nil, model: nil)
+    def self.with(entities, validations, functions: nil, model: nil, params: nil)
       klass = Class.new(Transactions::Contract)
       klass.send :model, model if model.present?
       add_functions klass, functions if functions.present?
-      add_properties klass, properties
+      add_entities klass, entities
       add_validations klass, validations
       klass
     end
@@ -43,25 +41,25 @@ module Forms::Builders::Contract
       klass.send type, *validation.args, &validation.block
     end
 
-    def self.add_properties(klass, properties)
-      properties.each do |property|
-        add_property klass, property
+    def self.add_entities(klass, entities)
+      entities.each do |entity|
+        add_entity klass, entity
       end
     end
 
-    def self.add_property(klass, property)
-      options = property.contract_options.dup
-      type = property.contract_type
-      key = property.key
-      if property.properties.present?
+    def self.add_entity(klass, entity)
+      options = entity.contract_options.dup
+      type = entity.contract_type
+      key = entity.key
+      if entity.entities.present?
         # NOTE:
         # Sub forms are used to define blocks
-        # Ex: property amount do
-        #   property :value
+        # Ex: entity amount do
+        #   entity :value
         # end
         # in the above example it becomes
-        # property :amount, form: SubForm
-        options[:form] = Build.with(property.properties, property.validations)
+        # entity :amount, form: SubForm
+        options[:form] = Build.with(entity.entities, entity.validations)
       end
       klass.send type, key, Options.new(options).reformat
     end

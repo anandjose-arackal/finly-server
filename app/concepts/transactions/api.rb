@@ -6,6 +6,7 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
   extend Trailblazer::Activity::TaskBuilder
+  include Transactions::Result::Evaluator
   include Dry::Monads[:result]
 
   # Dummy step to help define schema after operation has started

@@ -1,17 +1,14 @@
 class Forms::API
-  include Forms::Definitions::DSL
-  include Forms::Builders::Contract
-  include Forms::Builders::Filters
+  include Forms::Contracts::Builder
+  include Forms::Filters::Builder
+  include DynamicAttributes
   # include Forms::Builders::Configuration
 
-  def self.master
-    return (@master ||= {}) if self == Forms::API
+  class_attr :sections, default: []
+  class_attr :model
 
-    # Ensure all masters are always referencing the API.master
-    @master ||= Forms::API.master
+  def self.section(name, &block)
+    sections << Forms::Entity::Section.new(self, name, &block)
   end
 
-  class << self
-    delegate :[], :[]=, to: :master
-  end
 end
