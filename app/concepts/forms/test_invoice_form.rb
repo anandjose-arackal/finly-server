@@ -22,6 +22,8 @@ class Forms::TestInvoiceForm < Forms::API
       text :item_description, hint: "Please enter the name of the field", char_limit: 255
       dropdown :status_id, scope: Forms::Entity::Scope::List({value: 1, name: 'Approved'}, {value: 2, name: 'Pending'})
       dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {})
+      dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {})
+      dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {})
       # dropdown :location_id, choices: ReportStatus.all.as_json
     end
   end
