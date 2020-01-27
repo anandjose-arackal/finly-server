@@ -17,6 +17,9 @@ class BbpsBillStatusChecker < ApplicationJob
           payment.payment_order.update_order_status
           payment.payment_order.update_processed_amount
           bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+
+          # Update last paid on date for subscription
+
         end
         op.error do |result|
           puts "Error: #{result}"
