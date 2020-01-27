@@ -68,15 +68,28 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   end
 
   def check_bill_presence(options, model:, result:, **)
+    unless result['data']&.status == 'Y'
+      add_message(options, :error, :base, "Could Not Fetch Bill")
+      return
+    end
 
-    if result['data'].status == 'Y'
-      bill_date_year = Date.parse(result['data'].bill_date).strftime("%Y")
-      bill_period = result['data'].bill_period
+    bill_date_year = DateUtils.parse_date(result.bill_date)&.strftime("%Y")
+    bill_period = result.bill_period
+
+    # Find by bill Number if present
+    if result.bill_number.present? && result.bill_number != "NA"
+      bill = model.bbps_bills.where('bill_number = ?', result.bill_number).first
+    elsif (result.bill_date.present? && result.bill_date != "NA") && (result.due_date.present? && result.due_date != "NA")
+      bill = model.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
+    elsif result.bill_period.present? && result.bill_period != "NA"
       bill = model.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+    else
+      bill = nil
+    end
 
-      if bill.present?
-        result['bill'] = bill
-      end
+
+    if bill.present?
+      result['bill'] = bill
     end
 
     true

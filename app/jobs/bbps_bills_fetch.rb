@@ -30,7 +30,7 @@ class BbpsBillsFetch < ApplicationJob
     if autofetched
       return unless result.status == 'Y'
 
-      bill_date_year = Date.parse(result.bill_date).strftime("%Y")
+      bill_date_year = DateUtils.parse_date(result.bill_date)&.strftime("%Y")
       bill_period = result.bill_period
 
       # Find by bill Number if present
