@@ -14,6 +14,8 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   step :update_bill
 
+  step :check_create_permission
+
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
   end
@@ -111,6 +113,15 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     # Persist Contract
 
     result['bill'].update(order_number: result['data'].ref_no, order_number_type: "BillFetch")
+  end
+
+  def check_create_permission(options, current_user:, model:, result:, **)
+    return true if result['bill'].present?
+    authorizer = Docs::UtilityBills::Subscriptions::Authorizer.new(current_user, model)
+
+    result['can_create_bill'] = authorizer.add_bill?
+
+    true
   end
 
   private
