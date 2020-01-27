@@ -83,6 +83,7 @@ class Navbar::Config < BaseOperation
     cog_data = []
     structure = klass.structure(:cog_menu)
     master = klass.new
+    master.send 'delegator?' if master.respond_to? 'delegator?' # check if actual current user is present
     structure.each do |item|
       if item.is_a?(Symbol)
         menu_key = item
@@ -101,6 +102,7 @@ class Navbar::Config < BaseOperation
     cog_data = []
     structure = klass.structure(:cog_modules)
     master = klass.new
+    master.send 'delegator?' if master.respond_to? 'delegator?' # check if actual current user is present
     structure.each do |item|
       if item.is_a?(Symbol)
         menu_key = item
