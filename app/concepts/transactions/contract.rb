@@ -15,9 +15,9 @@ class Transactions::Contract < Reform::Form
     end
   end
 
-  def self.property(name, options = {})
+  def self.property(name, options = {}, &block)
     sanitize_options options
-    super(name, options)
+    super(name, options, &block)
   end
 
   def self.sanitize_options(options)

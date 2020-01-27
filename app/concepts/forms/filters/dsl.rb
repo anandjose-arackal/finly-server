@@ -29,13 +29,11 @@ module Forms::Filters::DSL
 
   def filter_form(options = {})
     # Forms::Filters::Cell.new(self).as_json
-    filter_key = field_key
-    filter_key = "#{options[:prefix]}_#{filter_key}" if options[:prefix]
     filter = {
         label: label,
         hint: hint,
         type: registered_type,
-        filter_key: filter_key,
+        filter_key: field_path,
         filters: filters,
         multiple: multiple
     }

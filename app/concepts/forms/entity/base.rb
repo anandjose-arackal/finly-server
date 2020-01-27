@@ -11,8 +11,10 @@ module Forms
 
       class_attribute :registered_type
 
+      attribute :form
       attribute :section
       attribute :field_key
+      attribute :field_path, default: ->(*args) { self.field_key&.to_s }
       attribute :label, default: ->(*args) { self.field_key&.to_s&.humanize }
       attribute :placeholder, default: "Enter value"
       attribute :hint
@@ -55,9 +57,11 @@ module Forms
       # Todo map_field support
       # class_attr :map_field_id
 
-      def initialize(section, field_key, opts = {}, &block)
+      def initialize(section, field_key, parent_path, opts = {}, &block)
         self.section = section
         field_key(field_key)
+        full_path = parent_path.present? ? "#{parent_path}_#{field_key}" : "#{field_key}"
+        field_path(full_path)
         section(section)
         self.options = opts
         initialize_with(opts)
