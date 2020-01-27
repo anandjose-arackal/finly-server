@@ -5,7 +5,7 @@
 #  id            :bigint           not null, primary key
 #  user_id       :integer
 #  company_id    :integer
-#  params        :text(65535)
+#  params        :text(16777215)
 #  headers       :text(65535)
 #  act           :string(255)
 #  premise       :string(255)
@@ -15,6 +15,7 @@
 #  rule          :string(255)
 #  level         :integer          default(1), not null
 #  admin_user_id :integer
+#  deleted_at    :datetime
 #
 
 class GatekeeperBlock < ApplicationRecord

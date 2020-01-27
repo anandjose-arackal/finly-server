@@ -19,6 +19,7 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  card_atm_withdrawal_id     :integer
+#  deleted_at                 :datetime
 #
 
 class UserBalanceHistory < ApplicationRecord

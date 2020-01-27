@@ -20,6 +20,9 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  status_id                       :integer
+#  utr                             :string(255)
+#  date_of_payment                 :date
+#  deleted_at                      :datetime
 #
 
 FactoryBot.define do

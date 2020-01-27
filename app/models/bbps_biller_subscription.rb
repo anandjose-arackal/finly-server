@@ -47,6 +47,7 @@
 #  category_id             :integer
 #  hsn_sac                 :string(255)
 #  quick_pay               :string(255)      default("N")
+#  last_paid_at            :datetime
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -167,6 +168,7 @@ class BbpsBillerSubscription < ApplicationRecord
         reminder_before_days: reminder_before_days,
         customer_email: customer_email,
         customer_name: customer_name,
+        last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
         customer_pan: customer_pan
     }
   end

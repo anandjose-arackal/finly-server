@@ -45,6 +45,7 @@
 #  order_number_type          :string(255)
 #  tax_rate_id                :integer
 #  hsn_sac                    :string(255)
+#  paid_at                    :datetime
 #
 
 class BbpsBill < ApplicationRecord
@@ -231,8 +232,6 @@ class BbpsBill < ApplicationRecord
         payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
 
-        autofetched: autofetched,
-
         amount: amount.as_json,
         total_amount: total_amount.as_json,
         late_payment_fee: late_payment_fee.as_json,
@@ -281,7 +280,8 @@ class BbpsBill < ApplicationRecord
         transaction_ref_id: payments&.first&.reference_resource&.bbps_ref_id,
         payment_mode: "BSC",
         bill_amount: payments&.first&.amount.as_json,
-        transaction_date: payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y"),
+        transaction_date: paid_at&.strftime("%I:%M %p, %d %b %Y"),
+        # transaction_date: payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y"),
         status: payments&.first&.payment_status&.name
     }
   end

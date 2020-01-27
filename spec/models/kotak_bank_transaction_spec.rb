@@ -22,6 +22,7 @@
 #  reversal_status_code       :string(255)
 #  reversal_response          :text(65535)
 #  reversal_api_counter       :integer          default(0)
+#  deleted_at                 :datetime
 #
 
 require 'rails_helper'
