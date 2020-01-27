@@ -31,9 +31,9 @@ class Company::Departments::Index < Company::Departments::Base
 
   def process
     if user.company_admin? || user.vp_admin_or_auditor?
-      self.departments = user.company.departments
+      self.departments = user.company.departments.non_deleted
     else
-      self.departments = user.departments
+      self.departments = user.departments.non_deleted
     end
     unless user.class.name =='AdminUser'
       user_role_id = params[:filter_role_id]
