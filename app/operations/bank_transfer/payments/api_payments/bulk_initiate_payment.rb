@@ -12,6 +12,17 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
     def init
       self.bank_payment_request = params[:bank_payment_request]
     end
+
+    def construct_response
+      response_hash = {
+          "bank_payment_request_id" => self.bank_payment_request.id
+      }
+      json_response = response_hash.to_json
+      path = Dir.home + '/certificates/encryption_certificates/qkr.crt'
+      cert = OpenSSL::X509::Certificate.new(File.read(path))
+      public_key = cert.public_key
+      encrypted_response = Base64.encode64(public_key.public_encrypt(json_response))
+    end
   end
 
   class BankTransfer::Payments::ApiPayments::BulkInitiatePayment::BulkFailurePresenter < BaseOperation::BasePresenter::FailurePresenter

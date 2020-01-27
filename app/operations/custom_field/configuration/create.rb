@@ -56,6 +56,21 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     end
   end
 
+  def pre_process
+    # here we will accept the params that are coming in as parent dependent field configurations
+    # and create them along with the field configuration object
+    if params&.dig(:field_configuration, :parent_drop_down_ids).present?
+      drop_down_ids = params&.dig(:field_configuration, :parent_drop_down_ids)
+      self.config_params[:parent_dependent_field_configuration_mappings] = []
+      drop_down_ids.each do |ddi|
+        self.config_params[:parent_dependent_field_configuration_mappings] << {
+            parent_type: "FieldDropDownItem",
+            parent_id: ddi
+        }
+      end
+    end
+  end
+
   def process
     self.field_configuration = FieldConfiguration.new config_params
     self.field_configuration.set_default_value default_value if default_value.present?

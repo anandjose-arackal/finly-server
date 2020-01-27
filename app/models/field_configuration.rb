@@ -52,6 +52,10 @@ class FieldConfiguration < ApplicationRecord
   has_many :parent_dependent_field_configuration_mappings, foreign_key: :dependent_field_configuration_id
   has_many :parent_drop_down_items, through: :parent_dependent_field_configuration_mappings, source: :parent, source_type: "FieldDropDownItem"
 
+  # adding associations with the related users as well
+  has_many :user_field_mappings
+  has_many :affected_users, through: :user_field_mappings, source: :user
+
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
@@ -69,6 +73,7 @@ class FieldConfiguration < ApplicationRecord
   accepts_nested_attributes_for :multiselect_items
   accepts_nested_attributes_for :field_parent_mappings
   accepts_nested_attributes_for :policy_field_mappings
+  accepts_nested_attributes_for :parent_dependent_field_configuration_mappings
 
   scope :with_id, -> (id) {where id: id}
 
@@ -93,7 +98,11 @@ class FieldConfiguration < ApplicationRecord
     includes(:field_type, :policy_field_mappings, :policies, :field_parent_types, :multiselect_items, drop_down_items: [:dependent_field_configurations, :parent_dependent_field_configuration_mappings])
   }
 
-  delegate :drop_down?, to: :field_type
+  scope :filter_parent_drop_down_id, -> (drop_down_id) {
+    joins(:parent_dependent_field_configuration_mappings).where('parent_dependent_field_configuration_mappings.parent_type = ? AND parent_dependent_field_configuration_mappings.parent_id IN (?)', "FieldDropDownItem", drop_down_id)
+  }
+
+  delegate :drop_down?, :multiselect?, to: :field_type
   delegate :text?, to: :field_type
 
   default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
@@ -195,9 +204,14 @@ class FieldConfiguration < ApplicationRecord
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
+    user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false
     if field_type_id == FieldType.id_for(:drop_down)
       # options = drop_down_items.exclude_deleted
-      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+      if user_level_custom_fields
+       options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+      else
+        options = drop_down_items.exclude_deleted.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+      end
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
@@ -210,7 +224,8 @@ class FieldConfiguration < ApplicationRecord
         global: self.global,
         # value: self.default_value,
         options: options,
-        root_field: self.root_field
+        root_field: self.root_field,
+        parent_drop_down_items: parent_drop_down_items
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
       # if self.drop_down_items.joins(:dependent_field_configurations).present?
