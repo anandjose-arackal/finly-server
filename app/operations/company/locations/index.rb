@@ -31,7 +31,7 @@ class Company::Locations::Index < Company::Locations::Base
 
   def process
     user_role_id = params[:filter_role_id]
-    self.locations = user.company.locations
+    self.locations = user.company.locations.non_deleted
     # Locations which are mapped to policies to which user is part of
     unless user.class.name =='AdminUser'
       if user_role_id.present?
