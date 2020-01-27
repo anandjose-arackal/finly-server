@@ -50,6 +50,7 @@ class Navbar::Config < BaseOperation
     menu_data = []
     structure = klass.structure(:tabs)
     master = klass.new
+    master.send 'delegator?' if master.respond_to? 'delegator?' # check if actual current user is present
     structure.each do |item|
       menu_key = nil
       sub_menu_keys = nil

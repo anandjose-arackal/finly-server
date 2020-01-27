@@ -289,4 +289,26 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
     {name: 'Users', id: 'users', url: '#employees/params={"view":"admin", "main_tab": "admin"}'}
   end
 
+  # used when user has been delegated on behalf of another user
+  def delegator?
+    # when actual current user present, we disallow any non-personal navigation in the app.
+    return false if RequestStore.store[:actual_current_user].blank?
+    block = proc { return nil }
+    all_actions = []
+
+    # flatten the nav structure
+    all_actions = self.data_map[self.class.name][:tabs].map {|a| r = []; if a.is_a?(Hash) then r << a.keys; r << a.values else r << a end}.flatten.compact
+
+    # here define all methods which you want to show for the delegated user
+    all_actions = all_actions.without :expenses, :trips, :reports, :money_requests, :create, :create_expense, :create_report, :create_trip, :create_money_request
+
+    all_actions.each {|action| override_actions(self, action, block) }
+  end
+
+  def override_actions(obj, action, block)
+    klass = class << obj; self; end
+    klass.send(:define_method, action, block)
+  end
+
+
 end
