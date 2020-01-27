@@ -19,8 +19,6 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def validate
-
-
     if self.payment.blank?
       add_message :error, "Payment not found"
       return
@@ -47,8 +45,14 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       return
     end
 
-    # checking a difference of 5 minutes between each consecutive retry
-
+    # ensuring that only invoices that are payable can have retriable payments
+    if payment.parent_type == "Invoice"
+      invoice = payment.parent
+      unless invoice.payable
+        add_message :error, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
+        return
+      end
+    end
   end
 
   def pre_process
