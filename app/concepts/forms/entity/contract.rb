@@ -16,6 +16,7 @@ class Forms::Entity::Contract
       params do
         required(:section).filled
         required(:field_key).filled
+        required(:field_path).filled
         required(:label).filled
         required(:placeholder).filled
         optional(:hint)
