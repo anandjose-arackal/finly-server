@@ -30,7 +30,7 @@ class BbpsBillsFetch < ApplicationJob
     if autofetched
       return unless result.status == 'Y'
 
-      bill_date_year = DateUtils.parse_date(result.bill_date)&.strftime("%Y")
+      bill_date_year = DateUtils.parse_date(result.bill_date).strftime("%Y")
       bill_period = result.bill_period
 
       # Find by bill Number if present
@@ -40,6 +40,8 @@ class BbpsBillsFetch < ApplicationJob
         bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
       elsif result.bill_period.present? && result.bill_period != "NA"
         bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+      else
+        bill = nil
       end
 
       # bill = subscription.bbps_bills.where()
@@ -52,7 +54,7 @@ class BbpsBillsFetch < ApplicationJob
       #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
       # end
 
-      return if result.ref_no.blank? || bill.blank?
+      return if result.ref_no.blank?
 
       # Do not create bill if bill for same year and period exists
       # Update bill's reference number
