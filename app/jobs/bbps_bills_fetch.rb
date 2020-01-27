@@ -32,9 +32,27 @@ class BbpsBillsFetch < ApplicationJob
 
       bill_date_year = Date.parse(result.bill_date).strftime("%Y")
       bill_period = result.bill_period
-      bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
 
-      return if result.ref_no.blank?
+      # Find by bill Number if present
+      if result.bill_number.present? && result.bill_number != "NA"
+        bill = subscription.bbps_bills.where('bill_number = ?', result.bill_number).first
+      elsif (result.bill_date.present? && result.bill_date != "NA") && (result.due_date.present? && result.due_date != "NA")
+        bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
+      elsif result.bill_period.present? && result.bill_period != "NA"
+        bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+      end
+
+      # bill = subscription.bbps_bills.where()
+      # # Find by bill date or due date if present
+      # # find by
+      #
+      # if bill_period == "NA"
+      #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).first
+      # else
+      #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+      # end
+
+      return if result.ref_no.blank? || bill.blank?
 
       # Do not create bill if bill for same year and period exists
       # Update bill's reference number
@@ -48,7 +66,7 @@ class BbpsBillsFetch < ApplicationJob
       bill_period = Date.today.strftime("%B").upcase if bill_period == "NA"
 
       params = {
-          amount: (result.amount.to_f / 100),
+          amount: (result.amount.to_f / 100).round(2),
           bill_date: result.bill_date,
           bill_number: result.bill_number,
           due_date: result.due_date,

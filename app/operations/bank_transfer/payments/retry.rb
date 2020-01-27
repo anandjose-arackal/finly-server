@@ -19,8 +19,6 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def validate
-
-
     if self.payment.blank?
       add_message :error, "Payment not found"
       return
@@ -45,6 +43,15 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
     unless bank_payment_request.is_initiating_user?(user) || bank_payment_request.is_reviewing_user?(user) || bank_payment_request.is_crediting_user?(user)
       add_message :error, "You are not authorized to do this action"
       return
+    end
+
+    # ensuring that only invoices that are payable can have retriable payments
+    if payment.parent_type == "Invoice"
+      invoice = payment.parent
+      unless invoice.payable
+        add_message :error, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
+        return
+      end
     end
   end
 

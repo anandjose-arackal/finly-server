@@ -237,6 +237,29 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         end
       end
     end
+
+    # Credit Note Check
+    if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
+      self.inward_invoice_params[:credit_note_adjustments_attributes].filter {|cna| cna[:id].blank?}.each do |cna|
+        cn = CreditNote.find_by id: cna[:credit_note_id]
+
+        unless cn.present? || (cn.company_id == inward_invoice.company_id)
+          add_message :error, "Credit Note Not Found"
+          next
+        end
+
+        unless cn.approved? || cn.auto_approved? || cn.partially_adjusted? || cn.unadjusted?
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id} is not in applicable at this state"
+          next
+        end
+
+        if precision_value(cna[:amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id}  doesn't have enough credits"
+          next
+        end
+        # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+      end
+    end
   end
 
   def pre_process
@@ -344,16 +367,21 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         return
       end
     end
+
+    # if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
+    #   self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
+    #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+    #   end
+    # end
   end
 
   def process
     self.inward_invoice.assign_attributes(self.inward_invoice_params)
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
 
-    # Validate Credit Notes After Balance Due has been calculated
-    return unless validate_credit_notes
+
     # Calculate the new balance_due based on credit notes
-    calculate_cn_adjustment
+    # calculate_cn_adjustment
 
 
     # fail
@@ -375,10 +403,14 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # # Validate Credit Notes After Balance Due has been calculated
+    # return unless validate_credit_notes
+
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
 
-      calculate_cn_adjustment
+
+      # calculate_cn_adjustment
       inward_invoice.save
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
@@ -436,7 +468,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     adjusted_cn_total = credit_notes.map(&:amount).map(&:value).sum
 
-    if adjusted_cn_total > balance_due
+    if precision_value(adjusted_cn_total) > precision_value(balance_due)
       add_message :error, "Total Credit Note Adjustment Amount Cannot Exceed Invoice Balance Due"
       return
     end
