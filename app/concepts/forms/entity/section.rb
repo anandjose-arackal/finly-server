@@ -1,7 +1,7 @@
 class Forms::Entity::Section
   include DynamicAttributes
   include Forms::Entity::Registry
-  attr_accessor :name, :block, :form
+  attr_accessor :name, :block, :form, :field_path
 
   def initialize(form, name, &block)
     self.form = form
