@@ -8,6 +8,7 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
 
   step :init
   step Model(CreditNote, :find_by)
+  step :validation
   step :verify_policy
   step :transition
 
@@ -15,6 +16,19 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
 
   def init(options, params:, **)
     params[:id] = params[:credit_note_id]
+    true
+  end
+
+  def validation(options, params:, model:, **)
+    if params[:aasm_event].to_s == 'reject'
+      if params[:reject_to_user].present? && params[:reject_to_level].present?
+        reject_to_details = model.reject_to_users
+
+        if reject_to_details[params[:reject_to_level].to_i].blank? && (reject_to_details[params[:reject_to_level].to_i].try(:id) != params[:reject_to_user])
+          add_message :error, :error, :base, "User details not found for this level"
+        end
+      end
+    end
     true
   end
 
@@ -35,6 +49,9 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
     parameters = {
         document: model,
         aasm_event: params[:aasm_event],
+        reject_to_user: params[:reject_to_user],
+        reject_to_level: params[:reject_to_level]
+
     }
     op = WorkflowManager::Base.(current_user, parameters)
     unless op.success?
