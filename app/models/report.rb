@@ -341,7 +341,7 @@ class Report < ApplicationRecord
     permitted_status = ['approved', 'auto_approved', 'settlement_confirmed', 'closed', 'settled']
     status = permitted_status & status
     status = permitted_status if status.blank?
-    where report_status_id: status
+    where report_status_id: ReportStatus.ids_for(status)
   }
 
   delegate :status_name, to: :status

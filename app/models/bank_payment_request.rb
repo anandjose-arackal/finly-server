@@ -371,7 +371,7 @@ class BankPaymentRequest < ApplicationRecord
     permitted_status = ['approved', 'credited', 'auto_approved']
     status = permitted_status & status
     status = permitted_status if status.blank?
-    where status_id: status
+    where status_id: BankPaymentRequestStatus.ids_for(status)
   }
 
   scope :filter_approved_date, -> (from, to) {

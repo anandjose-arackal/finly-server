@@ -528,7 +528,7 @@ class Invoice < ApplicationRecord
     permitted_status = ['partially_paid', 'approved', 'auto_approved', 'initiated', 'unpaid']
     status = permitted_status & status
     status = permitted_status if status.blank?
-    where invoice_status_id: status
+    where invoice_status_id: InwardInvoiceStatus.ids_for(status)
   }
 
 
