@@ -40,7 +40,10 @@ class Export::Reports::Base < Export::Base
 
     gst_applicable = expense.category&.gst_applicable?
 
+    r_cf = report&.custom_fields.to_a.reject {|c| preferences.pluck(:name).exclude? c.field_configuration&.field_name }
     preferences.each do |pref|
+      h = {}
+      r_cf.map {|r| if pref.name == r.field_configuration&.field_name then h[:r] = r; h[:p] = pref end}
       case pref.export_field_id
       when ExportField.type_report_id
           data_arr << report&.id
@@ -118,6 +121,8 @@ class Export::Reports::Base < Export::Base
         data_arr << expense.user.location&.name
       when ExportField.id_for(:cost_center)
         data_arr << expense.user.cost_center&.name
+      when h[:p].try(:export_field_id)
+        data_arr << h[:r].try(:configured_field_value)
       else
           data_arr << ''
       end
@@ -128,7 +133,7 @@ class Export::Reports::Base < Export::Base
 
 
   def extract_custom_field_names(reports = nil)
-    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense) ]
+    filed_parent_expenses_ids =[FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense)]
     FieldConfiguration.where(company_id: user.company_id).non_deleted.joins(:field_parent_mappings).where(field_parent_mappings: { field_parent_type_id: filed_parent_expenses_ids }).pluck(:field_name).uniq
   end
 
