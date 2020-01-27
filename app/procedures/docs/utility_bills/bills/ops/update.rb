@@ -7,6 +7,8 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
   step Contract::Persist()
 
   step :setup_dlrm
+  step :update_attachments
+
   fail :check
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill')
 
@@ -23,5 +25,12 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
     else
       true
     end
+  end
+
+  def update_attachments(options, params:, current_user:, model:, **)
+    attachment_ids = params[:attachment_ids]
+    attachments_to_remove = model.attachments.where.not(id: attachment_ids)
+    attachments_to_remove.destroy_all
+    true
   end
 end

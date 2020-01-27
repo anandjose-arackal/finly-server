@@ -75,6 +75,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :category, class_name: 'Category', optional: true
 
   has_many :payments, as: :parent
+  has_many :attachments, as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :amount
 

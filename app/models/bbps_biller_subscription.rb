@@ -73,6 +73,7 @@ class BbpsBillerSubscription < ApplicationRecord
 
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
+  has_many :attachments, as: :resource, dependent: :destroy
 
   after_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
