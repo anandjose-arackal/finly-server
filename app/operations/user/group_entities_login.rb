@@ -52,9 +52,6 @@ class User::GroupEntitiesLogin < User::Base
       return
     end
 
-    Rails.logger.fatal "ACTUAL CURRENT USER"
-    Rails.logger.fatal RequestStore.store[:actual_current_user].present?
-    Rails.logger.fatal RequestStore.store[:actual_current_user].inspect
     if RequestStore.store[:actual_current_user].present?
       add_message :error, "Group Entity switch disabled during user delegation"
       return
