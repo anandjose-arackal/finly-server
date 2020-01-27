@@ -149,6 +149,7 @@ class Reports::Index < Reports::Base
     has_scope :filter_category
     has_scope :filter_group, type: :array
     has_scope :filter_report_status_id, type: :array
+    has_scope :filter_report_status, type: :array # used for streamsets
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)

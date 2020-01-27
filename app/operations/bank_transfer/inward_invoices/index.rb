@@ -33,6 +33,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :show_only_invoices_which_are_forwarded
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_invoice_status, type: :array # used for streamsets
 
     # Sorting
     has_scope :sort_invoice_id
