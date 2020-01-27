@@ -64,6 +64,9 @@
 class User < ApplicationRecord
   include OperationCallbacks
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'user'
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -1304,10 +1307,10 @@ class User < ApplicationRecord
 
   # returns the list of per diems that the user has access to
   def per_diems_list
-    per_diems = self.company.per_diems.active
-    policies = self.policies
+    per_diems = self.company.per_diems.includes(:rate).active
+    policies = self.policies.includes(per_diems: [:rate])
     policies.each do |policy|
-      per_diems += policy.per_diems.active
+      per_diems += policy.per_diems.map {|pd| pd if pd.is_deleted == false}.reject(&:nil?)
     end
     per_diems
   end
@@ -1564,6 +1567,30 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), document)
   end
 
+  def is_utility_bill_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_initiator), document)
+  end
+
+  def is_utility_bill_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_reviewer), document)
+  end
+
+  def is_utility_bill_master_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer), document)
+  end
+
+  def is_utility_bill_master_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator), document)
+  end
+
+  def is_credit_note_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_initiator), document)
+  end
+
+  def is_credit_note_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:credit_note_reviewer), document)
+  end
+
   def access_locked?
     locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
@@ -1571,6 +1598,12 @@ class User < ApplicationRecord
   alias_method :locked?, :access_locked?
 
   # ************ User Role for vendor payments ******************
+
+  # ************ User Role for expense management ************
+    def is_travel_manager?(document=nil)
+      self.has_policy_role?(UserRole.id_for(:travel_manager), document)
+    end
+  # ************ User Role for expense management ************
 
   def relevant
     {

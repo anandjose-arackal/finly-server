@@ -41,6 +41,13 @@ when :yes_bank_balance_poller
   end
   set :deploy_to, '/home/centos/app_yb_balance'
   set :rails_env, 'production'
+when :background_production_olap
+  branch = fetch :branch
+  # unless ['master', :master].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
+  set :deploy_to, '/home/centos/app_olap'
+  set :rails_env, 'production'
 when :itzcash
   set :deploy_to, '/usr/local/app'
   set :rails_env, 'itzcash_uat'
@@ -109,14 +116,16 @@ linked_files = %w{
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
-    :background_production_bgg, :background_production_bgp, :background_production_bgpc
+    :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
+  linked_files << 'config/bunny.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
+  linked_files << 'config/bunny.yml'
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
 end
@@ -151,7 +160,6 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
-
 
 set :slackistrano, {
     channel: '#general',

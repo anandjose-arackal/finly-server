@@ -3,6 +3,7 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
   skip_user_authorization!
 
   step :fetch_all_billers
+  step :disable_unlisted_billers
   step :synchronize_billers
 
   matcher Dry::Matcher.new(
@@ -27,11 +28,20 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
       m.success do |result|
         context['billers'] = result
       end
+      m.error do |result|
+        return on_error options, :base, 'Could not fetch billers'
+      end
       m.failure do |result|
         # Todo raise alert as this API cannot fail
         return on_error options, :base, 'Could not fetch billers'
       end
     end
+    true
+  end
+
+  def disable_unlisted_billers(context, billers:, **)
+    listed_biller_ids = billers.map {|b| b['biller_id']}
+    BbpsBiller.where.not(biller_id: listed_biller_ids).update_all(status: 'D')
     true
   end
 
@@ -52,6 +62,11 @@ class Procurements::Bbps::Billers::Synchronize < Transactions::API
             deactivate(biller_config['biller_id'])
             options['billers.failed'] << biller_config.merge({errors: error_message})
           end
+        end
+
+        m.error do |result|
+          deactivate(biller_config['biller_id'])
+          options['billers.failed'] << biller_config.merge({errors: result})
         end
 
         m.failure do |result|

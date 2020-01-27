@@ -38,7 +38,6 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
 #
@@ -594,6 +593,10 @@ class Report < ApplicationRecord
 
   def controlling_user
     self.get_reviewers.first
+  end
+
+  def status_name
+    self.status.name&.split(/[_ ]/)&.map{|word| word.capitalize}&.join(" ")
   end
 
 

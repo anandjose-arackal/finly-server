@@ -9,7 +9,7 @@ json.result do
     json.user_employee_id expense.user&.profile&.employee_id
     json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
     json.expense_type expense.expense_type&.name
-    
+
     json.usage_dates do
       json.type expense.usage_date_type
       json.start DateUtils.date_formatted expense.usage_date_start
@@ -79,7 +79,7 @@ json.result do
       json.partial! 'shared/amount', amount: expense.base_amount
     end
 
-  # flag to show whether a particular expense has been converted or not
+    # flag to show whether a particular expense has been converted or not
     json.converted expense.converted?
     json.conversion_rate expense.conversion_rate
 
@@ -161,14 +161,14 @@ json.result do
     json.is_split expense.is_split?
     json.split_count expense.split_count
 
-# Tax Tracking Configuration
+    # Tax Tracking Configuration
 
     em_tax_tracking = expense.user.company.feature_subscription.em_tax_tracking
     json.config do
       json.em_tax_tracking em_tax_tracking
     end
 
-# Tax details for this expense
+    # Tax details for this expense
     json.tax_details do
       gst_applicable = expense.category&.gst_applicable
       json.gst_applicable gst_applicable

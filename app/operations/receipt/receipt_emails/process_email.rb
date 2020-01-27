@@ -8,6 +8,10 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
     create_expense
   end
 
+  def pre_process
+    self.receipt_email.update_columns(receipt_email_status_id: ReceiptEmailStatus.id_for(:completed))
+  end
+
   protected
   def download_attachment_urls
     self.receipt_email.receipt_email_attachments.each do |attachment|

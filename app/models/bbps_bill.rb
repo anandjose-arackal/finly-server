@@ -77,7 +77,7 @@ class BbpsBill < ApplicationRecord
 
   accepts_nested_attributes_for :amount
 
-  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, to: :status
+  delegate :open?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :payment_ticket_created?, :payment_initiated?, :failed, :paid?, :voided?, :payment_ticket_deleted?, to: :status
   delegate :amount_value, to: :amount
 
   default_scope {order('bbps_bills.created_at DESC')}
@@ -108,6 +108,10 @@ class BbpsBill < ApplicationRecord
       where(status_id: BbpsBillStatus.id_for(:failed))
     when 'payment_ticket_created', :payment_ticket_created
       where(status_id: BbpsBillStatus.id_for(:payment_ticket_created))
+    when 'payment_initiated', :payment_initiated
+      where(status_id: BbpsBillStatus.id_for(:payment_initiated))
+    when 'payment_ticket_deleted', :payment_ticket_deleted
+      where(status_id: BbpsBillStatus.id_for(:payment_ticket_deleted))
     else
       # do nothing
     end
@@ -300,9 +304,9 @@ class BbpsBill < ApplicationRecord
 
   def self.roles
     [
-        :utility_bill_master_initator,
+        :utility_bill_master_initiator,
         :utility_bill_master_reviewer,
-        :utility_bill_initator,
+        :utility_bill_initiator,
         :utility_bill_reviewer,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
@@ -312,16 +316,75 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
-    if [UserRole.id_for(:utility_bill_initator)].include?(role_id)
-      user.send("#{self.table_name}")
+    if [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
+      ids = self.joins(subscription: [:pocs]).where("bbps_bills.company_id = ?", user&.company&.id).where("bbps_subscription_pocs.user_id = ?", user.id).pluck("bbps_bills.id")
+      where(id: ids)
+    elsif [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
+      ids = self.joins(:subscription).
+          where("bbps_bills.company_id = ?", user&.company&.id).
+          where("bbps_biller_subscriptions.user_id = ?", user.id).
+          where(autofetched: true).
+          or(
+              self.joins(:subscription).
+                  where("bbps_bills.company_id = ?", user&.company&.id).
+                  where("bbps_biller_subscriptions.user_id = ?", user.id).
+                  where(autofetched: false).
+                  where.not(status_id: BbpsBillStatus.id_for(:open))
+          ).pluck("bbps_bills.id")
+      where(id: ids)
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
-      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
-      user.company.send("#{self.table_name}").where(policy_id: policy_ids, status_id: finance_associated_status_ids)
+      role_based_creditor_associated_items(user, role_id)
     end
   end
 
+  def role_based_reviewer_associated_items(user, role_id, options={})
+    policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
+
+    if role_id == UserRole.id_for(:utility_bill_reviewer)
+      super
+    elsif UserRole.id_for(:utility_bill_master_reviewer)
+      subscription_ids = BbpsBillerSubscription.role_based_reviewer_associated_items(user, role_id).pluck(:id)
+      ids = self.joins(:subscription).
+          where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?", true).or(
+                  self.joins(:subscription).where("bbps_biller_subscriptions.id in (?)", subscription_ids).where("bbps_bills.autofetched = ?" , false).where.not("bbps_bills.status_id = ?", BbpsBillStatus.id_for(:open))
+      ).pluck("bbps_bills.id")
+      where(id: ids)
+    elsif UserRole.id_for(:bank_payment_request_reviewer)
+      role_based_creditor_associated_items(user, role_id)
+    end
+  end
+
+  def self.role_based_associated_status_ids(user)
+    self.status_ids(*self.role_based_statuses(user))
+    # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
+  end
+
+  def self.open_status_ids(user)
+    []
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if UserRole.ids_for(:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_auditor, :bank_payment_request_creditor).include?(role_id.to_i)
+          statuses += [:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        elsif UserRole.ids_for(:utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer).include?(role_id.to_i)
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:open, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
   def self.finance_associated_status_ids
-    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided)
+    BbpsBill.status_ids(:approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:open, :rejected, :retracted, :awaiting_approval, :approved, :auto_approved, :payment_ticket_created, :payment_initiated, :failed, :paid, :voided, :payment_ticket_deleted)
   end
 
   def self.status_ids(*statuses)

@@ -37,7 +37,7 @@ class IciciBankApi::Registration < IciciBankApi::Base
         AGGRNAME: self.company_details["AGGR_NAME"],
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
-        ALIASID: self.company.icici_bank_config.alias_id.to_s,
+        ALIASID: self.company_details["ALIAS_ID"],
         URN: self.company.icici_bank_config.urn
     }
   end

@@ -198,6 +198,11 @@ class BbpsBillerSubscription < ApplicationRecord
     fields
   end
 
+  # display_name  used  in  payment  file  creation method to  print the  beneficiary name
+  def display_name
+      self.biller&.biller_name
+  end
+
   def self.document_owner_attribute
     'user_id'
   end
@@ -210,6 +215,17 @@ class BbpsBillerSubscription < ApplicationRecord
     'BbpsBillerSubscriptionStatus'
   end
 
+  def role_based_initiator_associated_items(user, role_id, options = {})
+    if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
+      super
+    elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
+      ids = BbpsBill.role_based_initiator_associated_items(user, role_id).pluck(:subscription_id)
+      where(id: ids)
+    elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      role_based_creditor_associated_items(user, role_id)
+    end
+  end
+
   def self.role_based_associated_status_ids(user)
     BbpsBillerSubscriptionStatus.ids_for(self.role_based_statuses(user))
   end
@@ -218,12 +234,16 @@ class BbpsBillerSubscription < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if [UserRole.id_for(:utility_bill_master_initiator)]
-          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :deactivated, :reactivated]
-        elsif [UserRole.id_for(:utility_bill_master_reviewer)]
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :deactivated, :reactivated]
+        if UserRole.ids_for(:bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_auditor, :bank_payment_request_creditor).include?(role_id.to_i)
+          statuses += [:approved, :auto_approved, :deactivated, :reactivated]
+        elsif UserRole.id_for(:utility_bill_master_initiator) == role_id.to_i
+          statuses += [:draft, :awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated, :reactivated]
+        elsif UserRole.id_for(:utility_bill_master_reviewer) == role_id.to_i
+          statuses += [:awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated, :reactivated]
+        elsif UserRole.ids_for(:utility_bill_initiator, :utility_bill_reviewer).include?(role_id.to_i)
+          statuses += [:approved, :auto_approved, :deactivated, :reactivated]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :deactivated, :reactivated]
+          statuses += [:awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated, :reactivated]
         end
       end
     end
@@ -244,9 +264,9 @@ class BbpsBillerSubscription < ApplicationRecord
 
   def self.roles
     [
-        :utility_bill_master_initator,
+        :utility_bill_master_initiator,
         :utility_bill_master_reviewer,
-        :utility_bill_initator,
+        :utility_bill_initiator,
         :utility_bill_reviewer,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,

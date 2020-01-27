@@ -33,11 +33,14 @@ class FieldDropDownItem < ApplicationRecord
   default_scope { unscope(:where) }
 
   def as_json(options={})
+    dependent = dependent_field_configurations
     {
         id: id,
         name: name,
-        dependent_field_configurations: dependent_field_configurations,
-        dependent_cf_present: self.dependent_field_configurations.exists?
+        # dependent_field_configurations: dependent_field_configurations,
+        # dependent_cf_present: self.dependent_field_configurations.exists?
+        dependent_field_configurations: dependent,
+        dependent_cf_present: dependent.present?
     }
   end
 

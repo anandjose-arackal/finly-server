@@ -47,6 +47,10 @@ class BbpsBillStatus < ApplicationRecord
     self.id == BbpsBillStatus.id_for(:payment_initiated)
   end
 
+  def payment_ticket_deleted?
+    self.id == BbpsBillStatus.id_for(:payment_ticket_deleted)
+  end
+
   def paid?
     self.id == BbpsBillStatus.id_for(:paid)
   end

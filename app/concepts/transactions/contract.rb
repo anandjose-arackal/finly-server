@@ -48,7 +48,7 @@ class Transactions::Contract < Reform::Form
               elsif deserializer.is_a?(Class)
                 # Todo
               else
-                deserializer.call(input, represented, **input)
+                deserializer.call(input, represented, **input&.symbolize_keys)
               end
             }
           }

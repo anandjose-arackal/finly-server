@@ -5022,7 +5022,7 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
-  get 'exports/:type', to: 'export#processor'
+  # get 'exports/:type', to: 'export#processor'
 
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
@@ -5052,6 +5052,7 @@ Rails.application.routes.draw do
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
+  get 'autocomplete/employees'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
@@ -5800,6 +5801,7 @@ Rails.application.routes.draw do
     get 'bills/payables', to: 'bills#payable_bills'
     resources :bills do
       patch 'review', to: 'bills#review'
+      get 'transaction_status', to: 'bills#transaction_status'
       put 'update_and_submit', to: 'bills#update_and_submit'
       patch 'bill_validate', to: 'bills#bill_validate'
       get 'download_receipt', to: 'bills#download_receipt'
@@ -5817,6 +5819,7 @@ Rails.application.routes.draw do
 
   resources :credit_notes do
     patch 'review', to: 'credit_notes#review'
+    put 'update_and_submit', to: 'credit_notes#update_and_submit'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

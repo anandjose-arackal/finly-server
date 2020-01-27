@@ -6,7 +6,7 @@ json.result do
     json.extract! invoice_line_item, :id, :parent_id
 
     json.order_number (invoice.po_number || invoice.invoice_id)
-    
+
     json.invoice_date invoice.date&.strftime("%Y-%m-%d %H:%M:%S")
     json.delivery_location invoice.delivery_location&.name
     json.vendor_id invoice.vendor_id

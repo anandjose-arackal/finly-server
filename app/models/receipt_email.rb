@@ -103,7 +103,7 @@ class ReceiptEmail < ApplicationRecord
 
     to_be_transcribed = false
     receipt_files&.each do |receipt_file|
-      receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense)
+      receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense, receipt_email_id: self.id)
       if self.expense_id.blank? and user.company.ocr_enabled?
         receipt.update(to_be_transcribed: true)
         to_be_transcribed = true
@@ -117,7 +117,7 @@ class ReceiptEmail < ApplicationRecord
                                                              image_tmp_path
     document_converter.convert do |images|
       images.each do |image|
-        receipt = receipts.create(user_id: user_id, image: image, note: self.subject, parent: self.expense)
+        receipt = receipts.create(user_id: user_id, image: image, note: self.subject, parent: self.expense, receipt_email_id: self.id)
         if self.expense_id.blank? and user.company.ocr_enabled?
           receipt.update(to_be_transcribed: true)
           to_be_transcribed = true
@@ -135,6 +135,19 @@ class ReceiptEmail < ApplicationRecord
       #############################################
     end
     # end
+  end
+
+  def awaiting_processing?
+    self.receipt_email_status_id == ReceiptEmailStatus.id_for(:awaiting_processing)
+  end
+
+  def in_progress?
+    self.receipt_email_status_id == ReceiptEmailStatus.id_for(:in_progress)
+
+  end
+
+  def completed?
+    self.receipt_email_status_id == ReceiptEmailStatus.id_for(:completed)
   end
 
 end

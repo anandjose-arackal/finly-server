@@ -6,17 +6,17 @@ module Events::Consumer
   end
 
   module ClassMethods
-    def consumes_event!(event, consumer_key:, name:, options: {})
-      raise "Name is not defined for consumer #{self.name}" if name.nil?
-      raise "Event is not defined for consumer #{self.name}" if event.nil?
-      raise "Consumer Key is not defined for consumer #{self.name}" if consumer_key.nil?
+    def consumes_event!(event, consumer_key:, name:, sync: false, options: {})
+      raise "Name is not defined for consumer #{self.event_name}" if name.nil?
+      raise "Event is not defined for consumer #{self.event_name}" if event.nil?
+      raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
 
-      async! unless options&.dig(:sync)
+      async! unless sync
       @event = event
       @event_options = options
       @consumer_key = consumer_key
       @consumes_event = true
-      @name = name
+      @event_name = name
 
       Events::Registry.add_event self, event, consumer_key
 
@@ -27,9 +27,9 @@ module Events::Consumer
     end
 
     def scheduled!(name:, every:, hour:, minute:, day_of_the_week: nil, day_of_the_month: nil)
-      raise "Name is not defined for consumer #{self.name}" if name.nil?
+      raise "Name is not defined for consumer #{self.event_name}" if name.nil?
 
-      @name = name
+      @event_name = event_name
       @scheduled = true
       @schedule = {
           every: every,
@@ -46,8 +46,8 @@ module Events::Consumer
       setup_schedule_job
     end
 
-    def name
-      @name
+    def event_name
+      @event_name
     end
 
     def consumer_key
@@ -85,7 +85,7 @@ module Events::Consumer
       at = "#{schedule[:day_of_the_week]} " if schedule[:day_of_the_week]
       at += "#{schedule[:hour].to_s.rjust(2, '0')}:#{schedule[:minute].to_s.rjust(2, '0')}"
       # Todo handle day of the month
-      Clockwork.every frequency, self.name, at: at do
+      Clockwork.every frequency, self.event_name, at: at do
         self.perform_async(type: :scheduled)
       end
     end
@@ -98,7 +98,11 @@ module Events::Consumer
   end
 
   def work(payload)
-    perform payload
+    # This is primarily to prevent database timeout exception that kept happening in production
+    # for sneakers
+    ActiveRecord::Base.connection_pool.with_connection do
+      perform payload
+    end
     ack! if respond_to?(:ack!)
   end
 

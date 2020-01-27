@@ -59,6 +59,10 @@ class Bbps::BillsController < BaseControllers::WebBase
     end
   end
 
+  def transaction_status
+    endpoint Docs::UtilityBills::Bills::Ops::TransactionStatus
+  end
+
   def bill_validate
     endpoint Docs::UtilityBills::Bills::Ops::BillValidate
   end
