@@ -320,7 +320,7 @@ class InvoiceCalculationUtils
   end
 
   # Credit Note Adjustments
-  def calculate_cn_adjustments(invoice_params, payment, invoice, calculation_from_payment)
+  def calculate_cn_adjustments(invoice_params, payment, invoice)
     self.invoice = invoice || payment&.invoice
     # return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
     return unless invoice.class.name == "Invoice"

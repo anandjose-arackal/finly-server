@@ -250,7 +250,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
-        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     return
@@ -273,7 +272,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       else
         InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
-        InvoiceCalculationUtils.new.calculate_cn_adjustments(self.payment_params, self.payment, nil)
       end
     end
     self.payment.save
