@@ -93,8 +93,8 @@ class BbpsBillsFetch < ApplicationJob
           subscription_id: subscription.id,
           autofetched: autofetched
       }
+      op = Docs::UtilityBills::Bills::Ops::Create.(params)
     end
-    op = Docs::UtilityBills::Bills::Ops::Create.(params)
   end
 
   def get_amount_from_response(response)
