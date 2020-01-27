@@ -6,7 +6,7 @@ class Analytics::Master
 
   def self.load!
     file_path = "#{Rails.root}/app/models/olap/**/*.rb"
-    Dir[file_path].each { |f| load f }
+    Dir[file_path].each {|f| load f}
     registry
   end
 
@@ -53,7 +53,6 @@ class Analytics::Master
   #     end
   #   end
   # end
-
 
 
 end

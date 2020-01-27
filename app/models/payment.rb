@@ -965,7 +965,8 @@ class Payment < ApplicationRecord
       narration: { value: self.note, editable: false, field_type: 'field_text_area' },
       categories: categories,
       cost_centers: cost_centers,
-      departments: departments
+      departments: departments,
+      rcm_enabled: self.invoice&.rcm_enabled
     }
   end
 
@@ -1047,22 +1048,23 @@ class Payment < ApplicationRecord
     end
 
     {
-        tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
-        total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
-        inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
-        discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
-        tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
-        tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
-        advance_amount: { value: invoice_advance, editable: false }, # Advance
-        freight_amount: { value: self.parent.freight_amount&.value, editable: false },
-        net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
-        net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
-        roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
-        tds_slabs: tds_slabs,
-        tax_rates: self.parent.company.tax_rates,
-        gst_type_id: { value: self.parent.gst_type_id, editable: false },
-        payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
-        balance_due:{ value: self.parent.balance_due&.value, editable: false } # Invoice AMOUNT
+      tds_applicable_amount: calculate_tds_applicable_amount('Invoice'),
+      total_amount: {value: precision_value(self.parent&.item_amounts_total), editable: false}, # TOTAL
+      inclusive_of_taxes: {value: self.parent.inclusive_of_taxes, editable: false},
+      discount: { discount_type_id: self.parent.discount_type_id, rate: self.parent.discount, discount_amount: precision_value(self.parent.discount_amount&.value), editable: false},
+      tax: { tax_type_id: self.parent.tax_type_id, tax_amount: precision_value(self.parent.tax_amount&.value), value: precision_value(self.parent.tax), editable: false },
+      tds: { tds_slab_id: self.parent.tds_slab_id, tds_amount: precision_value(self.parent.tds_amount&.value), editable: true, tds_slab_rate: self.parent&.tds_slab&.tds},
+      advance_amount: { value: invoice_advance, editable: false }, # Advance
+      freight_amount: { value: self.parent.freight_amount&.value, editable: false },
+      net_payable_amount: { value: self.parent.balance_due&.value, editable: false },
+      net_total: { value: self.parent.net_amount&.value, editable: false }, #Net Total
+      roundoff_amount: { value: self.parent.roundoff_amount, editable: false },
+      tds_slabs: tds_slabs,
+      tax_rates: self.parent.company.tax_rates,
+      gst_type_id: { value: self.parent.gst_type_id, editable: false },
+      payment_amount: { value: self.amount_value, editable: true }, #Payable Amount
+      balance_due:{ value: self.parent.balance_due&.value, editable: false }, # Invoice AMOUNT
+      available_credits: available_credits_amount
     }
   end
 
@@ -1141,5 +1143,10 @@ class Payment < ApplicationRecord
       configurations = initiating_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
       custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
+  end
+
+  def available_credits_amount
+    adj_amount =  self.parent.credit_note_adjustments.joins(:amount).pluck('amounts.value').sum rescue nil
+    precision_value(adj_amount)
   end
 end

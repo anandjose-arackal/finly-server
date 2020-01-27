@@ -21,7 +21,7 @@ class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
     # property :credit_note_item_type_id, validates:{ presence: true }
     property :item_id, validates: {presence: true}
     property :invoice_item_id, validates: {presence: true}
-    property :category_id, validates: {presence: true}
+    property :category_id
     property :comment, validates: {presence: true}
     property :hsn_sac, presence: true
     property :original_quantity, validates: {presence: true}

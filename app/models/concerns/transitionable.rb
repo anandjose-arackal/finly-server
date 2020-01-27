@@ -659,7 +659,11 @@ module Transitionable
         when :purchase_request_auditor, 'purchase_request_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          end
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           # Get data for purchase order reviewer
           data = data.or(role_based_reviewer_associated_items(user, role_id))
@@ -667,14 +671,22 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :goods_receiver, 'goods_receiver'
           # nothing
-         when :non_po_invoice_initiator, 'non_po_invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id:InwardInvoiceType.id_for(:non_po_invoice)))
+        when :non_po_invoice_initiator, 'non_po_invoice_initiator'
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)))
+          end
         when :non_po_invoice_reviewer, 'non_po_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :non_po_invoice_auditor, 'non_po_invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :po_invoice_initiator, 'po_invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+          end
         when :po_invoice_reviewer, 'po_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :po_invoice_auditor, 'po_invoice_auditor'
@@ -697,7 +709,7 @@ module Transitionable
           data = data.or(role_based_manager_associated_items(user, role_id))
         when :inventory_manager, 'inventory_manager'
           #nothing
-         when :vendor_creator, 'vendor_creator'
+           when :vendor_creator, 'vendor_creator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :vendor_reviewer, 'vendor_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
@@ -705,11 +717,11 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
           # data = []
-         when :policy_admin, 'policy_admin'
+           when :policy_admin, 'policy_admin'
           # data = []
-         when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+           when :bank_payment_request_auditor, 'bank_payment_request_auditor'
           # data = []
-         when :budget_manager, 'budget_manager'
+           when :budget_manager, 'budget_manager'
           data = []
         when :payment_agreement_initiator, 'payment_agreement_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
@@ -725,6 +737,16 @@ module Transitionable
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :utility_bill_reviewer, 'utility_bill_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :credit_note_initiator, 'credit_note_initiator'
+          data = data.or(role_based_initiator_associated_items(user, role_id))
+        when :credit_note_reviewer, 'credit_note_reviewer'
+          if self.table_name == 'invoices'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(role_based_reviewer_associated_items(user, role_id))
+          end
+        when :credit_note_auditor, 'credit_note_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         else
           # data = []
         end
