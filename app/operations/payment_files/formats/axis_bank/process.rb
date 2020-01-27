@@ -18,13 +18,14 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
   def process
     headers = retrieve_axis_headers
     content = []
+
     self.payment_file_data.each do |payment|
       content << [
           payment[:receiving_user_name],
           payment[:beneficiary_account_name],
           payment[:beneficiary_account_number],
           payment[:beneficiary_ifsc],
-          retrieve_report_amount,
+          retrieve_report_amount(payment),
           retrieve_report_data(payment)
       ]
     end
@@ -38,20 +39,22 @@ class PaymentFiles::Formats::AxisBank::Process < PaymentFiles::Formats::BaseForm
         "Account No.",
         "IFSC Code",
         "Amount (Rs.)",
-        "Report IDs"
+        "#{current_app == :em ? 'Report IDs' : 'Payment ID'}"
     ]
   end
 
+  #@todo
+  # the below hard coded logic need to move to personlizer
   def retrieve_report_data(payment)
-    if [2, 164].include? user.company.id # Satin CreditCare or L&C
+    if [2, 164].include? user.company.id && current_app == :em # Satin CreditCare or L&C
       return payment[:report_id]
-    else
-      return payment[:report_ids]
+    elsif current_app == :vp
+      return payment[:payment_id]
     end
   end
 
   def retrieve_report_amount(payment)
-    if [2, 164].include? user.company.id # Satin CreditCare or L&C
+    if [2, 164].include? user.company.id && current_app == :em # Satin CreditCare or L&C
       return payment[:reimbursable_amount]
     else
       return payment[:amount]

@@ -198,6 +198,11 @@ class BbpsBillerSubscription < ApplicationRecord
     fields
   end
 
+  # display_name  used  in  payment  file  creation method to  print the  beneficiary name
+  def display_name
+      self.biller&.biller_name
+  end
+
   def self.document_owner_attribute
     'user_id'
   end

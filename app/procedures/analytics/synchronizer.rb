@@ -35,7 +35,7 @@ class Analytics::Synchronizer < Transactions::API
     true
   end
 
-  def can_update_check(context, model:, record:,payload:, **)
+  def can_update_check(context, model:, record:, payload:, **)
     if model.in_sync?(record, payload)
       context[:in_sync] = true
       return false

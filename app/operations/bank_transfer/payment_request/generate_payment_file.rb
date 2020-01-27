@@ -49,7 +49,8 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
             amount: payment.amount_value,
             date: Date.today,
             note: generate_payment_note(payment),
-            payment_mode: payment.payment_mode
+            payment_mode: payment.payment_mode,
+            payment_id: payment.id
         }
       end
     end
