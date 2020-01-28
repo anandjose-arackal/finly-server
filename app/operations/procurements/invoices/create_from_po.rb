@@ -184,6 +184,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
         invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+        invoice_params[:advance_amount_required] = true
     end
 
     return invoice_params
