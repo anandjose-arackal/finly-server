@@ -15,7 +15,7 @@ module Constants
 
   PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
   EM_PROVIDER = %w( ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider )
-  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
+  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider BbpsBillerSubscriptionProvider BbpsBillAutofetchedProvider BbpsBillNonAutofetchedProvider CreditNoteProvider )
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
