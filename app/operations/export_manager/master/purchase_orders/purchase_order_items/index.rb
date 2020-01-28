@@ -176,11 +176,11 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def vendor_tds_rate(item)
-    # todo
+    purchase_order(item)&.vendor&.tds_rates_list&.tds
   end
 
   def vendor_tds_description(item)
-    # todo
+    purchase_order(item)&.vendor&.tds_rates_list&.name
   end
 
   def vendor_type(item)
