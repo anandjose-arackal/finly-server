@@ -83,7 +83,7 @@ module Forms
       end
 
       def build
-        transformer = Forms::Contracts::Transformer.new(field_key, options, nil, contract_block)
+        transformer = Forms::Contracts::Transformer.new(field_key, schema, nil, contract_block, collection: false)
         transformer.generate
       end
 

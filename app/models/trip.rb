@@ -37,9 +37,9 @@ class Trip < ApplicationRecord
   has_many :passengers, class_name: 'TripPassenger'
   has_many :routes, class_name: 'TripRoute'
 
-  has_many :transport_request, class_name: "TripTransportRequest"
-  has_many :hotel_request, class_name: "TripHotelRequest"
-  has_many :local_conveyance_request, class_name: "TripLocalConveyanceRequest"
+  has_many :transport_requests, class_name: "TripTransportRequest"
+  has_many :hotel_requests, class_name: "TripHotelRequest"
+  has_many :local_conveyance_requests, class_name: "TripLocalConveyanceRequest"
 
   acts_as_sequenced column: :trip_id, purpose: :trip, editable: false, prefix: 'TRF/'
 

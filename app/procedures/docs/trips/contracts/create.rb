@@ -1,8 +1,9 @@
-class Docs::Trips::Contracts::Create < Transactions::Contract
+class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
+  form Docs::Trips::Form
   property :company_id
   property :created_by_id
-  property :status_id, deserializer: -> (input, represented, **) {TripStatus.id_for(:draft)}
+  property :status_id, deserializer: -> (input, represented, **) {represented.status_id = TripStatus.id_for(:draft)}
   property :trip_id, writable: false
   property :policy_id
   property :start_date
@@ -35,7 +36,7 @@ class Docs::Trips::Contracts::Create < Transactions::Contract
     end
     property :description
   end
-  collection :hotel_request, populate_if_empty: TripHotelRequest do
+  collection :hotel_requests, populate_if_empty: TripHotelRequest do
     property :uuid, writeable: false
     property :route_uuid
     property :preferred_location
@@ -47,7 +48,7 @@ class Docs::Trips::Contracts::Create < Transactions::Contract
     end
     property :description
   end
-  collection :local_conveyance_request, populate_if_empty: TripLocalConveyanceRequest do
+  collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest do
     property :uuid, writeable: false
     property :route_uuid
     property :pickup_location

@@ -1,11 +1,12 @@
 class Forms::Contracts::Transformer
-  attr_accessor :field_name, :entity_options, :property_options, :block
+  attr_accessor :field_name, :entity_options, :property_options, :block, :collection
 
-  def initialize(field_name, entity_options, property_options, block)
+  def initialize(field_name, entity_options, property_options, block, collection: false)
     self.field_name = field_name
     self.entity_options = entity_options
     self.property_options = property_options
     self.block = block
+    self.collection = collection
   end
 
   def contract_validations
@@ -31,10 +32,11 @@ class Forms::Contracts::Transformer
   def generate
     transformer = self
     lambda do |*args|
+      function = transformer.collection ? :collection : :property
       if transformer.block
-        property transformer.field_name, transformer.property_options, &transformer.block
+        send function, transformer.field_name, transformer.property_options, &transformer.block
       else
-        property transformer.field_name, transformer.property_options
+        send function, transformer.field_name, transformer.property_options
       end
       validations = transformer.contract_validations
       validations[:validates].each do |val|

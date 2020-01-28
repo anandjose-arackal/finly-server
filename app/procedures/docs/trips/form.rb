@@ -3,15 +3,19 @@ class Docs::Trips::Form < Forms::API
   model Trip
   section :header do
     auto_number :trip_id, prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"
-    dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
-    dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
-    dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
+    # dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
+    # dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
+    # dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
     dropdown :status_id, scope: Forms::Entity::Scope::Enum(TripStatus, :id, :name), required: true
     dropdown :trip_type_id, scope: Forms::Entity::Scope::Enum(TripType, :id, :name), required: true
+    dropdown :policy_id, scope: Forms::Entity::Scope::AutoComplete('policies', filters: {}), required: true
+    date :start_date, required: true
+    date :end_date, required: true
+    text :purpose, required: true
   end
 
   section :passengers do
-    collection :passengers, populate_if_empty: TripPassenger do
+    collection :passengers, minimum: 1 do
       text :name, required: true
       text :contact_number
       text :email
@@ -19,7 +23,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :routes do
-    collection :routes, populate_if_empty: TripRoute do
+    collection :routes, minimum: 1 do
       text :from_location, required: true
       text :to_location, required: true
       boolean :require_transport, default_value: false
@@ -29,7 +33,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :transport_requests do
-    collection :transport_requests, populate_if_empty: TripTransportRequest do
+    collection :transport_requests do
       dropdown :mode, scope: Forms::Entity::Scope::List({value: "Flight"}), required: true
       datetime :depart_on, required: true
       dropdown :preferred_timeframe, required: true, scope: Forms::Entity::Scope::List(
@@ -43,7 +47,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :hotel_requests do
-    collection :hotel_requests, populate_if_empty: TripHotelRequest do
+    collection :hotel_requests do
       text :preferred_location, required: true
       datetime :checkin_at, required: true
       datetime :checkout_at, required: true
@@ -53,7 +57,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :local_conveyance_requests do
-    collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest do
+    collection :local_conveyance_requests do
       text :pickup_location, required: true
       datetime :pickup_at, required: true
       datetime :drop_at, required: true
