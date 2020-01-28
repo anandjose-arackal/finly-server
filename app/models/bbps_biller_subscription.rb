@@ -290,4 +290,8 @@ class BbpsBillerSubscription < ApplicationRecord
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
   end
+
+  def self.human_name(options = {})
+    options[:plural] ? 'Utility Bill Masters' : 'Utility Bill Master'
+  end
 end

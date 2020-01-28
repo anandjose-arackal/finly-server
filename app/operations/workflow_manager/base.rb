@@ -91,7 +91,9 @@ class WorkflowManager::Base < BaseOperation
     action = self.aasm_document.send(self.aasm_event)
 
 
-    unless action
+    if action
+      add_message :success, self.aasm_document.messages[:success]
+    else
       add_message :error, "Couldn't perform action"
       return
     end

@@ -404,6 +404,10 @@ class BbpsBill < ApplicationRecord
     self.status_ids(:open, :retracted, :rejected)
   end
 
+  def self.human_name(options = {})
+    options[:plural] ? 'Utility Bills' : 'Utility Bill'
+  end
+
   def payable?
     BbpsBillStatus.ids_for(:approved, :auto_approved).include?(self.status_id)
   end

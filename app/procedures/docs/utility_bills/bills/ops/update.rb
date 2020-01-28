@@ -1,4 +1,5 @@
-class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
+class Docs::UtilityBills::Bills::Ops::Update < Transactions
+  ::API
   step Model(BbpsBill, :find_by)
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :update?)
   # step :set_default_params
@@ -21,6 +22,12 @@ class Docs::UtilityBills::Bills::Ops::Update < Trailblazer::Operation
           reviewal_document: model,
           document_reviewer_mappings: params[:document_reviewer_mappings]
       })
+
+      dlrm_validation_op.messages.slice(:error, :success, :info).each do |key, val|
+        next if key == :errors_meta
+        add_message options, key, :base, val
+      end
+
       dlrm_validation_op.success?
     else
       true
