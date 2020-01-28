@@ -98,6 +98,7 @@ json.balance_due do
   json.currency_id @result.purchase_order.balance_amount&.currency&.id
 end
 
+json.can_create_items @result.user.permission.crud_inventory_item_po
 json.items do
   json.array! @result.purchase_order_items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
