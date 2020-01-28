@@ -39,7 +39,7 @@ module Forms::Entity::Registry
     if Forms::Entity::Registry.types[type]
       [Forms::Entity::Registry.types[type], name]
     else
-      [Entity, type]
+      [Forms::Entity::Base, type]
     end
   end
 

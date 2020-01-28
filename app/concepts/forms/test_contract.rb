@@ -4,6 +4,9 @@ class Forms::TestContract < Forms::Contracts::Builder
 
     section :header do
       text :name, char_limit: 10, required: true
+      property :profile do
+        text :employee_id, char_limit: 10, required: true
+      end
     end
 
   end
@@ -19,7 +22,10 @@ class Forms::TestContract < Forms::Contracts::Builder
 
   form Forms::TestContract::Form
   # property :id
-  property :name, form: {required: false}#, char_limit: 20}
+  # property :name, form: {required: false}#, char_limit: 20}
+  property :profile, populate_if_empty: UserProfile do
+    property :employee_id
+  end
   # collection :name do
   #   property :description
   # end

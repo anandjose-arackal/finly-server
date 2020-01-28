@@ -1,15 +1,16 @@
 class Forms::Contracts::Transformer
-  attr_accessor :field_name, :options, :block
+  attr_accessor :field_name, :entity_options, :property_options, :block
 
-  def initialize(field_name, options, block)
+  def initialize(field_name, entity_options, property_options, block)
     self.field_name = field_name
-    self.options = options
+    self.entity_options = entity_options
+    self.property_options = property_options
     self.block = block
   end
 
   def contract_validations
     validations = {validates: [], validate: []}
-    options.each do |option, value|
+    entity_options.each do |option, value|
       transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(field_name, value)
       next unless transformer
 
@@ -17,7 +18,7 @@ class Forms::Contracts::Transformer
       validations[:validate] += transformer.validate
     end
 
-    options[:options]&.each do |option, value|
+    entity_options[:options]&.each do |option, value|
       transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(field_name, value)
       next unless transformer
 
@@ -31,9 +32,9 @@ class Forms::Contracts::Transformer
     transformer = self
     lambda do |*args|
       if transformer.block
-        property transformer.field_name, {}, &transformer.block
+        property transformer.field_name, transformer.property_options, &transformer.block
       else
-        property transformer.field_name, {}
+        property transformer.field_name, transformer.property_options
       end
       validations = transformer.contract_validations
       validations[:validates].each do |val|

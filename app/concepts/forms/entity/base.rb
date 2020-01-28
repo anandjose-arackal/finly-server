@@ -65,7 +65,7 @@ module Forms
         full_path = parent_path.present? ? "#{parent_path}_#{field_key}" : "#{field_key}"
         field_path(full_path)
         section(section)
-        self.options = opts
+        self.options = opts || {}
         initialize_with(opts)
 
         instance_eval &block if block_given?
@@ -83,7 +83,7 @@ module Forms
       end
 
       def build
-        transformer = Forms::Contracts::Transformer.new(field_key, options, contract_block)
+        transformer = Forms::Contracts::Transformer.new(field_key, options, nil, contract_block)
         transformer.generate
       end
 

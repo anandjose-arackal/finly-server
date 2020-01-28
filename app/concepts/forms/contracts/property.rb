@@ -27,8 +27,13 @@ class Forms::Contracts::Property
 
   def build(form)
     entity = form.find_entity(self.path)
-    options = entity.options.deep_merge(self.options[:form])
-    transformer = Forms::Contracts::Transformer.new(entity.field_key, options, contract_block(form))
+    if entity
+      entity_options = entity.options
+      entity_options = entity_options.deep_merge(self.options[:form]) if self.options[:form]
+    else
+      entity_options = self.options[:form] || {}
+    end
+    transformer = Forms::Contracts::Transformer.new(name, entity_options, self.options.except(:form), contract_block(form))
     transformer.generate
   end
 
