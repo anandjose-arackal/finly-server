@@ -29,7 +29,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
     end
 
     if user.is_payment_agreement_initiator? && document_owner? 
-      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
+      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted? || payment_agreement.revised?
         return true
       end 
     end
@@ -46,7 +46,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
 
   def submit
     if user.is_payment_agreement_initiator? || user.vendor_payments_admin?
-      if document_owner? && (payment_agreement.draft? || payment_agreement.retracted? || payment_agreement.rejected?)
+      if document_owner? && (payment_agreement.draft? || payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.revised?)
         return true
       end
     end
