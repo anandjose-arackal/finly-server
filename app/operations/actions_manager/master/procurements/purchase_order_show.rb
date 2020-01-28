@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment
+    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment, :create_items
   ]
 
   def initialize(user = nil, params = {})
@@ -228,6 +228,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def update_btn
     save_btn
+  end
+
+  def create_items
+    user.permission.crud_inventory_item_po
   end
 
   def unapprove

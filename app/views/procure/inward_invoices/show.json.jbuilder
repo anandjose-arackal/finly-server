@@ -148,7 +148,6 @@ json.invoice do
   end
 
   # invoice items
-  json.can_create_items @result.user.permission.crud_inventory_item_non_po
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
