@@ -365,6 +365,21 @@ class BankPaymentRequest < ApplicationRecord
     where transfer_mode_id: id
   }
 
+  # used for streamsets 
+  scope :filter_payment_status, -> (status) {
+    status = [status] unless status.is_a? Array
+    permitted_status = ['approved', 'credited', 'auto_approved']
+    status = permitted_status & status
+    status = permitted_status if status.blank?
+    where status_id: BankPaymentRequestStatus.ids_for(status)
+  }
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where(approved_at: from.beginning_of_day..to.end_of_day)
+  }
+
   attr_accessor :cache_users
 
   before_save do

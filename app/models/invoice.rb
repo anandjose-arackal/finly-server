@@ -522,6 +522,16 @@ class Invoice < ApplicationRecord
     end
   }
 
+  # used for streamsets 
+  scope :filter_invoice_status, -> (status) {
+    status = [status] unless status.is_a? Array
+    permitted_status = ['partially_paid', 'approved', 'auto_approved', 'initiated', 'unpaid']
+    status = permitted_status & status
+    status = permitted_status if status.blank?
+    where invoice_status_id: InwardInvoiceStatus.ids_for(status)
+  }
+
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
