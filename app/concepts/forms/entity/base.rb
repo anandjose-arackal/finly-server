@@ -32,6 +32,8 @@ module Forms
       attribute :conditional_required, default: false
       attribute :multiple, default: false
 
+      attribute :populate_if_empty
+
       # option :char_limit #, default: 1000
       # option :min_items
       # option :max_items
@@ -78,6 +80,21 @@ module Forms
 
       def inspect
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
+      end
+
+      def build
+        transformer = Forms::Contracts::Transformer.new(field_key, options, contract_block)
+        transformer.generate
+      end
+
+      def contract_block
+        return nil unless entities.present?
+
+        lambda do |*args|
+          entities.each do |entity|
+            instance_eval &entity.build
+          end
+        end
       end
 
     end

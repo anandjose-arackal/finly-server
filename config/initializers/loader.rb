@@ -7,3 +7,5 @@ Loader.watch! "Routes Loader" do
 end
 
 Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'
+
+Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/contracts/transformers/**/*.rb"

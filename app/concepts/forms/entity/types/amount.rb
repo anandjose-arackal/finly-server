@@ -2,8 +2,8 @@ class Forms::Entity::Types::Amount < Forms::Entity::Base
   register :amount
   hint 'Amount'
 
-  def initialize(section, field_key, opts = {}, &block)
-    super(section, field_key, opts.merge(populate_if_empty: Amount)) do
+  def initialize(section, field_key, parent_path, opts = {}, &block)
+    super(section, field_key, parent_path, opts.merge(populate_if_empty: ::Amount)) do
       number :value, decimal: true
       number :currency_id, scope: Forms::Entity::Scope::Enum(Currency, :id, :country_code, :country, :symbol)
     end
