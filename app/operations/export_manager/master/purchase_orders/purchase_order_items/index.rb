@@ -52,7 +52,6 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :po_status
     attribute :po_payment_term
     attribute :po_delivery_date
-    attribute :po_submitted_on
     attribute :is_po_approved
     attribute :po_approved_on
     attribute :po_base_value
@@ -165,7 +164,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def vendor_state_code(item)
-    purchase_order(item)&.procurement.vendor&.state_code&.state_code
+    sprintf '%02d', purchase_order(item)&.procurement.vendor&.state_code&.state_code.to_i
   end
 
   def vendor_pan(item)
@@ -234,10 +233,6 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
   def po_delivery_date(item)
     purchase_order(item)&.delivery_date&.strftime("%d-%b-%Y")
-  end
-
-  def po_submitted_on(item)
-    # todo
   end
 
   def is_po_approved(item)
