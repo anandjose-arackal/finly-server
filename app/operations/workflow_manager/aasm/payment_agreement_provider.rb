@@ -13,7 +13,7 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
 
     event :submit do
       transitions from: [:open, :retracted, :rejected, :draft], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected, :draft], to: :awaiting_approval
+      transitions from: [:open, :retracted, :rejected, :draft, :revised], to: :awaiting_approval
     end
 
     event :approve do

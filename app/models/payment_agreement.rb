@@ -81,7 +81,7 @@ class PaymentAgreement < ApplicationRecord
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, :revised?, to: :status
 
   attr_accessor :payment_agreement_custom_fields
 
