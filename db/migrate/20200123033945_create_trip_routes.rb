@@ -2,14 +2,16 @@ class CreateTripRoutes < ActiveRecord::Migration[5.2]
   def change
     create_table :trip_routes do |t|
       t.uuid
-      t.references :trip, index: true, null: false, foreign_key: true
+      t.string :trip_id, index: true
       t.string :from_location, index: true
-      t.integer :to_location, index: true
+      t.string :to_location, index: true
       t.date :depart_on, index: true
       t.date :return_on, index: true
       t.boolean :require_transport, index: true, default: false
       t.boolean :require_hotel, index: true, default: false
       t.boolean :require_local_conveyance, index: true, default: false
+
+      t.timestamps null: false
     end
   end
 end

@@ -2,8 +2,8 @@
 #
 # Table name: trips
 #
-#  id                        :bigint           not null, primary key
-#  uuid                      :string(36)       not null
+#  id                        :bigint           not null
+#  uuid                      :string(36)       not null, primary key
 #  company_id                :integer          not null
 #  created_by_id             :integer          not null
 #  status_id                 :integer          not null
@@ -21,6 +21,7 @@
 #
 
 class Trip < ApplicationRecord
+  include UUIDHelper
   include Sequenced::ActsAsSequenced
 
   belongs_to :company

@@ -2,6 +2,8 @@ class CreateTripTypes < ActiveRecord::Migration[5.2]
   def change
     create_table :trip_types do |t|
       t.string :name, index: true, null: false
+
+      t.timestamps null: false
     end
     TripType.seed_data
 

@@ -15,6 +15,8 @@ class CreateTrips < ActiveRecord::Migration[5.2]
       t.integer :advance_requested_id, references: "amounts", index: true, foreign_key: true
       t.integer :advance_processed_id, references: "amounts", index: true, foreign_key: true
       t.integer :expenses_total_id, references: "amounts", index: true, foreign_key: true
+
+      t.timestamps null: false
     end
   end
 end

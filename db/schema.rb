@@ -7784,16 +7784,18 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
 
   create_table "trip_hotel_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.bigint "trip_id", null: false
-    t.bigint "trip_route_id", null: false
-    t.integer "created_by_id", null: false
-    t.integer "traveller_id", null: false
+    t.string "trip_id"
+    t.string "trip_route_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
     t.bigint "company_id"
     t.string "preferred_location"
     t.datetime "checkin_at"
     t.datetime "checkout_at"
     t.text "description"
     t.integer "budget_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_hotel_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_hotel_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_hotel_requests_on_created_by_id"
@@ -7805,16 +7807,18 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
 
   create_table "trip_local_conveyance_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.bigint "trip_id", null: false
-    t.bigint "trip_route_id", null: false
-    t.integer "created_by_id", null: false
-    t.integer "traveller_id", null: false
+    t.string "trip_id"
+    t.string "trip_route_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
     t.bigint "company_id"
     t.string "pickup_location"
     t.datetime "pickup_at"
     t.datetime "drop_at"
     t.text "description"
     t.integer "budget_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_local_conveyance_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_local_conveyance_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_local_conveyance_requests_on_created_by_id"
@@ -7826,31 +7830,35 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
 
   create_table "trip_passengers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.bigint "trip_id", null: false
+    t.string "trip_id"
     t.string "name"
     t.string "contact_number"
     t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["trip_id"], name: "index_trip_passengers_on_trip_id"
     t.index ["uuid"], name: "index_trip_passengers_on_uuid"
   end
 
   create_table "trip_routes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.bigint "trip_id", null: false
-    t.integer "from_location_id"
-    t.integer "to_location_id"
+    t.string "trip_id"
+    t.string "from_location"
+    t.string "to_location"
     t.date "depart_on"
     t.date "return_on"
     t.boolean "require_transport", default: false
     t.boolean "require_hotel", default: false
     t.boolean "require_local_conveyance", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["depart_on"], name: "index_trip_routes_on_depart_on"
-    t.index ["from_location_id"], name: "index_trip_routes_on_from_location_id"
+    t.index ["from_location"], name: "index_trip_routes_on_from_location"
     t.index ["require_hotel"], name: "index_trip_routes_on_require_hotel"
     t.index ["require_local_conveyance"], name: "index_trip_routes_on_require_local_conveyance"
     t.index ["require_transport"], name: "index_trip_routes_on_require_transport"
     t.index ["return_on"], name: "index_trip_routes_on_return_on"
-    t.index ["to_location_id"], name: "index_trip_routes_on_to_location_id"
+    t.index ["to_location"], name: "index_trip_routes_on_to_location"
     t.index ["trip_id"], name: "index_trip_routes_on_trip_id"
     t.index ["uuid"], name: "index_trip_routes_on_uuid"
   end
@@ -7862,16 +7870,18 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
 
   create_table "trip_transport_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
-    t.bigint "trip_id", null: false
-    t.bigint "trip_route_id", null: false
-    t.integer "created_by_id", null: false
-    t.integer "traveller_id", null: false
+    t.string "trip_id"
+    t.string "trip_route_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
     t.bigint "company_id"
     t.string "mode"
     t.date "depart_on"
     t.string "preferred_timeframe"
     t.integer "budget_id"
     t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_transport_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_transport_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_transport_requests_on_created_by_id"
@@ -7885,6 +7895,8 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
 
   create_table "trip_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_trip_types_on_name"
   end
 
@@ -7903,6 +7915,8 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.integer "advance_requested_id"
     t.integer "advance_processed_id"
     t.integer "expenses_total_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "trip_type_id"
     t.index ["advance_processed_id"], name: "index_trips_on_advance_processed_id"
     t.index ["advance_requested_id"], name: "index_trips_on_advance_requested_id"
@@ -9402,8 +9416,6 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
   add_foreign_key "travel_requests", "users"
-  add_foreign_key "trip_passengers", "trips"
-  add_foreign_key "trip_routes", "trips"
   add_foreign_key "trips", "trip_types"
   add_foreign_key "unique_identifiers", "companies"
   add_foreign_key "unique_identifiers", "purposes"
