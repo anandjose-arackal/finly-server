@@ -23,7 +23,7 @@ class ReviewalLevels::Create < ReviewalLevels::Base
       add_message :error, 'Policy not found'
     end
 
-    entity_types = %w( PurchaseOrderProvider ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider BankPaymentRequestProvider YesBankVendorProvider PurchaseRequestProvider PoInvoiceProvider NonPoInvoiceProvider PaymentAgreementProvider BbpsBillerSubscriptionProvider BbpsBillProvider CreditNoteProvider)
+    entity_types = %w( PurchaseOrderProvider ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider BankPaymentRequestProvider YesBankVendorProvider PurchaseRequestProvider PoInvoiceProvider NonPoInvoiceProvider PaymentAgreementProvider BbpsBillerSubscriptionProvider BbpsBillAutofetchedProvider BbpsBillNonAutofetchedProvider CreditNoteProvider)
     # entity_types = WorkflowManager::Aasm::BaseProvider.providers
 
     unless entity_types.include?(reviewal_level_params[:associated_entity_type])

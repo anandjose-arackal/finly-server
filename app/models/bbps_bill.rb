@@ -271,6 +271,14 @@ class BbpsBill < ApplicationRecord
     data
   end
 
+  def get_default_provider
+    if autofetched
+      'BbpsBillAutofetchedProvider'
+    else
+      'BbpsBillNonAutofetchedProvider'
+    end
+  end
+
   def generate_receipt
     {
         biller_name: subscription.biller&.biller_name,
