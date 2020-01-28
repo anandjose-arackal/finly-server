@@ -164,7 +164,8 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   end
 
   def vendor_state_code(item)
-    sprintf '%02d', purchase_order(item)&.procurement.vendor&.state_code&.state_code.to_i
+    sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
+    (sc.present?) ? (sprintf '%02d', sc) : ''
   end
 
   def vendor_pan(item)
