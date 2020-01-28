@@ -121,6 +121,24 @@ json.invoice do
   json.cost_center_id invoice.cost_center_id
   json.cost_center_name invoice.cost_center&.name
 
+  json.department_attributes do
+    json.id invoice.department_id
+    json.name invoice&.department&.name
+  end
+
+  json.sub_department_attributes do
+    json.id invoice.sub_department_id
+    json.name invoice.sub_department&.name
+  end
+
+  json.cost_center_attributes do
+    json.id invoice.cost_center_id
+    json.name invoice.cost_center&.name
+  end
+
+  json.delivery_location_attributes invoice.delivery_location&.as_json rescue nil
+  json.gstin_location_attributes invoice.gstin_location&.as_json rescue nil
+
   json.tds_slab_id invoice.tds_slab_id
   json.tds_slab_name invoice.tds_slab&.name
   json.tds_rate invoice.tds
@@ -168,6 +186,20 @@ json.invoice do
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
       json.billable_amount precision_value item.billable_amount&.value
+      json.department_attributes do
+        json.id item.department_id
+        json.name item&.department&.name
+      end
+      json.cost_center_attributes do
+        json.id item.cost_center_id
+        json.name item&.cost_center&.name
+      end
+      json.category_attributes do
+        json.id item.category_id
+        json.name item&.category&.name
+      end
+
+
       product = ""
       case item.inventory_line_item&.product_type_id
       when ProductType.id_for(:goods)
