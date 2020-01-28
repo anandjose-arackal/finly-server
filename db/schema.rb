@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_23_122647) do
+ActiveRecord::Schema.define(version: 2020_01_27_153512) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4111,6 +4111,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["transfer_mode_id"], name: "index_icici_bank_transactions_on_transfer_mode_id"
   end
 
@@ -4788,6 +4789,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "reversal_api_counter", default: 0
     t.datetime "deleted_at"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
     t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
     t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
@@ -8707,6 +8709,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
     t.index ["beneficiary_bank_account_id"], name: "index_yes_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_yes_bank_transactions_on_company_id"

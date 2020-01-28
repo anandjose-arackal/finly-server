@@ -27,14 +27,30 @@ class YesBankTransferRequest < NonPersistentModel
         transfer_type: get_transfer_type(transfer_type, ifsc),
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
-        unique_reference_number: unique_reference_number,
+        unique_reference_number: set_unique_reference(unique_reference_number),
         company_id: company_id
     })
   end
 
-  def generate_unique_reference
-    if self.unique_reference_number.present?
-      return self.unique_reference_number
+  def self.set_unique_reference(unique_reference_number)
+    if unique_reference_number.present?
+      return unique_reference_number
+    end
+    ref = nil
+    loop do
+      ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
+      if YesBankTransaction.find_by(unique_request_number: ref).blank?
+        self.unique_reference_number = ref
+        break
+      end
+    end
+    ref
+  end
+
+  ##### DEPRECATED #####
+  def generate_unique_reference(unique_reference_number)
+    if unique_reference_number.present?
+      return unique_reference_number
     end
     ref = nil
     loop do

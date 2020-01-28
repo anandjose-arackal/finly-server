@@ -24,6 +24,7 @@
 #  reversal_api_counter       :integer          default(0)
 #  deleted_at                 :datetime
 #  reference_payment_id       :integer
+#  bank_error_message         :text(16777215)
 #
 
 

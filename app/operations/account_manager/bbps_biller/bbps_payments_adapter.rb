@@ -16,7 +16,9 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   def credit(payment, options = {})
     # first we determine if the associated payment to this particular transaction is completed or not
     bill = payment.parent
-    bank_transaction = payment.reference_resource
+
+    # now the bank transaction will be the first in the list of reference resources
+    bank_transaction = payment.reference_resources.first
     if bank_transaction.present? and !bank_transaction.retriable?
       self.errors << "This bill payment cannot be processed at this time"
       return false

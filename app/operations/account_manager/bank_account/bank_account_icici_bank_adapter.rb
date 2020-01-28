@@ -22,6 +22,12 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       # payment cannot be processed in this case
       return false
     elsif bank_transaction.present? && (bank_transaction&.retriable? || bank_transaction&.open? || bank_transaction&.rejected?)
+      # here we need to add additional checks to make sure that all bank_transactions before this have been failed
+      op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+      unless op.success?
+        add_message :error, op.message
+        return false
+      end
       # even if the payment is being retried, the reference number needs to be
       # a new one
       reference_number = nil
@@ -34,8 +40,10 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
     if payment.reference_resource&.retriable?
-      # updating the request number with a new one because the old one will have been used already
-      bank_transaction.update_columns(unique_request_number: transfer_request.generate_unique_reference)
+      # here we shall create a new bank transaction that will contain the trails of the previous transaction
+      bank_transaction = create_bank_transaction(payment, transfer_request)
+      # # updating the request number with a new one because the old one will have been used already
+      # bank_transaction.update_columns(unique_request_number: transfer_request.unique_reference_number)
     elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
@@ -43,7 +51,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     end
 
 
-    unless bank_transaction
+    unless bank_transaction.present?
       payment.system_messages.build(
           content: "Payment cannot be processed at this time",
           system_message_type_id: SystemMessageType.id_for(:error).save
@@ -51,11 +59,19 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       return false
     end
 
+    # checking to ensure that two bank transactions having the same ID can't be present for a single payment
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      add_message :error, op.message
+      return
+    end
+
     # this operation will merely initiate the transaction at the bank's end, and the status will
-    # be determined based on the callback that is triggered later
+    # be determined based on the status update cron job that runs later
     op = IciciBankApi::TransactionInitiate.(
       transfer_request: transfer_request,
-      payment: payment
+      payment: payment,
+      bank_transaction: bank_transaction
     )
 
 

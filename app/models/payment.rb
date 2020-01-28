@@ -88,7 +88,7 @@ class Payment < ApplicationRecord
   # link to budget trails table
   has_many :budget_trails, as: :entity
 
-  belongs_to :reference_payment, class_name: "Payment"
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
 
