@@ -47,7 +47,7 @@ json.cost_center_attributes do
 end
 
 json.location_attributes @result.purchase_order.location&.as_json rescue nil
-json.gstin_location.attributes @result.purchase_order.gstin_location&.as_json rescue nil
+json.gstin_location_attributes @result.purchase_order.gstin_location&.as_json rescue nil
 
 json.actions @result.actions
 json.user @result.purchase_order.user.as_json rescue nil
