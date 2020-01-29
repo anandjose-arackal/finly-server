@@ -7,45 +7,13 @@ class Transactions::Contract < Reform::Form
   end
 
   def self.property(name, options = {}, &block)
-    sanitize_options options
+    Transactions::Contracts::Sanitizer.sanitize(self, :property, name, options, block)
     super(name, options, &block)
   end
 
-  def self.sanitize_options(options)
-    return unless options.present?
-
-    Deserializer.setup(options)
+  def self.collection(name, options = {}, &block)
+    Transactions::Contracts::Sanitizer.sanitize(self, :collection, name, options, block)
+    super(name, options, &block)
   end
-
-  # In-case deserialize: is defined in options, it sets it up the correct way for trailblazer
-  class Deserializer
-    def self.setup(options)
-      if options[:deserializer].present?
-        unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
-          options[:deserializer] = deserialize(options[:deserializer])
-        end
-      end
-    end
-
-    protected
-
-    def self.deserialize(deserializer)
-      klass = self
-      {
-          parse_pipeline: ->(*) {
-            ->(input, represented:, **) {
-              if deserializer.is_a?(Symbol)
-                klass.send(deserializer, input, represented, **input)
-              elsif deserializer.is_a?(Class)
-                # Todo
-              else
-                deserializer.call(input, represented, **input&.symbolize_keys)
-              end
-            }
-          }
-      }
-    end
-  end
-
 
 end

@@ -36,7 +36,7 @@ class Trip < ApplicationRecord
   belongs_to :expenses_total, class_name: 'Amount', optional: true, dependent: :destroy
   belongs_to :trip_type
 
-  has_many :passengers, class_name: 'TripPassenger', dependent: :destroy
+  has_many :passengers, class_name: 'TripPassenger', dependent: :destroy, autosave: true
   has_many :routes, class_name: 'TripRoute', dependent: :destroy
 
   has_many :transport_requests, class_name: "TripTransportRequest", dependent: :destroy

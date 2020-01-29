@@ -1,4 +1,4 @@
-class Docs::Trips::Ops::Create < Transactions::API
+class Docs::Trips::Ops::Update < Transactions::API
 
   step Model(Trip, :find_by_uuid)
   step Policy::Pundit(Docs::Trips::Policies::Actions, :update?)

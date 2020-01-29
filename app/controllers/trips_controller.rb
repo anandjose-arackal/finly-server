@@ -9,6 +9,10 @@ class TripsController < BaseControllers::WebBase
     endpoint Docs::Trips::Ops::Index
   end
 
+  def update
+    endpoint Docs::Trips::Ops::Update
+  end
+
   def show
     endpoint Docs::Trips::Ops::Show
   end

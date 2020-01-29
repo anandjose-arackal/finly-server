@@ -9,3 +9,5 @@ end
 Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'
 
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/contracts/transformers/**/*.rb"
+
+Loader.watch! "Transaction Contract Sanitizers", dir: "app/concepts/transactions/contracts/sanitizers/**/*.rb"
