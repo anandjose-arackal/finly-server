@@ -30,7 +30,7 @@ class KycProcess::User::Update < KycProcess::User::Base
   def kyc_strong_params
     return nil unless params&.dig(:individual_kyc).present?
     # params.require(:individual_kyc).permit(:id_proof, :address_proof)
-    params = self.params.require(:individual_kyc).permit(:kyc_number, :kyc_2_number, :kyc_1_number, :type_id)
+    params = self.params.require(:individual_kyc).permit(:kyc_number, :kyc_2_number, :kyc_1_number, :type_id,:initiated)
     ## DEPRECATED START ##
     params[:id_proof]= self.params[:individual_kyc][:id_proof] if self.params[:individual_kyc][:id_proof].present?
     params[:address_proof] = self.params[:individual_kyc][:address_proof] if self.params[:individual_kyc][:address_proof].present?
@@ -44,6 +44,8 @@ class KycProcess::User::Update < KycProcess::User::Base
     params[:kyc_1_back]= self.params[:individual_kyc][:kyc_1_back] if self.params[:individual_kyc][:kyc_1_back].present?
     params[:kyc_2_front] = self.params[:individual_kyc][:kyc_2_front] if self.params[:individual_kyc][:kyc_2_front].present?
     params[:kyc_2_back]= self.params[:individual_kyc][:kyc_2_back] if self.params[:individual_kyc][:kyc_2_back].present?
+    params[:id_proof_front] = self.params[:individual_kyc][:id_proof_front] if self.params[:individual_kyc][:id_proof_front].present?
+    params[:id_proof_back]= self.params[:individual_kyc][:id_proof_back] if self.params[:individual_kyc][:id_proof_back].present?
     params[:photo] = self.params[:individual_kyc][:photo] if self.params[:individual_kyc][:photo].present?
     params[:signature] = self.params[:individual_kyc][:signature] if self.params[:individual_kyc][:signature].present?
 
@@ -58,7 +60,7 @@ class KycProcess::User::Update < KycProcess::User::Base
   def user_profile_strong_params
     return nil unless params&.dig(:user, :profile).present?
     params.require(:user).require(:profile).permit(:gender, :date_of_birth, :address_1,
-                                                      :address_2, :city, :state_id, :pin_code)
+                                                      :address_2, :city, :state_id, :pin_code,:employee_id)
   end
 
 end

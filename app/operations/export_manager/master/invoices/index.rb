@@ -30,6 +30,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :finance_approved_date
     attribute :due_date
     attribute :invoice_discount
+    attribute :attachments
+    attribute :approval_pending_reviewers
   end
 
   section :purchase do
@@ -362,6 +364,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
 
   def due_date(invoice_line_item)
     invoice_line_item.parent&.due_date&.strftime("%d-%b-%Y")
+  end
+
+  def attachments(invoice_line_item)
+    invoice_line_item.parent.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
+  def approval_pending_reviewers(invoice_line_item)
+    invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
 
