@@ -157,7 +157,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
 
       if self.payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
-        if (self.payment_params[:invoice_attributes][:tds_slab_id] != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
+        if purchase_order.advance_tds_slab_id.present? && (self.payment_params[:invoice_attributes][:tds_slab_id] != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
           add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{purchase_order.advance_tds_slab&.name}"
           return
         end
