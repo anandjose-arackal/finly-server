@@ -4,11 +4,14 @@ class Forms::Entity::Types::AutoNumber < Forms::Entity::Base
 
   consumes_choices!
 
-  option :prefix
-  option :start_at
+  option :sequence
 
   contract do
-    required(:prefix).filled
-    required(:start_at).filled
+    required(:sequence) do
+      hash do
+        required(:prefix).filled
+        required(:start_at).filled
+      end
+    end
   end
 end

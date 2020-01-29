@@ -8,4 +8,8 @@ class Docs::Trips::Policies::Actions < ApplicationPolicy
     true
   end
 
+  def update?
+    true
+  end
+
 end

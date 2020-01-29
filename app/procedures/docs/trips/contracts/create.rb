@@ -10,7 +10,7 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
   property :policy_id
   property :start_date
   property :end_date
-  property :purpose, form: {scope: Forms::Entity::Scope::List({value: "a", name: "a"})}
+  property :purpose
   property :trip_type_id
   collection :passengers, populate_if_empty: TripPassenger do
     property :uuid, writeable: false

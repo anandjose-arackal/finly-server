@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::CharLimit < Forms::Contracts::Transformers::Base
+class Forms::Contracts::Transformers::Sequence < Forms::Contracts::Transformers::Base
 
   register :sequence
 
