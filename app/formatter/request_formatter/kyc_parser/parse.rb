@@ -47,6 +47,12 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     if params[:signature_file].present?
       params[:signature] = extract_image(params[:signature_file], params[:signature_content_type], params[:signature_file_name])
     end
+    if params[:id_proof_front_file].present?
+      params[:id_proof_front] = extract_image(params[:id_proof_front_file], params[:id_proof_front_content_type], params[:id_proof_front_file_name])
+    end
+    if params[:id_proof_back_file].present?
+      params[:id_proof_back] = extract_image(params[:id_proof_back_file], params[:id_proof_back_content_type], params[:id_proof_back_file_name])
+    end
     # Handling for Android END #
 
     if params[:type_name].present?
