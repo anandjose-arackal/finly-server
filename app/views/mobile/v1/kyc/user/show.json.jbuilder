@@ -45,7 +45,7 @@ json.signature do
   json.file_format kyc&.file_format(kyc&.signature)
   json.file_type kyc.file_format(kyc.signature)
   json.original (Rails.env.production? ? kyc&.signature&.url : "/api/#{kyc&.signature&.url}")
-  json.thumb (Rails.env.production? ? kyc&.signaturet&.url(:thumb) : "/api/#{kyc&.signature&.url(:thumb)}")
+  json.thumb (Rails.env.production? ? kyc&.signature&.url(:thumb) : "/api/#{kyc&.signature&.url(:thumb)}")
 end
 json.kyc_1_front do
   json.file_format kyc&.file_format(kyc&.kyc_1_front)
