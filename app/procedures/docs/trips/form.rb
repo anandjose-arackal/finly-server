@@ -4,7 +4,7 @@ class Docs::Trips::Form < Forms::API
 
   section :header do
     auto_number :trip_id, prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"
-    integer :created_by_id, required: true, visible: false, can_visible_be_changed: false
+    reference :created_by, required: true, visible: false, can_visible_be_changed: false, class_name: 'User'
     # dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
     # dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
     # dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true

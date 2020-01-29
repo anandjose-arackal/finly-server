@@ -1,15 +1,16 @@
 class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   form Docs::Trips::Form
+  user_scope :created_by
 
-  property :company_id, validates: {presence: true}
-  property :created_by_id, validates: {presence: true}
+  property :company, validates: {presence: true}
+  property :created_by, validates: {presence: true}
   property :status_id, deserializer: -> (input, represented, **) { represented.status_id = TripStatus.id_for(:draft) }
   property :trip_id, writable: false
   property :policy_id
   property :start_date
   property :end_date
-  property :purpose
+  property :purpose, form: {scope: Forms::Entity::Scope::List({value: "a", name: "a"})}
   property :trip_type_id
   collection :passengers, populate_if_empty: TripPassenger do
     property :uuid, writeable: false
@@ -67,10 +68,6 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   functions do
     validate :route_to_request_validation
-
-    def user_scope
-      User.find_by(id: created_by_id)
-    end
 
     def route_to_request_validation
       verified_requests = []
