@@ -15,10 +15,21 @@
 #
 
 class TripRoute < ApplicationRecord
+  include SoftDeletable
   include UUIDHelper
 
   belongs_to :trip
-  has_many :transport_request, class_name: "TripTransportRequest"
-  has_many :hotel_request, class_name: "TripHotelRequest"
-  has_many :local_conveyance_request, class_name: "TripLocalConveyanceRequest"
+
+  def as_json(options={})
+    {
+        id: id,
+        from_location: from_location,
+        to_location: to_location,
+        depart_on: depart_on,
+        return_on: return_on,
+        require_transport: require_transport,
+        require_hotel: require_hotel,
+        require_local_conveyance: require_local_conveyance
+    }
+  end
 end

@@ -11,8 +11,18 @@
 #
 
 class TripPassenger < ApplicationRecord
+  include SoftDeletable
   include UUIDHelper
 
   belongs_to :trip
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name,
+        contact_number: contact_number,
+        email: email
+    }
+  end
 
 end

@@ -17,6 +17,7 @@
 #
 
 class TripLocalConveyanceRequest < ApplicationRecord
+  include SoftDeletable
   include UUIDHelper
 
   belongs_to :trip, optional: true
@@ -25,4 +26,15 @@ class TripLocalConveyanceRequest < ApplicationRecord
   belongs_to :traveller, class_name: 'User', optional: true
   belongs_to :company, optional: true
   belongs_to :budget, class_name: 'Amount', optional: true
+
+  def as_json(options={})
+    {
+        id: id,
+        pickup_location: pickup_location,
+        pickup_at: pickup_at,
+        drop_at: drop_at,
+        description: description,
+        budget: budget
+    }
+  end
 end

@@ -1,11 +1,8 @@
 class TripsController < BaseControllers::WebBase
-  layout :resolve_layout
+  layout 'trailblazers'
 
   def create
     endpoint Docs::Trips::Ops::Create
-    respond_to do |format|
-      format.json {}
-    end
   end
 
   def index
@@ -13,7 +10,7 @@ class TripsController < BaseControllers::WebBase
   end
 
   def show
-
+    endpoint Docs::Trips::Ops::Show
   end
 
 end

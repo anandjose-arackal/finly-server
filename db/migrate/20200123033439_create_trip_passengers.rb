@@ -6,6 +6,7 @@ class CreateTripPassengers < ActiveRecord::Migration[5.2]
       t.string :name
       t.string :contact_number
       t.string :email
+      t.datetime :deleted_at, index: true
 
       t.timestamps null: false
     end

@@ -3,7 +3,6 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
     create_table :trip_transport_requests do |t|
       t.uuid
       t.string :trip_id, index: true
-      t.string :trip_route_id, index: true
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
@@ -12,13 +11,13 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.string :preferred_timeframe
       t.integer :budget_id, references: "amounts", index: true, foreign_key: true
       t.text :description
+      t.datetime :deleted_at, index: true
 
       t.timestamps null: false
     end
     create_table :trip_hotel_requests do |t|
       t.uuid
       t.string :trip_id, index: true
-      t.string :trip_route_id, index: true
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
@@ -27,13 +26,13 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.datetime :checkout_at
       t.text :description
       t.integer :budget_id, references: "amounts", index: true, foreign_key: true
+      t.datetime :deleted_at, index: true
 
       t.timestamps null: false
     end
     create_table :trip_local_conveyance_requests do |t|
       t.uuid
       t.string :trip_id, index: true
-      t.string :trip_route_id, index: true
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
@@ -42,6 +41,7 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.datetime :drop_at
       t.text :description
       t.integer :budget_id, references: "amounts", index: true, foreign_key: true
+      t.datetime :deleted_at, index: true
 
       t.timestamps null: false
     end

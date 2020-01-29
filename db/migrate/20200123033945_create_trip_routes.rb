@@ -10,6 +10,7 @@ class CreateTripRoutes < ActiveRecord::Migration[5.2]
       t.boolean :require_transport, index: true, default: false
       t.boolean :require_hotel, index: true, default: false
       t.boolean :require_local_conveyance, index: true, default: false
+      t.datetime :deleted_at, index: true
 
       t.timestamps null: false
     end

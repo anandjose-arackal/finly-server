@@ -26,7 +26,6 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
   end
   collection :transport_requests, populate_if_empty: TripTransportRequest do
     property :uuid
-    property :trip_route
     property :mode
     property :depart_on
     property :preferred_timeframe
@@ -38,7 +37,6 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
   end
   collection :hotel_requests, populate_if_empty: TripHotelRequest do
     property :uuid
-    property :trip_route
     property :preferred_location
     property :checkin_at
     property :checkout_at
@@ -50,7 +48,6 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
   end
   collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest do
     property :uuid
-    property :trip_route
     property :pickup_location
     property :pickup_at
     property :drop_at
