@@ -1,5 +1,4 @@
-class Docs::UtilityBills::Bills::Ops::Update < Transactions
-  ::API
+class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
   step Model(BbpsBill, :find_by)
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :update?)
   # step :set_default_params
