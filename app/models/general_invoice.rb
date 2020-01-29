@@ -364,7 +364,8 @@ class GeneralInvoice < ApplicationRecord
       agreement_number: self.payment_agreement&.get_agreement_number,
       start_date: self.start_date,
       end_date: self.end_date,
-      allow_add_invoice: false
+      allow_add_invoice: allowed_to_add_invoice?,
+      invoice_created: agreement_invoice_created?
 
     }
   end
@@ -400,6 +401,16 @@ class GeneralInvoice < ApplicationRecord
     if self.available_invoice_amount&.value.present?
       precision_value(self.available_invoice_amount&.value)
     end
+  end
+
+  def allowed_to_add_invoice?
+    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date >= Date.today
+  end
+
+  def agreement_invoice_created?
+    user = RequestStore.store[:current_user]
+    agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
+    agreement_invoice.present?
   end
 
 end

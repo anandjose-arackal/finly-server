@@ -224,6 +224,10 @@ class RentalInvoice < ApplicationRecord
     where(end_date: end_date.to_date)
   }
 
+  scope :filter_upcoming_invoice_date, -> (from, to){
+    # binding.pry
+  }
+
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
   # Choose what columns to clone out of these template columns
@@ -325,7 +329,8 @@ class RentalInvoice < ApplicationRecord
       agreement_number: self.payment_agreement&.get_agreement_number,
       start_date: self.start_date,
       end_date: self.end_date,
-      allow_add_invoice: false
+      allow_add_invoice: allowed_to_add_invoice?,
+      invoice_created: agreement_invoice_created?
 
     }
   end
@@ -341,6 +346,16 @@ class RentalInvoice < ApplicationRecord
 
   def get_invoice_number
     self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
+  end
+
+  def allowed_to_add_invoice?
+    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date >= Date.today
+  end
+
+  def agreement_invoice_created?
+    user = RequestStore.store[:current_user]
+    agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
+    agreement_invoice.present?
   end
 
 
