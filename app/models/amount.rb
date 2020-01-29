@@ -326,7 +326,7 @@ class Amount < ApplicationRecord
   end
 
   def as_json(options = {})
-    {
+    data = {
         value: self.value,
         currency: {
             id: self.currency&.id,
@@ -335,6 +335,10 @@ class Amount < ApplicationRecord
             symbol: self.currency&.symbol
         }
     }
+
+    return data unless options[:rounded]
+    data[:value] = precision_value
+    data
   end
 
   def update_currencies(date)

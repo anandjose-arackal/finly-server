@@ -88,5 +88,4 @@
 class Olap::Facts::SpendTransactions::ExpenseReport < Olap::Facts::SpendTransaction
 
 
-
 end

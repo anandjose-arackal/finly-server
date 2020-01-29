@@ -27,7 +27,9 @@ class Olap::Dimensions::Company < OlapRecord
   map :name
   map :active
   map :base_currency_id
-  map :status do |input, record| record.status&.name end
+  map :status do |input, record|
+    record.status&.name
+  end
   map :test_account
   map :subdomain
   map :group_id

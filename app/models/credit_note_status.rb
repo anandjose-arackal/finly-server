@@ -21,7 +21,7 @@ class CreditNoteStatus < ApplicationRecord
   end
 
   def self.values
-    %w( draft retracted awaiting_approval rejected approved auto_approved partially_adjusted adjusted voided )
+    %w( draft retracted awaiting_approval rejected approved auto_approved partially_adjusted adjusted voided unadjusted )
   end
 
   def display_name
@@ -62,5 +62,9 @@ class CreditNoteStatus < ApplicationRecord
 
   def adjusted?
     self.id == CreditNoteStatus.id_for(:adjusted)
+  end
+
+  def unadjusted?
+    self.id == CreditNoteStatus.id_for(:unadjusted)
   end
 end

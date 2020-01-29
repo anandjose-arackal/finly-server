@@ -165,6 +165,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_transfer_mode
     # has_scope :filter_custom_text_selection, type: :array
     # has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_payment_status, type: :array # used for streamsets
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
 
 
     def init

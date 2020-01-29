@@ -23,11 +23,8 @@ class Procurements::Payments::Show < Procurements::Payments::Base
     end
   end
 
-
   def success
     params[:payment] = self.payment
     Procurements::Payments::Show::ShowPresenter.new(user, params, messages)
   end
-
-
 end

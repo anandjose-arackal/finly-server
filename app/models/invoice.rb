@@ -179,7 +179,7 @@ class Invoice < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
-  has_many :credit_note_adjustments
+  has_many :credit_note_adjustments, dependent: :destroy
 
 
   accepts_nested_attributes_for :address
@@ -347,7 +347,7 @@ class Invoice < ApplicationRecord
 
   #scope for exportar screen
   scope :filter_date, -> (from, to) {
-    from = Date.parse(from) rescue Date.parse('01-01-1990')  unless from.is_a?(Date)
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
     to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
     where('invoices.created_at >= ? && invoices.created_at <= ?', from.beginning_of_day, to.end_of_day)
   }
@@ -466,6 +466,11 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_with_credit_note, -> (enabled) {
+    if enabled
+      joins(:credit_note_adjustments).where("credit_note_adjustments.id IS NOT NULL")
+    end
+  }
 
   scope :filter_year, -> (year) {
     if year.blank?
@@ -486,6 +491,15 @@ class Invoice < ApplicationRecord
       self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
     end
   }
+
+  scope :filter_rcm_enabled, -> (enabled) {
+    where(rcm_enabled: true) if StringUtils.to_bool(enabled)
+  }
+
+  scope :rcm_enabled, -> (enabled) {
+    where(rcm_enabled: true) if StringUtils.to_bool(enabled)
+  }
+
 
   # Sorting
   scope :sort_invoice_id, -> (type){
@@ -508,6 +522,16 @@ class Invoice < ApplicationRecord
       reorder("invoices.due_date #{type}")
     end
   }
+
+  # used for streamsets 
+  scope :filter_invoice_status, -> (status) {
+    status = [status] unless status.is_a? Array
+    permitted_status = ['partially_paid', 'approved', 'auto_approved', 'initiated', 'unpaid']
+    status = permitted_status & status
+    status = permitted_status if status.blank?
+    where invoice_status_id: InwardInvoiceStatus.ids_for(status)
+  }
+
 
   after_create :set_defaults
   after_save :budget_trail_entry
@@ -748,20 +772,22 @@ class Invoice < ApplicationRecord
           custom_fields: self.custom_fields,
           category_id: self.category_id,
           category_name: self.category&.name,
+          rcm_enabled: self.rcm_enabled,
 
           available_credits: self.vendor.credit_notes.filter_adjustables.joins(:net_adjustable_amount).sum(:value),
 
+          credit_note_adjustments: self.credit_note_adjustments.as_json,
           cost_center_id: self.cost_center_id,
           cost_center_name: self.cost_center&.name,
-        cost_center_id: self.cost_center_id,
-        cost_center_name: self.cost_center&.name,
+          cost_center_id: self.cost_center_id,
+          cost_center_name: self.cost_center&.name,
 
-        tds_slab_id: self.tds_slab_id,
-        tds_slab_name: self.tds_slab&.name,
-        tds_rate: self.tds,
+          tds_slab_id: self.tds_slab_id,
+          tds_slab_name: self.tds_slab&.name,
+          tds_rate: self.tds,
 
-        # invoice amounts total
-        item_amounts_total: self.item_amounts_total,
+          # invoice amounts total
+          item_amounts_total: self.item_amounts_total,
 
           # paid amount for this invoice
           # paid_amount: self.payments.successful.joins(:amount).sum(:value),
@@ -936,6 +962,9 @@ class Invoice < ApplicationRecord
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    elsif [UserRole.id_for(:credit_note_initiator), UserRole.id_for(:credit_note_reviewer)].include?(role_id)
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
       user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
     end
@@ -1160,7 +1189,9 @@ class Invoice < ApplicationRecord
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
-        :bank_payment_request_auditor
+        :bank_payment_request_auditor,
+        :credit_note_initiator,
+        :credit_note_reviewer
     ]
   end
 
