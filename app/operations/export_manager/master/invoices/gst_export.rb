@@ -129,15 +129,15 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   # TODO ADD SGST state remove
   # TODO ADD SGST ACCOUNT NUMBER internal id DONE
 
-  def igst_account_number
+  def igst_account_number(invoice_line_item)
     invoice_line_item.tax_rate&.igst_internal_id
   end
 
-  def sgst_account_number
+  def sgst_account_number(invoice_line_item)
     invoice_line_item.tax_rate&.sgst_internal_id
   end
 
-  def cgst_account_number
+  def cgst_account_number(invoice_line_item)
     invoice_line_item.tax_rate&.cgst_internal_id
   end
 
@@ -147,15 +147,15 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
 
   # TODO REVERSE CHARGE
 
-  def reverse_charge
+  def reverse_charge(invoice_line_item)
     0
   end
 
-  def reverse_charge_tax_gl_account
+  def reverse_charge_tax_gl_account(invoice_line_item)
     "N"
   end
 
-  def calculate_tax_for_rct
+  def calculate_tax_for_rct(invoice_line_item)
     "N"
   end
 
@@ -166,7 +166,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   # TODO ADD ITEM SERIAL NUMBER
   # TODO ADD ITC QUALIFIED based on item gst DONE
 
-  def itc_qualified
+  def itc_qualified(invoice_line_item)
     invoice_line_item.parent.items.map {|i| i.tax_rate.present?}.compact.present?
   end
 

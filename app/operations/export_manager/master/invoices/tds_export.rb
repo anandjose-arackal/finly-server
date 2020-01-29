@@ -71,7 +71,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
 
   # TODO VENDOR LEGAL STATUS DONE
 
-  def legal_status
+  def legal_status(invoice)
     invoice.vendor_location&.gstin_master&.constitution_of_business
   end
 
@@ -89,7 +89,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
 
   # TODO PAYMENT DATE DONE
 
-  def payment_date
+  def payment_date(invoice)
     invoice.payments.order(created_at: :desc).first&.created_at&.strftime("%d-%b-%y")
   end
 
@@ -107,7 +107,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
 
   # TODO ADD TOTAL INVOICE AMOUNT amt + gst DONE
 
-  def total_invoice_amount
+  def total_invoice_amount(invoice)
     invoice.gross_amount&.value + invoice.tax_amount&.value
   end
 
