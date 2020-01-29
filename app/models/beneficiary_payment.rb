@@ -206,7 +206,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
-      tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
       # net_amount = gross_amount - tds_amount
       net_amount = self.original_amount.value - tds_amount - self.advance_amount&.value.to_f
     else # calculate proactively
@@ -219,7 +220,7 @@ class BeneficiaryPayment < ApplicationRecord
       new_gross_amount = TaxCalculationUtils.tds_amount(original_amount, tds)
       tds_amount = original_amount - new_gross_amount
       # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
-      tds_amount = precision_value tds_amount # round the tds to the nearest digit as of now.
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
 
       net_amount = original_amount + tax_amount - tds_amount - self.advance_amount&.value.to_f
     end
