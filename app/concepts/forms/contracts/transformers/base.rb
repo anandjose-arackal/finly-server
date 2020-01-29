@@ -1,5 +1,7 @@
 class Forms::Contracts::Transformers::Base
 
+  attr_accessor :name, :value
+
   def validates
     @validates ||= []
   end
@@ -9,7 +11,13 @@ class Forms::Contracts::Transformers::Base
   end
 
   def initialize(name, value)
-    raise "To be handled"
+    self.name = name
+    self.value = value
+    transform!
+  end
+
+  def transform!
+    raise "To be implemented"
   end
 
   def self.register(key)

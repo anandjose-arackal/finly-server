@@ -31,6 +31,7 @@ module Forms
       attribute :dependent, default: false
       attribute :conditional_required, default: false
       attribute :multiple, default: false
+      attribute :scope
 
       attribute :populate_if_empty
 
@@ -89,6 +90,8 @@ module Forms
 
       def contract_block
         return nil unless entities.present?
+
+        entities = self.entities
 
         lambda do |*args|
           entities.each do |entity|

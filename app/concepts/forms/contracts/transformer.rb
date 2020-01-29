@@ -3,8 +3,8 @@ class Forms::Contracts::Transformer
 
   def initialize(field_name, entity_options, property_options, block, collection: false)
     self.field_name = field_name
-    self.entity_options = entity_options
-    self.property_options = property_options
+    self.entity_options = entity_options || {}
+    self.property_options = property_options || {}
     self.block = block
     self.collection = collection
   end

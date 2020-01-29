@@ -2,7 +2,7 @@ class Forms::Contracts::Transformers::MaxValue < Forms::Contracts::Transformers:
 
   register :max_value
 
-  def initialize(name, value)
+  def transform!
     return unless value
 
     validates << [name, numericality: { less_than_or_equal_to: value}]

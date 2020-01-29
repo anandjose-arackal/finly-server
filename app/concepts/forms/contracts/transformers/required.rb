@@ -2,7 +2,7 @@ class Forms::Contracts::Transformers::Required < Forms::Contracts::Transformers:
 
   register :required
 
-  def initialize(name, value)
+  def transform!
     return unless value
 
     validates << [name, presence: true]

@@ -2,7 +2,7 @@ class Forms::Contracts::Transformers::Minimum < Forms::Contracts::Transformers::
 
   register :minimum
 
-  def initialize(name, value)
+  def transform!
     return unless value
 
     validates << [name, {length: {minimum: 1}}]
