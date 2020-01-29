@@ -260,7 +260,8 @@ class BbpsBill < ApplicationRecord
         customer_email: subscription.customer_email,
         customer_name: subscription.customer_name,
         customer_pan: subscription.customer_pan,
-        show_payment_details: false
+        show_payment_details: false,
+        attachments: attachments.as_json
     }
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)

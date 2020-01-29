@@ -170,7 +170,8 @@ class BbpsBillerSubscription < ApplicationRecord
         customer_email: customer_email,
         customer_name: customer_name,
         last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
-        customer_pan: customer_pan
+        customer_pan: customer_pan,
+        attachments: attachments.as_json
     }
   end
 
