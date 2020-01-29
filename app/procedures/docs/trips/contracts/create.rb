@@ -77,19 +77,19 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
       if (invalid_requests = transport_requests - verified_requests).present?
         invalid_requests.each do |request|
-          errors.add :base, "Transport Request from #{request.from_location} to #{request.to_location} is not valid"
+          errors.add :base, "Transport Request from #{request.from_location} to #{request.to_location} on #{request.depart_on} is not valid"
         end
       end
 
       if (invalid_requests = hotel_requests - verified_requests).present?
         invalid_requests.each do |request|
-          errors.add :base, "Hotel Request in #{request.location} is not valid"
+          errors.add :base, "Hotel Request in #{request.location} on #{request.checkin_at} is not valid"
         end
       end
 
       if (invalid_requests = local_conveyance_requests - verified_requests).present?
         invalid_requests.each do |request|
-          errors.add :base, "Local Conveyance Request in #{request.location} is not valid"
+          errors.add :base, "Local Conveyance Request in #{request.location} on #{request.pickup_at} is not valid"
         end
       end
     end
