@@ -134,6 +134,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
   end
 
   def create_bank_payment_request
+    initiating_account = retrieve_initiating_account(user.company)
     payment_params = {
         payment_type_id: PaymentType.id_for(:credit),
         application: "vp",
@@ -141,8 +142,8 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
         receiving_user_id: self.bank_account.account_owner_id,
         initiating_user_type: "User",
         initiating_user_id: user.id,
-        initiating_account_type: YesBankCompanyAccount.name,
-        initiating_account_id: user.company.yes_bank_company_account.id,
+        initiating_account_type: initiating_account.class.name,
+        initiating_account_id: initiating_account.id,
         receiving_account_type: "BankAccount",
         receiving_account_id: self.bank_account.id,
         payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -168,7 +169,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
           currency_id: 1
       },
         payment_mode: params[:mode],
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account.class.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
@@ -199,6 +200,20 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       return
     end
     self.payment_order = self.bank_payment_request.payment_order
+  end
+
+  def retrieve_initiating_account(company)
+    case company&.feature_subscription&.bank_service_provider
+    when "YES"
+      initiating_account = user.company.yes_bank_company_account
+    when "ICICI"
+      initiating_account = user.company.icici_bank_company_account
+    when "KOTAK"
+      initiating_account = user.company.kotak_bank_company_account
+    else
+      initiating_account = user.company.yes_bank_company_account
+    end
+    initiating_account
   end
 
 end
