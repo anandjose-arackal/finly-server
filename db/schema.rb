@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_17_090309) do
+ActiveRecord::Schema.define(version: 2020_01_28_081247) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -774,6 +774,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.integer "category_id"
     t.string "hsn_sac"
     t.string "quick_pay", default: "N"
+    t.datetime "last_paid_at"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -867,6 +868,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.string "order_number_type"
     t.integer "tax_rate_id"
     t.string "hsn_sac"
+    t.datetime "paid_at"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -3939,10 +3941,6 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
   end
 
   create_table "individual_kycs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "id_proof_file_name"
-    t.string "id_proof_content_type"
-    t.integer "id_proof_file_size"
-    t.datetime "id_proof_updated_at"
     t.integer "kyc_status_id"
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
@@ -4016,6 +4014,15 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.datetime "kyc_2_back_updated_at"
     t.string "kyc_1_number"
     t.string "kyc_2_number"
+    t.boolean "initiated"
+    t.string "id_proof_front_file_name"
+    t.string "id_proof_front_content_type"
+    t.bigint "id_proof_front_file_size"
+    t.datetime "id_proof_front_updated_at"
+    t.string "id_proof_back_file_name"
+    t.string "id_proof_back_content_type"
+    t.bigint "id_proof_back_file_size"
+    t.datetime "id_proof_back_updated_at"
     t.index ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id"
     t.index ["company_id"], name: "index_individual_kycs_on_company_id"
     t.index ["kyc_status_id"], name: "index_individual_kycs_on_kyc_status_id"
@@ -6301,6 +6308,13 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.index ["user_id"], name: "index_receipt_email_parse_failures_on_user_id"
   end
 
+  create_table "receipt_email_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_receipt_email_statuses_on_name"
+  end
+
   create_table "receipt_emails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.text "subject"
     t.datetime "sent_at"
@@ -6331,7 +6345,9 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.string "original_source_content_type"
     t.integer "original_source_file_size"
     t.datetime "original_source_updated_at"
+    t.bigint "receipt_email_status_id"
     t.index ["expense_id"], name: "index_receipt_emails_on_expense_id"
+    t.index ["receipt_email_status_id"], name: "index_receipt_emails_on_receipt_email_status_id"
     t.index ["user_id"], name: "index_receipt_emails_on_user_id"
   end
 
@@ -6357,6 +6373,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
     t.datetime "deleted_at"
     t.index ["created_at"], name: "index_receipts_on_created_at"
     t.index ["created_by_id"], name: "index_receipts_on_created_by_id"
+    t.index ["id", "user_id", "parent_id", "parent_type", "to_be_transcribed"], name: "index_receipts_id_user_parent_parent_id"
     t.index ["modified_by_id"], name: "index_receipts_on_modified_by_id"
     t.index ["parent_id"], name: "index_receipts_on_parent_id"
     t.index ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id"
@@ -8681,6 +8698,7 @@ ActiveRecord::Schema.define(version: 2020_01_17_090309) do
   add_foreign_key "quickbooks_payment_types", "companies"
   add_foreign_key "receipt_email_parse_failures", "users"
   add_foreign_key "receipt_emails", "expenses"
+  add_foreign_key "receipt_emails", "receipt_email_statuses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
   add_foreign_key "report_comments", "expenses"
