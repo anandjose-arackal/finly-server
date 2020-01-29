@@ -7,13 +7,15 @@ class Transactions::Contract < Reform::Form
   end
 
   def self.property(name, options = {}, &block)
-    Transactions::Contracts::Sanitizer.sanitize(self, :property, name, options, block)
-    super(name, options, &block)
+    args = {contract: self, type: :property, name: name, options: options, block: block}
+    Transactions::Contracts::PreProcessor.execute(args)
+    super(args[:name], args[:options], &args[:block])
   end
 
   def self.collection(name, options = {}, &block)
-    Transactions::Contracts::Sanitizer.sanitize(self, :collection, name, options, block)
-    super(name, options, &block)
+    args = {contract: self, type: :property, name: name, options: options, block: block}
+    Transactions::Contracts::PreProcessor.execute(args)
+    super(args[:name], args[:options], &args[:block])
   end
 
 end

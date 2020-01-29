@@ -1,9 +1,9 @@
-class Transactions::Contracts::Sanitizers::SkipDestroy < Transactions::Contracts::Sanitizers::Base
+class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contracts::PreProcessors::Base
 
   register!
 
-  def self.run(contract, type, name, options, block)
-    return unless (model = options[:populate_if_empty]).present?
+  def run!
+    return false unless (model = options[:populate_if_empty]).present?
 
     if model and not StringUtils.to_bool(options[:skip_destroy])
       options[:populator] = -> (collection:, fragment:, index:, options:, **) do
@@ -17,6 +17,7 @@ class Transactions::Contracts::Sanitizers::SkipDestroy < Transactions::Contracts
         item ? item : collection.append(model.new)
       end
     end
+    true
   end
 
 end

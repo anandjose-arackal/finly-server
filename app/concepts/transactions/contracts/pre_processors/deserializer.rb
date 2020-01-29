@@ -1,16 +1,17 @@
-class Transactions::Contracts::Sanitizers::Deserializer < Transactions::Contracts::Sanitizers::Base
+class Transactions::Contracts::PreProcessors::Deserializer < Transactions::Contracts::PreProcessors::Base
 
   register!
 
-  def self.run(contract, type,name, options, block)
-    return unless options[:deserializer].present?
+  def run!
+    return false unless options[:deserializer].present?
 
     unless options[:deserializer].is_a?(Hash) and options[:deserializer][:parse_pipeline].present?
-      options[:deserializer] = deserialize(contract, options[:deserializer])
+      options[:deserializer] = deserialize(args[:contract], options[:deserializer])
     end
+    true
   end
 
-  def self.deserialize(contract, deserializer)
+  def deserialize(contract, deserializer)
     klass = contract
     {
         parse_pipeline: ->(*) {
