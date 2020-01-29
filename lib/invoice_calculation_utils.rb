@@ -294,7 +294,8 @@ class InvoiceCalculationUtils
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.tds_applicable_amount, tds)
     self.tds_amount = (self.tds_applicable_amount - new_gross_amount) rescue 0
-    self.tds_amount = self.tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+    # self.tds_amount = self.tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+    self.tds_amount = precision_value self.tds_amount # round the tds to the nearest digit as of now.
   end
 
   def calculate_advance_paid
