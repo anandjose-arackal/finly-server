@@ -3,7 +3,7 @@ class Docs::Trips::Form < Forms::API
   model Trip
 
   section :header do
-    auto_number :trip_id, prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"
+    auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: "000001"}
     reference :created_by, required: true, visible: false, can_visible_be_changed: false, class_name: 'User'
     # dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
     # dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
