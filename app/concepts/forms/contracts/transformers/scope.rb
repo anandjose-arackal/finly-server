@@ -46,7 +46,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
       assigned_value = self.send(name)
       route = value[:auto_complete_route]
       resolver = AutoComplete::Router.resolve(route)&.first&.klass
-      result = resolver.(params: {q: {id_eq: assigned_value}}, current_user: RequestStoreUtil.current_user)
+      result = resolver.(params: {q: {id_eq: assigned_value}}, current_user: user_scope)
       unless result.success? and result["model.records"].present?
         errors.add :base, "#{name.to_s.humanize} : invalid option selected"
       end
@@ -59,7 +59,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
     validate << -> do
       assigned_value = self.send(name)
       resolver = value[:resolver]
-      result = resolver.(params: {q: {id_eq: assigned_value}}, current_user: RequestStoreUtil.current_user)
+      result = resolver.(params: {q: {id_eq: assigned_value}}, current_user: user_scope)
       unless result.success? and result["model.records"].present?
         errors.add :base, "#{name.to_s.humanize} : invalid option selected"
       end

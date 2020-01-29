@@ -1,6 +1,7 @@
 class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   form Docs::Trips::Form
+
   property :company_id, validates: {presence: true}
   property :created_by_id, validates: {presence: true}
   property :status_id, deserializer: -> (input, represented, **) { represented.status_id = TripStatus.id_for(:draft) }
@@ -66,6 +67,10 @@ class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   functions do
     validate :route_to_request_validation
+
+    def user_scope
+      User.find_by(id: created_by_id)
+    end
 
     def route_to_request_validation
       verified_requests = []
