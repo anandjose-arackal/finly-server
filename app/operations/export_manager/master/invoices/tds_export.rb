@@ -14,6 +14,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   attribute :created_by
   attribute :gl_code
   attribute :tds_payable
+  attribute :tds_amount
   attribute :legal_status
   attribute :pan
   attribute :vendor_id
@@ -67,6 +68,10 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
 
   def tds_payable(invoice)
     invoice.tds
+  end
+
+  def tds_amount(invoice)
+    invoice.tds_amount&.value
   end
 
   # TODO VENDOR LEGAL STATUS DONE
