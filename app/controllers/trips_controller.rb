@@ -13,4 +13,20 @@ class TripsController < BaseControllers::WebBase
     endpoint Docs::Trips::Ops::Show
   end
 
+  def show_header
+    endpoint Docs::Trips::Ops::Show
+  end
+
+  def show_passengers
+    endpoint Docs::Trips::Ops::Show
+  end
+
+  def show_routes
+    endpoint Docs::Trips::Ops::Show
+  end
+
+  def show_booking_requests
+    endpoint Docs::Trips::Ops::Show
+  end
+
 end

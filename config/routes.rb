@@ -4824,6 +4824,10 @@ Rails.application.routes.draw do
   ######################### TRAVEL REQUESTS API START ##########################
 
   # get 'trips', to: 'trips#index'
+  get 'trips/:id/header', to: 'trips#show_header'
+  get 'trips/:id/passengers', to: 'trips#show_passengers'
+  get 'trips/:id/routes', to: 'trips#show_routes'
+  get 'trips/:id/booking_requests', to: 'trips#show_booking_requests'
   resources :trips
 
   get 'travel_requests/count', to: 'travel_requests#count'
@@ -5619,7 +5623,6 @@ Rails.application.routes.draw do
 
     resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
-
 
 
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'

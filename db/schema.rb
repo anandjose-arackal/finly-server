@@ -2388,6 +2388,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.datetime "approved_at"
     t.string "credit_note_number"
     t.string "uuid", limit: 36
+    t.datetime "last_adjusted_at"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -4184,10 +4185,6 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
   end
 
   create_table "individual_kycs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "id_proof_file_name"
-    t.string "id_proof_content_type"
-    t.integer "id_proof_file_size"
-    t.datetime "id_proof_updated_at"
     t.integer "kyc_status_id"
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
@@ -4262,6 +4259,15 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.string "kyc_1_number"
     t.string "kyc_2_number"
     t.string "uuid", limit: 36
+    t.boolean "initiated"
+    t.string "id_proof_front_file_name"
+    t.string "id_proof_front_content_type"
+    t.bigint "id_proof_front_file_size"
+    t.datetime "id_proof_front_updated_at"
+    t.string "id_proof_back_file_name"
+    t.string "id_proof_back_content_type"
+    t.bigint "id_proof_back_file_size"
+    t.datetime "id_proof_back_updated_at"
     t.index ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id"
     t.index ["company_id"], name: "index_individual_kycs_on_company_id"
     t.index ["kyc_status_id"], name: "index_individual_kycs_on_kyc_status_id"
