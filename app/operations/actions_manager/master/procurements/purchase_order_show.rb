@@ -231,7 +231,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def create_items
-    user.permission.crud_inventory_item_po
+    user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
   end
 
   def unapprove

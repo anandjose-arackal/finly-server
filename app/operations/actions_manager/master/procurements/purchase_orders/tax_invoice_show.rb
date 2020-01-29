@@ -190,7 +190,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def create_items
-    user.permission.crud_inventory_item_non_po
+    user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
   end
 
 end
