@@ -30,6 +30,8 @@ class TripTransportRequest < ApplicationRecord
   def as_json(options={})
     {
         id: id,
+        from_location: from_location,
+        to_location: to_location,
         model: mode,
         depart_on: depart_on,
         preferred_timeframe: preferred_timeframe,

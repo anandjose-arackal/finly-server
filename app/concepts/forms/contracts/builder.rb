@@ -7,18 +7,6 @@ class Forms::Contracts::Builder
     @properties ||= []
   end
 
-  def self.validations
-    @validations ||= {validates: [], validate: []}
-  end
-
-  def self.validates(name, validation)
-    validations[:validates] << [name, validation]
-  end
-
-  def self.validate(validation)
-    validations[:validates] << validation
-  end
-
   def self.property(name, options = {}, &block)
     properties << Forms::Contracts::Property.new(name, options, block, collection: false)
   end
@@ -27,21 +15,21 @@ class Forms::Contracts::Builder
     properties << Forms::Contracts::Property.new(name, options, block, collection: true)
   end
 
+  def self.functions(&block)
+    @functions = block if block_given?
+    @functions
+  end
+
   def self.build(user)
     form = self.form
     properties = self.properties
-    validations = self.validations
+    functions = self.functions
     klass = Class.new(Transactions::Contract) do
       properties.each do |prop|
         instance_eval &prop.build(form)
       end
-      validations[:validates].each do |validation|
-        validates *validation
-      end
 
-      validations[:validate].each do |validation|
-        validate validation
-      end
+      class_eval &functions if functions.present?
     end
     klass.send :model, form.model if form.model
     klass

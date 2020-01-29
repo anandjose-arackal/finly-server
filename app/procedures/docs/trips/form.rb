@@ -28,6 +28,8 @@ class Docs::Trips::Form < Forms::API
     collection :routes, minimum: 1 do
       text :from_location, required: true
       text :to_location, required: true
+      date :depart_on, required: true
+      date :return_on
       boolean :require_transport, default_value: false
       boolean :require_hotel, default_value: false
       boolean :require_local_conveyance, default_value: false
@@ -36,6 +38,8 @@ class Docs::Trips::Form < Forms::API
 
   section :transport_requests do
     collection :transport_requests do
+      text :from_location, required: true
+      text :to_location, required: true
       dropdown :mode, scope: Forms::Entity::Scope::List({value: "Flight"}), required: true
       datetime :depart_on, required: true
       dropdown :preferred_timeframe, required: true, scope: Forms::Entity::Scope::List(
@@ -50,7 +54,8 @@ class Docs::Trips::Form < Forms::API
 
   section :hotel_requests do
     collection :hotel_requests do
-      text :preferred_location, required: true
+      text :location, required: true
+      text :preferred_area, required: true
       datetime :checkin_at, required: true
       datetime :checkout_at, required: true
       amount :budget, required: true
@@ -60,7 +65,8 @@ class Docs::Trips::Form < Forms::API
 
   section :local_conveyance_requests do
     collection :local_conveyance_requests do
-      text :pickup_location, required: true
+      text :location, required: true
+      text :pickup_area, required: true
       datetime :pickup_at, required: true
       datetime :drop_at, required: true
       amount :budget, required: true

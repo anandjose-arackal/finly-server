@@ -30,7 +30,8 @@ class TripHotelRequest < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        preferred_location: preferred_location,
+        location: location,
+        preferred_area: preferred_area,
         checkin_at: checkin_at,
         checkout_at: checkout_at,
         description: description,

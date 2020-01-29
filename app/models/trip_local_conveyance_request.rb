@@ -30,7 +30,8 @@ class TripLocalConveyanceRequest < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        pickup_location: pickup_location,
+        location: location,
+        pickup_area: pickup_area,
         pickup_at: pickup_at,
         drop_at: drop_at,
         description: description,

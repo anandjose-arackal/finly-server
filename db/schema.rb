@@ -7785,46 +7785,48 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
   create_table "trip_hotel_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "trip_id"
-    t.string "trip_route_id"
     t.integer "created_by_id"
     t.integer "traveller_id"
     t.bigint "company_id"
-    t.string "preferred_location"
+    t.string "location"
+    t.string "preferred_area"
     t.datetime "checkin_at"
     t.datetime "checkout_at"
     t.text "description"
     t.integer "budget_id"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_hotel_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_hotel_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_hotel_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_hotel_requests_on_deleted_at"
     t.index ["traveller_id"], name: "index_trip_hotel_requests_on_traveller_id"
     t.index ["trip_id"], name: "index_trip_hotel_requests_on_trip_id"
-    t.index ["trip_route_id"], name: "index_trip_hotel_requests_on_trip_route_id"
     t.index ["uuid"], name: "index_trip_hotel_requests_on_uuid"
   end
 
   create_table "trip_local_conveyance_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "trip_id"
-    t.string "trip_route_id"
     t.integer "created_by_id"
     t.integer "traveller_id"
     t.bigint "company_id"
-    t.string "pickup_location"
+    t.string "location"
+    t.string "pickup_area"
     t.datetime "pickup_at"
     t.datetime "drop_at"
     t.text "description"
     t.integer "budget_id"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_local_conveyance_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_local_conveyance_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_local_conveyance_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_local_conveyance_requests_on_deleted_at"
     t.index ["traveller_id"], name: "index_trip_local_conveyance_requests_on_traveller_id"
     t.index ["trip_id"], name: "index_trip_local_conveyance_requests_on_trip_id"
-    t.index ["trip_route_id"], name: "index_trip_local_conveyance_requests_on_trip_route_id"
     t.index ["uuid"], name: "index_trip_local_conveyance_requests_on_uuid"
   end
 
@@ -7834,8 +7836,10 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.string "name"
     t.string "contact_number"
     t.string "email"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_passengers_on_deleted_at"
     t.index ["trip_id"], name: "index_trip_passengers_on_trip_id"
     t.index ["uuid"], name: "index_trip_passengers_on_uuid"
   end
@@ -7850,8 +7854,10 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.boolean "require_transport", default: false
     t.boolean "require_hotel", default: false
     t.boolean "require_local_conveyance", default: false
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_routes_on_deleted_at"
     t.index ["depart_on"], name: "index_trip_routes_on_depart_on"
     t.index ["from_location"], name: "index_trip_routes_on_from_location"
     t.index ["require_hotel"], name: "index_trip_routes_on_require_hotel"
@@ -7871,32 +7877,38 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
   create_table "trip_transport_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "uuid", limit: 36, null: false
     t.string "trip_id"
-    t.string "trip_route_id"
     t.integer "created_by_id"
     t.integer "traveller_id"
     t.bigint "company_id"
+    t.string "from_location"
+    t.string "to_location"
     t.string "mode"
     t.date "depart_on"
     t.string "preferred_timeframe"
     t.integer "budget_id"
     t.text "description"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["budget_id"], name: "index_trip_transport_requests_on_budget_id"
     t.index ["company_id"], name: "index_trip_transport_requests_on_company_id"
     t.index ["created_by_id"], name: "index_trip_transport_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_transport_requests_on_deleted_at"
     t.index ["depart_on"], name: "index_trip_transport_requests_on_depart_on"
+    t.index ["from_location"], name: "index_trip_transport_requests_on_from_location"
     t.index ["mode"], name: "index_trip_transport_requests_on_mode"
+    t.index ["to_location"], name: "index_trip_transport_requests_on_to_location"
     t.index ["traveller_id"], name: "index_trip_transport_requests_on_traveller_id"
     t.index ["trip_id"], name: "index_trip_transport_requests_on_trip_id"
-    t.index ["trip_route_id"], name: "index_trip_transport_requests_on_trip_route_id"
     t.index ["uuid"], name: "index_trip_transport_requests_on_uuid"
   end
 
   create_table "trip_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_types_on_deleted_at"
     t.index ["name"], name: "index_trip_types_on_name"
   end
 
@@ -7915,6 +7927,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.integer "advance_requested_id"
     t.integer "advance_processed_id"
     t.integer "expenses_total_id"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "trip_type_id"
@@ -7923,6 +7936,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_052111) do
     t.index ["booking_cost_id"], name: "index_trips_on_booking_cost_id"
     t.index ["company_id"], name: "index_trips_on_company_id"
     t.index ["created_by_id"], name: "index_trips_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trips_on_deleted_at"
     t.index ["end_date"], name: "index_trips_on_end_date"
     t.index ["estimated_booking_cost_id"], name: "index_trips_on_estimated_booking_cost_id"
     t.index ["expenses_total_id"], name: "index_trips_on_expenses_total_id"

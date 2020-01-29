@@ -6,6 +6,8 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
+      t.string :from_location, index: true
+      t.string :to_location, index: true
       t.string :mode, index: true
       t.date :depart_on, index: true
       t.string :preferred_timeframe
@@ -21,7 +23,8 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
-      t.string :preferred_location
+      t.string :location
+      t.string :preferred_area
       t.datetime :checkin_at
       t.datetime :checkout_at
       t.text :description
@@ -36,7 +39,8 @@ class CreateTripTransportRequests < ActiveRecord::Migration[5.2]
       t.integer :created_by_id, references: "users", index: true, foreign_key: true
       t.integer :traveller_id, references: "users", index: true, foreign_key: true
       t.references :company, index: true
-      t.string :pickup_location
+      t.string :location
+      t.string :pickup_area
       t.datetime :pickup_at
       t.datetime :drop_at
       t.text :description
