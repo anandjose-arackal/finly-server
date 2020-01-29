@@ -8,25 +8,26 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   system :vp
   validate :fetch_invoices
 
-  attribute :invoice_id
+  attribute :invoice_number
+  attribute :finly_ref_no
+  attribute :invoice_date
   attribute :invoice_status
   attribute :invoice_type
   attribute :created_by
-  attribute :gl_code
-  attribute :tds_payable
-  attribute :tds_amount
+  attribute :tds_gl_code
   attribute :legal_status
   attribute :pan
   attribute :vendor_id
   attribute :vendor_name
   # attribute :payment_date
-  attribute :amount_paid
+  attribute :total_invoice_amount
+  attribute :invoice_base_amount
+  attribute :tds_name
+  attribute :tds_payable
+  attribute :tds_amount
   attribute :cgst_sgst_amount
   attribute :igst_amount
-  # attribute :total_invoice_amount
-  attribute :invoice_number
-  attribute :invoice_date
-  attribute :invoice_base_amount
+  attribute :amount_paid
 
   def fetch_invoices
     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
@@ -45,7 +46,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid])).left_joins(:payments)
   end
 
-  def invoice_id(invoice)
+  def finly_ref_no(invoice)
     invoice.invoice_id
   end
 
@@ -68,10 +69,6 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
 
   def tds_payable(invoice)
     invoice.tds
-  end
-
-  def tds_amount(invoice)
-    invoice.tds_amount&.value
   end
 
   # TODO VENDOR LEGAL STATUS DONE
