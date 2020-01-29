@@ -23,9 +23,9 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   attribute :item_igst_amount
   attribute :item_cgst_amount
   attribute :item_sgst_amount
-  attribute :item_igst_rate
-  attribute :item_cgst_rate
-  attribute :item_sgst_rate
+  attribute :item_igst
+  attribute :item_cgst
+  attribute :item_sgst
   attribute :igst_account_number
   attribute :cgst_account_number
   attribute :sgst_account_number
@@ -119,16 +119,16 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
     invoice_line_item.igst || 0
   end
 
-  def item_igst_rate(invoice_line_item)
-    invoice_line_item&.tax if invoice_line_item.parent&.gst_type_id == GstType.id_for(:igst)
+  def item_igst(invoice_line_item)
+    invoice_line_item&.tax.to_f if invoice_line_item.parent&.gst_type_id == GstType.id_for(:igst)
   end
 
-  def item_cgst_rate(invoice_line_item)
-    invoice_line_item&.tax / 2.0 if invoice_line_item.parent&.gst_type_id == GstType.id_for(:cgst_sgst)
+  def item_cgst(invoice_line_item)
+    (invoice_line_item&.tax.to_f / 2.0) if invoice_line_item.parent&.gst_type_id == GstType.id_for(:cgst_sgst)
   end
 
-  def item_sgst_rate(invoice_line_item)
-      invoice_line_item&.tax / 2.0 if invoice_line_item.parent&.gst_type_id == GstType.id_for(:cgst_sgst)
+  def item_sgst(invoice_line_item)
+    (invoice_line_item&.tax.to_f / 2.0) if invoice_line_item.parent&.gst_type_id == GstType.id_for(:cgst_sgst)
   end
 
   # TODO ADD SGST state remove
