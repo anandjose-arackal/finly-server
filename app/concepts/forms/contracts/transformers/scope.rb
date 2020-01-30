@@ -22,7 +22,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
     enum_klass = value[:enum]
     validate << -> do
       assigned_value = self.send(name)
-      unless enum_klass.find_by(id: assigned_value).present?
+      unless Object.const_get(enum_klass).find_by(id: assigned_value).present?
         errors.add :base, "#{name.to_s.humanize} : invalid option selected"
       end
     end
@@ -30,7 +30,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
 
   def validate_choices
     name = self.name
-    value = self.value[:choices]
+    value = entity.choices #self.value[:choices]
     validate << -> do
       assigned_value = self.send(name)
       unless (value.select {|choice| choice[:value] == assigned_value}).present?
@@ -58,7 +58,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
     value = self.value
     validate << -> do
       assigned_value = self.send(name)
-      resolver = value[:resolver]
+      resolver = Object.const_get(value[:resolver])
       result = resolver.(params: {q: {id_eq: assigned_value}}, current_user: user_scope)
       unless result.success? and result["model.records"].present?
         errors.add :base, "#{name.to_s.humanize} : invalid option selected"

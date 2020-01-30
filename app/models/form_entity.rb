@@ -59,17 +59,23 @@ class FormEntity < ApplicationRecord
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
 
+  accepts_nested_attributes_for :choices
+
   serialize :options, JSON
   serialize :chained, JSON
   serialize :scope, JSON
 
-  scope :root, -> {where parent_id: nil}
+  scope :root, -> { where parent_id: nil }
 
   def populate_if_empty
     val = super()
     return nil unless val
 
     Object.const_get(val)
+  end
+
+  def scope
+    super()&.with_indifferent_access
   end
 
   def schema
@@ -115,8 +121,8 @@ class FormEntity < ApplicationRecord
     property_options = {
         populate_if_empty: populate_if_empty
     }
-    property_options.reject! {|k, v| v.nil?}
-    builder_args = [field_key, schema, property_options, contract_block, collection: is_collection]
+    property_options.reject! { |k, v| v.nil? }
+    builder_args = [field_key, self, schema, property_options, contract_block, collection: is_collection]
     transformer = Forms::Contracts::Transformer.new(*builder_args)
     transformer.generate
   end

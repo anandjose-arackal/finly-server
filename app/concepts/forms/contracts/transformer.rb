@@ -1,7 +1,8 @@
 class Forms::Contracts::Transformer
-  attr_accessor :field_name, :entity_options, :property_options, :block, :collection
+  attr_accessor :field_name, :entity_options, :property_options, :block, :collection, :entity
 
-  def initialize(field_name, entity_options, property_options, block, collection: false)
+  def initialize(entity, field_name, entity_options, property_options, block, collection: false)
+    self.entity = entity
     self.field_name = field_name
     self.entity_options = entity_options || {}
     self.property_options = property_options || {}
@@ -12,7 +13,7 @@ class Forms::Contracts::Transformer
   def contract_validations
     validations = {validates: [], validate: []}
     entity_options.each do |option, value|
-      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(field_name, value)
+      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(entity, field_name, value)
       next unless transformer
 
       validations[:validates] += transformer.validates
@@ -20,7 +21,7 @@ class Forms::Contracts::Transformer
     end
 
     entity_options[:options]&.each do |option, value|
-      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(field_name, value)
+      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(entity,field_name, value)
       next unless transformer
 
       validations[:validates] += transformer.validates

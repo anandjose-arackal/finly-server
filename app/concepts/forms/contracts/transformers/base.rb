@@ -1,6 +1,6 @@
 class Forms::Contracts::Transformers::Base
 
-  attr_accessor :name, :value
+  attr_accessor :name, :value, :entity
 
   def validates
     @validates ||= []
@@ -10,7 +10,8 @@ class Forms::Contracts::Transformers::Base
     @validate ||= []
   end
 
-  def initialize(name, value)
+  def initialize(entity, name, value)
+    self.entity = entity
     self.name = name
     self.value = value
     transform!

@@ -34,7 +34,7 @@ class Forms::Contracts::Property
     else
       entity_options = self.options[:form] || {}
     end
-    transformer = Forms::Contracts::Transformer.new(name, entity_options, self.options.except(:form), contract_block(form, entities_map), collection: is_collection)
+    transformer = Forms::Contracts::Transformer.new(entity, name, entity_options, self.options.except(:form), contract_block(form, entities_map), collection: is_collection)
     transformer.generate
   end
 

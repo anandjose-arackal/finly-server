@@ -33,16 +33,20 @@ class Forms::Synchronizer
     unless entity_model.present?
       entity_model = section_model.entities.new entity.schema.except(:section, :choices)
       entity_model.parent = parent
-      if entity.schema[:choices]
-        choices = entity.schema[:choices].map do |choice|
-          choice.merge!(
+      if entity.schema&.dig(:scope, :choices)
+        pos = 0
+        choices = []
+        entity.schema&.dig(:scope, :choices).each do |choice|
+          choices << choice.merge!(
               {
                   company: company,
                   form: form_model,
                   form_section: section_model,
-                  form_entity: entity_model
+                  form_entity: entity_model,
+                  position: pos
               }
           )
+          pos += 1
         end
         entity_model.assign_attributes(choices_attributes: choices)
       end
