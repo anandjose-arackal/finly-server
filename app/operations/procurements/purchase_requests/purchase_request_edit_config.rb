@@ -27,7 +27,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
       # self.cost_centers = user.company.cost_centers.where(application: "vp") rescue CostCenter.none
       # Temp removing app scope it for swiggy 
-      self.cost_centers = user.company.cost_centers rescue CostCenter.none
+      self.cost_centers = user.company.cost_centers.non_deleted rescue CostCenter.none
       self.reviewal_chains = []
       self.department_mappings = []
       params[:reviewal_document] = purchase_request
