@@ -43,9 +43,9 @@ class Company::Departments::Index < Company::Departments::Base
         # User has any role in policy
         department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(self.current_application).exclude_deleted.pluck('policy_department_mappings.department_id')
       end
-      department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
+      department_parent_id = [user.company.departments.non_deleted.where(id: department_ids)&.last&.parent&.id] rescue []
       # To be shown on filter page
-      self.policy_department_filter_mapping = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
+      self.policy_department_filter_mapping = user.company.departments.non_deleted.where(id: department_ids + department_parent_id) unless department_ids.blank?
     end
 
   end
