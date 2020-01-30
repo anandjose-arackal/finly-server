@@ -3,6 +3,7 @@ json.editable kyc.editable?
 json.status do
   json.id kyc.kyc_status.id
   json.name kyc.kyc_status.name.humanize
+  json.initiated kyc.initiated
 end
 json.id_proof do
   json.file_type kyc.file_format(kyc.id_proof)

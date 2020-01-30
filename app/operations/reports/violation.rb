@@ -71,37 +71,25 @@ class Reports::Violation < Reports::Base
 
     expense_rules = policy.expense_rules.non_deleted.includes(:greater_than_amount,:category)
     budget_rules = policy.budget_rules.non_deleted.includes(:amount,:without_receipt_amount, :period, :budget_rule_category_mappings)
-
     selected_drop_down_items = nil
 
     # For performance optimization, filtering down budget rules based on selected report custom fields
     # For performance optimization, filtering down budget rules based on selected report custom fields
 
     expenses_selected_drop_down_items = []
+    report_value_ids = report.custom_fields.only_drop_downs.pluck(:value_id)
+    report_selected_drop_down_items = FieldDropDownSelection.with_id(report_value_ids).pluck(:value_id)
     report.expenses.each do |expense|
       value_ids = expense.custom_fields.only_drop_downs.pluck(:value_id)
       expenses_selected_drop_down_items << FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
     end
     expenses_selected_drop_down_items = expenses_selected_drop_down_items&.flatten&.uniq
+    expenses_selected_drop_down_items += report_selected_drop_down_items unless report_selected_drop_down_items.blank?
     rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
     rule_ids = budget_rules.pluck(:id)
     budgets_without_field_mappings = rule_ids - rule_field_mappings.pluck(:budget_rule_id)
     rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: expenses_selected_drop_down_items).pluck(:budget_rule_id)
     budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
-    # relevant_budget_rule_id = budget_rules
-
-    if report.custom_fields.only_drop_downs.present?
-      value_ids = report.custom_fields.only_drop_downs.pluck(:value_id)
-      selected_drop_down_items = FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
-      selected_drop_down_items = selected_drop_down_items&.flatten
-
-      rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
-      rule_ids = budget_rules.pluck(:id)
-      budgets_without_field_mappings = rule_ids - rule_field_mappings.pluck(:budget_rule_id)
-      rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: selected_drop_down_items).pluck(:budget_rule_id)
-      budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
-      # relevant_budget_rule_id = budget_rules
-    end
     report.expenses.each do |expense|
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy

@@ -82,6 +82,9 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
             # This is because only IMPS and RTGS transactions return the URT in the API
             # Now all transactions give UTR in the transaction status API
             if utr.present?
+              if self.icici_bank_transaction.neft?
+                utr = "0#{utr}1"
+              end
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
             end
           when "PENDING FOR PROCESSING"

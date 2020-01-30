@@ -36,6 +36,7 @@
 #  submitted_at                  :datetime
 #  approved_at                   :datetime
 #  credit_note_number            :string(255)
+#  last_adjusted_at              :datetime
 #
 
 class CreditNote < ApplicationRecord
@@ -72,15 +73,14 @@ class CreditNote < ApplicationRecord
   has_many :items, class_name: 'CreditNoteItem', dependent: :destroy
   has_many :adjustments, class_name: 'CreditNoteAdjustment' #, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   # before_save :calculate_amount
   after_create :calculate_from_items_values, unless: :skip_callback
   before_save :calculate_from_item_methods
+  after_touch :update_adjustments
 
-
-  # before_validation { debugger; puts "Hello"}
-
-  delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, to: :status
+  delegate :draft?, :awaiting_approval?, :retracted?, :rejected?, :approved?, :auto_approved?, :voided?, :adjusted?, :partially_adjusted?, :unadjusted?, to: :status
 
   def as_json(options = {})
     if options[:index]
@@ -107,9 +107,8 @@ class CreditNote < ApplicationRecord
           user_name: user&.name,
           user_email: user&.email,
           user_employee_id: user.employee_id,
-          previously_adjusted_amount: previously_adjusted_amount.as_json,
-          net_adjustable_amount: net_adjustable_amount.as_json
-
+          previously_adjusted_amount: previously_adjusted_amount.as_json({rounded: true}),
+          net_adjustable_amount: net_adjustable_amount.as_json({rounded: true})
       }
     else
       data = {
@@ -123,9 +122,10 @@ class CreditNote < ApplicationRecord
           created_at: created_at.strftime('%d %b %Y'),
           updated_at: updated_at.strftime('%d %b %Y'),
           invoice_number: invoice&.invoice_number,
+          rcm_enabled: invoice&.rcm_enabled,
           # roundoff_amount: roundoff_amount,
 
-          # attachment: attachments.as_json,
+          attachments: attachments.as_json,
           # custom_fields: self.custom_fields,
           vendor: vendor.as_json,
           shipping_location: shipping_location.as_json,
@@ -138,39 +138,57 @@ class CreditNote < ApplicationRecord
           policy: policy.as_json,
           items: items.as_json,
           gross_receivable_amount: gross_receivable_amount.as_json,
-          after_tax_amount: {
-              currency: gross_receivable_amount&.currency.as_json,
-              value: gross_receivable_amount&.value.to_f + tax_amount&.value.to_f
-          },
+          after_tax_amount: after_tax_amount,
           tax_amount: tax_amount.as_json,
           tds_rate_id: tds_rate_id,
           tds_amount: tds_amount.as_json,
           net_receivable_amount: net_receivable_amount.as_json,
           freight_amount: freight_amount.as_json,
           previously_adjusted_amount: previously_adjusted_amount.as_json,
-          net_adjustable_amount: net_adjustable_amount.as_json
+          net_adjustable_amount: net_adjustable_amount.as_json,
+          user: user.as_json
       }
     end
 
     return data
   end
 
+  def after_tax_amount
+    data = {
+        currency: gross_receivable_amount&.currency.as_json,
+    }
+
+    if self.invoice.rcm_enabled
+      data[:value] = gross_receivable_amount&.value.to_f
+    else
+      data[:value] = precision_value(gross_receivable_amount&.value.to_f + tax_amount&.value.to_f)
+    end
+
+    data
+  end
+
   scope :filter_status, -> (status) {
     case status
-    when 'approved', :approved
-      where(status_id: CreditNoteStatus.id_for(:approved))
-    when 'auto_approved', :auto_approved
-      where(status_id: CreditNoteStatus.id_for(:auto_approved))
-    when 'processing', :processing
-      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
-    when 'awaiting_approval', :awaiting_approval
-      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'draft', :draft
+      where(status_id: CreditNoteStatus.id_for(:draft))
     when 'retracted', :retracted
       where(status_id: CreditNoteStatus.id_for(:retracted))
     when 'rejected', :rejected
       where(status_id: CreditNoteStatus.id_for(:rejected))
-    when 'draft', :draft
-      where(status_id: CreditNoteStatus.id_for(:draft))
+    when 'processing', :processing
+      where(status_id: CreditNoteStatus.id_for(:awaiting_approval))
+    when 'awaiting_approval', :awaiting_approval
+      awaiting_action_items(RequestStore.store[:current_user]&.id)
+    when 'approved', :approved
+      where(status_id: CreditNoteStatus.id_for(:approved))
+    when 'auto_approved', :auto_approved
+      where(status_id: CreditNoteStatus.id_for(:auto_approved))
+    when 'partially_adjusted', :partially_adjusted
+      where(status_id: CreditNoteStatus.id_for(:partially_adjusted))
+    when 'unadjusted', :unadjusted
+      where(status_id: CreditNoteStatus.id_for(:unadjusted))
+    when 'adjusted', :adjusted
+      where(status_id: CreditNoteStatus.id_for(:adjusted))
     when 'voided', :voided
       where(status_id: CreditNoteStatus.id_for(:voided))
     else
@@ -203,11 +221,19 @@ class CreditNote < ApplicationRecord
   }
 
   scope :filter_location_id, -> (id) {
-    where(location_id: id)
+    where(shipping_location_id: id).or(where(billing_location_id: id))
   }
 
   scope :filter_invoice_id, -> (id) {
     where(invoice_id: id)
+  }
+
+  scope :filter_sequence_id, -> (id) {
+    where("credit_notes.sequence_id like ?", "%#{id}%")
+  }
+
+  scope :filter_invoice_sequence_id, -> (id) {
+    joins(:invoice).where("invoices.invoice_id like ?", "%#{id}%")
   }
 
   scope :filter_invoice_number, -> (invoice_number) {
@@ -219,12 +245,12 @@ class CreditNote < ApplicationRecord
   }
 
   scope :filter_adjustables, -> (enabled = true) {
-    joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved))
+    joins(:net_adjustable_amount).where("amounts.value > ?", 0).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted))
   }
 
-  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', start_date, end_date)}
-  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
-  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", start_date.beginning_of_day, end_date.end_of_day)}
+  scope :filter_date, -> (start_date, end_date) {where('credit_note_date >= ? AND credit_note_date =< ? ', Date.parse(start_date), Date.parse(end_date))}
+  scope :filter_created_on_date, -> (start_date, end_date) {where("created_at >= ? AND created_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
+  scope :filter_approved_on_date, -> (start_date, end_date) {where("approved_at >= ? AND approved_at <= ?", Date.parse(start_date).beginning_of_day, Date.parse(end_date).end_of_day)}
 
   scope :filter_amount, -> (gteq, lteq) do
     gteq = gteq.to_f
@@ -233,8 +259,35 @@ class CreditNote < ApplicationRecord
     joins(:amount).where("value >= ? AND value <= ?", gteq, lteq)
   end
 
+  scope :order_previously_adjustable_amount, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    joins(:previously_adjusted_amount).reorder("amounts.value #{order_type}")
+  }
+
+  scope :order_net_adjustable_amount, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    joins(:net_adjustable_amount).reorder("amounts.value #{order_type}")
+  }
+
+  scope :order_created_at, -> (order_type = "ASC") {
+    order_type = format_order_type(order_type)
+    reorder("credit_notes.created_at #{order_type}")
+  }
+
+  def self.format_order_type(order_type)
+    order_type = "ASC" unless ["ASC", "DESC"].include?(order_type.to_s.upcase)
+    order_type
+  end
+
 
   # Transitionable Methods #
+
+  def validate_if_auditor(user)
+    policy = Policy.find_by id: self.policy_id
+    if policy.present? && policy.policy_user_roles.present?
+      policy.policy_user_roles.where(user_role_id: UserRole.id_for(:credit_note_auditor), user_id: user.id).present? rescue false
+    end
+  end
 
   def self.document_owner_attribute
     'user_id'
@@ -252,16 +305,32 @@ class CreditNote < ApplicationRecord
     CreditNoteStatus.ids_for(self.role_based_statuses(user))
   end
 
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if [UserRole.id_for(:credit_note_initiator)]
-          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         elsif [UserRole.id_for(:credit_note_reviewer)]
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :voided]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :voided, :adjusted, :partially_adjusted, :unadjusted]
+        elsif UserRole.ids_for(:purchase_order_initiator,
+                               :purchase_order_reviewer,
+                               :purchase_order_auditor,
+                               :po_invoice_initiator,
+                               :po_invoice_reviewer,
+                               :po_invoice_auditor,
+                               :non_po_invoice_initiator,
+                               :non_po_invoice_reviewer,
+                               :non_po_invoice_auditor,
+                               :bank_payment_request_initiator,
+                               :bank_payment_request_reviewer,
+                               :bank_payment_request_auditor,
+                               :bank_payment_request_creditor,
+        ).include?(role_id)
+          status_ids += [:approved, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided]
+          statuses += [:retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted]
         end
       end
     end
@@ -273,11 +342,44 @@ class CreditNote < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    CreditNoteStatus.ids_for(:approved, :auto_approved, :voided)
+    CreditNoteStatus.ids_for(:approved, :auto_approved, :voided, :adjusted, :partially_adjusted, :unadjusted)
   end
 
   def self.auditor_associated_status_ids
     CreditNoteStatus.ids_for([:approved, :auto_approved, :awaiting_approval, :rejected, :retracted, :voided])
+  end
+
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
+    if UserRole.id_for(:credit_note_initiator) == role_id
+      super
+    elsif UserRole.ids_for(:purchase_order_initiator,
+                           :purchase_order_reviewer,
+                           :purchase_order_auditor,
+                           :po_invoice_initiator,
+                           :po_invoice_reviewer,
+                           :po_invoice_auditor,
+                           :non_po_invoice_initiator,
+                           :non_po_invoice_reviewer,
+                           :non_po_invoice_auditor,
+                           :bank_payment_request_initiator,
+                           :bank_payment_request_reviewer,
+                           :bank_payment_request_auditor,
+                           :bank_payment_request_creditor,
+    ).include?(role_id)
+      policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
+      # Find all Credit notes post approved state in the respective policies
+      where(policy_id: policy_ids).where(status_id: CreditNoteStatus.ids_for(:approved, :auto_approved, :partially_adjusted, :unadjusted, :adjusted, :voided))
+    else
+      # Nothing
+    end
+  end
+
+  def self.role_based_reviewer_associated_items(user, role_id, options = {})
+    if UserRole.id_for(:credit_note_reviewer) == role_id
+      super
+    else
+      role_based_initiator_associated_items(user, role_id)
+    end
   end
 
   def self.roles
@@ -322,12 +424,20 @@ class CreditNote < ApplicationRecord
     currency_id = company&.base_currency_id || 1
 
     # Gross Receivable Amount
-    gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
+    # Only picks from the items where item type is QTY Change / Price Drop
+    gross_receivable_amount_value = items.
+        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map {|item| item.taxable_amount&.value}.compact.sum
+
+    gross_receivable_amount_value = precision_value(gross_receivable_amount_value)
+
+
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
       self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
+
     # Tax Amount (GST)
     tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     if tax_amount.present?
@@ -336,10 +446,15 @@ class CreditNote < ApplicationRecord
       self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
     end
 
+    # Where TDS Applicable is yes
+    # Only picks from the items where item type is QTY Change / Price Drop
+    tds_applicable_amount = items.
+        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map {|item| item.taxable_amount&.value}.compact.sum
     tds_amount_value = 0
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
-      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+      tds_amount_value = tds_applicable_amount * tds_rate_percentage / 100
 
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
@@ -348,7 +463,12 @@ class CreditNote < ApplicationRecord
       end
     end
 
-    net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
+    if self.invoice.rcm_enabled
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value - tds_amount_value)
+    else
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value + tax_amount_value - tds_amount_value)
+    end
+
     if self.net_receivable_amount.present?
       self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
@@ -360,19 +480,28 @@ class CreditNote < ApplicationRecord
     self.save(validation: false)
   end
 
+  def update_adjustments
+    update_adjustable_amount
+    update_status
+  end
+
   def calculate_from_item_methods
     currency_id = company&.base_currency_id || 1
 
-    # items = items.as_json
-
     # Gross Receivable Amount
     # gross_receivable_amount_value = items.map {|item| item.taxable_amount&.value}.compact.sum
-    gross_receivable_amount_value = items.map(&:get_taxable_amount).compact.sum
+    # Only picks from the items where item type is QTY Change / Price Drop
+    gross_receivable_amount_value = items.
+        filter {|item| CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map(&:get_taxable_amount).compact.sum
+
+
     if gross_receivable_amount.present?
       gross_receivable_amount.update(value: gross_receivable_amount_value)
     else
       self.gross_receivable_amount = Amount.create(value: gross_receivable_amount_value, currency_id: currency_id)
     end
+
     # Tax Amount (GST)
     # tax_amount_value = items.map {|item| item.tax_amount&.value}.compact.sum
     tax_amount_value = items.map(&:get_tax_amount).compact.sum
@@ -382,13 +511,19 @@ class CreditNote < ApplicationRecord
       self.tax_amount = Amount.create(value: tax_amount_value, currency_id: currency_id)
     end
 
+    # Where TDS Applicable is yes
+    # Only picks from the items where item type is QTY Change / Price Drop
+    tds_applicable_amount = items.
+        filter {|item| item.tds_applicable? and CreditNoteItemType.ids_for(:qty_change, :price_drop).include?(item.credit_note_item_type_id)}.
+        map(&:get_taxable_amount).compact.sum
+
     tds_amount_value = 0
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
-      tds_amount_value = gross_receivable_amount_value * tds_rate_percentage / 100
+      tds_amount_value = tds_applicable_amount * tds_rate_percentage / 100
       # tds_amount_value = tds_amount_value.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
       tds_amount_value = tds_amount_value.ceil # round the tds to the nearest digit as of now.
-    
+
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
       else
@@ -396,7 +531,12 @@ class CreditNote < ApplicationRecord
       end
     end
 
-    net_receivable_amount_value = gross_receivable_amount_value + tax_amount_value - tds_amount_value
+    if self.invoice.rcm_enabled
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value - tds_amount_value)
+    else
+      net_receivable_amount_value = precision_value(gross_receivable_amount_value + tax_amount_value - tds_amount_value)
+    end
+
     if self.net_receivable_amount.present?
       self.net_receivable_amount.update(value: net_receivable_amount_value)
     else
@@ -408,7 +548,7 @@ class CreditNote < ApplicationRecord
 
   def update_adjustable_amount
     currency_id = net_receivable_amount.currency_id
-    previously_adjusted_amount_value = adjustments.joins(:amount).sum(:value)
+    previously_adjusted_amount_value = precision_value(adjustments.joins(:amount).sum(:value))
 
     if self.previously_adjusted_amount.present?
       self.previously_adjusted_amount.update(value: previously_adjusted_amount_value)
@@ -416,12 +556,23 @@ class CreditNote < ApplicationRecord
       self.previously_adjusted_amount = Amount.create(value: previously_adjusted_amount_value, currency_id: currency_id)
     end
 
-    net_adjustable_amount_value = net_receivable_amount&.value&.to_f - previously_adjusted_amount_value
+    net_adjustable_amount_value = precision_value(net_receivable_amount&.value&.to_f - previously_adjusted_amount_value)
     if self.net_adjustable_amount.present?
       self.net_adjustable_amount.update(value: net_adjustable_amount_value)
     else
       self.net_adjustable_amount = Amount.create(value: net_adjustable_amount_value, currency_id: currency_id)
     end
+  end
+
+  def update_status
+    if precision_value(net_adjustable_amount.value) == 0
+      self.status_id = CreditNoteStatus.id_for(:adjusted)
+    elsif precision_value(net_adjustable_amount.value) < precision_value(net_receivable_amount.value)
+      self.status_id = CreditNoteStatus.id_for(:partially_adjusted)
+    elsif precision_value(net_adjustable_amount.value) == precision_value(net_receivable_amount.value)
+      self.status_id = CreditNoteStatus.id_for(:unadjusted)
+    end
+    save(validation: false)
   end
 
 end
