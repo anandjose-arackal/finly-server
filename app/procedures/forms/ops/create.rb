@@ -1,4 +1,4 @@
-class Forms::Create < Transactions::API
+class Forms::Ops::Create < Transactions::API
 
   schema do
     params do
@@ -18,9 +18,9 @@ class Forms::Create < Transactions::API
     true
   end
 
-  def build_contract(options, params:, **)
+  def build_contract(options, params:, model:, **)
     field_type = params['field_type']
-    Forms::Definitions::Registry.types[field_type].new
+    Forms::Definitions::Registry.types[field_type].new(model)
   end
 
 end
