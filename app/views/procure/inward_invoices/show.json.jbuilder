@@ -126,6 +126,11 @@ json.invoice do
     json.name invoice&.department&.name
   end
 
+  json.policy_attributes do
+    json.id invoice.policy_id
+    json.name invoice.policy&.name
+  end
+
   json.sub_department_attributes do
     json.id invoice.sub_department_id
     json.name invoice.sub_department&.name

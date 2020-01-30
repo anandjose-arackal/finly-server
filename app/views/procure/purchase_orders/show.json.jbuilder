@@ -31,6 +31,11 @@ json.vendor do
   end
 end
 
+json.policy_attributes do
+  json.id @result.purchase_order.policy_id
+  json.name @result.purchase_order.policy&.name
+end
+
 json.department_attributes do
   json.id @result.purchase_order.department_id
   json.name @result.purchase_order.department&.name
