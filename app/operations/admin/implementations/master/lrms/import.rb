@@ -33,15 +33,15 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
       custom_headers[name] = sheet.row(1)
       (2..sheet.last_row).each do |i|
         row = sheet.row(i)
-        begin
+        #begin
           result = process_row(row)
           unless result.is_a?(Admin::Implementations::Processor::Import::Result)
             item_complete false
-            raise "invalid result"
+            #raise "invalid result"
           end
-         rescue Exception => e
-           result false, "#{e.message}"
-         end
+        #rescue Exception => e
+        # result false, "#{e.message}"
+        # end
 
         unless result.success?
           item_complete false
@@ -93,11 +93,46 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
   end
 
   def destroy_records(data)
-    result success: false, message: "Destroy action cant perform"
+    lrm_params = set_params(data)
+    lrm = LevelReviewerMapping.find_by id: lrm_params[:id]
+    unless lrm.present?
+      return result  false, "Mapping not found"
+    else
+      if lrm.destroy
+        return result  true, "Level Reviewer Mapping Destroyed"
+      end
+    end
   end
 
   def update_record(data)
-    result success: false, message: "Update action cant perform"
+    lrm_params = set_params(data)
+    lrm = LevelReviewerMapping.find_by id: lrm_params[:id]
+    unless lrm.present?
+      return result  false, message: "Mapping not found"
+    end
+    self.policy = lrm.level&.policy
+
+    if lrm_params[:min].present? && lrm_params[:max].present?
+      if lrm_params[:min] >= lrm_params[:max]
+        return result false, "Max Threshold should be greater than Min"
+      end
+    end
+
+    if lrm_params[:reviewer_email].present?
+      reviewer_email = clean_up_data lrm_params[:reviewer_email]
+      reviewer = get_reviewer(reviewer_email, application)&.id
+      unless  reviewer.present?
+        return result false, "Reviewer Not Found"
+      end
+    else
+      reviewer = nil
+    end
+    lrm_params[:reviewer_id] = reviewer
+
+    unless lrm.update(lrm_params.except(:id,:reviewer_email,:policy_name,:policy_creation_flag,:user_email,:department_code, :location_code))
+      return result false, lrm.errors.full_messages
+    end
+    result true, 'Updated Successfully'
   end
 
   def create_record(data)
@@ -111,7 +146,6 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
       elsif self.policy.blank? && !lrm_params[:policy_creation_flag]
         return result false, "Policy not found"
       end
-
     else
       self.policy = company.policies.default.first
     end
@@ -171,6 +205,11 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     location_code = row[import_fields[:location_code]].to_s
     id = row[import_fields[:id]].to_s
     policy_creation_flag = row[import_fields[:policy_creation_flag ]]
+    reviewer_email = row[import_fields[:reviewer_email]]
+    exception = row[import_fields[:exception]]&.to_s&.upcase == 'N' ? false : true
+    wo_exception = row[import_fields[:wo_exception]]&.to_s&.upcase == 'N' ? false : true
+    min = row[import_fields[:min]]
+    max = row[import_fields[:max]]
 
     params = {
         id: id,
@@ -178,6 +217,11 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         policy_creation_flag: (policy_creation_flag.to_s.upcase == 'Y' ? true : false),
         department_code: department_code,
         location_code: location_code,
+        reviewer_email: reviewer_email,
+        exception: exception,
+        wo_exception: wo_exception,
+        min: (min.present? ? min.to_i : 0),
+        max: (max.present? ? max.to_i : nil)
     }
   end
 
@@ -188,13 +232,20 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         :policy_creation_flag => 2,
         :department_code => 3,
         :location_code => 4,
+        :reviewer_email => 7,
+        :exception => 8,
+        :wo_exception => 9,
+        :min => 10,
+        :max => 11
     }
   end
 
 
   def get_policy(policy_name,application)
     policy = self.company.policies.find_by(name: policy_name, application: application)
-    return policy if policy.present?
+  end
+
+  def create_policy(policy_name, application)
     policy = self.company.policies.create(name: policy_name, application: application)
   end
 
@@ -237,7 +288,10 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         "PoInvoiceProvider" =>"po_invoice_reviewer",
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
-        "PaymentAgreementProvider" => "payment_agreement_reviewer"}
+        "PaymentAgreementProvider" => "payment_agreement_reviewer",
+        "BbpsBillerSubscriptionProvider" => "utility_bill_master_reviewer",
+        "BbpsBillProvider" => "utility_bill_reviewer",
+        "CreditNoteProvider"=> "credit_note_reviewer"}
 
     user = get_user_entity(reviewer_id)
     if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
@@ -257,7 +311,28 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     else
       user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
     end
+    check_enable_feature_subscription(user) unless user.nil?
     user
+  end
+
+  def check_enable_feature_subscription(user)
+    if self.application == 'em'
+      return true if user&.user_panel_subscription&.expense_management?
+      #enabling EM module for the user
+      user.user_panel_subscription.update(expense_management: true)
+      role_mapping = user.role_mapping.expense_management.employee
+      if role_mapping.blank?
+        user.role_mapping.create(user_role_id: UserRole.id_for(:employee), purpose_id: 1)
+      end
+    elsif self.application == 'vp'
+      return true if user&.user_panel_subscription&.yes_bank_account_transfer?
+      #enabling VP module for the user
+      user.user_panel_subscription.update(yes_bank_account_transfer: true)
+      role_mapping = user.role_mapping.expense_management.employee
+      if role_mapping.blank?
+        user.role_mapping.create(user_role_id: UserRole.id_for(:employee), purpose_id: 2)
+      end
+    end
   end
 
   def clean_up_data(text)
