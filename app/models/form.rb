@@ -16,11 +16,23 @@ class Form < ApplicationRecord
   include UUIDHelper, SoftDeletable
 
   has_many :sections, class_name: 'FormSection', dependent: :destroy
+  has_many :entities, through: :sections
 
   def as_json(options = {})
     {
         id: id,
         sections: sections
     }
+  end
+
+  def contract
+    sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
+    Class.new(Transactions::Contract) do
+      sections.each do |section|
+        section.entities.root.each do |entity|
+          instance_eval &entity.contract
+        end
+      end
+    end
   end
 end

@@ -42,7 +42,7 @@ class Forms::Contracts::Builder
   end
 
   def self.build(user)
-    form = self.form
+    form = self.form.fetch(user)
     properties = self.properties
     functions = self.functions
     user_scope = define_user_scope

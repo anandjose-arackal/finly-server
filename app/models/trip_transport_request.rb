@@ -4,16 +4,20 @@
 #
 #  id                  :bigint           not null
 #  uuid                :string(36)       not null, primary key
-#  trip_id             :string(255)      not null
-#  trip_route_id       :string(255)      not null
-#  created_by_id       :integer          not null
-#  traveller_id        :integer          not null
+#  trip_id             :string(255)
+#  created_by_id       :integer
+#  traveller_id        :integer
 #  company_id          :bigint
+#  from_location       :string(255)
+#  to_location         :string(255)
 #  mode                :string(255)
 #  depart_on           :date
 #  preferred_timeframe :string(255)
 #  budget_id           :integer
 #  description         :text(65535)
+#  deleted_at          :datetime
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
 #
 
 class TripTransportRequest < ApplicationRecord

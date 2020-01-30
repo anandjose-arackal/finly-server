@@ -4,7 +4,7 @@
 #
 #  id                       :bigint           not null
 #  uuid                     :string(36)       not null, primary key
-#  trip_id                  :string(255)      not null
+#  trip_id                  :string(255)
 #  from_location            :string(255)
 #  to_location              :string(255)
 #  depart_on                :date
@@ -12,6 +12,9 @@
 #  require_transport        :boolean          default(FALSE)
 #  require_hotel            :boolean          default(FALSE)
 #  require_local_conveyance :boolean          default(FALSE)
+#  deleted_at               :datetime
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
 #
 
 class TripRoute < ApplicationRecord

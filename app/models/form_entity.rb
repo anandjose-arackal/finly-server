@@ -38,11 +38,14 @@
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
 #  chained                      :text(65535)
-#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  can_associate_children       :boolean          default(FALSE)
+#  scope                        :text(65535)
+#  internal                     :boolean          default(FALSE)
+#  is_modified                  :boolean          default(FALSE)
+#  field_path                   :string(255)
+#  parent_id                    :integer
 #
 
 class FormEntity < ApplicationRecord
@@ -51,13 +54,82 @@ class FormEntity < ApplicationRecord
   belongs_to :company
   belongs_to :form_section
   belongs_to :form
-  belongs_to :parent, class_name: 'FormEntity', optional: true
+  belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
 
+  has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
-
-  accepts_nested_attributes_for :choices
 
   serialize :options, JSON
   serialize :chained, JSON
-  serialize :data_provider, JSON
+  serialize :scope, JSON
+
+  scope :root, -> {where parent_id: nil}
+
+  def populate_if_empty
+    val = super()
+    return nil unless val
+
+    Object.const_get(val)
+  end
+
+  def schema
+    {
+        field_key: field_key,
+        label: label,
+        placeholder: placeholder,
+        hint: hint,
+        field_type: field_type,
+        default_value: default_value,
+        multiple: multiple,
+        editable: editable,
+        required: required,
+        active: active,
+        unique: unique,
+        visible: visible,
+        position: position,
+        custom_field: custom_field,
+        dependent: dependent,
+        conditional_required: conditional_required,
+        can_visible_be_changed: can_visible_be_changed,
+        can_editable_be_changed: can_editable_be_changed,
+        can_required_be_changed: can_required_be_changed,
+        can_uniqueness_be_changed: can_uniqueness_be_changed,
+        can_be_disabled: can_be_disabled,
+        can_label_be_renamed: can_label_be_renamed,
+        can_not_be_hidden: can_not_be_hidden,
+        can_be_filtered: can_be_filtered,
+        can_choices_be_changed: can_choices_be_changed,
+        show_in_bulk_import: show_in_bulk_import,
+        allow_sort_in_filter: allow_sort_in_filter,
+        allow_clearing_default_value: allow_clearing_default_value,
+        options: options,
+        chained: chained,
+        scope: scope,
+        internal: internal,
+        field_path: field_path
+    }
+  end
+
+  def contract
+    is_collection = (field_type == "collection")
+    property_options = {
+        populate_if_empty: populate_if_empty
+    }
+    property_options.reject! {|k, v| v.nil?}
+    builder_args = [field_key, schema, property_options, contract_block, collection: is_collection]
+    transformer = Forms::Contracts::Transformer.new(*builder_args)
+    transformer.generate
+  end
+
+  def contract_block
+    return nil unless entities.present?
+
+    entities = self.entities
+
+    lambda do |*args|
+      entities.each do |entity|
+        instance_eval &entity.contract
+      end
+    end
+  end
 end

@@ -17,6 +17,9 @@
 #  advance_requested_id      :integer
 #  advance_processed_id      :integer
 #  expenses_total_id         :integer
+#  deleted_at                :datetime
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
 #  trip_type_id              :bigint
 #
 

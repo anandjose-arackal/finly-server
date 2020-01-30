@@ -1,5 +1,6 @@
+# Todo - Deprecated since we are using database to generate the forms. Can delete if everything is stable
 module Forms::Contracts::DSL
-  extend ActiveSupport::Concern
+extend ActiveSupport::Concern
 
   class_methods do
     def contract(user, params = {})

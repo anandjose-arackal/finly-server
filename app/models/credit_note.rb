@@ -37,6 +37,7 @@
 #  approved_at                   :datetime
 #  credit_note_number            :string(255)
 #  uuid                          :string(36)
+#  last_adjusted_at              :datetime
 #
 
 class CreditNote < ApplicationRecord

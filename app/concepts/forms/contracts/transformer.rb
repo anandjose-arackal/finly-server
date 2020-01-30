@@ -39,12 +39,12 @@ class Forms::Contracts::Transformer
         send function, transformer.field_name, transformer.property_options
       end
       validations = transformer.contract_validations
-      validations[:validates].each do |val|
-        validates *val
-      end
-
       validations[:validate].each do |val|
         validate val
+      end
+
+      validations[:validates].each do |val|
+        validates *val
       end
     end
   end

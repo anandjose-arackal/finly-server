@@ -33,7 +33,7 @@ module Forms
       attribute :multiple, default: false
       attribute :scope
       attribute :internal, default: false
-
+      attribute :is_modified, default: false
       attribute :populate_if_empty
 
       # option :char_limit #, default: 1000
@@ -84,14 +84,16 @@ module Forms
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
       end
 
-      def builder_args
-        [field_key, schema, {}, contract_block, collection: false]
-      end
-
-      def build
-        transformer = Forms::Contracts::Transformer.new(*builder_args)
-        transformer.generate
-      end
+      # Todo - Deprecated since we are generating the forms from database.
+      # Todo - This was old implementation of generating forms directly from class
+      # def builder_args
+      #   [field_key, schema, {}, contract_block, collection: false]
+      # end
+      #
+      # def build
+      #   transformer = Forms::Contracts::Transformer.new(*builder_args)
+      #   transformer.generate
+      # end
 
       def contract_block
         return nil unless entities.present?

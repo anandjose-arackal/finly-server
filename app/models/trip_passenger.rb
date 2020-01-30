@@ -4,10 +4,13 @@
 #
 #  id             :bigint           not null
 #  uuid           :string(36)       not null, primary key
-#  trip_id        :string(255)      not null
+#  trip_id        :string(255)
 #  name           :string(255)
 #  contact_number :string(255)
 #  email          :string(255)
+#  deleted_at     :datetime
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
 #
 
 class TripPassenger < ApplicationRecord

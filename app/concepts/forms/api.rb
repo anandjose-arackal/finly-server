@@ -1,5 +1,5 @@
 class Forms::API
-  include Forms::Contracts::DSL
+  # include Forms::Contracts::DSL
   include Forms::Filters::Builder
   include DynamicAttributes
 
@@ -16,6 +16,10 @@ class Forms::API
       return entity if entity
     end
     nil
+  end
+
+  def self.fetch(user)
+    ::Form.find_by(company_id: user.company_id, klass_name: self.name)
   end
 
 end

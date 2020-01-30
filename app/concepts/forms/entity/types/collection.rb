@@ -8,8 +8,10 @@ class Forms::Entity::Types::Collection < Forms::Entity::Base
     optional(:minimum).value(:int?)
   end
 
-  def builder_args
-    [field_key, schema, {}, contract_block, collection: true]
-  end
+  # Todo - Deprecated since we are generating the forms from database.
+  # Todo - This was old implementation of generating forms directly from class
+  # def builder_args
+  #   [field_key, schema, {}, contract_block, collection: true]
+  # end
 
 end

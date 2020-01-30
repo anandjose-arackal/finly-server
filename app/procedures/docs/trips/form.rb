@@ -9,7 +9,7 @@ class Docs::Trips::Form < Forms::API
     # dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
     # dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
     # dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
-    dropdown :status_id, scope: Forms::Entity::Scope::Enum(TripStatus, :id, :name), required: true
+    dropdown :status_id, scope: Forms::Entity::Scope::Enum(TripStatus, :id, :name), required: true, default_value: 1
     dropdown :trip_type_id, scope: Forms::Entity::Scope::Enum(TripType, :id, :name), required: true
     dropdown :policy_id, scope: Forms::Entity::Scope::AutoComplete('policies', filters: {}), required: true
     date :start_date, required: true
@@ -18,7 +18,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :passengers do
-    collection :passengers, minimum: 1 do
+    collection :passengers, populate_if_empty: TripPassenger, minimum: 1 do
       text :name, required: true
       text :contact_number
       text :email
@@ -26,7 +26,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :routes do
-    collection :routes, minimum: 1 do
+    collection :routes, populate_if_empty: TripRoute, minimum: 1 do
       text :from_location, required: true
       text :to_location, required: true
       date :depart_on, required: true
@@ -38,7 +38,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :transport_requests do
-    collection :transport_requests do
+    collection :transport_requests, populate_if_empty: TripTransportRequest do
       text :from_location, required: true
       text :to_location, required: true
       dropdown :mode, scope: Forms::Entity::Scope::List({value: "Flight"}), required: true
@@ -54,7 +54,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :hotel_requests do
-    collection :hotel_requests do
+    collection :hotel_requests, populate_if_empty: TripHotelRequest do
       text :location, required: true
       text :preferred_area, required: true
       datetime :checkin_at, required: true
@@ -65,7 +65,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :local_conveyance_requests do
-    collection :local_conveyance_requests do
+    collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest do
       text :location, required: true
       text :pickup_area, required: true
       datetime :pickup_at, required: true

@@ -26,7 +26,7 @@ class Forms::Contracts::Property
   end
 
   def build(form)
-    entity = form&.find_entity(self.path)
+    entity = form&.entities.find_by(field_path: self.path)
     if entity
       entity_options = entity.schema
       entity_options = entity_options.deep_merge(self.options[:form]) if self.options[:form]

@@ -5,15 +5,15 @@ class Forms::Entity::Scope
   end
 
   def self.AutoComplete(route, filters: {})
-    {auto_complete_route: route, filters: filters}
+    {auto_complete_route: route.to_s, filters: filters}
   end
 
   def self.Enum(klass, *keys)
-    {enum: klass, keys: keys}
+    {enum: klass.to_s, keys: keys}
   end
 
   def self.Resolver(klass, *keys, filters: {})
-    {resolver: klass, keys: keys, filters: filters}
+    {resolver: klass.to_s, keys: keys, filters: filters}
   end
 
 end
