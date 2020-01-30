@@ -28,7 +28,7 @@ end
 json.system_messages do
   json.array! (payment.system_messages)
 end
-json.bank_reference_number payment.reference_resource&.bank_reference_number
+json.bank_reference_number payment.utr
 json.retriable do
   json.retriable payment.retriable?
   json.change_mode payment.payment_order.failed? rescue nil

@@ -115,7 +115,9 @@ class Settlement::SReport::Approved < Reports::Base
         op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
         if op.success?
           payment = op.payment_order.payments.first
-          payment.update(reference_resource: self.report)
+          # setting the reference resource payment for the report
+          self.report.update(reference_payment_id: payment.id)
+          # payment.update(reference_resource: self.report)
         else
           # add a condition here so that if this fails, we are notified or at least initimated in some way
 

@@ -52,14 +52,19 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "Only completed payments can have an attached UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource.bank_reference_number.present?
+      if payment.reference_resources.present? && payment.reference_resources.first&.bank_reference_number.present?
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource&.is_a?(YesBankTransaction)
+      if payment.reference_resources.present? && payment.receiving_account_type == "BankAccount"
         # payment.reference_resource.update(bank_reference_number: utr)
-        reference_resource = payment.reference_resource
-        reference_resource.bank_reference_number = utr
+        reference_resource = payment.reference_resources.first
+        # setting the utr of this transaction irrespective of the type of the transaction
+        if reference_resource.try(:bank_reference_number)
+          reference_resource.bank_reference_number = utr
+        else
+          reference_resource.utr = utr
+        end
         existing_transactions << reference_resource
       else
         # disallow duplicate utr to be updated
@@ -82,7 +87,9 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                   beneficiary_bank_account_id: payment.receiving_account&.id,
                                                   amount_id: amount.id)
         # payment.update(reference_resource: bank_transaction)
-        payment.reference_resource = new_transactions.last
+        # setting the reference payment ID for the bank transaction here
+        new_transactions.last.update(reference_payment_id: payment.id)
+        # payment.reference_resource = new_transactions.last
         self.update_payments << payment
       end
       # add a success message to the result array

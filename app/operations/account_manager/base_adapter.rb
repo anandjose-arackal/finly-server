@@ -108,7 +108,7 @@ class AccountManager::BaseAdapter
             value: closing_balance,
             currency_id: currency_id
         },
-        associated_transaction: payment.reference_resource,
+        associated_transaction: payment.reference_resources.first,
         payment: payment,
         company_id: company_id,
         date: DateTime.now

@@ -13,14 +13,14 @@ class FixSpuriousPayments < ApplicationJob
 
       # case 2 - where the payment is still in progress or pending state, and has an associated bank transaction with it
       # in this case we just set the payment status to possible failure and let the status checker handle the rest
-      bt = payment.reference_resource
-      if bt.present?
-        bt.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
+      bts = payment.reference_resources
+      if bts.present?
+        bts.update(transfer_status_id: BankTransferStatus.id_for(:possible_failure))
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
       end
 
       # case 3 - when the payment is in pending state and has no bank transaction associated with it - mark the payment as failed for retrying later
-      if payment.reference_resource.blank? && (payment.receiving_account_type == "BankAccount")
+      if payment.reference_resources.blank? && (payment.receiving_account_type == "BankAccount")
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       end
     end
