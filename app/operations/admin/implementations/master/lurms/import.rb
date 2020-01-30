@@ -91,7 +91,15 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
   end
 
   def destroy_records(data)
-    result success: false, message: "Destroy action cant perform"
+    lurm_params = set_params(data)
+    lurm = LevelUserReviewerMapping.find_by id: lurm_params[:id]
+    unless lurm.present?
+      return result  false,"Mapping not found"
+    else
+      if lurm.destroy
+        return result  true,"Level Reviewer Mapping Destroyed"
+      end
+    end
   end
 
   def update_record(data)
@@ -259,7 +267,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "PoInvoiceProvider" => "po_invoice_reviewer",
         "BankPaymentRequestProvider" =>"bank_payment_request_reviewer",
         "YesBankVendorProvider" =>"vendor_reviewer",
-        "PaymentAgreementProvider" => "payment_agreement_reviewer"}
+        "PaymentAgreementProvider" => "payment_agreement_reviewer",
+        "BbpsBillerSubscriptionProvider" => "utility_bill_master_reviewer",
+        "BbpsBillProvider" => "utility_bill_reviewer",
+        "CreditNoteProvider"=> "credit_note_reviewer"}
 
     entity_user = get_user_entity(reviewer_id)
     if application == 'em' && entity_user.present? && entity_user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
@@ -296,8 +307,28 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     else
       user = self.user_profiles.where('user_profiles.employee_id = ?', identifier&.to_s)&.last&.user
     end
-
+    check_enable_feature_subscription(user) unless user.nil?
     user
+  end
+
+  def check_enable_feature_subscription(user)
+    if self.application == 'em'
+      return true if user&.user_panel_subscription&.expense_management?
+      #enabling EM module for the user
+      user.user_panel_subscription.update(expense_management: true)
+      role_mapping = user.role_mapping.expense_management.employee
+      if role_mapping.blank?
+        user.role_mapping.create(user_role_id: UserRole.id_for(:employee), purpose_id: 1)
+      end
+    elsif self.application == 'vp'
+      return true if user&.user_panel_subscription&.yes_bank_account_transfer?
+      #enabling VP module for the user
+      user.user_panel_subscription.update(yes_bank_account_transfer: true)
+      role_mapping = user.role_mapping.expense_management.employee
+      if role_mapping.blank?
+        user.role_mapping.create(user_role_id: UserRole.id_for(:employee), purpose_id: 2)
+      end
+    end
   end
 
   def assign_initiator_role(entity_user)
@@ -308,7 +339,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "PoInvoiceProvider" => "po_invoice_initiator",
         "BankPaymentRequestProvider" =>"bank_payment_request_initiator",
         "YesBankVendorProvider" =>"vendor_creator",
-        "PaymentAgreementProvider" => "payment_agreement_initiator"}
+        "PaymentAgreementProvider" => "payment_agreement_initiator",
+        "BbpsBillerSubscriptionProvider" => "utility_bill_master_initiator",
+        "BbpsBillProvider" => "utility_bill_initiator",
+        "CreditNoteProvider"=> "credit_note_initiator"}
 
     if application == 'em' && entity_user.present? && policy.user_mapping.where(user_id: entity_user.id).first&.nil?
       policy.user_mapping.create(user_id: entity_user.id)
