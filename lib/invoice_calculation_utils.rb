@@ -90,6 +90,7 @@ class InvoiceCalculationUtils
       self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
     end
 
+
     # assign balance due
     if self.invoice.balance_due.present?
       self.invoice.balance_due.value = self.balance_due_amount
@@ -320,19 +321,61 @@ class InvoiceCalculationUtils
 
   # Credit Note Adjustments
   def calculate_cn_adjustments(invoice_params, payment, invoice)
-    return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
+    self.invoice = invoice || payment&.invoice
+    # return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
+    return unless invoice.class.name == "Invoice"
 
-    adjustment_amount_to_add = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
-    adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
+    # removed_cna_ids = []
+    # # Where credit note adjustments are removed from an invoice
+    # if invoice_params[:credit_note_adjustments_attributes].present?
+    #   removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}.compact
+    # end
 
-    balance_due_amount = invoice.balance_due.value
+    # Where credit note adjustments
+    cna_added_amount = precision_value(self.invoice.credit_note_adjustments.joins(:amount).sum(:value))
+    # cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    # adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
 
-    balance_due_amount = balance_due_amount + adjustment_amount_to_add - adjustment_amount_to_subtract
 
-    if invoice.balance_due.present?
-      invoice.balance_due.value = balance_due_amount
+    balance_due_amount = self.invoice.balance_due.value
+
+    # if calculation_from_payment
+    #   balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
+    #
+    #   if balance_due_amount < 0
+    #     amount_to_deduct = balance_due_amount.abs
+    #
+    #     self.invoice.credit_note_adjustments.reorder("created_at desc").each do |cna|
+    #       break if amount_to_deduct == 0
+    #       if amount_to_deduct >= cna.amount.value
+    #         amount_to_deduct -= cna.amount.value
+    #         cna.destroy
+    #       else
+    #         cna.amount.update(value: (cna.amount.value - amount_to_deduct))
+    #         amount_to_deduct = 0
+    #       end
+    #     end
+    #   end
+    #   cna_added_amount = self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
+    #   cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    #
+    #   balance_due_amount = self.invoice.balance_due.value
+    # end
+    #
+
+    # For Debugging
+    Rails.logger.fatal "**************************************************************************************************"
+    Rails.logger.fatal "Invoice Balance Due - #{self.invoice.balance_due.value.to_f}"
+    Rails.logger.fatal "Invoice Credit Note Adjustments - #{self.invoice.credit_note_adjustments.as_json.inspect}"
+    Rails.logger.fatal "CNA Added Amount #{cna_added_amount}"
+    Rails.logger.fatal "Balance Due Amount(#{balance_due_amount}) - CNA Added Amount(#{cna_added_amount})"
+    Rails.logger.fatal "**************************************************************************************************"
+
+    balance_due_amount = balance_due_amount - cna_added_amount
+    balance_due_amount = precision_value balance_due_amount
+
+    if self.invoice.balance_due.present?
+      self.invoice.balance_due.value = balance_due_amount
     end
-
   end
-
 end

@@ -337,6 +337,15 @@ class Report < ApplicationRecord
     where report_status_id: filter_status
   }
 
+  # used for streamsets 
+  scope :filter_report_status, -> (status) {
+    status = [status] unless status.is_a? Array
+    permitted_status = ['approved', 'auto_approved', 'settlement_confirmed', 'closed', 'settled']
+    status = permitted_status & status
+    status = permitted_status if status.blank?
+    where report_status_id: ReportStatus.ids_for(status)
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -463,7 +472,7 @@ class Report < ApplicationRecord
     end
     currency_code = options&.dig(:currency_code) || self.base_currency_code
     # precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
-    precision_value(temp_expenses.map {|expense| expense.amount.public_send(currency_code.to_sym)}.compact.sum)
+    precision_value(temp_expenses.map {|expense| expense.amount&.public_send(currency_code.to_sym)}.compact.sum)
   end
 
   def reimbursable_expenses(options = {})
@@ -586,6 +595,10 @@ class Report < ApplicationRecord
 
   def controlling_user
     self.get_reviewers.first
+  end
+
+  def status_name
+    self.status.name&.split(/[_ ]/)&.map{|word| word.capitalize}&.join(" ")
   end
 
 

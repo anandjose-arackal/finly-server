@@ -37,10 +37,6 @@ json.payments do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.credited_at payment.reference_resource&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
-    json.retriable do
-      json.retriable payment.retriable?
-      json.change_mode payment.payment_order.failed?
-    end
     json.category_id payment.category_id
     json.category_name payment.category&.name
     json.department_id payment.department_id
@@ -56,6 +52,12 @@ json.payments do
       else
         json.original_amount precision_value invoice.original_amount&.value
       end
+
+      json.retriable do
+        json.retriable (payment.retriable? && invoice.payable)
+        json.change_mode payment.payment_order.failed?
+      end
+
       json.invoice do
         json.id invoice.id
         json.invoice_type invoice.invoice_type&.name

@@ -38,7 +38,12 @@ class Export::Reports::Background::Base < BackgroundOperation
   def retrieve_data(preferences, report, expense, custom_field_column_names)
     data_arr = []
     user = expense.user
+
+    r_cf = report&.custom_fields.to_a.reject {|c| preferences.pluck(:name).exclude? c.field_configuration&.field_name }
+
     preferences.each do |pref|
+      h = {}
+      r_cf.map {|r| if pref.name == r.field_configuration&.field_name then h[:r] = r; h[:p] = pref end}
       case pref.export_field_id
       when ExportField.type_report_id
           data_arr << report&.id
@@ -110,6 +115,14 @@ class Export::Reports::Background::Base < BackgroundOperation
         data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
       when ExportField.id_for(:sgst)
         data_arr << ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+      when ExportField.id_for(:department)
+        data_arr << expense.user.department&.name
+      when ExportField.id_for(:location)
+        data_arr << expense.user.location&.name
+      when ExportField.id_for(:cost_center)
+        data_arr << expense.user.cost_center&.name
+      when h[:p].try(:export_field_id)
+        data_arr << h[:r].try(:configured_field_value)
       else
           data_arr << ''
       end
@@ -123,6 +136,7 @@ class Export::Reports::Background::Base < BackgroundOperation
     custom_field_column_names.each do |cf_name|
       value = ''
       expense.custom_fields.map {|ecf| value = (ecf.configured_field_value || '') if ecf.field_configuration.field_name == cf_name}
+
       records << value
     end
     records

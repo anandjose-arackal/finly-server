@@ -40,7 +40,6 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
-#  company_id             :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -414,7 +413,7 @@ class Expense < ApplicationRecord
   scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
   scope :with_split_link, -> (split_link) {where split_link: split_link}
   scope :filter_split_link, -> (split_link) {where split_link: split_link}
-  scope :includes_export, -> {includes(:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+  scope :includes_export, -> {includes(:category, :receipts, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
                                        :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
                                        {card_expense: [custom_fields: [:field_configuration]]},
                                        {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},

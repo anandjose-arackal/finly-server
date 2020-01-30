@@ -30,6 +30,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :finance_approved_date
     attribute :due_date
     attribute :invoice_discount
+    attribute :attachments
+    attribute :approval_pending_reviewers
   end
 
   section :purchase do
@@ -45,6 +47,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :tds_nature
     attribute :tds_percentage
     attribute :tds_amount
+    attribute :rcm_enabled
   end
 
   section :item_details do
@@ -100,7 +103,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     return if has_errors?
 
     invoices = invoices_presenter.invoices
-    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id))
+    InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
   end
 
   def po_number(invoice_line_item)
@@ -275,6 +278,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoice_line_item.parent.tds_amount&.value || 0.0
   end
 
+  def rcm_enabled(invoice_line_item)
+    return invoice_line_item.parent.rcm_enabled
+  end
+
   def tds_percentage(invoice_line_item)
     return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
     invoice_line_item.parent.tds_slab&.tds || 0.0
@@ -289,14 +296,18 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def line_item_sgst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
     invoice_line_item.sgst || 0
   end
 
   def line_item_cgst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
+
     invoice_line_item.cgst || 0
   end
 
   def line_item_igst(invoice_line_item)
+    return 0 if invoice_line_item.tax_rate_id.nil?
     invoice_line_item.igst || 0
   end
 
@@ -353,6 +364,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
 
   def due_date(invoice_line_item)
     invoice_line_item.parent&.due_date&.strftime("%d-%b-%Y")
+  end
+
+  def attachments(invoice_line_item)
+    invoice_line_item.parent.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
+  def approval_pending_reviewers(invoice_line_item)
+    invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
 

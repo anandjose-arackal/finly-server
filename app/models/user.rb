@@ -1308,10 +1308,10 @@ class User < ApplicationRecord
 
   # returns the list of per diems that the user has access to
   def per_diems_list
-    per_diems = self.company.per_diems.active
-    policies = self.policies
+    per_diems = self.company.per_diems.includes(:rate).active
+    policies = self.policies.includes(per_diems: [:rate])
     policies.each do |policy|
-      per_diems += policy.per_diems.active
+      per_diems += policy.per_diems.map {|pd| pd if pd.is_deleted == false}.reject(&:nil?)
     end
     per_diems
   end
