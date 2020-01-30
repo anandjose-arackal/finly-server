@@ -2,6 +2,10 @@ class Forms::Contracts::Transformers::Base
 
   attr_accessor :name, :value, :entity
 
+  def setters
+    @setters ||= []
+  end
+
   def validates
     @validates ||= []
   end

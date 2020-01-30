@@ -7,7 +7,7 @@ class Forms::Contracts::Transformers::DefaultValue < Forms::Contracts::Transform
 
     name = self.name
     value = self.value
-    validate << -> do
+    setters << -> do
       send("#{name}=", value) unless send(name).present?
     end
   end
