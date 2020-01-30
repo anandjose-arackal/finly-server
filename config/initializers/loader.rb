@@ -1,3 +1,9 @@
+Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'
+
+Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/contracts/transformers/**/*.rb"
+
+Loader.watch! "Transaction Contract PreProcessors", dir: "app/concepts/transactions/contracts/pre_processors/**/*.rb"
+
 # Clear and reload all routers
 Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|
@@ -5,9 +11,3 @@ Loader.watch! "Routes Loader" do
   end
   Dir.glob(Rails.root.join("app/routes/**/*.rb")).each {|f| load f}
 end
-
-Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'
-
-Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/contracts/transformers/**/*.rb"
-
-Loader.watch! "Transaction Contract PreProcessors", dir: "app/concepts/transactions/contracts/pre_processors/**/*.rb"

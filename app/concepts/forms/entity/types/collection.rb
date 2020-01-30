@@ -8,9 +8,8 @@ class Forms::Entity::Types::Collection < Forms::Entity::Base
     optional(:minimum).value(:int?)
   end
 
-  def build
-    transformer = Forms::Contracts::Transformer.new(field_key, options, nil, contract_block, collection: true)
-    transformer.generate
+  def builder_args
+    [field_key, schema, {}, contract_block, collection: true]
   end
 
 end

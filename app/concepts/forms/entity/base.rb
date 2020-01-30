@@ -32,6 +32,7 @@ module Forms
       attribute :conditional_required, default: false
       attribute :multiple, default: false
       attribute :scope
+      attribute :internal, default: false
 
       attribute :populate_if_empty
 
@@ -83,8 +84,12 @@ module Forms
         "#<Entity##{self.registered_type}:#{object_id} @schema=#{schema.as_json}>"
       end
 
+      def builder_args
+        [field_key, schema, {}, contract_block, collection: false]
+      end
+
       def build
-        transformer = Forms::Contracts::Transformer.new(field_key, schema, nil, contract_block, collection: false)
+        transformer = Forms::Contracts::Transformer.new(*builder_args)
         transformer.generate
       end
 

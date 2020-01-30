@@ -2,7 +2,6 @@ class Forms::API
   include Forms::Contracts::DSL
   include Forms::Filters::Builder
   include DynamicAttributes
-  # include Forms::Builders::Configuration
 
   class_attr :sections, default: []
   class_attr :model
