@@ -102,6 +102,9 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             BbpsBillerSubscriptionProvider
+             BbpsBillProvider
+             CreditNoteProvider
              )
 
 
