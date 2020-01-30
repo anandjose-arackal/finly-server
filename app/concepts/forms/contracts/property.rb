@@ -25,25 +25,26 @@ class Forms::Contracts::Property
     properties << Forms::Contracts::Property.new(name, options, block, collection: true, parent: self)
   end
 
-  def build(form)
-    entity = form&.entities.find_by(field_path: self.path)
+  def build(form, entities_map)
+    entity = entities_map[self.path]
+    # entity = form&.entities.find_by(field_path: self.path)
     if entity
       entity_options = entity.schema
       entity_options = entity_options.deep_merge(self.options[:form]) if self.options[:form]
     else
       entity_options = self.options[:form] || {}
     end
-    transformer = Forms::Contracts::Transformer.new(name, entity_options, self.options.except(:form), contract_block(form), collection: is_collection)
+    transformer = Forms::Contracts::Transformer.new(name, entity_options, self.options.except(:form), contract_block(form, entities_map), collection: is_collection)
     transformer.generate
   end
 
-  def contract_block(form)
+  def contract_block(form, entities_map)
     return nil unless properties.present?
 
     properties = self.properties
     lambda do |*args|
       properties.each do |prop|
-        instance_eval &prop.build(form)
+        instance_eval &prop.build(form, entities_map)
       end
     end
   end

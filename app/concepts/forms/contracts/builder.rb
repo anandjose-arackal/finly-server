@@ -46,9 +46,11 @@ class Forms::Contracts::Builder
     properties = self.properties
     functions = self.functions
     user_scope = define_user_scope
+    entities_map = {}
+    form.entities.includes(:entities).each {|e| entities_map[e.field_path] = e }
     klass = Class.new(Transactions::Contract) do
       properties.each do |prop|
-        instance_eval &prop.build(form)
+        instance_eval &prop.build(form, entities_map)
       end
 
       class_eval &functions if functions.present?
