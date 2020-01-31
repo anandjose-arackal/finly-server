@@ -1,7 +1,7 @@
 class ReportsAwaitingApproval < ApplicationJob
 
   def perform
-    company_list = Company.where(id: [1,2])
+    company_list = Company.where(id: [144])
     company_list.each do |company|
       remind_document_reviewer(company)      
     end
