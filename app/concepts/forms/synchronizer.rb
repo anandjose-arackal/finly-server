@@ -1,5 +1,4 @@
 class Forms::Synchronizer
-  extend ActiveSupport::Concern
 
   def self.call
     Forms::Router.forms.each { |form| Forms::Synchronizer.sync(form) }
@@ -13,6 +12,9 @@ class Forms::Synchronizer
 
       form.sections.each do |section|
         sync_section company, form_model, section
+      end
+      form.dependencies.each do |dependency|
+        sync_dependency company, form_model, dependency
       end
     end
   end
@@ -64,6 +66,10 @@ class Forms::Synchronizer
     end
 
     entity_model
+  end
+
+  def self.sync_dependency(company, form_model, dependency)
+    dependency.map
   end
 
 end

@@ -45,7 +45,8 @@
 #  internal                     :boolean          default(FALSE)
 #  is_modified                  :boolean          default(FALSE)
 #  field_path                   :string(255)
-#  parent_id                    :integer
+#  parent_id                    :string(255)
+#  populate_if_empty            :string(255)
 #
 
 require 'rails_helper'

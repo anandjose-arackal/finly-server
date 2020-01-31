@@ -1,13 +1,17 @@
 class Forms::API
-  # include Forms::Contracts::DSL
   include Forms::Filters::Builder
   include DynamicAttributes
 
   class_attr :sections, default: []
+  class_attr :dependencies, default: []
   class_attr :model
 
   def self.section(name, &block)
     sections << Forms::Entity::Section.new(self, name, &block)
+  end
+
+  def self.dependency(map)
+    dependencies << Forms::Dependency::Item.new(map)
   end
 
   def self.find_entity(field_path)

@@ -2,6 +2,20 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
 
   register :scope
 
+  # def transform!
+  #   return unless value
+  #
+  #   name = self.name
+  #   entity = self.entity
+  #
+  #   validate << -> do
+  #     assigned_value = self.send(name)
+  #     unless Forms::Entity::Scope.valid_choice?(entity, assigned_value, user_scope)
+  #       errors.add :base, "#{name.to_s.humanize} : invalid option selected"
+  #     end
+  #   end
+  # end
+
   def transform!
     return unless value
 
@@ -33,7 +47,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
     value = entity.choices #self.value[:choices]
     validate << -> do
       assigned_value = self.send(name)
-      unless (value.select {|choice| choice[:value] == assigned_value}).present?
+      unless (value.select {|choice| choice[:value]&.to_s == assigned_value&.to_s}).present?
         errors.add :base, "#{name.to_s.humanize} : #{assigned_value} is an invalid option"
       end
     end
@@ -65,7 +79,5 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
       end
     end
   end
-
-
 
 end

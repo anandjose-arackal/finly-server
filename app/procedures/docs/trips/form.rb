@@ -4,11 +4,11 @@ class Docs::Trips::Form < Forms::API
 
   section :header do
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
-    reference :created_by, required: true, visible: false, can_visible_be_changed: false, class_name: 'User'
-    reference :company, required: true, visible: false, can_visible_be_changed: false, class_name: 'Company', internal: true
-    # dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
-    # dropdown :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
-    # dropdown :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
+    dropdown :created_by, required: true, visible: false#, class_name: 'User'
+    dropdown :company, required: true#, class_name: 'Company', internal: true
+    # lookup :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
+    # lookup :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
+    # lookup :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
     dropdown :status_id, scope: Forms::Entity::Scope::Enum(TripStatus, :id, :name), required: true, default_value: 1
     dropdown :trip_type_id, scope: Forms::Entity::Scope::Enum(TripType, :id, :name), required: true
     dropdown :policy_id, scope: Forms::Entity::Scope::AutoComplete('policies', filters: {}), required: true
@@ -74,5 +74,19 @@ class Docs::Trips::Form < Forms::API
       large_text :description
     end
   end
+
+  dependency(
+      {
+          controlling_field: :status_id,
+          dependent_field: :transport_requests_preferred_timeframe,
+          dependency_mappings: [
+              {
+                  controlling_choice: :draft,
+                  required: false, editable: true, visible: true,
+                  choices: ['6am to 9am']
+              }
+          ]
+      }
+  )
 
 end

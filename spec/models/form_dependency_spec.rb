@@ -2,15 +2,14 @@
 #
 # Table name: form_dependencies
 #
-#  id                    :bigint           not null, primary key
+#  id                    :bigint           not null
 #  company_id            :integer          not null
-#  dependency_type_id    :integer          not null
-#  controlling_user_id   :integer          not null
-#  controlling_entity_id :integer          not null
-#  dependent_entity_id   :integer          not null
+#  controlling_entity_id :string(255)      not null
+#  dependent_entity_id   :string(255)      not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  uuid                  :string(36)
+#  uuid                  :string(36)       primary key
+#  form_id               :string(255)      not null
 #
 
 require 'rails_helper'

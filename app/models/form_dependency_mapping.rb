@@ -1,0 +1,28 @@
+# == Schema Information
+#
+# Table name: form_dependency_mappings
+#
+#  id                    :bigint           not null
+#  company_id            :integer          not null
+#  form_dependency_id    :string(255)      not null
+#  controlling_choice_id :string(255)      not null
+#  dependent_required    :boolean
+#  dependent_visible     :boolean
+#  dependent_editable    :boolean
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  uuid                  :string(36)       primary key
+#  form_id               :string(255)      not null
+#
+
+class FormDependencyMapping < ApplicationRecord
+  include UUIDHelper
+
+  belongs_to :company
+  belongs_to :form_dependency
+  belongs_to :controlling_choice, polymorphic: true
+  has_many :dependency_choice_mappings, class_name: "FormDependencyChoiceMapping"
+  has_many :dependent_choices, through: :dependency_choice_mappings, class_name: "FormEntityChoice", foreign_key: :dependent_choice_id
+
+  accepts_nested_attributes_for :dependency_choice_mappings
+end
