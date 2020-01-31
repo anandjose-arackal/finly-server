@@ -209,7 +209,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
           'Supplier': invoice.vendor&.vendor_id,
           'Comments': 'Finly',
-          'PAYMENT MODE': 'NEFT'
+          'Payment Mode': 'NEFT'
       }.each do |k, v|
         row.add k, v
       end
