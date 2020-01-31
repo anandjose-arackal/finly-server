@@ -226,7 +226,7 @@ class PaymentAgreements::Base < BaseOperation
       else
         amt = (item.rate * item.quantity)
       end
-      amount_arr << amt*tds_percentage/100
+      amount_arr << (amt*tds_percentage/100).ceil # round the tds to the nearest digit as of now. This is as per IT rule
     end
     return amount_arr.sum
   end
