@@ -1,6 +1,7 @@
 <style>
   .text {
     font-size: 40px;
+    padding-right: 40px;
   }
 </style>
 <table style="min-width: 2300px;">
@@ -13,23 +14,32 @@
   <tr>
     <td class="text">Mobile Number: <%= kyc.user.mobile_number %></td>
     <td class="text">Card Serial No: <%= kyc.user.cards.last&.proxy %></td>
-    <td class="text">&nbsp;</td>
+    <td class="text">DOB: <%=kyc.user.profile&.date_of_birth&.strftime("%d/%m/%Y") %></td>
+    <td class="text">Employee ID: <%= kyc.user.profile&.employee_id%></td>
   </tr>
   </tbody>
 </table>
 <table>
   <tbody>
   <tr>
-    <td><img src="<%= kyc.kyc_1_front.url(:original) %>" style="max-width: 1000px;"/></td>
-    <td><img src="<%= kyc.photo.url(:original) %>" style="max-width: 350px; margin-left: 100px"/></td>
+    <% base_path = "https://dev.finly.io/api" %>
+    <td><img src="<%= (Rails.env.production? ? kyc.kyc_1_front.url(:original) : "#{base_path}#{kyc.kyc_1_front.url(:original)&.split('?')&.first}")%>" style="max-width: 1000px;"/></td>
+    <td colspan="2"><img src="<%= (Rails.env.production? ? kyc.photo.url(:original) : "#{base_path}#{kyc.photo.url(:original)&.split('?')&.first}") %>" style="max-width: 350px; margin-left: 100px"/>
+                    <img src="<%= "#{Rails.root}/app/assets/images/osv.jpg" %>" style="max-width: 400px;margin-left: 100px"/>
+    </td>
   </tr>
   <tr>
-    <td><img src="<%= kyc.kyc_1_back.url(:original) %>" style="max-width: 1000px;"/></td>
-    <td><img src="<%= kyc.signature.url(:original) %>" style="max-height: 500px;"/></td>
+    <td><img src="<%= (Rails.env.production? ? kyc.kyc_1_back.url(:original) : "#{base_path}#{kyc.kyc_1_back.url(:original)&.split('?')&.first}") %>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= (Rails.env.production? ? kyc.signature.url(:original) : "#{base_path}#{kyc.signature.url(:original)&.split('?')&.first}") %>" style="max-height: 500px;"/></td>
   </tr>
   <tr>
-    <td><img src="<%= kyc.kyc_2_front.url(:original) %>" style="max-width: 1000px;"/></td>
-    <td><img src="<%= kyc.kyc_2_back.url(:original) %>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= (Rails.env.production? ? kyc.kyc_2_front.url(:original) : "#{base_path}#{kyc.kyc_2_front.url(:original)&.split('?')&.first}")%>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= (Rails.env.production? ? kyc.kyc_2_back.url(:original) : "#{base_path}#{kyc.kyc_2_back.url(:original)&.split('?')&.first}")%>" style="max-width: 1000px;"/></td>
   </tr>
+  <tr>
+    <td><img src="<%= (Rails.env.production? ? kyc.id_proof_front.url(:original) : "#{base_path}#{kyc.id_proof_front.url(:original)&.split('?')&.first}") %>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= (Rails.env.production? ? kyc.id_proof_back.url(:original) : "#{base_path}#{kyc.id_proof_back.url(:original)&.split('?')&.first}") %>" style="max-width: 1000px;"/></td>
+  </tr>
+ 
   </tbody>
 </table>
