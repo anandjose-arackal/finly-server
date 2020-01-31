@@ -31,6 +31,30 @@ json.vendor do
   end
 end
 
+json.policy_attributes do
+  json.id @result.purchase_order.policy_id
+  json.name @result.purchase_order.policy&.name
+end
+
+json.department_attributes do
+  json.id @result.purchase_order.department_id
+  json.name @result.purchase_order.department&.name
+end
+
+json.sub_department_attributes do
+  json.id @result.purchase_order.sub_department_id
+  json.name @result.purchase_order.sub_department&.name
+end
+
+json.cost_center_attributes do
+  json.id @result.purchase_order.cost_center_id
+  json.name @result.purchase_order.cost_center&.name
+end
+
+json.location_attributes @result.purchase_order.location&.as_json rescue nil
+json.gstin_location_attributes @result.purchase_order.gstin_location&.as_json rescue nil
+json.delivery_location_attributes @result.purchase_order.delivery_location&.as_json rescue nil
+
 json.actions @result.actions
 json.user @result.purchase_order.user.as_json rescue nil
 
@@ -122,6 +146,16 @@ json.items do
     end
     json.product_type product
     json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
+
+    json.department_attributes do
+      json.id item.department_id
+      json.name item.department&.name
+    end
+
+    json.cost_center_attributes do
+      json.id item.cost_center_id
+      json.name item.cost_center&.name
+    end
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
