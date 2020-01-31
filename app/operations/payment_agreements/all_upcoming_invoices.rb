@@ -39,7 +39,7 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
 
   class PaymentAgreements::AllUpcomingInvoices::AllUpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices, :general_invoices, :rental_invoices, :policies
+    attr_accessor :invoices, :general_invoices, :rental_invoices, :policies, :paginated_general_invoices, :paginated_rental_invoices
 
     has_scope :filter_policy_id
     has_scope :filter_vendor_id
@@ -47,12 +47,19 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
     has_scope :filter_creation_date
     has_scope :filter_from_date
     has_scope :filter_to_date
+    has_scope :filter_upcoming_invoice_date, using: [:from, :to], type: :hash
 
     def init
       self.general_invoices = params[:general_invoices]
-      self.general_invoices = apply_scopes(general_invoices, params)
+      if self.general_invoices.present?
+        self.general_invoices = apply_scopes(general_invoices, params)
+        self.paginated_general_invoices = general_invoices.order(created_at: :desc).paginate(page: params[:page], per_page: params[:per_page])
+      end
       self.rental_invoices = params[:rental_invoices]
-      self.rental_invoices = apply_scopes(rental_invoices, params)
+      if self.rental_invoices.present?
+        self.rental_invoices = apply_scopes(rental_invoices, params)
+        self.paginated_rental_invoices = rental_invoices.order(created_at: :desc).paginate(page: params[:page], per_page: params[:per_page])
+      end
       if params[:agreement_item_type].present?
         filter_agreement_item_type
       end

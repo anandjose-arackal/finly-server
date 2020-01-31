@@ -162,6 +162,7 @@ class RentalInvoice < ApplicationRecord
     
     exclude_association :trails
     exclude_association :invoices
+    exclude_association :items
   end
   
 
@@ -224,8 +225,12 @@ class RentalInvoice < ApplicationRecord
     where(end_date: end_date.to_date)
   }
 
-  scope :filter_upcoming_invoice_date, -> (from, to){
-    # binding.pry
+  scope :filter_upcoming_invoice_date, -> (from, to){ 
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.parse('01-01-2050') if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where("DATE(payment_agreement_upcoming_date) >= ? AND DATE(payment_agreement_upcoming_date) <= ?", from, to)
   }
 
   # Columns mapped with actual invoice columns
@@ -349,7 +354,7 @@ class RentalInvoice < ApplicationRecord
   end
 
   def allowed_to_add_invoice?
-    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date >= Date.today
+    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date >= Date.today && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
   end
 
   def agreement_invoice_created?

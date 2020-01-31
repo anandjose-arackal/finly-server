@@ -343,6 +343,8 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
     when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
+    when 'AgreementInvoiceProvider', :AgreementInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:agreement_invoice_reviewer)).distinct
     end
   }
 
@@ -1530,7 +1532,7 @@ class User < ApplicationRecord
   end
 
 
-  # Agreement Based Payments Role
+  ########### Agreement Based Payments Role End #############
   def is_payment_agreement_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
   end
@@ -1542,6 +1544,19 @@ class User < ApplicationRecord
   def is_payment_agreement_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
+
+  def is_agreement_invoice_iniatitor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), document)
+  end
+
+  def is_agreement_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), document)
+  end
+
+  def is_agreement_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
+  end
+  ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)

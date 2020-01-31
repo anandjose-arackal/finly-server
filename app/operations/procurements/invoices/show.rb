@@ -190,7 +190,13 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
   
     def get_invoice_provider_name
-      self.invoice.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+      if self.invoice.procurement.purchase_order.present?
+        return 'PoInvoiceProvider'
+      elsif self.invoice.payment_agreement_id.present?
+        return 'AgreementInvoiceProvider'
+      else
+        return 'NonPoInvoiceProvider'
+      end
     end
   end
 

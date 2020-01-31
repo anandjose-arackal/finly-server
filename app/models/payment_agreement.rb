@@ -297,7 +297,7 @@ class PaymentAgreement < ApplicationRecord
         revised: self.revision_of_pa_id.present?,
         revision_of_pa_id: self.revision_of_pa_id,
         revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number
-    }
+      }
   end
 
   def self.document_owner_attribute
@@ -467,6 +467,21 @@ class PaymentAgreement < ApplicationRecord
 
   def get_agreement_number
     self.override_order_number.present? ? self.override_order_number : self.order_number
+  end
+
+  def is_agreement_invoice_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), self)
+  end
+
+  def is_agreement_invoice_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), self)
+  end
+
+  def is_agreement_invoice_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
 
 end

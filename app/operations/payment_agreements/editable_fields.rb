@@ -60,11 +60,11 @@ class PaymentAgreements::EditableFields < PaymentAgreements::Base
   def rental_invoice_field_config
     # return {} if self.payment_agreement.rental_invoices.blank?
     field_config = {
-      lock_in_perioid: false,
+      lock_in_perioid: true,
       rent_free_period: true,
       tenancy_period: true,
       notice_period: true,
-      square_feet: false
+      square_feet: true
     }
     invoice_field_config.merge(field_config)
   end
@@ -89,7 +89,7 @@ class PaymentAgreements::EditableFields < PaymentAgreements::Base
       line_items: {
         description: true,
         comment: true,
-        quantity: false,
+        quantity: true,
         unit_of_measurement: true,
         expected_rate: true,
         discount: true,
@@ -101,7 +101,7 @@ class PaymentAgreements::EditableFields < PaymentAgreements::Base
   def security_deposit_field_config
     # return {} if self.payment_agreement.security_deposits.blank?
     {
-      vendor_name: false,
+      vendor_name: true,
       vendor_location: true,
       account_name: true,
       cost_center: true,
@@ -118,7 +118,7 @@ class PaymentAgreements::EditableFields < PaymentAgreements::Base
       vendor_name: true,
       vendor_location: true,
       account_name: true,
-      cost_center: false,
+      cost_center: true,
       department: true,
       location: true,
       note: true,
