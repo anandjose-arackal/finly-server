@@ -63,7 +63,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
     invoice&.created_by&.name
   end
 
-  def gl_code(invoice)
+  def tds_gl_code(invoice)
     invoice.tds_slab&.gl_code
   end
 
