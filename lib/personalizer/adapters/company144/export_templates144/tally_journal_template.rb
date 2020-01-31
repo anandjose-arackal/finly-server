@@ -37,7 +37,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
+            report.approved_at&.strftime('%d/%m/%Y'),
             report.id,
             Date.today.strftime('%d/%m/%Y'),
             '',
@@ -54,7 +54,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
+            report.approved_at&.strftime('%d/%m/%Y'),
             report.id,
             Date.today.strftime('%d/%m/%Y'),
             '',
