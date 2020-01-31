@@ -59,4 +59,19 @@ class FeatureSubscription < ApplicationRecord
     false
   end
 
+  # this is only for when we are using the workaround
+  # for multi bank support
+  def bank_transaction_class
+    case self.bank_service_provider
+    when "YES"
+      return YesBankTransaction
+    when "ICICI"
+      return IciciBankTransaction
+    when "KOTAK"
+      return KotakBankTransaction
+    else
+      return YesBankTransaction
+    end
+  end
+
 end

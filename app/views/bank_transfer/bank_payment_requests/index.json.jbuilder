@@ -62,7 +62,7 @@ json.results do
           json.payment_mode payment.payment_mode&.upcase
           json.date payment.date.strftime('%d %b %Y')
           json.amount payment.amount_value
-          json.utr payment.reference_resource&.bank_reference_number
+          json.utr payment.utr
           json.payment_status payment.payment_status_name
           next if payment.receiving_account.is_a?(BbpsBiller)
           if payment&.receiving_account&.account_owner&.is_a?(YesBankVendor)

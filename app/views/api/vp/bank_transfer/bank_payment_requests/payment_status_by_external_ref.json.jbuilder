@@ -12,4 +12,4 @@ json.payment_mode payment.payment_mode
 json.system_messages do
   json.array! (payment.system_messages)
 end
-json.bank_reference_number payment.reference_resource&.bank_reference_number
+json.bank_reference_number payment.utr

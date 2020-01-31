@@ -29,8 +29,9 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       return
     end
 
-    bt = self.payment.reference_resource
-    if bt.present? && !(bt&.retriable?)
+    # getting the last tried payment, and making sure that it is failed
+    latest_bt = payment.reference_resources.first
+    if latest_bt.present? && !(latest_bt&.retriable?)
       add_message :error, "Only failed payments can be retried"
       return
     end

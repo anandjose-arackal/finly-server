@@ -16,7 +16,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
-    bank_transaction = payment.reference_resource
+    bank_transaction = payment.reference_resources.first
 
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure? || bank_transaction.pending_for_processing? || bank_transaction.pending_utr?)
       # payment cannot be processed in this case
@@ -39,15 +39,14 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource&.retriable?
+    if bank_transaction&.retriable?
       # here we shall create a new bank transaction that will contain the trails of the previous transaction
       bank_transaction = create_bank_transaction(payment, transfer_request)
-      # # updating the request number with a new one because the old one will have been used already
-      # bank_transaction.update_columns(unique_request_number: transfer_request.unique_reference_number)
-    elsif payment.reference_resource.blank? && payment.in_progress?
+    # i.e. it is the first time the payment is being credited
+    elsif bank_transaction.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
-      bank_transaction = payment.reference_resource
+      bank_transaction = payment.reference_resources.first
     end
 
 
