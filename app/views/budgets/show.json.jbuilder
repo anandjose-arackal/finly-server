@@ -1,4 +1,4 @@
-budget = @result["model"]
+budget = @op["model"]
 json.extract! budget, :id, :name, :user
 
 json.applicable_entities do

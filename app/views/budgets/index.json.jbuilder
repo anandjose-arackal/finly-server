@@ -1,5 +1,5 @@
 json.result do
-  json.array! @result["budgets"] do |budget|
+  json.array! @op["budgets"] do |budget|
     json.merge! budget.as_json
     # json.extract! budget, :id, :name
     # # json.period do

@@ -1,4 +1,4 @@
-budget = @result["model"]
+budget = @op["model"]
 case params[:filter_criteria]
 when 'budget'
 	json.result budget.budget_criteria_as_json
