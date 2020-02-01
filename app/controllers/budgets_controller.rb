@@ -1,6 +1,6 @@
 class BudgetsController < BaseControllers::WebBase
 
-  layout 'trailblazers'
+  layout 'trailblazers', only: [:index, :show, :sub_budgets, :create, :update]
 
   def index
     endpoint BudgetManager::BudgetsTrb::Ops::Index
