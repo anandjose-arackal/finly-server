@@ -57,6 +57,7 @@ class BranchLocation < ApplicationRecord
   scope :with_id, -> (id) { where id: id }
 
   scope :include_state, -> { includes :state }
+  default_scope {unscope(:where)}
 
   def state_code
     self.state&.state_code
