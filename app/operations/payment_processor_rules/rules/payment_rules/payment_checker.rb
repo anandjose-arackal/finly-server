@@ -35,7 +35,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
     end
   end
 
-  section 'Duplicate check inside the Payments Adapter' do
+  section 'Duplicate payment check inside the Payments Adapter' do
 
     premise :ensure_successive_payments_are_not_initiated_within_short_timeframe do
 
@@ -58,12 +58,16 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
     end
 
     premise :ensure_all_previous_transactions_have_failed_before_allowing_retry do
+
       rule "For a given payment, we need to make sure there are no old bank_transactions that are NOT failed" do
         payment = params[:payment]
         bank_transactions = payment.reference_resources
         # what we're doing below is that unless all previous bank_transactions have a failed or rejected status
         # the API call for this payment shall not happen
         if bank_transactions.present?
+
+          # TODO - call the common status checker class and update the status of this bank transaction
+
           unless bank_transactions.pluck(:transfer_status_id).uniq.sort == BankTransferStatus.ids_for(:failed, :rejected)
             add_system_message :error, payment, "Payment cannot be processed as there is a pending transaction for this payment with the bank"
             message "Payment cannot be processed as there is a pending transaction for this payment with the bank"
@@ -72,6 +76,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         end
       end
     end
+
   end
 
 

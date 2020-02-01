@@ -30,6 +30,14 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       reference_number = nil
     end
 
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      add_message :error, op.message
+      return false
+    end
+
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
@@ -41,14 +49,24 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       bank_transaction = payment.reference_resources.first
     end
 
-
-    unless bank_transaction
-      payment.system_messages.build(
-                                 content: "Payment cannot be processed at this time",
-                                 system_message_type_id: SystemMessageType.id_for(:error).save
-      )
+    # ensure that a new bank transction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transction is not
+    # created inside this adapter. Also logging the errors for this particular state
+    op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
+    unless op.success?
+      add_message :error, op.message
       return false
     end
+
+
+
+    # unless bank_transaction
+    #   payment.system_messages.build(
+    #                              content: "Payment cannot be processed at this time",
+    #                              system_message_type_id: SystemMessageType.id_for(:error).save
+    #   )
+    #   return false
+    # end
 
     # Initiates transaction
     op = KotakBankApi::Transfer.({

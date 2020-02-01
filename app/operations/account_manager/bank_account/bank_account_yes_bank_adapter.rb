@@ -61,6 +61,14 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       return false
     end
 
+    # adding another rule to ensure that if this is a retry, then all
+    # previous bank transactions have failed
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_payments_have_failed, {payment: payment, options: options})
+    unless op.success?
+      add_message :error, op.message
+      return false
+    end
+
     # unless bank_transaction.present?
     #   payment.system_messages.build(
     #                              content: "Payment cannot be processed at this time - #{bank_transaction.errors.full_messages.to_sentence}",

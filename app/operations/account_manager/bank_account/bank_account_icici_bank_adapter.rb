@@ -22,18 +22,20 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       # payment cannot be processed in this case
       return false
     elsif bank_transaction.present? && (bank_transaction&.retriable? || bank_transaction&.open? || bank_transaction&.rejected?)
-      # here we need to add additional checks to make sure that all bank_transactions before this have been failed
-      op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
-      unless op.success?
-        add_message :error, op.message
-        return false
-      end
       # even if the payment is being retried, the reference number needs to be
       # a new one
       reference_number = nil
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
+    end
+
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      add_message :error, op.message
+      return false
     end
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
@@ -50,13 +52,22 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     end
 
 
-    unless bank_transaction.present?
-      payment.system_messages.build(
-          content: "Payment cannot be processed at this time",
-          system_message_type_id: SystemMessageType.id_for(:error).save
-      )
+    # ensure that a new bank transction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transction is not
+    # created inside this adapter. Also logging the errors for this particular state
+    op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
+    unless op.success?
+      add_message :error, op.message
       return false
     end
+
+    # unless bank_transaction.present?
+    #   payment.system_messages.build(
+    #       content: "Payment cannot be processed at this time",
+    #       system_message_type_id: SystemMessageType.id_for(:error).save
+    #   )
+    #   return false
+    # end
 
     # checking to ensure that two bank transactions having the same ID can't be present for a single payment
     op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
