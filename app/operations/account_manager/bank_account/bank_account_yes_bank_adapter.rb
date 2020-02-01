@@ -45,27 +45,35 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
+    if bank_transaction.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
       bank_transaction = payment.reference_resources.first
     end
 
 
-    unless bank_transaction.present?
-      payment.system_messages.build(
-                                 content: "Payment cannot be processed at this time",
-                                 system_message_type_id: SystemMessageType.id_for(:error).save
-      )
+    # ensure that a new bank transction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transction is not
+    # created inside this adapter. Also logging the errors for this particular state
+    op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
+    unless op.success?
+      add_message :error, op.message
       return false
     end
 
+    # unless bank_transaction.present?
+    #   payment.system_messages.build(
+    #                              content: "Payment cannot be processed at this time - #{bank_transaction.errors.full_messages.to_sentence}",
+    #                              system_message_type_id: SystemMessageType.id_for(:error).save
+    #   )
+    #   return false
+    # end
 
     # checking to ensure that two bank transactions having the same ID can't be present for a single payment
     op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
     unless op.success?
       add_message :error, op.message
-      return
+      return false
     end
 
     op = YesBankApi::Transfer::BankTransfer.({

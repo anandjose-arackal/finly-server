@@ -703,12 +703,18 @@ class Payment < ApplicationRecord
   # since only one virtual account transaction can correspond to a single payment
   # can change in the future, but unlikely
   def virtual_account_transaction
+    return nil unless self.reference_resources.first.is_a?(VirtualAccountTransaction)
+    self.reference_resources.first
+  end
+
+  def bbps_bank_transaction
+    return nil unless self.reference_resources.first.is_a?(BbpsYesBankTransaction)
     self.reference_resources.first
   end
 
   def utr
     return super unless super.blank?
-    return self.reference_resources.first.utr
+    return self.reference_resources.first.try(:utr)
   end
 
   private

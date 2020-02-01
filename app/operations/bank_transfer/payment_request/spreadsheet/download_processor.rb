@@ -209,7 +209,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
           ]
         end
         payment_details += [
-            (payment.reference_resources&.bank_reference_number),
+            (payment.utr),
             payment.note,
             payment.payment_status&.name&.humanize,
             (payment.system_messages.pluck(:content)&.to_sentence)

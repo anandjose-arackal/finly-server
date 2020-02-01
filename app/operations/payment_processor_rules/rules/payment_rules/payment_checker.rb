@@ -74,4 +74,25 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
     end
   end
 
+
+  section 'Data consistency check inside payment adapter' do
+
+    premise :bank_transaction_must_exist_before_calling_bank_apis do
+
+      rule "Bank Transaction object must exist inside the payments adapter" do
+        bank_transaction = params[:bank_transaction]
+        payment = params[:payment]
+        # i.e. unless this bank transaction has been persisted, it's an error
+        unless bank_transaction.exists?
+          payment.system_messages.build(
+              content: "Payment cannot be processed at this time - #{bank_transaction.errors.full_messages.to_sentence}",
+              system_message_type_id: SystemMessageType.id_for(:error).save
+          )
+          message "Bank Transaction did not get created inside the adapter - #{bank_transaction.errors.full_messages.to_sentence}"
+          fail
+        end
+      end
+    end
+  end
+
 end

@@ -266,7 +266,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
             receiving_account_number: payment.receiving_account&.account_number,
             receiving_account_ifsc: payment.receiving_account&.ifsc
         },
-        bank_reference_number: payment.reference_resource&.bank_reference_number
+        bank_reference_number: payment.utr
     }
     if payment.failed?
       post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence

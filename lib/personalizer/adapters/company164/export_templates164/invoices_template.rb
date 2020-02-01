@@ -206,7 +206,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Account': '61110004',
           'Sub Account': '9992',
           'Credit': (invoice.payments.joins(:amount).sum('amounts.value') || 0.0),
-          'Reference Code': invoice.payments&.first&.reference_resource&.bank_reference_number,
+          'Reference Code': invoice.payments&.first&.utr,
           'Supplier': invoice.vendor&.vendor_id,
           'Comments': 'Finly',
           'PAYMENT MODE': 'NEFT'

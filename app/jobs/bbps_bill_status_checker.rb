@@ -6,7 +6,7 @@ class BbpsBillStatusChecker < ApplicationJob
       bill = payment.parent
       next unless bill.present? && bill.class.name == "BbpsBill"
       order_number = bill.order_number
-      bank_transaction = payment.reference_resource
+      bank_transaction = payment.bbps_bank_transaction
       params = {
           order_number: order_number
       }
