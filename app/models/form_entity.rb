@@ -76,7 +76,11 @@ class FormEntity < ApplicationRecord
   end
 
   def scope
-    super()&.with_indifferent_access
+    val = super()&.with_indifferent_access
+    return nil unless val.present?
+
+    handler = Forms::Entity::Scope.handler(val[:type])
+    handler.new val, form_entity: self
   end
 
   def schema
@@ -123,7 +127,7 @@ class FormEntity < ApplicationRecord
         populate_if_empty: populate_if_empty
     }
     property_options.reject! { |k, v| v.nil? }
-    builder_args = [field_key, self, schema, property_options, contract_block, collection: is_collection]
+    builder_args = [self, field_key, schema, property_options, contract_block, collection: is_collection]
     transformer = Forms::Contracts::Transformer.new(*builder_args)
     transformer.generate
   end

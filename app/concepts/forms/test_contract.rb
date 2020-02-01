@@ -16,6 +16,14 @@ class Forms::TestContract < Forms::Contracts::Builder
     property :profile do
       property :employee_id
     end
+    collection :role_mapping do
+
+    end
+    validate :test
+    def test
+      # debugger
+    end
+    # validate -> (){puts "Class: #{profile.class}"}
   end
 
 
@@ -25,6 +33,7 @@ class Forms::TestContract < Forms::Contracts::Builder
   property :profile, populate_if_empty: UserProfile do
     property :employee_id, form: {required: true, char_limit: 5}
   end
+
   # collection :name do
   #   property :description
   # end

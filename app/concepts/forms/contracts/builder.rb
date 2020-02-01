@@ -49,12 +49,16 @@ class Forms::Contracts::Builder
     entities_map = {}
     form.entities.includes(:entities).each {|e| entities_map[e.field_path] = e }
     klass = Class.new(Transactions::Contract) do
+      class_eval &user_scope if user_scope.present?
+      class_eval &functions if functions.present?
+
       properties.each do |prop|
         instance_eval &prop.build(form, entities_map)
       end
 
-      class_eval &functions if functions.present?
-      class_eval &user_scope if user_scope.present?
+      form.dependencies.each do |dependency|
+        instance_eval &dependency.contract
+      end
     end
     klass.send :model, form.model if form&.model
     klass

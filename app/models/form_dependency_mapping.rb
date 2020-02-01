@@ -22,7 +22,6 @@ class FormDependencyMapping < ApplicationRecord
   belongs_to :form_dependency
   belongs_to :controlling_choice, polymorphic: true
   has_many :dependency_choice_mappings, class_name: "FormDependencyChoiceMapping"
-  has_many :dependent_choices, through: :dependency_choice_mappings, class_name: "FormEntityChoice", foreign_key: :dependent_choice_id
 
   accepts_nested_attributes_for :dependency_choice_mappings
 end

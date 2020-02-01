@@ -8,7 +8,7 @@ class Forms::Contracts::Property
     self.block = block
     self.is_collection = collection
     self.parent = parent
-    self.path = self.parent.present? ? "#{parent.path}_#{self.name}" : "#{self.name}"
+    self.path = self.parent.present? ? "#{parent.path}/#{self.name}" : "#{self.name}"
 
     instance_eval &block if self.block.present?
   end
@@ -27,7 +27,6 @@ class Forms::Contracts::Property
 
   def build(form, entities_map)
     entity = entities_map[self.path]
-    # entity = form&.entities.find_by(field_path: self.path)
     if entity
       entity_options = entity.schema
       entity_options = entity_options.deep_merge(self.options[:form]) if self.options[:form]

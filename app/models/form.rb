@@ -28,11 +28,16 @@ class Form < ApplicationRecord
 
   def contract
     sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
+    dependencies = self.dependencies
     Class.new(Transactions::Contract) do
       sections.each do |section|
         section.entities.root.each do |entity|
           instance_eval &entity.contract
         end
+      end
+
+      dependencies.each do |dependency|
+        instance_eval &dependency.contract
       end
     end
   end

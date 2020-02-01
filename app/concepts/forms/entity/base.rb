@@ -64,7 +64,7 @@ module Forms
       def initialize(section, field_key, parent_path, opts = {}, &block)
         self.section = section
         field_key(field_key)
-        full_path = parent_path.present? ? "#{parent_path}_#{field_key}" : "#{field_key}"
+        full_path = parent_path.present? ? "#{parent_path}/#{field_key}" : "#{field_key}"
         field_path(full_path)
         section(section)
         self.options = opts || {}

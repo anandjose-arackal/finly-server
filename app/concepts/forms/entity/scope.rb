@@ -1,24 +1,43 @@
 class Forms::Entity::Scope
 
-  def self.List(*args)
-    {choices: args&.map { |m| m.slice(:value, :active) }}
+  def self.scope_handlers
+    @scope_handlers ||= {}.with_indifferent_access
   end
 
-  def self.AutoComplete(route, filters: {})
-    {auto_complete_route: route.to_s, filters: filters}
+  def self.register(type, klass)
+    scope_handlers[type] = klass
   end
 
-  def self.Enum(klass, *keys)
-    {enum: klass.to_s, keys: keys}
+  def self.handler(type)
+    scope_handlers[type]
+    # scope_handlers.find do |handler|
+    #   handler.accept?(args)
+    # end
   end
 
-  def self.Resolver(klass, *keys, filters: {})
-    {resolver: klass.to_s, keys: keys, filters: filters}
+  def self.[](key)
+    scope_handlers[key]
   end
 
-  def self.Boolean()
-    List({value: "true", active: true}, {value: "false", active: true})
-  end
+  # def self.List(*args)
+  #   {choices: args&.map { |m| m.slice(:value, :active) }}
+  # end
+  #
+  # def self.AutoComplete(route, filters: {})
+  #   {route: route.to_s, filters: filters}
+  # end
+  #
+  # def self.Enum(klass, *keys)
+  #   {enum: klass.to_s, keys: keys}
+  # end
+  #
+  # def self.Resolver(klass, *keys, filters: {})
+  #   {resolver: klass.to_s, keys: keys, filters: filters}
+  # end
+  #
+  # def self.CheckBox()
+  #   List({value: "true", active: true}, {value: "false", active: true})
+  # end
 
   def self.choice_value(form_entity, user, choice)
     return nil unless (scope = form_entity.scope).present?
@@ -29,8 +48,8 @@ class Forms::Entity::Scope
       resolver = Object.const_get(scope[:resolver])
       result = resolver.(params: {q: {name_eq: choice}}, current_user: user)
       return result['model.records'].first
-    elsif scope[:auto_complete_route].present?
-      route = scope[:auto_complete_route]
+    elsif scope[:route].present?
+      route = scope[:route]
       resolver = AutoComplete::Router.resolve(route)&.first&.klass
       result = resolver.(params: {q: {name_eq: choice}}, current_user: user)
       return result['model.records']&.first
@@ -48,8 +67,8 @@ class Forms::Entity::Scope
       resolver = Object.const_get(scope[:resolver])
       result = resolver.(params: {q: {id_eq: choice_id}}, current_user: user)
       return result['model.records'].present?
-    elsif scope[:auto_complete_route].present?
-      route = scope[:auto_complete_route]
+    elsif scope[:route].present?
+      route = scope[:route]
       resolver = AutoComplete::Router.resolve(route)&.first&.klass
       result = resolver.(params: {q: {id_eq: choice_id}}, current_user: user)
       return result['model.records'].present?
@@ -67,8 +86,8 @@ class Forms::Entity::Scope
   #     resolver = Object.const_get(scope[:resolver])
   #     result = resolver.(params: {q: {name_eq: choice}}, current_user: user_scope)
   #     return result['model.records'].first&.id
-  #   elsif scope[:auto_complete_route].present?
-  #     route = scope[:auto_complete_route]
+  #   elsif scope[:route].present?
+  #     route = scope[:route]
   #     resolver = AutoComplete::Router.resolve(route)&.first&.klass
   #     result = resolver.(params: {q: {name_eq: choice}}, current_user: user_scope)
   #     return result['model.records']&.first&.id

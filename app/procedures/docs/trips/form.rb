@@ -6,12 +6,12 @@ class Docs::Trips::Form < Forms::API
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
     dropdown :created_by, required: true, visible: false#, class_name: 'User'
     dropdown :company, required: true#, class_name: 'Company', internal: true
-    # lookup :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {}), required: true
-    # lookup :location_id, scope: Forms::Entity::Scope::AutoComplete('locations', filters: {}), required: true
-    # lookup :cost_center_id, scope: Forms::Entity::Scope::AutoComplete('cost_centers', filters: {}), required: true
-    dropdown :status_id, scope: Forms::Entity::Scope::Enum(TripStatus, :id, :name), required: true, default_value: 1
-    dropdown :trip_type_id, scope: Forms::Entity::Scope::Enum(TripType, :id, :name), required: true
-    dropdown :policy_id, scope: Forms::Entity::Scope::AutoComplete('policies', filters: {}), required: true
+    # lookup :department_id, scope: Forms::Entity::Scope[:auto_complete].scope('departments', filters: {}), required: true
+    # lookup :location_id, scope: Forms::Entity::Scopes::AutoComplete.scope('locations', filters: {}), required: true
+    # lookup :cost_center_id, scope: Forms::Entity::Scopes::AutoComplete.scope('cost_centers', filters: {}), required: true
+    dropdown :status_id, scope: Forms::Entity::Scope[:enum].scope(TripStatus, :id, :name), required: true, default_value: 1
+    dropdown :trip_type_id, scope: Forms::Entity::Scope[:enum].scope(TripType, :id, :name), required: true
+    dropdown :policy_id, scope: Forms::Entity::Scope[:auto_complete].scope('policies', filters: {}), required: true
     date :start_date, required: true
     date :end_date, required: true
     text :purpose, required: true
@@ -31,9 +31,9 @@ class Docs::Trips::Form < Forms::API
       text :to_location, required: true
       date :depart_on, required: true
       date :return_on
-      boolean :require_transport, default_value: false
-      boolean :require_hotel, default_value: false
-      boolean :require_local_conveyance, default_value: false
+      checkbox :require_transport, default_value: false
+      checkbox :require_hotel, default_value: false
+      checkbox :require_local_conveyance, default_value: false
     end
   end
 
@@ -41,9 +41,9 @@ class Docs::Trips::Form < Forms::API
     collection :transport_requests, populate_if_empty: TripTransportRequest do
       text :from_location, required: true
       text :to_location, required: true
-      dropdown :mode, scope: Forms::Entity::Scope::List({value: "Flight"}), required: true
+      dropdown :mode, scope: Forms::Entity::Scopes::List.scope({value: "Flight"}), required: true
       datetime :depart_on, required: true
-      dropdown :preferred_timeframe, required: true, scope: Forms::Entity::Scope::List(
+      dropdown :preferred_timeframe, required: true, scope: Forms::Entity::Scopes::List.scope(
           {value: "6am to 9am"}, {value: "9am to 12pm"}, {value: "12pm to 3pm"},
           {value: "3pm to 6pm"}, {value: "6pm to 9pm"}, {value: "9pm to 12am"},
           {value: "12am to 3am"}, {value: "3am to 6am"}
@@ -77,11 +77,11 @@ class Docs::Trips::Form < Forms::API
 
   dependency(
       {
-          controlling_field: :status_id,
-          dependent_field: :transport_requests_preferred_timeframe,
+          controlling_field: 'status_id',
+          dependent_field: 'transport_requests/preferred_timeframe',
           dependency_mappings: [
               {
-                  controlling_choice: :draft,
+                  controlling_choice: 'draft',
                   required: false, editable: true, visible: true,
                   choices: ['6am to 9am']
               }

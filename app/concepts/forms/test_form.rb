@@ -9,8 +9,8 @@ class Forms::TestForm < Forms::API
   # section :line_items do
   #   collection :line_items do
   #     text :item_description, hint: "Please enter the name of the field", char_limit: 255
-  #     dropdown :status_id, scope: Forms::Entity::Scope::List({value: 1, name: 'Approved'}, {value: 1, name: 'Pending'})
-  #     dropdown :department_id, scope: Forms::Entity::Scope::AutoComplete('departments', filters: {})
+  #     dropdown :status_id, scope: Forms::Entity::Scopes::List({value: 1, name: 'Approved'}, {value: 1, name: 'Pending'})
+  #     dropdown :department_id, scope: Forms::Entity::Scopes::AutoComplete('departments', filters: {})
   #   end
   # end
 

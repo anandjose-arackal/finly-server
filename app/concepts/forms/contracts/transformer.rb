@@ -11,7 +11,7 @@ class Forms::Contracts::Transformer
   end
 
   def contract_validations
-    # Setters: Executed first to set all the values. This will ensure all values are set before the validations are run. Ex: default_value transformer
+    # Setters: Executed first to set all the values. This will ensure all values are set before the validations are run. Ex: Define
     # validates: name, validation_config
     # validate: Proc used to define validations
     validations = {validates: [], validate: [], setters: []}
@@ -25,7 +25,7 @@ class Forms::Contracts::Transformer
     end
 
     entity_options[:options]&.each do |option, value|
-      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(entity,field_name, value)
+      transformer = Forms::Contracts::Transformers::Registry.for(option)&.new(entity, field_name, value)
       next unless transformer
 
       validations[:setters] += transformer.setters

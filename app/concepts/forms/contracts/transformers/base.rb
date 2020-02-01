@@ -10,7 +10,7 @@ class Forms::Contracts::Transformers::Base
     @validates ||= []
   end
 
-  def validate
+  def  validate
     @validate ||= []
   end
 
