@@ -271,6 +271,8 @@ class PaymentAgreement < ApplicationRecord
     with_ids(ids)
   }
 
+  scope :exclude_revision, -> { where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
+
 
   def as_json(options={})
     {
@@ -296,7 +298,9 @@ class PaymentAgreement < ApplicationRecord
         termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
         revised: self.revision_of_pa_id.present?,
         revision_of_pa_id: self.revision_of_pa_id,
-        revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number
+        revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number,
+        revision_reason: self.revision_reason,
+        termination_reason: self.termination_reason
       }
   end
 

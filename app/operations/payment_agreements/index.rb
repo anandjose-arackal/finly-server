@@ -13,6 +13,9 @@ class PaymentAgreements::Index < PaymentAgreements::Base
       admin_restricted_status_ids = [PaymentAgreementStatus.id_for(:draft)]
       self.payment_agreements = ::PaymentAgreement.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})
       self.payment_agreements = user.payment_agreements.or(payment_agreements)
+      if self.payment_agreements.present?
+        self.payment_agreements = self.payment_agreements.exclude_revision
+      end
       return
     end
 

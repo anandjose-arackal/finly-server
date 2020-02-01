@@ -34,7 +34,7 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
     end
 
     self.workflow_output = op.workflow_output
-    self.payment_agreement.update(revision_reason: params[:revision_reason])
+    self.payment_agreement.update(revision_reason: params[:revision_reason], revised_by_id: user.id)
     create_revised_agreement
   end
 
@@ -47,7 +47,6 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
     
     attr_accessor :revised_agreement, :payment_agreement
     def init
-      # self.payment_agreement = params[:payment_agreement]
       self.revised_agreement = params[:revised_agreement]
     end
   end
@@ -60,27 +59,16 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
 
   def create_revised_agreement
     self.revised_agreement = self.payment_agreement.amoeba_dup
-    self.revised_agreement.agreement_date = Date.today
-    self.revised_agreement.execution_date = Date.today
+    # self.revised_agreement.agreement_date = Date.today
+    # self.revised_agreement.execution_date = Date.today
     self.revised_agreement.revision_of_pa_id = self.payment_agreement.id
     # self.revised_agreement.policy_id = nil
     self.revised_agreement.controlling_level_id = nil
     self.revised_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
-    # dlrms_attr = {taken_control:false, taken_control_by_id: nil, viewable: false, action_taken_by_id: nil, action_id: nil, policy_id: , level_id: document_reviewer_mappable_id: , document_reviewer_mappable_type: 'PaymentAgreement'}
-    # self.revised_agreement.document_level_reviewer_mappings.each {|dlrm| dlrm.assign_attributes(dlrms_attr)}
     self.revised_agreement.save!
     dlrms_attr = {id: nil, taken_control:false, taken_control_by_id: nil, viewable: false, action_taken_by_id: nil, action_id: nil}
     self.revised_agreement.document_level_reviewer_mappings = payment_agreement.document_level_reviewer_mappings
     self.revised_agreement.document_level_reviewer_mappings.each {|dlrm| dlrm.assign_attributes(dlrms_attr)}
     self.revised_agreement.save!
-
-
-    # params[:reviewal_document] = self.revised_agreement.reload
-    # # document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-    # unless document_reviewer_mappings_op.success?
-    #   self.revised_agreement.destroy
-    #   add_message :error, document_reviewer_mappings_op.messages[:error]
-    #   return
-    # end
   end
 end
