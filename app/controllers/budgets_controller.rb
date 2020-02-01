@@ -3,7 +3,8 @@ class BudgetsController < BaseControllers::WebBase
   layout 'trailblazers'
 
   def index
-    @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
+    endpoint BudgetManager::BudgetsTrb::Ops::Index
+    # @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
@@ -12,7 +13,8 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def show
-    @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
+    endpoint BudgetManager::BudgetsTrb::Ops::Show
+    # @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
@@ -26,7 +28,8 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def sub_budgets
-    @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
+    endpoint BudgetManager::BudgetsTrb::Ops::Show
+    # @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
@@ -35,7 +38,8 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def create
-    @result = BudgetManager::BudgetsTrb::Ops::Create.(params.to_unsafe_h, "current_user" => current_user)
+    endpoint BudgetManager::BudgetsTrb::Ops::Create
+    # @result = BudgetManager::BudgetsTrb::Ops::Create.(params.to_unsafe_h, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
@@ -44,7 +48,8 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def update
-    @result = BudgetManager::BudgetsTrb::Ops::Update.(params, "current_user" => current_user)
+    endpoint BudgetManager::BudgetsTrb::Ops::Create
+    # @result = BudgetManager::BudgetsTrb::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
