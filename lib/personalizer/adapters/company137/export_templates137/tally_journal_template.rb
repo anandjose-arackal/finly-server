@@ -1,7 +1,7 @@
 class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTemplate < Personalizer::Adapters::ExportBase
   attr_accessor :headers, :contents, :procurements
 
-  
+
   def pre_validate
 
   end
@@ -14,7 +14,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
       add_message :error, invoices_presenter.messages[:error]
       return
     end
-    invoices =invoices_presenter.invoices.where(invoice_type: [InwardInvoiceStatus.id_for(:tax_invoice),InwardInvoiceStatus.id_for(:non_po_invoice)])
+    invoices = invoices_presenter.invoices.where(invoice_type: [InwardInvoiceType.id_for(:tax_invoice), InwardInvoiceType.id_for(:non_po_invoice)])
     self.headers = [
         'Vch Type',
         'Tally VoucherVch No.',
@@ -71,7 +71,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
     invoices.each do |invoice|
       grn = invoice.procurement&.inward_documents&.first
       invoice&.items&.each do |item|
-        self.contents <<[
+        self.contents << [
             get_voucher_type(invoice),
             '',
             Date.today&.strftime("%b %d, %y"),
@@ -94,7 +94,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
             item&.tax&.to_f,
             'Purchase Taxable',
             item&.taxable_amount&.value,
-            'Office Expenses',
+            item&.category&.name,
             item&.net_amount&.value,
             '',
             '',
@@ -108,11 +108,11 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
             '',
             '',
             '',
-            ((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(po) : ''),
+            ((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(invoice) : ''),
             item&.cgst,
-            ((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(po) : ''),
+            ((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(invoice) : ''),
             item&.sgst,
-            ((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(po) : ''),
+            ((item&.igst.present? && item&.igst > 0) ? get_igst_ledger(invoice) : ''),
             item.igst,
             '',
             '',
@@ -162,7 +162,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
   end
 
   def get_order_number(invoice)
-    order_number =""
+    order_number = ""
     if invoice.invoice_type == 'non_po_invoice'
       order_number = invoice.invoice_id
     elsif invoice.invoice_type == 'tax_invoice'
@@ -182,4 +182,4 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
     Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
   end
 
-  end
+end

@@ -1,5 +1,5 @@
 class KycProcess::User::Base < BaseOperation
-  attr_accessor :individual_kyc,:update_user
+  attr_accessor :individual_kyc,:update_user,:kyc_operation_phone_number
 
   def pre_validate
     if user.blank? or params&.dig(:id).blank?
@@ -11,6 +11,7 @@ class KycProcess::User::Base < BaseOperation
     self.update_user = User::Show.(user, params)&.selected_user
     return if self.update_user.blank?
     self.individual_kyc = self.update_user.individual_kyc
+    self.kyc_operation_phone_number = '8419957575'
   end
 
   # def pre_validate

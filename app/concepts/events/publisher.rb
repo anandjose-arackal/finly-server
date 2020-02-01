@@ -9,7 +9,7 @@ class Events::Publisher
     raise "Consumer key cannot be nil" if consumer_key.nil?
 
     payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), type: :event}
-    payload.reject! { |k, v| v.nil? } # Remove all nil values
+    payload.reject! {|k, v| v.nil?} # Remove all nil values
 
     if Rails.env.production?
       Async.(routing_key, payload, current_user: current_user, persistence: persistence, consumer_key: consumer_key)

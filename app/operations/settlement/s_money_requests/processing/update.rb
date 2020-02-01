@@ -1,5 +1,7 @@
 # Update UTR and Paid status individually for the iten from the Batch show page
-# 
+# If no details are supplied then money requests are not credited.
+# To credit it explicitly, call the mark_as_paid operation
+#  
 class Settlement::SMoneyRequests::Processing::Update < Settlement::SMoneyRequests::Processing::Base
   attr_accessor :money_request_processor, :mapping, :pending_mappings, :request_params
 

@@ -20,7 +20,14 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
           attachment_params.delete(:procurement_document_type)
           attachment_params.delete(:procurement_document_id)
         end
+      when 'CreditNote'
+        document = CreditNote.find_by id: attachment_params[:procurement_document_id]
+        unless document&.company_id == user.company_id
+          attachment_params.delete(:procurement_document_type)
+          attachment_params.delete(:procurement_document_id)
+        end
       end
+
     else
       attachment_params.delete(:procurement_document_type)
       attachment_params.delete(:procurement_document_id)
