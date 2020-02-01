@@ -280,7 +280,8 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :quickbooks_user
   accepts_nested_attributes_for :enforce_policy
 
-  delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :employee_id, to: :profile, allow_nil: true
   delegate :company_name, to: :company
 
   ############# Devise validateable validations ############

@@ -180,7 +180,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def actual_invoice_absent
-    self.payment_agreement.general_invoices.agreement_invoices.blank? && self.payment_agreement.general_invoices.recurring_invoices.blank?
+    self.payment_agreement.agreement_invoices.blank? && self.payment_agreement.recurring_invoices.blank?
   end
 
 end
