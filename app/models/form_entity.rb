@@ -80,7 +80,7 @@ class FormEntity < ApplicationRecord
     return nil unless val.present?
 
     handler = Forms::Entity::Scope.handler(val[:type])
-    handler.new val, form_entity: self
+    handler.new val, self
   end
 
   def schema

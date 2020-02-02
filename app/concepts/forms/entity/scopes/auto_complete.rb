@@ -10,14 +10,18 @@ class Forms::Entity::Scopes::AutoComplete < Forms::Entity::Scopes::Base
     scope[:filters]
   end
 
-  def find(choice, user: nil)
-    resolver = ::AutoComplete::Router.resolve(route)&.first&.klass
-    result = resolver.(params: {q: {name_eq: choice}}, current_user: user)
+  def klass
+    ::AutoComplete::Router.resolve(route)&.first&.klass
+  end
+
+  def find_by_id(choice, user: nil)
+    result = klass.(params: {q: {id_eq: choice}}, current_user: user)
     result['model.records']&.first
   end
 
-  def valid?(choice, user: nil)
-    find(choice).present?
+  def find_by_name(choice, user: nil)
+    result = klass.(params: {q: {name_eq: choice}}, current_user: user)
+    result['model.records']&.first
   end
 
   def self.scope(route, filters)

@@ -13,4 +13,5 @@ class Docs::Trips::Ops::Create < Transactions::API
     Docs::Trips::Contracts::Create.build(current_user).new(model)
   end
 
+
 end

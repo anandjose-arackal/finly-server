@@ -20,47 +20,24 @@ class Forms::Contracts::Builder
     @functions
   end
 
-  def self.user_scope(scope = NoObject)
-    @user_scope = scope unless scope == NoObject
-    @user_scope
-  end
-
-  def self.define_user_scope
-    scope = user_scope
-    lambda do |*args|
-      define_method :user_scope do
-        return nil unless scope.present?
-
-        user = send(scope)
-        if scope.to_s.ends_with?('_id') and not user.class.to_s == User.name
-          User.find_by(id: send(scope))
-        else
-          user
-        end
-      end
-    end
-  end
-
   def self.build(user)
     form = self.form.fetch(user)
     properties = self.properties
     functions = self.functions
-    user_scope = define_user_scope
     entities_map = {}
     form.entities.includes(:entities).each {|e| entities_map[e.field_path] = e }
-    klass = Class.new(Transactions::Contract) do
-      class_eval &user_scope if user_scope.present?
+    klass = Class.new(Forms::Contract) do
       class_eval &functions if functions.present?
 
       properties.each do |prop|
-        instance_eval &prop.build(form, entities_map)
+        class_eval &prop.build(form, entities_map)
       end
 
       form.dependencies.each do |dependency|
-        instance_eval &dependency.contract
+        class_eval &dependency.contract
       end
     end
-    klass.send :model, form.model if form&.model
+    klass.send :model, form.model if form.model
     klass
   end
 

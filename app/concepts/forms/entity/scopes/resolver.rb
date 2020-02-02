@@ -14,14 +14,14 @@ class Forms::Entity::Scopes::Resolver < Forms::Entity::Scopes::Base
     scope[:keys]
   end
 
-  def find(choice, user: nil)
-    resolver = Object.const_get(klass.to_s)
-    result = resolver.(params: {q: {name_eq: choice}}, current_user: user)
+  def find_by_id(choice, user: nil)
+    result = klass.(params: {q: {id_eq: choice}}, current_user: user)
     result['model.records'].first
   end
 
-  def valid?(choice, user: nil)
-    find(choice).present?
+  def find_by_name(choice, user: nil)
+    result = klass.(params: {q: {name_eq: choice}}, current_user: user)
+    result['model.records'].first
   end
 
   def self.scope(klass, *keys)

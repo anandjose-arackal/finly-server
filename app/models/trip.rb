@@ -27,6 +27,9 @@ class Trip < ApplicationRecord
   include SoftDeletable
   include UUIDHelper
   include Sequenced::ActsAsSequenced
+  include Forms::Contract::ModelHelper
+
+  owner_scope :created_by
 
   belongs_to :company
   belongs_to :created_by, class_name: 'User'
@@ -49,4 +52,5 @@ class Trip < ApplicationRecord
   acts_as_sequenced column: :trip_id, purpose: :trip, editable: false, prefix: 'TRF/'
 
   scope :non_draft, -> { where.not status_id: TripStatus.id_for(:draft) }
+
 end

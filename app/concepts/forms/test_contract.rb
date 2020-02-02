@@ -11,7 +11,7 @@ class Forms::TestContract < Forms::Contracts::Builder
 
   end
 
-  class Forms::TestContract::Test < Transactions::Contract
+  class Forms::TestContract::Test < Reform::Form
     property :first_name
     property :profile do
       property :employee_id

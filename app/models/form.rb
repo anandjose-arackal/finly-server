@@ -26,10 +26,16 @@ class Form < ApplicationRecord
     }
   end
 
+  def model
+    Object.const_get(super()) if super()
+  end
+
   def contract
     sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     dependencies = self.dependencies
-    Class.new(Transactions::Contract) do
+    Class.new(Forms::Contract) do
+      property :root_contract, virtual: true, deserializer: -> (input, represented, **) {puts "Root Contract (Root): #{self}";represented.root_contract = self}
+
       sections.each do |section|
         section.entities.root.each do |entity|
           instance_eval &entity.contract
@@ -37,7 +43,7 @@ class Form < ApplicationRecord
       end
 
       dependencies.each do |dependency|
-        instance_eval &dependency.contract
+        class_eval &dependency.contract
       end
     end
   end

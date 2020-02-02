@@ -18,7 +18,7 @@ extend ActiveSupport::Concern
 
   module Build
     def self.with(api, user:, params:)
-      klass = Class.new(Transactions::Contract) do
+      klass = Class.new(Reform::Form) do
         api.sections.each do |section|
           section.entities.each do |entity|
             instance_eval &entity.build

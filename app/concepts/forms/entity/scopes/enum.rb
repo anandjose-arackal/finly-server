@@ -10,12 +10,12 @@ class Forms::Entity::Scopes::Enum < Forms::Entity::Scopes::Base
     scope[:keys]
   end
 
-  def find(choice, user: nil)
-    klass.where(name: choice).or(klass.where(id: choice)).first
+  def find_by_id(choice, user: nil)
+    klass.where(id: choice).first
   end
 
-  def valid?(choice, user: nil)
-    find(choice).present?
+  def find_by_name(choice, user: nil)
+    klass.where(name: choice).first
   end
 
   def self.scope(klass, *keys)

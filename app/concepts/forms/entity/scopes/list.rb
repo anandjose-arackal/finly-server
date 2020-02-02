@@ -6,16 +6,12 @@ class Forms::Entity::Scopes::List < Forms::Entity::Scopes::Base
   #   args[:choices].present?
   # end
 
-  def find(choice, user: nil)
-    if form_entity.present?
-      form_entity.choices.find_by(value: choice)
-    else
-      # Todo maybe handle it directly from the list of choices?
-    end
+  def find_by_id(choice, user: nil)
+    form_entity.choices.find_by(uuid: choice)
   end
 
-  def valid?(choice, user: nil)
-    find(choice, user: user).present?
+  def find_by_name(choice, user: nil)
+    form_entity.choices.find_by(value: choice)
   end
 
   def self.scope(*args)

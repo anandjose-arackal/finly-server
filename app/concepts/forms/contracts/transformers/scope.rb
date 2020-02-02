@@ -23,7 +23,7 @@ class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Ba
     value = self.value
     validate << -> do
       assigned_value = self.send(name)
-      unless value.valid?(assigned_value, user: user_scope)
+      unless value.valid?(id: assigned_value, user: RequestStore[:owner_scope])
         errors.add :base, "#{name.to_s.humanize} : invalid option selected"
       end
     end

@@ -3,18 +3,23 @@ class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contra
   register!
 
   def run!
-    return false unless (model = options[:populate_if_empty]).present?
+    return false unless (model_klass = options[:populate_if_empty]).present?
 
-    if model and not StringUtils.to_bool(options[:skip_destroy])
-      options[:populator] = -> (collection:, fragment:, index:, options:, **) do
-        item = collection.find { |item| [fragment["id"].to_s, fragment["uuid"].to_s].include?(item.id.to_s) }
+    name = self.name
+    if model_klass and not StringUtils.to_bool(options[:skip_destroy])
+      options[:populator] = -> (model: nil, collection:, fragment:, index: nil, options:, **) do
+        if collection
+          item = collection.find { |item| [fragment["id"].to_s, fragment["uuid"].to_s].include?(item.id.to_s) }
 
-        if fragment["_destroy"]
-          collection.destroy(item) if item
-          return skip!
+          if fragment["_destroy"]
+            collection.destroy(item) if item
+            return skip!
+          end
+
+          item ? item : collection.append(model_klass.new)
+        else
+          model || self.send("#{name}=", model_klass.new)
         end
-
-        item ? item : collection.append(model.new)
       end
     end
     true

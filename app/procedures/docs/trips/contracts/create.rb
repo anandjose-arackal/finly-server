@@ -1,7 +1,6 @@
 class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   form Docs::Trips::Form
-  user_scope :created_by
 
   property :company, validates: {presence: true}
   property :created_by, validates: {presence: true}

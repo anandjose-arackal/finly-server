@@ -6,16 +6,21 @@ class Forms::Entity::Scopes::CheckBox < Forms::Entity::Scopes::Base
   #   args[:checkbox]
   # end
 
-  def find(choice, user: nil)
-    if form_entity.present?
+  def find_by_id(choice, user: nil)
       form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
-    else
-      # Todo maybe handle it directly from the list of choices?
-    end
   end
 
-  def valid?(choice, user: nil)
-    [true, "true", "false", false].include?(choice) or find(choice, user: user).present?
+  def find_by_name(choice, user: nil)
+    form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
+  end
+
+  def valid?(id: nil, name: nil, user: nil)
+    return true if [true, "true", "false", false].include?(id)
+    return true if [true, "true", "false", false].include?(name)
+    return true if find_by_id(choice, user: user).present?
+    return true if find_by_name(choice, user: user).present?
+
+    false
   end
 
   def self.scope

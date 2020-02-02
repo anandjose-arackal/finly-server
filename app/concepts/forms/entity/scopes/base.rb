@@ -14,21 +14,29 @@ class Forms::Entity::Scopes::Base
     self.class.type
   end
 
-  def initialize(scope, form_entity: nil)
+  def initialize(scope, form_entity)
     self.scope = scope
     self.form_entity = form_entity
   end
 
-  def find(choice, user: nil)
+  def find_by_id(choice, user: nil)
     raise "Find is not defined for #{klass}"
   end
 
-  def valid?(choice, user: nil)
-    raise "Valid is not defined for #{klass}"
+  def find_by_name(choice, user: nil)
+    raise "Find is not defined for #{klass}"
+  end
+
+  def valid?(id: nil, name: nil, user: nil)
+    if id
+      find_by_id(id, user: user).present?
+    elsif name
+      find_by_name(name, user: user).present?
+    end
   end
 
   def as_json(options = {})
-    raise "Entity Scope is not defined for #{klass}"
+    raise "Entity Scope is not defined for #{self.class.klass}"
   end
 
 end
