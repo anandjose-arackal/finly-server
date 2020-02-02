@@ -34,8 +34,6 @@ class Form < ApplicationRecord
     sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     dependencies = self.dependencies
     Class.new(Forms::Contract) do
-      property :root_contract, virtual: true, deserializer: -> (input, represented, **) {puts "Root Contract (Root): #{self}";represented.root_contract = self}
-
       sections.each do |section|
         section.entities.root.each do |entity|
           instance_eval &entity.contract
