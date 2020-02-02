@@ -14,6 +14,7 @@ class Forms::Contract < Reform::Form
   # Overriding validate to capture the owner_scope as it was very difficult to
   # find the root contract from nested contracts. RequestStore[:owner_scope] is used for validating
   # the user when the resolver / auto-complete is set
+  # Fixme: Try and identify a way of easily navigating to parent and root contract from nested contracts
   def validate(input)
     if RequestStore[:owner_scope].nil?
       scope = model.class.owner_scope
