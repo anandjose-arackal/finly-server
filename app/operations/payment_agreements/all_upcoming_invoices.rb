@@ -9,8 +9,6 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
   end
 
   def process 
-    # self.general_invoices = user.company.general_invoices.where.not(billing_type_id: BillingType.id_for(:variable_periodic)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue Invoice.none
-
     one_time_gi_invoices = user.company.general_invoices.where(billing_type_id: BillingType.id_for(:one_time)).where("start_date <= ? AND end_date >= ? AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue GeneralInvoice.none
 
     fixed_periodic_gi_invoices = user.company.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue GeneralInvoice.none
@@ -23,8 +21,6 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
     fixed_periodic_ri_invoices = user.company.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where("payment_agreement_upcoming_date <= ?", Date.today).where(fixed_periodic_template: true) rescue RentalInvoice.none
 
     self.rental_invoices = one_time_ri_invoices.or(fixed_periodic_ri_invoices)
-
-    # self.rental_invoices = user.company.rental_invoices.where.not(billing_type_id: BillingType.id_for(:variable_periodic)).where("start_date <= ? AND end_date >= ?  AND payment_agreement_upcoming_date <= ?", Date.today, Date.today, Date.today).where(is_payment_agreement_upcoming_invoice: true) rescue Invoice.none
 
     initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
     self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
@@ -58,7 +54,7 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
       self.rental_invoices = params[:rental_invoices]
       if self.rental_invoices.present?
         self.rental_invoices = apply_scopes(rental_invoices, params)
-        self.paginated_rental_invoices = rental_invoices.order(created_at: :desc).paginate(page: params[:page], per_page: params[:per_page])
+        self.paginated_rental_invoices = self.rental_invoices.order(created_at: :desc).paginate(page: params[:page], per_page: params[:per_page])
       end
       if params[:agreement_item_type].present?
         filter_agreement_item_type
