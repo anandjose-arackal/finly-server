@@ -45,6 +45,8 @@ class Department < ApplicationRecord
 
   accepts_nested_attributes_for :user_department_mappings
 
+  default_scope {unscope(:where)}
+
   scope :with_ids, -> (id) { where id: id }
   scope :with_name, -> (name) {where name: name}
   # scope :only_sub_departments, -> {

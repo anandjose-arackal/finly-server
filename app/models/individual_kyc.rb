@@ -207,7 +207,6 @@ class IndividualKyc < ApplicationRecord
   def can_submit?
     return false if require_photo? and not self.photo.present?
     return false unless self.kyc_1_front.present? and self.kyc_1_back.present?
-    return false unless self.id_proof_front.present?
     true
   end
 

@@ -42,6 +42,9 @@ class Admin::Implementations::Master::Lrms::ImportTemplates < Admin::Implementat
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             BbpsBillerSubscriptionProvider
+             BbpsBillProvider
+             CreditNoteProvider
              )
 
     file = Tempfile.new(['lrm_import_template', '.xlsx'])

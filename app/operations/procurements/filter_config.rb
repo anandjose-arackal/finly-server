@@ -9,7 +9,7 @@ class Procurements::FilterConfig < Procurements::Base
     # self.departments = user.company.departments.roots
     self.sub_departments = user.company.departments.only_sub_departments
     # self.sub_departments = user.company.dep_subdept_mapping
-    self.cost_centers = user.company.cost_centers.with_application(current_app)
+    self.cost_centers = user.company.cost_centers.non_deleted.with_application(current_app)
     self.policies = ::Policy::VendorPayments::Index.(user, params).policies rescue Policy.none
   end
 
