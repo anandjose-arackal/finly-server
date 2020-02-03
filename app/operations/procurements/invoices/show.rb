@@ -36,7 +36,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
       end
-      self.cost_centers = user.company.cost_centers
+      self.cost_centers = user.company.cost_centers.non_deleted
       self.tax_rates = user.company.tax_rates
       self.gstin_locations = self.invoice.vendor&.gstin_locations
       self.variable_periodic_invoice = (self.invoice.open? || self.invoice.rejected? || self.invoice.retracted?) && (self.invoice.billing_type_id == BillingType.id_for(:variable_periodic))
@@ -251,6 +251,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if user.is_bank_payment_request_initiator?
     return if user.is_bank_payment_request_reviewer?
     return if user.is_bank_payment_request_creditor?
+    return if user.is_credit_note_initiator?
+    return if user.is_credit_note_reviewer?
     # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
     # return if validate_po_access
     add_message :error, 'You are not authorized to view this document, Please contact your Admin.'

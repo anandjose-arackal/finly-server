@@ -10,6 +10,8 @@
 #  updated_at       :datetime         not null
 #  is_deleted       :boolean
 #  deleted_at       :datetime
+#  category_id      :integer
+#  code             :string(255)
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)
@@ -37,6 +39,7 @@ class CostCenter < ApplicationRecord
 
   has_many :budget_trails
 
+  default_scope {unscope(:where).order(name: :asc)}
   scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app

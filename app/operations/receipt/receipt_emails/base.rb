@@ -22,6 +22,12 @@ class Receipt::ReceiptEmails::Base < BackgroundOperation
       add_message :error, 'Email not found'
       return
     end
+
+    if self.receipt_email.completed?
+      add_message :error, 'Email processed already'
+      return
+    end
+
   end
 
 end

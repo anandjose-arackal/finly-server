@@ -8,10 +8,10 @@ end
 
 namespace :load do
   task :defaults do
-    set :sneakers_pid, -> { File.join(shared_path, 'tmp', 'pids', 'sneakers.pid') }
-    set :sneakers_log, -> { File.join(shared_path, 'log', 'sneakers.log') }
+    set :sneakers_pid, -> {File.join(shared_path, 'tmp', 'pids', 'sneakers.pid')}
+    set :sneakers_log, -> {File.join(shared_path, 'log', 'sneakers.log')}
     # set :sneakers_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
-    set :sneakers_role, -> { :sneakers }
+    set :sneakers_role, -> {:sneakers}
     set :sneakers_env, fetch(:rack_env, fetch(:rails_env, 'production'))
   end
 end

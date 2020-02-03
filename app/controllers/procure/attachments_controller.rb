@@ -14,6 +14,4 @@ class Procure::AttachmentsController < BaseControllers::WebBase
     @result = Procurements::Attachments::Create.(current_user, params)
     respond
   end
-
-
 end

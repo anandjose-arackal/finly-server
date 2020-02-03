@@ -1,5 +1,6 @@
 class ExportManager::Builders::Spreadsheet < ExportManager::API
   include DSL
+  include MathUtil
 
   type :spreadsheet
 
