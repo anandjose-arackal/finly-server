@@ -52,7 +52,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.category_ids = category.pluck(:id) rescue []
     self.tax_rates = user.company.tax_rates.non_deleted
 
-    self.cost_centers = user.company.cost_centers
+    self.cost_centers = user.company.cost_centers.non_deleted
 
     self.summary = {}
     self.summary[:sum_of_item_amount] = 0

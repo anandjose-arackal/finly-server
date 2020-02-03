@@ -202,7 +202,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           item[:department_id] = department.id if department.present?
         end 
         if cost_center_id.present?
-          cost_center = user.company.cost_centers.find_by_id(cost_center_id)
+          cost_center = user.company.cost_centers.non_deleted.find_by_id(cost_center_id)
           item[:cost_center_name] = cost_center.name if cost_center.present?
           item[:cost_center_id] = cost_center.id if cost_center.present?
         end

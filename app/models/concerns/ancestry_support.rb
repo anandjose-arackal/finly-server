@@ -11,7 +11,7 @@ module AncestrySupport
 
   def json_tree(options={})
     json = as_json(options)
-    json[:children] = children&.map(&:json_tree)
+    json[:children] = children&.non_deleted&.map(&:json_tree)
     json
   end
 
