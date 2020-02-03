@@ -70,7 +70,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
       }.each do |k, v|
@@ -86,7 +86,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': '31329011',
-          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
+          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
           'Tax': item.tax_rate&.rate&.to_f,
           'Base Amount':item.taxable_amount&.value,
           'Debit': total_tax_value(item),
@@ -110,9 +110,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Invoice Number': invoice.invoice_number,
         'Invoice Date': invoice.date&.strftime("%d/%m/%Y"),
         'Invoice Type': 'I',
-        'State': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
+        'State': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : '') ,
         'Supplier GSTN': invoice&.gstin_location&.gstin,
-        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "'#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
+        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? "#{"%02d" % invoice&.gstin_location&.state&.state_code}" : ''),
         'Account': '43181001',
         'Supplier': invoice.vendor.vendor_id,
         'Sub Account': '',
@@ -134,14 +134,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': "'#{invoice.id}",
+          'Report ID': "#{invoice.id}",
           'Voucher Type': 'JV',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "'#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
+          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? "#{"%05d" % invoice.created_by.gl_config&.dig(:location_code)}" : ''),
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.net_amount&.value,
           'Comments': 'Finly'
@@ -154,7 +154,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     row = Row.new(record: invoice, header: header)
     {
         'S. NO.': sl_no,
-        'Report ID': "'#{invoice.id}",
+        'Report ID': "#{invoice.id}",
         'Voucher Type': 'JV',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -181,7 +181,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         row = Row.new(record: invoice, header: header)
         {
             'S. NO.': sl_no,
-            'Report ID': "'#{invoice.id}",
+            'Report ID': "#{invoice.id}",
             'Voucher Type': 'BP',
             'Period': invoice.date&.strftime("%Y%m"),
             'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -198,7 +198,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: invoice, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': "'#{invoice.id}",
+          'Report ID': "#{invoice.id}",
           'Voucher Type': 'BP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -244,7 +244,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       'Reference Code',
       'SAC',
       'Ref. Invoice No.',
-      'PAYMENT MODE',
+      'Payment Mode',
     ].each do |k|
       header.add k
     end
@@ -291,11 +291,11 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     else
       parent = item.category
     end
-    "'#{parent&.gl_code}"
+    "#{parent&.gl_code}"
   end
 
   def retrieve_sub_account(item)
-    "'#{item.category&.gl_code}"
+    "#{item.category&.gl_code}"
   end
 
 end

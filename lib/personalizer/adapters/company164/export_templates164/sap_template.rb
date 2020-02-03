@@ -60,7 +60,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             '',
             retrieve_account(expense),
             retrieve_sub_account(expense),
-            (report.user.gl_config&.dig(:location_code).present? ? "'#{"%05d" % report.user.gl_config&.dig(:location_code)}" : ''),
+            (report.user.gl_config&.dig(:location_code).present? ? "#{"%05d" % report.user.gl_config&.dig(:location_code)}" : ''),
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
@@ -178,14 +178,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
     parent_category_id = expense.category&.ancestry
     if parent_category_id.present?
       parent = self.categories.find(parent_category_id.to_i)
-      return "'#{parent.gl_code}"
+      return "#{parent.gl_code}"
     else
-      return "'#{expense.category&.gl_code}"
+      return "#{expense.category&.gl_code}"
     end
   end
 
   def retrieve_sub_account(expense)
-    "'#{expense.category&.gl_code}"
+    "#{expense.category&.gl_code}"
   end
 
 
