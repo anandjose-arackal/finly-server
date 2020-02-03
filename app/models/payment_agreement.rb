@@ -298,7 +298,7 @@ class PaymentAgreement < ApplicationRecord
   end
 
   def self.roles
-    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor]
+    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor]
   end
 
   def get_default_provider
