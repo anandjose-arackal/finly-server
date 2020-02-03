@@ -221,6 +221,7 @@ class PaymentAgreements::Base < BaseOperation
     amount_arr = []
     # Get value from line items
     invoice.items.each do |item|
+      next unless item.tds_applicable?
       if item.discount.present?
         amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
       else
