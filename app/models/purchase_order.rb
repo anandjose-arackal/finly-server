@@ -66,11 +66,12 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
+#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
-#  discount_type_id             :integer
 #  rejection_note               :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
@@ -963,6 +964,8 @@ class PurchaseOrder < ApplicationRecord
         tds = self.advance_tds_slab&.tds
         new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
         tds_amount = self.requested_advance_amount.value - new_advance_amount
+        # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+        tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
         if self.advance_amount.nil?

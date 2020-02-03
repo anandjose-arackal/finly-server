@@ -16,11 +16,21 @@ module TrailblazerErrorTracker
 
   def messages(type = nil)
     unless type
+      all_err_messages = []
+
+      errors.except(:base).each do |key, val|
+        prepend_value = key.to_s.humanize.gsub(".", " > ")
+        unless val.respond_to?(:each)
+          val = [val]
+        end
+        error_messages = val.map {|m| prepend_value + " " + m.to_s}
+        all_err_messages.push(error_messages)
+      end
+
+      all_err_messages.push(errors[:base])
       messages = {
           success: (messages(:success)&.values&.flatten || []),
-          # errors: (messages(:errors)&.values&.flatten || []),
-          errors: errors&.values&.flatten || [],
-          # errors_meta: (messages(:errors) || [])
+          errors: all_err_messages.flatten.compact,
           errors_meta: errors || {}
       }
       return messages

@@ -98,7 +98,11 @@ module Events::Consumer
   end
 
   def work(payload)
-    perform payload
+    # This is primarily to prevent database timeout exception that kept happening in production
+    # for sneakers
+    ActiveRecord::Base.connection_pool.with_connection do
+      perform payload
+    end
     ack! if respond_to?(:ack!)
   end
 

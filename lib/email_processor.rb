@@ -31,13 +31,14 @@ class EmailProcessor
       receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)
       receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", @email.raw_html)
       receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", @email.raw_headers)
+      receipt_email.receipt_email_status_id = ReceiptEmailStatus.id_for(:awaiting_processing)
       receipt_email.save
       if @email.attachments.any?
         @email.attachments.each do |attachment|
           receipt_email.receipt_email_attachments.create(original_attachment: attachment)
         end
       end
-      # receipt_email.save_receipts
+      receipt_email.update_columns(receipt_email_status_id: ReceiptEmailStatus.id_for(:in_progress))
       Receipt::ReceiptEmails::ProcessEmail.call_async(user.id, receipt_email_id: receipt_email.id)
     end
   end

@@ -136,7 +136,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def generate_xls_file
       file = Tempfile.new(['export', '.xlsx'])
-      workbook = ::WriteXLSX.new(file)
+      workbook = ::WriteXLSX.new(file, strings_to_urls: false)
       worksheet = workbook.add_worksheet('Sheet 1')
 
       self.headers.each_with_index do |item, index|
@@ -207,7 +207,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       file = Tempfile.new([filename, '.xlsx'])
 
       # Open Temporary file with WriteXLSX
-      workbook = ::WriteXLSX.new(file.path)
+      workbook = ::WriteXLSX.new(file.path, strings_to_urls: false)
 
       # Write to xlsx file
       self.sheets.each do |sheet|
@@ -295,7 +295,11 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           elsif file_details[:file_contents].present?
             stream.write file_details[:file_contents]
           elsif file_details[:url].present?
-            stream.write(open(file_details[:url]).read)
+            if Rails.env.production?
+              stream.write(open(file_details[:url]).read)
+            else
+              stream.write(open("#{Rails.root}/public#{file_details[:url]}"&.split("?")&.first).read)
+            end
           end
 
         end
