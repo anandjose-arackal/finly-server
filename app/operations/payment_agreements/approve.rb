@@ -37,7 +37,7 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
       update_one_time_invoice
       if self.payment_agreement.general_invoices.fixed_periodic_type.present? || self.payment_agreement.rental_invoices.fixed_periodic_type.present?
         params[:payment_agreement_id] = self.payment_agreement.id
-        upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoice.(user, params)
+        upcoming_invoice_op = ::PaymentAgreements::CreateUpcomingInvoiceBackground.call(user, {payment_agreement_id: self.payment_agreement.id})
       end
     end
   end
