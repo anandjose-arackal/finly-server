@@ -63,7 +63,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': "'#{invoice.id}",
+          'Report ID': {value: invoice.id, type: 'string'},
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -80,7 +80,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       row = Row.new(record: item, header: header)
       {
           'S. NO.': sl_no,
-          'Report ID': "'#{invoice.id}",
+          'Report ID': {value: invoice.id, type: 'string'},
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
