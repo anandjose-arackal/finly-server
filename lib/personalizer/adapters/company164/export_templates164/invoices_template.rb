@@ -62,7 +62,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': sl_no,
+          'S. NO.': {value: sl_no, type: 'string'},
           'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
@@ -79,7 +79,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       ap_entries << row
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': sl_no,
+          'S. NO.': {value: sl_no, type: 'string'},
           'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
@@ -100,7 +100,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     ########## Vendor Total Bill Amount, against all ap entries
     row = Row.new(record: invoice, header: header)
     {
-        'S. NO.': sl_no,
+        'S. NO.': {value: sl_no, type: 'string'},
         'Report ID': "'#{invoice.id}",
         'Voucher Type': 'AP',
         'Period': invoice.date&.strftime("%Y%m"),
@@ -133,7 +133,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': sl_no,
+          'S. NO.': {value: sl_no, type: 'string'},
           'Report ID': "#{invoice.id}",
           'Voucher Type': 'JV',
           'Period': invoice.date&.strftime("%Y%m"),
@@ -153,7 +153,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     end
     row = Row.new(record: invoice, header: header)
     {
-        'S. NO.': sl_no,
+        'S. NO.': {value: sl_no, type: 'string'},
         'Report ID': "#{invoice.id}",
         'Voucher Type': 'JV',
         'Period': invoice.date&.strftime("%Y%m"),
@@ -180,7 +180,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       bp_entries=[]
         row = Row.new(record: invoice, header: header)
         {
-            'S. NO.': sl_no,
+            'S. NO.': {value: sl_no, type: 'string'},
             'Report ID': "#{invoice.id}",
             'Voucher Type': 'BP',
             'Period': invoice.date&.strftime("%Y%m"),
@@ -197,7 +197,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         bp_entries << row
       row = Row.new(record: invoice, header: header)
       {
-          'S. NO.': sl_no,
+          'S. NO.': {value: sl_no, type: 'string'},
           'Report ID': "#{invoice.id}",
           'Voucher Type': 'BP',
           'Period': invoice.date&.strftime("%Y%m"),

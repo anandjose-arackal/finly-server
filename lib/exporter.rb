@@ -144,7 +144,12 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       self.contents.each_with_index do |items, row|
         items.each_with_index do |item, column|
-          worksheet.write(1 + row, column, item)
+          if item.is_a?(Hash)
+            puts item
+            worksheet.write_string(1 + row, column, item[:value])
+          else
+            worksheet.write(1 + row, column, item)
+          end
         end
       end
       workbook.close
