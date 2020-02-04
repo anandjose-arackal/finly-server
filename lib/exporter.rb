@@ -148,6 +148,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
             puts item
             worksheet.write_string(1 + row, column, item[:value])
           else
+            puts item
+            puts item.class
             worksheet.write(1 + row, column, item)
           end
         end
