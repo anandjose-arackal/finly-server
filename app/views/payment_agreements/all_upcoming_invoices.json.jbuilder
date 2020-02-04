@@ -15,3 +15,11 @@ json.results do
     end
   end
 end
+
+gi_count = 0
+ri_count = 0
+
+gi_count = @result.general_invoices.count if @result.general_invoices.present?
+ri_count = @result.rental_invoices.count if @result.rental_invoices.present?
+
+json.count gi_count + ri_count
