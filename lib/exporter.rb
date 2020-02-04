@@ -145,11 +145,16 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       self.contents.each_with_index do |items, row|
         items.each_with_index do |item, column|
           if item.is_a?(Hash)
-            puts item
-            worksheet.write_string(1 + row, column, item[:value])
+            case item[:value]
+            when 'string'
+              worksheet.write_string(1 + row, column, item[:value])
+            when 'number'
+              worksheet.write_number(1 + row, column, item[:value])
+            when 'currency'
+            else
+               worksheet.write_string(1 + row, column, item[:value])
+            end
           else
-            puts item
-            puts item.class
             worksheet.write(1 + row, column, item)
           end
         end
