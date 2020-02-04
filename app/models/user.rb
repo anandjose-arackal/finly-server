@@ -1546,7 +1546,7 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
 
-  def is_agreement_invoice_iniatitor?(document = nil)
+  def is_agreement_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), document)
   end
 

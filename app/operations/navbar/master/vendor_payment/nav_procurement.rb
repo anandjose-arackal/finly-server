@@ -125,7 +125,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def upcoming_invoices
-    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator?)
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator? || user.agreement_invoice_initiator?)
     {name: 'Upcoming Invoices', id: 'payables', url: 'upcoming_invoices'}
   end
 
