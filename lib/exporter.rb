@@ -151,9 +151,12 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
             when 'number'
               worksheet.write_number(1 + row, column, item[:value])
             when 'date'
-              binding.pry
-              date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
-              worksheet.write(1 + row, column, item[:value], date_format)
+              if item[:value].present?
+               date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+               worksheet.write_date_time(1 + row, column, item[:value]&.iso8601, date_format)
+              else
+                worksheet.write_blank(1 + row, column)
+              end
             when 'currency'
             else
                worksheet.write_string(1 + row, column, item[:value])

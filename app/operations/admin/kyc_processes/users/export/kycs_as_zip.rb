@@ -35,8 +35,8 @@ class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users
       if kyc.combined_kyc.present?
         self.files << {name: "#{file_name_prefix}.jpg", url: kyc.combined_kyc.url(:original)}
       else
-        self.files << {name: "#{file_name_prefix}_1.jpg", url: kyc.kyc_file_1.url(:original)} if kyc.kyc_file_1.present?
-        self.files << {name: "#{file_name_prefix}_2.jpg", url: kyc.kyc_file_2.url(:original)} if kyc.kyc_file_2.present?
+        self.files << {name: "#{file_name_prefix}_1.jpg", url: kyc.kyc_1_front.url(:original)} if kyc.kyc_file_1.present?
+        self.files << {name: "#{file_name_prefix}_2.jpg", url: kyc.kyc_1_back.url(:original)} if kyc.kyc_file_2.present?
       end
     end
   end
