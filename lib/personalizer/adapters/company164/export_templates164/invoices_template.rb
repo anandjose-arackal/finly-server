@@ -62,7 +62,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': {value: sl_no, type: 'string'},
+          'S. NO.': sl_no,
           'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
@@ -70,7 +70,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''),
+          'Department':{value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''), type: 'string'},
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.taxable_amount&.value,
       }.each do |k, v|
@@ -79,14 +79,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       ap_entries << row
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': {value: sl_no, type: 'string'},
+          'S. NO.': sl_no,
           'Report ID': "'#{invoice.id}",
           'Voucher Type': 'AP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': '31329011',
-          'Sub Account': (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''),
+          'Sub Account':{value:  (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''), type: 'string'},
           'Tax': item.tax_rate&.rate&.to_f,
           'Base Amount':item.taxable_amount&.value,
           'Debit': total_tax_value(item),
@@ -100,8 +100,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     ########## Vendor Total Bill Amount, against all ap entries
     row = Row.new(record: invoice, header: header)
     {
-        'S. NO.': {value: sl_no, type: 'string'},
-        'Report ID': "'#{invoice.id}",
+        'S. NO.': sl_no,
+        'Report ID': {value: invoice.id, type: 'string'},
         'Voucher Type': 'AP',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -110,9 +110,9 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         'Invoice Number': invoice.invoice_number,
         'Invoice Date': invoice.date&.strftime("%d/%m/%Y"),
         'Invoice Type': 'I',
-        'State': (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''),
+        'State': {value: (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''), type: 'string'},
         'Supplier GSTN': invoice&.gstin_location&.gstin,
-        'Place Of Supply': (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''),
+        'Place Of Supply': {value:  (invoice&.gstin_location&.state&.state_code.present? ? sprintf("%02d", invoice&.gstin_location&.state&.state_code) : ''), type: 'string'},
         'Account': '43181001',
         'Supplier': invoice.vendor.vendor_id,
         'Sub Account': '',
@@ -133,15 +133,15 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     invoice.items.each do |item|
       row = Row.new(record: item, header: header)
       {
-          'S. NO.': {value: sl_no, type: 'string'},
-          'Report ID': "#{invoice.id}",
+          'S. NO.': sl_no,
+          'Report ID': {value: invoice.id, type: 'string'},
           'Voucher Type': 'JV',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
           'Description': get_description(invoice),
           'Account': retrieve_account(item),
           'Sub Account': retrieve_sub_account(item),
-          'Department':(invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''),
+          'Department': {value: (invoice.created_by.gl_config&.dig(:location_code).present? ? sprintf("%05d", invoice.created_by.gl_config&.dig(:location_code)) : ''), type: 'string'},
           'Cost Center': invoice.created_by.gl_config&.dig(:cost_center),
           'Debit': item.net_amount&.value,
           'Comments': 'Finly'
@@ -153,8 +153,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
     end
     row = Row.new(record: invoice, header: header)
     {
-        'S. NO.': {value: sl_no, type: 'string'},
-        'Report ID': "#{invoice.id}",
+        'S. NO.': sl_no,
+        'Report ID': {value: invoice.id, type: 'string'},
         'Voucher Type': 'JV',
         'Period': invoice.date&.strftime("%Y%m"),
         'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -180,8 +180,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
       bp_entries=[]
         row = Row.new(record: invoice, header: header)
         {
-            'S. NO.': {value: sl_no, type: 'string'},
-            'Report ID': "#{invoice.id}",
+            'S. NO.': sl_no,
+            'Report ID': {value: invoice.id, type: 'string'},
             'Voucher Type': 'BP',
             'Period': invoice.date&.strftime("%Y%m"),
             'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
@@ -197,8 +197,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::InvoicesTemplate <
         bp_entries << row
       row = Row.new(record: invoice, header: header)
       {
-          'S. NO.': {value: sl_no, type: 'string'},
-          'Report ID': "#{invoice.id}",
+          'S. NO.': sl_no,
+          'Report ID': {value: invoice.id, type: 'string'},
           'Voucher Type': 'BP',
           'Period': invoice.date&.strftime("%Y%m"),
           'Voucher Date': invoice.date&.strftime("%d/%m/%Y"),
