@@ -70,7 +70,7 @@ class PaymentAgreement < ApplicationRecord
     exclude_association :agreement_invoices
     exclude_association :fixed_periodic_general_invoices
     exclude_association :fixed_periodic_rental_invoices
-    exclude_association :document_level_reviewer_mappings
+    # exclude_association :document_level_reviewer_mappings
     exclude_association :dlrms
   end
 
