@@ -114,7 +114,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     params[:distance_config] = self.distance_config
     params[:time_config] = self.time_config
     params[:per_diem_config] = self.per_diem_config
-    params[:categories] = company.categories.non_deleted.active
+    params[:categories] = company.categories.active
     params[:base_currency] = policy.base_currency
     ExpenseTypes::Show::ExpenseConfigurationPresenter.new(user, params, messages)
   end
