@@ -37,9 +37,9 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
-            report.id,
             Date.today.strftime('%d/%m/%Y'),
+            report.id,
+            report.approved_at&.strftime('%d/%m/%Y'),
             '',
             '',
             print_ledger_name(expense),
@@ -54,9 +54,9 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
-            report.id,
             Date.today.strftime('%d/%m/%Y'),
+            report.id,
+            report.approved_at&.strftime('%d/%m/%Y'),
             '',
             '',
             expense.user&.profile&.employee_id,

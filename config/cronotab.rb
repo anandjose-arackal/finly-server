@@ -41,7 +41,7 @@ Crono.perform(BbpsBillsFetch).every 1.day, at: {hour: 8, min: 00}
 
 # Always scope scheduled mailers to production env to avoid accidental email trigger via development/staging environment
 # if Rails.env.production?
-#   Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
+#    Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # end
 # Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}

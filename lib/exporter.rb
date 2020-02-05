@@ -144,7 +144,26 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       self.contents.each_with_index do |items, row|
         items.each_with_index do |item, column|
-          worksheet.write(1 + row, column, item)
+          if item.is_a?(Hash)
+            case item[:type]
+            when 'string'
+              worksheet.write_string(1 + row, column, item[:value])
+            when 'number'
+              worksheet.write_number(1 + row, column, item[:value])
+            when 'date'
+              if item[:value].present?
+               date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+               worksheet.write_date_time(1 + row, column, item[:value]&.iso8601, date_format)
+              else
+                worksheet.write_blank(1 + row, column)
+              end
+            when 'currency'
+            else
+               worksheet.write_string(1 + row, column, item[:value])
+            end
+          else
+            worksheet.write(1 + row, column, item)
+          end
         end
       end
       workbook.close
