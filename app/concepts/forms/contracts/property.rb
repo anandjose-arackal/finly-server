@@ -35,11 +35,14 @@ class Forms::Contracts::Property
       entity_options = self.options[:form] || {}
     end
 
+    contract_property_options = entity&.contract_property_options || {}
+    contract_property_options.merge(options.except(:form))
+
     transformer = Forms::Contracts::Transformer.new(
         entity,
         name,
         entity_options,
-        self.options.except(:form),
+        contract_property_options,
         contract_block(form, entity, entities_map),
         collection: is_collection
     )

@@ -1,32 +1,13 @@
 class Forms::Contracts::Transformer
-  attr_accessor :field_name, :entity_options, :property_options, :block, :collection, :entity
+  attr_accessor :field_name, :entity_options, :contract_property_options, :block, :collection, :entity
 
-  def initialize(entity, field_name, entity_options, property_options, block, collection: false)
+  def initialize(entity, field_name, entity_options, contract_property_options, block, collection: false)
     self.entity = entity
     self.field_name = field_name
     self.entity_options = entity_options || {}
-    self.property_options = property_options || {}
+    self.contract_property_options = contract_property_options || {}
     self.block = block
     self.collection = collection
-    setup_property_options
-  end
-
-  def setup_property_options
-    return unless entity
-
-    entity = self.entity
-
-    if entity.custom_field
-      property_options[:virtual] = true
-      property_options[:deserializer] = -> (input, represented, **) do
-        associated_cf = represented.custom_fields.find { |custom_field| custom_field.form_entity_id == entity.uuid }
-        represented.send("#{entity.field_key}=", (associated_cf.value))
-      end
-    end
-
-    if entity.populate_if_empty.present? and not self.property_options[:populate_if_empty]
-      self.property_options[:populate_if_empty] = entity.populate_if_empty
-    end
   end
 
   def contract_validations
@@ -59,9 +40,9 @@ class Forms::Contracts::Transformer
     lambda do |*args|
       function = transformer.collection ? :collection : :property
       if transformer.block
-        send function, transformer.field_name, transformer.property_options, &transformer.block
+        send function, transformer.field_name, transformer.contract_property_options, &transformer.block
       else
-        send function, transformer.field_name, transformer.property_options
+        send function, transformer.field_name, transformer.contract_property_options
       end
       validations = transformer.contract_validations
       validations[:setters].each do |val|
