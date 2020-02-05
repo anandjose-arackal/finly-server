@@ -36,7 +36,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
       end
-      self.cost_centers = user.company.cost_centers
+      self.cost_centers = user.company.cost_centers.non_deleted
       self.tax_rates = user.company.tax_rates
       self.gstin_locations = self.invoice.vendor&.gstin_locations
       self.variable_periodic_invoice = (self.invoice.open? || self.invoice.rejected? || self.invoice.retracted?) && (self.invoice.billing_type_id == BillingType.id_for(:variable_periodic))

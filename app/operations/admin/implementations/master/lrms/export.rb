@@ -105,6 +105,9 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             BbpsBillerSubscriptionProvider
+             BbpsBillProvider
+             CreditNoteProvider
              )
     if params[:with_id] == "all"
       params[:with_id] = company.policies.pluck(:id)

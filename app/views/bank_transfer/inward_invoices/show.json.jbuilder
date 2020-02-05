@@ -130,7 +130,7 @@ json.invoice_categories current_company.categories.vendor_payments_only
 json.invoice_item_categories current_company.categories.inward_invoice_items_only
 
 json.cost_centers do
-  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+  json.array!(current_company.cost_centers.non_deleted.with_application(RequestStoreUtil.current_app)) do |cost_center|
     json.id cost_center.id
     json.name cost_center.name
   end

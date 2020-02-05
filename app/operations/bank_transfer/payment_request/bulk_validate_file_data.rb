@@ -77,7 +77,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
     self.categories_with_children = all_categories.categories.where(ancestry: ids).pluck(:ancestry).compact.map(&:to_i)
 
-    all_cost_centers = current_company.cost_centers.vendor_payments_only
+    all_cost_centers = current_company.cost_centers.vendor_payments_only.non_deleted
     self.all_cost_center_ids = all_cost_centers.pluck(:id) rescue []
 
     self.tax_rates = user.company.tax_rates

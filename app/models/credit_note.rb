@@ -521,6 +521,8 @@ class CreditNote < ApplicationRecord
     tds_rate_percentage = tds_rate&.tds
     if tds_rate_percentage.present?
       tds_amount_value = tds_applicable_amount * tds_rate_percentage / 100
+      # tds_amount_value = tds_amount_value.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount_value = tds_amount_value.ceil # round the tds to the nearest digit as of now.
 
       if self.tds_amount.present?
         self.tds_amount.update(value: tds_amount_value)
