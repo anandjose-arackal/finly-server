@@ -1,8 +1,9 @@
 class Forms::Contracts::Property
 
-  attr_accessor :name, :options, :block, :is_collection, :parent, :path
+  attr_accessor :name, :options, :block, :is_collection, :parent, :path, :builder
 
-  def initialize(name, options = {}, block, collection: false, parent: nil)
+  def initialize(builder, name, options = {}, block, collection: false, parent: nil)
+    self.builder = builder
     self.name = name || raise('Name cannot be blank')
     self.options = options || {}
     self.block = block
@@ -18,11 +19,11 @@ class Forms::Contracts::Property
   end
 
   def property(name, options = {}, &block)
-    properties << Forms::Contracts::Property.new(name, options, block, collection: false, parent: self)
+    properties << Forms::Contracts::Property.new(builder, name, options, block, collection: false, parent: self)
   end
 
   def collection(name, options = {}, &block)
-    properties << Forms::Contracts::Property.new(name, options, block, collection: true, parent: self)
+    properties << Forms::Contracts::Property.new(builder, name, options, block, collection: true, parent: self)
   end
 
   def build(form, entities_map)
@@ -33,15 +34,34 @@ class Forms::Contracts::Property
     else
       entity_options = self.options[:form] || {}
     end
-    transformer = Forms::Contracts::Transformer.new(entity, name, entity_options, self.options.except(:form), contract_block(form, entities_map), collection: is_collection)
+
+    transformer = Forms::Contracts::Transformer.new(
+        entity,
+        name,
+        entity_options,
+        self.options.except(:form),
+        contract_block(form, entity, entities_map),
+        collection: is_collection
+    )
     transformer.generate
   end
 
-  def contract_block(form, entities_map)
+  def contract_block(form, entity, entities_map)
     return nil unless properties.present?
 
     properties = self.properties
+    load_custom_fields = builder.load_custom_fields?
     lambda do |*args|
+
+      if load_custom_fields and entity&.entities.custom_fields.present?
+        instance_eval &Forms::Contracts::CustomField.setup(entity.entities.custom_fields)
+
+        # Load custom fields from form
+        entity.entities.custom_fields.each do |custom_field_entity|
+          instance_eval &custom_field_entity.contract
+        end
+      end
+
       properties.each do |prop|
         instance_eval &prop.build(form, entities_map)
       end

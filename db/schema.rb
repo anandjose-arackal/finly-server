@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_31_161230) do
+ActiveRecord::Schema.define(version: 2020_02_05_073649) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3727,14 +3727,32 @@ ActiveRecord::Schema.define(version: 2020_01_31_161230) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_custom_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "document_type"
+    t.string "document_id"
+    t.string "form_entity_id", null: false
+    t.string "field_key", null: false
+    t.string "value"
+    t.string "value_text"
+    t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
+    t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
+    t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
+    t.index ["field_key"], name: "index_form_custom_fields_on_field_key"
+    t.index ["form_entity_id"], name: "index_form_custom_fields_on_form_entity_id"
+    t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
+    t.index ["value"], name: "index_form_custom_fields_on_value"
+    t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
+  end
+
   create_table "form_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "controlling_entity_id", null: false
-    t.integer "dependent_entity_id", null: false
+    t.string "controlling_entity_id", null: false
+    t.string "dependent_entity_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "uuid", limit: 36
-    t.bigint "form_id", null: false
+    t.string "form_id", null: false
     t.index ["company_id"], name: "index_form_dependencies_on_company_id"
     t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
     t.index ["dependent_entity_id"], name: "index_form_dependencies_on_dependent_entity_id"
@@ -3743,27 +3761,31 @@ ActiveRecord::Schema.define(version: 2020_01_31_161230) do
 
   create_table "form_dependency_choice_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "form_dependency_choice_id", null: false
-    t.integer "dependent_choice_id", null: false
+    t.string "form_dependency_mapping_id", null: false
+    t.string "dependent_choice_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "uuid", limit: 36
+    t.string "form_id", null: false
+    t.string "dependent_choice_type"
     t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
     t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
-    t.index ["form_dependency_choice_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
+    t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
+    t.index ["form_id"], name: "index_form_dependency_choice_mappings_on_form_id"
   end
 
   create_table "form_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "form_dependency_id", null: false
-    t.integer "controlling_choice_id", null: false
-    t.boolean "dependent_entity_required"
-    t.boolean "dependent_entity_visible"
-    t.boolean "dependent_entity_editable"
+    t.string "form_dependency_id", null: false
+    t.string "controlling_choice_id", null: false
+    t.boolean "dependent_required"
+    t.boolean "dependent_visible"
+    t.boolean "dependent_editable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "uuid", limit: 36
-    t.bigint "form_id", null: false
+    t.string "form_id", null: false
+    t.string "controlling_choice_type"
     t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
     t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
     t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
@@ -9258,8 +9280,6 @@ ActiveRecord::Schema.define(version: 2020_01_31_161230) do
   add_foreign_key "finly_transactions", "payment_purposes"
   add_foreign_key "finly_transactions", "payments"
   add_foreign_key "finly_transactions", "transaction_types"
-  add_foreign_key "form_dependencies", "forms"
-  add_foreign_key "form_dependency_mappings", "forms"
   add_foreign_key "individual_kyc_tracks", "individual_kycs"
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"

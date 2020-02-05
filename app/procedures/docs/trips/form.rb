@@ -2,7 +2,7 @@ class Docs::Trips::Form < Forms::API
 
   model Trip
 
-  section :header do
+  section :header, associate_custom_fields: true do
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
     dropdown :created_by, required: true, visible: false#, class_name: 'User'
     dropdown :company, required: true#, class_name: 'Company', internal: true
@@ -18,7 +18,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :passengers do
-    collection :passengers, populate_if_empty: TripPassenger, minimum: 1 do
+    collection :passengers, populate_if_empty: TripPassenger, minimum: 1, associate_custom_fields: true do
       text :name, required: true
       text :contact_number
       text :email
@@ -26,7 +26,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :routes do
-    collection :routes, populate_if_empty: TripRoute, minimum: 1 do
+    collection :routes, populate_if_empty: TripRoute, minimum: 1, associate_custom_fields: true do
       text :from_location, required: true
       text :to_location, required: true
       date :depart_on, required: true
@@ -38,7 +38,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :transport_requests do
-    collection :transport_requests, populate_if_empty: TripTransportRequest do
+    collection :transport_requests, populate_if_empty: TripTransportRequest, associate_custom_fields: true do
       text :from_location, required: true
       text :to_location, required: true
       dropdown :mode, scope: Forms::Entity::Scopes::List.scope({value: "Flight"}), required: true
@@ -54,7 +54,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :hotel_requests do
-    collection :hotel_requests, populate_if_empty: TripHotelRequest do
+    collection :hotel_requests, populate_if_empty: TripHotelRequest, associate_custom_fields: true do
       text :location, required: true
       text :preferred_area, required: true
       datetime :checkin_at, required: true
@@ -65,7 +65,7 @@ class Docs::Trips::Form < Forms::API
   end
 
   section :local_conveyance_requests do
-    collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest do
+    collection :local_conveyance_requests, populate_if_empty: TripLocalConveyanceRequest, associate_custom_fields: true do
       text :location, required: true
       text :pickup_area, required: true
       datetime :pickup_at, required: true

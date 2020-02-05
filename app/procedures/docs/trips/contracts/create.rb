@@ -1,6 +1,7 @@
 class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
 
   form Docs::Trips::Form
+  load_custom_fields!
 
   property :company, validates: {presence: true}
   property :created_by, validates: {presence: true}

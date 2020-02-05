@@ -6,8 +6,8 @@ class Forms::API
   class_attr :dependencies, default: []
   class_attr :model
 
-  def self.section(name, &block)
-    sections << Forms::Entity::Section.new(self, name, &block)
+  def self.section(name, options={}, &block)
+    sections << Forms::Entity::Section.new(self, name, options, &block)
   end
 
   def self.dependency(map)

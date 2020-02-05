@@ -67,6 +67,8 @@ class FormEntity < ApplicationRecord
   serialize :scope, JSON
 
   scope :root, -> { where parent_id: nil }
+  scope :system_fields, -> { where.not custom_field: true }
+  scope :custom_fields, -> { where custom_field: true }
 
   def populate_if_empty
     val = super()
@@ -123,10 +125,7 @@ class FormEntity < ApplicationRecord
 
   def contract
     is_collection = (field_type == "collection")
-    property_options = {
-        populate_if_empty: populate_if_empty
-    }
-    property_options.reject! { |k, v| v.nil? }
+    property_options = {}
     builder_args = [self, field_key, schema, property_options, contract_block, collection: is_collection]
     transformer = Forms::Contracts::Transformer.new(*builder_args)
     transformer.generate
@@ -135,9 +134,12 @@ class FormEntity < ApplicationRecord
   def contract_block
     return nil unless entities.present?
 
+    entity = self
     entities = self.entities
 
     lambda do |*args|
+      instance_eval &Forms::Contracts::CustomField.setup(entities.custom_fields) if entity.associate_custom_fields
+
       entities.each do |entity|
         instance_eval &entity.contract
       end

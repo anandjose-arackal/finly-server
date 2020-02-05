@@ -23,6 +23,8 @@ class TripRoute < ApplicationRecord
 
   belongs_to :trip
 
+  has_many :custom_fields, as: :document, class_name: "FormCustomField", primary_key: :uuid
+
   def as_json(options={})
     {
         id: id,

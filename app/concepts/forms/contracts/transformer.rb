@@ -8,6 +8,25 @@ class Forms::Contracts::Transformer
     self.property_options = property_options || {}
     self.block = block
     self.collection = collection
+    setup_property_options
+  end
+
+  def setup_property_options
+    return unless entity
+
+    entity = self.entity
+
+    if entity.custom_field
+      property_options[:virtual] = true
+      property_options[:deserializer] = -> (input, represented, **) do
+        associated_cf = represented.custom_fields.find { |custom_field| custom_field.form_entity_id == entity.uuid }
+        represented.send("#{entity.field_key}=", (associated_cf.value))
+      end
+    end
+
+    if entity.populate_if_empty.present? and not self.property_options[:populate_if_empty]
+      self.property_options[:populate_if_empty] = entity.populate_if_empty
+    end
   end
 
   def contract_validations

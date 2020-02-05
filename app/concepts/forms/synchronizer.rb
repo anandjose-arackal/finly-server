@@ -22,7 +22,12 @@ class Forms::Synchronizer
   private
 
   def self.sync_section(company, form_model, section)
-    section_model = form_model.sections.where(name: section.name, company_id: company.id, form_id: form_model.id).first_or_create
+    section_model = form_model.sections.find_or_initialize_by(
+        name: section.name,
+        company_id: company.id,
+        form_id: form_model.id
+    )
+    section_model.update(section.schema) # unless section_model.persisted?
 
     section.entities.each do |entity|
       sync_entity company, form_model, section_model, entity

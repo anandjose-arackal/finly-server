@@ -31,6 +31,8 @@ class TripTransportRequest < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :budget, class_name: 'Amount', optional: true
 
+  has_many :custom_fields, as: :document, class_name: "FormCustomField", primary_key: :uuid
+
   def as_json(options={})
     {
         id: id,

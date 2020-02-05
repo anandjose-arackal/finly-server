@@ -16,10 +16,12 @@ class Forms::TestContract < Forms::Contracts::Builder
     property :profile do
       property :employee_id
     end
-    collection :role_mapping do
+    property :t_bag
+    collection :role_mapping, deserializer: -> (input, represented, **) { debugger } do
 
     end
     validate :test
+
     def test
       # debugger
     end
