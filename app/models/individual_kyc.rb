@@ -129,6 +129,12 @@ class IndividualKyc < ApplicationRecord
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
   ## DEPRICATED END ##
 
+  has_attached_file :id_proof_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_front, content_type: CONTENT_TYPES
+
+  has_attached_file :id_proof_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_back, content_type: CONTENT_TYPES
+
   has_attached_file :aadhar_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :aadhar_front, content_type: CONTENT_TYPES
 

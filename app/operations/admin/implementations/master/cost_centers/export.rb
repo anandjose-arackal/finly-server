@@ -16,7 +16,7 @@ class Admin::Implementations::Master::CostCenters::Export < Admin::Implementatio
   end
 
   def input
-    company.cost_centers
+    company.cost_centers.non_deleted
   end
 
   def id(cost_center)

@@ -15,7 +15,7 @@ class CostCenters::Index < CostCenters::Base
   end
 
   def process
-    self.cost_centers = company.cost_centers
+    self.cost_centers = company.cost_centers.non_deleted
   end
 
   def user_model

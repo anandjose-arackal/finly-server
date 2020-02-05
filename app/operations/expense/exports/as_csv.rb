@@ -14,9 +14,9 @@ class Expense::Exports::AsCsv < Expense::Exports::Base
   def process
     # column_names = preferences.pluck(:name)
     self.result = CSV.generate do |csv|
-      csv << (default_column_names + cf_headers)
+      csv << (default_column_names + custom_field_column_names)
       self.expenses.each do |e|
-        csv << retrieve_data(preferences, e.report, e, self.cf_data)
+        csv << retrieve_data(preferences, e.report, e, custom_field_column_names)
       end
     end
   end

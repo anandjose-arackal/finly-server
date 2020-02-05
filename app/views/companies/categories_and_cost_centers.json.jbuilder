@@ -17,7 +17,7 @@ json.tds_slabs do
 end
 
 json.cost_centers do
-  json.array!(current_company.cost_centers) do |cost_center|
+  json.array!(current_company.cost_centers.non_deleted) do |cost_center|
     json.extract! cost_center, :id, :name
   end
 end
