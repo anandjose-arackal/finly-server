@@ -3,7 +3,7 @@
 class FixSpuriousPayments < ApplicationJob
 
   def perform
-    spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('created_at <= ?', (DateTime.now - 1.hour)).where(receiving_account_type: "BankAccount")
+    spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('created_at <= ?', (DateTime.now - 8.hour)).where(receiving_account_type: "BankAccount")
     spurious_payments.each do |payment|
       # case 1 - if the payment is in pending state because of the bank account being on hold or disabled
       if payment.receiving_account_type == "BankAccount" && (payment.receiving_account.on_hold? || payment.receiving_account.disabled?)
