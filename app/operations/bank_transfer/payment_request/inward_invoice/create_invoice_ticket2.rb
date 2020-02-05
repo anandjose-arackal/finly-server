@@ -13,7 +13,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
+                :update_payable_for_invoices
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -93,6 +94,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
+    self.update_payable_for_invoices = []
   end
 
   def validate
@@ -155,7 +157,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       end
 
       if total_payments >= invoice_amount.round(2)
-        invoice.update payable: false
+        # invoice.update payable: false
+        self.update_payable_for_invoices << invoice
       end
 
       if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
@@ -165,6 +168,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       end
       self.requested_amount += payable_amount
     end
+  end
+
+  def pre_process
+    self.inward_invoices.where(id: self.update_payable_for_invoices).update_all payable: false
   end
 
   def process
