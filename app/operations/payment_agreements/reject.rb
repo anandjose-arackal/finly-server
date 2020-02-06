@@ -31,6 +31,8 @@ class PaymentAgreements::Reject < PaymentAgreements::Base
       return
     end
 
+    self.payment_agreement.update(reject_note: params[:reject_note])
+
     self.workflow_output = op.workflow_output
   end
 

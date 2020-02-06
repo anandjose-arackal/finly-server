@@ -300,7 +300,8 @@ class PaymentAgreement < ApplicationRecord
         revision_of_pa_id: self.revision_of_pa_id,
         revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number,
         revision_reason: self.revision_reason,
-        termination_reason: self.termination_reason
+        termination_reason: self.termination_reason,
+        reject_note: self.reject_note
       }
   end
 
