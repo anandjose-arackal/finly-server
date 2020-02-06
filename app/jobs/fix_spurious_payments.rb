@@ -3,7 +3,7 @@
 class FixSpuriousPayments < ApplicationJob
 
   def perform
-    spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('updated_at <= ?', (DateTime.now - 8.hour)).where(receiving_account_type: "BankAccount")
+    spurious_payments = Payment.where(payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:in_progress)]).where('updated_at <= ?', (DateTime.now - 1.day)).where(receiving_account_type: "BankAccount")
     spurious_payments.each do |payment|
 
       bpr = payment.reload.payment_order.try(:bank_payment_request)
