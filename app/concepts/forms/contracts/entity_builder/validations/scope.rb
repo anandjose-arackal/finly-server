@@ -10,7 +10,7 @@ class Forms::Contracts::EntityBuilder::Validations::Scope < Forms::Contracts::En
   #
   #   validate << -> do
   #     assigned_value = self.send(name)
-  #     unless Forms::Entity::Scope.valid_choice?(entity, assigned_value, user_scope)
+  #     unless Forms::DSL::Entity::Scope.valid_choice?(entity, assigned_value, user_scope)
   #       errors.add :base, "#{name.to_s.humanize} : invalid option selected"
   #     end
   #   end

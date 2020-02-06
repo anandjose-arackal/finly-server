@@ -2,7 +2,7 @@ class Forms::Ops::Create < Transactions::API
 
   schema do
     params do
-      required(:field_type).value(inclusion?: Forms::Entity::Registry.types.keys)
+      required(:field_type).value(inclusion?: Forms::DSL::Entity::Registry.types.keys)
     end
   end
 

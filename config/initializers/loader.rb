@@ -1,5 +1,5 @@
-Loader.watch! "Forms Types", dir: 'app/concepts/forms/entity/types/**/*.rb'
-Loader.watch! "Forms Scopes", dir: 'app/concepts/forms/entity/scopes/**/*.rb'
+Loader.watch! "Forms Types", dir: 'app/concepts/forms/dsl/entity/types/**/*.rb'
+Loader.watch! "Forms Scopes", dir: 'app/concepts/forms/dsl/entity/scopes/**/*.rb'
 
 Loader.watch! "Form Contract Transformers", dir: "app/concepts/forms/contracts/entity_builder/validations/**/*.rb"
 

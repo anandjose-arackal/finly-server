@@ -7,11 +7,11 @@ class Forms::API
   class_attr :model
 
   def self.section(name, options={}, &block)
-    sections << Forms::Entity::Section.new(self, name, options, &block)
+    sections << Forms::DSL::Entity::Section.new(self, name, options, &block)
   end
 
   def self.dependency(map)
-    dependencies << Forms::Dependency::Item.new(map)
+    dependencies << Forms::DSL::Dependency::Item.new(map)
   end
 
   def self.find_entity(field_path)
