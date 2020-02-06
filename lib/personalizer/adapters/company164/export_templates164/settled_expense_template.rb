@@ -66,8 +66,5 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SettledExpenseTemp
     end
   end
 
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
 
 end
