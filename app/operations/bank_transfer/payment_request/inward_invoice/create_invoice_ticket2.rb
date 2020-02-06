@@ -13,7 +13,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
+                :update_payable_for_invoices
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -76,7 +77,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       ids << param[:invoice_id]
       self.payable_amounts[param[:invoice_id]&.to_i] = param[:payable_amount].to_f
     end
-    self.inward_invoices = user.company.inward_invoices.with_id(ids)
+    self.inward_invoices = user.company.inward_invoices.with_id(ids).includes(:vendor, :balance_due, payments: [:amount])
 
     # we will use this later in background operation
     # to update the status of invoice from pending to its previous state,
@@ -93,6 +94,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
+    self.update_payable_for_invoices = []
   end
 
   def validate
@@ -125,8 +127,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
       invoice_amount = invoice.balance_due&.value.to_f
-      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
-      previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+
+      # paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+      # previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+
+      paid_amount = invoice.payments.map {|p| p.amount&.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum.round(2)
+      previous_payments = invoice.payments.map {|p| p.amount&.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum.round(2)
+
       total_payments = (payable_amount.to_f + 0.99) + previous_payments
 
       # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
@@ -155,7 +162,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       end
 
       if total_payments >= invoice_amount.round(2)
-        invoice.update payable: false
+        # invoice.update payable: false
+        self.update_payable_for_invoices << invoice
       end
 
       if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
@@ -165,6 +173,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       end
       self.requested_amount += payable_amount
     end
+  end
+
+  def pre_process
+    self.inward_invoices.where(id: self.update_payable_for_invoices).update_all payable: false
   end
 
   def process
