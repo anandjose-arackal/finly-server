@@ -26,7 +26,8 @@
 # Security deposit is required to create rental invoice in payment agreements
 
 class SecurityDeposit < ApplicationRecord
-
+  include SoftDeletable
+  
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
