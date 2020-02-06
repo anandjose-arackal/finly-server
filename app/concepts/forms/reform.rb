@@ -1,6 +1,6 @@
-class Forms::Contract < Reform::Form
+class Forms::Reform < ::Reform::Form
 
-  module Forms::Contract::ModelHelper
+  module Forms::Reform::ModelHelper
     extend ActiveSupport::Concern
 
     included do

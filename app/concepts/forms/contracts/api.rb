@@ -36,7 +36,7 @@ class Forms::Contracts::API
     form.entities.includes(:entities).each { |e| entities_map[e.field_path] = e }
     root_custom_fields = form.entities.root.custom_fields
     load_custom_fields = load_custom_fields?
-    klass = Class.new(Forms::Contract) do
+    klass = Class.new(Forms::Reform) do
       class_eval &functions if functions.present?
 
       if load_custom_fields and root_custom_fields.present?

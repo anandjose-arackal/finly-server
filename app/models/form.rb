@@ -35,7 +35,7 @@ class Form < ApplicationRecord
     sections = self.sections.includes(entities: {entities: {entities: {entities: [:entities]}}})
     dependencies = self.dependencies
     form = self
-    Class.new(Forms::Contract) do
+    Class.new(Forms::Reform) do
       # Fixme: this applies custom fields for the entire document root, need to scope it down based on the section specific custom fields
       # Fixme: Low Priority
       instance_eval &Forms::Contracts::EntityBuilder::CustomField.setup(form.entities.root.custom_fields)
