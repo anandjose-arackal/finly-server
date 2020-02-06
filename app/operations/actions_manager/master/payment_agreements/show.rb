@@ -173,7 +173,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def terminate
-    user.vendor_payments_admin? && payment_agreement.approved?
+    user.vendor_payments_admin? && (payment_agreement.approved? || payment_agreement.auto_approved?)
   end
 
   def revise
