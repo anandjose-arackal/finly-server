@@ -152,8 +152,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
               worksheet.write_number(1 + row, column, item[:value])
             when 'date'
               if item[:value].present?
-               date_format = workbook.add_format({:num_format => 'dd/mm/yyyy'})
-               date = item[:value].strftime('%d/%m/%Y')
+               date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
+               date = item[:value].strftime('%d-%m-%Y')
                worksheet.write_date_time(1 + row, column, date, date_format)
               else
                 worksheet.write_blank(1 + row, column)
