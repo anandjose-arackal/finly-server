@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::Sequence < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::Sequence < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :sequence
 

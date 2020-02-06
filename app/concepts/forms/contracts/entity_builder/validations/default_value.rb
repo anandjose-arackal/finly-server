@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::DefaultValue < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::DefaultValue < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :default_value
 

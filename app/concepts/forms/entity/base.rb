@@ -92,7 +92,7 @@ module Forms
       # end
       #
       # def build
-      #   transformer = Forms::Contracts::Transformer.new(*builder_args)
+      #   transformer = Forms::Contracts::EntityBuilder.new(*builder_args)
       #   transformer.generate
       # end
 

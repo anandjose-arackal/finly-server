@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::CharLimit < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::CharLimit < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :char_limit
 

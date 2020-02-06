@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::Scope < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::Scope < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :scope
 

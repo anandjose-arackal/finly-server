@@ -1,8 +1,8 @@
-class Forms::Contracts::CustomField
+class Forms::Contracts::EntityBuilder::CustomField
 
   def self.setup(custom_fields)
     lambda do |*args|
-      collection :custom_fields, deserializer: Forms::Contracts::CustomField::Build(custom_fields) do
+      collection :custom_fields, deserializer: Forms::Contracts::EntityBuilder::CustomField::Build(custom_fields) do
         property :uuid
         property :form_entity_id
         property :field_key

@@ -1,4 +1,4 @@
-class Forms::Contracts::Property
+class Forms::Contracts::API::Property
 
   attr_accessor :name, :options, :block, :is_collection, :parent, :path, :builder
 
@@ -19,11 +19,11 @@ class Forms::Contracts::Property
   end
 
   def property(name, options = {}, &block)
-    properties << Forms::Contracts::Property.new(builder, name, options, block, collection: false, parent: self)
+    properties << Forms::Contracts::API::Property.new(builder, name, options, block, collection: false, parent: self)
   end
 
   def collection(name, options = {}, &block)
-    properties << Forms::Contracts::Property.new(builder, name, options, block, collection: true, parent: self)
+    properties << Forms::Contracts::API::Property.new(builder, name, options, block, collection: true, parent: self)
   end
 
   def build(form, entities_map)
@@ -38,7 +38,7 @@ class Forms::Contracts::Property
     contract_property_options = entity&.contract_property_options || {}
     contract_property_options.merge(options.except(:form))
 
-    transformer = Forms::Contracts::Transformer.new(
+    transformer = Forms::Contracts::EntityBuilder.new(
         entity,
         name,
         entity_options,
@@ -57,7 +57,7 @@ class Forms::Contracts::Property
     lambda do |*args|
 
       if load_custom_fields and entity&.entities.custom_fields.present?
-        instance_eval &Forms::Contracts::CustomField.setup(entity.entities.custom_fields)
+        instance_eval &Forms::Contracts::EntityBuilder::CustomField.setup(entity.entities.custom_fields)
 
         # Load custom fields from form
         entity.entities.custom_fields.each do |custom_field_entity|

@@ -144,7 +144,7 @@ class FormEntity < ApplicationRecord
   def contract
     is_collection = (field_type == "collection")
     builder_args = [self, field_key, schema, contract_property_options, contract_block, collection: is_collection]
-    transformer = Forms::Contracts::Transformer.new(*builder_args)
+    transformer = Forms::Contracts::EntityBuilder.new(*builder_args)
     transformer.generate
   end
 
@@ -155,7 +155,7 @@ class FormEntity < ApplicationRecord
     entities = self.entities
 
     lambda do |*args|
-      instance_eval &Forms::Contracts::CustomField.setup(entities.custom_fields) if entity.associate_custom_fields
+      instance_eval &Forms::Contracts::EntityBuilder::CustomField.setup(entities.custom_fields) if entity.associate_custom_fields
 
       entities.each do |entity|
         instance_eval &entity.contract

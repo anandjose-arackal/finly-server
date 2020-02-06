@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::Required < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::Required < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :required
 

@@ -1,4 +1,4 @@
-class Forms::Contracts::Transformers::Minimum < Forms::Contracts::Transformers::Base
+class Forms::Contracts::EntityBuilder::Validations::Minimum < Forms::Contracts::EntityBuilder::Validations::Base
 
   register :minimum
 

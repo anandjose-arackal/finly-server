@@ -1,4 +1,4 @@
-class Docs::Trips::Contracts::Create < Forms::Contracts::Builder
+class Docs::Trips::Contracts::Create < Forms::Contracts::API
 
   form Docs::Trips::Form
   load_custom_fields!
