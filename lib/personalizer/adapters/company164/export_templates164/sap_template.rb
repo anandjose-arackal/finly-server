@@ -53,7 +53,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
             expense.amount.value,
             '',
-            expense.date.strftime("%d/%m/%Y"),
+            {value: expense.date, type: 'date'},
             'I',
             '',
             '',
@@ -79,7 +79,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
           report.id,
           'JV',
           report.submitted_at.strftime("%Y%m"),
-          report.submitted_at.strftime("%d/%m/%Y"),
+          {value: report.submitted_at, type: 'date'},
           "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
           '',
           '',
@@ -186,11 +186,6 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def retrieve_sub_account(expense)
     "#{expense.category&.gl_code}"
-  end
-
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
   end
 
 end
