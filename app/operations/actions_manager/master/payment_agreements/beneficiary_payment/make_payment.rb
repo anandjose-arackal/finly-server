@@ -23,7 +23,7 @@ class ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment
         return false
       end
     end
-    if self.beneficiary_payment.status.unpaid?
+    if self.beneficiary_payment.status.unpaid? && (user.vendor_payments_admin? || user.is_bank_payment_request_initiator?)
       return true
     end
   end
