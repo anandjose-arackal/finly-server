@@ -163,7 +163,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       if total_payments >= invoice_amount.round(2)
         # invoice.update payable: false
-        self.update_payable_for_invoices << invoice
+        self.update_payable_for_invoices << invoice.id
       end
 
       if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
