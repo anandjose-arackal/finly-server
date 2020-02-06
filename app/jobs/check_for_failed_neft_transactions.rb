@@ -12,6 +12,9 @@ class CheckForFailedNeftTransactions < ApplicationJob
           utr = entry.remarks.split("-").third
         end
 
+        # in case this entry does not have a remarks column, skip it
+        next if utr.blank?
+
         # first making the UTR the same as the one we store in the DB
         utr = "0#{utr[0..(utr.length-3)]}"
 
