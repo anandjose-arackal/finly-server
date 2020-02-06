@@ -49,7 +49,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
   has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
   has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
-
+# TODO - Decommision recurring invoice, use agreement invoice instead
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
   has_many :agreement_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 

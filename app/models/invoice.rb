@@ -397,7 +397,7 @@ class Invoice < ApplicationRecord
     when 'non_po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
     when 'agreement_invoice', 'recurring_invoice'
-      where invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice)
+      where invoice_type_id: [InwardInvoiceType.id_for(:recurring_invoice), InwardInvoiceType.id_for(:agreement_invoice)]
 
     else
       return nil
@@ -420,6 +420,7 @@ class Invoice < ApplicationRecord
                             InwardInvoiceType.id_for(:advance),
                             InwardInvoiceType.id_for(:non_po_invoice),
                             InwardInvoiceType.id_for(:recurring_invoice),
+                            InwardInvoiceType.id_for(:agreement_invoice),
                             nil])
   }
 
