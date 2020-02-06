@@ -35,6 +35,7 @@ class WorkflowManager::Aasm::PaymentAgreementProvider < WorkflowManager::Aasm::B
     end
 
     event :reject do
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :reject_to_level?
       transitions :from => :awaiting_approval, :to => :rejected, guard: :user_can_review?
     end
 

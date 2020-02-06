@@ -176,7 +176,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def revise
-    (user.vendor_payments_admin? || document_owner?) && payment_agreement.approved? && actual_invoice_absent
+    (user.vendor_payments_admin? || document_owner?) && (payment_agreement.approved? || payment_agreement.auto_approved?) && actual_invoice_absent
   end
 
   def actual_invoice_absent
