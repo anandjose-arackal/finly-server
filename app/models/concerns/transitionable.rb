@@ -698,7 +698,7 @@ module Transitionable
         when :invoice_auditor, 'invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
          when :agreement_invoice_initiator, 'agreement_invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id:InwardInvoiceType.id_for(:agreement_invoice)))
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: [InwardInvoiceType.id_for(:agreement_invoice), InwardInvoiceType.id_for(:recurring_invoice)]))
         when :agreement_invoice_reviewer, 'agreement_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :agreement_invoice_auditor, 'agreement_invoice_auditor'
