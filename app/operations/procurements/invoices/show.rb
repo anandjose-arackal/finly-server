@@ -26,7 +26,16 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # self.departments = user.company.departments
 
       # self.locations = user.company.locations
-      params[:filter_role_id] =  invoice.get_invoice_provider_name == 'PoInvoiceProvider' ? [UserRole.id_for(:po_invoice_initiator)] : [UserRole.id_for(:non_po_invoice_initiator)]
+
+      case get_invoice_provider_name
+      when 'PoInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:po_invoice_initiator)]
+      when 'NonPoInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
+      when 'AgreementInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:agreement_invoice_initiator)]
+      end
+
       # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
