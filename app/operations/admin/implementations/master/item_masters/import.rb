@@ -67,7 +67,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     if category_id.nil? && data[:category].present?
       messages << "Associated Category Not Found"
     end
-    hsn_sac = data[:hsn_sac].blank? ? nil : data[:hsn_sac].to_i
+    hsn_sac = data[:hsn_sac].blank? ? nil : data[:hsn_sac]
     item_code = data[:item_code].to_s
     discount = data[:discount].to_f&.round(2)
     rate = data[:rate].to_f&.round(2)
@@ -95,7 +95,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     [{
         description: description,
         category_id: category_id,
-        hsn_sac: hsn_sac,
+        hsn_sac: clean_up_data(hsn_sac),
         item_code: item_code,
         item_expense_type_id: item_expense_type_id,
         supply_item_type_id: supply_item_type_id,
@@ -103,6 +103,14 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
         discount: discount,
         rate: rate
     }, messages]
+  end
+
+  def clean_up_data(text)
+    if text.is_a?(Float) || text.is_a?(Integer)
+      text.to_i.to_s
+    else
+      text.to_s.strip
+    end
   end
 
 end

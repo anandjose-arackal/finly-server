@@ -12,11 +12,11 @@ class Expense::Exports::AsXml < Expense::Exports::Base
   end
 
   def process
-    self.column_names = (default_column_names + cf_headers)
+    self.column_names = (default_column_names + custom_field_column_names)
     @data = []
     # csv << column_names
     expenses.each do |e|
-      @data << retrieve_data(preferences, e.report, e, self.cf_data)
+      @data << retrieve_data(preferences, e.report, e, custom_field_column_names)
     end
   end
 

@@ -33,7 +33,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :vendor_name
     attribute :vendor_business_name
     attribute :vendor_mobile_number
-    # attribute :vendor_state_code
+    attribute :vendor_state_code
     attribute :vendor_gstin
     attribute :vendor_pan
     attribute :vendor_tds_rate
@@ -163,10 +163,10 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     purchase_order(item)&.procurement.vendor&.mobile_number
   end
 
-  # def vendor_state_code(item)
-  #   sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
-  #   (sc.present?) ? (sprintf '%02d', sc) : ''
-  # end
+   def vendor_state_code(item)
+     sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
+     (sc.present?) ? (sprintf '%02d', sc) : ''
+   end
 
   def vendor_pan(item)
     purchase_order(item)&.procurement.vendor&.pan

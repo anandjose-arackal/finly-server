@@ -360,7 +360,7 @@ class BbpsBill < ApplicationRecord
   end
 
   def self.open_status_ids(user)
-    []
+    BbpsBillStatus.ids_for(:open)
   end
 
   def self.role_based_statuses(user)
