@@ -1,57 +1,15 @@
+require 'dry/monads'
+require 'dry/monads/do'
 class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Processor::Import
-
-  class Contract < Docs::UtilityBills::Subscriptions::Contracts::Base
-
-    # property :company
-    property :category, deserializer: -> (input, represented, **) do
-      represented.category = represented.company.categories.find_by(name: input[:category_id])
-    end
-    property :user, deserializer: -> (input, represented, **) do
-      represented.user = represented.company.users.find_by(email: input[:initiator])
-    end
-    property :bbps_biller_id, deserializer: -> (input, represented, **) do
-      biller = BbpsBiller.find_by(biller_id: input[:biller_id])
-      represented.bbps_biller_id = biller&.id
-    end
-    # property :mobile_number
-
-    property :customer_param_key_1, deserializer: -> (input, represented, **) do
-      represented.customer_param_key_1 = represented.biller&.biller_customer_params[0]&.dig('param_name')
-    end
-
-    # property :customer_param_value_1
-
-    property :customer_param_key_2, deserializer: -> (input, represented, **) do
-      represented.customer_param_key_1 = represented.biller&.biller_customer_params[1]&.dig('param_name')
-    end
-
-    # property :customer_param_value_2
-
-    property :customer_param_key_3, deserializer: -> (input, represented, **) do
-      represented.customer_param_key_1 = represented.biller&.biller_customer_params[2]&.dig('param_name')
-    end
-
-    # property :customer_param_value_3
-
-    property :customer_param_key_4, deserializer: -> (input, represented, **) do
-      represented.customer_param_key_1 = represented.biller&.biller_customer_params[3]&.dig('param_name')
-    end
-    # property :customer_param_value_4
-
-    property :customer_param_key_5, deserializer: -> (input, represented, **) do
-      represented.customer_param_key_1 = represented.biller&.biller_customer_params[4]&.dig('param_name')
-    end
-
-    # property :customer_param_value_5
-
-  end
+  include Dry::Monads[:result]
+  include Dry::Monads::Do.for(:build_params)
 
   bus Admin::Implementations::Master::BaseMaster
-  subscribe 'bank_accounts.import'
+  subscribe 'bbps_subscription.import'
   headers({
               :initiator => "Initiator / Creator of Subscription*",
               :category_id => "Category (for Reference) [Optional]",
-              :biller_id => "Biller ID*",
+              :bbps_biller_id => "Biller ID*",
               :biller_name => "Biller Name (for Reference) [Optional]",
               :mobile_number => "Associated Mobile Number*",
               :customer_param_value_1 => "Custom Param 1",
@@ -62,23 +20,22 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
               :location => "Location*",
               :department => "Department",
               :cost_center => "Cost Center",
-              :policy => "Policy*",
+              :policy_name => "Policy*",
               :poc => "POCs Email(Separated by commas)*",
               :destroy => "Destroy"
           })
   attr_accessor :bank_account_params
 
   def create_record(data)
-    bank_account_params, messages = set_params(data)
-    unless messages.blank?
-      return result false, messages.join(', ')
+    subscription = Docs::UtilityBills::Subscriptions::Contracts::Base.new(BbpsBillerSubscription.new)
+
+    params = build_params data
+
+    unless subscription.validate params and subscription.persist
+      return result false, subscription.errors.full_messages.join(", ")
     end
-    user = bank_account_params[:user]
-    bank_account = user.bank_accounts.new bank_account_params.except(:user)
-    unless bank_account.save
-      return result false, bank_account.errors.full_messages
-    end
-    result true, 'Created Successfully'
+
+    result true, 'Create Successfully'
   end
 
   def update_record(data)
@@ -123,42 +80,84 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     result true, "Destroyed Successfully"
   end
 
-  def set_params(data)
-    messages = []
-    name = data[:name].to_s
-    user_id = clean_up_data data[:user_id]
-    user_entity = get_user_entity user_id
-    unless user_entity.present?
-      messages << "User Not Found"
-    end
-    account_number = clean_up_data data[:account_number]
-    account_number.is_a?(String) ? account_number.gsub!("'", "") : ''
-    ifsc = data[:ifsc]
-    params = {
-        name: name,
-        user: user_entity,
-        account_number: clean_up_data(account_number),
-        ifsc: ifsc
-    }
-    [params, messages]
+  def build_params(data)
+    params = {}
+    params[:company_id] = company&.id
+    params[:user_id] = yield find_user(data[:initiator])
+    params[:policy_id] = yield find_policy(data[:policy])
+    params[:department_id] = yield find_department(data[:department])
+    params[:location_id] = yield find_location(data[:location])
+    params[:cost_center_id] = yield find_cost_center(data[:cost_center])
+    params[:category_id] = yield find_category(data[:category])
+    params[:tax_rate_id] = yield find_tax_rate(data[:tax_rate])
+    params[:subscription_pocs] = yield find_pocs(data[:poc], required: true)
+    params
   end
 
-  def clean_up_data(text)
-    if text.is_a?(Float) || text.is_a?(Integer)
-      text.to_i.to_s
-    else
-      text.to_s.strip
+  def find_user(identifier, required: false)
+    find error_key: "User #{identifier}", required: required do
+      company.users.find_by(email: identifier)
     end
   end
 
-  def get_user_entity(identifier)
-    user = nil
-    if Constants::VALID_EMAIL_FORMAT.match?(identifier)
-      user = company.users.find_by_email identifier
-    elsif Constants::VALID_MOBILE_NUMBER.match?(identifier)
-      user = company.users.find_by_mobile_number identifier
+  def find_policy(identifier, required: false)
+    find error_key: 'Policy', required: required do
+      company.policies.find_by(name: identifier)&.first
     end
-    user
+  end
+
+  def find_department(identifier, required: false)
+    find error_key: 'Department', required: required do
+      company.departments.find_by(name: identifier)&.first
+    end
+  end
+
+  def find_location(identifier, required: false)
+    find error_key: 'Location', required: required do
+      company.locations.find_by(name: identifier)&.first
+    end
+  end
+
+  def find_cost_center(identifier, required: false)
+    find error_key: 'Cost_center', required: required do
+      company.cost_centers.find_by(name: identifier)&.first
+    end
+  end
+
+  def find_category(identifier, required: false)
+    find error_key: 'Category', required: required do
+      company.categories.find_by(name: identifier)&.first
+    end
+  end
+
+  def find_tax_rate(identifier, required: false)
+    find error_key: 'Tax Rate', required: required do
+      company.tax_rates.find_by(name: identifier)&.first
+    end
+  end
+
+  def find_pocs(pocs, required: false)
+    ids = pocs.split(",").map { |item| item.strip }
+    users = ids.map { |id| find_user(id, required: required) }
+    users.map do |user_result|
+      return user_result if user_result.success?
+
+      {
+          user_id: user_result.success.id
+      }
+    end
+  end
+
+  def find(required: false, error_key: nil, klass: nil, failure_message: nil, &block)
+    value = block.call
+    if value or not required
+      return Success(value)
+    end
+
+    failure_message ||= "#{klass} not found" if klass
+    failure_message ||= "#{error_key} not found" if error_key
+    failure_message ||= "Error: Field is found"
+    Failure(failure_message)
   end
 
 end
