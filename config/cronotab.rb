@@ -21,7 +21,8 @@ Crono.perform(TaxBenefitProcess).every 1.day, at: {hour: 00, min: 25}
 Crono.perform(BankTransferProcess).every 1.day, at: {hour: 9, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
 Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
-Crono.perform(FixSpuriousPayments).every 30.minutes
+Crono.perform(FixSpuriousPayments).every 1.day, at: {hour: 06, min: 30}
+Crono.perform(CheckForFailedNeftTransactions).every 1.hour
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
 Crono.perform(YesBankStatusChecker).every 15.minutes
 Crono.perform(IciciStatusChecker).every 15.minutes
