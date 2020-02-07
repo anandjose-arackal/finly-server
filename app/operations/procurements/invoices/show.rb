@@ -195,7 +195,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         #   return true
         # end
       # end
-      provider_name = invoice.get_invoice_provider_name
+      provider_name = get_invoice_provider_name
       invoice.get_reviewers(nil, provider_name).include?(user)
     end
   
