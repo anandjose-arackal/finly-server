@@ -26,4 +26,4 @@ end
 
 # json.count gi_count + ri_count
 
-json.count = @result.invoices.count
+json.count @result.invoices.count
