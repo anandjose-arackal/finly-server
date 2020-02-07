@@ -169,6 +169,7 @@ class CustomField < ApplicationRecord
   end
 
   def as_json(options = {})
+    user_level_custom_fields = self.field_configuration.user_level_field
     case
     when options[:report_show]
       return report_show
@@ -179,7 +180,11 @@ class CustomField < ApplicationRecord
       dependent_field_configuration_ids = []
       has_dependent_cf = false
       if field_configuration.field_type_id == FieldType.id_for(:drop_down)
-        options = field_configuration.drop_down_items.exclude_deleted
+        if user_level_custom_fields
+          options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+        else
+          options = field_configuration.drop_down_items.exclude_deleted
+        end
         # options.each do |option|
         #   if option.dependent_field_configurations.present?
         #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
