@@ -123,8 +123,4 @@ class Personalizer::Adapters::Company190::ExportTemplates190::ExpenseExportTempl
     end
   end
 
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
-
 end
