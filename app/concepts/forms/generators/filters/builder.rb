@@ -1,4 +1,4 @@
-module Forms::Filters::Builder
+module Forms::Generators::Filters::Builder
 
   def self.included(base)
     base.extend(ClassMethods)
@@ -6,7 +6,7 @@ module Forms::Filters::Builder
 
   module ClassMethods
     def filters(user)
-      Forms::Filters::Builder::Build(self, company: user.company, user: user)
+      Forms::Generators::Filters::Builder::Build(self, company: user.company, user: user)
     end
   end
 

@@ -6,7 +6,7 @@ module Forms
         include Registry
         include Schema
         include Forms::DSL::Entity::Contract::DSL
-        include Forms::Filters::DSL
+        include Forms::Generators::Filters::DSL
 
         attr_accessor :options
 

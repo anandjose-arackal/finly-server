@@ -1,4 +1,4 @@
-module Forms::Filters::DSL
+module Forms::Generators::Filters::DSL
   extend ActiveSupport::Concern
 
   DEFAULT_FILTERS = %i(
@@ -28,7 +28,7 @@ module Forms::Filters::DSL
   end
 
   def filter_form(options = {})
-    # Forms::Filters::Cell.new(self).as_json
+    # Forms::Generators::Filters::Cell.new(self).as_json
     filter = {
         label: label,
         hint: hint,
