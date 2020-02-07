@@ -2,46 +2,47 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
 
   class Contract < Docs::UtilityBills::Subscriptions::Contracts::Base
 
-    property :company
+    # property :company
     property :category, deserializer: -> (input, represented, **) do
       represented.category = represented.company.categories.find_by(name: input[:category_id])
     end
     property :user, deserializer: -> (input, represented, **) do
       represented.user = represented.company.users.find_by(email: input[:initiator])
     end
-    property :biller, deserializer: -> (input, represented, **) do
-      represented.biller = BbpsBiller.find_by(biller_id: input[:biller_id])
+    property :bbps_biller_id, deserializer: -> (input, represented, **) do
+      biller = BbpsBiller.find_by(biller_id: input[:biller_id])
+      represented.bbps_biller_id = biller&.id
     end
-    property :mobile_number
+    # property :mobile_number
 
     property :customer_param_key_1, deserializer: -> (input, represented, **) do
       represented.customer_param_key_1 = represented.biller&.biller_customer_params[0]&.dig('param_name')
     end
 
-    property :customer_param_value_1
+    # property :customer_param_value_1
 
     property :customer_param_key_2, deserializer: -> (input, represented, **) do
       represented.customer_param_key_1 = represented.biller&.biller_customer_params[1]&.dig('param_name')
     end
 
-    property :customer_param_value_2
+    # property :customer_param_value_2
 
     property :customer_param_key_3, deserializer: -> (input, represented, **) do
       represented.customer_param_key_1 = represented.biller&.biller_customer_params[2]&.dig('param_name')
     end
 
-    property :customer_param_value_3
+    # property :customer_param_value_3
 
     property :customer_param_key_4, deserializer: -> (input, represented, **) do
       represented.customer_param_key_1 = represented.biller&.biller_customer_params[3]&.dig('param_name')
     end
-    property :customer_param_value_4
+    # property :customer_param_value_4
 
     property :customer_param_key_5, deserializer: -> (input, represented, **) do
       represented.customer_param_key_1 = represented.biller&.biller_customer_params[4]&.dig('param_name')
     end
 
-    property :customer_param_value_5
+    # property :customer_param_value_5
 
   end
 
