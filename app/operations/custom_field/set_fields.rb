@@ -202,11 +202,12 @@ class CustomField::SetFields < CustomField::Base
     acceptable_dropdown_values = []
     dropdown_field_ids = self.field_configurations.enabled.filter_dropdowns.pluck(:id)
     completed = false
-    user_level_custom_fields = current_company&.feature_subscription&.user_level_custom_fields? ? true :false
+    # user_level_custom_fields = current_company&.feature_subscription&.user_level_custom_fields? ? true :false
 
     until completed
       completed = true
       self.field_configurations.each do |config|
+        user_level_custom_fields = config.user_level_field
         next unless config.enabled
         next unless dropdown_field_ids.include?(config.id)
         acceptable_value = false

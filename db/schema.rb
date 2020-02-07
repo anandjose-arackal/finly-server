@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_23_122647) do
+ActiveRecord::Schema.define(version: 2020_02_07_104931) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -634,6 +634,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.string "ifsc_prefix"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "bank_payment_request_comment_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -858,6 +859,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.string "biller_time_out"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["biller_id"], name: "index_bbps_billers_on_biller_id"
     t.index ["created_at"], name: "index_bbps_billers_on_created_at"
     t.index ["parent_biller_id"], name: "index_bbps_billers_on_parent_biller_id"
@@ -928,6 +930,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "biller_id"
+    t.datetime "deleted_at"
     t.index ["label"], name: "index_bbps_subscription_fields_on_label"
     t.index ["subscription_id"], name: "index_bbps_subscription_fields_on_subscription_id"
     t.index ["value"], name: "index_bbps_subscription_fields_on_value"
@@ -938,6 +941,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "subscription_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["subscription_id"], name: "index_bbps_subscription_pocs_on_subscription_id"
     t.index ["user_id"], name: "index_bbps_subscription_pocs_on_user_id"
   end
@@ -976,6 +980,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "amount_id"
     t.string "quick_pay", default: "N"
     t.integer "reference_payment_id"
+    t.datetime "deleted_at"
     t.index ["bill_id"], name: "index_bbps_yes_bank_transactions_on_bill_id"
     t.index ["company_id"], name: "index_bbps_yes_bank_transactions_on_company_id"
   end
@@ -3436,6 +3441,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_export_requests_on_company_id"
     t.index ["expires_on"], name: "index_export_requests_on_expires_on"
     t.index ["export_name"], name: "index_export_requests_on_export_name"
@@ -3457,6 +3463,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["active"], name: "index_export_templates_on_active"
     t.index ["company_id"], name: "index_export_templates_on_company_id"
     t.index ["created_by_user_id"], name: "index_export_templates_on_created_by_user_id"
@@ -3568,6 +3575,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "sequence_number"
     t.datetime "deleted_at"
     t.boolean "printable", default: true
+    t.boolean "user_level_field", default: false
     t.index ["company_id"], name: "index_field_configurations_on_company_id"
     t.index ["configurable_id"], name: "index_field_configurations_on_configurable_id"
     t.index ["configurable_type"], name: "index_field_configurations_on_configurable_type"
@@ -3744,6 +3752,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "updated_by_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_form_dependencies_on_company_id"
     t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
     t.index ["controlling_user_id"], name: "index_form_dependencies_on_controlling_user_id"
@@ -3759,6 +3768,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "dependent_choice_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
     t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
     t.index ["form_dependency_choice_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
@@ -3774,6 +3784,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.boolean "dependent_entity_editable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_form_dependency_choices_on_company_id"
     t.index ["controlling_choice_id"], name: "index_form_dependency_choices_on_controlling_choice_id"
     t.index ["form_dependency_id"], name: "index_form_dependency_choices_on_form_dependency_id"
@@ -3821,6 +3832,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.text "options"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -3862,6 +3874,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "section_type"
+    t.datetime "deleted_at"
     t.index ["active"], name: "index_form_sections_on_active"
     t.index ["company_id"], name: "index_form_sections_on_company_id"
     t.index ["form_id"], name: "index_form_sections_on_form_id"
@@ -3876,6 +3889,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_forms_on_company_id"
     t.index ["created_at"], name: "index_forms_on_created_at"
     t.index ["klass_name"], name: "index_forms_on_klass_name"
@@ -4009,6 +4023,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.string "api_token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["device"], name: "index_google_maps_configs_on_device"
   end
 
@@ -4111,6 +4126,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["transfer_mode_id"], name: "index_icici_bank_transactions_on_transfer_mode_id"
   end
 
@@ -4178,10 +4194,6 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
   end
 
   create_table "individual_kycs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "id_proof_file_name"
-    t.string "id_proof_content_type"
-    t.integer "id_proof_file_size"
-    t.datetime "id_proof_updated_at"
     t.integer "kyc_status_id"
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
@@ -4256,6 +4268,15 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.string "kyc_1_number"
     t.string "kyc_2_number"
     t.datetime "deleted_at"
+    t.boolean "initiated"
+    t.string "id_proof_front_file_name"
+    t.string "id_proof_front_content_type"
+    t.bigint "id_proof_front_file_size"
+    t.datetime "id_proof_front_updated_at"
+    t.string "id_proof_back_file_name"
+    t.string "id_proof_back_content_type"
+    t.bigint "id_proof_back_file_size"
+    t.datetime "id_proof_back_updated_at"
     t.index ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id"
     t.index ["company_id"], name: "index_individual_kycs_on_company_id"
     t.index ["kyc_status_id"], name: "index_individual_kycs_on_kyc_status_id"
@@ -4788,6 +4809,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "reversal_api_counter", default: 0
     t.datetime "deleted_at"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
     t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
     t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"
@@ -5742,6 +5764,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
     t.datetime "last_retried_at"
+    t.string "utr"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -6117,7 +6140,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
     t.string "product_id"
-    t.text "description"
+    t.text "description", limit: 16777215, collation: "utf8_bin"
     t.string "hsn_sac"
     t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
@@ -7185,6 +7208,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.string "authentication_context"
     t.string "finly_sso_path"
     t.string "label"
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_single_sign_on_configurations_on_company_id"
   end
 
@@ -7291,6 +7315,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.bigint "export_template_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["event_workflow_id"], name: "index_task_file_manager_actions_on_event_workflow_id"
     t.index ["export_template_id"], name: "index_task_file_manager_actions_on_export_template_id"
   end
@@ -7303,6 +7328,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "day_of_the_month"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "task_workflows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -7319,6 +7345,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "updated_at", null: false
     t.integer "task_schedule_id"
     t.string "uuid", limit: 36, null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_task_workflows_on_company_id"
     t.index ["created_at"], name: "index_task_workflows_on_created_at"
     t.index ["event_key"], name: "index_task_workflows_on_event_key"
@@ -7519,6 +7546,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.integer "mode_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_transfer_mode_company_mappings_on_company_id"
     t.index ["mode_id"], name: "index_transfer_mode_company_mappings_on_mode_id"
   end
@@ -8386,6 +8414,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.boolean "enabled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["balance_id"], name: "index_utility_bills_accounts_on_balance_id"
     t.index ["company_id"], name: "index_utility_bills_accounts_on_company_id"
   end
@@ -8707,6 +8736,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_122647) do
     t.datetime "deleted_at"
     t.integer "transfer_mode_id"
     t.integer "reference_payment_id"
+    t.text "bank_error_message", limit: 16777215
     t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
     t.index ["beneficiary_bank_account_id"], name: "index_yes_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_yes_bank_transactions_on_company_id"
