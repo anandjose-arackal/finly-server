@@ -6,6 +6,10 @@ class NonPersistentModel < ApplicationRecord
     post_initialize(attributes)
   end
 
+  # this is simply to override the method in SoftDeletable class
+  # that was being painful because it couldn't find deleted_at
+  default_scope {}
+
   def pre_initialize(attributes= {})
 
   end
