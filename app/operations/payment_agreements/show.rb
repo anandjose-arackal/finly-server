@@ -55,7 +55,6 @@ class PaymentAgreements::Show < PaymentAgreements::Base
     return if payment_agreement.validate_if_reviewer(user)
     return if payment_agreement.validate_if_auditor(user)
     return if user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor?
-    return if user.is_bank_payment_request_initiator?
     raise_unauthorized_exception
   end
 end

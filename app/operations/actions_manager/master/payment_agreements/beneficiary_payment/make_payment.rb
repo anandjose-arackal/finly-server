@@ -17,13 +17,15 @@ class ActionsManager::Master::PaymentAgreements::BeneficiaryPayment::MakePayment
     end
   end
 
+  # make payment can only be done if user is abp initiator and bpr initiator
+  # 
   def make_payment
     unless agreement.no_expiration
       if agreement.expiration_date.to_date < Date.today
         return false
       end
     end
-    if self.beneficiary_payment.status.unpaid? && (user.vendor_payments_admin? || user.is_bank_payment_request_initiator?)
+    if self.beneficiary_payment.status.unpaid? && (user.vendor_payments_admin? || (user.is_payment_agreement_initiator? && user.is_bank_payment_request_initiator?))
       return true
     end
   end
