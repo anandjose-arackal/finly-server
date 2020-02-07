@@ -397,7 +397,7 @@ class Invoice < ApplicationRecord
     when 'non_po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
     when 'agreement_invoice', 'recurring_invoice'
-      where invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice)
+      where invoice_type_id: [InwardInvoiceType.id_for(:recurring_invoice), InwardInvoiceType.id_for(:agreement_invoice)]
 
     else
       return nil
@@ -420,6 +420,7 @@ class Invoice < ApplicationRecord
                             InwardInvoiceType.id_for(:advance),
                             InwardInvoiceType.id_for(:non_po_invoice),
                             InwardInvoiceType.id_for(:recurring_invoice),
+                            InwardInvoiceType.id_for(:agreement_invoice),
                             nil])
   }
 
@@ -841,7 +842,7 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
   end
 
-  ##### For Po Invoice and Non PO invoice Initiator roles #####
+  ##### For Po Invoice, Non PO invoice, Agreement Invoice roles #####
   def is_po_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:po_invoice_initiator), self)
@@ -870,6 +871,21 @@ class Invoice < ApplicationRecord
   def is_non_po_auditing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
+  end
+
+  def is_agreement_invoice_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), self)
+  end
+
+  def is_agreement_invoice_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), self)
+  end
+
+  def is_agreement_invoice_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
   ############ End ############
 
@@ -954,7 +970,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options={})
-    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
+    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
@@ -1161,9 +1177,9 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator)].include?(role_id)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
-        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer)].include?(role_id)
+        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer), UserRole.id_for(:agreement_invoice_reviewer)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif UserRole.id_for(:admin) == role_id.to_i
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
@@ -1185,6 +1201,9 @@ class Invoice < ApplicationRecord
         :non_po_invoice_initiator,
         :non_po_invoice_reviewer,
         :non_po_invoice_auditor,
+        :agreement_invoice_initiator,
+        :agreement_invoice_reviewer,
+        :agreement_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
