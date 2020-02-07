@@ -4,7 +4,6 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
 
   def init
     self.payment_agreement_type_id = params[:payment_agreement_type_id]
-    params[:payment_agreement_id] = self.payment_agreement_type_id
     self.payment_agreement_type = params[:payment_agreement_type]
     self.payment_agreement = user.company.payment_agreements.find_by_id params[:payment_agreement_id]
     self.procurement_id = params[:procurement_id]
