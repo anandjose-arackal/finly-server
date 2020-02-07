@@ -65,6 +65,9 @@ class PaymentAgreements::Revise < PaymentAgreements::Base
     # self.revised_agreement.policy_id = nil
     self.revised_agreement.controlling_level_id = nil
     self.revised_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
+    self.revised_agreement.document_level_reviewer_mappings = payment_agreement.document_level_reviewer_mappings.dup
+    self.revised_agreement.document_level_reviewer_mappings.each{|dlrm| dlrm.document_reviewer_mappable_id =  payment_agreement.id}
+      #payment_agreement.document_level_reviewer_mappings.map{|dlrm| dlrm.document_reviewer_mappable_id = payment_agreement.id}
     self.revised_agreement.save!
     dlrms_attr = {id: nil, taken_control:false, taken_control_by_id: nil, viewable: false, action_taken_by_id: nil, action_id: nil}
     # self.revised_agreement.document_level_reviewer_mappings = payment_agreement.document_level_reviewer_mappings
