@@ -31,7 +31,8 @@ class PaymentAgreements::AllUpcomingInvoices < PaymentAgreements::Base
 
   class PaymentAgreements::AllUpcomingInvoices::AllUpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices, :general_invoices, :rental_invoices, :policies, :paginated_general_invoices, :paginated_rental_invoices
+    attr_accessor :invoices, :general_invoices, :rental_invoices, :policies, :paginated_general_invoices, :paginated_rental_invoices,
+                  :paginated_invoices
 
     has_scope :filter_policy_id
     has_scope :filter_vendor_id
