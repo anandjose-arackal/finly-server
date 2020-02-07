@@ -181,7 +181,7 @@ class CustomField < ApplicationRecord
       has_dependent_cf = false
       if field_configuration.field_type_id == FieldType.id_for(:drop_down)
         if user_level_custom_fields
-          options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+          options = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
         else
           options = field_configuration.drop_down_items.exclude_deleted
         end
