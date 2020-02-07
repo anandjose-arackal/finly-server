@@ -24,7 +24,7 @@ class ActionsManager::Master::PaymentAgreements::SecurityDeposit::MakePayment < 
       end
     end
 
-    if security_deposit.status.unpaid?
+    if security_deposit.status.unpaid? && (user.vendor_payments_admin? || (user.is_payment_agreement_initiator? && user.is_bank_payment_request_initiator?))
       return true
     end
   end

@@ -33,6 +33,7 @@ class PaymentAgreements::Submit < PaymentAgreements::Base
       add_message :error, op.messages[:error]
       return
     end
+    self.payment_agreement.update(reject_note: nil)
     self.workflow_output = op.workflow_output
   end
 

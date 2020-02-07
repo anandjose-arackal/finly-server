@@ -28,6 +28,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     validate_item_quantity
     ActiveRecord::Base.transaction do
       if self.payment_agreement.save
+        validate_invoice_line_items unless has_errors?
         validate_prepaid_consistency unless has_errors?
         security_deposit_validation unless has_errors?
         validate_invoice_frequency unless has_errors?

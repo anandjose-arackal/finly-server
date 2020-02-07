@@ -33,13 +33,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def reject
-    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
@@ -49,13 +49,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   # end
 
   def approve
-    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
 
   def forward
-    if invoice.is_non_po_reviewing_user?
+    if invoice.is_non_po_reviewing_user? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
@@ -89,7 +89,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       invoice.processing? && document_owner?
     end
   end
@@ -122,13 +122,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def delete
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def save_and_submit
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
     end
   end
