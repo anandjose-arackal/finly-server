@@ -23,7 +23,8 @@ class PaymentAgreementStatus < ApplicationRecord
         :closed,
         :invoice_created,
         :payment_ticket_created,
-        :terminated
+        :terminated,
+        :revised
     ]
   end
 
@@ -58,6 +59,10 @@ class PaymentAgreementStatus < ApplicationRecord
 
   def terminated?
     self.id == PaymentAgreementStatus.id_for(:terminated)
+  end
+
+  def revised?
+    self.id == PaymentAgreementStatus.id_for(:revised)
   end
 
 end

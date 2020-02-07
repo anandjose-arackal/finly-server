@@ -125,5 +125,17 @@ class PaymentAgreementsController < BaseControllers::WebBase
     @result = PaymentAgreements::Terminate.(current_user, params)
     respond
   end
+  
+  def revise
+    @result = PaymentAgreements::Revise.(current_user, params)
+    respond
+  end
+
+
+  # Used for revised agreements
+  def editable_fields
+    @result = PaymentAgreements::EditableFields.(current_user, params)
+    respond
+  end
 
 end

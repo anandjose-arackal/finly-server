@@ -13,9 +13,9 @@ module Constants
   ENDING_NUMBERS = /\d+$/
   OTP_RESEND_INTERVAL = 60
 
-  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider AgreementInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
   EM_PROVIDER = %w( ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider )
-  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
+  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider PoInvoiceProvider NonPoInvoiceProvider AgreementInvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
