@@ -1,4 +1,4 @@
-class Admin::Implementations::Master::BBPS::ImportTemplates < Admin::Implementations::Processor::ImportTemplate
+class Admin::Implementations::Master::BBPS::ImportTemplate < Admin::Implementations::Processor::ImportTemplate
 
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'bank_accounts.import_template'
