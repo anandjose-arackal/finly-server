@@ -1,19 +1,21 @@
 class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Processor::Export
 
   bus Admin::Implementations::Master::BaseMaster
-  subscribe 'bbps.export'
+  subscribe 'bbps_subscriptions.export'
 
   headers({
+              :id => "ID",
               :initiator => "Initiator / Creator of Subscription*",
-              :category => "Category (for Reference) [Optional]",
-              :biller_id => "Biller ID*",
+              :name => "Name*",
+              :category_id => "Category (for Reference) [Optional]",
+              :bbps_biller_id => "Biller ID*",
               :biller_name => "Biller Name (for Reference) [Optional]",
-              :associated_mobile_number => "Associated Mobile Number*",
-              :custom_param_1 => "Custom Param 1",
-              :custom_param_2 => "Custom Param 2",
-              :custom_param_3 => "Custom Param 3",
-              :custom_param_4 => "Custom Param 4",
-              :custom_param_5 => "Custom Param 5",
+              :mobile_number => "Associated Mobile Number*",
+              :customer_param_value_1 => "Custom Param 1",
+              :customer_param_value_2 => "Custom Param 2",
+              :customer_param_value_3 => "Custom Param 3",
+              :customer_param_value_4 => "Custom Param 4",
+              :customer_param_value_5 => "Custom Param 5",
               :location => "Location*",
               :department => "Department",
               :cost_center => "Cost Center",
@@ -30,15 +32,23 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
     BbpsBillerSubscription.where(:company_id => company.id)
   end
 
+  def id(subscription)
+    subscription.id
+  end
+
   def initiator(subscription)
     subscription.user&.email
   end
 
-  def category(subscription)
-    subscription.category.name
+  def name(subscription)
+    subscription.name
   end
 
-  def biller_id(subscription)
+  def category_id(subscription)
+    subscription.category&.name
+  end
+
+  def bbps_biller_id(subscription)
     subscription.biller&.biller_id
   end
 
@@ -46,44 +56,44 @@ class Admin::Implementations::Master::BBPS::Export < Admin::Implementations::Pro
     subscription.biller&.biller_name
   end
 
-  def associated_mobile_number(subscription)
+  def mobile_number(subscription)
     subscription.mobile_number
   end
 
-  def custom_param_1(subscription)
+  def customer_param_value_1(subscription)
     subscription.customer_param_value_1
   end
 
-  def custom_param_2(subscription)
+  def customer_param_value_2(subscription)
     subscription.customer_param_value_2
   end
 
-  def custom_param_3(subscription)
+  def customer_param_value_3(subscription)
     subscription.customer_param_value_3
   end
 
-  def custom_param_4(subscription)
+  def customer_param_value_4(subscription)
     subscription.customer_param_value_4
   end
 
-  def custom_param_5(subscription)
+  def customer_param_value_5(subscription)
     subscription.customer_param_value_5
   end
 
   def location(subscription)
-    subscription.location&.location_code
+    subscription.location&.name #.location_code
   end
 
   def department(subscription)
-    subscription.department&.department_code
+    subscription.department&.name #.department_code
   end
 
   def cost_center(subscription)
-    subscription.cost_center&.cost_center_code
+    subscription.cost_center&.name #.cost_center_code
   end
 
   def policy(subscription)
-    subscription.cost_center&.name
+    subscription.policy&.name
   end
 
   def poc(subscription)
