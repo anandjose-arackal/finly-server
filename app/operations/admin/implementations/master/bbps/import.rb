@@ -117,17 +117,5 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     Success(pocs)
   end
 
-  def find(required: false, error_key: nil, klass: nil, failure_message: nil, &block)
-    value = block.call
-    if value or not required
-      return Success(value)
-    end
-
-    failure_message ||= "#{klass} not found" if klass
-    failure_message ||= "#{error_key} not found" if error_key
-    failure_message ||= "Error: Field is found"
-    Failure(failure_message)
-  end
-
 end
 

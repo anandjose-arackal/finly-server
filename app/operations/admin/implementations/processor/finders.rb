@@ -1,5 +1,17 @@
 module Admin::Implementations::Processor::Finders
 
+  def find(required: false, error_key: nil, klass: nil, failure_message: nil, &block)
+    value = block.call
+    if value or not required
+      return Success(value)
+    end
+
+    failure_message ||= "#{klass} not found" if klass
+    failure_message ||= "#{error_key} not found" if error_key
+    failure_message ||= "Error: Field is found"
+    Failure(failure_message)
+  end
+
   def find_user(identifier, required: false)
     find error_key: "User #{identifier}", required: required do
       company.users.find_by(email: identifier)
