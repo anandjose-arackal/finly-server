@@ -268,7 +268,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
 
   def get_payment_agreement_upcoming_date(start_date, end_date, prepaid)
     # return start_date # FOR TESTING ONLY
-    prepaid ? start_date.beginning_of_month : (end_date.end_of_month + 1)
+    prepaid ? start_date.beginning_of_month : (end_date + 1)
   end
 
   def create_invoice_amount(amount)
