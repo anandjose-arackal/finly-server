@@ -990,8 +990,18 @@ class Invoice < ApplicationRecord
     return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
   end
 
+  # def get_invoice_provider_name
+  #   self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+  # end
+
   def get_invoice_provider_name
-    self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+    if self.procurement.purchase_order.present?
+      return 'PoInvoiceProvider'
+    elsif self.payment_agreement_id.present?
+      return 'AgreementInvoiceProvider'
+    else
+      return 'NonPoInvoiceProvider'
+    end
   end
 
   def get_default_provider
