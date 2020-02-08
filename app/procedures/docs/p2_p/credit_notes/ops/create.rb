@@ -1,5 +1,4 @@
 class Docs::P2P::CreditNotes::Ops::Create < Transactions::API
-  include Background::Worker
 
   schema do
     params do
