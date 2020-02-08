@@ -34,6 +34,8 @@ class WorkflowManager::Base < BaseOperation
         self.aasm_document = ::WorkflowManager::Aasm::PoInvoiceProvider.new user, workflow_input
       elsif provider_name == 'NonPoInvoiceProvider'
         self.aasm_document = ::WorkflowManager::Aasm::NonPoInvoiceProvider.new user, workflow_input
+      elsif provider_name == 'AgreementInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::AgreementInvoiceProvider.new user, workflow_input
       end
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input

@@ -206,7 +206,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
-
+      # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
       # net_amount = gross_amount - tds_amount
       net_amount = self.original_amount.value - tds_amount - self.advance_amount&.value.to_f
     else # calculate proactively
@@ -218,6 +219,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(original_amount, tds)
       tds_amount = original_amount - new_gross_amount
+      # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
 
       net_amount = original_amount + tax_amount - tds_amount - self.advance_amount&.value.to_f
     end
@@ -277,6 +280,14 @@ class BeneficiaryPayment < ApplicationRecord
       self.balance_due.update(value: balance_due_amount)
     else
       self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
+    end
+
+    # quick fix for abp
+    # payable amount has no definition in that document. just there for display purposes.
+    if self.payable_amount.present?
+      self.payable_amount.update(value: balance_due_amount)
+    else
+      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: 1)
     end
 
     # # adding the payment amount to the params if  the object is present

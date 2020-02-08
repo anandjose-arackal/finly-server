@@ -80,6 +80,9 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
       when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:non_po_invoice_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'AgreementInvoiceProvider', :AgreementInvoiceProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:agreement_invoice_reviewer)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
       when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
         user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
         user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
@@ -94,6 +97,16 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
         user_ids += [user.id] if user.vendor_payments_admin? && user_ids.exclude?(user.id)
       when 'MoneyRequestProvider', 'ReportProvider', 'TravelRequestBookingProvider', 'TravelRequestProvider', :MoneyRequestProvider, :ReportProvider, :TravelRequestProvider, :TravelRequestBookingProvider
         user_ids = User.joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management is true').with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)) rescue []
+      when 'BbpsBillerSubscriptionProvider', :BbpsBillerSubscriptionProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:utility_bill_master_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'BbpsBillProvider', :BbpsBillProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:utility_bill_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'CreditNoteProvider', :CreditNoteProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:credit_note_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+
       end
       return user_ids
     end

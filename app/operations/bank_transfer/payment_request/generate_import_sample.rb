@@ -60,7 +60,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     # adding Cost Centers to the excel sheet
     cost_center_headers = ["ID", "Cost Center Name"]
     cost_center_contents = []
-    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+    current_company.cost_centers.non_deleted.vendor_payments_only.each do |cost_center|
       cost_center_contents << [cost_center.id, cost_center.name]
     end
     self.sheets << {

@@ -221,12 +221,13 @@ class PaymentAgreements::Base < BaseOperation
     amount_arr = []
     # Get value from line items
     invoice.items.each do |item|
+      next unless item.tds_applicable?
       if item.discount.present?
         amt = (item.rate * item.quantity) - (item.rate * item.quantity*item.discount/100)
       else
         amt = (item.rate * item.quantity)
       end
-      amount_arr << amt*tds_percentage/100
+      amount_arr << (amt*tds_percentage/100).ceil # round the tds to the nearest digit as of now. This is as per IT rule
     end
     return amount_arr.sum
   end
@@ -861,6 +862,37 @@ class PaymentAgreements::Base < BaseOperation
         return
       end
 
+    end
+  end
+
+  def validate_invoice_line_items
+    return # Breaking as frontend is not sending inventory line item ID
+    g_item_ids = []
+    r_item_ids = []
+    if self.payment_agreement.general_invoices.fixed_periodic_type.present?
+      self.payment_agreement.general_invoices.fixed_periodic_type.each do |general_invoice|
+        if general_invoice.items.present?
+          g_item_ids << general_invoice.invoice_items.collect{|i| i.inventory_line_item_id}
+        else
+          add_message :error, "All general invoice line items should have atleast one inventory item"
+        end
+      end
+    end
+    if self.payment_agreement.rental_invoices.fixed_periodic_type.present?
+      self.payment_agreement.rental_invoices.fixed_periodic_type.each do |rental_invoice|
+        if rental_invoice.items.present?
+          r_item_ids << rental_invoice.invoice_items.collect{|i| i.inventory_line_item_id}
+        else
+          add_message :error, "All rental invoice line items should have atleast one inventory item"
+        end
+      end
+    end
+
+    if g_item_ids.uniq.count > 1
+      add_message :error, "All general invoice line items should have same inventory item"
+    end
+    if r_item_ids.uniq.count > 1
+      add_message :error, "All rental invoice line items should have same inventory item"
     end
   end
 

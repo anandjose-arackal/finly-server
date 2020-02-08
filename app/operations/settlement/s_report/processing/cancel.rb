@@ -39,14 +39,15 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
       return
     end
 
-    unless PaymentOrderStatus.ids_for(:pending, :failed).include?(self.report_group_processor.payment_order.status_id)
+    unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.report_group_processor.payment_order.payment_order_status_id)
       add_message :error, 'Batch cannot be cancelled at this stage'
       return
     end
-    if self.report_group_processor.payment_order&.in_progress?
-      add_message :error, 'Batch cannot be cancelled at this stage'
-      return
-    end
+
+    # if self.report_group_processor.payment_order&.in_progress?
+    #   add_message :error, 'Batch cannot be cancelled at this stage'
+    #   return
+    # end
   end
 
 

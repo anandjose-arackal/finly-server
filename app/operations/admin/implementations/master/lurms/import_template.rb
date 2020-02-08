@@ -42,6 +42,9 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             BbpsBillerSubscriptionProvider
+             BbpsBillProvider
+             CreditNoteProvider
              )
     file = Tempfile.new(['lurm_import_template', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)

@@ -39,6 +39,7 @@ class CostCenter < ApplicationRecord
 
   has_many :budget_trails
 
+  default_scope {unscope(:where).order(name: :asc)}
   scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app

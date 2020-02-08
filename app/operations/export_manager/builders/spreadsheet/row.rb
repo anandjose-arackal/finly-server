@@ -12,7 +12,7 @@ class ExportManager::Builders::Spreadsheet::Row
 
   def add(column, value)
     header.add column
-    values[column&.to_s] = value&.to_s
+    values[column&.to_s] = value
   end
 
   def build
