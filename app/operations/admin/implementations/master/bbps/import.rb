@@ -29,7 +29,9 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
   attr_accessor :bank_account_params
 
   def create_record(data)
-    create_or_update(BbpsBillerSubscription.new, data, success_message: "Created Successfully")
+    subscription_model = BbpsBillerSubscription.new
+    subscription_model.status_id = BbpsBillerSubscriptionStatus.id_for(:auto_approved)
+    create_or_update(subscription_model, data, success_message: "Created Successfully")
   end
 
   def update_record(data)
