@@ -1,7 +1,7 @@
 class Admin::Implementations::Master::BBPS::ImportTemplate < Admin::Implementations::Processor::ImportTemplate
 
   bus Admin::Implementations::Master::BaseMaster
-  subscribe 'bank_accounts.import_template'
+  subscribe 'bbps_subscriptions.import_template'
   headers ({
       :id => "ID",
       :initiator => "Initiator / Creator of Subscription*",
