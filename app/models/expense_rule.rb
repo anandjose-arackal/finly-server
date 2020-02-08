@@ -13,7 +13,6 @@
 #  policy_id              :integer
 #  is_deleted             :boolean          default(FALSE)
 #  deleted_at             :datetime
-#  uuid                   :string(36)
 #
 
 class ExpenseRule < ApplicationRecord

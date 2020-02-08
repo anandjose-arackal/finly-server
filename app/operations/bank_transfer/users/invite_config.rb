@@ -218,6 +218,24 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
           }
         ]
       }
+
+      data << {
+        name: 'Agreement Invoice',
+        roles: [
+          {
+            key: 'agreement_invoice_initiator',
+            label: 'Agreement Invoice Initiator'
+          },
+          {
+            key: 'agreement_invoice_reviewer',
+            label: 'Agreement Invoice Reviewer'
+          },
+          {
+            key: 'agreement_invoice_auditor',
+            label: 'Agreement Invoice Auditor'
+          }
+        ]
+      }
     end
     if feature_subscription.agreement_based_payment_system
       data << {

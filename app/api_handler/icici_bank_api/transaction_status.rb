@@ -105,8 +105,11 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
           end
         elsif api_response&.upcase == "FAILURE"
           # this condition is because apparently, for IMPS transactions, the message being sent is: "Session could not be retrieved"
-          message = self.parsed_response["MESSAGE"]
+          message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
           if self.icici_bank_transaction.imps? && message.downcase == "session could not be retrieved"
+            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          end
+          if message == "Invalid Inquiry Req id or unique Id"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
           end
         else

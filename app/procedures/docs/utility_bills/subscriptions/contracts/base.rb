@@ -3,13 +3,13 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :id
   property :bbps_biller_id, validates: {presence: true}
   property :name, validates: {presence: true}
-  property :company_id
+  property :company_id, validates: {presence: true}
   property :sequence_id
   property :mobile_number, validates: {presence: true}
 
-  property :department_id
-  property :cost_center_id
-  property :location_id
+  property :department_id, validates: {presence: true}
+  property :cost_center_id, validates: {presence: true}
+  property :location_id, validates: {presence: true}
   property :policy_id, validates: {presence: true}
 
   property :category_id
@@ -132,7 +132,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
         if config['regex'].present?
           regex = Regexp.new config['regex']
 
-          errors.add("customer_param_key_#{a}", "Please provide #{label} in the correct format") unless value&.match(regex)
+          errors.add("customer_param_key_#{a}", "Please provide #{label} in the correct format") unless value&.to_s.match(regex)
           valid = false
         end
       else
@@ -189,11 +189,11 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   private
 
   def check_alphanumeric(string)
-    string.match(/\A[a-zA-Z0-9]*\z/)
+    string.to_s.match(/\A[a-zA-Z0-9]*\z/)
   end
 
   def check_numeric(string)
-    string.match(/^\d+$/)
+    string.to_s.match(/^\d+$/)
   end
 
   def customer_fields!(collection:, fragment:, index:, options:, **)
