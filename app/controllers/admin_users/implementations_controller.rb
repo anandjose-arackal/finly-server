@@ -1,8 +1,6 @@
 class AdminUsers::ImplementationsController < BaseControllers::AdminBase
   protect_from_forgery with: :null_session
   def create
-    Admin::Implementations::Master::BBPS::Export
-    Admin::Implementations::Master::BBPS::Import
     @result = Admin::Implementations::RequestHandler.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
