@@ -92,9 +92,4 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyTemplate < Pe
     STANZA_INDIRECT_GL_CODE_MAPPING[gl]
   end
 
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
-
 end
