@@ -1,7 +1,8 @@
 class MakeAllModelsSoftDeletable < ActiveRecord::Migration[5.2]
   def change
     change_column :money_request_processors, :payment_file_generated_at, :datetime
-
+    change_column :report_processor_groups, :payment_file_generated_at, :datetime
+    
     non_existent_models = []
     ################## BELOW STEP IS BEFORE DEPLOY #######################
     # first we have to seed the seedable classes with soft deletable
