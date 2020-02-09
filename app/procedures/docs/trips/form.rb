@@ -6,12 +6,12 @@ class Docs::Trips::Form < Forms::API
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
     dropdown :created_by, required: true, visible: false#, class_name: 'User'
     dropdown :company, required: true#, class_name: 'Company', internal: true
-    # lookup :department_id, scope: Forms::DSL::Entity::Scope[:auto_complete].scope('departments', filters: {}), required: true
-    # lookup :location_id, scope: Forms::DSL::Entity::Scopes::AutoComplete.scope('locations', filters: {}), required: true
-    # lookup :cost_center_id, scope: Forms::DSL::Entity::Scopes::AutoComplete.scope('cost_centers', filters: {}), required: true
-    dropdown :status_id, scope: Forms::DSL::Entity::Scope[:enum].scope(TripStatus, :id, :name), required: true, default_value: 1
-    dropdown :trip_type_id, scope: Forms::DSL::Entity::Scope[:enum].scope(TripType, :id, :name), required: true
-    dropdown :policy_id, scope: Forms::DSL::Entity::Scope[:auto_complete].scope('policies', filters: {}), required: true
+    # lookup :department_id, scope: Forms::API::Entity::Scope[:auto_complete].scope('departments', filters: {}), required: true
+    # lookup :location_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('locations', filters: {}), required: true
+    # lookup :cost_center_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('cost_centers', filters: {}), required: true
+    dropdown :status_id, scope: Forms::API::Entity::Scope[:enum].scope(TripStatus, :id, :name), required: true, default_value: 1
+    dropdown :trip_type_id, scope: Forms::API::Entity::Scope[:enum].scope(TripType, :id, :name), required: true
+    dropdown :policy_id, scope: Forms::API::Entity::Scope[:auto_complete].scope('policies', filters: {}), required: true
     date :start_date, required: true
     date :end_date, required: true
     text :purpose, required: true
@@ -41,9 +41,9 @@ class Docs::Trips::Form < Forms::API
     collection :transport_requests, populate_if_empty: TripTransportRequest, associate_custom_fields: true do
       text :from_location, required: true
       text :to_location, required: true
-      dropdown :mode, scope: Forms::DSL::Entity::Scopes::List.scope({value: "Flight"}), required: true
+      dropdown :mode, scope: Forms::API::Entity::Scopes::List.scope({value: "Flight"}), required: true
       datetime :depart_on, required: true
-      dropdown :preferred_timeframe, required: true, scope: Forms::DSL::Entity::Scopes::List.scope(
+      dropdown :preferred_timeframe, required: true, scope: Forms::API::Entity::Scopes::List.scope(
           {value: "6am to 9am"}, {value: "9am to 12pm"}, {value: "12pm to 3pm"},
           {value: "3pm to 6pm"}, {value: "6pm to 9pm"}, {value: "9pm to 12am"},
           {value: "12am to 3am"}, {value: "3am to 6am"}

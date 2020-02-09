@@ -81,7 +81,7 @@ class FormEntity < ApplicationRecord
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    handler = Forms::DSL::Entity::Scope.handler(val[:type])
+    handler = Forms::API::Entity::Scope.handler(val[:type])
     handler.new val, self
   end
 

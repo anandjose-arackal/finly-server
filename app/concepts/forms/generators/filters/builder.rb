@@ -24,7 +24,7 @@ module Forms::Generators::Filters::Builder
     #   entities.each do |entity|
     #     if entity.entities.present?
     #       filter_key = nil
-    #       unless entity.class <= Forms::DSL::Entity::Section
+    #       unless entity.class <= Forms::API::Entity::Section
     #         filter_key = entity.field_key
     #         filter_key = "#{prefix}_#{filter_key}" if prefix
     #       end

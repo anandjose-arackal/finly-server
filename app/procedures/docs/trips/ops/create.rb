@@ -9,8 +9,8 @@ class Docs::Trips::Ops::Create < Transactions::API
   step Messages::Task::SuccessMessage("Trip saved")
 
   def build_contract(context, model:, current_user:, **)
-    # Docs::Trips::Form.fetch(current_user).contract.new(model)
-    Docs::Trips::Contracts::Create.build(current_user).new(model)
+    Docs::Trips::Form.fetch(current_user).contract.new(model)
+    # Docs::Trips::Contracts::Create.build(current_user).new(model)
   end
 
 
