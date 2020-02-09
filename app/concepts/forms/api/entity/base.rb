@@ -3,7 +3,7 @@ class Forms::API::Entity::Base
   include Registry
   include Schema
   include Forms::API::Entity::Contract::DSL
-  include Forms::Generators::Filters::DSL
+  include Forms::Generators::Filters::ApiEntityHelper
 
   attr_accessor :options
 

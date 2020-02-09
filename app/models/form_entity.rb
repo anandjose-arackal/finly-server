@@ -52,6 +52,7 @@
 class FormEntity < ApplicationRecord
   include SoftDeletable, UUIDHelper
   include Forms::Generators::Contracts::ModelHelpers::FormEntity
+  include Forms::Generators::Filters::ModelHelpers::FormEntity
 
   belongs_to :company
   belongs_to :form_section

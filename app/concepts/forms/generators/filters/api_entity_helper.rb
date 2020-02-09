@@ -1,4 +1,4 @@
-module Forms::Generators::Filters::DSL
+module Forms::Generators::Filters::ApiEntityHelper
   extend ActiveSupport::Concern
 
   DEFAULT_FILTERS = %i(

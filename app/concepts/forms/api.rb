@@ -1,5 +1,4 @@
 class Forms::API
-  include Forms::Generators::Filters::Builder
   include DynamicAttributes
 
   class_attr :sections, default: []

@@ -15,9 +15,11 @@
 class Form < ApplicationRecord
   include UUIDHelper, SoftDeletable
   include Forms::Generators::Contracts::ModelHelpers::Form
+  include Forms::Generators::Filters::ModelHelpers::Form
 
+  belongs_to :company
   has_many :sections, class_name: 'FormSection', dependent: :destroy
-  has_many :entities, through: :sections
+  has_many :entities, class_name: "FormEntity"
   has_many :dependencies, class_name: 'FormDependency'
 
   def as_json(options = {})
