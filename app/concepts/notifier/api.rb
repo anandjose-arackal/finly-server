@@ -2,9 +2,9 @@ class Notifier::API < Transactions::API
   include DynamicAttributes
   include Events::Consumer
 
-  def self.event(event_name)
-    consumes_event! 'mail'
-  end
+  # def self.event(event_name)
+  #   consumes_event! 'mail'
+  # end
 
   def on_event(user, payload)
     self.class.(params: params, current_user: user)

@@ -11,9 +11,9 @@ class Events::Publisher
     payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user), type: :event}
     payload.reject! {|k, v| v.nil?} # Remove all nil values
 
-    if Rails.env.production?
+    # if Rails.env.production?
       Async.(routing_key, payload, current_user: current_user, persistence: persistence, consumer_key: consumer_key)
-    end
+    # end
     Sync.(routing_key, payload, current_user: current_user, ignore_failure: ignore_failure, consumer_key: consumer_key)
   end
 

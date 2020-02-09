@@ -7,6 +7,9 @@ module Events::Consumer
 
   module ClassMethods
     def consumes_event!(event, consumer_key:, name:, sync: false, options: {})
+      if event == "bbps_biller_subscription.submit"
+        # puts "event", event
+      end
       raise "Name is not defined for consumer #{self.event_name}" if name.nil?
       raise "Event is not defined for consumer #{self.event_name}" if event.nil?
       raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
@@ -19,6 +22,7 @@ module Events::Consumer
       @event_name = name
 
       Events::Registry.add_event self, event, consumer_key
+
 
       if async?
         include Sneakers::Worker
@@ -125,7 +129,6 @@ module Events::Consumer
     # Todo load request store properties
     # request_store_properties = payload&.dig('request_store_properties')
     # RequestStoreUtil.from_hash request_store_properties
-
     receive(type, user, message)
   end
 

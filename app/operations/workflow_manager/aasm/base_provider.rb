@@ -60,6 +60,9 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Update the status of the document
     update_status
+
+    # Broadcast event
+    broadcast_event
   end
 
   def update_dlrms
@@ -210,6 +213,14 @@ class WorkflowManager::Aasm::BaseProvider
     self.document_update_params[:controlling_level_id] = self.new_level&.id
     self.document_update_params[document.class.document_status_attribute] = status_id
     self.document.update(self.document_update_params)
+  end
+
+  def broadcast_event
+    # routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false
+    event_channel = document.class.respond_to?(:event_channel) ? document.class.event_channel : document.class.table_name
+    Events::Publisher.broadcast "#{event_channel}.#{aasm.current_event}",
+                                Events::Payload::Record.(document, user, aasm.current_event, {from_status: aasm.current_state}),
+                                current_user: user, consumer_key: Notifier::Router
   end
 
   def reviewers_not_present?
