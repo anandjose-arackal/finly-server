@@ -1,4 +1,4 @@
-class Forms::Contracts::API
+class Forms::Generators::Contracts::API
   include DynamicAttributes
 
   class_attr :form
@@ -8,11 +8,11 @@ class Forms::Contracts::API
   end
 
   def self.property(name, options = {}, &block)
-    properties << Forms::Contracts::API::Property.new(self, name, options, block, collection: false)
+    properties << Forms::Generators::Contracts::API::Property.new(self, name, options, block, collection: false)
   end
 
   def self.collection(name, options = {}, &block)
-    properties << Forms::Contracts::API::Property.new(self, name, options, block, collection: true)
+    properties << Forms::Generators::Contracts::API::Property.new(self, name, options, block, collection: true)
   end
 
   def self.load_custom_fields!
@@ -40,7 +40,7 @@ class Forms::Contracts::API
       class_eval &functions if functions.present?
 
       if load_custom_fields and root_custom_fields.present?
-        instance_eval &Forms::Contracts::EntityBuilder::CustomField.setup(root_custom_fields)
+        instance_eval &Forms::Generators::Contracts::EntityBuilder::CustomField.setup(root_custom_fields)
 
         # Load custom fields from form
         root_custom_fields.each do |custom_field_entity|

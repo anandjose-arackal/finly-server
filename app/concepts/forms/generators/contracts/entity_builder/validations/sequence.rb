@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::Sequence < Forms::Contracts::EntityBuilder::Validations::Base
+class Forms::Generators::Contracts::EntityBuilder::Validations::Sequence < Forms::Generators::Contracts::EntityBuilder::Validations::Base
 
   register :sequence
 

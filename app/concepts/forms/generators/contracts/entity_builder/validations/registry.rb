@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::Registry
+class Forms::Generators::Contracts::EntityBuilder::Validations::Registry
 
   def self.handlers
     @handlers ||= {}.with_indifferent_access

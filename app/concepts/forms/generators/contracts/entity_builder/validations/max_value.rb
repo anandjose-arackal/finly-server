@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::MaxValue < Forms::Contracts::EntityBuilder::Validations::Base
+class Forms::Generators::Contracts::EntityBuilder::Validations::MaxValue < Forms::Generators::Contracts::EntityBuilder::Validations::Base
 
   register :max_value
 

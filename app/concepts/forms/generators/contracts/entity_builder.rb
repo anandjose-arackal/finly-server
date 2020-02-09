@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder
+class Forms::Generators::Contracts::EntityBuilder
   attr_accessor :field_name, :entity_options, :contract_property_options, :block, :collection, :entity
 
   def initialize(entity, field_name, entity_options, contract_property_options, block, collection: false)
@@ -16,7 +16,7 @@ class Forms::Contracts::EntityBuilder
     # validate: Proc used to define validations
     validations = {validates: [], validate: [], setters: []}
     entity_options.each do |option, value|
-      transformer = Forms::Contracts::EntityBuilder::Validations::Registry.for(option)&.new(entity, field_name, value)
+      transformer = Forms::Generators::Contracts::EntityBuilder::Validations::Registry.for(option)&.new(entity, field_name, value)
       next unless transformer
 
       validations[:setters] += transformer.setters
@@ -25,7 +25,7 @@ class Forms::Contracts::EntityBuilder
     end
 
     entity_options[:options]&.each do |option, value|
-      transformer = Forms::Contracts::EntityBuilder::Validations::Registry.for(option)&.new(entity, field_name, value)
+      transformer = Forms::Generators::Contracts::EntityBuilder::Validations::Registry.for(option)&.new(entity, field_name, value)
       next unless transformer
 
       validations[:setters] += transformer.setters

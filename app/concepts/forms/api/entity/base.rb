@@ -90,7 +90,7 @@ class Forms::API::Entity::Base
   # end
   #
   # def build
-  #   transformer = Forms::Contracts::EntityBuilder.new(*builder_args)
+  #   transformer = Forms::Generators::Contracts::EntityBuilder.new(*builder_args)
   #   transformer.generate
   # end
 

@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::Scope < Forms::Contracts::EntityBuilder::Validations::Base
+class Forms::Generators::Contracts::EntityBuilder::Validations::Scope < Forms::Generators::Contracts::EntityBuilder::Validations::Base
 
   register :scope
 

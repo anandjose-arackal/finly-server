@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::Base
+class Forms::Generators::Contracts::EntityBuilder::Validations::Base
 
   attr_accessor :name, :value, :entity
 
@@ -26,7 +26,7 @@ class Forms::Contracts::EntityBuilder::Validations::Base
   end
 
   def self.register(key)
-    Forms::Contracts::EntityBuilder::Validations::Registry.register(key, self)
+    Forms::Generators::Contracts::EntityBuilder::Validations::Registry.register(key, self)
   end
 
 

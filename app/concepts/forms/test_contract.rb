@@ -1,4 +1,4 @@
-class Forms::TestContract < Forms::Contracts::API
+class Forms::TestContract < Forms::Generators::Contracts::API
 
   class Forms::TestContract::Form < Forms::API
 

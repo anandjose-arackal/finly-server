@@ -1,4 +1,4 @@
-class Forms::Contracts::EntityBuilder::Validations::DefaultValue < Forms::Contracts::EntityBuilder::Validations::Base
+class Forms::Generators::Contracts::EntityBuilder::Validations::DefaultValue < Forms::Generators::Contracts::EntityBuilder::Validations::Base
 
   register :default_value
 
