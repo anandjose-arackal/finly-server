@@ -18,7 +18,10 @@ module Forms::Generators::Filters::ModelHelpers::FormEntity
         multiple: multiple
     }
     if field_type_klass.consumes_choices?
-      filter[:scope] = scope
+      filter[:scope] = scope.as_json
+    end
+    if field_type_klass.consumes_choices?
+      filter[:choices] = choices.as_json
     end
     filter
   end

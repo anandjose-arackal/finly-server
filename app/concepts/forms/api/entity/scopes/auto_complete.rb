@@ -27,4 +27,10 @@ class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Bas
   def self.scope(route, filters)
     {type: :auto_complete, route: route.to_s, filters: filters}
   end
+
+  def as_json(options={})
+    {
+        type: :auto_complete, route: route
+    }
+  end
 end
