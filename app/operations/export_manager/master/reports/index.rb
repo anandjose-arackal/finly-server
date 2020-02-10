@@ -8,22 +8,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   handle :reports
   validate :input
 
-  attribute :item_number
-  attribute :gl_code
-  attribute :description
-  attribute :product_type
-  attribute :active
-  attribute :category
-  attribute :hsn_sac
-  attribute :sku
-  attribute :expense_type
-  attribute :tds_applicable
-  attribute :tax_rate
-  attribute :item_rate
-  attribute :supply_item_type
-  attribute :unit_of_measurement
-  attribute :created_user
-  attribute :created_at
+  attribute :report_id
 
   def input
     result = ::ItemMaster::Item::Index.(user, params)
