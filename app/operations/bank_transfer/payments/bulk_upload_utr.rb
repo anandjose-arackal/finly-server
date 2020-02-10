@@ -45,6 +45,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       begin
        credited_at = nil
        credited_at = DateTime.strptime(payment_data[:processed_date], "%m-%d-%Y") if payment_data[:processed_date].present?
+       #XLSX library read the date in MM-DD-YYYY format, Rewrite the date in supplied format after processing.
+       self.result_array.last[-1] = credited_at&.strftime("%d/%m/%Y")
       rescue ArgumentError => e
         self.result_array[index] << "Invalid Processed Date"
         next
