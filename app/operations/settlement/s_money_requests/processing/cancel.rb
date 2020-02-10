@@ -40,7 +40,7 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
       return
     end
 
-    unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.money_request_processor.payment_order.payment_order_status_id)
+    unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.money_request_processor.payment_order&.payment_order_status_id)
       add_message :error, 'Batch cannot be cancelled at this stage'
       return
     end
