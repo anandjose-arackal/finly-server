@@ -734,6 +734,7 @@ class PaymentAgreements::Base < BaseOperation
     validate_grouped_vendor_start_end_date unless has_errors?
   end
 
+  # checks to see if atleast one security deposit but not more, is there for all vendors
   def security_deposit_validation
     if self.payment_agreement.security_deposits.count > 1
       unless self.payment_agreement.security_deposits.pluck(:vendor_id).count == self.payment_agreement.security_deposits.pluck(:vendor_id).uniq.count
@@ -865,6 +866,8 @@ class PaymentAgreements::Base < BaseOperation
     end
   end
 
+  # checks to see if items are there or not
+  # checks to see if general_invoice or rental_invoice have same items
   def validate_invoice_line_items
     return # Breaking as frontend is not sending inventory line item ID
     g_item_ids = []
