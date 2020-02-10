@@ -36,7 +36,8 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.report_processor_group.mappings.exclude_cancelled.each do |item|
+      # self.report_processor_group.mappings.exclude_cancelled.each do |item|
+      self.report_processor_group.mappings.exclude_cancelled.left_joins(:reports).select('report_processor_group_mappings.*, reports.id AS report_id, reports.bank_reference_number AS report_bank_reference_number, reports.source_account AS report_source_account').each do |item|
         item_contents << processor_details(self.report_processor_group, item)
       end
     end
@@ -56,33 +57,40 @@ class Settlement::SReport::Processing::GenerateTemplateFile < Settlement::SRepor
   private
 
   def processor_details(processor, item)
-    marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
-    document_ids = item.reports.pluck(:id).join(", ") rescue ""
+    marked_as_completed = (item.completed?) ? 'Y' : ''
+    msg = (item.completed?) ? '(only UTR updateable)' : ''
+    # document_ids = item.reports.pluck(:id).join(", ") rescue ""
     [
+      # document_ids,
+      item.report_id,
       item.id,
-      document_ids,
       processor.created_by_user&.name,
       item.processor_accountable&.name,
       item.processor_accountable&.account_number,
       item.user&.name,
       item.note,
-      item.amount&.value,
-      item.bank_reference_number,
-      marked_as_completed
+      item.reports.find_by(id: item.report_id).total_amount,
+      item.reports.find_by(id: item.report_id).total_amount([:reimbursable]),
+      item.report_bank_reference_number,
+      item.report_source_account,
+      marked_as_completed,
+      msg
     ]
   end
 
   def default_headers
     [
+      "Report ID(unmodifiable)",
       "Batch Item ID(unmodifiable)",
-      "Report IDs(unmodifiable)",
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
       "Report Requested By User(unmodifiable)", 
       "Purpose of Report(unmodifiable)", 
       "Total Report Amount(unmodifiable)", 
+      "Total Reimbursable Amount(unmodifiable)", 
       "UTR",
+      "Source Account",
       "Mark As Paid(Y or N)"
     ]
   end

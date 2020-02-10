@@ -11,8 +11,8 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     # todo add unapprove etc
 
     event :submit do
-      transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:draft, :retracted, :rejected], to: :awaiting_approval
+      transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: [:reviewers_not_present?, :vendor_workflow_disabled?]
+      transitions from: [:draft, :retracted, :rejected], to: :awaiting_approval, guard: [:reviewers_present?]
     end
 
     event :approve do
@@ -26,7 +26,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     event :take_control do
-      transitions :from => :awaiting_approval, :to => :awaiting_approval
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :user_is_admin?
     end
 
     event :return_control do
@@ -34,6 +34,7 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     end
 
     event :reject do
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :reject_to_level?
       transitions :from => :awaiting_approval, :to => :rejected, guard: :user_can_review?
     end
 
@@ -53,6 +54,24 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     after_all_events :change_state
   end
 
+  def update_status
+    super()
+    if [:deactivate].include?(aasm.current_event)
+      document.bank_accounts.update_all disabled: true
+    end
+
+    if [:reactivate].include?(aasm.current_event)
+      document.bank_accounts.update_all disabled: false
+    end
+  end
+
+  def vendor_workflow_disabled?
+    !document.company.feature_subscription.vendor_empanelment_workflow
+  end
+
+  def user_is_admin?
+    user.vendor_payment_admin?
+  end
 
   def reviewal_chain_present?
     document.dlrms.present?

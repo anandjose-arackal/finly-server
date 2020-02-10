@@ -1,13 +1,23 @@
 json.payments do
   json.array!(@result.paginated_payments.include_for_index) do |payment|
-    if payment.receiving_account&.account_owner&.is_a?(YesBankVendor)
+    if payment.receiving_account&.is_a?(BbpsBiller)
+      json.owner_name payment.receiving_account&.biller_name
+      json.editable false # because a bbps bill can never be edited from the payment ticket screen
+    elsif payment.receiving_account&.account_owner&.is_a?(YesBankVendor)
       json.owner_name payment.receiving_account&.account_owner&.display_name
+      json.owner_business_name payment&.receiving_account&.account_owner&.business_name
+      json.owner_trade_name payment&.receiving_account&.account_owner&.trade_name
+      json.beneficiary_id payment.receiving_account&.account_owner&.id
+      json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+      json.disabled payment&.receiving_account&.disabled
+      json.name payment.receiving_account&.name
+      json.account_number payment.receiving_account&.account_number
+      json.ifsc payment.receiving_account&.ifsc
     else
       json.owner_name payment.receiving_account&.account_owner&.name
+      json.beneficiary_id payment.receiving_account&.account_owner&.id
+      json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
     end
-    json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account&.account_number
-    json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
@@ -16,9 +26,7 @@ json.payments do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account&.id
-    json.beneficiary_id payment.receiving_account&.account_owner&.id
-    json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
-    if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+    if payment.receiving_user.is_a?(User) || payment.receiving_user.is_a?(BbpsBillerSubscription) || payment.receiving_user.authorized
       json.beneficiary_type "authorized"
     else
       json.beneficiary_type "unauthorized"
@@ -29,10 +37,6 @@ json.payments do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.credited_at payment.reference_resource&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
-    json.retriable do
-      json.retriable payment.retriable?
-      json.change_mode payment.payment_order.failed?
-    end
     json.category_id payment.category_id
     json.category_name payment.category&.name
     json.department_id payment.department_id
@@ -48,6 +52,12 @@ json.payments do
       else
         json.original_amount precision_value invoice.original_amount&.value
       end
+
+      json.retriable do
+        json.retriable (payment.retriable? && invoice.payable)
+        json.change_mode payment.payment_order.failed?
+      end
+
       json.invoice do
         json.id invoice.id
         json.invoice_type invoice.invoice_type&.name
@@ -79,7 +89,7 @@ json.payments do
         json.tds_rate precision_value invoice.tds_rate
         json.discount_rate precision_value invoice.discount_rate
         json.advance_rate precision_value invoice.advance_rate
-        json.invoice_id invoice.id
+        json.invoice_id invoice.invoice_id
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
@@ -92,6 +102,7 @@ json.payments do
         json.custom_fields do
           json.array! invoice.custom_fields
         end
+        json.custom_field_config invoice.remaining_custom_field_config
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
@@ -144,40 +155,47 @@ json.payments do
     json.parent_id payment.parent_id
     # json.invoice_details payment.invoice.invoice_amount_details
     json.parent_details do
-      json.merge! payment.parent_details
-      # json.payable_amount payment.get_payable_amount
-      json.payable_amount precision_value payment.amount.value
+      unless payment.parent.nil?
+        json.merge! payment.parent_details
+        # json.payable_amount payment.get_payable_amount
+        json.payable_amount precision_value payment.amount.value
+      end
     end
   end
 end
 
-# json.payments_count @result.ordered_payments.count
-# json.payments_status_ids @result.payment_status_ids
-# json.payment_status_id_count @result.payment_status_id_count
-json.payments_count @result.ordered_payments.size
-# non-paginated payments listing all payments in this payment order
-json.filter_count @result.filter_count
-unless current_company.id == 118
-json.unpaid_payments do
-  json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
-    json.owner_name payment.receiving_account&.account_owner&.name
-    json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account&.account_number
-    json.ifsc payment.receiving_account&.ifsc
-    json.amount precision_value payment.amount_value
-    json.payment_amount payment.amount_value
-    json.net_amount precision_value payment.amount_value
-    json.status payment.payment_status_name
-    json.id payment.id
-    json.note payment.note
-    json.account_id payment.receiving_account&.id
-    json.beneficiary_id payment.receiving_account&.account_owner&.id
-    json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
-    if payment.receiving_user&.is_a?(User) || payment.receiving_user&.authorized
-      json.beneficiary_type "authorized"
-    else
-      json.beneficiary_type "unauthorized"
+# # json.payments_count @result.ordered_payments.count
+# # json.payments_status_ids @result.payment_status_ids
+# # json.payment_status_id_count @result.payment_status_id_count
+# json.payments_count @result.ordered_payments.size
+# # non-paginated payments listing all payments in this payment order
+# json.filter_count @result.filter_count
+unless [168, 169, 174, 175, 118].include?(current_user.company_id)
+  json.unpaid_payments do
+    json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
+      if payment.receiving_account&.is_a?(BbpsBiller)
+        json.name payment.receiving_account&.biller_name
+      else
+        json.owner_name payment.receiving_account&.account_owner&.name
+        json.beneficiary_id payment.receiving_account&.account_owner&.id
+        json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
+        json.name payment.receiving_account&.name
+        json.account_number payment.receiving_account&.account_number
+        json.disabled payment.receiving_account&.disabled
+        json.ifsc payment.receiving_account&.ifsc
+      end
+      json.amount precision_value payment.amount_value
+      json.payment_amount payment.amount_value
+      json.net_amount precision_value payment.amount_value
+      json.status payment.payment_status_name
+      json.id payment.id
+      json.note payment.note
+      json.account_id payment.receiving_account&.id
+      if payment.receiving_user&.is_a?(User) || payment.receiving_user&.is_a?(BbpsBillerSubscription) || payment.receiving_user&.authorized
+        json.beneficiary_type "authorized"
+      else
+        json.beneficiary_type "unauthorized"
+      end
     end
   end
-end
 end

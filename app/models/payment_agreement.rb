@@ -24,11 +24,15 @@
 #  renewal_reminder_date :datetime
 #  total_amount_id       :integer
 #  override_order_number :string(255)
+#  terminated_at         :datetime
+#  terminated_by_id      :integer
+#  termination_reason    :text(65535)
+#  deleted_at            :datetime
 #
 
 class PaymentAgreement < ApplicationRecord
 
-  include Transitionable
+  include Transitionable, SoftDeletable
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :order_number, purpose: :payment_agreement, editable: false, prefix: 'PA'
@@ -39,20 +43,37 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :total_amount, optional: true, class_name: 'Amount'
+  belongs_to :terminated_by, optional: true, class_name: 'User'
+  belongs_to :revision_of_pa, optional: true, class_name: 'PaymentAgreement'
 
-
-  has_many :general_invoices, dependent: :destroy
-  has_many :rental_invoices, dependent: :destroy
+  has_many :general_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
+  has_many :rental_invoices, -> { where(fixed_periodic_template: [nil, false]) }, dependent: :destroy
+  has_many :fixed_periodic_general_invoices, -> { where(fixed_periodic_template: true) }, class_name: "GeneralInvoice", dependent: :destroy
+  has_many :fixed_periodic_rental_invoices, -> { where(fixed_periodic_template: true) }, class_name: "RentalInvoice", dependent: :destroy
+# TODO - Decommision recurring invoice, use agreement invoice instead
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
+  has_many :agreement_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 
   # has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
   
   has_many :notify_users, as: :document, dependent: :destroy 
   has_many :security_deposits, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
 
   has_many :attachments, as: :resource, dependent: :destroy
+
+  amoeba do
+    clone [:custom_fields, :general_invoices, :rental_invoices, :beneficiary_payments, :security_deposits, :notify_users]
+    exclude_association :trails
+    exclude_association :recurring_invoices
+    exclude_association :agreement_invoices
+    exclude_association :fixed_periodic_general_invoices
+    exclude_association :fixed_periodic_rental_invoices
+    # exclude_association :document_level_reviewer_mappings
+    exclude_association :dlrms
+  end
 
   # validates_associated :invoices
   attr_accessor :selected_invoice_frequency_attributes
@@ -61,7 +82,9 @@ class PaymentAgreement < ApplicationRecord
   validate :agreement_date_comparison, :expiration_date_if_allowed, :agreement_item_combinations
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :terminated?, :revised?, to: :status
+
+  attr_accessor :payment_agreement_custom_fields
 
   accepts_nested_attributes_for :general_invoices, :rental_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
@@ -195,7 +218,7 @@ class PaymentAgreement < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-        with_id(ids)
+        with_ids(ids)
       end
     else
       where status_id: status_id
@@ -242,27 +265,45 @@ class PaymentAgreement < ApplicationRecord
     end
   }
 
+  scope :filter_invoice_number, -> (invoice_number) {
+    ids = where('payment_agreements.order_number LIKE ? OR payment_agreements.override_order_number LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:general_invoices).where('general_invoices.invoice_id LIKE ? OR general_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    ids+= joins(:rental_invoices).where('rental_invoices.invoice_id LIKE ? OR rental_invoices.override_invoice_id LIKE ?', "%#{invoice_number}%", "%#{invoice_number}%").pluck(:id)
+    with_ids(ids)
+  }
+
+  scope :exclude_revision, -> { where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
+
+
   def as_json(options={})
     {
-      id: self.id,
-      agreement_number: get_agreement_number,
-      title: self.title,
-      policy_id: self.policy_id,
-      policy: self.policy&.name,
-      created_by: self.creator&.name,
-      status: self.status&.name,
-      invoice_due_date: self.execution_date&.to_date,
-      display_status: self.status&.name&.titleize,
-      created_at: self.created_at.to_date,
-      agreement_date: self.agreement_date&.to_date,
-      execution_date: self.execution_date&.to_date,
-      expiration_date: self.expiration_date&.to_date,
-      no_expiration: self.no_expiration,
-      renewal_date: self.renewal_date&.to_date,
-      note: self.note,
-      renewal_reminder_date: self.renewal_reminder_date,
-      vendors: get_related_vendors(options)
-    }
+        id: self.id,
+        agreement_number: get_agreement_number,
+        title: self.title,
+        policy_id: self.policy_id,
+        policy: self.policy&.name,
+        created_by: self.creator&.name,
+        status: self.status&.name,
+        invoice_due_date: self.execution_date&.to_date,
+        display_status: self.status&.name&.titleize,
+        created_at: self.created_at.to_date,
+        agreement_date: self.agreement_date&.to_date,
+        execution_date: self.execution_date&.to_date,
+        expiration_date: self.expiration_date&.to_date,
+        no_expiration: self.no_expiration,
+        renewal_date: self.renewal_date&.to_date,
+        note: self.note,
+        renewal_reminder_date: self.renewal_reminder_date,
+        vendors: get_related_vendors(options),
+        custom_fields: self.custom_fields,
+        termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
+        revised: self.revision_of_pa_id.present?,
+        revision_of_pa_id: self.revision_of_pa_id,
+        revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number,
+        revision_reason: self.revision_reason,
+        termination_reason: self.termination_reason,
+        reject_note: self.reject_note
+      }
   end
 
   def self.document_owner_attribute
@@ -278,7 +319,7 @@ class PaymentAgreement < ApplicationRecord
   end
 
   def self.roles
-    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor]
+    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor]
   end
 
   def get_default_provider
@@ -356,11 +397,28 @@ class PaymentAgreement < ApplicationRecord
 
   def validate_comparison_with_execution_date
     if self.agreement_date.present? && self.execution_date.present?
+      # Payment agreement cannot be created for past months
+      # validate_current_month
       if self.agreement_date > self.execution_date
         errors.add(:agreement_date, 'cannot be greater than execution date')
       end
     end
   end
+
+  def validate_current_month
+    if self.agreement_date.present?
+      if self.agreement_date&.to_date < Date.today.beginning_of_month
+        errors.add(:agreement_date, 'cannot be from previous months')
+      end
+    end
+
+    if self.execution_date.present?
+      if self.execution_date&.to_date < Date.today.beginning_of_month
+        errors.add(:execution_date, 'cannot be from previous months')
+      end
+    end
+  end
+
 
   def expiration_date_if_allowed
     if self.no_expiration.blank? && self.expiration_date.blank?
@@ -415,6 +473,21 @@ class PaymentAgreement < ApplicationRecord
 
   def get_agreement_number
     self.override_order_number.present? ? self.override_order_number : self.order_number
+  end
+
+  def is_agreement_invoice_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), self)
+  end
+
+  def is_agreement_invoice_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), self)
+  end
+
+  def is_agreement_invoice_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
 
 end

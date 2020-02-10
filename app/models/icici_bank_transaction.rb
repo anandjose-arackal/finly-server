@@ -25,6 +25,7 @@
 #  transfer_status_id    :integer
 #  company_id            :integer
 #  request_id            :string(255)
+#  transfer_mode_id      :integer
 #
 
 class IciciBankTransaction < ApplicationRecord
@@ -33,6 +34,8 @@ class IciciBankTransaction < ApplicationRecord
   belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
   belongs_to :bank_transaction_type, optional: true
   belongs_to :company
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
+
 
   has_one :payment, as: :reference_resource
 
@@ -44,7 +47,7 @@ class IciciBankTransaction < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   scope :processing_transactions, -> {
-    where(transfer_status_id: BankTransferStatus.ids_for(:pending_utr, :pending_for_processing))
+    where(transfer_status_id: BankTransferStatus.ids_for(:pending_utr, :pending_for_processing, :possible_failure, :suspect))
   }
 
   scope :completed, -> {
@@ -77,6 +80,10 @@ class IciciBankTransaction < ApplicationRecord
 
   def neft?
     self.txn_type == "RGS"
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name
   end
 
 end

@@ -12,7 +12,7 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyTemplate < Pe
     users = user.company.users
     self.reports = Report.where(user_id: users.pluck(:id)).settlement_viewable
     self.reports = apply_scopes(self.reports, params)
-    self.reports = self.reports.includes({user: :profile},expenses:[:category,:amount,{manual_expense:[custom_fields: [:value]]},{card_expense:[custom_fields: [:value]]},{distance_expense:[custom_fields: [:value]]},{time_expense:[custom_fields: [:value]]}])
+    self.reports = self.reports.includes({user: :profile},expenses:[:category,:amount,:custom_fields,{manual_expense:[:custom_fields]},{card_expense:[:custom_fields]},{distance_expense:[:custom_fields]},{time_expense:[:custom_fields]}])
 
     self.headers = [
         'GL Code',
@@ -56,20 +56,20 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyTemplate < Pe
     end
   end
 
-  def print_department(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'department' }&.first
+  def print_department(expense)
+    expense.custom_fields.map { |cf| cf.configured_field_value if cf.field_key == 'department' }&.first
   end
 
-  def print_market(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'market' }&.first
+  def print_market(expense)
+    expense.custom_fields.map { |cf| cf.configured_field_value if cf.field_key == 'market' }&.first
   end
 
-  def print_hostel(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'hostel' }&.first
+  def print_hostel(expense)
+    expense.custom_fields.map { |cf| cf.configured_field_value if cf.field_key == 'hostel' }&.first
   end
 
-  def print_city(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'city' }&.first
+  def print_city(expense)
+    expense.custom_fields.map { |cf| cf.configured_field_value if cf.field_key == 'city' }&.first
   end
 
   STANZA_INDIRECT_GL_CODE_MAPPING = {
@@ -90,11 +90,6 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyTemplate < Pe
     return gl unless STANZA_INDIRECT_GL_CODE_MAPPING.keys.include?(gl)
     return gl unless expense.report.policy.name.downcase.include?('indirect')
     STANZA_INDIRECT_GL_CODE_MAPPING[gl]
-  end
-
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
   end
 
 end

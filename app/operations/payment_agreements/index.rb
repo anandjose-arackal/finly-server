@@ -9,10 +9,13 @@ class PaymentAgreements::Index < PaymentAgreements::Base
   end
 
   def process
-    if user.vendor_payments_admin?
+    if user.vendor_payments_admin? || user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor?
       admin_restricted_status_ids = [PaymentAgreementStatus.id_for(:draft)]
       self.payment_agreements = ::PaymentAgreement.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})
       self.payment_agreements = user.payment_agreements.or(payment_agreements)
+      if self.payment_agreements.present?
+        self.payment_agreements = self.payment_agreements.exclude_revision
+      end
       return
     end
 
@@ -24,7 +27,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
   end
 
   def success
-    params[:payment_agreements] = self.payment_agreements.includes(:security_deposits, :beneficiary_payments, :general_invoices, :rental_invoices)
+    params[:payment_agreements] = self.payment_agreements
     PaymentAgreements::Index::IndexPresenter.new(user, params, messages)
   end
 
@@ -45,6 +48,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     has_scope :filter_awaiting_approval
     has_scope :search_by_email
     has_scope :filter_agreement_type
+    has_scope :filter_invoice_number
 
 
     def init

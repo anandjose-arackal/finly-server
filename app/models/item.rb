@@ -34,9 +34,13 @@ class Item < ApplicationRecord
   include SoftDeletable
   include Sequenced::ActsAsSequenced
   include MathUtil
+  include EventProducer
+
+  event_channel 'item'
 
   acts_as_sequenced column: :item_number, purpose: :item_master, min_length: 8, editable: false, prefix: -> (record) { record.goods? ? "G" : "S" }
 
+  default_scope {unscope(where: :deleted_at)}
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
@@ -50,6 +54,7 @@ class Item < ApplicationRecord
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
   # validates :rate, presence: true
   validates :description, presence: true
   # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
@@ -58,7 +63,10 @@ class Item < ApplicationRecord
   accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :with_category_id, -> (id) { where category_id: id }
-  scope :search, -> (term) {
+  scope :search_term, -> (term) {
+    where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+  scope :filter_search, -> (term) {
     where("description like ? OR sku like ? OR note like ? OR hsn_sac like ? OR item_number like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
   scope :filter_category_id, -> (category_id) { where category_id: category_id }
@@ -104,36 +112,37 @@ class Item < ApplicationRecord
 
   def as_json
     {
-      id: id,
-      item_number: item_number,
-      unit_of_measurement: unit_of_measurement,
-      hsn_sac: hsn_sac,
-      category_name: category&.name,
-      category_id: category_id,
-      category_gl_code: category&.gl_code,
-      rate: rate,
-      description: description,
-      discount: discount,
-      sku: sku,
-      tax_amount: self.tax_amount,
-      tax_rate_id: tax_rate_id,
-      tax: tax,
-      account: account,
-      item_code: item_code,
-      gl_code: item_code,
-      supply_item_type_id: supply_item_type_id,
-      item_type: supply_item_type.as_json,
-      product_type: product_type_id,
-      product_type_label: product_type_label,
-      rate_contract_vendors: rate_contract_vendors,
-      preferred_vendors: rate_contract_vendors,
-      user: user,
-      active: active,
-      item_expense_type_id: item_expense_type_id,
-      item_expense_type_name: item_expense_type&.name,
-      tds_applicable: tds_applicable,
-      tds_applicable_label: (tds_applicable ? "yes" : "no"),
-      custom_description: get_custom_description
+        id: id,
+        item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
+        hsn_sac: hsn_sac,
+        category_name: category&.name,
+        category_id: category_id,
+        category_gl_code: category&.gl_code,
+        rate: rate,
+        description: description,
+        discount: discount,
+        sku: sku,
+        tax_amount: self.tax_amount,
+        tax_rate_id: tax_rate_id,
+        tax: tax,
+        account: account,
+        item_code: item_code,
+        gl_code: item_code,
+        supply_item_type_id: supply_item_type_id,
+        item_type: supply_item_type.as_json,
+        product_type: product_type_id,
+        product_type_label: product_type_label,
+        rate_contract_vendors: rate_contract_vendors,
+        preferred_vendors: rate_contract_vendors,
+        user: user,
+        active: active,
+        item_expense_type_id: item_expense_type_id,
+        item_expense_type_name: item_expense_type&.name,
+        tds_applicable: tds_applicable,
+        tds_applicable_label: (tds_applicable ? "yes" : "no"),
+        custom_description: get_custom_description,
+        custom_fields: self.custom_fields
 
     }
   end
@@ -164,7 +173,7 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name, rate:  precision_value(line_item&.amount&.value)}}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.display_name, rate:  precision_value(line_item&.amount&.value), rate_contract_item_id: line_item.id}}
   end
 
   def get_custom_description

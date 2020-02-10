@@ -37,6 +37,8 @@ json.status do
   json.extract! invoice.invoice_status, :id, :name
 end
 
+json.invoice_payment_status invoice.invoice_payment_status
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true
@@ -53,8 +55,9 @@ json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
-                :cost_allocation_items, :narration, :discount_type_id
+                :cost_allocation_items, :narration, :discount_type_id, :rcm_enabled
 
+  json.invoice_type invoice.invoice_type&.name
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
   # json.po_number invoice.procurement&.purchase_order&.po_number
@@ -67,6 +70,7 @@ json.invoice do
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
   json.user invoice.created_by.as_json rescue nil
+  json.available_credits invoice.available_credits
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -117,6 +121,29 @@ json.invoice do
   json.cost_center_id invoice.cost_center_id
   json.cost_center_name invoice.cost_center&.name
 
+  json.department_attributes do
+    json.id invoice.department_id
+    json.name invoice&.department&.name
+  end
+
+  json.policy_attributes do
+    json.id invoice.policy_id
+    json.name invoice.policy&.name
+  end
+
+  json.sub_department_attributes do
+    json.id invoice.sub_department_id
+    json.name invoice.sub_department&.name
+  end
+
+  json.cost_center_attributes do
+    json.id invoice.cost_center_id
+    json.name invoice.cost_center&.name
+  end
+
+  json.delivery_location_attributes invoice.delivery_location&.as_json rescue nil
+  json.gstin_location_attributes invoice.gstin_location&.as_json rescue nil
+
   json.tds_slab_id invoice.tds_slab_id
   json.tds_slab_name invoice.tds_slab&.name
   json.tds_rate invoice.tds
@@ -133,6 +160,16 @@ json.invoice do
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
   json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
+  json.credit_note_adjustments do
+    json.array! invoice.credit_note_adjustments do |cna|
+      json.id cna.id
+      json.credit_note_id cna.credit_note.id
+      json.credit_note_number cna.credit_note.credit_note_number
+      json.credit_note_sequence_id cna.credit_note.sequence_id
+      json.amount cna.amount.as_json
+    end
+  end
+
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
@@ -144,6 +181,7 @@ json.invoice do
       json.gl_code item.inventory_line_item&.category.gl_code rescue nil
       json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
 
+
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.discount_rate precision_value((item.discount_amount&.value/(item.rate * item.quantity) * 100)) rescue 0
@@ -153,12 +191,28 @@ json.invoice do
       json.total_amount precision_value item.net_amount&.value
       json.taxable_amount precision_value item.taxable_amount&.value
       json.billable_amount precision_value item.billable_amount&.value
+      json.department_attributes do
+        json.id item.department_id
+        json.name item&.department&.name
+      end
+      json.cost_center_attributes do
+        json.id item.cost_center_id
+        json.name item&.cost_center&.name
+      end
+      json.category_attributes do
+        json.id item.category_id
+        json.name item&.category&.name
+      end
+
+
       product = ""
       case item.inventory_line_item&.product_type_id
       when ProductType.id_for(:goods)
         product = "goods"
+        json.purchase_order_accepted_quantity item.purchase_order_item&.accepted
       when ProductType.id_for(:service)
         product = "service"
+        json.purchase_order_accepted_quantity item.quantity
       end      
       json.product_type product
     end
@@ -174,25 +228,27 @@ json.invoice do
       json.ifsc invoice.receiving_account&.ifsc
       json.name invoice.receiving_account&.name
       json.id invoice.receiving_account&.id
+      json.disabled invoice.receiving_account&.disabled
     end
 
     if invoice.vendor&.bank_accounts.present?
       json.bank_accounts do
-        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+        json.array!(invoice.vendor&.bank_accounts.enabled) do |bank_account|
           json.id bank_account.id
           json.name bank_account.name
           json.account_number bank_account.account_number
           json.ifsc bank_account.ifsc
           json.default bank_account.default_account
           json.selected invoice.receiving_account&.id == bank_account.id
+          json.disabled bank_account.disabled
         end
       end
     end
   end
 end
 
-json.invoice_categories current_company.categories.vendor_payments_only
-json.invoice_item_categories current_company.categories.inward_invoice_items_only
+json.invoice_categories current_company.categories.vendor_payments_only.active
+json.invoice_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.cost_centers do
   # json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
@@ -230,7 +286,7 @@ json.tds_slabs do
 end
 
 json.attachments do
-  json.array! invoice.attachments do |attachment|
+  json.array! invoice.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -242,7 +298,7 @@ end
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
-    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
+    json.location "#{gstin_location&.location.to_s} - #{gstin_location.state&.name&.to_s}"
   end
 end
 
@@ -339,3 +395,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

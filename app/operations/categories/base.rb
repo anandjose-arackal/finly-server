@@ -1,6 +1,6 @@
 class Categories::Base < BaseOperation
 
-  attr_accessor :categories, :purpose, :company, :parent_type_id, :custom_fields
+  attr_accessor :categories, :purpose, :company, :parent_type_id, :custom_fields, :vp_categories, :em_categories
 
   #Jugaad for swiggy as they do not have access to expense management
   # and below roles are scoped to expense management
@@ -10,12 +10,14 @@ class Categories::Base < BaseOperation
 
   class Categories::Base::CategoriesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :categories, :custom_fields
+    attr_accessor :categories, :custom_fields, :em_categories, :vp_categories
 
     has_scope :filter_search
 
     def init
       self.categories = apply_scopes(params[:categories], params)
+      self.em_categories = apply_scopes(params[:em_categories], params)
+      self.vp_categories = apply_scopes(params[:vp_categories], params)
       self.custom_fields = params[:custom_fields]
     end
   end

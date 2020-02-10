@@ -71,10 +71,14 @@
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
 #  rejection_note               :text(65535)
+#  taxable_amount_id            :integer
+#  vendor_poc_id                :integer
+#  vlpm_id                      :integer
+#  vendor_note                  :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable, MathUtil
+  include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
@@ -132,7 +136,6 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
-  has_many :purchase_request_item
 
   has_many :quotations, dependent: :destroy
 
@@ -153,6 +156,7 @@ class PurchaseOrder < ApplicationRecord
   scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
   scope :not_open, -> {where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
+  scope :filter_ids, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
@@ -175,7 +179,8 @@ class PurchaseOrder < ApplicationRecord
   }
   scope :filter_delivery_location, -> (name) {
     if name.present?
-      joins(:delivery_location).where('name LIKE ?', "%#{name}%")
+      # joins(:delivery_location).where('name LIKE ?', "%#{name}%")
+      joins(:delivery_location).where('branch_locations.name LIKE ? or branch_locations.address_1 LIKE ? or branch_locations.address_2 LIKE ? or branch_locations.pin LIKE ? or purchase_orders.shipping_address LIKE ?', "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%", "%#{name}%")
     end
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
@@ -434,6 +439,13 @@ class PurchaseOrder < ApplicationRecord
     if user.present?
       pr_item_ids = user.company.purchase_requests.where('purchase_requests.order_number LIKE ?', "%#{pr_number}%" ).joins(:purchase_request_items).pluck('purchase_request_items.id')
         joins(:items).where('purchase_order_items.purchase_request_item_id IN (?)', pr_item_ids)
+    end
+  }
+
+  scope :filter_po_approver_id, -> (approver_id) {
+    if approver_id.present?
+      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      where(id: ids)
     end
   }
 
@@ -952,6 +964,8 @@ class PurchaseOrder < ApplicationRecord
         tds = self.advance_tds_slab&.tds
         new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
         tds_amount = self.requested_advance_amount.value - new_advance_amount
+        # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+        tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
         if self.advance_amount.nil?
@@ -1112,21 +1126,29 @@ class PurchaseOrder < ApplicationRecord
         end
       end
 
-      document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
+      # document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them
-      document_ids.uniq.each do |document_id|
-        purchase_request = user.company.purchase_requests.find_by_id document_id
-        params[:document] = purchase_request
-        params[:aasm_event] = 'po_creation'
-        if purchase_request.purchase_request_items.approved.blank?
-          op = WorkflowManager::Base.(user, params) if purchase_request.present?
-          unless op.success? || purchase_request.present?
-            add_message :error, op.messages[:error]
-            raise_unauthorized_exception
-          end
-        end unless document_ids.blank?
-      end
+      # document_ids.uniq.each do |document_id|
+      #   purchase_request = user.company.purchase_requests.find_by_id document_id
+      #   params[:document] = purchase_request
+      #   params[:aasm_event] = 'po_creation'
+      #   if purchase_request.purchase_request_items.approved.blank?
+      #     op = WorkflowManager::Base.(user, params) if purchase_request.present?
+      #     unless op.success? || purchase_request.present?
+      #       add_message :error, op.messages[:error]
+      #       raise_unauthorized_exception
+      #     end
+      #   end unless document_ids.blank?
+      # end
     end
+  end
+
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
+    if role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      return user.company.purchase_orders.where(policy_id: policy_ids, purchase_order_status_id: finance_associated_status_ids)
+    end
+    user.send("#{self.table_name}")
   end
 
   def update_po_cost_allocation_items

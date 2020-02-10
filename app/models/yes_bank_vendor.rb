@@ -28,6 +28,7 @@
 #  vendor_id                :string(255)
 #  disabled                 :boolean          default(FALSE)
 #  deleted_at               :datetime
+#  vedor_code               :string(255)
 #  msme_registered          :boolean          default(FALSE)
 #  msme_registration_number :string(255)
 #  status_id                :integer
@@ -35,13 +36,13 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
-#  vedor_code               :string(255)
 #  trade_name               :string(255)
-#  reject_note              :string(255)
+#  reject_note              :text(65535)
+#  rcm_enabled              :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
 
@@ -56,6 +57,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User"
   belongs_to :vendor_type, optional: true
   belongs_to :status, class_name: "VendorStatus", optional: true # todo remove optional after creation of migration
+  belongs_to :tds_rates_list, optional: true
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
@@ -68,6 +70,7 @@ class YesBankVendor < ApplicationRecord
   has_many :tds_rates, through: :vendor_tds_rates
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
+  has_many :credit_notes, foreign_key: :vendor_id
 
 
   default_scope { unscope(:where) }
@@ -83,7 +86,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   has_many :budget_trails, as: :vendor
-
+  has_many :trails, as: :parent
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 
@@ -109,6 +112,7 @@ class YesBankVendor < ApplicationRecord
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ? OR yes_bank_vendors.trade_name like ? OR yes_bank_vendors.pan like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids += where(id: ids).joins(:gstin_locations).where('gstin_locations.gstin like ?', "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -197,6 +201,8 @@ class YesBankVendor < ApplicationRecord
     where id: ids
   }
 
+  scope :without_id, -> (id) {where.not(id: id)}
+
   # Scopes for ordering ends
 
   before_validation do
@@ -244,10 +250,12 @@ class YesBankVendor < ApplicationRecord
         state: state,
         state_code_id: state_code_id,
         tds_id: tds_rates_list_id,
-        bank_accounts: bank_accounts,
+        bank_accounts: bank_accounts.enabled,
         state_code: state_code&.state_code,
         address: address,
-        trade_name: trade_name
+        trade_name: trade_name,
+        rcm_enabled: rcm_enabled,
+        custom_fields: self.custom_fields
     }
   end
 

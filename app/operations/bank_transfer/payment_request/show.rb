@@ -75,7 +75,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.payments_verified = []
       # separating the verified and unverified payments
       self.payment_order.payments.each do |payment|
-        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+        if payment.receiving_user.is_a?(User) || payment.receiving_user.is_a?(BbpsBillerSubscription) || payment.receiving_user.authorized
           self.payments_verified << payment
         else
           self.payments_unverified << payment
@@ -91,8 +91,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
       self.invoice_custom_fields = invoice_custom_field_configurations
       self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
-      self.invoice_categories = self.user.company.categories.vendor_payments_only
-      self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only
+      self.invoice_categories = self.user.company.categories.vendor_payments_only.active
+      self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only.active
 
       op = BudgetsCalculator::RelevantBudgets.(user, object: self.bank_payment_request)
       if op.success?

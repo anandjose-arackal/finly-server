@@ -77,9 +77,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
         # destroying previous messages first, before adding the processing message
-        self.payment&.system_messages.destroy_all
-        self.payment&.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
-                                      content: "Payment processed. Awaiting credit confirmation").save
+        self.payment&.system_messages&.destroy_all
+        self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:info),
+                                      content: "Payment processed. Awaiting credit confirmation")&.save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -108,8 +108,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
             create_refund_payment
           end
         end
+
+        # Commenting this as we are implementing post processor
         # nulling reimbursements that might have happened through this
-        nullify_reimbursed_reports
+        # nullify_reimbursed_reports
       else
         # do nothing for now, will get back to this later
       end
@@ -202,6 +204,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     # also update the status and processed amount of the payment order from here
     self.payment&.payment_order&.update_order_status
     self.payment&.payment_order&.update_processed_amount
+    self.payment_order.execute_post_operation(true)
   end
 
   def handle_successful_transaction
@@ -234,6 +237,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
     # update the status of the payment order after this
     self.payment&.payment_order&.update_order_status
+    self.payment_order.execute_post_operation(true)
 
     self.payment&.system_messages&.destroy_all # deleting the previous system messages
   end

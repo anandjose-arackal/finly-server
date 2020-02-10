@@ -17,12 +17,16 @@ class Admin::Implementations::Master::Users::ImportTemplates < Admin::Implementa
       :city => "City",
       :gender => "Gender",
       :company_id => "Company ID (mandatory)",
-      :department_code => "Department Code",
-      :location_code => "Location Code",
+      :department_code => "Department Name",
+      :location_code => "Location Name",
+      :cost_center_code => "Cost Center Name",
       :mothers_maiden_name => "Mothers Maiden Name (mandatory)",
       :expense_management => "Expense Management Y for enable",
       :disburse  => "Disburse Y for enable",
-      :vendor_payments => "Vendor Payments Y for enable"
+      :vendor_payments => "Vendor Payments Y for enable",
+      :enforce_policy => 'Enforce Policy',
+      :invite => 'Sent Invite',
+      :destroy => 'Deactivate (Y for Deactivate/ activate for Activation'
   })
 
   def valid_request

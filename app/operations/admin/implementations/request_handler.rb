@@ -46,7 +46,8 @@ class Admin::Implementations::RequestHandler < Admin::Base
       params[:implementation_request_id] =implementation_request.id
       data ={admin_user_id: user.id, company_id: params[:company_id], implementation_request_id: implementation_request.id}
       data[:with_id] = params[:with_id] if params[:with_id].present?
-      self.master.call_async(user, data)
+       self.master.call_async(user, data)
+      #self.master.call(user, data)
     end
   end
 

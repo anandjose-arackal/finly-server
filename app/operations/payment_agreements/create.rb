@@ -11,39 +11,51 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       return
     end
     self.payment_agreement = user.company.payment_agreements.build(payment_agreement_params)
-    validate_invoice_frequency
-    validate_invoice_start_end_date
-    check_agreement_item_presence
-    validate_start_end_date_consecutiveness
-    billing_type_validations
-    validate_agreement_item_combinations
-  end
-
-  def process
-    clear_expiration_date_on_no_expiration
-    create_or_update_custom_fields
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.general_invoices.present?
-      self.payment_agreement.general_invoices.map{ |general_invoice| general_invoice.set_creator_and_company(user)}
+      self.payment_agreement.general_invoices.each do |general_invoice| 
+        general_invoice.set_creator_and_company(user)
+        update_invoice_limit(general_invoice)
+      end
     end
     if self.payment_agreement.rental_invoices.present?
-      self.payment_agreement.rental_invoices.map{ |rental_invoice| rental_invoice.set_creator_and_company(user)}
+      self.payment_agreement.rental_invoices.each do |rental_invoice| 
+        rental_invoice.set_creator_and_company(user)
+      end
     end
+    validate_item_quantity
+    ActiveRecord::Base.transaction do
+      if self.payment_agreement.save
+        validate_invoice_line_items unless has_errors?
+        validate_prepaid_consistency unless has_errors?
+        security_deposit_validation unless has_errors?
+        validate_invoice_frequency unless has_errors?
+        validate_invoice_start_end_date unless has_errors?
+        fixed_periodic_grouped_vendor_validations unless has_errors?
+        check_agreement_item_presence unless has_errors?
+        # validate_start_end_date_consecutiveness unless has_errors?
+        billing_type_validations unless has_errors?
+        validate_agreement_item_combinations unless has_errors?
+        create_or_update_custom_fields
+      end
+      if has_errors?
+        raise ActiveRecord::Rollback
+        return
+      end
+    end
+  end
+
+  def process
+    clear_expiration_date_on_no_expiration
+    return if has_errors?
     if self.payment_agreement.save && self.payment_agreement.reload
-      # set_custom_field
       update_item_attributes
-      # set_due_date_for_general_invoices if payment_agreement.general_invoices.present?
-      # set_due_date_for_rental_invoices if payment_agreement.rental_invoices.present?
-      # set_due_date_for_beneficiary_payments if payment_agreement.beneficiary_payments.present?
-      # set_due_date_for_security_deposits if payment_agreement.security_deposits.present?
 
       # Set total amount on agreement level
       update_total_amount
 
-      # duplicate general/rental invoice department, cost_center in line items
-      # update_line_item_attributes if payment_agreement.general_invoices.present? || payment_agreement.rental_invoices.present?
       abp_attachment_ids = get_attachment_ids(params)
       Attachment.update_resource({ids: abp_attachment_ids, resource_id: self.payment_agreement.id, user: user}) if abp_attachment_ids.present?
 

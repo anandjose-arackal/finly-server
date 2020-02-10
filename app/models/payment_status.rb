@@ -80,6 +80,32 @@ class PaymentStatus < ApplicationRecord
     self.id == PaymentStatus.id_for(:initiated)
   end
 
+  def self.status_ids_for_invoice_initiated
+    [
+        PaymentStatus.id_for(:initiated),
+        PaymentStatus.id_for(:pending_credit),
+        PaymentStatus.id_for(:pending_approval),
+        PaymentStatus.id_for(:processing),
+        PaymentStatus.id_for(:in_progress),
+        PaymentStatus.id_for(:pending)
+    ]
+  end
+
+  def self.all_except_failed
+    [
+        PaymentStatus.id_for(:initiated),
+        PaymentStatus.id_for(:pending_credit),
+        PaymentStatus.id_for(:pending_approval),
+        PaymentStatus.id_for(:processing),
+        PaymentStatus.id_for(:in_progress),
+        PaymentStatus.id_for(:pending),
+        PaymentStatus.id_for(:completed),
+        PaymentStatus.id_for(:scheduled),
+        PaymentStatus.id_for(:possible_failure),
+        PaymentStatus.id_for(:processing)
+    ]
+  end
+
 end
 
 

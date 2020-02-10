@@ -32,18 +32,18 @@ class User::GroupEntitiesLogin < User::Base
         return
       end
       unless user&.valid_password?(params[:password])
-        add_message :error, 'Invalid Username or Password'
+        add_message :error, 'The email / mobile or password you entered is incorrect'
         return
       end
     end
 
     if user.blank?
-      add_message :error, "User not found"
+      add_message :error, "The email / mobile or password you entered is incorrect"
       return
     end
 
     if self.company.blank?
-      add_message :error, "Company not found"
+      add_message :error, "The email / mobile or password you entered is incorrect"
       return
     end
 
@@ -51,11 +51,16 @@ class User::GroupEntitiesLogin < User::Base
       add_message :error, "Your corporate doesn't have group entity feature enabled"
       return
     end
+
+    if RequestStore.store[:actual_current_user].present?
+      add_message :error, "Group Entity switch disabled during user delegation"
+      return
+    end
   end
 
   def process
     self.group = self.company.group
-    group_companies = self.group.companies
+    group_companies = self.group.companies.where(status_id: CompanyStatus.ids_for(:active, :partial_block, :hidden))
     users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(self.email, self.mobile_number)
     self.companies = Company.with_id(users.pluck(:company_id))
   end

@@ -1,6 +1,7 @@
 class User::Invite::CreateVp < User::Invite::Base
 
-  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles, :admin
+  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles, :admin,
+                :existing_emails, :common_users
 
   def pre_validate
     if params.blank? or user.blank?
@@ -37,6 +38,12 @@ class User::Invite::CreateVp < User::Invite::Base
         end
       else
         # do nothing
+    end
+
+    if user.company.feature_subscription.group_entity_structure
+      gc = current_company.group
+      # prevent sql injection
+      self.common_users = gc.companies.without(current_company).select('users.*').joins(:users).where('users.email in (?)', invite_params[:email]) rescue Company.none
     end
   end
 
@@ -88,12 +95,13 @@ class User::Invite::CreateVp < User::Invite::Base
           messages[:error] << "#{email} is not a valid email format"
           return false
         end
-        if User.find_by_email(email).present?
+        next if group_users(email).present?
+        if User.with_company_id(user.company_id).find_by_email(email).present?
           violating_emails << email
         end
       end
       if violating_emails.present?
-        messages[:error] << "Following emails are already invited: #{violating_emails.to_sentence}"
+        messages[:error] << "Following emails are already invited in your company: #{violating_emails.to_sentence}"
         return false
       end
       if has_errors?
@@ -143,7 +151,13 @@ class User::Invite::CreateVp < User::Invite::Base
   end
 
   def pre_process
-
+    self.existing_emails = []
+    emails.each do |email|
+      if User.find_by_email(email).present?
+        self.existing_emails << email
+        self.emails = self.emails - email
+      end
+    end
   end
 
   def process
@@ -155,6 +169,10 @@ class User::Invite::CreateVp < User::Invite::Base
         invite_params[:email] = email
         invite_params[:first_name] = ''
         invite_params[:last_name] = ''
+        if user.company.feature_subscription.group_entity_structure
+          u = group_users(email)
+          invite_params = u.attributes
+        end
         self.invited_users << User.invite!(invite_params, self.user) do |u|
           u.invitation_note = params[:pending_invite][:note]
           self.policy_roles.each do |role|
@@ -191,6 +209,15 @@ class User::Invite::CreateVp < User::Invite::Base
       messages[:error] << 'Invites failed. Please try again'
     end
 
+    # now adding the users that already exist. We will merely be cloning the existing user's details and create them in the DB
+    # so that they can log in to either company if required
+    self.existing_emails.each do |existing_email|
+      existing_user = User.without_company_id(user.company_id).find_by(email: existing_email)
+      new_user = existing_user.dup
+      new_user.company_id = user.company_id
+      new_user.save
+    end
+
   end
 
   def post_process
@@ -210,6 +237,10 @@ class User::Invite::CreateVp < User::Invite::Base
 
   def create_invite_params_vp
     params.require(:pending_invite).permit(:email, :mobile, :mobile_number, :company_id, :policy_id)
+  end
+
+  def group_users(email)
+    self.common_users.find {|u| u if u.email.strip.downcase == email.strip.downcase}
   end
 
 end

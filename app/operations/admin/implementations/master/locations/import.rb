@@ -4,6 +4,7 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
   subscribe 'locations.import'
   headers ({
       :id => "ID",
+      :parent_id => "Parent Location Name",
       :name => "Name",
       :address_1 => "Address Line1",
       :address_2 => "Address Line2",
@@ -22,7 +23,7 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
     unless messages.blank?
       return result false, messages.join(', ')
     end
-    location = self.company.locations.new data.except(:id,:destroy,:state)
+    location = self.company.locations.build data.except(:id,:destroy,:state)
     unless location.save
       return result false, location.errors.full_messages
     end
@@ -63,12 +64,20 @@ class Admin::Implementations::Master::Locations::Import < Admin::Implementations
       state_id = State.where('name LIKE ?', "%#{data[:state]}%")&.first&.id
       data[:state_id] = state_id
       unless state_id.present?
-        messages << "Unable to match state name"
+        messages << "State name is incorrect"
       end
     end
     if data[:name].blank?
       messages << "Name cant be blank"
     end
+    parent_name= data[:parent_id]&.to_s
+
+    if parent_name.present?
+      parent = company.locations.find_by_name(parent_name)&.id
+      data[:parent_id] = parent&.to_s if parent.present?
+      messages <<  "Parent Location Not found" if parent.blank?
+    end
+
     [data, messages]
   end
 

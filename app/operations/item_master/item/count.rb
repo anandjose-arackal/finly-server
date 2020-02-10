@@ -13,7 +13,7 @@ class ItemMaster::Item::Count < ItemMaster::Item::Base
   end
 
   def init
-    self.inventory_items = user.company.items
+    self.inventory_items = user.company.items.non_deleted
   end
 
   def process

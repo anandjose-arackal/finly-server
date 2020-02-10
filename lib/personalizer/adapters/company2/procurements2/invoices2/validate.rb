@@ -11,11 +11,11 @@ class Personalizer::Adapters::Company2::Procurements2::Invoices2::Validate < Per
   end
 
   def process
-    if purchase_order.custom_fields.first&.value&.value
-      unless purchase_order.all_items_shipped?
-        add_message :error, 'Cannot add invoice till all the items are shipped'
-      end
-    end
+    # if purchase_order.custom_fields.first&.value&.value
+    #   unless purchase_order.all_items_shipped?
+    #     add_message :error, 'Cannot add invoice till all the items are shipped'
+    #   end
+    # end
   end
 
 end

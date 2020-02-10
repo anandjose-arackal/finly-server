@@ -13,21 +13,47 @@ json.vendor do
     json.ifsc @result.purchase_order.bank_account&.ifsc
     json.name @result.purchase_order.bank_account&.name
     json.id @result.purchase_order.bank_account&.id
+    json.disabled @result.purchase_order.bank_account&.disabled
   end
 
   if @result.purchase_order.vendor&.bank_accounts.present?
     json.bank_accounts do
-      json.array!(@result.purchase_order.vendor&.bank_accounts) do |bank_account|
+      json.array!(@result.purchase_order.vendor&.bank_accounts.enabled) do |bank_account|
         json.id bank_account.id
         json.name bank_account.name
         json.account_number bank_account.account_number
         json.ifsc bank_account.ifsc
         json.selected @result.purchase_order.bank_account&.id == bank_account.id
         json.default bank_account.default_account
+        json.disabled bank_account.disabled
       end
     end
   end
 end
+
+json.policy_attributes do
+  json.id @result.purchase_order.policy_id
+  json.name @result.purchase_order.policy&.name
+end
+
+json.department_attributes do
+  json.id @result.purchase_order.department_id
+  json.name @result.purchase_order.department&.name
+end
+
+json.sub_department_attributes do
+  json.id @result.purchase_order.sub_department_id
+  json.name @result.purchase_order.sub_department&.name
+end
+
+json.cost_center_attributes do
+  json.id @result.purchase_order.cost_center_id
+  json.name @result.purchase_order.cost_center&.name
+end
+
+json.location_attributes @result.purchase_order.location&.as_json rescue nil
+json.gstin_location_attributes @result.purchase_order.gstin_location&.as_json rescue nil
+json.delivery_location_attributes @result.purchase_order.delivery_location&.as_json rescue nil
 
 json.actions @result.actions
 json.user @result.purchase_order.user.as_json rescue nil
@@ -97,7 +123,7 @@ json.balance_due do
 end
 
 json.items do
-  json.array! @result.purchase_order.items do |item|
+  json.array! @result.purchase_order_items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id,
@@ -120,6 +146,16 @@ json.items do
     end
     json.product_type product
     json.tds_applicable (item.inventory_line_item&.tds_applicable) ? "yes" : "no"
+
+    json.department_attributes do
+      json.id item.department_id
+      json.name item.department&.name
+    end
+
+    json.cost_center_attributes do
+      json.id item.cost_center_id
+      json.name item.cost_center&.name
+    end
 
     json.taxable_amount do
       json.value item.taxable_amount&.value&.round(2)
@@ -161,7 +197,7 @@ end
 # end
 
 json.attachments do
-  json.array! @result.purchase_order.attachments do |attachment|
+  json.array! @result.purchase_order.attachments.reject{ |attachment| attachment.file_file_size.nil? } do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
@@ -183,7 +219,7 @@ json.comments do
   end
 end
 
-json.po_item_categories current_company.categories.inward_invoice_items_only
+json.po_item_categories current_company.categories.inward_invoice_items_only.active
 
 json.policies do
   json.array! @result.policies do |policy|
@@ -290,3 +326,5 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

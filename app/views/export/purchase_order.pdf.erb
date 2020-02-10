@@ -8,7 +8,7 @@
         <br>
         <div class="mg-botm-8"><b><%= @company.configuration.legal_entity_name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
-        <div class="font-light-gray col-xs-6">
+        <div class="font-light-gray col-xs-8">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
         </div>
       </div>
@@ -285,6 +285,7 @@
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.rate, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.discount_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.tax_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td> <%= number_with_delimiter(item.tax&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/)  rescue 0 %> %</td>
             <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(item.total_amount&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
         <% end %>
@@ -307,7 +308,7 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter(@result.purchase_order.total_before_tax&.value&.to_d.round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= number_with_delimiter((@result.purchase_order.total_before_tax&.value + @result.purchase_order.discount_amount&.value).round(2), delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
@@ -369,10 +370,10 @@
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="terms-condition-tittle">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
-      <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
+      <div><%= @result.purchase_order&.procurement_term_text&.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless [137,156,166,179,173].include?(@company.id) %>
+      <% if (@company.configuration.show_po_approved_trail) %>
         <ul>
           <% approved_users = [] %>
           <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>

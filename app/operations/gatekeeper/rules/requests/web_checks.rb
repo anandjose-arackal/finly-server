@@ -41,18 +41,18 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
-    rule 'Request UserAgent has to match Session UserAgent' do
-      request = RequestStoreUtil.current_request
-      session = RequestStoreUtil.current_session
-      next if request.user_agent == session.user_agent
-
-      message 'UserAgent mismatch'
-      session_status_id UserSessionStatus.id_for(:blocked)
-      response_code 401
-      level 1
-      fail
-
-    end
+    # rule 'Request UserAgent has to match Session UserAgent' do
+    #   request = RequestStoreUtil.current_request
+    #   session = RequestStoreUtil.current_session
+    #   next if request.user_agent == session.user_agent
+    #
+    #   message 'UserAgent mismatch'
+    #   session_status_id UserSessionStatus.id_for(:blocked)
+    #   response_code 401
+    #   level 1
+    #   fail
+    #
+    # end
 
     rule 'X-Finly-RP is required for all web requests' do
       next if RequestStoreUtil.x_finly_rp_attributes.present?
@@ -182,7 +182,8 @@ Gatekeeper::Checker.new 'On New Request' do
 
       section 'X-Finly-RP property mismatch' do
         [
-            :user_agent, :timezone, :fingerprint, :language, :system_language,
+            #:user_agent,
+            :timezone, :fingerprint, :language, :system_language,
             :browser, :browser_version, :browser_engine, :browser_engine_version,
             :os_name, :os_version,
             :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,

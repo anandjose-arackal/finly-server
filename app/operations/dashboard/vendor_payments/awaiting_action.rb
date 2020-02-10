@@ -46,9 +46,10 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
           document_types[:purchase_requests] = true
         when UserRole.id_for(:purchase_order_reviewer)
           document_types[:purchase_orders] = true
-        when UserRole.id_for(:invoice_reviewer)
-          document_types[:po_invoices] = true
+        when UserRole.id_for(:non_po_invoice_reviewer)
           document_types[:non_po_invoices] = true
+        when UserRole.id_for(:po_invoice_reviewer)
+          document_types[:po_invoices] = true
         when UserRole.id_for(:goods_receiver)
           document_types[:grn] = true
         when UserRole.id_for(:bank_payment_request_reviewer)
@@ -249,14 +250,15 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
       params[:filter_creation_date_from] = params[:filter_date_from] if params[:filter_date_from].present?
       params[:filter_creation_date_to] = params[:filter_date_to] if params[:filter_date_to].present?
+      params[:filter_awaiting_action] = true
 
       procurements = Procurements::Grn::Pending::Index.(user, params)
       data = {
-        title: "Receipt Note",
-        type: 'receive',
-        count: procurements.count,
-        # filters: [{filter_status_tags: [7]}]
-        filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]}]
+          title: "Receipt Note",
+          type: 'receive',
+          count: procurements.count,
+          # filters: [{filter_status_tags: [7]}]
+          filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)], filter_awaiting_action: true}]
       }
 
       if params[:filter_date_from].present?
@@ -278,7 +280,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       end
       data = {
         title: "Payment Agreements",
-        type: 'payment_agreements',
+        type: 'agreements',
         count: payment_agreements.count,
         filters: [{filter_by_status_id: 'awaiting_approval'}]
       }

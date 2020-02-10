@@ -1,11 +1,11 @@
 class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Master::Base
 
   register_handle :proc_tax_invoice_show
-  validate :input
+  # validate :data_provider
 
   # register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove]
 
-  register_actions [:more_details_button, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove, :take_control, :return_control, :forward, :make_payment]
+  register_actions [:more_details_button, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove, :take_control, :return_control, :forward, :make_payment, :create_credit_note]
 
 
   def initialize(user = nil, params = {})
@@ -59,7 +59,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def unapprove
-    unless invoice.approved?
+    # return false if invoice.paid?
+    unless invoice.approved? or invoice.initiated? or invoice.paid? or invoice.unpaid? or invoice.partially_paid?
       if last_level?
         state = (previous_reviewer.include? user.id) ? true : false
       else
@@ -209,5 +210,9 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     # only then they can approve or reject
     provider_name = invoice.get_invoice_provider_name
     invoice.get_reviewers(nil, provider_name).include?(user) && user.vendor_payment_admin?
+  end
+
+  def create_credit_note
+    InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id) && user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) && invoice.credit_note.blank?
   end
 end

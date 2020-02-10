@@ -7,10 +7,12 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
       :id => 'ID',
       :policy => 'Policy Name',
       :policy_creation_flag => 'For New Policy Y / or Blank',
-      :user_id => 'User Email / Mobile',
+      :user_id => 'User Email / Mobile / Employee ID ',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
-      :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :reviewer_email_mobile => 'Reviewer Email / Mobile / Employee ID',
+      :with_exception => 'With Exception Y/N',
+      :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
       :max => "Max Threshold",
       :destroy => 'Destroy'
@@ -40,6 +42,9 @@ class Admin::Implementations::Master::Lurms::ImportTemplates < Admin::Implementa
              BankPaymentRequestProvider
              YesBankVendorProvider
              PaymentAgreementProvider
+             BbpsBillerSubscriptionProvider
+             BbpsBillProvider
+             CreditNoteProvider
              )
     file = Tempfile.new(['lurm_import_template', '.xlsx'])
     workbook  = ::WriteXLSX.new(file)

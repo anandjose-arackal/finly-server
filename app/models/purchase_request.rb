@@ -24,7 +24,7 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-  include Transitionable
+  include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
@@ -50,7 +50,7 @@ class PurchaseRequest < ApplicationRecord
   validates :description, :location, :policy, presence: true
   validates_presence_of :cost_center, :department, unless: :cost_allocation_items?
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, :partially_closed?, to: :status, allow_nil: true
 
   before_validation :add_company
 
@@ -172,6 +172,29 @@ class PurchaseRequest < ApplicationRecord
       reorder("purchase_requests.created_at #{type}")
     end
   }
+
+  scope :filter_pr_creator_id, -> (creator_id){
+    where(creator_id: creator_id)
+  }
+
+  scope :filter_pr_approver_id, -> (approver_id){
+    if approver_id.present?
+      ids = self.awaiting_action_items(approver_id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
+
+  scope :role_based_filter, -> (boolean) {
+    if boolean
+      user = RequestStore.store[:current_user]
+      if user.present?
+        role_based_policy_ids = user.company.policies.joins(:policy_user_roles).with_application('vp').where('policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?', [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:inventory_manager)], user.id).pluck(:id).uniq rescue []
+        pr_ids = user.company.purchase_requests.where(policy_id: role_based_policy_ids).joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)])
+        with_ids(pr_ids)
+      end
+    end
+  }
+
 
   # scope :sort_amount, -> (type){
   #   type = type&.strip&.upcase
@@ -300,7 +323,7 @@ class PurchaseRequest < ApplicationRecord
         if (UserRole.id_for(:purchase_request_initiator) == role_id.to_i)
           statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
         elsif (UserRole.id_for(:purchase_request_reviewer) == role_id.to_i)
-          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory]
+          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory, :po_created]
         end
       end
     end

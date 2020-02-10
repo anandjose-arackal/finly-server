@@ -28,7 +28,7 @@ class CustomField < ApplicationRecord
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest', 'Booking', 'YesBankVendor', 'PurchaseRequest', 'PurchaseRequestItem', 'GeneralInvoice', 'RentalInvoice']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest', 'Booking', 'YesBankVendor', 'PurchaseRequest', 'PurchaseRequestItem', 'GeneralInvoice', 'RentalInvoice', 'Item', 'PaymentAgreement', 'RateContract']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
   scope :only_drop_downs, -> { where value_type: 'FieldDropDownSelection' }
@@ -87,6 +87,7 @@ class CustomField < ApplicationRecord
         if self.value.blank?
           self.value = FieldText.new
         end
+        self.configured_field_value = value
         self.value.value = value
       when FieldType.id_for(:number)
         if self.value.blank?
@@ -107,8 +108,10 @@ class CustomField < ApplicationRecord
         if self.value.blank?
           self.value = FieldDropDownSelection.new
         end
+        value_text = FieldDropDownItem.find_by_id(value)&.name
         if self.field_configuration.present? and self.field_configuration.drop_down_items.present? and self.field_configuration.drop_down_items.with_id(value).present?
           self.value.value_id = value
+          self.configured_field_value = value_text
         end
       when FieldType.id_for(:date)
         if self.value.blank?
@@ -169,6 +172,8 @@ class CustomField < ApplicationRecord
     case
     when options[:report_show]
       return report_show
+    when options[:report_mailer_show] # Show page when user navigates from email
+      return report_mailer_show
     else 
       options = []
       dependent_field_configuration_ids = []
@@ -234,6 +239,13 @@ class CustomField < ApplicationRecord
 
   def set_field_key
     self.field_key = self.field_configuration.field_key
+  end
+
+  def report_mailer_show
+    {
+        label: field_configuration.field_name,
+        value: self.value
+    }
   end
 
 end

@@ -18,7 +18,7 @@
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
 #  category_code              :string(255)
-#  gst_applicable             :boolean          default(TRUE)
+#  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
 #
 
@@ -26,9 +26,12 @@ class Category < ApplicationRecord
   include AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
+
+  event_channel 'category'
 
   belongs_to :company, optional: true
 
@@ -38,7 +41,7 @@ class Category < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   validates :company_id, presence: true
-  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry]}
+  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry, :active]}
   # validate :at_least_one_application
 
   default_scope { order(name: :asc) }

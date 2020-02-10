@@ -8,10 +8,15 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  company_id :integer
+#  gl_code    :string(255)
+#  deleted_at :datetime
 #
 
 class TdsRatesList < ApplicationRecord
   include LiquidDroppable, SoftDeletable
+  include EventProducer
+
+  event_channel 'tds_rate'
 
   def self.seed_data(company_id)
     DEFAULTS.each do |rate|

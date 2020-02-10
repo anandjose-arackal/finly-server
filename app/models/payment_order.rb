@@ -27,10 +27,13 @@
 #  post_operation_payload    :text(65535)
 #  api_initiated             :boolean          default(FALSE)
 #  bank_account_provider_id  :integer
+#  deleted_at                :datetime
+#  transfer_mode_id          :integer
 #
 
 class PaymentOrder < ApplicationRecord
-  include PostOperationExecution
+  include PostOperationExecution, SoftDeletable
+  include LiquidDroppable
 
   CONFIG = {
       meal_card: {
@@ -64,6 +67,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
   belongs_to :bank_account_provider, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   serialize :post_operation_payload, Hash
 
@@ -180,10 +184,14 @@ class PaymentOrder < ApplicationRecord
   end
 
   def payment_mode
-    if super.blank?
+    if mode.blank?
       return self.payments.first&.payment_mode
     end
-    super
+    mode || super
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
   end
 
   def payment_type
@@ -245,13 +253,13 @@ class PaymentOrder < ApplicationRecord
     status_ids = self.payments.pluck(:payment_status_id)
     if status_ids.include?(PaymentStatus.id_for(:failed))
       # now further check if there are successes / initiated as well
-      if status_ids.include?(PaymentStatus.id_for(:completed)) || status_ids.include?(PaymentStatus.id_for(:initiated))
+      if status_ids.include?(PaymentStatus.id_for(:completed)) || status_ids.include?(PaymentStatus.id_for(:initiated)) || status_ids.include?(PaymentStatus.id_for(:processing))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else # i.e. if there are only failures in this payment order
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       end
     else
-      if status_ids.include?(PaymentStatus.id_for(:initiated))
+      if status_ids.include?(PaymentStatus.id_for(:initiated)) || status_ids.include?(PaymentStatus.id_for(:processing))
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else
         self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))

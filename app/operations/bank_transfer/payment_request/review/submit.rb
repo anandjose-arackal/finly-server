@@ -1,4 +1,5 @@
 class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentRequest::Review::Base
+  attr_accessor :payable_amounts, :payment_to_invoices, :inward_invoices
 
   def personalizer
     {
@@ -12,6 +13,18 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     id = params[:id] || params[:bank_payment_request_id]
     self.bank_payment_request = user.bank_payment_requests.find_by id: id
     self.payment_order = bank_payment_request&.payment_order
+
+    self.payable_amounts = {}
+    ids = []
+    self.payment_to_invoices = {}
+    self.bank_payment_request.payment_order.payments.each do |payment|
+      break unless payment.parent_type == 'Invoice'
+      ids << payment.parent_id
+      self.payment_to_invoices[payment.parent_id.to_i] = payment
+      self.payable_amounts[payment.parent_id.to_i] = payment.amount&.value.to_f
+    end
+
+    self.inward_invoices = user.company.inward_invoices.with_id(ids)
   end
 
 
@@ -43,6 +56,26 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
+
+    self.payable_amounts.each do |invoice_id, payable_amount|
+      invoice = self.inward_invoices.find_by(id: invoice_id)
+      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
+      paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+
+      if remaining_amount.blank?
+        next
+      end
+
+      if payable_amount.round(2) > remaining_amount
+        add_message :error, "You cannot pay more than the remaining amount in an invoice. Payment with id, #{self.payment_to_invoices[invoice.id]&.id}, cannot be processed."
+      end
+
+      if paid_amount >= invoice.balance_due&.value.to_f
+        add_message :error, "Invoice has been credited. Payment with id, #{self.payment_to_invoices[invoice.id]&.id}, cannot be processed."
+        return
+      end
+    end
+
   end
 
   def pre_process

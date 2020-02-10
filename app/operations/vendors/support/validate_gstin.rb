@@ -1,12 +1,13 @@
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
-  attr_accessor :gstin_params, :connection, :api_response, :response_body,
-    :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
+  attr_accessor :gstin_params, :connection, :api_response, :response_body, :state,
+                :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
-                  :gstin_master, :trade_name_match_percentile
+                  :gstin_master, :trade_name_match_percentile, :state
 
     def init
+      self.state = params[:state]
       self.gstin_master = params[:gstin_master]
       self.response_body = params[:response_body]
       self.match_percentile = params[:match_percentile]
@@ -36,17 +37,14 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     # First find in GSTIN Master
     self.gstin_master = Gstin.with_gstin(gstin_params[:gstin]).first
 
-    if self.gstin_master.present?
-      self.valid_response = true
-    else
-      if make_api_call
-        unless self.valid_response
-          return
-        end
-      else
-        add_message :error, "Something went wrong. Please try again later"
+
+    if make_api_call
+      unless self.valid_response
         return
       end
+    else
+      add_message :error, "Something went wrong. Please try again later"
+      return
     end
 
     self.response_body = JSON.parse(self.gstin_master.api_response.to_json)
@@ -88,6 +86,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     params[:response_body] = self.response_body
     params[:match_percentile] = self.match_percentile || 0
     params[:trade_name_match_percentile] = self.trade_name_match_percentile || 0
+    params[:state] = self.state
     Vendors::Support::ValidateGstin::ValidatePresenter.new(user, params, messages)
   end
 
@@ -107,20 +106,20 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
     legal_name_of_business = response_body[:data][:lgnm]
 
-    data = {
-      gstin: response_body[:data][:gstin],
-      api_response: response_body,
-      legal_name_of_business: response_body[:data][:lgnm],
-      state: response_body[:data][:stj],
-      date_of_registration: response_body[:data][:rgdt],
-      constitution_of_business: response_body[:data][:ctb],
-      status: response_body[:data][:sts],
-      trade_name: response_body[:data][:tradeNam],
-      api_provider: response_body[:data][:masters_india],
-      address: addr_array.join(", ")
-    }
+    self.state = GstStateCode.with_state_code(response_body[:data][:gstin][0..1]).first
 
-    data
+    data = {
+        gstin: response_body[:data][:gstin],
+        api_response: response_body,
+        legal_name_of_business: response_body[:data][:lgnm],
+        state: self.state&.name,
+        date_of_registration: response_body[:data][:rgdt],
+        constitution_of_business: response_body[:data][:ctb],
+        status: response_body[:data][:sts],
+        trade_name: response_body[:data][:tradeNam],
+        api_provider: response_body[:data][:masters_india],
+        address: addr_array.join(", ")
+    }
   end
 
   def make_api_call
@@ -149,7 +148,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
         end
       else
         # Save information to gstin master
-        self.gstin_master = Gstin.create(gstin_master_params(response_body))
+        # self.gstin_master = Gstin.gstin_params[:gstin]
+        if self.gstin_master.present?
+          self.gstin_master.update(gstin_master_params(response_body))
+        else
+          self.gstin_master = Gstin.create(gstin_master_params(response_body))
+        end
         self.valid_response = true
         return true
       end

@@ -57,6 +57,8 @@
 #  cost_center_id            :integer
 #  department_id             :integer
 #  location_id               :integer
+#  default_company_id        :integer
+#  finly_id                  :string(36)
 #
 
 require 'rails_helper'

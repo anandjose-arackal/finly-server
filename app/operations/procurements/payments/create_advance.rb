@@ -3,7 +3,7 @@
 class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy, :policy_id,
                 :description, :bank_payment_request, :advance_amount,
-                :payment_request_params
+                :payment_request_params, :transfer_mode_id, :transfer_mode
 
   class Procurements::Payments::CreateAdvance::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -50,6 +50,8 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     self.description = params[:description]
 
     params[:filter_role_id] = UserRole.id_for(:bank_payment_request_initiator)
@@ -159,6 +161,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         payment_status_id: PaymentStatus.id_for(:pending_approval),
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         amount_attributes: {
             value: self.advance_amount,
             currency_id: Currency.first.id
@@ -180,6 +183,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
@@ -199,7 +203,10 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
         description: self.description,
         beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
         policy_id: self.policy_id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        expected_payments: 1,
+        ticket_type: 'purchase_order',
+        transfer_mode_id: self.transfer_mode_id
     }
     return bank_payment_request_params
   end

@@ -67,7 +67,7 @@ class Reports::Expenses::Reject < Reports::Base
           amount.destroy if amount
         end
 
-        if [2, 164].include?(report&.user&.company_id)
+        if [1, 2, 164].include?(report&.user&.company_id)
           self.report.reload
           check_for_violations
           params[:reviewal_document] = report

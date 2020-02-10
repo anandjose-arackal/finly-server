@@ -12,6 +12,7 @@
 #  payment_order_id           :integer
 #  description                :text(65535)
 #  uploader_id                :integer
+#  allow_delete               :boolean          default(TRUE)
 #
 
 class PaymentOrderAttachment < ApplicationRecord
@@ -30,4 +31,7 @@ class PaymentOrderAttachment < ApplicationRecord
   #     }, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
 
+  scope :deleteable, -> {
+    where allow_delete: true
+  }
 end

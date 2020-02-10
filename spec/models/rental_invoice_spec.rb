@@ -95,7 +95,12 @@
 #  total_proforma_advance                :integer
 #  template_invoice_id                   :integer
 #  notice_period                         :integer
-#  square_feel                           :decimal(10, 5)
+#  square_feet                           :decimal(10, 5)
+#  prepaid                               :boolean
+#  fixed_periodic_template               :boolean
+#  escalation_percentage                 :float(24)
+#  override_invoice_id                   :string(255)
+#  rcm_enabled                           :boolean
 #
 
 require 'rails_helper'

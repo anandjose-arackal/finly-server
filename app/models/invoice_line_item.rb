@@ -4,7 +4,7 @@
 #
 #  id                     :integer          not null, primary key
 #  invoice_id             :integer
-#  description            :string(255)
+#  description            :text(65535)
 #  quantity               :decimal(20, 5)
 #  rate                   :decimal(20, 10)
 #  tax                    :decimal(20, 10)
@@ -29,9 +29,9 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
-#  sgst                   :decimal(20, )
-#  cgst                   :decimal(20, )
-#  igst                   :decimal(20, )
+#  sgst                   :decimal(20, 5)   default(0.0)
+#  cgst                   :decimal(20, 5)   default(0.0)
+#  igst                   :decimal(20, 5)   default(0.0)
 #  purchase_order_item_id :integer
 #  billable_amount_id     :integer
 #
@@ -75,7 +75,8 @@ class InvoiceLineItem < ApplicationRecord
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
-  TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id tax_amount_id discount_amount_id amount_id net_amount_id hsn_sac taxable_amount_id parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst billable_amount_id }
+  TEMPLATE_COLUMNS = %w{ description quantity rate tax discount category_id gst_type_id hsn_sac parent_type parent_id inventory_line_item_id item_info comment account tax_rate_id cost_center_id unit_of_measurement department_id sgst cgst igst }
+  CLONE_RECORDS = %w{ tax_amount_id discount_amount_id amount_id net_amount_id taxable_amount_id billable_amount_id}
 
   def tax
     self.tax_rate&.rate || super
@@ -148,7 +149,8 @@ class InvoiceLineItem < ApplicationRecord
       tax_rate: self.tax_rate.as_json,
       cost_center: self.cost_center.as_json,
       unit_of_measurement: self.unit_of_measurement,
-      department: self.department.as_json
+      department: self.department.as_json,
+      tds_applicable: tds_applicable?
     }
   end
 

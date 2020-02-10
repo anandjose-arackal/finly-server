@@ -93,12 +93,20 @@
 #  total_proforma_advance                :integer
 #  delivery_location_id                  :integer
 #  template_invoice_id                   :integer
+#  prepaid                               :boolean
+#  fixed_periodic_template               :boolean
+#  escalation_percentage                 :float(24)
+#  override_invoice_id                   :string(255)
+#  total_invoice_amount_id               :integer
+#  available_invoice_amount_id           :integer
+#  include_tax_and_tds                   :boolean          default(FALSE)
+#  rcm_enabled                           :boolean
 #
 
-  # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
+# These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
 
-  # Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
-  # Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
+# Refer migration "AddColumnsToGeneralInvoices" for columns w.r.t invoices table
+# Make columns consistent with that in 'Invoices' table as this model acts as a template to actual "Invoice"
 
 class GeneralInvoice < ApplicationRecord
   include SoftDeletable, MathUtil
@@ -140,10 +148,12 @@ class GeneralInvoice < ApplicationRecord
   belongs_to :invoice_frequency, optional: true
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :template_invoice, optional: true, class_name: 'GeneralInvoice'
+  belongs_to :total_invoice_amount, optional: true, class_name: 'Amount'
+  belongs_to :available_invoice_amount, optional: true, class_name: 'Amount'
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :items, class_name: "InvoiceLineItem", as: :parent
-  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy, autosave: true
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :invoices, as: :agreement_item
@@ -159,23 +169,24 @@ class GeneralInvoice < ApplicationRecord
     
     exclude_association :trails
     exclude_association :invoices
+    exclude_association :items
   end
 
 
   alias_attribute :status, :invoice_status
 
 
-  accepts_nested_attributes_for :address
-  accepts_nested_attributes_for :amount
-  accepts_nested_attributes_for :gross_amount
-  accepts_nested_attributes_for :net_amount
-  accepts_nested_attributes_for :discount_amount
-  accepts_nested_attributes_for :tds_amount
-  accepts_nested_attributes_for :tax_amount
-  accepts_nested_attributes_for :original_amount
-  accepts_nested_attributes_for :freight_amount
-  accepts_nested_attributes_for :advance_amount
-  accepts_nested_attributes_for :balance_due
+  accepts_nested_attributes_for :address, :amount, :gross_amount, :net_amount, :discount_amount, :tds_amount, :tax_amount, :original_amount, :freight_amount, :advance_amount, :balance_due, :total_invoice_amount
+  # accepts_nested_attributes_for :amount
+  # accepts_nested_attributes_for :gross_amount
+  # accepts_nested_attributes_for :net_amount
+  # accepts_nested_attributes_for :discount_amount
+  # accepts_nested_attributes_for :tds_amount
+  # accepts_nested_attributes_for :tax_amount
+  # accepts_nested_attributes_for :original_amount
+  # accepts_nested_attributes_for :freight_amount
+  # accepts_nested_attributes_for :advance_amount
+  # accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   accepts_nested_attributes_for :notify_users, allow_destroy: true
   accepts_nested_attributes_for :invoice_frequency
@@ -195,12 +206,44 @@ class GeneralInvoice < ApplicationRecord
 
 
   validates :vendor, :vendor_location, :department, :location, :cost_center, :payment_term, :start_date, :end_date, :billing_type, presence: true
+  # validates_inclusion_of :prepaid, in: [true, false] 
 
   # validate :invoice_frequency_for_fix_periodic, :start_end_date_for_agreement
   validate :additional_validations
   # validates_associated :invoice_items
 
   scope :template_invoices, -> { where(template_invoice_id: nil) }
+  scope :with_billing_type, -> (billing_type_id){ where(billing_type_id: billing_type_id) }
+  scope :fixed_periodic_type, -> { where(billing_type_id: BillingType.id_for(:fixed_periodic)) }
+  scope :one_time_type, -> { where(billing_type_id: BillingType.id_for(:one_time)) }
+
+
+  scope :filter_policy_id, -> (policy_id) {
+    joins(:payment_agreement).where("payment_agreements.policy_id = ?", policy_id)
+  } 
+  scope :filter_vendor_id, -> (vendor_id) {
+    where(vendor_id: vendor_id)
+  }
+  scope :filter_due_date, -> (due_date) {
+    where(due_date: due_date&.to_date)
+  }
+  scope :filter_creation_date, -> (creation_date) {
+    where(created_at: creation_date.to_date.beginning_of_day..creation_date.to_date.end_of_day)
+  }
+  scope :filter_from_date, -> (start_date) {
+    where(start_date: start_date.to_date)
+  }
+  scope :filter_to_date, -> (end_date) {
+    where(end_date: end_date.to_date)
+  }
+
+  scope :filter_upcoming_invoice_date, -> (from, to){ 
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.parse('01-01-2050') if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where("DATE(payment_agreement_upcoming_date) >= ? AND DATE(payment_agreement_upcoming_date) <= ?", from, to)
+  }
 
   # Columns mapped with actual invoice columns
   TEMPLATE_COLUMNS = %w{ date due_date tax_type_id discount discount_type_id inclusive_of_taxes tds tds_type_id gst_type_id payment_id tax category_id advance roundoff_amount tds_slab_id company_id created_by_user_id receiving_account_id receiving_account_type remaining_amount_id invoice_type_id delivery_location_id sub_department_id gstin_location_id payment_agreement_id bank_account_id vendor_location_id vendor_id department_id location_id cost_center_id payment_term_id billing_type_id advance_type_id }
@@ -277,41 +320,47 @@ class GeneralInvoice < ApplicationRecord
 
   def agreement_based_json
     {
-      id: self.id, 
-      invoice_type: self.invoice_type&.name,
-      department_attributes: { id: self.department_id, name: self.department&.name },
-      location_attributes: { id: self.location_id, name: self.location&.name },
-      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
-      payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
-      billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name&.titleize},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      notify_users: self.notify_users&.as_json,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name},
-      bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
-      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
-      vendor_locations: fetch_vendor_locations.as_json,
-      bank_accounts: fetch_vendor_bank_accounts.as_json,
-      note: self.note,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      invoice_frequency_attributes: get_invoice_frequency_attributes,
-      billing_start_date: self.billing_start_date&.to_date,
-      billing_day_of_month: billing_day_of_month,
-      due_date: self.due_date&.to_date,
-      start_date: self.start_date,
-      end_date: self.end_date,
-      lock_in_period: self.lock_in_period,
-      rent_free_period: self.rent_free_period,
-      tenancy_period: self.tenancy_period,
-      custom_fields: self.custom_fields,
-      already_exists: true
+        id: self.id,
+        invoice_type: self.invoice_type&.name,
+        department_attributes: { id: self.department_id, name: self.department&.name },
+        location_attributes: { id: self.location_id, name: self.location&.name },
+        cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+        payment_term_attributes: {id: self.payment_term&.id, name: self.payment_term&.name},
+        billing_type_attributes: {id: self.billing_type&.id, name: self.billing_type&.name&.titleize},
+        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+        notify_users: self.notify_users&.as_json,
+        vendor_attributes: {id: self.vendor_id, name: self.vendor&.display_name, business_name: self.vendor&.business_name, vendor_code: self&.vendor&.vendor_id, trade_name: self.vendor&.trade_name},
+        bank_account_attributes: {id: self.bank_account_id, name: invoice_bank_account&.name, account_number: invoice_bank_account&.account_number, ifsc: invoice_bank_account&.ifsc },
+        vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
+        vendor_locations: fetch_vendor_locations.as_json,
+        bank_accounts: fetch_vendor_bank_accounts.as_json,
+        note: self.note,
+        tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+        invoice_frequency_attributes: get_invoice_frequency_attributes,
+        billing_start_date: self.billing_start_date&.to_date,
+        billing_day_of_month: billing_day_of_month,
+        due_date: self.due_date&.to_date,
+        start_date: self.start_date,
+        end_date: self.end_date,
+        lock_in_period: self.lock_in_period,
+        rent_free_period: self.rent_free_period,
+        tenancy_period: self.tenancy_period,
+        custom_fields: self.custom_fields,
+        already_exists: true,
+        prepaid: self.prepaid,
+        escalation_percentage: self.escalation_percentage,
+        total_invoice_amount_attributes: { id: self.total_invoice_amount_id, value: get_total_invoice_amount },
+        available_invoice_amount: get_available_invoice_amount,
+        invoice_number: self.get_invoice_number,
+        include_tax_and_tds: !!self.include_tax_and_tds
     }
   end
 
   def payment_history_json
     {
       id: self.id,
-      invoice_number: self.invoice_id,
+      invoice_number: self.get_invoice_number,
       vendor_name: self.vendor&.display_name,
       due_date: self.due_date&.to_date,
       net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
@@ -322,12 +371,17 @@ class GeneralInvoice < ApplicationRecord
       agreement_type: self.class.name.underscore,
       payment_agreement_id: self.payment_agreement_id,
       vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number
+      agreement_number: self.payment_agreement&.get_agreement_number,
+      start_date: self.start_date,
+      end_date: self.end_date,
+      allow_add_invoice: allowed_to_add_invoice?,
+      invoice_created: agreement_invoice_created?
 
     }
   end
 
-  def invoice_no_or_id
+  def get_invoice_number
+    self.override_invoice_id.present? ? self.override_invoice_id : self.invoice_id
   end
 
   # Quickfix as frontend was failing
@@ -337,6 +391,37 @@ class GeneralInvoice < ApplicationRecord
     else
       {id: nil, number: nil, period_id: nil }
     end
+  end
+
+  def check_billing_type
+    if self.billing_type.variable_periodic?
+      [nil]
+    else
+      [true, false]
+    end
+  end
+
+  def get_total_invoice_amount
+    if self.total_invoice_amount&.value.present?
+      precision_value(self.total_invoice_amount&.value)
+    end
+  end
+
+  def get_available_invoice_amount
+    if self.available_invoice_amount&.value.present?
+      precision_value(self.available_invoice_amount&.value)
+    end
+  end
+
+  def allowed_to_add_invoice?
+    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date <= Date.today && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
+  end
+
+  def agreement_invoice_created?
+    user = RequestStore.store[:current_user]
+    user = RequestStore.store[:current_user]
+    agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
+    agreement_invoice.present?
   end
 
 end

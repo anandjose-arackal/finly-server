@@ -194,11 +194,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(self.invoice)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return
-    end
+    # valid = CustomField::Validate.(self.invoice)
+    # unless valid.success?
+    #   add_message :error, valid.messages[:error]
+    #   return
+    # end
   end
 
   def set_custom_fields_invoice(invoice, data, save)
@@ -249,7 +249,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
-      invoice_items_attributes << {
+      data = {
           tax: item.tax,
           discount: item.discount,
           unit_of_measurement: item.unit_of_measurement,
@@ -267,12 +267,16 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id,
-          billable_amount_attributes: {
-              value: item.taxable_amount&.value.to_f,
-              currency_id: 1
-          }
+          purchase_order_item_id: item.id #,
+          # billable_amount_attributes: {
+          #     value: get_billable_amount(item),
+          #     currency_id: 1
+          # }
       }
+      if item.inventory_line_item.service?
+        data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}
+      end
+      invoice_items_attributes << data
     end
     invoice_items_attributes
   end
@@ -282,7 +286,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   # considers goods quantity and service billable amount
   def create_srn
     invoice_items_attributes = []
+    srn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id')
     self.purchase_order.items.each do |item|
+      previously_billed_amount = srn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -312,7 +318,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
-            real_amount = item.previously_billed_amount - bill_cal
+            real_amount = previously_billed_amount - bill_cal
             next if real_amount <=0
           end
         end
@@ -321,9 +327,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         real_q = item.quantity.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-          next unless item.previously_billed_amount > 0
+          next unless previously_billed_amount > 0
           real_q = item.quantity
-          real_amount = item.previously_billed_amount
+          real_amount = previously_billed_amount
         end
       end
       invoice_items_attributes << {
@@ -358,7 +364,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   # takes into account goods accepted and service billable amount
   def create_grn_and_srn
     invoice_items_attributes = []
+    rn_item = self.procurement.inward_documents.joins(:items).select('inward_document_items.billable_amount, inward_document_items.purchase_order_item_id as poi_id, inward_document_items.accepted')
     self.purchase_order.items.each do |item|
+      previously_billed_amount = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:billable_amount).sum.to_f
+      accepted = rn_item.collect {|ii| ii if ii.poi_id == item.id}.compact.pluck(:accepted).sum.to_f
       real_q = 0
       real_amount = 0
       if self.previous_invoices.present?
@@ -374,11 +383,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # item quantity billed in previous invoices were all delivered and accepted
         # then skip
         # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
-        if it_cal == 0 && item_in_invoice && it_cal.to_f == item.accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if it_cal == 0 && item_in_invoice && it_cal.to_f == accepted.to_f && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
           # i forgot what i did here, but this is important.
-          real_q = item.accepted.to_f - it_cal.to_f
+          real_q = accepted.to_f - it_cal.to_f
           next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
             # here we sum billable amount for all service items in previous invoices
@@ -388,18 +397,18 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
             # next if real_q <= 0
             next if bill_cal.to_f.round(2) == item.taxable_amount&.value.to_f.round(2)
             real_q = item.quantity
-            real_amount = item.previously_billed_amount - bill_cal
+            real_amount = previously_billed_amount - bill_cal
             next if real_amount <=0
           end
         end
       else
         # vendor is billed only for what he delivered and what the user accepted
-        real_q = item.accepted.to_f
+        real_q = accepted.to_f
         next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-          next unless item.previously_billed_amount > 0
+          next unless previously_billed_amount > 0
           real_q = item.quantity
-          real_amount = item.previously_billed_amount
+          real_amount = previously_billed_amount
         end
       end
       invoice_items_attributes << {
@@ -546,6 +555,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     end
     true
   end
+
 
 end
 

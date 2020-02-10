@@ -3,7 +3,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id, :policy
+                :headers, :contents, :validate_operation, :policy_id, :policy, :upload,
+                :transfer_mode_id, :transfer_mode
 
   def pre_validate
     if user.blank?
@@ -45,7 +46,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.headers = [:name, :business_name, :bank_account_number, :ifsc, :original_amount,
-               :inclusive_of_taxes, :gst_type_id, :tax, :advance_amount, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
+               :inclusive_of_taxes, :gst_type_id, :tax_rate_id, :advance_amount, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
     payment_order_custom_fields = current_company.field_configurations.non_deleted.root_fields.with_field_parent_type(FieldParentType.id_for(:invoice))
     payment_order_custom_fields.each do |field|
       headers << field.field_name.gsub(" ", "_").underscore.to_sym
@@ -62,6 +63,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.payment_mode = params[:transfer_type]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     self.scheduled_at = params[:scheduled_at]
     self.policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: self.policy_id)
@@ -78,7 +81,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
@@ -113,13 +116,26 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-
-    op = BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # if [168, 169, 174, 175].include?(user.company.id)
+    #   op = BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackgroundOptimized.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # else  
+      op = BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # end
     # op = ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+
+    # save uploaded attachment to the payment ticket
+    params[:id] = self.bank_payment_request.id
+    params[:bank_payment_request] = { attached_file: params[:file], description: params[:description], allow_delete: false }
+    update_attachment = BankTransfer::PaymentRequest::Update::UpdateAttachment.(current_user, params)
+    if update_attachment.success?
+      # self.upload = update_attachment
+      add_message :success, "File was saved."
+    end
   end
 
   def success
     params[:bank_payment_request_id] = self.bank_payment_request.id
+    # params[:upload] = self.upload
     BankTransfer::PaymentRequest::BulkCreateFromFile::SuccessPresenter.new(user, params, messages)
   end
 
@@ -171,6 +187,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
@@ -187,10 +204,14 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             value: self.requested_amount,
             currency_id: 1
         },
+        description: params[:description],
         beneficiary_type_id: 2,
         policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,
-        api_initiated: false
+        api_initiated: false,
+        expected_payments: self.validate_operation.order_details.count,
+        ticket_type: 'beneficiary',
+        transfer_mode_id: self.transfer_mode_id
     }
     bpr_attributes
   end

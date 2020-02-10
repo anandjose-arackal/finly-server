@@ -2,24 +2,24 @@
 #
 # Table name: yes_bank_transactions
 #
-#  id                                   :integer          not null, primary key
-#  unique_request_number                :string(255)
-#  transfer_type                        :string(255)
-#  bank_reference_number                :string(255)
-#  unique_response_number               :string(255)
-#  amount_id                            :integer
-#  beneficiary_bank_account_id          :integer
-#  company_id                           :integer
-#  transfer_status_id                   :integer
-#  created_at                           :datetime         not null
-#  updated_at                           :datetime         not null
-#  bank_response                        :string(255)
-#  refunded                             :boolean
-#  error_sub_code                       :string(255)
-#  bank_transaction_type_id             :integer
-#  account_name_check                   :boolean          default(FALSE)
-#  beneficiary_full_name                :string(255)
-#  beneficiary_verification_retry_count :integer
+#  id                          :integer          not null, primary key
+#  unique_request_number       :string(255)
+#  transfer_type               :string(255)
+#  bank_reference_number       :string(255)
+#  unique_response_number      :string(255)
+#  amount_id                   :integer
+#  beneficiary_bank_account_id :integer
+#  company_id                  :integer
+#  transfer_status_id          :integer
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  bank_response               :string(255)
+#  refunded                    :boolean
+#  error_sub_code              :string(255)
+#  bank_transaction_type_id    :integer
+#  account_name_check          :boolean          default(FALSE)
+#  beneficiary_full_name       :string(255)
+#  transfer_mode_id            :integer
 #
 
 class YesBankTransaction < ApplicationRecord
@@ -28,6 +28,7 @@ class YesBankTransaction < ApplicationRecord
   belongs_to :beneficiary_bank_account, optional: true, class_name: "BankAccount"
   belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
   belongs_to :bank_transaction_type, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
   has_one :payment, as: :reference_resource
 
@@ -54,6 +55,10 @@ class YesBankTransaction < ApplicationRecord
 
   def utr
     self.bank_reference_number
+  end
+
+  def mode
+    self.transfer_mode&.mode&.name
   end
 
   private

@@ -105,6 +105,8 @@ class NotifierType < ApplicationRecord
               configurable_push_notification: true, configurable_mailer: true},
              {key: :bank_payment_request_credit_confirm, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_credit_failure, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
 
              {key: :payment_order_bulk_download, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
@@ -185,7 +187,28 @@ class NotifierType < ApplicationRecord
              {key: :vendor_take_control, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :vendor_return_control, has_push_notification: true, has_mailer: true,
-              configurable_push_notification: true, configurable_mailer: true}]
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_update, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+
+              # Purchase Request
+             {key: :purchase_request_submit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_approve, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_reject, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_unapprove, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_retract, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_comment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_take_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_request_comment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true}
+            ]
 
   scope :with_name, ->(name) {where name: name}
 

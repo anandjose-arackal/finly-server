@@ -24,41 +24,36 @@ class Export::Reports::AsXmlBackground < Export::Reports::Background::Base
   def init
     report_presenter = ::Reports::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
-    self.reports = report_presenter&.reports.includes_export
+    self.reports = report_presenter&.reports
     if id.present?
       self.reports = self.reports&.with_id(id)
     end
     self.default_column_names = user.company.export_preferences.pluck(:name)
-    self.custom_field_column_names = extract_custom_field_names(reports)
+    self.custom_field_column_names = extract_custom_field_names
     self.preferences = user.company.export_preferences
   end
 
   def authorize
-    unless reports
+    unless reports.count
       messages[:error] << "Reports to export not found."
     end
   end
 
   def process
-    cf_data = generate_custom_field_data reports
-    cf_headers = cf_data[:headers]
-    self.column_names = default_column_names + cf_headers
+    self.column_names = default_column_names + custom_field_column_names
     self.data = []
-    reports.each do |r|
-      r.expenses.each do |e|
-        self.data << retrieve_data(preferences, r, e, cf_data)
+    reports.includes_export.find_each(batch_size: 100) do |r|
+      r.expenses.find_each(batch_size: 100) do |e|
+        self.data << retrieve_data(preferences, r, e, custom_field_column_names)
       end
     end
   end
 
   def post_process
     #adding report names in the name of the file
-    names = []
-    reports.each do |report|
-      names << report.name
-    end
-    self.report_names = names.to_sentence
-    exported_xls = Exporter.new(user, {spreadsheet: {headers: self.column_names, contents: self.data}, report_names: report_names}, messages).spreadsheet_exporter.generate_xls
+
+    report_names = 'report_export'
+    exported_xls = Exporter.new(user, {spreadsheet: {headers: self.column_names, contents: self.data}}, messages).spreadsheet_exporter.generate_xls
     exportable_file = exported_xls
     self.file_name = 'export.xls'
     self.download_url = create_temporary_link(exportable_file)

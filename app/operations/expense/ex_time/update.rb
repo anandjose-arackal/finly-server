@@ -215,6 +215,15 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       end
     end
 
+    if expense.report.present? && expense.report.processing? && [1, 2, 164].include?(expense.report&.user&.company_id)
+      expense.report.reload
+      check_for_violations
+      params[:reviewal_document] = expense.report
+      params[:violations_present] = has_warning?
+
+      op = ::ReviewalManager::DocumentReviewalMappings::SetUnaffected.(expense.report&.user, params)
+    end
+
     add_message :success, 'Expense updated'
   end
 

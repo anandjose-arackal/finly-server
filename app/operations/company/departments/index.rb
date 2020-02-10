@@ -1,6 +1,8 @@
 class Company::Departments::Index < Company::Departments::Base
 
-  attr_accessor :departments, :policy_department_filter_mapping
+  attr_accessor :departments, :policy_department_filter_mapping, :current_application
+
+
 
   class Company::Departments::Index::DepartmentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :departments, :company_departments, :policy_department_filter_mapping, :policy_user_department_document_mapping, :all_departments
@@ -23,23 +25,27 @@ class Company::Departments::Index < Company::Departments::Base
     [User, AdminUser]
   end
 
+  def init
+    self.current_application = params[:current_app] || current_app
+  end
+
   def process
     if user.company_admin? || user.vp_admin_or_auditor?
-      self.departments = self.company.departments
+      self.departments = user.company.departments.non_deleted
     else
-      self.departments = user.departments
+      self.departments = user.departments.non_deleted
     end
     unless user.class.name =='AdminUser'
       user_role_id = params[:filter_role_id]
       if user_role_id.present?
-        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
+        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id).joins(:policy_department_mappings).with_application(current_application).exclude_deleted.pluck('policy_department_mappings.department_id')
       else
         # User has any role in policy
-        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
+        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(self.current_application).exclude_deleted.pluck('policy_department_mappings.department_id')
       end
-      department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
+      department_parent_id = [user.company.departments.non_deleted.where(id: department_ids)&.last&.parent&.id] rescue []
       # To be shown on filter page
-      self.policy_department_filter_mapping = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
+      self.policy_department_filter_mapping = user.company.departments.non_deleted.where(id: department_ids + department_parent_id) unless department_ids.blank?
     end
 
   end

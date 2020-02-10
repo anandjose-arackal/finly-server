@@ -1,5 +1,8 @@
 if Rails.env.production?
   Sidekiq::Logstash.setup
+end
+
+if not Rails.env.development?
   redis_config = Rails.application.config_for(:redis_config)
   Sidekiq.configure_server do |config|
     config.redis = {url: redis_config['url'], password: redis_config['password']}
@@ -20,3 +23,9 @@ end
 
 
 Sidekiq::Extensions.enable_delay!
+
+if Rails.env.uat?
+  class Sidekiq::Extensions::DelayedMailer
+    sidekiq_options queue: 'mailer_test'
+  end
+end

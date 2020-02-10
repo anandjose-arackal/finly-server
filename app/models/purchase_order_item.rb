@@ -6,7 +6,7 @@
 #  purchase_order_id        :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :string(255)
+#  description              :text(65535)
 #  hsn_sac                  :string(255)
 #  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
@@ -34,10 +34,10 @@
 #  purchase_request_item_id :integer
 #  department_id            :integer
 #  cgst                     :decimal(20, 10)
-#  sgst                     :decimal(20, )
-#  igst                     :decimal(20, )
+#  sgst                     :decimal(20, 5)   default(0.0)
+#  igst                     :decimal(20, 5)   default(0.0)
 #  taxable_amount_id        :integer
-#  previously_billed_amount :decimal(10, )    default(0)
+#  previously_billed_amount :decimal(20, 5)   default(0.0)
 #
 
 class PurchaseOrderItem < ApplicationRecord
@@ -91,8 +91,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      ids = joins(:inventory_line_item).where("items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
-      where(id: ids)
+      where(category_id: category_ids)
     end
   }
 
@@ -104,6 +103,7 @@ class PurchaseOrderItem < ApplicationRecord
   }
 
   scope :include_details, -> {includes(:total_amount, :cost_center,purchase_order: [:department, :location])}
+  scope :include_for_show,  -> {includes(:inventory_line_item,:category,:purchase_request_item,:taxable_amount,:tax_amount, :discount_amount,:total_amount,:tax_rate)}
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

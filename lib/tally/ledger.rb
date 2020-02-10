@@ -5,6 +5,7 @@ class Tally::Ledger < NonPersistentModel
   validates_presence_of :name, :amount
   validate :bill_allocations_validate
   validate :cost_allocations_validate
+  validate :bank_allocations_validate
 
   def amount
     @amount ||= 0
@@ -22,6 +23,10 @@ class Tally::Ledger < NonPersistentModel
     @category_allocations ||= []
   end
 
+  def bank_allocations
+    @bank_allocations ||= []
+  end
+
   def add(value)
     self.amount += value
   end
@@ -30,8 +35,12 @@ class Tally::Ledger < NonPersistentModel
     bill_allocations.find {|bill_allocation| bill_allocation.name == name}
   end
 
+  def find_bank_allocation(name)
+    bank_allocations.find {|bank_allocation| bank_allocation.name == name}
+  end
+
   def find_category_allocation(name)
-    category_allocations.find {|category_allocation| category_allocation.name == name}
+    bank_allocations.find {|category_allocation| category_allocation.name == name}
   end
 
   def add_bill_allocation(name, type, amount)
@@ -52,6 +61,21 @@ class Tally::Ledger < NonPersistentModel
     category_allocation.add cost_center, amount
   end
 
+  def add_bank_allocation(name, date, transaction_type, payment_mode, party_name, amount)
+    bank_allocation = find_bank_allocation name
+    if bank_allocation.nil?
+      bank_allocation = Tally::BankAllocation.new(
+          name: name,
+          date: date,
+          transaction_type: transaction_type,
+          payment_mode: payment_mode,
+          party_name: party_name
+      )
+      bank_allocations << bank_allocation
+    end
+    bank_allocation.add amount
+  end
+
   def as_json(options)
     Tally::Utils.format(
         {
@@ -60,7 +84,8 @@ class Tally::Ledger < NonPersistentModel
             "ispartyledger": Tally::Utils.to_bool(self.is_party_ledger),
             "amount": self.amount,
             "billallocations.list": self.bill_allocations.as_json(options),
-            "categoryallocations.list": self.category_allocations.as_json(options)
+            "categoryallocations.list": self.category_allocations.as_json(options),
+            "bankallocations.list": self.bank_allocations.as_json(options)
         }
     )
   end
@@ -82,6 +107,16 @@ class Tally::Ledger < NonPersistentModel
       unless category_allocation.valid?
         category_allocation.errors.full_messages.each do |message|
           errors.add :category_allocation, message
+        end
+      end
+    end
+  end
+
+  def bank_allocations_validate
+    self.bank_allocations.each do |bank_allocation|
+      unless bank_allocation.valid?
+        bank_allocation.errors.full_messages.each do |message|
+          errors.add :bank_allocation, message
         end
       end
     end

@@ -128,7 +128,7 @@ class YesBankApi::Base < BaseHandler
 
       post_params_hash = (Hash.from_xml(template) rescue nil)
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
       end
 
       self.timeout = true
@@ -147,7 +147,9 @@ class YesBankApi::Base < BaseHandler
         self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
         # this is an anomaly, so send email and flag it
-        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        if self.payment.present? && self.payment.reference_resource.blank?
+          Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        end
       end
     rescue Faraday::ResourceNotFound
       self.end_time = DateUtils.local_date_time
@@ -155,7 +157,7 @@ class YesBankApi::Base < BaseHandler
       post_params_hash = (Hash.from_xml(template) rescue nil)
 
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
       end
 
       self.resource_not_found = true

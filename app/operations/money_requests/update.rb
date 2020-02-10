@@ -95,6 +95,7 @@ class MoneyRequests::Update < MoneyRequests::Base
   def process
     original_policy_id = money_request.policy_id
     money_request.skip_customizable_validation = true
+    ActiveRecord::Base.transaction do
     if money_request.update_attributes(self.update_param)
       updated_policy_id = money_request.policy_id
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
@@ -110,12 +111,14 @@ class MoneyRequests::Update < MoneyRequests::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
       end
 
     else
       messages[:error] = money_request.errors.full_messages
+    end
     end
   end
 

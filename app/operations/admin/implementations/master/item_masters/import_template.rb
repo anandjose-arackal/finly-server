@@ -11,6 +11,7 @@ class Admin::Implementations::Master::ItemMasters::ImportTemplates < Admin::Impl
       :item_expense_type => "Expense Type",
       :po_item =>  "PO Item (Y/N)",
       :non_po_item => "Non PO Item (Y/N)",
+      :good_service => "Goods or Service ( G / S)",
       :discount => "Discount",
       :rate => "Rate",
       :destroy => "Destroy"

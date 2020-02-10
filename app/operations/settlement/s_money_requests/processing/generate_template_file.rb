@@ -36,7 +36,8 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
     item_contents = (self.content.blank?) ? [] : self.content
 
     if self.content.blank?
-      self.money_request_processor.mappings.exclude_cancelled.each do |item|
+      # self.money_request_processor.mappings.exclude_cancelled.each do |item|
+      self.money_request_processor.mappings.exclude_cancelled.left_joins(:money_requests).select('money_request_processor_mappings.*, money_requests.id AS money_request_id, money_requests.bank_reference_number AS mr_bank_reference_number, money_requests.source_account AS mr_source_account').each do |item|
         item_contents << processor_details(self.money_request_processor, item)
       end
     end
@@ -56,26 +57,30 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
   private
 
   def processor_details(processor, item)
-    marked_as_completed = (item.completed?) ? 'Y(only UTR updatable)' : ''
-    document_ids = item.money_requests.pluck(:id).join(", ") rescue ""
+    marked_as_completed = (item.completed?) ? 'Y' : ''
+    msg = (item.completed?) ? '(only UTR updateable)' : ''
+    # document_ids = item.money_requests.pluck(:id).join(", ") rescue ""
     [
+      # document_ids,
+      item.money_request_id,
       item.id,
-      document_ids,
       processor.created_by_user&.name,
       item.processor_accountable&.name,
       item.processor_accountable&.account_number,
       item.user&.name,
       item.note,
-      item.amount&.value,
-      item.bank_reference_number,
-      marked_as_completed
+      item.money_requests.find_by(id: item.money_request_id).total_amount,
+      item.mr_bank_reference_number,
+      item.mr_source_account,
+      marked_as_completed,
+      msg
     ]
   end
 
   def default_headers
     [
+      "Advance ID(unmodifiable)",
       "Batch Item ID(unmodifiable)",
-      "Advance IDs(unmodifiable)",
       "Batch Created By(unmodifiable)", 
       "Beneficiary Account Name(unmodifiable)",
       "Beneficiary Account Number(unmodifiable)",
@@ -83,6 +88,7 @@ class Settlement::SMoneyRequests::Processing::GenerateTemplateFile < Settlement:
       "Purpose of Advance(unmodifiable)", 
       "Total Advance Amount(unmodifiable)", 
       "UTR",
+      "Source Account",
       "Mark As Paid(Y or N)"
     ]
   end

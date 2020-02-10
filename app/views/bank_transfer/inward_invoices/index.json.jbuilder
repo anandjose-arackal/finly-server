@@ -1,7 +1,8 @@
 json.results do
   json.array!(@result.paginated_invoices.include_for_index) do |invoice|
     json.id invoice.id
-    json.controlling_user invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
+    controlling_user = invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
+    json.controlling_user controlling_user
     json.awaiting_action invoice.awaiting_action(@result.user)
     json.invoice_type invoice.invoice_type&.name
     json.proforma_advance invoice.proforma_advance&.value
@@ -15,9 +16,11 @@ json.results do
 
     json.invoice do
       json.id invoice.id
-      json.controlling_user invoice.get_reviewers(nil, invoice.get_invoice_provider_name).first&.name
+      json.invoice_id invoice.invoice_id
+      json.controlling_user controlling_user
       json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at&.strftime("%d-%m-%Y")
+      json.created_by invoice.created_by&.name
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
       json.advance invoice.advance
@@ -58,9 +61,10 @@ json.results do
       end
       json.net_amount precision_value invoice.net_amount&.value
       json.gross_amount precision_value invoice.gross_amount&.value
-      json.custom_fields do
-        json.array! invoice.custom_fields
-      end
+      # commenting out the below line because it's not being used in the index screen
+      # json.custom_fields do
+      #   json.array! invoice.custom_fields
+      # end
       json.category_id invoice.category_id
       json.category_name invoice.category&.name
 
@@ -80,8 +84,8 @@ json.results do
       # json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
       # json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
-      json.paid_amount invoice.payment_amounts_total
-      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total)
+      json.paid_amount invoice.payment_amounts_total.round(2)
+      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total(false)).round(2)
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if invoice&.invoice_items.present?
@@ -122,6 +126,7 @@ json.results do
           json.id invoice.vendor&.id
           json.gst invoice.vendor&.gst
           json.pan invoice.vendor&.pan
+          json.trade_name invoice&.vendor&.trade_name
 
           json.selected_bank_account do
             json.account_number invoice.receiving_account&.account_number

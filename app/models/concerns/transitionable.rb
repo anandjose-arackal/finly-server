@@ -141,19 +141,22 @@ module Transitionable
       provider_name ||= get_default_provider
       dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
-
+      reject_to_details = reject_to_users
       dlrms.each do |dlrm|
         level_number = dlrm.level_number
 
         data = chain[level_number - 1] || {}
 
+        data[:level_id] = dlrm.level_id
         data[:level_number] = dlrm.level_number
+        data[:reject_to_level] = reject_to_details[data[:level_id]].present?
+        data[:reject_to_user] = reject_to_details[data[:level_id]] if data[:reject_to_level]
         data[:level_name] = dlrm.level.name
         data[:policy_id] = dlrm.policy_id
         data[:awaiting_action] = (self.controlling_level_id == dlrm.level_id)
         data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
         if data[:action_taken]
-          data[:action_taken_at] = dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"
+          data[:action_taken_at] = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
         end
         data[:reviewers] = data[:reviewers] || []
         reviewer = {
@@ -193,6 +196,14 @@ module Transitionable
                 action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
             }
           end
+        end
+
+        if dlrm.rejected_by_id.present?
+          data[:rejected_by] = {
+            id: dlrm.rejected_by_id,
+            name: dlrm.rejected_by&.name,
+            email: dlrm.rejected_by&.email
+          }
         end
 
         chain[level_number - 1] = data
@@ -250,12 +261,16 @@ module Transitionable
       user_ids = []
 
       if level.present?
+        dlrms = self.document_level_reviewer_mappings.select{|dlrm| dlrm if dlrm.level_id == level.id}
+
         taken_control_by_ids = []
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
+        # taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids += dlrms.pluck(:taken_control_by_id)
         taken_control_by_ids.compact!
 
         forwarded_to_ids = []
-        forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        # forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        forwarded_to_ids += dlrms.pluck(:forwarded_to_id)
         forwarded_to_ids.compact!
 
         if taken_control_by_ids.present?
@@ -263,7 +278,8 @@ module Transitionable
         elsif forwarded_to_ids.present?
           user_ids = forwarded_to_ids
         else
-          user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+          # user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+          user_ids = dlrms.pluck(:reviewer_id)
         end
 
         # user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
@@ -349,6 +365,12 @@ module Transitionable
 
     # In case reviewer wants to reject it to a particular user who had previously approved
     def reject_to_users
+      previous_dlrms = self.document_level_reviewer_mappings.where('level_id < ?', self.level&.id)
+      reject_to = {} # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
+      previous_dlrms.each do |dlrm|
+        reject_to[dlrm.level_id] = get_reviewers(dlrm&.level_id)&.first
+      end
+      reject_to
     end
 
     def can_return_control?
@@ -500,7 +522,7 @@ module Transitionable
         return []
       end
 
-      admin = user.admin?
+      admin = user.admin? || user.vendor_payment_admin?
 
       # Find all level ids where user is a reviewer & is NOT forwarded
       all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).where(forwarded: false).pluck(:level_id)
@@ -625,10 +647,10 @@ module Transitionable
     end
 
     def role_based_associated_items(user, role_id, options={})
+      data = self.none
       if user.has_policy_role?(role_id)
         # role_id = UserRole.id_for(role_name.to_sym)
         role_name = UserRole.find_by_id(role_id).name
-        data = self.none
         case role_name
         when :purchase_request_initiator, 'purchase_request_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
@@ -637,7 +659,11 @@ module Transitionable
         when :purchase_request_auditor, 'purchase_request_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(PurchaseOrder.initiator_associated_items(user, role_id))
+          end
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           # Get data for purchase order reviewer
           data = data.or(role_based_reviewer_associated_items(user, role_id))
@@ -646,13 +672,21 @@ module Transitionable
         when :goods_receiver, 'goods_receiver'
           # nothing
         when :non_po_invoice_initiator, 'non_po_invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id:InwardInvoiceType.id_for(:non_po_invoice)))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)))
+          end
         when :non_po_invoice_reviewer, 'non_po_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :non_po_invoice_auditor, 'non_po_invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :po_invoice_initiator, 'po_invoice_initiator'
-          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id,invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+          if self.table_name == 'credit_notes'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))
+          end
         when :po_invoice_reviewer, 'po_invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :po_invoice_auditor, 'po_invoice_auditor'
@@ -662,6 +696,12 @@ module Transitionable
         when :invoice_reviewer, 'invoice_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :invoice_auditor, 'invoice_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
+         when :agreement_invoice_initiator, 'agreement_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: [InwardInvoiceType.id_for(:agreement_invoice), InwardInvoiceType.id_for(:recurring_invoice)]))
+        when :agreement_invoice_reviewer, 'agreement_invoice_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :agreement_invoice_auditor, 'agreement_invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
@@ -675,7 +715,7 @@ module Transitionable
           data = data.or(role_based_manager_associated_items(user, role_id))
         when :inventory_manager, 'inventory_manager'
           #nothing
-        when :vendor_creator, 'vendor_creator'
+           when :vendor_creator, 'vendor_creator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :vendor_reviewer, 'vendor_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
@@ -683,23 +723,41 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
           # data = []
-        when :policy_admin, 'policy_admin'
+           when :policy_admin, 'policy_admin'
           # data = []
-        when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+           when :bank_payment_request_auditor, 'bank_payment_request_auditor'
           # data = []
-        when :budget_manager, 'budget_manager'
+           when :budget_manager, 'budget_manager'
           data = []
         when :payment_agreement_initiator, 'payment_agreement_initiator'
-          data = role_based_initiator_associated_items(user, role_id)
+          data = data.or(role_based_initiator_associated_items(user, role_id))
         when :payment_agreement_reviewer, 'payment_agreement_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id)
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :payment_agreement_auditor, 'payment_agreement_auditor'
-          data = role_based_auditor_associated_items(user, role_id)
+          data = data.or(role_based_auditor_associated_items(user, role_id))
+        when :utility_bill_master_initiator, 'utility_bill_master_initiator'
+          data = data.or(role_based_initiator_associated_items(user, role_id))
+        when :utility_bill_master_reviewer, 'utility_bill_master_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :utility_bill_initiator, 'utility_bill_initiator'
+          data = data.or(role_based_initiator_associated_items(user, role_id))
+        when :utility_bill_reviewer, 'utility_bill_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :credit_note_initiator, 'credit_note_initiator'
+          data = data.or(role_based_initiator_associated_items(user, role_id))
+        when :credit_note_reviewer, 'credit_note_reviewer'
+          if self.table_name == 'invoices'
+            data = data.or(role_based_initiator_associated_items(user, role_id))
+          else
+            data = data.or(role_based_reviewer_associated_items(user, role_id))
+          end
+        when :credit_note_auditor, 'credit_note_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         else
           # data = []
         end
-        data
       end
+      data
     end
 
     def role_based_admin_associated_items(user, role_id, options={})
@@ -728,6 +786,8 @@ module Transitionable
         document_table_name = 'inward_invoices'
       elsif (document_table_name == "yes_bank_vendors") || ("#{self.table_name}" == "yes_bank_vendors")
         document_table_name = 'vendors'
+      elsif (document_table_name == "bbps_biller_subscriptions") || ("#{self.table_name}" == "bbps_biller_subscriptions")
+        document_table_name = 'bbps_subscriptions'
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     end
@@ -740,44 +800,45 @@ module Transitionable
       else
         # Models like Report doesn't has company_id attribute
         user_ids = user.company.users.pluck(:id)
-
         controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).flatten.compact
       end
 
-      # Get all the documents without viewable
-      document_ids = DocumentLevelReviewerMapping.where(
-                                                     reviewer_id: user.id,
-                                                     document_reviewer_mappable_type: self.name,
-                                                     level_id: controlling_level_ids,
-      ).pluck(:document_reviewer_mappable_id)
-
-      # Get all the documents where the user had previously interacted with
-      document_ids += DocumentLevelReviewerMapping.where(
-          reviewer_id: user.id,
-          document_reviewer_mappable_type: self.name,
-          viewable: true,
-      ).pluck(:document_reviewer_mappable_id)
-
-      # Get all the taken control items for admin user
-      document_ids += DocumentLevelReviewerMapping.where(
-                                                      taken_control: true,
-                                                      document_reviewer_mappable_type: self.name,
-                                                      taken_control_by_id: user.id
-      ).pluck(:document_reviewer_mappable_id)
-
-      # Get all the taken control items for admin user
-      document_ids += DocumentLevelReviewerMapping.where(
-                                                      forwarded: true,
-                                                      document_reviewer_mappable_type: self.name,
-                                                      forwarded_to_id: user.id
-      ).pluck(:document_reviewer_mappable_id)
-
+      # # Get all the documents without viewable
+      # document_ids = DocumentLevelReviewerMapping.where(
+      #                                                reviewer_id: user.id,
+      #                                                document_reviewer_mappable_type: self.name,
+      #                                                level_id: controlling_level_ids,
+      # ).pluck(:document_reviewer_mappable_id)
+      #
+      # # Get all the documents where the user had previously interacted with
       # document_ids += DocumentLevelReviewerMapping.where(
-      #   forwarded: true,
-      #   document_reviewer_mappable_type: self.name,
-      #   forwarded_to_id: user.id
-      # )
-      documents = self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
+      #     reviewer_id: user.id,
+      #     document_reviewer_mappable_type: self.name,
+      #     viewable: true,
+      # ).pluck(:document_reviewer_mappable_id)
+      #
+      # # Get all the taken control items for admin user
+      # document_ids += DocumentLevelReviewerMapping.where(
+      #                                                 taken_control: true,
+      #                                                 document_reviewer_mappable_type: self.name,
+      #                                                 taken_control_by_id: user.id
+      # ).pluck(:document_reviewer_mappable_id)
+      #
+      # # Get all the taken control items for admin user
+      # document_ids += DocumentLevelReviewerMapping.where(
+      #                                                 forwarded: true,
+      #                                                 document_reviewer_mappable_type: self.name,
+      #                                                 forwarded_to_id: user.id
+      # ).pluck(:document_reviewer_mappable_id)
+
+
+      # consolidated above 4 queries into 1
+      dlrms = DocumentLevelReviewerMapping.
+          where(document_reviewer_mappable_type: self.name).
+          where("(reviewer_id = #{user.id} AND (level_id IN (?) OR viewable IS TRUE)) OR (taken_control IS TRUE AND taken_control_by_id = #{user.id}) OR (forwarded IS TRUE AND forwarded_to_id = #{user.id})", controlling_level_ids)
+
+
+      documents = self.status_based_associated_items(user, role_id).where(id: dlrms.pluck(:document_reviewer_mappable_id), policy_id: policy_ids)
       open_status_ids = self.open_status_ids(user)
       documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.document_owner_attribute} = ?", user.id)) rescue self.none
       return documents

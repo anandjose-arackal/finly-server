@@ -7,7 +7,7 @@ class InvoiceCalculationUtils
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
-                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount
+                :roundoff_amount, :balance_due_amount, :payment_amount, :tds_applicable_amount, :cn_adjustment_amount
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, taxable_amount, invoice_amount, tds_applicable_amount, payment = nil, invoice = nil, payment_amount = nil)
@@ -31,12 +31,26 @@ class InvoiceCalculationUtils
       self.balance_due_amount = precision_value self.net_amount
     end
 
+    self.balance_due_amount = self.balance_due_amount - self.advance_amount
+
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
       if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
         self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
       end
     end
+
+    # # Applying Credit Note
+    # unless self.invoice.class.name == 'OutwardInvoice'
+    #   if cn_adjustment_amount > 0
+    #     if cn_adjustment_amount <= balance_due_amount
+    #       self.balance_due_amount -= cn_adjustment_amount
+    #     else
+    #       invoice.credit_note_adjustment
+    #       self.balance_due_amount = 0
+    #     end
+    #   end
+    # end
 
     # assign gross amount
     unless self.invoice.class.name == 'OutwardInvoice'
@@ -76,6 +90,7 @@ class InvoiceCalculationUtils
       self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
     end
 
+
     # assign balance due
     if self.invoice.balance_due.present?
       self.invoice.balance_due.value = self.balance_due_amount
@@ -98,9 +113,9 @@ class InvoiceCalculationUtils
     # self.payment_amount = self.balance_due_amount
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.payment_amount
+        payment.amount.value = self.payment_amount.round(2)
       else
-        payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.payment_amount.round(2), currency_id: 1)
       end
     end
     params
@@ -143,6 +158,8 @@ class InvoiceCalculationUtils
     else
       self.balance_due_amount = precision_value self.net_amount
     end
+
+    self.balance_due_amount = self.balance_due_amount - self.advance_amount
 
     # assign the respective calculated amounts to the payment and invoice object
 
@@ -244,8 +261,14 @@ class InvoiceCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
-    self.tax_amount = self.net_amount - self.gross_amount
+    if self.invoice.rcm_enabled?
+      self.net_amount = self.gross_amount
+      net_if_tax_applied = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = net_if_tax_applied - self.gross_amount
+    else
+      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+      self.tax_amount = self.net_amount - self.gross_amount
+    end
   end
 
   def calculate_inclusive_taxes
@@ -272,6 +295,8 @@ class InvoiceCalculationUtils
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.tds_applicable_amount, tds)
     self.tds_amount = (self.tds_applicable_amount - new_gross_amount) rescue 0
+    # self.tds_amount = self.tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+    self.tds_amount = self.tds_amount.ceil # round the tds to the nearest digit as of now.
   end
 
   def calculate_advance_paid
@@ -282,7 +307,7 @@ class InvoiceCalculationUtils
     end
     original_net_amount = self.net_amount
     self.advance_amount = self.invoice.advance_amount&.value.to_f
-    self.net_amount = original_net_amount - self.advance_amount
+    # self.net_amount = original_net_amount - self.advance_amount # net amount should be without previously paid advance
   end
 
   def calculate_freight_charges
@@ -296,4 +321,63 @@ class InvoiceCalculationUtils
     self.net_amount = original_net_amount + self.freight_amount
   end
 
+  # Credit Note Adjustments
+  def calculate_cn_adjustments(invoice_params, payment, invoice)
+    self.invoice = invoice || payment&.invoice
+    # return if (invoice_params[:credit_note_adjustments_attributes].blank? || !invoice_params[:credit_note_adjustments_attributes].is_a?(Array))
+    return unless invoice.class.name == "Invoice"
+
+    # removed_cna_ids = []
+    # # Where credit note adjustments are removed from an invoice
+    # if invoice_params[:credit_note_adjustments_attributes].present?
+    #   removed_cna_ids = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:_destroy]}.map {|item| item[:id]}.compact
+    # end
+
+    # Where credit note adjustments
+    cna_added_amount = precision_value(self.invoice.credit_note_adjustments.joins(:amount).sum(:value))
+    # cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    # adjustment_amount_to_subtract = invoice_params[:credit_note_adjustments_attributes].filter {|item| item[:id].blank?}.map {|item| item[:amount_attributes]&.dig(:value).to_f}.sum
+
+
+    balance_due_amount = self.invoice.balance_due.value
+
+    # if calculation_from_payment
+    #   balance_due_amount = balance_due_amount - cna_added_amount + cna_removed_amount
+    #
+    #   if balance_due_amount < 0
+    #     amount_to_deduct = balance_due_amount.abs
+    #
+    #     self.invoice.credit_note_adjustments.reorder("created_at desc").each do |cna|
+    #       break if amount_to_deduct == 0
+    #       if amount_to_deduct >= cna.amount.value
+    #         amount_to_deduct -= cna.amount.value
+    #         cna.destroy
+    #       else
+    #         cna.amount.update(value: (cna.amount.value - amount_to_deduct))
+    #         amount_to_deduct = 0
+    #       end
+    #     end
+    #   end
+    #   cna_added_amount = self.invoice.credit_note_adjustments.where.not(id: removed_cna_ids).joins(:amount).sum(:value)
+    #   cna_removed_amount = self.invoice.credit_note_adjustments.where(id: removed_cna_ids).joins(:amount).sum(:value)
+    #
+    #   balance_due_amount = self.invoice.balance_due.value
+    # end
+    #
+
+    # For Debugging
+    Rails.logger.fatal "**************************************************************************************************"
+    Rails.logger.fatal "Invoice Balance Due - #{self.invoice.balance_due.value.to_f}"
+    Rails.logger.fatal "Invoice Credit Note Adjustments - #{self.invoice.credit_note_adjustments.as_json.inspect}"
+    Rails.logger.fatal "CNA Added Amount #{cna_added_amount}"
+    Rails.logger.fatal "Balance Due Amount(#{balance_due_amount}) - CNA Added Amount(#{cna_added_amount})"
+    Rails.logger.fatal "**************************************************************************************************"
+
+    balance_due_amount = balance_due_amount - cna_added_amount
+    balance_due_amount = precision_value balance_due_amount
+
+    if self.invoice.balance_due.present?
+      self.invoice.balance_due.value = balance_due_amount
+    end
+  end
 end

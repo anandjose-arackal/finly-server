@@ -18,7 +18,7 @@ json.items do
     json.utr utr
     json.actions @result.item_actions(item)
     json.reports do
-      json.array! item.reports do |report|
+      json.array! item.reports.sort do |report|
 
         report_count += 1
         json.extract! report, :id, :policy, :date_as_string
@@ -34,6 +34,8 @@ json.items do
         json.total_amount do
           json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
         end
+        json.utr_number report.bank_reference_number
+        json.source_account report.source_account
       end
     end
     json.system_messages do

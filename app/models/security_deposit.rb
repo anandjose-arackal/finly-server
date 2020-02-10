@@ -20,12 +20,14 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  status_id                       :integer
+#  deleted_at                      :datetime
 #
 
 # Security deposit is required to create rental invoice in payment agreements
 
 class SecurityDeposit < ApplicationRecord
-
+  include SoftDeletable
+  
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :cost_center, optional: true
   belongs_to :department, optional: true
@@ -68,7 +70,7 @@ class SecurityDeposit < ApplicationRecord
 
     {
       id: self.id,
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name, trade_name: self.vendor&.trade_name},
       bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       department_attributes: { id: self.department_id, name: self.department&.name },
@@ -83,6 +85,7 @@ class SecurityDeposit < ApplicationRecord
       vendor_id: self.vendor_id,
       payment_agreement_id: self.payment_agreement_id,
       vendor_name: self.vendor&.name,
+      vendor_code: self.vendor&.vendor_id,
       creation_date: self.created_at.to_date,
       agreement_type: 'security_deposit',
       status_attributes: {id: self.status&.id, name: self.status&.name, display_name: self.status&.name&.titleize, payment_agreement_status: self.payment_agreement&.status&.name},
@@ -94,6 +97,10 @@ class SecurityDeposit < ApplicationRecord
       bank_payment_request_id: (self.payments.first.payment_order.bank_payment_request.id rescue nil),
       already_exists: true
     }
+  end
+
+  def document_owner_attribute
+    'creator_id'
   end
 
   private

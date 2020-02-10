@@ -13,7 +13,7 @@
 #  payable_amount_id               :integer
 #  inclusive_of_taxes              :boolean
 #  gst_type_id                     :integer
-#  tax                             :decimal(10, )
+#  tax                             :decimal(10, 3)
 #  tds_slab_id                     :integer
 #  company_id                      :integer
 #  sub_department_id               :integer
@@ -41,32 +41,32 @@
 #  payment_agreement_upcoming_date :date
 #
 
-    #                 :id => :integer,
-    #               :name => :string,
-    #          :vendor_id => :integer,
-    #    :bank_account_id => :integer,
-    #        :category_id => :integer,
-    #      :department_id => :integer,
-    # :original_amount_id => :integer,
-    #      :tax_amount_id => :integer,
-    #  :payable_amount_id => :integer,
-    # :inclusive_of_taxes => :boolean,
-    #        :gst_type_id => :integer,
-    #                :tax => :decimal,
-    #        :tds_slab_id => :integer,
-    #         :company_id => :integer,
-    #  :sub_department_id => :integer,
-    #         :created_at => :datetime,
-    #         :updated_at => :datetime,
-    #          :status_id => :integer,
-    #      :tds_amount_id => :integer,
-    #     :balance_due_id => :integer,
-    #      :net_amount_id => :integer,
-    #    :gross_amount_id => :integer,
-    #    :roundoff_amount => :decimal
-    #     :invoice_number => :text,
-    #       :invoice_date => :date,
-    #   :invoice_due_date => :date
+#                 :id => :integer,
+#               :name => :string,
+#          :vendor_id => :integer,
+#    :bank_account_id => :integer,
+#        :category_id => :integer,
+#      :department_id => :integer,
+# :original_amount_id => :integer,
+#      :tax_amount_id => :integer,
+#  :payable_amount_id => :integer,
+# :inclusive_of_taxes => :boolean,
+#        :gst_type_id => :integer,
+#                :tax => :decimal,
+#        :tds_slab_id => :integer,
+#         :company_id => :integer,
+#  :sub_department_id => :integer,
+#         :created_at => :datetime,
+#         :updated_at => :datetime,
+#          :status_id => :integer,
+#      :tds_amount_id => :integer,
+#     :balance_due_id => :integer,
+#      :net_amount_id => :integer,
+#    :gross_amount_id => :integer,
+#    :roundoff_amount => :decimal
+#     :invoice_number => :text,
+#       :invoice_date => :date,
+#   :invoice_due_date => :date
 
 
 
@@ -103,6 +103,7 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :gross_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :payment_agreement, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :payments, as: :parent
 
@@ -116,6 +117,12 @@ class BeneficiaryPayment < ApplicationRecord
   # after_commit :calculate_tax_and_amount
   validate :payment_agreement_related_fields
   after_create :update_creator_id, :update_company_id, :update_status
+  delegate :paid?, to: :status
+
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) {where.not(id: id)}
+  scope :only_unpaid, -> {where.not status_id: BeneficiaryPaymentStatus.id_for(:paid)}
+  scope :only_paid, -> {where status_id: BeneficiaryPaymentStatus.id_for(:paid)}
 
   def tax_rate
   	self.tax
@@ -148,6 +155,7 @@ class BeneficiaryPayment < ApplicationRecord
         taxable_amount: precision_value(self.gross_amount&.value),
         editable: self.unpaid?,
         tax_rate: precision_value(self.tax_rate),
+        tax_rate_id: self.tax_rate_id,
         tds_rate: precision_value(self.tds_slab&.tds),
         net_amount: precision_value(self.net_amount&.value),
         gross_amount: precision_value(self.gross_amount&.value),
@@ -170,7 +178,8 @@ class BeneficiaryPayment < ApplicationRecord
         location_attributes: { id: self.location_id, name: self.location&.name },
         cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
         note: self.note,
-        already_exists: true
+        already_exists: true,
+        payment_agreement_id: self.payment_agreement_id
 
     	}
     end
@@ -197,7 +206,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
-
+      # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
       # net_amount = gross_amount - tds_amount
       net_amount = self.original_amount.value - tds_amount - self.advance_amount&.value.to_f
     else # calculate proactively
@@ -209,6 +219,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(original_amount, tds)
       tds_amount = original_amount - new_gross_amount
+      # tds_amount = tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+      tds_amount = tds_amount.ceil # round the tds to the nearest digit as of now.
 
       net_amount = original_amount + tax_amount - tds_amount - self.advance_amount&.value.to_f
     end
@@ -270,6 +282,14 @@ class BeneficiaryPayment < ApplicationRecord
       self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
     end
 
+    # quick fix for abp
+    # payable amount has no definition in that document. just there for display purposes.
+    if self.payable_amount.present?
+      self.payable_amount.update(value: balance_due_amount)
+    else
+      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: 1)
+    end
+
     # # adding the payment amount to the params if  the object is present
     # self.payment_amount = payment_amount || balance_due_amount
 
@@ -318,7 +338,7 @@ class BeneficiaryPayment < ApplicationRecord
       tds_amount: precision_value(self.tds_amount&.value),
       tax: precision_value(self.tax),
       tds: precision_value(self.tds_slab&.tds),
-      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name},
+      vendor_attributes: {id: self.vendor_id, name: self.vendor&.name, business_name: self.vendor&.business_name, trade_name: self.vendor&.trade_name},
       bank_account_attributes: {id: self.bank_account_id, name: self.bank_account&.name, account_number: self.bank_account&.account_number, ifsc: self.bank_account&.ifsc },
       vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location, gstin: self.vendor_location&.gstin, address: self.vendor_location&.address },
       department_attributes: { id: self.department_id, name: self.department&.name },

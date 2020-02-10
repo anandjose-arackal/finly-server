@@ -4,7 +4,7 @@ class ItemMaster::Item::Show < ItemMaster::Item::Base
 
   def init
     id = params[:id] || params[:inventory_line_item_id]
-    self.inventory_line_item = user.company.items.find_by(id: id)
+    self.inventory_line_item = user.company.items.non_deleted.find_by(id: id)
   end
 
   def validate

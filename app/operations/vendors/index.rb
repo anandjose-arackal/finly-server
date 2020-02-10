@@ -22,6 +22,8 @@ class Vendors::Index < Vendors::Base
     has_scope :filter_gstin
     has_scope :filter_pan
     has_scope :filter_creation_date, using: [:from, :to], type: :hash
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
@@ -30,9 +32,9 @@ class Vendors::Index < Vendors::Base
     
     def init
       # Todo temp workaround because of frontend format issue - START
-      if params[:filter_ids]
-        params[:filter_ids] = params[:filter_ids].first.split(",")
-      end
+      # if params[:filter_ids]
+      #   params[:filter_ids] = params[:filter_ids].first.split(",")
+      # end
 
       self.vendors = params[:vendors]
       self.vendors = apply_scopes(self.vendors, params)

@@ -12,6 +12,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
               :item_expense_type => "Expense Type",
               :po_item =>  "PO Item (Y/N)",
               :non_po_item => "Non PO Item (Y/N)",
+              :good_service => "Goods or Service ( G / S)",
               :discount => "Discount",
               :rate => "Rate",
               :destroy => "Destroy"
@@ -21,7 +22,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def input
-    company.items
+    company.items.non_deleted.includes(:category,:item_expense_type,:supply_item_type)
   end
 
   def id(item)
@@ -41,7 +42,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def item_expense_type(item)
-    item.item_expense_type.name
+    item.item_expense_type&.name
   end
 
   def item_number(item)
@@ -49,15 +50,19 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
   end
 
   def po_item(item)
-    ['po_item','po_non_po_item'].include?(item.supply_item_type.name) ? 'Y' : ''
+    ['po_item','po_non_po_item'].include?(item.supply_item_type&.name) ? 'Y' : ''
   end
 
   def non_po_item(item)
-    ['non_po_item','po_non_po_item'].include?(item.supply_item_type.name) ? 'Y' : ''
+    ['non_po_item','po_non_po_item'].include?(item.supply_item_type&.name) ? 'Y' : ''
   end
 
   def discount(item)
     item.rate
+  end
+
+  def good_service(item)
+    item.product_type&.name&.humanize rescue ''
   end
 
   def rate(item)

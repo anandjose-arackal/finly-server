@@ -28,6 +28,7 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
       self.custom_fields_config = {}
       self.custom_fields_config[:general_invoice] = configurations.with_parent_type(FieldParentType.id_for(:general_invoice))
       self.custom_fields_config[:rental_invoice] = configurations.with_parent_type(FieldParentType.id_for(:rental_invoice))
+      self.custom_fields_config[:payment_agreement] = configurations.with_parent_type(FieldParentType.id_for(:payment_agreement))
     end
   end
 

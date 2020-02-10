@@ -18,9 +18,9 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.violations_present = !!params[:violations_present]
     self.chain = []
 
-    self.provider_names = %w( PurchaseOrderProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider)
+    self.provider_names = %w( PurchaseOrderProvider PoInvoiceProvider NonPoInvoiceProvider AgreementInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider BbpsBillerSubscriptionProvider BbpsBillProvider CreditNoteProvider )
 
-    policy_id = params[:policy_id]
+    policy_id = params[:policy_id] || params['policy_id'] || document.policy_id
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
     self.policy = user.company.policies.with_id(policy_id).first rescue nil
   end
@@ -28,6 +28,11 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   def validate
     unless provider_names.include? provider_name
       add_message :error, 'Invalid Document Provided'
+      return
+    end
+
+    unless policy.present?
+      add_message :error, 'Invalid Policy'
       return
     end
   end

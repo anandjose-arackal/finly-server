@@ -4,6 +4,7 @@ class Admin::Implementations::Master::Locations::ImportTemplates < Admin::Implem
   subscribe 'locations.import_template'
   headers ({
       :id => "ID",
+      :parent_id => "Parent Location Name",
       :name => "Name",
       :address_1 => "Address Line1",
       :address_2 => "Address Line2",

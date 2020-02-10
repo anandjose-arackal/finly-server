@@ -23,7 +23,11 @@ class RateContracts::Update < RateContracts::Base
   def process
     # Update RateContract
     if self.rate_contract.present?
-      add_message :error, rate_contract.errors.full_messages unless rate_contract.update_attributes(strong_params)
+      unless rate_contract.update_attributes(strong_params)
+        add_message :error, rate_contract.errors.full_messages
+        return
+      end
+      validate_custom_fields(true)
     end
   end
 

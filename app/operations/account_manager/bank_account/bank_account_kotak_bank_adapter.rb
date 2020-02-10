@@ -22,7 +22,9 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       # payment cannot be processed in this case
       return false
     elsif bank_transaction&.retriable? || bank_transaction&.open?
-      reference_number = bank_transaction.unique_reference_number
+      # reference_number = bank_transaction.unique_reference_number
+      # Setting reference number as nil, as Kotak Bank requires new unique number everytime
+      reference_number = nil
     else
       # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
@@ -31,7 +33,9 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
+    if payment.reference_resource&.retriable?
+      bank_transaction.update_columns(unique_reference_number: transfer_request.unique_reference_number)
+    elsif payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
       bank_transaction = payment.reference_resource
@@ -183,6 +187,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         beneficiary_account_ifsc: self.account.ifsc,
         beneficiary_name: self.account.name,
         transfer_status_id: transfer_status_id,
+        transfer_mode_id: payment.transfer_mode_id,
         narration: payment.note,
         amount_attributes: {
             value: payment.amount_value,

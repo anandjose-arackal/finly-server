@@ -25,7 +25,7 @@ class Vendors::Create < Vendors::Base
     self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
 
-    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors)
+    self.all_result = GstinLocation.where(vendor_id: user.company.yes_bank_vendors.non_deleted)
 
   end
 
@@ -46,20 +46,50 @@ class Vendors::Create < Vendors::Base
         if levels.present?
           unless self.vendor_parameters[:policy_id].present?
             add_message :error, "Please select a policy"
+            return
           end
 
           unless policy_ids.include?(vendor_parameters[:policy_id].to_i)
-            add_message :error, "Unknown policy"
+            add_message :error, "Unknown policy. Please select a valid policy from the list."
+            return
           end
         end
       end
     end
 
+    if self.vendor_parameters[:pan].blank?
+      vendor_parameters[:gstin_locations_attributes].each do |gstin|
+        gstin[:gstin] = nil
+        gstin[:gstin_id] = nil
+      end
+      add_message :notice, "GSTIN details can only be saved if a valid PAN is supplied."
+    end
 
-    if user.company_id == 156
+    # unless user.company_id == 156
+
+    # unless [156, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+    #   if vendor_parameters[:pan].blank?
+    #     add_message :error, 'Please provide PAN to proceed'
+    #     return
+    #   end
+    #
+    #
+    # end
+
+    if vendor_parameters[:pan].present?
+      unless vendor_parameters[:pan].match?(Constants::VALID_PAN)
+        add_message :error,  "Incorrent format for pan number: #{vendor_parameters[:pan]}"
+      end
+      validate_attachment(vendor_parameters, :pan)
+    end
+
+    if [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+
       unless vendor_parameters[:pan].present?
-        add_message :error, "Please provide PAN to proceed"
-        return
+        vendor_parameters[:gstin_locations_attributes].each do |gstin|
+          gstin[:gstin] = nil
+          gstin[:gstin_id] = nil
+        end
       else
         validate_attachment(vendor_parameters, :pan)
       end
@@ -112,22 +142,67 @@ class Vendors::Create < Vendors::Base
 
     # check for duplicate gstin in the system for the  current company
     gstins = []
-    vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
-      next if gstin_location[:_destroy]
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each do |gstin_location|
+        poc_email = gstin_location[:poc_email]
+        poc_mobile_number = gstin_location[:poc_mobile_number]
+        if poc_email.present?
+          unless Constants::VALID_EMAIL_FORMAT.match?(poc_email)
+            add_message :error, "#{poc_email}: Invalid email"
+            return
+          end
+        end
 
-      gstins << gstin_location[:gstin]
-      duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin)> 1}
+        if poc_mobile_number.present?
+          unless Constants::VALID_MOBILE_NUMBER.match?(poc_mobile_number)
+            add_message :error, "#{poc_mobile_number}: Invalid mobile number"
+            return
+          end
+        end
 
-      if duplicate_gstin.present?
-        add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
+        next if gstin_location[:_destroy]
+
+        gstins << gstin_location[:gstin]
+        duplicate_gstin = gstins.detect {|gstin| gstins.count(gstin) > 1}
+
+        if duplicate_gstin.present?
+          add_message :error, "Duplicate GSTIN entered  - #{duplicate_gstin}"
+          return
+        end
+
+
+        if gstin_location[:gstin].present?
+          gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
+          validate_pan_number_in_gstin(vendor_parameters[:pan], gstin_location[:gstin], vendor_parameters[:gst_registered])
+
+          unless [156, 179, 205, 206, 207, 208, 2, 1].include?(user.company_id)
+            if gstin.present?
+              add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+              return
+            end
+          end
+        end
+      end
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].blank?
+      add_message :error, "Please provide bank account details"
+      return
+    end
+
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      # check to see the number of bank account sent is equal to the bank account marked for destruction
+      ba_count = self.vendor_parameters[:bank_accounts_attributes].count
+      ba_delete_count = self.vendor_parameters[:bank_accounts_attributes].select {|b| b[:_destroy] == true}.count
+      if ba_count == ba_delete_count
+        add_message :error, "Please provide bank account details"
         return
       end
-
-
-      if gstin_location[:gstin].present?
-        gstin = self.all_result.where(gstin: gstin_location[:gstin]).first
-        if gstin.present?
-          add_message :error, "GSTIN details for \"#{gstin.gstin}\" already exists in the system. See vendor - #{gstin.vendor.display_name}"
+    end
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each do |bank_account|
+        if bank_account[:account_number].present? && bank_account[:confirm_account_number].present? && (bank_account[:account_number] != bank_account[:confirm_account_number])
+          add_message :error, "Account number: #{bank_account[:account_number]} does not match with confirmation account number: #{bank_account[:confirm_account_number]}"
           return
         end
       end
@@ -155,6 +230,10 @@ class Vendors::Create < Vendors::Base
     # if the receipt is being uploaded, delete the 'remove_file' key
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
+
+      vendor_parameters[:vendor_attachments_attributes].each do |file|
+        decode_base64_file(file, file[:attached_file])
+      end
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
@@ -167,9 +246,11 @@ class Vendors::Create < Vendors::Base
     end
 
     # Remove Empty gstin locations
-    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-      unless gst.keys.present?
-        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+    if vendor_parameters[:gstin_locations_attributes].present?
+      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+        unless gst.keys.present?
+          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+        end
       end
     end
 
@@ -197,7 +278,7 @@ class Vendors::Create < Vendors::Base
       self.vendor.assign_attributes(vendor_parameters)
       self.vendor.authorized = true
       self.vendor.status_id = VendorStatus.id_for(:auto_approved)
-
+      return if has_errors?
       if user.company.vendor_empanelment_workflow_enabled?
         self.vendor.update(status_id: VendorStatus.id_for(:draft))
 
@@ -214,7 +295,6 @@ class Vendors::Create < Vendors::Base
         self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
       end
 
-
       if self.vendor.save
         if user.company.vendor_empanelment_workflow_enabled?
           self.vendor.update(status_id: VendorStatus.id_for(:draft))
@@ -225,7 +305,11 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
+            if self.vendor.present? 
+              self.vendor.really_destroy!
+            end
             add_message :error, document_reviewer_mappings_op.messages[:error]
+            return
           end
           return
         else
@@ -236,6 +320,9 @@ class Vendors::Create < Vendors::Base
       end
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
+      validate_duplicate_bank_account
+      validate_default_bank_account
+      return if has_errors?
       self.vendor.authorized = true
       validate_custom_fields(true)
       return if has_errors?
@@ -249,7 +336,11 @@ class Vendors::Create < Vendors::Base
 
           document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
           unless document_reviewer_mappings_op.success?
+            if self.vendor.present? 
+              self.vendor.really_destroy!
+            end
             add_message :error, document_reviewer_mappings_op.messages[:error]
+            return
           end
           return
         else

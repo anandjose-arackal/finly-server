@@ -42,7 +42,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
-    self.company_items = user.company.items
+    self.company_items = user.company.items.non_deleted
 
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
@@ -52,7 +52,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.category_ids = category.pluck(:id) rescue []
     self.tax_rates = user.company.tax_rates.non_deleted
 
-    self.cost_centers = user.company.cost_centers
+    self.cost_centers = user.company.cost_centers.non_deleted
 
     self.summary = {}
     self.summary[:sum_of_item_amount] = 0

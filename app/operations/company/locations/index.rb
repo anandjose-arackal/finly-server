@@ -1,6 +1,6 @@
 class Company::Locations::Index < Company::Locations::Base
 
-  attr_accessor :locations ,:policy_location_filter_mapping
+  attr_accessor :locations ,:policy_location_filter_mapping, :current_application
 
   class Company::Locations::Index::LocationsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -19,24 +19,28 @@ class Company::Locations::Index < Company::Locations::Base
     [User, AdminUser]
   end
 
+  def init
+    self.current_application = params[:current_app] || current_app
+  end
+
   def validate
-    if self.company.blank?
+    if user.company.blank?
       add_message :error, "Company not found"
     end
   end
 
   def process
     user_role_id = params[:filter_role_id]
-    self.locations = self.company.locations
+    self.locations = user.company.locations.non_deleted
     # Locations which are mapped to policies to which user is part of
     unless user.class.name =='AdminUser'
       if user_role_id.present?
-        location_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id)&.joins(:policy_location_mappings).with_application(current_app)&.exclude_deleted&.pluck('policy_location_mappings.location_id')
+        location_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id)&.joins(:policy_location_mappings).with_application(current_application)&.exclude_deleted&.pluck('policy_location_mappings.location_id')
       else
-        location_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id)&.joins(:policy_location_mappings).with_application(current_app)&.exclude_deleted&.pluck('policy_location_mappings.location_id')
+        location_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id)&.joins(:policy_location_mappings).with_application(current_application)&.exclude_deleted&.pluck('policy_location_mappings.location_id')
       end
-      location_parent_id = [user.company&.locations&.where(id: location_ids)&.last&.parent&.id] rescue []
-      self.policy_location_filter_mapping = user.company&.locations&.where(id: location_ids + location_parent_id) unless location_ids.blank?
+      location_parent_id = [user.company&.locations&.non_deleted&.where(id: location_ids)&.last&.parent&.id] rescue []
+      self.policy_location_filter_mapping = user.company&.locations&.non_deleted&.where(id: location_ids + location_parent_id) unless location_ids.blank?
     end
   end
 

@@ -6,20 +6,21 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
     self.policies = Policy::VendorPayments::Index.(user, params).policies
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.request_types = {
-      awaiting_action: false,
-      payment_tickets: false,
-      purchase_requests: false,
-      purchase_orders: false,
-      non_po_invoices: false,
-      po_invoices: false,
-      budgets: false,
-      po_advances: false,
-      grns: false,
-      vendors: false,
-      payment_agreements: false
+        awaiting_action: false,
+        payment_tickets: false,
+        purchase_requests: false,
+        purchase_orders: false,
+        non_po_invoices: false,
+        po_invoices: false,
+        budgets: false,
+        po_advances: false,
+        grns: false,
+        vendors: false,
+        payment_agreements: false,
+        approved_purchase_request_items: false
     }
 
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
@@ -37,6 +38,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
       unless user.company.purchase_requisition_enabled?
         request_types[:purchase_requests] = false
+        request_types[:approved_purchase_request_items] = false
       end
 
       unless user.company.agreement_based_payment_system_enabled?
@@ -48,7 +50,6 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         if reviewer_role_ids.include?(role_id)
           request_types[:awaiting_action] = true
         end
-
         case role_id
         # when UserRole.id_for(:admin) ########## Admin role check removed as PUR usually doesn't contain admin role
         #   request_types.keys.map {|key| request_types[key] = true }
@@ -57,6 +58,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:purchase_requests] = true
         when UserRole.id_for(:purchase_order_initiator)
           request_types[:purchase_orders] = true
+          request_types[:approved_purchase_request_items] = true
         when UserRole.id_for(:goods_receiver)
           request_types[:grns] = true
         # when UserRole.id_for(:invoice_initiator)
@@ -78,8 +80,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         #   if user.company.vendor_empanelment_workflow_enabled?
         #     request_types[:vendors] = true
         #   end
-        when UserRole.id_for(:payment_agreement_initiator)
-          request_types[:payment_agreements] = true 
+        when UserRole.id_for(:payment_agreement_initiator), UserRole.id_for(:agreement_invoice_initiator)
+          request_types[:payment_agreements] = true
+        when UserRole.id_for(:inventory_manager)
+          request_types[:approved_purchase_request_items] = true
         end
       end
     end

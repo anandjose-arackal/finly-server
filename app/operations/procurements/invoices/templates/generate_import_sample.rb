@@ -19,7 +19,7 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID", "Default Tax Rate"]
     item_contents = []
-    company.items.where.not(item_number: nil).where(active: true, supply_item_type_id: [SupplyItemType.id_for(:non_po_item), SupplyItemType.id_for(:po_non_po_item)]).includes(:category).each do |item|
+    company.items.non_deleted.where.not(item_number: nil).where(active: true, supply_item_type_id: [SupplyItemType.id_for(:non_po_item), SupplyItemType.id_for(:po_non_po_item)]).includes(:category).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
@@ -47,7 +47,7 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
     # adding Cost Centers to the excel sheet
     cost_center_headers = ["ID", "Cost Center Name"]
     cost_center_contents = []
-    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+    current_company.cost_centers.non_deleted.vendor_payments_only.each do |cost_center|
       cost_center_contents << [cost_center.id, cost_center.name]
     end
     self.sheets << {

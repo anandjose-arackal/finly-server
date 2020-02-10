@@ -24,22 +24,23 @@
 #  cost_center_id               :integer
 #  category_id                  :integer
 #  hsn_sac                      :string(255)
+#  rate_contract_item_id        :integer
 #
 
-    # table_name => purchase_request_items
-    # 
-    #                     :id => :integer,
-    #    :purchase_request_id => :integer,
-    # :inventory_line_item_id => :integer,
-    #              :vendor_id => :integer,
-    #   :delivery_location_id => :integer,
-    #                :purpose => :text,
-    #               :quantity => :integer,
-    #         :unit_amount_id => :integer,
-    #    :estimated_amount_id => :integer,
-    #          :delivery_date => :date,
-    #             :created_at => :datetime,
-    #             :updated_at => :datetime
+# table_name => purchase_request_items
+#
+#                     :id => :integer,
+#    :purchase_request_id => :integer,
+# :inventory_line_item_id => :integer,
+#              :vendor_id => :integer,
+#   :delivery_location_id => :integer,
+#                :purpose => :text,
+#               :quantity => :integer,
+#         :unit_amount_id => :integer,
+#    :estimated_amount_id => :integer,
+#          :delivery_date => :date,
+#             :created_at => :datetime,
+#             :updated_at => :datetime
 
 
 class PurchaseRequestItem < ApplicationRecord
@@ -60,6 +61,7 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :category, optional: true
+  belongs_to :rate_contract_item, optional: true, class_name: 'RateContractLineItem'
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
   has_one :purchase_order_item
   has_many :trails, as: :parent
@@ -117,6 +119,55 @@ class PurchaseRequestItem < ApplicationRecord
 
   scope :search_delivery_location, -> (location_name) {
     joins(purchase_request: :location).where('branch_locations.name LIKE ?', "%#{location_name}%")
+  }
+
+  scope :filter_policy_id, -> (policy_id) {
+    if policy_id.present?
+      joins(:purchase_request).where('purchase_requests.policy_id = ?', policy_id)
+    end
+  }
+
+  scope :filter_location_id, -> (location_id) {
+    joins(:purchase_request).where('purchase_requests.location_id = ?', location_id)
+  }
+
+  scope :filter_department_id, -> (department_id) {
+    joins(:purchase_request).where('purchase_requests.location_id = ?', department_id)
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
+  scope :filter_by_date_range, -> (from, to) {
+    if from.present? || to.present?
+      from = Date.parse('01-01-1990') if from.blank?
+      to = Date.today if to.blank?
+      from = Date.parse(from) unless from.is_a?(Date)
+      to = Date.parse(to) unless to.is_a?(Date)
+      where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+    end
+  }
+
+  scope :role_based_filter, -> (boolean) {
+    if StringUtils.to_bool(boolean)
+      user = RequestStore.store[:current_user]
+      approved_purchase_requests = user.company.purchase_requests.role_based_filter(true)
+      if approved_purchase_requests.present?
+        approved_item_ids = approved_purchase_requests.joins(:purchase_request_items).pluck('purchase_request_items.id')
+        with_ids(approved_item_ids)
+      end
+    end
   }
 
 

@@ -24,6 +24,7 @@
 #  cost_center_id               :integer
 #  category_id                  :integer
 #  hsn_sac                      :string(255)
+#  rate_contract_item_id        :integer
 #
 
 FactoryBot.define do

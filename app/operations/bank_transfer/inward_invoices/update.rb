@@ -213,6 +213,58 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    if self.inward_invoice_params[:bank_account_id].blank?
+      add_message :error, "Please select the bank account for the vendor. If they are not present, please update this detail from the Vendor Empanelment screen."
+      return
+    end
+
+    # Credit Note Adjustments Validation
+    if inward_invoice_params[:credit_note_adjusments_attributes].present?
+      inward_invoice_params[:credit_note_adjusments_attributes].each do |adjustment_attr|
+        op = Docs::P2P::CreditNotes::Ops::Show(params: {id: adjustment_attr[:credit_note_id]}, current_user: user)
+        unless op.success?
+          add_message :error, "Credit Note not found for provided amount #{adjustment_attr[:amount][:value]}"
+          next
+        end
+
+        credit_note = op['model']
+        unless credit_note.vendor_id == invoice.vendor_id
+          add_message :error, "Applied Credit Note #{credit_note.credit_note_number} doesn't belong to Vendor #{invoice.vendor.vendor_id}"
+        end
+
+        if adjustment_attr[:amount][:value].to_f > credit_note.net_adjustable_amount&.value.to_f
+          add_message :error, "Cannot adjust amount more than available credits in Credit Note #{credit_note.credit_note_number} "
+        end
+      end
+    end
+
+    if self.inward_invoice_params[:date].blank?
+      add_message :error, "Invoice date is mandatory"
+      return
+    end
+    
+    # Credit Note Check
+    if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
+      self.inward_invoice_params[:credit_note_adjustments_attributes].filter {|cna| cna[:id].blank?}.each do |cna|
+        cn = CreditNote.find_by id: cna[:credit_note_id]
+
+        unless cn.present? || (cn.company_id == inward_invoice.company_id)
+          add_message :error, "Credit Note Not Found"
+          next
+        end
+
+        unless cn.approved? || cn.auto_approved? || cn.partially_adjusted? || cn.unadjusted?
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id} is not in applicable at this state"
+          next
+        end
+
+        if precision_value(cna[:amount_attributes][:value]) > precision_value(cn.net_adjustable_amount.value)
+          add_message :error, "Applied Credit Note with ID #{cn.sequence_id}  doesn't have enough credits"
+          next
+        end
+        # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+      end
+    end
   end
 
   def pre_process
@@ -310,11 +362,27 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if self.inward_invoice.receiving_account_type.blank?
       self.inward_invoice_params[:receiving_account_type] = BankAccount.name
     end
+
+    receiving_account = self.inward_invoice.vendor&.bank_accounts&.find_by(id: self.inward_invoice_params[:bank_account_id])
+    self.inward_invoice.receiving_account = receiving_account
+
+      # if self.inward_invoice_params[:credit_note_adjusments_attributes].present?
+      #   self.inward_invoice_params[:credit_note_adjusments_attributes].each do |cna|
+      #     cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
+      #   end
+      # end
   end
 
   def process
     self.inward_invoice.assign_attributes(self.inward_invoice_params)
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
+
+
+    # Calculate the new balance_due based on credit notes
+    # calculate_cn_adjustment
+
+
+    # fail
 
     validate_custom_fields_invoice
     return if has_errors?
@@ -333,8 +401,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # # Validate Credit Notes After Balance Due has been calculated
+    # return unless validate_credit_notes
+
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
+
+
+      # calculate_cn_adjustment
+      inward_invoice.save
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
       self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
@@ -353,6 +428,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def post_process
+    # update_agreement_available_limit
     add_message :success, "Invoice updated"
   end
 
@@ -369,5 +445,51 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     month.strip.to_i.between?(1, 12)
   end
 
+  def validate_agreement_limit
+    if self.inward_invoice.agreement_item.present? && self.inward_invoice.agreement_item_type == 'GeneralInvoice'
+      payment_agreement = inward_invoice.agreement_item.payment_agreement
+      if inward_invoice.agreement_item.total_invoice_amount&.value.present? && inward_invoice.agreement_item.billing_type.variable_periodic?
+        available_limit = inward_invoice.agreement_item.total_invoice_amount&.value - get_invoice_amount_sum(payment_agreement)
+        if available_limit.present? && available_limit < inward_invoice&.balance_due&.value
+          add_message :error, "Balance due cannot exceed available agreement limit of Rs. #{available_limit}"
+          return
+        end
+      end
+    end
+  end
 
+  def validate_credit_notes
+    credit_notes = inward_invoice.credit_note_adjustments
+    return true if credit_notes.blank?
+
+    balance_due = inward_invoice.balance_due.value
+
+    adjusted_cn_total = credit_notes.map(&:amount).map(&:value).sum
+
+    if precision_value(adjusted_cn_total) > precision_value(balance_due)
+      add_message :error, "Total Credit Note Adjustment Amount Cannot Exceed Invoice Balance Due"
+      return
+    end
+    true
+  end
+
+  def update_agreement_available_limit
+    if self.inward_invoice.agreement_item.present? && self.inward_invoice.agreement_item.billing_type.variable_periodic?
+      payment_agreement = self.inward_invoice.agreement_item.payment_agreement
+      invoiced_amount_sum = get_invoice_amount_sum(payment_agreement)
+      available_limit = self.inward_invoice.agreement_item.total_invoice_amount&.value - invoiced_amount_sum
+      self.inward_invoice.agreement_item.available_invoice_amount.update(value: available_limit, currency_id: 1)
+      return
+    end
+  end
+
+  # For invoices created from variable periodic agreement based payments
+  def get_invoice_amount_sum(payment_agreement)
+    payment_agreement.agreement_invoices.where(agreement_item_id: self.inward_invoice.agreement_item_id).collect{|i| i.balance_due.value}.sum
+  end
+
+  def calculate_cn_adjustment
+    return if inward_invoice.blank?
+    InvoiceCalculationUtils.new.calculate_cn_adjustments(inward_invoice_params, nil, inward_invoice)
+  end
 end

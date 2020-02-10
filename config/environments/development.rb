@@ -27,6 +27,38 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
+  # config.lograge.enabled = true
+  # # config.lograge.keep_original_rails_log = true
+  # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/logstash_#{Rails.env}.log"
+  # config.lograge.formatter = Lograge::Formatters::Logstash.new
+  # config.lograge.custom_options = lambda do |event|
+  #   {
+  #       exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+  #       exception_object: event.payload[:exception_object] # the exception instance
+  #   }
+  # end
+  #
+  # config.lograge.custom_payload do |controller|
+  #   user = controller.current_user
+  #   params = RequestStore.store[:request_params]&.except(:password, :password_confirmation)
+  #   params = LogSanitizer.sanitize params if params.present?
+  #   hash = {params: params}
+  #   hash[:current_app] = (controller.current_app rescue nil)
+  #   hash[:current_device] = (controller.current_device rescue nil)
+  #   hash[:ip] = controller.request.remote_ip
+  #   hash[:request_id] = controller.request.request_id
+  #   if user.present?
+  #     hash[:user_id] = user&.id
+  #     hash[:user_name] = (user&.name rescue nil)
+  #     hash[:user_email] = user&.email
+  #     hash[:user_mobile_number] = user&.mobile_number
+  #     hash[:company_name] = (controller.current_company&.name rescue nil)
+  #     hash[:company_id] = (controller.current_company&.id rescue nil)
+  #     hash[:current_view] = (controller.params&.dig(:view) rescue nil)
+  #   end
+  #   hash.as_json
+  # end
+
   config.serve_static_files = true
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
@@ -75,6 +107,7 @@ Rails.application.configure do
   # end
 
   config.mailer_config = config_for(:mailer_config)
+  config.action_mailer.deliver_later_queue_name = 'mailer_queue'
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

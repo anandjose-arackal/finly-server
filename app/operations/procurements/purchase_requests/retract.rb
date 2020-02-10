@@ -14,6 +14,7 @@ class Procurements::PurchaseRequests::Retract < Procurements::PurchaseRequests::
   end
 
   def post_process
+    Event::EPurchaseRequest::Retract.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     add_message :success, "Purchase request retracted"
   end
 end

@@ -34,6 +34,7 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
       return
     end
     self.workflow_output = op.workflow_output
+    update_agreement_available_limit
   end
 
   def post_process

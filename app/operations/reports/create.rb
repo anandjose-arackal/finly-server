@@ -84,6 +84,7 @@ class Reports::Create < Reports::Base
                                          name: params[:name],
                                          created_by: delegated_action_user
     report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
+    ActiveRecord::Base.transaction do
     if report.save
       # report.tracks.create action_user: for_user,
       #                      action_user_role_id: role_id,
@@ -116,11 +117,13 @@ class Reports::Create < Reports::Base
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
+        raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
         return
       end
 
     else
       add_message :error, report.errors.full_messages
+    end
     end
   end
 

@@ -31,9 +31,10 @@ class Agreements::AgreementAuthorizer::Index < Agreements::AgreementAuthorizer::
       AgreementType.all.each do |type|
         agreement = self.agreements.with_type_id(type.id)&.first
         content = nil
-        content_path = agreement&.file&.path
+        content_path = agreement&.file&.url
         if content_path.present?
-          content = File.read(content_path)
+          # content = File.read(content_path)
+          content = open(content_path)&.read
         end
         agreement_by_type << {
             type: {

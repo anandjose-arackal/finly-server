@@ -14,6 +14,7 @@ class Procurements::PurchaseRequests::TakeControl < Procurements::PurchaseReques
   end
 
   def post_process
+    Event::EPurchaseRequest::TakeControl.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     add_message :success, "You've taken control of purchase request"
   end
 end

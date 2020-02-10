@@ -36,7 +36,10 @@ class UserAgentClients::FindOrCreate < BaseOperation
     user_agent = user.user_agent_clients.find_by_user_agent(ua_string)
     return user_agent if user_agent.present?
 
-    user_agent = user.user_agent_clients.build user_agent: ua_string, status_id: UserAgentClientStatus.id_for(:unverified)
+    user_agent = user.user_agent_clients.build user_agent: ua_string,
+                                               status_id: UserAgentClientStatus.id_for(:unverified),
+                                               user_finly_id: user.finly_id, user_id: user.id
+
     unless user_agent.valid?
       add_message :error, user_agent.errors.full_messages
       return

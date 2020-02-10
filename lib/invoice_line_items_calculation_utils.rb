@@ -41,10 +41,15 @@ class InvoiceLineItemsCalculationUtils
         calculate_billable_amount(item) # this is mainly if item is a service
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
-        self.net_amount = self.gross_amount + self.tax_amount
+        if invoice.rcm_enabled?
+          self.net_amount = self.gross_amount
+        else
+          self.net_amount = self.gross_amount + self.tax_amount
+        end
       end
       self.invoice_total += self.net_amount
-      self.total_discount += self.discount_amount
+      total_invoice_discount = (self.service_item) ? 0 : self.discount_amount
+      self.total_discount += total_invoice_discount
       self.total_tax += self.tax_amount
       self.taxable_amount += self.item_taxable_amount
       if item.tds_applicable? && invoice.tds_slab_id.present?
@@ -61,10 +66,10 @@ class InvoiceLineItemsCalculationUtils
 
       # invoice item tax amount
       if item.tax_amount.present?
-        item.tax_amount.value = self.tax_amount
+        item.tax_amount.value = self.tax_amount.abs
         item.tax_amount.currency_id = Currency.first.id
       else
-        item.tax_amount = Amount.new(value: self.tax_amount, currency_id: 1)
+        item.tax_amount = Amount.new(value: self.tax_amount.abs, currency_id: 1)
       end
 
       # invoice discount amount
@@ -77,22 +82,22 @@ class InvoiceLineItemsCalculationUtils
 
       # invoice item net amount
       if item.net_amount.present?
-        item.net_amount.value = self.net_amount
+        item.net_amount.value = self.net_amount.abs
         item.net_amount.currency_id = Currency.first.id
       else
-        item.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
+        item.net_amount = Amount.new(value: self.net_amount.abs, currency_id: 1)
       end
 
       # invoice item taxable amount
       if item.taxable_amount.present?
         taxable_amount_value = (self.service_item) ? self.taxable_amount_for_service : self.item_taxable_amount
         # item.taxable_amount.value = self.item_taxable_amount
-        item.taxable_amount.value = taxable_amount_value
+        item.taxable_amount.value = taxable_amount_value.abs
         item.taxable_amount.currency_id = Currency.first.id
       else
         taxable_amount_value = (self.service_item) ? self.taxable_amount_for_service : self.item_taxable_amount
         # item.taxable_amount = Amount.new(value: self.item_taxable_amount, currency_id: 1)
-        item.taxable_amount = Amount.new(value: taxable_amount_value, currency_id: 1)
+        item.taxable_amount = Amount.new(value: taxable_amount_value.abs, currency_id: 1)
       end
     end
 
@@ -119,6 +124,7 @@ class InvoiceLineItemsCalculationUtils
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
+    InvoiceCalculationUtils.new.calculate_cn_adjustments(params, payment, invoice)
     params
   end
 
@@ -137,7 +143,14 @@ class InvoiceLineItemsCalculationUtils
         when 1
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
         when 2
-          self.discount_amount = item.discount.to_f
+          # self.discount_amount = item.discount.to_f
+          po_item = item.purchase_order_item
+          if po_item.present?
+            po_item_amount = po_item.rate.to_f * po_item.quantity.to_f
+          end
+          item_amount = po_item.present? ? po_item_amount : self.invoice_item_amount
+          rate = ((item.discount.to_f / item_amount) * 100).round(2) rescue 0
+          self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
         else
           self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
       end
@@ -157,7 +170,9 @@ class InvoiceLineItemsCalculationUtils
       when 1
         self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
       when 2
-        self.discount_amount = item.discount.to_f
+        # self.discount_amount = item.discount.to_f
+        rate = ((item.discount.to_f / self.invoice_item_amount) * 100).round(2) rescue 0
+        self.discount_amount = (rate.to_f * self.invoice_item_amount.to_f) / 100
       else
         self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
     end
@@ -168,15 +183,26 @@ class InvoiceLineItemsCalculationUtils
     if item.tax.blank?
       self.net_amount = self.gross_amount
       self.tax_amount = 0
+      item.igst = 0
+      item.cgst = 0
+      item.sgst = 0
       return
     end
     if item.parent.class.name == 'OutwardInvoice'
       self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
+      self.tax_amount = self.net_amount - self.gross_amount
     else
-      self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+      if item.parent&.rcm_enabled?
+        self.net_amount = self.gross_amount
+        # if RCM doesn't apply, we shall have to calculate the tax using a "pseudo" net amount
+        # i.e. calculate tax as though RCM wasn't there and then tabulate it differently
+        net_if_tax_applied = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+        self.tax_amount = net_if_tax_applied - self.gross_amount
+      else
+        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
+        self.tax_amount = self.net_amount - self.gross_amount
+      end
     end
-    self.tax_amount = self.net_amount - self.gross_amount
-
     # setting the SGST, CGST and IGST values for the invoice
     case item.parent.gst_type_id
       when GstType.id_for(:cgst_sgst)
@@ -198,6 +224,9 @@ class InvoiceLineItemsCalculationUtils
     if item.tax.blank?
       self.gross_amount = self.after_discount_amount
       self.tax_amount = 0
+      item.igst = 0
+      item.cgst = 0
+      item.sgst = 0
       return
     end
     if item.parent.class.name == 'OutwardInvoice'
@@ -206,7 +235,6 @@ class InvoiceLineItemsCalculationUtils
       self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.rate))
     end
     self.tax_amount = self.after_discount_amount - self.gross_amount
-
     # setting the SGST, CGST and IGST values for the invoice
     case item.parent.gst_type_id
       when GstType.id_for(:cgst_sgst)

@@ -69,7 +69,7 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       parent_name= data[:parent_id]&.to_s
 
       if parent_name.present?
-        parent = company.categories.find_by_name(parent_name)&.id
+        parent = company.categories.active.find_by_name(parent_name)&.id
         messages <<  "Parent Category Not found" if parent.blank?
       end
 

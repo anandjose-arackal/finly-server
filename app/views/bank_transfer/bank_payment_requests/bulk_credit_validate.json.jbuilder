@@ -32,26 +32,26 @@ json.orders do
           json.scheduled_at payment.payment_order.scheduled_at&.strftime "%d %b %Y"
           json.processed_at payment.payment_order.processed_at&.strftime "%d %b %Y"
         end
-        json.name payment.receiving_account.account_owner.name
-        json.account_number payment.receiving_account.account_number
-        json.ifsc payment.receiving_account.ifsc
+        json.name payment.receiving_account&.account_owner&.name
+        json.account_number payment.receiving_account&.account_number
+        json.ifsc payment.receiving_account&.ifsc
         json.net_amount precision_value payment.amount_value
         json.invoice_amount precision_value payment.invoice_amount
         json.status payment.payment_status_name
         json.id payment.id
         json.note payment.note
-        json.account_id payment.receiving_account.id
-        json.beneficiary_id payment.receiving_account.account_owner&.id
-        json.beneficiary_type payment.receiving_account.account_owner_type == "YesBankVendor" ? 2 : 1
+        json.account_id payment.receiving_account&.id
+        json.beneficiary_id payment.receiving_account&.account_owner&.id
+        json.beneficiary_type payment.receiving_account&.account_owner_type == "YesBankVendor" ? 2 : 1
         json.system_messages do
           json.array! (payment.system_messages)
         end
         json.bank_transfer_type payment.payment_mode&.upcase
         json.bank_reference_number payment.reference_resource&.bank_reference_number
         json.initiating_user do
-          json.name payment.initiating_user.name
-          json.email payment.initiating_user.email
-          json.mobile_number payment.initiating_user.mobile_number
+          json.name payment.initiating_user&.name
+          json.email payment.initiating_user&.email
+          json.mobile_number payment.initiating_user&.mobile_number
         end
         # json.retriable payment.retriable?
 

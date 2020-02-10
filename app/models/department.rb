@@ -13,12 +13,16 @@
 #  deleted_at      :datetime
 #  department_code :string(255)
 #  code            :string(255)
+#  gl_code         :string(255)
 #
 
 class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'department'
 
   acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
@@ -39,6 +43,8 @@ class Department < ApplicationRecord
 
 
   accepts_nested_attributes_for :user_department_mappings
+
+  default_scope {unscope(:where)}
 
   scope :with_ids, -> (id) { where id: id }
   scope :with_name, -> (name) {where name: name}

@@ -1,0 +1,37 @@
+<% content_for :body do %>
+  <head>
+    <title><%=@data.action_name%></title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
+  </div>
+  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
+    <p style="font-size: 17px; margin-left: 3%;text-align: left"><%=@data.body_val.html_safe%></p>
+    <br>
+
+    <% if @data.action_url %>
+      <div style="text-align: center;">
+        <a href="https://www.finly.io/" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+          border-radius: 2px;
+          text-decoration: none;">Go to Finly</a>
+      </div>
+    <% else %>
+      <div style="text-align: center;">
+        <a href="https://www.finly.io/" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+          border-radius: 2px;
+          text-decoration: none;">Go to Finly</a>
+      </div>
+    <% end %>
+
+    <br>
+    <div style="text-align: right; padding-right: 3%;">
+      <label style="font-size: 20px; font-weight: bold;">Purchase Request Total&nbsp;:&nbsp;&#8377;<%= @data.purchase_request.calculate_total_amount%></label>
+    </div>
+    <br>
+
+  </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

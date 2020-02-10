@@ -14,6 +14,7 @@
 #  verification_code_failed_attempts :integer
 #  created_at                        :datetime         not null
 #  updated_at                        :datetime         not null
+#  user_finly_id                     :string(255)
 #
 
 require 'rails_helper'

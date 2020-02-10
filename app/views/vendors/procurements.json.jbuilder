@@ -18,7 +18,7 @@ end
 
 json.po_invoices do
   json.array! @result.data[:po_invoices] do |invoice|
-    json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id, :date, :due_date
+    json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id, :date, :due_date, :po_number
     json.created_by invoice.created_by&.name
     json.created_at invoice.created_at&.strftime("%d-%b-%Y")
     json.amount invoice.net_amount&.value

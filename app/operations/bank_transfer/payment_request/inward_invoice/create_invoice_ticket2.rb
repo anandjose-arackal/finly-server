@@ -13,7 +13,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params, :invoices_status
+                :payments, :invoices_params, :invoices_status, :transfer_mode_id, :transfer_mode,
+                :update_payable_for_invoices
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -76,7 +77,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       ids << param[:invoice_id]
       self.payable_amounts[param[:invoice_id]&.to_i] = param[:payable_amount].to_f
     end
-    self.inward_invoices = user.company.inward_invoices.with_id(ids)
+    self.inward_invoices = user.company.inward_invoices.with_id(ids).includes(:vendor, :balance_due, payments: [:amount])
 
     # we will use this later in background operation
     # to update the status of invoice from pending to its previous state,
@@ -88,9 +89,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
+    self.transfer_mode_id = params[:transfer_mode_id]
+    self.transfer_mode = user.company.transfer_modes.find_by id: self.transfer_mode_id
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.description = params[:description]
+    self.update_payable_for_invoices = []
   end
 
   def validate
@@ -101,11 +105,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     invalid_invoices = []
     self.inward_invoices.each do |invoice|
-      invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      # invalid_invoices << invoice if (invoice.initiated? || invoice.paid?)
+      invalid_invoices << invoice unless invoice.payable
     end
 
     if invalid_invoices.present?
-      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:id).compact.join(", ")}\", are already linked to a payment ticket"
+      add_message :error, "These invoices with ID, \"#{invalid_invoices.map(&:invoice_id).compact.join(", ")}\", are already linked to a payment ticket"
       return
     end
 
@@ -114,31 +119,64 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? or self.transfer_mode.blank?
       add_message :error, "Payment mode cannot be blank"
       return
     end
 
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
-      remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      invoice_amount = invoice.balance_due&.value.to_f
+
+      # paid_amount = invoice.payments.successful.joins(:amount).sum(:value).round(2)
+      # previous_payments = invoice.payments.all_except_failed.joins(:amount).sum(:value).round(2)
+
+      paid_amount = invoice.payments.map {|p| p.amount&.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum.round(2)
+      previous_payments = invoice.payments.map {|p| p.amount&.value if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum.round(2)
+
+      total_payments = (payable_amount.to_f + 0.99) + previous_payments
+
+      # remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      remaining_amount = (invoice_amount - previous_payments).round(2)
+
       if remaining_amount.blank?
         next
       end
       if invoice.vendor.blank?
-        add_message :error, "This invoice, with id #{invoice.id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
         return
       end
       if invoice.bank_account.blank?
-        add_message :error, "This invoice, with id #{invoice.id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, does not have a bank account selected for the chosen vendor, #{invoice.vendor&.business_name || invoice.vendor&.name}"
+        return
+      end
+
+      if invoice.bank_account&.disabled
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, has a bank account which is disabled. Payment can only be processed to active bank accounts."
         return
       end
 
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
+        return false
+      end
+
+      if total_payments >= invoice_amount.round(2)
+        # invoice.update payable: false
+        self.update_payable_for_invoices << invoice.id
+      end
+
+      if (paid_amount >= invoice_amount) or (previous_payments >= invoice_amount)
+        invoice.update payable: false
+        add_message :error, "Invoice has been credited."
+        return
       end
       self.requested_amount += payable_amount
     end
+  end
+
+  def pre_process
+    self.inward_invoices.where(id: self.update_payable_for_invoices).update_all payable: false
   end
 
   def process
@@ -152,6 +190,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
+        self.inward_invoices.update_all(payable: true)
         self.bank_payment_request.destroy
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return
@@ -210,11 +249,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_mode: self.bank_payment_request.payment_mode,
+          transfer_mode_id: self.transfer_mode_id,
           amount_attributes: {
               value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id
           },
-          note: invoice.note,
+          note: invoice.narration,
           category_id: invoice.category_id,
           cost_center_id: invoice.cost_center_id,
           department_id: invoice.department_id,
@@ -255,13 +295,14 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     initiating_account = retrieve_initiating_account(user.company)
     payment_order_params = {
         initiating_user: user,
-        payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+        payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        transfer_mode_id: self.transfer_mode_id,
         initiating_account_type: initiating_account&.class&.name,
         receiving_account_type: "BankAccount",
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -271,7 +312,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     }
     bank_payment_request_params = {
         owner_id: user.id,
-        status_id: BankPaymentRequestStatus.id_for(:open),
+        status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
@@ -280,7 +321,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
         policy_id: self.policy&.id,
-        payment_order_attributes: payment_order_params
+        payment_order_attributes: payment_order_params,
+        expected_payments: self.inward_invoices.count,
+        ticket_type: 'invoice',
+        transfer_mode_id: self.transfer_mode_id
     }
     return bank_payment_request_params
   end

@@ -154,6 +154,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                         transfer_type: transfer_request.transfer_type,
                                                         receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
+                                                        transfer_mode_id: payment.transfer_mode_id,
                                                         remarks: payment.note,
                                                         customer_induced: "N",
                                                         amount_attributes: {

@@ -12,7 +12,7 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
 
   def init
     id = params[:id] || params[:inventory_item_id]
-    self.inventory_item = user.company.items.find_by(id: id)
+    self.inventory_item = user.company.items.non_deleted.find_by(id: id)
     self.inventory_item_parameters = inventory_item_params
   end
 
@@ -28,11 +28,13 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
       supply_item_type = SupplyItemType.name_for(supply_item_type_id.to_i)
 
       if supply_item_type == 'po_item'
-        unless user.permission.crud_inventory_item_po
+        #unless user.permission.crud_inventory_item_po
+        unless user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
           add_message :error, "You don't have permission for this action"
         end
       elsif supply_item_type == 'non_po_item'
-        unless user.permission.crud_inventory_item_non_po
+        # unless user.permission.crud_inventory_item_non_po
+        unless user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
           add_message :error, "You don't have permission for this action"
         end
       end
@@ -50,6 +52,7 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
 
   def process
     unless self.inventory_item.update(self.inventory_item_parameters)
+      # validate_custom_fields(true)
       add_message :error, self.inventory_item.errors.full_messages
       return
     end

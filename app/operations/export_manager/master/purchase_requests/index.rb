@@ -1,13 +1,23 @@
-class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::BaseSubscriber
+class ExportManager::Master::PurchaseRequests::Index < ExportManager::Builders::Spreadsheet
   attr_accessor :input_data
 
-  bus ExportManager::Master::BaseMaster
-  subscribe :purchase_request
-  generators ExportManager::Generator::Spreadsheet
-  processor ExportManager::Processor::Synchronous
+  label 'Export'
+  description 'Purchase Requests Export'
+  configurable true
+  system :vp
+  screen 'purchase_requests.index'
+  handle :purchase_request
   validate :input
-  fields [request_id: {spreadsheet: true}, description: {spreadsheet: true}, department: {spreadsheet: true}, location: {spreadsheet: true}, total_items: {spreadsheet: true}, created_by: {spreadsheet: true}, status: {spreadsheet: true}, amount: {spreadsheet: true}]
 
+  attribute :request_id
+  attribute :description
+  attribute :department
+  attribute :location
+  attribute :policy
+  attribute :total_items
+  attribute :created_by
+  attribute :status
+  attribute :amount
 
   def input
     return self.input_data unless self.input_data.nil?
@@ -19,7 +29,7 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
       return
     end
 
-    purchase_request_presenter.purchase_requests
+    purchase_request_presenter.purchase_requests.includes(:total_amount, :status, :creator, :policy, :location, :department)
   end
 
   def request_id(purchase_request)
@@ -52,5 +62,9 @@ class ExportManager::Master::PurchaseRequests::Index < ExportManager::Master::Ba
 
   def amount(purchase_request)
     purchase_request&.total_amount&.value
+  end
+
+  def policy(purchase_request)
+    purchase_request.policy&.name
   end
 end

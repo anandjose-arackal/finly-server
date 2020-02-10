@@ -22,7 +22,17 @@ class VendorAttachment < ApplicationRecord
 
   include Attachable
 
-  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  CONTENT_TYPES = {content_type: %w(image/jpg
+                                    image/jpeg
+                                    image/png
+                                    image/gif
+                                    application/pdf
+                                    application/rtf
+                                    application/msword
+                                    application/vnd.ms-excel
+                                    application/xml
+                                    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                    application/vnd.openxmlformats-officedocument.wordprocessingml.document)}
 
   # has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   has_attached_file :attached_file, default_url: '/assets/:style/missing.png'

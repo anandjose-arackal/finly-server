@@ -14,14 +14,14 @@ class Procurements::Create < Procurements::Base
     end
 
     if document_type == 'recurring_invoice'
-      if !user.is_non_po_invoice_initiator? || !user.vendor_payments_admin?
+      unless user.is_non_po_invoice_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_initiator? || user.is_agreement_invoice_initiator?
         add_message :error, 'You do not have required role to perform this action'
         return
       end
-    end
-
-    unless user.is_purchase_order_initiator? || user.is_po_invoice_initiator? || user.is_non_po_invoice_initiator?#|| user.vendor_payments_admin?
-      add_message :error, 'You do not have permission for this action'
+    else
+      unless user.is_purchase_order_initiator? || user.is_po_invoice_initiator? || user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?#|| user.vendor_payments_admin?
+        add_message :error, 'You do not have permission for this action'
+      end
     end
 
     document_types = %w( purchase_order invoice non_po_invoice recurring_invoice)

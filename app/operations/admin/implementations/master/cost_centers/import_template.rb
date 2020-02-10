@@ -4,10 +4,9 @@ class Admin::Implementations::Master::CostCenters::ImportTemplates < Admin::Impl
   subscribe 'cost_centers.import_template'
   headers ({
       :id => "ID",
+      :parent_id => "Parent Cost Center Name",
       :name => "Cost Center",
       :cost_center_code => "Cost Center Code",
-      :expense_management => "Expense Management (Y)",
-      :vendor_payment => "Vendor Payments (Y)",
       :destroy => "Destroy"
   })
 

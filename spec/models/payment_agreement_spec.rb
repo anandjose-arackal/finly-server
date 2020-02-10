@@ -24,6 +24,10 @@
 #  renewal_reminder_date :datetime
 #  total_amount_id       :integer
 #  override_order_number :string(255)
+#  terminated_at         :datetime
+#  terminated_by_id      :integer
+#  termination_reason    :text(65535)
+#  deleted_at            :datetime
 #
 
 require 'rails_helper'

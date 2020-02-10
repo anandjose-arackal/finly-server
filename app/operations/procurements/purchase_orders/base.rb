@@ -37,4 +37,33 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         # ]
     )
   end
+
+  def update_purchase_request_status(purchase_request = nil)
+    if purchase_request.present?
+      if purchase_request.purchase_request_items.where(status_id: [PurchaseRequestItemStatus.id_for(:po_closed), PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.
+          id_for(:rejected)]).present?
+        # Partially Close
+        unless purchase_request.partially_closed?
+          params[:aasm_event] = 'partially_close'
+          params[:document] = purchase_request
+          op = WorkflowManager::Base.(user, params)
+          unless op.success?
+            add_message :error, "Cannot partially close associated purchase request #{purchase_request.order_number} at this state"
+          end
+        end
+      else
+        # Approved
+        unless purchase_request.approved? || purchase_request.auto_approved?
+          purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:approved))
+          Trail.create(parent_type: 'PurchaseRequest', parent_id: purchase_request.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_reopen))
+          # Needs current level which is not present here
+          # params[:aasm_event] = 'approve'
+          # op = WorkflowManager::Base.(user, params)
+          # unless op.success?
+          #   add_message :error, "Cannot approve associated purchase request #{purchase_request.order_number} at this state"
+          # end
+        end
+      end
+    end
+  end
 end

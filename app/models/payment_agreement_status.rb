@@ -22,7 +22,9 @@ class PaymentAgreementStatus < ApplicationRecord
         :rejected,
         :closed,
         :invoice_created,
-        :payment_ticket_created
+        :payment_ticket_created,
+        :terminated,
+        :revised
     ]
   end
 
@@ -53,6 +55,14 @@ class PaymentAgreementStatus < ApplicationRecord
 
   def awaiting_approval?
     self.id == PaymentAgreementStatus.id_for(:awaiting_approval)
+  end
+
+  def terminated?
+    self.id == PaymentAgreementStatus.id_for(:terminated)
+  end
+
+  def revised?
+    self.id == PaymentAgreementStatus.id_for(:revised)
   end
 
 end

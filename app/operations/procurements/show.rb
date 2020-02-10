@@ -24,7 +24,8 @@ class Procurements::Show < Procurements::Base
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans, :vendor,
-                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions, :proforma_invoices
+                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions, :proforma_invoices,
+                  :credit_notes
 
     def init
       self.procurement = params[:procurement]
@@ -39,6 +40,7 @@ class Procurements::Show < Procurements::Base
       self.delivery_challans = self.procurement.delivery_challans
       self.e_way_bills = self.procurement.e_way_bills
       self.po_revisions = self.procurement.po_revisions
+      self.credit_notes = self.procurement.credit_notes
 
       self.procurement_trail = get_procurement_trail
       self.locations = user.company.locations
@@ -64,7 +66,7 @@ class Procurements::Show < Procurements::Base
           actions[:add_document] = true
         end
       elsif purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.all_items_accepted? || purchase_order.all_items_billed? || purchase_order.partial_items_accepted?) && (user_in_level? || document_owner? || user.is_po_invoice_initiator?)
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.all_items_accepted? || purchase_order.all_items_billed? || purchase_order.partial_items_accepted?) && (user_in_level? || document_owner? || user.is_po_invoice_initiator? || user.is_goods_receiver?)
           actions[:add_document] = true
         end
       end
@@ -124,6 +126,7 @@ class Procurements::Show < Procurements::Base
       documents += self.e_way_bills
       documents += self.po_revisions
       documents += self.proforma_invoices
+      documents += self.credit_notes
 
       documents.sort_by!{ |doc| doc.created_at}.reverse!
       documents

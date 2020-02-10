@@ -2,9 +2,9 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
   attr_accessor :purchase_requests, :policies, :filter_ids
   def init
     self.filter_ids = params[:filter_ids]
-    if self.filter_ids.present?
-      self.filter_ids = filter_ids[0].split(",").reject { |id| id.empty? } rescue []
-    end
+    # if self.filter_ids.present?
+    #   self.filter_ids = filter_ids[0].split(",").reject { |id| id.empty? } rescue []
+    # end
   end
 
   def validate
@@ -45,10 +45,14 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     has_scope :filter_by_location_id
     has_scope :filter_awaiting_approval
     has_scope :filter_policy_id
+    has_scope :filter_pr_creator_id
+    has_scope :filter_pr_approver_id
 
     has_scope :sort_order_number
     has_scope :sort_description
     has_scope :sort_date
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
     # has_scope :sort_amount
 
     def init
@@ -59,7 +63,7 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
       # If certain PR's are selected in export, override purchase_requests with the filtered requests
       if self.filter_ids.present?
         self.purchase_requests = user.company.purchase_requests.where(id: self.filter_ids)
-      end 
+      end
       self.count = purchase_requests&.count
     end
 

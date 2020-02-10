@@ -131,6 +131,10 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
           {
             key: 'vendor_manager',
             label: 'Vendor Manager'
+          },
+          {
+            key: 'vendor_auditor',
+            label: 'Vendor Auditor'
           }
         ]
       }
@@ -211,6 +215,43 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
           {
             key: 'non_po_invoice_auditor',
             label: 'Non PO Invoice Auditor'
+          }
+        ]
+      }
+
+      data << {
+        name: 'Agreement Invoice',
+        roles: [
+          {
+            key: 'agreement_invoice_initiator',
+            label: 'Agreement Invoice Initiator'
+          },
+          {
+            key: 'agreement_invoice_reviewer',
+            label: 'Agreement Invoice Reviewer'
+          },
+          {
+            key: 'agreement_invoice_auditor',
+            label: 'Agreement Invoice Auditor'
+          }
+        ]
+      }
+    end
+    if feature_subscription.agreement_based_payment_system
+      data << {
+        name: 'Payment Agreement',
+        roles: [
+          {
+            key: 'payment_agreement_initiator',
+            label: 'Payment Agreement Initiator'
+          },
+          {
+            key: 'payment_agreement_reviewer',
+            label: 'Payment Agreement Reviewer'
+          },
+          {
+            key: 'payment_agreement_auditor',
+            label: 'Payment Agreement Auditor'
           }
         ]
       }

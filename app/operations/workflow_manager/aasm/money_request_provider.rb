@@ -81,6 +81,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :reject do
+      transitions :from => :processing, :to => :processing, guard: :reject_to_level?
       transitions :from => :trip_processing, :to => :trip_rejected, guard: [:user_can_review?, :travel_request_present?]
       transitions :from => :processing, :to => :rejected, guard: :user_can_review?
     end

@@ -60,6 +60,7 @@ class Reports::Update < Reports::Base
 
   def process
     original_policy_id = report.policy_id
+    ActiveRecord::Base.transaction do
     if report.update_attributes(update_param)
       updated_policy_id = report.policy_id
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
@@ -78,12 +79,14 @@ class Reports::Update < Reports::Base
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?
           add_message :error, document_reviewer_mappings_op.messages[:error]
+          raise ActiveRecord::Rollback, document_reviewer_mappings_op.messages[:error]
           return
         end
       end
     else
       messages[:error] = report.errors.full_messages
       false
+    end
     end
   end
 

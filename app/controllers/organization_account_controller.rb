@@ -11,6 +11,8 @@ class OrganizationAccountController < BaseControllers::WebBase
   end
 
   def categories
+    # in org account, show all categories irrespective of current app
+    RequestStore.store[:organization_account] = true
     @result = Categories::Index.(current_user, params)
     respond
   end
@@ -57,6 +59,36 @@ class OrganizationAccountController < BaseControllers::WebBase
       #todo vivek : Add feature subscription for expense tds / tax
       format.json {}
     end
+  end
+
+  def transfer_modes
+    modes = TransferMode.all
+    company_modes = current_user.company.transfer_modes.as_json
+    @result = {
+      success: true,
+      messages: {
+          error: [],
+          failure: [],
+          success: [],
+          message: [],
+          notice: []
+      },
+      transfer_modes: modes,
+      company_modes: company_modes,
+    }
+    respond_to do |format|
+      format.json {render json: @result.as_json}
+    end
+  end
+
+  def create_transfer_modes
+    @result = Company::TransferModes::Create.(current_user, params)
+    respond_success_failure
+  end
+
+  def destroy_transfer_modes
+    @result = Company::TransferModes::Destroy.(current_user, params)
+    respond_success_failure
   end
 
 end

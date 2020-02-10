@@ -36,7 +36,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     unless payment_ids.is_a?(Array)
       payment_ids = payment_ids&.split(",")
     end
-    self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
+    # self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
+    self.crediting_payments = self.bank_payment_request.payments.creditable # all payments will be done together
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
   end
 
@@ -134,7 +135,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # payment_order.update(initiating_account_type: initiating_account.class.name) # this probably doesn't make sense here because each individual payment now can be initiated from anywhere
     self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
-
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
     unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
@@ -187,6 +187,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # Sending email to original document initiators about payments against it
     payments = self.bank_payment_request.payments
     payments.each do |payment|
+      # notify vendor that they got the money they deserved
+      Event::EBankPaymentRequest::NotifyVendor.(user, payment: payment)
+
       case payment.parent_type
       when 'Invoice'        
         document_owner = payment.invoice.created_by
@@ -221,6 +224,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           user.company.kotak_bank_company_account
         when "YesBankCompanyAccount"
           return user.company.yes_bank_company_account
+        when "UtilityBillsAccount"
+          return user.company.utility_bills_account
         else
           return user.company.yes_bank_company_account
         end
@@ -255,6 +260,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           return AccountManager::KotakBankAccount::KotakBankCompanyAccountAdapter.new(user.company.kotak_bank_company_account)
         when "YesBankCompanyAccount"
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+        when "UtilityBillsAccount"
+          return AccountManager::BillingAccount::UtilityBillsAccountAdapter.new(user.company.utility_bills_account)
         else
           return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
         end

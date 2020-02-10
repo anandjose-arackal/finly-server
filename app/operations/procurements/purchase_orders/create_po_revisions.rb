@@ -15,6 +15,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.klass.delete(:trails)
     self.klass.delete(:advance_payments)
     self.klass.delete(:payments)
+    self.klass.delete(:purchase_request_items)
     # self.foreign_keys = klass.map {|k| PurchaseOrder.reflections[k.to_s].foreign_key}
   end
 
@@ -41,7 +42,6 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     # self.duplicate_po.advance_amount_status_id = nil
     self.duplicate_po.advance_amount_status_id = self.purchase_order.advance_payments.present? ? self.purchase_order.advance_amount_status_id : nil
     self.duplicate_po.purchase_order_status_id = (user.vendor_payment_admin? && !document_owner?? PurchaseOrderStatus.id_for(:auto_approved) : PurchaseOrderStatus.id_for(:open))
-
     # op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
     # if op.success?
     #   self.duplicate_po.po_number = op.document_number
@@ -50,7 +50,11 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:po_revised))
 
     self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
-    self.duplicate_po.save
+    if self.duplicate_po.save
+      if self.purchase_order.purchase_request_items.present?
+        update_purchase_request_item
+      end
+    end
 
     if self.purchase_order.advance_payments.present?
       self.purchase_order.advance_payments.update_all(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
@@ -126,6 +130,17 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       self.duplicate_po = params[:duplicate_po]
     end
 
+  end
+
+  def update_purchase_request_item
+    if purchase_order.purchase_request_items.present?
+      self.purchase_order.purchase_request_items.each do |item|
+        purchase_request = item.purchase_request
+        item.update(purchase_order_id: duplicate_po.id, status_id: PurchaseRequestItemStatus.id_for(:po_created))
+        Trail.create(parent_type: 'PurchaseRequestItem', parent_id: item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_revised))
+        update_purchase_request_status(purchase_request)
+      end
+    end
   end
 
 end

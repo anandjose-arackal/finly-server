@@ -41,7 +41,7 @@ class ProcurementMailer < ApplicationMailer
     @include_attachments = presenter.include_attachments
     #### variables required for the attachment pdf #########
     if @include_attachments
-    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id })
+    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.purchase_order.id, skip_for_mailer: true })
       if @result.success?
         @purchase_order = @data.purchase_order
         @curr_user = @data.user
@@ -63,6 +63,13 @@ class ProcurementMailer < ApplicationMailer
     end
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
+  end
+
+  def send_purchase_request_mail(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_purchase_request'
+    end
   end
 
 
@@ -142,6 +149,7 @@ class ProcurementMailer < ApplicationMailer
 
   def invoice_bulk_take_control(presenter)
     @data = presenter
+
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_invoices'
     end
@@ -178,5 +186,26 @@ class ProcurementMailer < ApplicationMailer
     if presenter.success?
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_awaiting_submit'
     end    
+  end
+
+  def purchase_request_bulk_approval(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_approval_pr'
+    end
+  end
+
+  def purchase_request_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_take_control_pr'
+    end
+  end
+
+  def purchase_request_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, subject: presenter.subject, template_name: 'bulk_reject_pr'
+    end
   end
 end

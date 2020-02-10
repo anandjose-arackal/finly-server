@@ -39,6 +39,6 @@ class Procurements::PurchaseRequests::BulkTakeControlProcessor < BackgroundOpera
   end
 
   def post_process
-    # op = Event::EPurchaseRequest::BulkTakeControl.(user, result: result)
+    op = Event::EPurchaseRequest::BulkTakeControl.(user, result: result)
   end
 end

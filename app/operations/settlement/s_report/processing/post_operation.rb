@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings
+  attr_accessor :payment_order, :report_processor_group, :remaining_mappings, :utr, :pending_mappings, :source_account, :completed_mappings
 
   def pre_validate
     if object.blank?
@@ -35,12 +35,15 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       self.pending_mappings = self.report_processor_group.mappings.not_completed
     end
 
+    self.completed_mappings = self.report_processor_group.mappings.completed
+
     if self.pending_mappings.blank?
-      add_message :error, "No Money Request found which can be processed."
+      add_message :error, "No Report found which can be processed."
       return
     end
 
     self.utr = params[:utr].present? ? params[:utr] : {}
+    self.source_account = params[:source_account].present? ? params[:source_account] : {}
 
     # Since now we can change individual item's status,
     # we check to see if any mappings are remaining to be processed,
@@ -62,6 +65,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
     marked_as_closed = !!params&.dig(:marked_as_closed)
+    update_documents = !!params&.dig(:update_documents)
 
     if marked_as_closed
       report_status = ReportStatus.id_for(:closed)
@@ -74,10 +78,10 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       Report.transaction do
         ReportTrack.transaction do
           self.pending_mappings.each do |mapping|
-            if marked_as_completed or marked_as_closed or mapping.payment.completed?
+            if marked_as_completed or marked_as_closed or mapping.payment&.completed? or update_documents
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
-                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed, bank_reference_number: self.utr[mapping.id])
+              # mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+              #                marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
               #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
               #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id)
@@ -96,7 +100,22 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 event = 'settle'
               end
 
+              update_mapping = true
+
               mapping.reports.each do |report|
+
+                report.bank_reference_number = self.utr[report.id] if self.utr[report.id].present?
+                report.source_account = self.source_account[report.id] if self.source_account[report.id].present?
+                report.save if (self.utr[report.id].present? or self.source_account[report.id].present?)
+
+                # temp workaround for satin a*hles
+                # if we do not update the utr or source_account, we dont settle the report from update or process template file operation
+                # only when the op is called from the mark_as_paid op, we settle the reports
+
+                if update_documents and (report.bank_reference_number.blank? or report.source_account.blank?)
+                  update_mapping = false
+                  next
+                end
 
                 parameters = {
                   document: report,
@@ -129,7 +148,13 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 
 
               end
-            elsif mapping.payment.failed?
+
+              if update_mapping
+                mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              end
+
+            elsif mapping.payment&.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
             end
@@ -137,6 +162,12 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
         end
       end
     end
+
+    # explicitly settle reports of completed mappings when called from batch level
+    # 
+    update_mapping_data
+    # 
+
     if self.report_processor_group.processed_amount.blank?
       processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
     else
@@ -151,7 +182,11 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
                                          processed_amount: processed_amount)
-    elsif has_success and self.remaining_mappings.blank?
+    elsif has_success and self.remaining_mappings.blank? and update_documents
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                         marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
+                                         processed_amount: processed_amount)
+    elsif has_success and self.remaining_mappings.blank? and not update_documents
       self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
                                          processed_amount: processed_amount)
@@ -173,6 +208,31 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     end
     report.comments.build(user: self.report_processor_group.created_by_user,
                           report_comment_action_id: report_comment_action, content: comment).save
+  end
+
+  def update_mapping_data
+    report_comment_action = ReportCommentAction.id_for(:report_settled)
+    marked_as_closed = false
+    event = 'settle'
+
+    self.completed_mappings.each do |mapping|
+      mapping.reports.each do |report|
+        next if report.settled? or report.settlement_confirmed? # explicitly settle reports when called from batch level
+        parameters = {
+            document: report,
+            aasm_event: event
+        }
+
+        created_by_user = User.find_by id: self.report_processor_group.created_by_user_id
+        op = WorkflowManager::Base.(created_by_user, parameters)
+
+        if op.success?
+          # Update the trail with payment info
+          op.workflow_output[:trail]&.update(payment_id: mapping.payment&.id)
+          generate_comment(report, mapping, report_comment_action, marked_as_closed)
+        end
+      end
+    end
   end
 
 end

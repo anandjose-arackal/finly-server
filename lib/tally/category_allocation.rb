@@ -11,10 +11,10 @@ class Tally::CategoryAllocation < NonPersistentModel
   def add(cc, value)
     cost_center = cost_centers.find {|c| c[:name] == cc}
     if cost_center.nil?
-      cost_center = {name: cc, value: 0}
+      cost_center = {name: cc, amount: 0}
       self.cost_centers << cost_center
     end
-    cost_center[:value] += value
+    cost_center[:amount] += value&.to_f&.round(2)
   end
 
   def as_json(options = {})

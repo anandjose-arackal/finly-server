@@ -5,6 +5,7 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
 
   headers ({
               :id => "ID",
+              :parent_id => "Parent Location Name",
               :name => "Name",
               :address_1 => "Address Line1",
               :address_2 => "Address Line2",
@@ -28,6 +29,10 @@ class Admin::Implementations::Master::Locations::Export < Admin::Implementations
 
   def id(location)
     location.id
+  end
+
+  def parent_id(location)
+    location.parent&.name
   end
 
   def name(location)

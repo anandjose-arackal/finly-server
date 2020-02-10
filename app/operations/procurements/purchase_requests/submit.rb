@@ -50,6 +50,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def post_process
+    Event::EPurchaseRequest::Submit.(user, purchase_request: purchase_request, workflow_output: workflow_output)
     if purchase_request.purchase_request_status_id == PurchaseRequestStatus.id_for(:auto_approved)
       add_message :success, "Purchase Request Auto Approved"
     else

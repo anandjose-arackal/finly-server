@@ -1,8 +1,20 @@
 class Sms::Send < BaseHandler
 
+  attr_accessor :file_logger
+
   def init
     super
     self.params = {} if self.params.nil?
+
+    self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_msg91_api.log', sync: true)
+  end
+
+  def file_logger_base_params
+    {}
+  end
+
+  def file_logger_params(logger_params)
+    file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
   end
 
   def message
@@ -46,10 +58,8 @@ class Sms::Send < BaseHandler
       add_message :error, 'Message cannot be blank'
       return
     end
-    list = ""
-    mob_num.each do |number|
-      list += number.to_s + ","
-    end
+    mobile_numbers = mob_num.map{ |s| "91#{s}" }
+    list = mobile_numbers.join(",")
     {
         authkey: authentication_key,
         mobiles: list,
@@ -59,6 +69,21 @@ class Sms::Send < BaseHandler
         country: 91,
         response: 'json'
     }
+  end
+
+  def process
+    super
+    # logging the request / response
+    p = self.path
+    params = query_params
+    response = JSON.parse(self.response.body) rescue {}
+    self.file_logger.info(
+        file_logger_params(
+            path: p,
+            post_params: params,
+            msg91_response: response
+        )
+    )
   end
 
   def success

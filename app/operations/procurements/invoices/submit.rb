@@ -20,8 +20,16 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       add_message :error, 'Invoice not found'
     end
 
-    if self.invoice.attachments.blank?
-      add_message :error, "Please attach an invoice document before submitting."
+    if invoice.payment_agreement_id.blank? || vendor_gstin_registered
+      if self.invoice.attachments.blank?
+        add_message :error, "Please attach an invoice document before submitting."
+        return
+      end
+    end
+
+    receiving_account = self.invoice.receiving_account
+    if receiving_account&.disabled
+      add_message :error, "This invoice has a bank account which is disabled. Payment can only be processed to active bank accounts."
       return
     end
 
@@ -50,6 +58,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     unless dlrm_validation_op.success?
       add_message :error, dlrm_validation_op.messages[:error]
     end
+    validate_agreement_limit
   end
 
   def process
@@ -80,10 +89,15 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
+    update_agreement_available_limit
     role_id = self.workflow_output[:role_id]
     Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     # Email to vendor that invoice is generated when the invoice is approved/auto_approved
-    Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
+    # Event::EInvoice::VendorMail.(user, invoice: invoice, workflow_output: workflow_output) if self.invoice.approved? || self.invoice.auto_approved?
     add_message :success, 'Successfully submitted invoice'
+  end
+
+  def vendor_gstin_registered
+    self.invoice.vendor.gst_registered
   end
 end

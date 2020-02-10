@@ -56,7 +56,7 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
         payment = params[:payment]
         payment.with_lock do
           payment.reload
-          # debugger # todo kotak remove belonw code
+          # todo kotak remove belonw code
           # payment.update(payment_status_id: PaymentStatus.id_for(:pending));payment.reload
           unless [PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
             payment.system_messages.create(content: "Payment cannot be processed in this state",

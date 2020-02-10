@@ -23,7 +23,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     item_contents = []
     rcv = 0
     brcv = 0
-    company.items.where(active: true).each do |item|
+    company.items.non_deleted.where(active: true).each do |item|
       list = [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
       if item.rate_contract_vendors.present?
         rcv  = item.rate_contract_vendors.count
@@ -91,7 +91,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
 
     cost_center_headers = ["Cost Center ID", "Cost Center Name"]
     cost_center_contents = []
-    cost_centers = user.company.cost_centers.where(application: "vp")
+    cost_centers = user.company.cost_centers.non_deleted.where(application: "vp")
     if cost_centers.present?
       cost_centers.each do |cost_center|
         cost_center_contents << [cost_center.id, cost_center.name]

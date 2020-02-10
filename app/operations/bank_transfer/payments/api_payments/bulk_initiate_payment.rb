@@ -90,6 +90,7 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
   end
 
   def process
+    initiating_account = retrieve_initiating_account(user.company)
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
@@ -99,7 +100,7 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
             currency_id: 1
         },
         payment_mode: self.payment_mode,
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account.class.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",

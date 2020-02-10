@@ -32,20 +32,25 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
     data = []
     bank_payment_requests.each do |request|
       request.payment_order.payments.each do |payment|
+        ifsc = payment.receiving_account&.ifsc
+        ifsc_prefix =( ifsc.present? ? ifsc[0..3].upcase : '')
         data << {
-            beneficiary_account_name: payment.receiving_account.name,
-            beneficiary_account_number: payment.receiving_account.account_number,
-            beneficiary_ifsc: payment.receiving_account.ifsc,
+            beneficiary_account_name: BankDetailsMaster.where(ifsc_prefix: ifsc_prefix)&.first&.name,
+            beneficiary_account_number: payment.receiving_account&.account_number,
+            beneficiary_ifsc: ifsc,
             initiating_user_name: payment.initiating_user&.name,
             initiating_user_email: payment.initiating_user&.email,
             initiating_user_mobile_number: payment.initiating_user&.mobile_number,
-            receiving_user_name: payment.receiving_user.display_name,
-            receiving_user_email: payment.receiving_user.email,
-            receiving_user_mobile_number: payment.receiving_user.mobile_number,
+            # receiving_user_name: payment.receiving_user&.display_name,
+            receiving_user_name: payment.receiving_user.try(:display_name),
+            # receiving_user_email: payment.receiving_user&.email,
+            receiving_user_email: payment.receiving_user.try(:email),
+            receiving_user_mobile_number: payment.receiving_user&.mobile_number,
             amount: payment.amount_value,
-            date: Date.today.strftime("%d-%^b-%Y"),
+            date: Date.today,
             note: generate_payment_note(payment),
-            payment_mode: payment.payment_mode
+            payment_mode: payment.payment_mode,
+            payment_id: payment.id
         }
       end
     end

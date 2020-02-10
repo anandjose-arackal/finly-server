@@ -134,7 +134,7 @@ class MoneyRequests::Index < MoneyRequests::Base
     end
 
     def get_counts
-      type_counts = money_requests.group(:status_id)
+      type_counts = money_requests.group(:status_id).count
       self.counts = {}
       counts[:open] = (type_counts[MoneyRequestStatus.id_for(:open)] or 0)
       counts[:processing] = (type_counts[MoneyRequestStatus.id_for(:processing)] or 0)

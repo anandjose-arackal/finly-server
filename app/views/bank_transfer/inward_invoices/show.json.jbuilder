@@ -14,6 +14,7 @@ json.invoice do
   else
     json.original_amount precision_value invoice.original_amount&.value
   end
+  json.rcm_enabled invoice&.rcm_enabled
   json.raw_amount precision_value invoice&.amount&.value
   json.advance_amount precision_value invoice.advance_amount&.value
   json.tax_amount precision_value invoice.tax_amount&.value
@@ -70,8 +71,8 @@ json.invoice do
   json.item_amounts_total invoice.item_amounts_total&.round(2)
 
   json.net_payable_amount invoice.balance_due&.value
-  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value).round(2)
+  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value)).round(2)
 
   # invoice items
   json.invoice_items do
@@ -100,6 +101,7 @@ json.invoice do
     json.name invoice.vendor&.name
     json.email invoice.vendor&.email
     json.id invoice.vendor&.id
+    json.rcm_enabled invoice.vendor&.rcm_enabled
 
     json.selected_bank_account do
       json.account_number invoice.receiving_account&.account_number
@@ -110,13 +112,14 @@ json.invoice do
 
     if invoice.vendor&.bank_accounts.present?
       json.bank_accounts do
-        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+        json.array!(invoice.vendor&.bank_accounts.enabled) do |bank_account|
           json.id bank_account.id
           json.name bank_account.name
           json.account_number bank_account.account_number
           json.ifsc bank_account.ifsc
           json.default bank_account.default_account
           json.selected invoice.receiving_account&.id == bank_account.id
+          json.disabled bank_account.disabled
         end
       end
     end
@@ -127,7 +130,7 @@ json.invoice_categories current_company.categories.vendor_payments_only
 json.invoice_item_categories current_company.categories.inward_invoice_items_only
 
 json.cost_centers do
-  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+  json.array!(current_company.cost_centers.non_deleted.with_application(RequestStoreUtil.current_app)) do |cost_center|
     json.id cost_center.id
     json.name cost_center.name
   end
@@ -152,3 +155,5 @@ json.comments do
     end
   end
 end
+
+json.transfer_modes current_company.transfer_modes.as_json

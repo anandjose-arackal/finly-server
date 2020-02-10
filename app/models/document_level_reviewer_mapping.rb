@@ -25,6 +25,8 @@
 #  forwarded_to_id                 :integer
 #  min                             :decimal(20, 5)   default(0.0)
 #  max                             :decimal(20, 5)
+#  rejected_by_id                  :integer
+#  action_taken_at                 :datetime
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord
@@ -41,6 +43,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   belongs_to :action, class_name: 'TrailAction', optional: true
   belongs_to :forwarded_to, class_name: 'User', optional: true
   belongs_to :forwarded_by, class_name: 'User', optional: true
+  belongs_to :rejected_by, class_name: 'User', optional: true
 
   # Scopes
   scope :with_level_ids, -> (ids) {where level_id: ids}

@@ -1,6 +1,7 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present, :forwarded_to_user,
-                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name
+                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name,
+                :reject_to_user, :reject_to_level
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -9,6 +10,10 @@ class WorkflowManager::Base < BaseOperation
     self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
 
+    # used for knowing if the document would be rejected to a specific level in the approval chain
+    self.reject_to_user = params[:reject_to_user]
+    self.reject_to_level = params[:reject_to_level]
+
     # todo - The below switch case can be reduced to one line since provider name is already present
     self.document_class_name = self.document&.class&.name
 
@@ -16,7 +21,9 @@ class WorkflowManager::Base < BaseOperation
       violations_present: violations_present,
       document: document,
       provider_name: provider_name,
-      forwarded_to_user: forwarded_to_user
+      forwarded_to_user: forwarded_to_user,
+      reject_to_level: reject_to_level,
+      reject_to_user: reject_to_user
     }
 
     case self.document_class_name
@@ -27,7 +34,9 @@ class WorkflowManager::Base < BaseOperation
         self.aasm_document = ::WorkflowManager::Aasm::PoInvoiceProvider.new user, workflow_input
       elsif provider_name == 'NonPoInvoiceProvider'
         self.aasm_document = ::WorkflowManager::Aasm::NonPoInvoiceProvider.new user, workflow_input
-      end 
+      elsif provider_name == 'AgreementInvoiceProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::AgreementInvoiceProvider.new user, workflow_input
+      end
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input
     when 'MoneyRequest'
@@ -53,6 +62,12 @@ class WorkflowManager::Base < BaseOperation
       self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
     when 'PaymentAgreement'
       self.aasm_document = ::WorkflowManager::Aasm::PaymentAgreementProvider.new user, workflow_input
+    when 'BbpsBillerSubscription'
+      self.aasm_document = ::WorkflowManager::Aasm::BbpsBillerSubscriptionProvider.new user, workflow_input
+    when 'BbpsBill'
+      self.aasm_document = ::WorkflowManager::Aasm::BbpsBillProvider.new user, workflow_input
+    when 'CreditNote'
+      self.aasm_document = ::WorkflowManager::Aasm::CreditNoteProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

@@ -1,11 +1,11 @@
 class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::Master::Base
 
   register_handle :proc_purchase_order_show
-  validate :input
+  # validate :data_provider
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
     :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
     :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
-    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment
+    :take_control, :return_control, :forward, :mark_vendor_confirmed, :make_payment, :upload_attachment, :create_items
   ]
 
   def initialize(user = nil, params = {})
@@ -164,6 +164,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def save_btn
     # admin can save provided it is open or processing or the provided condiftions
     # document owner can save provided po is open, retracted or rejected
+    return true if user.vendor_payment_admin?
     if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
         # Admin
@@ -227,6 +228,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def update_btn
     save_btn
+  end
+
+  def create_items
+    user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
   end
 
   def unapprove

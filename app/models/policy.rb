@@ -19,6 +19,9 @@
 
 class Policy < ApplicationRecord
   include SoftDeletable
+  include EventProducer
+
+  event_channel 'policy'
 
   belongs_to :company, optional: true
   belongs_to :base_currency, optional: true, class_name: 'Currency'
@@ -38,8 +41,9 @@ class Policy < ApplicationRecord
   has_many :departments, through: :policy_department_mappings
   has_many :policy_location_mappings, dependent: :destroy
   has_many :locations, class_name: 'BranchLocation', through: :policy_location_mappings
-  has_many :policy_cost_center_mappings, dependent: :destroy
-  has_many :cost_centers, through: :policy_cost_center_mappings
+  has_many :invoices
+  # has_many :policy_cost_center_mappings, dependent: :destroy
+  # has_many :cost_centers, through: :policy_cost_center_mappings
 
   has_one :distance_expense_config
   has_one :time_expense_config
@@ -60,7 +64,13 @@ class Policy < ApplicationRecord
   scope :without_id, ->(id) {where.not id: id}
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
-  scope :with_application, -> (application) {where( application: application).or(default)}
+  scope :with_application, -> (application) do
+    if application == :fi
+      where( application: %w(em vp)).or(default)
+    else
+      where( application: application).or(default)
+    end
+  end
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
   scope :with_company_id, -> (company_id) {where company_id: company_id}
@@ -163,21 +173,21 @@ class Policy < ApplicationRecord
     true
   end
 
-  def update_policy_cost_center_mapping(params)
-    # Creating new record on every update as it was required to be like this only
-    begin
-      ActiveRecord::Base.transaction do
-        self.policy_cost_center_mappings.destroy_all
-        params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
-          cost_center = self.company.cost_centers.find_by_id cost_center_id
-          result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
-        end
-      end
-    rescue
-      return false
-    end
-    true
-  end
+  # def update_policy_cost_center_mapping(params)
+  #   # Creating new record on every update as it was required to be like this only
+  #   begin
+  #     ActiveRecord::Base.transaction do
+  #       self.policy_cost_center_mappings.destroy_all
+  #       params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
+  #         cost_center = self.company.cost_centers.find_by_id cost_center_id
+  #         result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
+  #       end
+  #     end
+  #   rescue
+  #     return false
+  #   end
+  #   true
+  # end
 
   def update_policy_location_mapping(params)
     # Creating new record on every update as it was required to be like this only
@@ -217,5 +227,4 @@ class Policy < ApplicationRecord
     self.build_cash_expense_config(enabled: true).save
     self.build_card_expense_config(enabled: true).save
   end
-
 end

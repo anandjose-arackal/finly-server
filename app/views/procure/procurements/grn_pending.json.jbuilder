@@ -9,13 +9,18 @@ json.results do
     json.user do
       json.extract! p.user, :id, :name, :email, :mobile_number
     end
-
-    if p.purchase_order.present?
-      json.document 'Purchase Order'
-      json.po_number p.purchase_order.po_number
+    po =  nil
+    if p.po_revisions.present?
+      po = p.po_revisions.first
+    else
+      po = p.purchase_order
     end
 
-    po = p.purchase_order
+    if po.present?
+      json.document 'Purchase Order'
+      json.po_number po.po_number
+    end
+
     if po.present?
       json.po_number po.po_number
       json.po_status po.status&.name
@@ -31,6 +36,8 @@ json.results do
         json.extract! vendor, :id, :vendor_id, :name, :created_at, :email, :mobile_number, :authorized, :description, :pan, :address, :is_deleted
         display_name = vendor.business_name || vendor.name      
         json.display_name display_name
+        json.trade_name  vendor.trade_name
+        json.business_name  vendor.business_name
       end
     end
 
@@ -39,6 +46,7 @@ json.results do
       cost_center = po&.cost_center || invoice&.cost_center
       json.department department&.full_name
       json.cost_center cost_center&.name
+      json.gstin po&.gstin_location&.gstin
     end
 
     json.documents do

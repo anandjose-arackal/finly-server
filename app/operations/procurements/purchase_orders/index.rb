@@ -11,7 +11,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
 
   def process
     # if user.vendor_payments_admin? && params[:team_po] == false
-    if user.vendor_payments_admin?
+    if user.vendor_payments_admin? or RequestStore.store[:vendor_manager]
       admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
       self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.purchase_orders)
       return
@@ -38,6 +38,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders, :paginated_purchase_orders
 
+    has_scope :filter_ids, type: :array
     has_scope :filter_user
     has_scope :filter_po_number
     has_scope :filter_status
@@ -61,11 +62,20 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_awaiting_approval
     has_scope :show_only_po_which_have_advances
     has_scope :show_only_po_which_are_forwarded
+    has_scope :filter_all_advances, type: :boolean
+    has_scope :filter_po_advance_status
+    has_scope :po_advances_date, using: [:from, :to], type: :hash
+    has_scope :due_date, using: [:from, :to], type: :hash
+    has_scope :filter_po_approver_id
+    has_scope :filter_custom_text_selection, type: :array
+    has_scope :filter_custom_drop_down_selection, type: :array
 
     # Sorting
     has_scope :sort_po_number
     has_scope :sort_po_name
     # has_scope :sort_amount
+
+    has_scope :filter_delivery_location
 
     def init
       self.purchase_orders = params[:purchase_orders]

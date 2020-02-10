@@ -9,11 +9,11 @@ class InvoiceLineItemDrop < Drop
   end
 
   def taxable_amount
-    @object.taxable_amount.value
+    @object.taxable_amount&.value || 0
   end
 
   def billable_amount
-    @object.billable_amount.value
+    @object.billable_amount&.value || 0
   end
 
   def tax_amount
@@ -49,6 +49,10 @@ class InvoiceLineItemDrop < Drop
   def igst_amount
     return 0 unless igst?
     @object.tax_amount&.value
+  end
+
+  def tax_rate
+    @object.tax_rate&.to_liquid
   end
 
 end

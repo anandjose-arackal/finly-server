@@ -5,18 +5,18 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
 
   headers ({
       :id => "ID",
-      :name => "Vendor NAme",
+      :business_name => "Legal Name",
       :vendor_type => "Vendor Type",
       :vendor_id => "Vendor Code",
-      :business_name => "Business Name",
+      :trade_name => "Trade Name",
       :mobile_number => "Mobile Number",
       :email => "Email",
       :pan => "PAN",
-      :state => "State",
       :description => "Description",
       :address => "Address",
       :gstin => "GSTIN",
       :gst_location => "GST Location",
+      :state => "GST State",
       :vendor_bank_account_name => "Bank Account Name",
       :account_number => "Account Number",
       :ifsc => "IFSC",
@@ -28,15 +28,15 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
   end
 
   def input
-    company.yes_bank_vendors
+    company.yes_bank_vendors.non_deleted.authorized.includes(:vendor_type,:bank_accounts,:gstin_locations)
   end
 
   def id(vendor)
     vendor.id
   end
 
-  def name(vendor)
-    vendor.name
+  def business_name(vendor)
+    vendor.business_name
   end
 
   def vendor_type(vendor)
@@ -47,8 +47,8 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
     vendor.vendor_id
   end
 
-  def business_name(vendor)
-    vendor.business_name
+  def trade_name(vendor)
+    vendor.trade_name
   end
 
   def mobile_number(vendor)

@@ -1,6 +1,6 @@
 class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
 
-  attr_accessor :approving_user, :approved, :auto_approve
+  attr_accessor :approving_user, :approved, :auto_approve, :invoices_initiators
 
   def init
     super
@@ -30,7 +30,8 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     # else
     #   [self.bank_payment_request.controlling_user]
     # end
-    self.bank_payment_request.affected_users(:approve)
+    users = self.bank_payment_request.affected_users(:approve) + [bank_payment_request.owner] + parent_document_creator
+    users.uniq
   end
 
   def notification_affected_users
@@ -69,7 +70,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
   def mailer_subject(user)
     approver_id = self.bank_payment_request.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
-      "Payment Order approved : #{self.bank_payment_request.name}"
+      return "Payment Order approved : #{self.bank_payment_request.name}"
     else
       if approved and user.id == self.bank_payment_request.owner.id
         if auto_approve
@@ -94,11 +95,14 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
         else
           message = "Congratulations! Your payment order #{bank_payment_request.name} has been approved"
         end
-        if bank_payment_request.credit_pending?
+        if bank_payment_request.document_role_users(:creditor).present? && bank_payment_request.credit_pending? && bank_payment_request.document_role_users(:creditor).include?(user)
           message = "#{message} and is awaiting credit!"
+          #return
         end
-      else
+      elsif self.bank_payment_request.affected_users(:approve).present? && self.bank_payment_request.affected_users(:approve).include?(user)
         message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently waiting for your approval"
+      elsif parent_document_creator.include?(user)
+        message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}'"
       end
     end
     message
@@ -113,6 +117,18 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     #   return self.bank_payment_request.bank_payment_request_trails.last.action_user_role_id
     # end
     bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+  end
+
+  def parent_document_creator
+    document_owners = []
+    self.bank_payment_request.payment_order.payments.each do |payment|
+       user_id = payment.parent.method('creator_id').call rescue nil
+       document_owner = user.company.users.find_by_id user_id
+       if document_owner.present?
+        document_owners += [document_owner]
+       end
+    end
+    return document_owners
   end
 
 end

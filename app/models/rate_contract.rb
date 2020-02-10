@@ -29,6 +29,7 @@ class RateContract < ApplicationRecord
   belongs_to :company, optional: true
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   before_validation :add_company
 
@@ -51,18 +52,19 @@ class RateContract < ApplicationRecord
 
   def as_json(options={})
     {
-      id: id,
-      rate_contract_number: rate_contract_number,
-      name: name, 
-      vendor_id: vendor_id,
-      vendor_name: vendor&.name,
-      renewal_alert_number: renewal_alert_number,
-      renewal_alert_period_id: renewal_alert_period_id,
-      creator_id: creator_id,
-      renewable: renewable,
-      note: note,
-      default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
-      locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
+        id: id,
+        rate_contract_number: rate_contract_number,
+        name: name,
+        vendor_id: vendor_id,
+        vendor_name: vendor&.display_name,
+        renewal_alert_number: renewal_alert_number,
+        renewal_alert_period_id: renewal_alert_period_id,
+        creator_id: creator_id,
+        renewable: renewable,
+        note: note,
+        default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
+        locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
+        custom_fields: self.custom_fields
     }
   end
 

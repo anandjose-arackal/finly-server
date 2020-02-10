@@ -28,19 +28,23 @@
 #  approved_at                  :datetime
 #  company_id                   :integer
 #  max_payment_amount           :decimal(20, 5)
-#  rejection_note               :text(65535)
 #  bank_account_provider_id     :integer
 #  otp                          :string(255)
 #  otp_sent_at                  :datetime
 #  otp_attempts                 :integer
 #  otp_count                    :integer
+#  rejection_note               :text(65535)
+#  expected_payments            :integer          default(0)
+#  ticket_type                  :string(255)
+#  transfer_mode_id             :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
-
   include SoftDeletable,
           FindByOrderedIds,
-          Transitionable
+          Transitionable,
+          CustomFieldFilterSupport
+  include LiquidDroppable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
@@ -52,6 +56,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
   belongs_to :company, optional: true
+  belongs_to :transfer_mode, optional: true, class_name: "TransferModeCompanyMapping"
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -71,6 +76,13 @@ class BankPaymentRequest < ApplicationRecord
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, :pending?, :creation_in_progress?, to: :status, allow_nil: true
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
+
+  enum ticket_type: {
+    beneficiary: 'beneficiary_payment',
+    invoice: 'invoice',
+    purchase_order: 'purchase_order',
+    security_deposit: 'security_deposit'
+  }
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
@@ -113,6 +125,12 @@ class BankPaymentRequest < ApplicationRecord
         ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
         with_id(ids)
       end
+    when 'in_progress'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:in_progress))
+    when 'partially_completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:partially_completed))
+    when 'completed'
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:completed))
     else
       # all
     end
@@ -181,13 +199,22 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
-                                                          {payments: [
-                                                              {amount: [:currency]},
-                                                              :payment_status,
-                                                              :invoice,
-                                                              {payment_order: [bank_payment_request: [:status]]},
-                                                              :payment_order]},
+  scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :controlling_level, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+                                                                                                                                                                                                                                            {payments: [
+                                                            {amount: [:currency]},
+                                                            :payment_status,
+                                                            :invoice,
+                                                            {payment_order: [bank_payment_request: [:status]]},
+                                                            :payment_order]},
+                                                                                                                                                                                                                                            {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
+
+  scope :include_for_index_meesho, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
+                                                          # {payments: [
+                                                          #     # {amount: [:currency]},
+                                                          #     :payment_status,
+                                                          #     # :invoice,
+                                                          #     {payment_order: [bank_payment_request: [:status]]},
+                                                          #     :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
                                                                              :initiating_user,:parent,:payment_status,
@@ -241,7 +268,7 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,{receiving_account: :account_owner},:initiating_user,{amount: :currency},
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
   invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
@@ -272,6 +299,19 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
+  scope :filter_custom_field_dropdown, -> (key, selected_value_id) {
+    if selected_value_id.present?
+      raw_po_ids = self.pluck(:payment_order_id)
+      raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+      field_configuration = FieldConfiguration.where(company_id: self.pluck(:company_id), id: key)
+      invoice_ids = CustomField.with_field_configuration_ids(field_configuration.pluck(:id)).with_parent(raw_invoice_ids, "Invoice").joins("INNER JOIN field_drop_down_selections ON custom_fields.value_id = field_drop_down_selections.id AND custom_fields.value_type = 'FieldDropDownSelection'").where('field_drop_down_selections.value_id = ?', selected_value_id).pluck(:parent_id)
+
+      po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+      bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+      where(id: bpr_ids)
+    end
+  }
+
   scope :filter_policy_id, -> (policy_id) {
     where policy_id: policy_id
   }
@@ -287,22 +327,57 @@ class BankPaymentRequest < ApplicationRecord
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
+  # scope :filter_payment_ids, -> (payment_ids) {
+  #   payment_ids = payment_ids.split(",").each {|e| e.strip!}
+  #   all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
+  #   if all_payments.where(id: payment_ids).any?
+  #     payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+  #     where(payment_order_id: payment_order_ids)
+  #   else
+  #     BankPaymentRequest.none
+  #   end
+  # }
+
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
-    all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    if all_payments.where(id: payment_ids).any?
-      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-      where(payment_order_id: payment_order_ids)
-    else
-      BankPaymentRequest.none
+    if payment_ids.present?
+      joins(payment_order: :payments).where("payments.id IN (?)", payment_ids)
     end
   }
 
+  # scope :filter_vendor_id, -> (vendor_id) {
+  #   payment_order_ids = self.pluck(:payment_order_id)
+  #   payments = Payment.where(payment_order_id: payment_order_ids)
+  #   payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
+  #   where(payment_order_id: payment_order_ids)
+  # }
+
   scope :filter_vendor_id, -> (vendor_id) {
-    payment_order_ids = self.pluck(:payment_order_id)
-    payments = Payment.where(payment_order_id: payment_order_ids)
-    payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    joins(payment_order: :payments).where("payments.receiving_user_type = ? AND payments.receiving_user_id = ?", "YesBankVendor", vendor_id)
+  }
+
+  scope :filter_ticket_type, -> (type) {
+    type = type.to_s.underscore
+    where ticket_type: type
+  }
+
+  scope :filter_transfer_mode, -> (id) {
+    where transfer_mode_id: id
+  }
+
+  # used for streamsets 
+  scope :filter_payment_status, -> (status) {
+    status = [status] unless status.is_a? Array
+    permitted_status = ['approved', 'credited', 'auto_approved']
+    status = permitted_status & status
+    status = permitted_status if status.blank?
+    where status_id: BankPaymentRequestStatus.ids_for(status)
+  }
+
+  scope :filter_approved_date, -> (from, to) {
+    from = Date.parse(from) rescue Date.parse('01-01-1990') unless from.is_a?(Date)
+    to = Date.parse(to) rescue Date.today unless to.is_a?(Date)
+    where(approved_at: from.beginning_of_day..to.end_of_day)
   }
 
   attr_accessor :cache_users
@@ -493,6 +568,12 @@ class BankPaymentRequest < ApplicationRecord
       policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
     end
   end
+
+  def mode
+    self.transfer_mode&.mode&.name&.upcase
+  end
+
+
 
   private
 

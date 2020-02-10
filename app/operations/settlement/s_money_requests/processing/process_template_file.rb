@@ -1,3 +1,8 @@
+# Processes uploaded excel file which contains utr details for each advance. Earlier this would do this on user level. Now it won't.
+# 
+# TODO
+# optimize ruby logic
+# 
 class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::SMoneyRequests::Processing::Base
 
   attr_accessor :file, 
@@ -10,10 +15,12 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
                 :pending_items, 
                 :pending_item_ids,
                 :completed_items,
+                :completed_money_requests,
                 :edge_case, 
                 :processable_mappings,
                 :just_show_excel,
-                :associated_utr
+                :associated_utr,
+                :associated_source_account
 
   def pre_validate
     if user.blank?
@@ -43,7 +50,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
   def init
 
     self.file = params[:file]
-    headers = [:item_id, :document_ids, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :mark_as_paid]
+    headers = [:document_id, :item_id, :batch_created_by, :beneficiary_account_name, :beneficiary_account_number, :advance_requested_by_user, :purpose_of_advance, :total_advance_amount, :utr, :source_account, :mark_as_paid, :msg]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
@@ -74,7 +81,7 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     if validate_operation.success?
       self.processable_mappings = self.validate_operation.processable_mappings
       if self.processable_mappings.blank?
-        add_message :error, "No processable reports found"
+        add_message :error, "No processable advances found"
         return
       end
     else
@@ -91,24 +98,49 @@ class Settlement::SMoneyRequests::Processing::ProcessTemplateFile < Settlement::
     # user is allowed to update utr for completed items
     self.completed_items = self.money_request_processor.mappings.completed.where id: self.processable_mappings.pluck(:item_id)
 
+    self.completed_money_requests = self.completed_items.collect(&:money_requests).flatten
+
+    if self.completed_money_requests.present?
+      self.completed_money_requests = self.completed_money_requests.collect {|r| r if self.processable_mappings.pluck(:document_id).map(&:to_i).include? r.id}.compact
+    end
+
   end
 
   def process
     # 
-    # we will use this to cleanly map advance ids and utr
+    # we will use this to cleanly map advance ids, utr and source_accounts
     self.associated_utr = {}
-    self.processable_mappings.pluck(:item_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.associated_source_account = {}
+
+    # self.processable_mappings.pluck(:item_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
 
     # utr can be updated for items which are already completed
-    self.completed_items.each do |item|
+    # self.completed_items.each do |item|
+    #   if item.bank_reference_number != self.associated_utr[item.id]&.strip
+    #     item.update(bank_reference_number: self.associated_utr[item.id])
+    #   end
+    # end
+
+    self.processable_mappings.pluck(:document_id,:utr).map { |id, utr| self.associated_utr[id.to_i] = utr }
+    self.processable_mappings.pluck(:document_id,:source_account).map { |id, source_account| self.associated_source_account[id.to_i] = source_account }
+
+    # utr can be updated for items which are already completed
+    self.completed_money_requests.each do |item|
       if item.bank_reference_number != self.associated_utr[item.id]&.strip
-        item.update(bank_reference_number: self.associated_utr[item.id])
+        item.bank_reference_number = self.associated_utr[item.id]
+      end
+      if item.source_account != self.associated_source_account[item.id]&.strip
+        item.source_account = self.associated_source_account[item.id]
+      end
+      if item.changes[:bank_reference_number].present? or item.changes[:source_account].present?
+        item.save
       end
     end
 
+
     # only if anything is pending, we call the post_opertion to update the item and in turn the batch
     if self.pending_item_ids.present?
-      result = Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {marked_as_completed: true, request_ids: self.pending_item_ids, utr: self.associated_utr}, true)
+      result = Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {update_documents: true, marked_as_completed: false, request_ids: self.pending_item_ids, utr: self.associated_utr, source_account: self.associated_source_account}, true)
       unless result.success?
         self.just_show_excel = false
         add_message :error, result.messages[:error]

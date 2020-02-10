@@ -54,6 +54,7 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
       self.money_request_processor.status_id = MoneyRequestProcessorStatus.id_for(:pending)
       self.scheduled = false
     end
+    validate_requested_amount
     set_source_account
     set_receiving_accounts
     set_payment_request
@@ -77,7 +78,11 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
   def process
     self.money_request_processor.save
     if self.money_request_processor.process_via_finly?
-      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
+      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
     elsif self.money_request_processor.rejected?
       Settlement::SMoneyRequests::Processing::PostOperation.(self.money_request_processor, {rejected: true}, true)
     end
@@ -95,7 +100,14 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
         self.bank_transfer_type = self.money_request_processor.payment_mode
         case params[:source_account_type]
           when 'company_credits'
-            self.money_request_processor.source_account = current_company.yes_bank_company_account
+            case current_company.feature_subscription.bank_service_provider
+            when "YES"
+              self.money_request_processor.source_account = current_company.yes_bank_company_account
+            when "ICICI"
+              self.money_request_processor.source_account = current_company.icici_bank_company_account
+            else
+              self.money_request_processor.source_account = current_company.yes_bank_company_account
+            end
           when 'finly_money'
             self.money_request_processor.source_account = user.bank_wallet
           else
@@ -243,6 +255,24 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
 
   def has_amounts?
     not self.money_request_processor.rejected?
+  end
+
+  def validate_requested_amount
+    mappings = params&.dig(:mappings)
+    user_ids = mappings&.keys
+    user_ids.each do |user_id|
+      config = params&.dig(:mappings, user_id.to_s)
+      if config.present?
+        grouped_request_ids = config[:money_request_ids]
+        currency_id = config&.dig("amount", "currency_id")
+        user_processing_amount = config&.dig("amount", "value")&.to_f || 0.0
+        pocket_currency = Currency.find_by_id(currency_id) || Currency.first
+        user_requested_amount = MoneyRequestItem.with_money_request(grouped_request_ids).sum_amount(pocket_currency&.country_code)
+        if user_requested_amount < user_processing_amount
+          add_message :error, 'Entered amount is more than the actual requested amount'
+        end
+      end
+    end
   end
 
 end

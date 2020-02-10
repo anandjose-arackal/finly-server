@@ -3,7 +3,7 @@
 
 class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
-  attr_accessor :payment, :payment_order, :payment_mode
+  attr_accessor :payment, :payment_order, :payment_mode, :bank_payment_request
 
   def pre_validate
     if user.blank? || params.blank?
@@ -13,9 +13,9 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
   def init
     id = params[:id] || params[:payment_id]
-    op = BankTransfer::Payments::Index.(user, params)
-    self.payment = op.payments.find_by(id: id)
+    self.payment = Payment.where(company_id: user.company.id).find_by(id: id)
     self.payment_mode = params[:payment_mode] || self.payment&.payment_mode
+    self.bank_payment_request = payment&.payment_order&.bank_payment_request
   end
 
   def validate
@@ -39,6 +39,20 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
       add_message :error, "This payment does not belong to a payment order"
       return
     end
+
+    unless bank_payment_request.is_initiating_user?(user) || bank_payment_request.is_reviewing_user?(user) || bank_payment_request.is_crediting_user?(user)
+      add_message :error, "You are not authorized to do this action"
+      return
+    end
+
+    # ensuring that only invoices that are payable can have retriable payments
+    if payment.parent_type == "Invoice"
+      invoice = payment.parent
+      unless invoice.payable
+        add_message :error, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
+        return
+      end
+    end
   end
 
   def pre_process
@@ -54,6 +68,10 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def post_process
+    self.payment.payment_order.bank_payment_request.comments.create user_id: user.id,
+                                     action_id: BankPaymentRequestCommentAction.id_for(:payment_retry),
+                                     note: "Retry for Payment ID - #{self.payment.id}"
+
     add_message :success, "Payment initiated! Check back in some time to check the status"
   end
 

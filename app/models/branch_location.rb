@@ -24,12 +24,16 @@
 #  nature_of_office      :string(255)
 #  billable_location     :boolean          default(TRUE)
 #  shippable_location    :boolean          default(TRUE)
+#  gl_code               :string(255)
 #
 
 class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include EventProducer
+
+  event_channel 'location'
 
   acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry
@@ -51,6 +55,7 @@ class BranchLocation < ApplicationRecord
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :include_state, -> { includes :state }
+  default_scope {unscope(:where)}
 
   def state_code
     self.state&.state_code

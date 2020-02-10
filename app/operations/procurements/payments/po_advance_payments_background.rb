@@ -2,10 +2,10 @@
 # This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
 
 class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
-  sidekiq_options queue: :payments_queue
+  sidekiq_options queue: :payments_creation
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :purchase_orders
+                :company_id, :execute, :payment_params, :purchase_orders, :transfer_mode_id
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -36,6 +36,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
+    self.transfer_mode_id = self.bank_payment_request.transfer_mode_id
     # here assign attributes to the existing bank payment request object which can be saved later
     self.payment_params = []
     self.payments_attributes.each do |payment|
@@ -72,7 +73,8 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
           cost_center_id: payment[:cost_center_id],
           api_initiated: true,
           parent_type: payment[:parent_type],
-          parent_id: payment[:parent_id]
+          parent_id: payment[:parent_id],
+          transfer_mode_id: payment[:transfer_mode_id]
       }
     end
     self.purchase_orders = PurchaseOrder.where(id: self.payment_params.pluck(:purchase_order_id))

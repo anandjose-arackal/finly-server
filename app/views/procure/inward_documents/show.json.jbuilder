@@ -3,7 +3,7 @@ json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_nu
 
 if @result.inward_document.vendor.present?
   json.vendor do
-    json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state, :business_name, :vendor_id
+    json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state, :business_name, :vendor_id, :trade_name
   end
 end
 
@@ -66,10 +66,11 @@ json.items do
 end
 
 json.attachments do
-  json.array! @result.inward_document.attachments do |attachment|
+  json.array! @result.inward_document.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+    json.content_type attachment.file_content_type
     json.url attachment.file.url
   end
 end
@@ -131,7 +132,7 @@ json.purchase_order do
     end
   end
   json.attachments do
-    json.array! @result.purchase_order.attachments do |attachment|
+    json.array! @result.purchase_order.attachments.reject {|attachment| attachment.file_file_size.nil?} do |attachment|
       json.extract! attachment, :id, :description
       json.file_name attachment.file_file_name
       json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"

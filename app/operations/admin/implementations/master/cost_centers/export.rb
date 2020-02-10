@@ -5,10 +5,9 @@ class Admin::Implementations::Master::CostCenters::Export < Admin::Implementatio
 
   headers ({
               :id => "ID",
+              :parent_id => "Parent Cost Center Name",
               :name => "Cost Center",
               :cost_center_code => "Cost Center Code",
-              :expense_management => "Expense Management (Y)",
-              :vendor_payment => "Vendor Payments (Y)",
               :destroy => "Destroy"
   })
 
@@ -17,11 +16,15 @@ class Admin::Implementations::Master::CostCenters::Export < Admin::Implementatio
   end
 
   def input
-    company.cost_centers
+    company.cost_centers.non_deleted
   end
 
   def id(cost_center)
     cost_center.id
+  end
+
+  def parent_id(cost_center)
+   cost_center.parent&.name
   end
 
   def name(cost_center)
@@ -30,14 +33,6 @@ class Admin::Implementations::Master::CostCenters::Export < Admin::Implementatio
 
   def cost_center_code(cost_center)
     cost_center.cost_center_code
-  end
-
-  def expense_management(cost_center)
-    cost_center.application == 'em' ? 'Y' : ''
-  end
-
-  def vendor_payment(cost_center)
-    cost_center.application == 'vp' ? 'Y' : ''
   end
 
   def destroy(cost_center)

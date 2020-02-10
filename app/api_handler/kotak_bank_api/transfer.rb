@@ -250,7 +250,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
-        'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
+        # 'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
+        'TRANSFER_TYPE' => resolve_transfer_type(beneficiary_ifsc, transfer_request.transfer_type),
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount,
         'BENEFICIARY_EMAIL' => (self.beneficiary_email.present? ? (self.beneficiary_email) : ("noreply@finly.io")),
@@ -266,5 +267,13 @@ class KotakBankApi::Transfer < KotakBankApi::Base
   def set_response_parameters
     self.transfer_request.transaction_result = transaction_result
     self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+  end
+
+  def resolve_transfer_type(ifsc, transfer_type)
+    if ifsc.present? && ifsc[0..3] == "KKBK"
+      ""
+    else
+      transfer_type&.strip&.upcase
+    end
   end
 end

@@ -4,11 +4,10 @@ class Procurements::Comments::Create < Procurements::Comments::Base
   def init
     self.comment_params = comment_parameters
 
-    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice purchase_request )
+    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice purchase_request credit_note )
 
     document_type = comment_params[:parent_commentable_type]
     document_id = comment_params[:parent_commentable_id]
-
 
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id
@@ -34,7 +33,6 @@ class Procurements::Comments::Create < Procurements::Comments::Base
       self.comment.save
       add_message :success, 'Added Comment'
     end
-
   end
 
   def post_process
@@ -44,7 +42,11 @@ class Procurements::Comments::Create < Procurements::Comments::Base
       Event::EPurchaseOrder::Comment.(user, document: document, purchase_order: document)
     when 'Invoice'
       Event::EInvoice::Comment.(user, document: document, invoice: document)
+    when 'PurchaseRequest'
+      Event::EPurchaseRequest::Comment.(user, document: document, purchase_request: document)
     end
+
+
   end
 
   private

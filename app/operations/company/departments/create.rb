@@ -17,6 +17,6 @@ class Company::Departments::Create < Company::Departments::Base
   end
 
   def department_attributes
-    params.require(:department).permit(:name, :parent_id, {user_department_mappings_attributes: [:user_id]})
+    params.require(:department).permit(:name, :parent_id, :department_code, {user_department_mappings_attributes: [:user_id]})
   end
 end

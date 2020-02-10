@@ -32,8 +32,8 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       end 
     end
 
-    if purchase_request.is_reviewing_user?
-      purchase_request.action_users(:approve).include?(user)
+    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
+      return purchase_request.action_users(:approve).include?(user)
     end
   end
 

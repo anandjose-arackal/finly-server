@@ -2,84 +2,89 @@
 #
 # Table name: individual_kycs
 #
-#  id                         :integer          not null, primary key
-#  id_proof_file_name         :string(255)
-#  id_proof_content_type      :string(255)
-#  id_proof_file_size         :integer
-#  id_proof_updated_at        :datetime
-#  kyc_status_id              :integer
-#  user_id                    :integer          not null
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  address_proof_file_name    :string(255)
-#  address_proof_content_type :string(255)
-#  address_proof_file_size    :integer
-#  address_proof_updated_at   :datetime
-#  review_position            :integer
-#  admin_review_workflow_id   :integer          not null
-#  upgraded_by_resource_id    :integer
-#  proof_file_1_file_name     :string(255)
-#  proof_file_1_content_type  :string(255)
-#  proof_file_1_file_size     :integer
-#  proof_file_1_updated_at    :datetime
-#  proof_file_1               :string(255)
-#  proof_file_2_file_name     :string(255)
-#  proof_file_2_content_type  :string(255)
-#  proof_file_2_file_size     :integer
-#  proof_file_2_updated_at    :datetime
-#  proof_file_2               :string(255)
-#  type_id                    :integer
-#  kyc_file_1_file_name       :string(255)
-#  kyc_file_1_content_type    :string(255)
-#  kyc_file_1_file_size       :integer
-#  kyc_file_1_updated_at      :datetime
-#  kyc_file_2_file_name       :string(255)
-#  kyc_file_2_content_type    :string(255)
-#  kyc_file_2_file_size       :integer
-#  kyc_file_2_updated_at      :datetime
-#  kyc_number                 :string(255)
-#  company_id                 :integer          not null
-#  admin_note                 :text(65535)
-#  submitted_on               :datetime
-#  upgraded_on                :datetime
-#  aadhar_front_file_name     :string(255)
-#  aadhar_front_content_type  :string(255)
-#  aadhar_front_file_size     :integer
-#  aadhar_front_updated_at    :datetime
-#  aadhar_back_file_name      :string(255)
-#  aadhar_back_content_type   :string(255)
-#  aadhar_back_file_size      :integer
-#  aadhar_back_updated_at     :datetime
-#  photo_file_name            :string(255)
-#  photo_content_type         :string(255)
-#  photo_file_size            :integer
-#  photo_updated_at           :datetime
-#  signature_file_name        :string(255)
-#  signature_content_type     :string(255)
-#  signature_file_size        :integer
-#  signature_updated_at       :datetime
-#  combined_kyc_file_name     :string(255)
-#  combined_kyc_content_type  :string(255)
-#  combined_kyc_file_size     :integer
-#  combined_kyc_updated_at    :datetime
-#  kyc_1_front_file_name      :string(255)
-#  kyc_1_front_content_type   :string(255)
-#  kyc_1_front_file_size      :integer
-#  kyc_1_front_updated_at     :datetime
-#  kyc_1_back_file_name       :string(255)
-#  kyc_1_back_content_type    :string(255)
-#  kyc_1_back_file_size       :integer
-#  kyc_1_back_updated_at      :datetime
-#  kyc_2_front_file_name      :string(255)
-#  kyc_2_front_content_type   :string(255)
-#  kyc_2_front_file_size      :integer
-#  kyc_2_front_updated_at     :datetime
-#  kyc_2_back_file_name       :string(255)
-#  kyc_2_back_content_type    :string(255)
-#  kyc_2_back_file_size       :integer
-#  kyc_2_back_updated_at      :datetime
-#  kyc_1_number               :string(255)
-#  kyc_2_number               :string(255)
+#  id                          :integer          not null, primary key
+#  kyc_status_id               :integer
+#  user_id                     :integer          not null
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  address_proof_file_name     :string(255)
+#  address_proof_content_type  :string(255)
+#  address_proof_file_size     :integer
+#  address_proof_updated_at    :datetime
+#  review_position             :integer
+#  admin_review_workflow_id    :integer          not null
+#  upgraded_by_resource_id     :integer
+#  proof_file_1_file_name      :string(255)
+#  proof_file_1_content_type   :string(255)
+#  proof_file_1_file_size      :integer
+#  proof_file_1_updated_at     :datetime
+#  proof_file_1                :string(255)
+#  proof_file_2_file_name      :string(255)
+#  proof_file_2_content_type   :string(255)
+#  proof_file_2_file_size      :integer
+#  proof_file_2_updated_at     :datetime
+#  proof_file_2                :string(255)
+#  type_id                     :integer
+#  kyc_file_1_file_name        :string(255)
+#  kyc_file_1_content_type     :string(255)
+#  kyc_file_1_file_size        :integer
+#  kyc_file_1_updated_at       :datetime
+#  kyc_file_2_file_name        :string(255)
+#  kyc_file_2_content_type     :string(255)
+#  kyc_file_2_file_size        :integer
+#  kyc_file_2_updated_at       :datetime
+#  kyc_number                  :string(255)
+#  company_id                  :integer          not null
+#  admin_note                  :text(65535)
+#  submitted_on                :datetime
+#  upgraded_on                 :datetime
+#  aadhar_front_file_name      :string(255)
+#  aadhar_front_content_type   :string(255)
+#  aadhar_front_file_size      :integer
+#  aadhar_front_updated_at     :datetime
+#  aadhar_back_file_name       :string(255)
+#  aadhar_back_content_type    :string(255)
+#  aadhar_back_file_size       :integer
+#  aadhar_back_updated_at      :datetime
+#  photo_file_name             :string(255)
+#  photo_content_type          :string(255)
+#  photo_file_size             :integer
+#  photo_updated_at            :datetime
+#  signature_file_name         :string(255)
+#  signature_content_type      :string(255)
+#  signature_file_size         :integer
+#  signature_updated_at        :datetime
+#  combined_kyc_file_name      :string(255)
+#  combined_kyc_content_type   :string(255)
+#  combined_kyc_file_size      :integer
+#  combined_kyc_updated_at     :datetime
+#  kyc_1_front_file_name       :string(255)
+#  kyc_1_front_content_type    :string(255)
+#  kyc_1_front_file_size       :integer
+#  kyc_1_front_updated_at      :datetime
+#  kyc_1_back_file_name        :string(255)
+#  kyc_1_back_content_type     :string(255)
+#  kyc_1_back_file_size        :integer
+#  kyc_1_back_updated_at       :datetime
+#  kyc_2_front_file_name       :string(255)
+#  kyc_2_front_content_type    :string(255)
+#  kyc_2_front_file_size       :integer
+#  kyc_2_front_updated_at      :datetime
+#  kyc_2_back_file_name        :string(255)
+#  kyc_2_back_content_type     :string(255)
+#  kyc_2_back_file_size        :integer
+#  kyc_2_back_updated_at       :datetime
+#  kyc_1_number                :string(255)
+#  kyc_2_number                :string(255)
+#  initiated                   :boolean
+#  id_proof_front_file_name    :string(255)
+#  id_proof_front_content_type :string(255)
+#  id_proof_front_file_size    :bigint
+#  id_proof_front_updated_at   :datetime
+#  id_proof_back_file_name     :string(255)
+#  id_proof_back_content_type  :string(255)
+#  id_proof_back_file_size     :bigint
+#  id_proof_back_updated_at    :datetime
 #
 
 require 'fileutils'
@@ -112,7 +117,7 @@ class IndividualKyc < ApplicationRecord
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :id_proof, content_type: CONTENT_TYPES
+  #validates_attachment :id_proof, content_type: CONTENT_TYPES
 
   has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES
@@ -123,6 +128,12 @@ class IndividualKyc < ApplicationRecord
   has_attached_file :kyc_file_2, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
   ## DEPRICATED END ##
+
+  has_attached_file :id_proof_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_front, content_type: CONTENT_TYPES
+
+  has_attached_file :id_proof_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_back, content_type: CONTENT_TYPES
 
   has_attached_file :aadhar_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :aadhar_front, content_type: CONTENT_TYPES

@@ -6,6 +6,7 @@ json.results do
     json.controlling_level_name po.controlling_level&.name
     # Vendor
     json.vendor_name po.vendor&.business_name
+    json.vendor_trade_name po.vendor&.trade_name
     json.vendor_id po.vendor&.id
 
     # Created by
@@ -34,6 +35,8 @@ json.results do
       json.can_reject po.can_really_reject?
       json.can_take_control po.can_take_control?
     end
+
+    json.delivery_location po.delivery_location&.name
   end
 end
 

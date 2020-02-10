@@ -344,22 +344,10 @@ class Notification < ApplicationRecord
 
     # base = Constants::BASE_URL
     view = ""
+    path = ""
+    suffix = ""
 
-    # now depending on the object type, the URL will be loaded
-    if self.object_type == "PaymentOrder" || self.object_type == "Payment Order" || self.object_type == "Purchase Order" || self.object_type == "Invoice"
-      case view_role_id
-        when 3
-          view = "\"reviewer\""
-        when 2
-          view = "\"creditor\""
-        when 1
-          view = "\"admin\""
-        else
-          view = "\"initiator\""
-      end
-      suffix = "/params={\"view\":#{view},\"ref\":1,\"n_id\":#{self.id}"
-      path = ""
-    else
+    if ["em", :em].include?(RequestStore.store[:current_app])
       case view_role_id
         when 3
           view = "\"manager\""
@@ -370,7 +358,7 @@ class Notification < ApplicationRecord
         else
           view = "\"personal\""
       end
-      suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
+      suffix = "/params={\"view\":" + view + ",\"preview\":true"
       path = ""
     end
 
@@ -420,23 +408,27 @@ class Notification < ApplicationRecord
       when "Purchase Order"
         document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
-        # if path_object.is_deleted?
-          path = "procurements"
+          path = "purchase_orders"
+          suffix = "/params={"
         else
-          path = "procurements/#{document.procurement.id}"
+          path = "procure_purchase_order/#{document.id}"
+          suffix = "/params={\"procurement_id\":#{document.procurement_id}"
         end
-        # /params={\"view\":\"initiator\",\"document_type\":\"invoice\",\"document_id\":#{document.procurement.id}"
-        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"purchase_order\",\"document_id\":#{document.id}"
       when 'Invoice'
         document = Invoice.unscoped.find_by(id: self.path_object_id)
         if document.blank? || document&.procurement.blank?
-          path = "procurements"
+          path = "new_payment_invoices"
+          suffix = "/params={"
         else
-          path = "procurements/#{document.procurement.id}"
+          path = "procure_invoice/#{document.id}"
+          if document.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+            suffix = "/params={\"procurement_id\":#{document.procurement_id }"
+          elsif document.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+            suffix = "/params={\"procurement_id\":#{document.procurement_id },\"procurement_type\":\"non_po\""
+          elsif document.invoice_type_id == InwardInvoiceType.id_for(:agreement_invoice)
+            suffix = "/params={\"procurement_id\":#{document.procurement_id },\"procurement_type\":\"non_po\",\"invoice_type\":\"recurring_invoice\""
+          end
         end
-        # /params={\"view\":\"initiator\",\"document_type\":\"purchase_order\",\"document_id\":#{document.procurement.id}"
-        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"invoice\",\"document_id\":#{document.id}"
-        # end
       else
         # do nothing
     end

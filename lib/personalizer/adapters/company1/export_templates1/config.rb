@@ -26,6 +26,14 @@ class Personalizer::Adapters::Company1::ExportTemplates1::Config
             formats: [
                 {name: 'Export to Quickbooks', extension: 'xls'}
             ]
+        },
+        tally_journal: {
+            class: Personalizer::Adapters::Company1::ExportTemplates1::TallyJournalTemplate,
+            name: 'Tally Journal Uploader of Purchase',
+            description: 'Tally exportable format.',
+            formats: [
+                {name: 'Export as XLS', extension: 'xls'}
+            ]
         }
     }
   end

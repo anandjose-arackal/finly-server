@@ -27,11 +27,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
                   :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations,
-                  :payment_ticket_policies
+                  :payment_ticket_policies, :purchase_order_items
 
     def init
       self.purchase_order = params[:purchase_order]
       self.procurement = self.purchase_order.procurement
+      self.purchase_order_items = self.purchase_order.items.include_for_show
       self.actions = get_actions
       # self.departments = user.company.departments.leaves
       # self.locations = user.company.locations.includes(:state).leaves
@@ -46,7 +47,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         self.sub_departments = purchase_order.user.company.departments.leaves
       end
 
-      self.cost_centers = user.company.cost_centers
+      self.cost_centers = user.company.cost_centers.non_deleted
       self.tax_rates = user.company.tax_rates
       self.tds_slabs = TdsSlabs::Index.(user, params)
 
@@ -79,7 +80,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         end
       end
 
-      if purchase_order.items.present?
+      if purchase_order_items.present?
         op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
         if op.success?
           self.budgets = op.budget_data
@@ -92,7 +93,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       actions[:audit_trail] = true
       actions[:export_items] = true
-      if purchase_order.items.count > 0
+      if purchase_order_items.count > 0
         actions[:show_comments] = true
       end
 
@@ -193,7 +194,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     def taxes_applicable_flag?
       # Shows "Taxes as applicable" text on pdf if true
       flag = false
-      self.purchase_order.items.each do |item|
+      self.purchase_order_items.each do |item|
         if item.tax_rate.blank? || item.tax_rate&.rate == 0
           flag = true
           break
@@ -232,6 +233,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
     # Give access to grn initiator once PO is approved
     return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
+    return if params[:skip_for_mailer]
     raise_unauthorized_exception
   end
 end
