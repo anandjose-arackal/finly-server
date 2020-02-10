@@ -61,8 +61,8 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
   end
 
   def pre_process
-    self.ri_dates = payment_agreement.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
-    self.gi_dates = payment_agreement.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: true).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
+    self.ri_dates = payment_agreement.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: [true, false]).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
+    self.gi_dates = payment_agreement.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: [true. false]).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
   end
 
   def process
