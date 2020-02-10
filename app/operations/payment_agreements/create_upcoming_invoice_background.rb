@@ -282,11 +282,19 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     final_end_date = reference_invoices.last.end_date
     # upcoming_invoices_count = get_upcoming_invoice_count(invoice_frequency_number, initial_start_date, current_month_end_date)
     upcoming_invoice_dates = get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, final_end_date, reference_invoices)
+    klass_name = reference_invoices.first.class.name
+    case klass_name
+    when "GeneralInvoice"
+      upcoming_invoice_dates = upcoming_invoice_dates.values - gi_dates
+    when "RentalInvoice"
+      upcoming_invoice_dates = upcoming_invoice_dates.values - ri_dates
+    end
     options = {
       # invoice_frequency_number: invoice_frequency_number,
       # initial_start_date: initial_start_date,
       # current_month_end_date: current_month_end_date,
-      upcoming_invoice_dates: upcoming_invoice_dates.values
+      # upcoming_invoice_dates: upcoming_invoice_dates.values
+      upcoming_invoice_dates: upcoming_invoice_dates
     }
     return setup_upcoming_invoices_params(reference_invoice_ids, options)
   end
@@ -361,22 +369,15 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
         id = reference_invoices.where("(Date(start_date) <= ?)", ideal_start_date).order(:start_date).order(start_date: :desc).last.id
         frequency_based_dates = self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: id).order(:start_date)
       end
-      klass_name = reference_invoices.first.class.name
-      case klass_name
-      when "GeneralInvoice"
-        frequency_based_dates = frequency_based_dates.pluck(:start_date, :end_date) - gi_dates
-      when "RentalInvoice"
-        frequency_based_dates = frequency_based_dates.pluck(:start_date, :end_date) - ri_dates
-      end
       if index.zero?
-        frequency_based_dates.each do |date|
+        frequency_based_dates.pluck(:start_date, :end_date).each do |date|
           end_d = date[1] >= ideal_end_date ? ideal_end_date : date[1]
           upcoming_invoice_dates[count] = [start_date, end_d]
           start_date = end_d + 1
           count += 1
         end
       else
-        frequency_based_dates.each do |date|
+        frequency_based_dates.pluck(:start_date, :end_date).each do |date|
           end_d = date[1] >= ideal_end_date ? ideal_end_date : date[1]
           upcoming_invoice_dates[count] = [start_date, end_d]
           start_date = end_d + 1
@@ -540,13 +541,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
       start_date = end_date + 1
       break if end_date >= final_end_date
     end
-    klass_name = reference_invoices.first.class.name
-    case klass_name
-    when "GeneralInvoice"
-      ideal_end_dates = ideal_end_dates - gi_dates
-    when "RentalInvoice"
-      ideal_end_dates = ideal_end_dates - ri_dates
-    end
+    ideal_end_dates
   end
 
 
