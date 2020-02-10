@@ -17,7 +17,7 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   def unauthenticated_user
     raise "Model has not been defined" if model.nil?
     # adding condition here to check if the company has normal logins blocked thanks to SSO
-    fail_with_event :on_normal_login_blocked, "Normal login has been blocked for your corporate"
+    fail_with_event :on_normal_login_blocked, "Your corporate has blocked password-based logins. Please contact your administrator"
 
     self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
   end
@@ -57,8 +57,10 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   # normal login is blocked for this corporate from another ID
   def on_normal_login_blocked(message)
     company = self.unauthenticated_user.company
-    if company.sso_enabled? && company.normal_login_blocked?
-
+    if company&.normal_login_blocked?
+      params[:user] = self.unauthenticated_user
+      params[:message] = message || "Your corporate has blocked password-based logins. Please contact your administrator"
+      UserSessions::Create.(:failed, params)
     end
   end
 
