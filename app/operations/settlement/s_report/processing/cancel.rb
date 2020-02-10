@@ -39,9 +39,13 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
       return
     end
 
-    unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.report_group_processor.payment_order&.payment_order_status_id)
-      add_message :error, 'Batch cannot be cancelled at this stage'
-      return
+    # i.e. if the report is being settled via Finly, only if the order is either pending, or failed can it be cancelled
+    # in_progress will not come in here because if it's being processed, we cannot cancel it halfway
+    if self.report_group_processor.process_via_finly?
+      unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.report_group_processor.payment_order&.payment_order_status_id)
+        add_message :error, 'Batch cannot be cancelled at this stage'
+        return
+      end
     end
 
     # if self.report_group_processor.payment_order&.in_progress?
