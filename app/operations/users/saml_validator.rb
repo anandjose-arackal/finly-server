@@ -1,6 +1,6 @@
 class Users::SamlValidator < BaseOperation
 
-  attr_accessor :sso_config_id, :sso_response, :email, :companies
+  attr_accessor :sso_config_id, :sso_response, :email, :companies, :unauthenticated_user
 
   class Users::SamlValidator::SamlValidatorPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -28,12 +28,19 @@ class Users::SamlValidator < BaseOperation
   def process
     if self.sso_response.is_valid?
       self.email = self.sso_response.name_id
-      RequestStore.store[:skip_password] = true
-      op = User::GroupEntitiesLogin.(nil, email_mobile: self.email)
-      if op.success?
-        self.companies = op.companies
+      # extracting the unauthenticated user here to check if the
+      # corporate that the user belongs to has multi-entity logins
+      self.unauthenticated_user = User.find_by(email: self.email)
+      if self.unauthenticated_user&.company&.group_entity_structure_enabled?
+        RequestStore.store[:skip_password] = true
+        op = User::GroupEntitiesLogin.(nil, email_mobile: self.email)
+        if op.success?
+          self.companies = op.companies
+        else
+          add_message :error, op.messages[:error]
+        end
       else
-        add_message :error, op.messages[:error]
+        self.companies = [self.unauthenticated_user.company]
       end
     else
       add_message :error, "SSO login failed: #{self.sso_response.errors.to_sentence}"
