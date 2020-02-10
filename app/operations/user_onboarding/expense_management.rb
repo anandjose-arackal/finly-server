@@ -5,7 +5,8 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
   attr_accessor :policy_ids, :policies, :user_role_ids, :user_ids, :assignable_roles, :unassignable_roles,
                 :urm_columns, :urm_values, :pur_columns, :pur_values,
                 :urm_unassignable_roles, :pur_unassignable_roles,
-                :urm_user_role_ids, :pur_user_role_ids
+                :urm_user_role_ids, :pur_user_role_ids,
+                :pum_unassignable_roles, :pum_columns, :pum_values
 
   def validate
     if self.bulk_assign[:policy_ids].present? and self.policy_ids.blank?
@@ -31,13 +32,18 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
     # and
     # policy_user_roles
     # 
+
+    flow(pre_process_pum)
+    self.pum_unassignable_roles = self.unassignable_roles
+    self.pum_columns, self.pum_values = setup_pum(assignable_roles)
+
+    return false if has_errors?
+
     if urm_user_role_ids.present?
-      flow(pre_process_urm)
+      flow(pre_process_urm, check = false)
       self.urm_unassignable_roles = self.unassignable_roles
       self.urm_columns, self.urm_values = setup_urm(assignable_roles)
-    end
 
-    if pur_user_role_ids.present?
       flow(pre_process_pur)
       self.pur_unassignable_roles = self.unassignable_roles
       self.pur_columns, self.pur_values = setup_pur(assignable_roles)
@@ -83,9 +89,10 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
   def process
     # Bulk insert into table, 
     # much faster  
+    exec_statement(pum_columns, pum_values, :policy_user_mappings) if urm_user_role_ids.present?
     exec_statement(urm_columns, urm_values, :user_role_mappings) if urm_user_role_ids.present?
 
-    exec_statement(pur_columns, pur_values, :policy_user_roles) if pur_user_role_ids.present?
+    exec_statement(pur_columns, pur_values, :policy_user_roles) if urm_user_role_ids.present?
 
   end
 
@@ -119,10 +126,10 @@ class UserOnboarding::ExpenseManagement < UserOnboarding::Base
 
   private
 
-  def flow(preprocessor)
+  def flow(preprocessor, check = true)
     self.assignable_roles, self.unassignable_roles = preprocessor
 
-    if assignable_roles.blank?
+    if check && assignable_roles.blank?
       add_message :error, "Request cannot be processed. Perhaps, selected users are already assigned to the chosen policies with the specified roles."
       return
     end

@@ -7,7 +7,7 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
                     :vendor_reviewer, :policy_admin, :vendor_manager, :budget_manager, :non_po_initiator,
                     :purchase_order_auditor, :bank_payment_request_auditor, :purchase_request_auditor, :invoice_auditor, :vendor_auditor, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor,
                     :utility_bill_master_initiator, :utility_bill_master_reviewer, :utility_bill_initiator, :utility_bill_reviewer,
-                    :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor
+                    :credit_note_initiator, :credit_note_reviewer, :credit_note_auditor, :agreement_invoice_initiator, :agreement_invoice_reviewer, :agreement_invoice_auditor
   ]
 
   def purchase_request_initiator
@@ -142,6 +142,18 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def credit_note_auditor
+    true
+  end
+
+  def agreement_invoice_initiator
+    true
+  end
+
+  def agreement_invoice_reviewer
+    true
+  end
+
+  def agreement_invoice_auditor
     true
   end
 end

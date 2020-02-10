@@ -34,7 +34,13 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
       add_message :error, 'Batch not found'
       return
     end
+
     unless MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_processor.status_id)
+      add_message :error, 'Batch cannot be cancelled at this stage'
+      return
+    end
+
+    unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.money_request_processor.payment_order.payment_order_status_id)
       add_message :error, 'Batch cannot be cancelled at this stage'
       return
     end

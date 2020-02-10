@@ -32,7 +32,11 @@ class UserOnboarding::Base < BaseOperation
     self.policies = user.company.policies.with_id(bulk_assign[:policy_ids])
     self.policy_ids = user.company.policies.with_id(bulk_assign[:policy_ids]).pluck(:id) rescue nil
     self.urm_user_role_ids = (UserRole::VALUES_EM.except(:admin, :purchaser, :receiver).values & bulk_assign[:user_role_ids]) rescue nil
-    self.pur_user_role_ids = (UserRole::VP_ROLES.except(:admin, :policy_admin).values & bulk_assign[:user_role_ids]) rescue nil
+    if RequestStore.store[:em_onboarding]
+      self.pur_user_role_ids = (UserRole::VALUES_EM.except(:admin, :purchaser, :receiver).values & bulk_assign[:user_role_ids]) rescue nil
+    else
+      self.pur_user_role_ids = (UserRole::VP_ROLES.except(:admin, :policy_admin).values & bulk_assign[:user_role_ids]) rescue nil
+    end
     result = ::UserOnboarding::BuildUsersForImport.(current_user, params)
 
     unless result.success?
@@ -85,6 +89,18 @@ class UserOnboarding::Base < BaseOperation
     return assignable_roles, unassignable_roles
   end
 
+  def pre_process_pum
+    pum = PolicyUserMapping.where(user_id: self.user_ids, policy_id: self.policy_ids)
+    all_roles = pum.pluck(:user_id, :policy_id)
+
+    new_roles = self.user_ids.product(self.policy_ids)
+
+    assignable_roles = new_roles - all_roles
+    unassignable_roles = new_roles & all_roles
+    return assignable_roles, unassignable_roles
+
+  end
+
   def pre_process_pur
     # We will now check if users were already assigned to selected policies and the roles
     # since, we need to avoid duplicate records
@@ -133,6 +149,14 @@ class UserOnboarding::Base < BaseOperation
 
     columns = [:user_id, :user_role_id, :purpose_id]
     values = assignable_roles.collect {|u_id, r_id| [u_id, r_id, purpose_id]}
+    return columns, values
+  end
+
+  def setup_pum(assignable_roles)
+    # setup data points for importing into table
+    columns = [:user_id, :policy_id]
+    values = assignable_roles.collect {|u_id, p_id| [u_id, p_id]}
+
     return columns, values
   end
 

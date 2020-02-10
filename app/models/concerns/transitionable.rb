@@ -697,6 +697,12 @@ module Transitionable
           data = data.or(role_based_reviewer_associated_items(user, role_id))
         when :invoice_auditor, 'invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
+         when :agreement_invoice_initiator, 'agreement_invoice_initiator'
+          data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: [InwardInvoiceType.id_for(:agreement_invoice), InwardInvoiceType.id_for(:recurring_invoice)]))
+        when :agreement_invoice_reviewer, 'agreement_invoice_reviewer'
+          data = data.or(role_based_reviewer_associated_items(user, role_id))
+        when :agreement_invoice_auditor, 'agreement_invoice_auditor'
+          data = data.or(role_based_auditor_associated_items(user, role_id))
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'

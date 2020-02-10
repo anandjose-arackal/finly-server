@@ -25,6 +25,7 @@ config/insights_config.yml
 config/bbps_config.yml
 .rubocop.yml
 .vscode/
+reference_resource_migration.log
 
 # Ignore all logfiles and tempfiles.
 /log/*
