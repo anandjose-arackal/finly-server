@@ -48,11 +48,15 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     if self.payment.neft?
       remarks = remarks[0..30]
     end
-    if self.receiving_account&.account_owner.is_a?(YesBankVendor)
-      payee_name = self.receiving_account.account_owner.business_name
-    else
-      payee_name = self.receiving_account.account_owner.name
-    end
+
+    # payee_name will always be the bank account's name henceforth
+    payee_name = self.receiving_account&.name
+
+    # if self.receiving_account&.account_owner.is_a?(YesBankVendor)
+    #   payee_name = self.receiving_account.account_owner.business_name
+    # else
+    #   payee_name = self.receiving_account.account_owner.name
+    # end
 
     {
         AGGRID: self.company_details["AGGR_ID"],
