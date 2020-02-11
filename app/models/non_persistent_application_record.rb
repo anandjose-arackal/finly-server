@@ -1,5 +1,5 @@
 class NonPersistentApplicationRecord < ActiveRecord::Base
-  include LiquidDroppable, ActiveRecordMaster
+  include LiquidDroppable
 
   self.abstract_class = true
 
