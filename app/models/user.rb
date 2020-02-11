@@ -59,6 +59,7 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
+#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -140,6 +141,9 @@ class User < ApplicationRecord
   has_many :user_pockets
 
   has_many :export_jobs, foreign_key: :created_by_id
+
+  # adding association to drop down items
+  has_many :user_drop_down_item_mappings
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
@@ -280,7 +284,8 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :quickbooks_user
   accepts_nested_attributes_for :enforce_policy
 
-  delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :employee_id, to: :profile, allow_nil: true
   delegate :company_name, to: :company
 
   ############# Devise validateable validations ############
@@ -344,6 +349,8 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
     when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
+    when 'AgreementInvoiceProvider', :AgreementInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:agreement_invoice_reviewer)).distinct
     end
   }
 
@@ -980,7 +987,7 @@ class User < ApplicationRecord
   end
 
   def name
-    return nil if first_name.blank? and last_name.blank?
+    return "" if first_name.blank? and last_name.blank?
     name = first_name
     "#{first_name} #{last_name}"
   end
@@ -1531,7 +1538,7 @@ class User < ApplicationRecord
   end
 
 
-  # Agreement Based Payments Role
+  ########### Agreement Based Payments Role End #############
   def is_payment_agreement_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
   end
@@ -1543,6 +1550,19 @@ class User < ApplicationRecord
   def is_payment_agreement_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
+
+  def is_agreement_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), document)
+  end
+
+  def is_agreement_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), document)
+  end
+
+  def is_agreement_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
+  end
+  ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)
@@ -1645,7 +1665,7 @@ class User < ApplicationRecord
 
   def associated_group_role_ids
     associated_user_ids = associated_group_users.pluck(:id)
-    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id) + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id)
+    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id).uniq + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id).uniq
   end
 
   protected

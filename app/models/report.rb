@@ -42,6 +42,7 @@
 #  source_account                     :string(255)
 #  location_id                        :integer
 #  cost_center_id                     :integer
+#  reference_payment_id               :integer
 #
 
 class Report < ApplicationRecord

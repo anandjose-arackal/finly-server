@@ -6,7 +6,7 @@
 #  purchase_order_id        :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :text(65535)
+#  description              :text(16777215)
 #  hsn_sac                  :string(255)
 #  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)

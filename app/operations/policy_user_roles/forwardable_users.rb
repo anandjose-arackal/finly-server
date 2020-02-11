@@ -3,7 +3,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
 
   def init
 
-    self.document_types = %w( purchase_order_provider po_invoice_provider non_po_invoice_provider )
+    self.document_types = %w( purchase_order_provider po_invoice_provider non_po_invoice_provider agreement_invoice_provider )
     unless document_types.include?(params[:document_type])
       add_message :error, "Invalid Type"
     end
@@ -110,6 +110,9 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
     elsif document_type == 'non_po_invoice_provider'
       # params[:filter_inward_invoice_type] = 'non_po_invoice'
+      params[:filter_awaiting_approval] = true
+      self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
+    elsif document_type == 'agreement_invoice_provider'
       params[:filter_awaiting_approval] = true
       self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
     else

@@ -27,7 +27,8 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
   section :po_details do
     attribute :procurement_name
     attribute :po_number
-    attribute :po_date
+    attribute :po_creation_date
+    attribute :po_closed_date
     attribute :created_by
     attribute :policy
     attribute :vendor_name
@@ -85,8 +86,12 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     purchase_order(item)&.po_number
   end
 
-  def po_date(item)
+  def po_creation_date(item)
     purchase_order(item)&.created_at&.strftime "%d-%b-%Y"
+  end
+
+  def po_closed_date(item)
+    purchase_order(item).trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
   end
 
   def created_by(item)

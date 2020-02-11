@@ -7,7 +7,6 @@
 #  form_id                      :integer          not null
 #  form_section_id              :integer          not null
 #  created_by_user_id           :integer
-#  parent_id                    :integer
 #  field_key                    :string(255)      not null
 #  label                        :string(255)
 #  placeholder                  :boolean
@@ -38,6 +37,7 @@
 #  options                      :text(65535)
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  deleted_at                   :datetime
 #
 
 class FormEntity < ApplicationRecord

@@ -32,6 +32,8 @@
 #  original_source_content_type :string(255)
 #  original_source_file_size    :integer
 #  original_source_updated_at   :datetime
+#  deleted_at                   :datetime
+#  receipt_email_status_id      :bigint
 #
 
 require 'fileutils'

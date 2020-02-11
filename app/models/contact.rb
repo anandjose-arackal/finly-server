@@ -11,6 +11,7 @@
 #  contactable_id   :integer
 #  contactable_type :string(255)
 #  designation      :string(255)
+#  deleted_at       :datetime
 #
 
 class Contact < ApplicationRecord

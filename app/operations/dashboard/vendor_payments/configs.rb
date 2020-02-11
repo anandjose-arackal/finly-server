@@ -80,7 +80,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         #   if user.company.vendor_empanelment_workflow_enabled?
         #     request_types[:vendors] = true
         #   end
-        when UserRole.id_for(:payment_agreement_initiator)
+        when UserRole.id_for(:payment_agreement_initiator), UserRole.id_for(:agreement_invoice_initiator)
           request_types[:payment_agreements] = true
         when UserRole.id_for(:inventory_manager)
           request_types[:approved_purchase_request_items] = true

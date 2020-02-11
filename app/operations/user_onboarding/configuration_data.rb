@@ -45,6 +45,7 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
         self.document_list << 'purchase_order'
         self.document_list << 'po_invoice'
         self.document_list << 'non_po_invoice'
+        self.document_list << 'agreement_invoice'
         self.document_list << 'goods'
         self.document_list << 'inventory'
         self.document_list << 'item_master'

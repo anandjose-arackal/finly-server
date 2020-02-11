@@ -80,21 +80,18 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  payment_agreement_id            :integer
 #  vendor_location_id              :integer
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
 #  payable                         :boolean          default(FALSE)
-#  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
@@ -397,7 +394,7 @@ class Invoice < ApplicationRecord
     when 'non_po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
     when 'agreement_invoice', 'recurring_invoice'
-      where invoice_type_id: InwardInvoiceType.id_for(:recurring_invoice)
+      where invoice_type_id: [InwardInvoiceType.id_for(:recurring_invoice), InwardInvoiceType.id_for(:agreement_invoice)]
 
     else
       return nil
@@ -420,6 +417,7 @@ class Invoice < ApplicationRecord
                             InwardInvoiceType.id_for(:advance),
                             InwardInvoiceType.id_for(:non_po_invoice),
                             InwardInvoiceType.id_for(:recurring_invoice),
+                            InwardInvoiceType.id_for(:agreement_invoice),
                             nil])
   }
 
@@ -841,7 +839,7 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
   end
 
-  ##### For Po Invoice and Non PO invoice Initiator roles #####
+  ##### For Po Invoice, Non PO invoice, Agreement Invoice roles #####
   def is_po_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:po_invoice_initiator), self)
@@ -870,6 +868,21 @@ class Invoice < ApplicationRecord
   def is_non_po_auditing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:non_po_invoice_auditor), self)
+  end
+
+  def is_agreement_invoice_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), self)
+  end
+
+  def is_agreement_invoice_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), self)
+  end
+
+  def is_agreement_invoice_auditing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
   ############ End ############
 
@@ -954,7 +967,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options={})
-    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator)].include?(role_id)
+    if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
@@ -974,8 +987,18 @@ class Invoice < ApplicationRecord
     return user.present? ? user.company.bank_accounts.find_by_id(self.bank_account_id) : nil
   end
 
+  # def get_invoice_provider_name
+  #   self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+  # end
+
   def get_invoice_provider_name
-    self.procurement.present? && self.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+    if self.procurement.purchase_order.present?
+      return 'PoInvoiceProvider'
+    elsif self.payment_agreement_id.present?
+      return 'AgreementInvoiceProvider'
+    else
+      return 'NonPoInvoiceProvider'
+    end
   end
 
   def get_default_provider
@@ -1169,9 +1192,9 @@ class Invoice < ApplicationRecord
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator)].include?(role_id)
+        if [UserRole.id_for(:po_invoice_initiator), UserRole.id_for(:non_po_invoice_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:agreement_invoice_initiator)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
-        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer)].include?(role_id)
+        elsif [UserRole.id_for(:po_invoice_reviewer), UserRole.id_for(:non_po_invoice_reviewer), UserRole.id_for(:invoice_reviewer), UserRole.id_for(:agreement_invoice_reviewer)].include?(role_id)
           statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
         elsif UserRole.id_for(:admin) == role_id.to_i
           statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
@@ -1193,6 +1216,9 @@ class Invoice < ApplicationRecord
         :non_po_invoice_initiator,
         :non_po_invoice_reviewer,
         :non_po_invoice_auditor,
+        :agreement_invoice_initiator,
+        :agreement_invoice_reviewer,
+        :agreement_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,

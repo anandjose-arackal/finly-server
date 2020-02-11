@@ -23,6 +23,8 @@
 #  entity_created_at    :datetime
 #  entity_submitted_at  :datetime
 #  billed               :boolean          default(FALSE)
+#  deleted_at           :datetime
+#  date                 :datetime
 #
 
 class BudgetTrail < ApplicationRecord

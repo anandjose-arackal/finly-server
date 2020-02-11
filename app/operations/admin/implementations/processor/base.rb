@@ -1,5 +1,6 @@
 class Admin::Implementations::Processor::Base < BackgroundOperation
   include EventBus::Subscriber
+  include Dry::Monads[:result]
 
   attr_accessor :master, :implementation_request, :company, :input
 

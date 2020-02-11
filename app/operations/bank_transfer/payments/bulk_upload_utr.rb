@@ -15,7 +15,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def init
     self.file = params[:file]
-    self.payments_data = ImportUtil.load_spreadsheet_quickly(file, [:payment_id, :utr], {skip_empty_lines: true})
+    self.payments_data = ImportUtil.load_spreadsheet_quickly(file, [:payment_id, :utr,:processed_date], {skip_empty_lines: true})
     self.result_array = []
     self.headers = retrieve_headers
   end
@@ -42,6 +42,16 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       self.result_array << payment_data.values
       id = payment_data[:payment_id]
       utr = payment_data[:utr]
+      begin
+       credited_at = nil
+       credited_at = DateTime.strptime(payment_data[:processed_date], "%d-%m-%Y") if payment_data[:processed_date].present?
+       credited_at += Time.now&.seconds_since_midnight&.seconds unless credited_at.nil?
+       #XLSX library read the date in MM-DD-YYYY format, Rewrite the date in supplied format after processing.
+       self.result_array.last[-1] = credited_at&.strftime("%m/%d/%Y")
+      rescue ArgumentError => e
+        self.result_array[index] << "Invalid Processed Date"
+        next
+      end
       # payment = Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
       payment = self.all_payments.find { |payment| payment if payment.id.to_i == id.to_i }
       if payment.blank?
@@ -80,7 +90,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                   transfer_status_id: BankTransferStatus.id_for(:completed),
                                                   bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
                                                   beneficiary_bank_account_id: payment.receiving_account&.id,
-                                                  amount_id: amount.id)
+                                                  amount_id: amount.id,
+                                                  created_at: credited_at )
         # payment.update(reference_resource: bank_transaction)
         payment.reference_resource = new_transactions.last
         self.update_payments << payment
@@ -105,7 +116,8 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def retrieve_headers
     [
         "Payment ID",
-        "UTR"
+        "UTR",
+        "Processed Date (MM/DD/YYYY)"
     ]
   end
 

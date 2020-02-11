@@ -56,15 +56,15 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     end
 
     def po_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:tax_invoice))
+      get_count([InwardInvoiceType.id_for(:tax_invoice)])
     end
 
     def non_po_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:non_po_invoice))
+      get_count([InwardInvoiceType.id_for(:non_po_invoice)])
     end
 
     def agreement_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:recurring_invoice))
+      get_count([InwardInvoiceType.id_for(:recurring_invoice), InwardInvoiceType.id_for(:agreement_invoice)])
     end
 
     def get_count(id)
