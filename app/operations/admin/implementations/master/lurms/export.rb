@@ -11,7 +11,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
       :user_id => 'User Email / Mobile',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
-      :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :reviewer_email_mobile => 'Employee ID / Reviewer Email / Mobile',
       :with_exception => 'With Exception Y/N',
       :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
