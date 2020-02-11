@@ -115,8 +115,8 @@ end
 
 json.request_items @result.items do |item|
   json.category do
-    json.name item.category.name
-    json.id item.category.id
+    json.name item.category&.name
+    json.id item.category&.id
   end
   json.amount do
     json.value item.amount.value

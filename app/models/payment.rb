@@ -74,6 +74,7 @@ class Payment < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :department, optional: true
   belongs_to :company, optional: true
+  belongs_to :cost_center, optional: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
