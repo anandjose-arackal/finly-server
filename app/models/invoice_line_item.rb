@@ -39,6 +39,7 @@
 
 class InvoiceLineItem < ApplicationRecord
   include LiquidDroppable
+include Exposures::Model::Exposable
   include MathUtil
 
   belongs_to :invoice, optional: true

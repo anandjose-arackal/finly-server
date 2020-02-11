@@ -12,6 +12,7 @@
 
 class GstStateCode < ApplicationRecord
   include LiquidDroppable
+include Exposures::Model::Exposable
 
   scope :with_state_code, -> (state_code) {
     where(state_code: state_code)

@@ -18,6 +18,7 @@
 class Company < ApplicationRecord
   include Constants
   include LiquidDroppable
+include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'company'

@@ -58,6 +58,7 @@
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
+include Exposures::Model::Exposable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'

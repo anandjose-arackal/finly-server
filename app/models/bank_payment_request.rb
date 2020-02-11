@@ -46,6 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           Transitionable,
           CustomFieldFilterSupport
   include LiquidDroppable
+include Exposures::Model::Exposable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy

@@ -27,7 +27,7 @@ class Exposures::API < Liquid::Drop
       includes << include_key unless includes.include?(name)
     end
 
-    attr = Attribute.new(
+    attributes[name] = Attribute.new(
         {
             name: name,
             includes: includes,
@@ -36,9 +36,7 @@ class Exposures::API < Liquid::Drop
             block: block
         }
     )
-    attributes[name] ||= []
-    attributes[name] << attr
-    class_eval &attr.define!
+    class_eval &attributes[name].define!
   end
 
   def initialize(object)

@@ -30,8 +30,9 @@ class Exposures::API::Attribute
         end
 
         return value unless exposure
-        return value if value.class <= Drop
-        return value.to_liquid
+        return value if value.class <= Exposure::API
+        raise "#{value.class.name} does not have an exposure defined" unless value.respond_to?(:to_exposure)
+        return value.to_exposure
       end
     end
   end

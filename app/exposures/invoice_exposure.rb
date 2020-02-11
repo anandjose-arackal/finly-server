@@ -12,6 +12,7 @@ class InvoiceExposure < Exposures::API
   attribute :shipping_location, record_attribute: :delivery_location, exposure: true, includes: [:delivery_location]
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
+  attribute :created_at, record_attribute: true
   attribute :net_amount, includes: [:net_amount] do
     record.net_amount&.value || 0
   end
