@@ -1660,7 +1660,7 @@ class User < ApplicationRecord
 
   def associated_group_role_ids
     associated_user_ids = associated_group_users.pluck(:id)
-    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id) + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id)
+    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id).uniq + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id).uniq
   end
 
   protected
