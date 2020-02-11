@@ -16,12 +16,12 @@ class Exposures::API < Liquid::Drop
   #   - includes: Array: List of models to include
   #   - record_attribute: If the attribute can be fetched directly from the model.
   #       All record attributes that are data providers will be added to the include list by default
-  #   - data_provider: Flag if the result should be converted to a liquid_drop
-  def self.attribute(name, includes: [], record_attribute: false, data_provider: false, &block)
+  #   - exposure: Flag if the result should be converted to a Exposure::API
+  def self.attribute(name, includes: [], record_attribute: false, exposure: false, &block)
     raise "#{name} is already defined for class #{self.name}" if exists?(name)
     raise "#{name} : Non-record attributes require a block for fetching the data" unless record_attribute or block_given?
 
-    if record_attribute and data_provider
+    if record_attribute and exposure
       include_key = record_attribute.is_a?(Symbol) ? record_attribute : name
 
       includes << include_key unless includes.include?(name)
@@ -32,12 +32,13 @@ class Exposures::API < Liquid::Drop
             name: name,
             includes: includes,
             record_attribute: record_attribute,
-            data_provider: data_provider,
+            exposure: exposure,
             block: block
         }
     )
+    attributes[name] ||= []
     attributes[name] << attr
-    class_eval &attribute.define!
+    class_eval &attr.define!
   end
 
   def initialize(object)

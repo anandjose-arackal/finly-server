@@ -3,7 +3,7 @@ class Exposures::API::Attribute
   attr_accessor :name, :includes, :record_attribute, :exposure, :block
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
-  def initialize(name, includes: [], record_attribute: false, exposure: false, &block)
+  def initialize(name:, includes: [], record_attribute: false, exposure: false, block: nil)
     self.name = name
     self.includes = includes
     self.record_attribute = record_attribute
@@ -13,6 +13,10 @@ class Exposures::API::Attribute
 
   # Defines self as a method
   def define!
+    record_attribute = self.record_attribute
+    name = self.name
+    block = self.block
+    exposure = self.exposure
     lambda do |*args|
       define_method name do
         if record_attribute
@@ -25,7 +29,7 @@ class Exposures::API::Attribute
           value = block.call
         end
 
-        return value unless data_provider
+        return value unless exposure
         return value if value.class <= Drop
         return value.to_liquid
       end

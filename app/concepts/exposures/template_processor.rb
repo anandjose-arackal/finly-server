@@ -6,9 +6,13 @@ module Exposures::TemplateProcessor
   end
 
   class_methods do
-    def template(text, key: :record)
-      Exposures::TemplateProcessor.template self, text, key: key
+    def template(exposure, text, key: :record)
+      Exposures::TemplateProcessor.template exposure, text, key: key
     end
+  end
+
+  def template(text, key: :record)
+    self.class.template(self, text, key: key)
   end
 
 end
