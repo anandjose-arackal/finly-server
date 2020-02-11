@@ -1,4 +1,4 @@
-class NonPersistentModel < ApplicationRecord
+class NonPersistentModel < NonPersistentApplicationRecord
 
   def initialize(attributes= {})
     pre_initialize(attributes)
