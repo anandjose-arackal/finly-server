@@ -1,71 +1,71 @@
 class InvoiceDrop < Drop
 
   def invoice_id
-    @object.invoice_id
+    record.invoice_id
   end
 
   def company
-    @object.company.to_liquid
+    record.company.to_liquid
   end
 
   def vendor_location
-    @object.gstin_location.to_liquid
+    record.gstin_location.to_liquid
   end
 
   def vendor
-    @object.vendor.to_liquid
+    record.vendor.to_liquid
   end
 
   def date
-    @object.date
+    record.date
   end
 
   def approved_date
-    @object.approved_at
+    record.approved_at
   end
 
   def cost_center
-    @object.cost_center.to_liquid
+    record.cost_center.to_liquid
   end
 
   def department
-    @object.department.to_liquid
+    record.department.to_liquid
   end
 
   def billing_location
-    @object.location.to_liquid
+    record.location.to_liquid
   end
 
   def shipping_location
-    @object.delivery_location.to_liquid
+    record.delivery_location.to_liquid
   end
 
   def narration
-    @object.narration
+    record.narration
   end
 
   def invoice_number
-    @object.invoice_number
+    record.invoice_number
   end
 
   def net_amount
-    @object.net_amount&.value || 0
+    record.net_amount&.value || 0
   end
 
   def gross_amount
-    @object.gross_amount&.value || 0
+    record.gross_amount&.value || 0
   end
 
   def tds_amount
-    @object.tds_amount.value || 0
+    record.tds_amount.value || 0
   end
 
   def tds_slab
-    @object.tds_slab.to_liquid
+    record.tds_slab.to_liquid
   end
 
   def line_items
-    @object.invoice_items.to_a.map(&:to_liquid)
+    record.invoice_items.to_a.map(&:to_liquid)
   end
 
 end
