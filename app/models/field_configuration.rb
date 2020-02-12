@@ -208,7 +208,7 @@ class FieldConfiguration < ApplicationRecord
     user_level_custom_fields = self.user_level_field
     if field_type_id == FieldType.id_for(:drop_down)
       # options = drop_down_items.exclude_deleted
-      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
+      options = drop_down_items.includes(:dependent_field_configurations)
       # if user_level_custom_fields
       #  options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
       # else
