@@ -209,7 +209,7 @@ class Invoice < ApplicationRecord
   delegate :paid_amount_value, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
-           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, to: :invoice_status, allow_nil: true
+           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
@@ -532,6 +532,9 @@ class Invoice < ApplicationRecord
     where invoice_status_id: InwardInvoiceStatus.ids_for(status)
   }
 
+  scope :scope_all_except_voided, -> {
+    where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
+  }
 
   after_create :set_defaults
   after_save :budget_trail_entry
@@ -995,7 +998,7 @@ class Invoice < ApplicationRecord
   # end
 
   def get_invoice_provider_name
-    if self.procurement.purchase_order.present?
+    if self.procurement.present? && self.procurement.purchase_order.present?
       return 'PoInvoiceProvider'
     elsif self.payment_agreement_id.present?
       return 'AgreementInvoiceProvider'

@@ -11,6 +11,7 @@ class WorkflowManager::Aasm::NonPoInvoiceProvider < WorkflowManager::Aasm::BaseP
     state :unpaid
     state :partially_paid
     state :paid
+    state :void
 
     event :submit do
       # transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
@@ -56,6 +57,10 @@ class WorkflowManager::Aasm::NonPoInvoiceProvider < WorkflowManager::Aasm::BaseP
       transitions :from => [:approved, :auto_approved], :to => :paid, guard: :balance_due_is_zero?
     end
 
+    event :void do
+      transitions :from => [:approved, :auto_approved], to: :voided, guard: [:user_is_admin?, :no_payments?]
+    end
+
     after_all_events :change_state
     # after_all_transitions :log_status_change
     # success :change_state
@@ -70,5 +75,13 @@ class WorkflowManager::Aasm::NonPoInvoiceProvider < WorkflowManager::Aasm::BaseP
   def balance_due_is_zero?
     # if invoice final amount comes to zero, probably because so much advance was adjusted, then auto mark it as paid
     document.balance_due&.value == 0
+  end
+
+  def user_is_admin?
+    user.vendor_payments_admin?
+  end
+
+  def no_payments?
+    document.payments.blank?
   end
 end

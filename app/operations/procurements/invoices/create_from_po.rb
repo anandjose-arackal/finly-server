@@ -24,7 +24,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       end
     end
 
-    self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:invoice_items) : nil
+    self.previous_invoices = (self.procurement.invoices.scope_all_except_voided.present?) ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
 

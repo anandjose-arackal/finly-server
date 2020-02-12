@@ -6,7 +6,7 @@ class Procurements::Invoices::ReturnControl < Procurements::Invoices::Base
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    self.invoice = user.company.inward_invoices.admin_associated_items(user).find_by id: invoice_id
+    self.invoice = user.company.inward_invoices.scope_all_except_voided.admin_associated_items(user).find_by id: invoice_id
 
     self.procurement = self.invoice&.procurement
   end
