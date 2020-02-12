@@ -147,7 +147,11 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           if item.is_a?(Hash)
             case item[:type]
             when 'string'
-              worksheet.write_string(1 + row, column, item[:value])
+              if item[:value].present?
+                worksheet.write_string(1 + row, column, item[:value])
+              else
+                worksheet.write_blank(1 + row, column)
+              end
             when 'number'
               worksheet.write_number(1 + row, column, item[:value])
             when 'date'
