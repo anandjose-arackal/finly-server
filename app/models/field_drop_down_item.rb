@@ -44,15 +44,23 @@ class FieldDropDownItem < ApplicationRecord
   default_scope { unscope(:where) }
 
   def as_json(options={})
-    dependent = dependent_field_configurations
+    # dependent_field_ids = ParentDependentFieldConfigurationMapping.where(parent_type: "FieldDropDownItem", parent_id: self.id).pluck(:dependent_field_configuration_id)
+    # dependent_field_configs = FieldConfiguration.where(id: dependent_field_ids).select(:field_name, :id, )
+    # dependent = dependent_field_configurations
+    # {
+    #     id: id,
+    #     name: name,
+    #     # dependent_field_configurations: dependent_field_configurations,
+    #     # dependent_cf_present: self.dependent_field_configurations.exists?
+    #     dependent_field_configurations: dependent,
+    #     # custom_field_name: self.field_configuration&.field_name,
+    #     dependent_cf_present: dependent.present?
+    # }
     {
         id: id,
         name: name,
-        # dependent_field_configurations: dependent_field_configurations,
-        # dependent_cf_present: self.dependent_field_configurations.exists?
-        dependent_field_configurations: dependent,
-        # custom_field_name: self.field_configuration&.field_name,
-        dependent_cf_present: dependent.present?
+        # dependent_field_configurations: dependent,
+        dependent_cf_present: dependent_field_configuration_ids.present?
     }
   end
 

@@ -230,11 +230,13 @@ class FieldConfiguration < ApplicationRecord
         parent_drop_down_items: parent_drop_down_items
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
-      # if self.drop_down_items.joins(:dependent_field_configurations).present?
+      # if self.drop_down_items.joins(:dependent_field_configurations).count > 0
       #   result[:has_dependent_cf] = true
       # end
+
       ddi = drop_down_items.pluck :id
       result[:has_dependent_cf] = true if ParentDependentFieldConfigurationMapping.where(parent_id: ddi).present?
+
       # self.drop_down_items.each do |drop_down|
       #   if drop_down.dependent_field_configurations.present?
       #     result[:has_dependent_cf] = true
