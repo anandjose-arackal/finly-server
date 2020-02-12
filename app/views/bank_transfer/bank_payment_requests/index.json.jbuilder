@@ -4,6 +4,7 @@ json.results do
     json.ticket_type payment_request.ticket_type
 
     json.controlling_level_name payment_request.controlling_level&.name
+    json.controlling_level_reviwers payment_request.get_reviewers.map{|user| user.name}
     json.rejection_note payment_request.rejection_note
     # json.can_approve payment_request.can_approve?
     # json.can_approve payment_request.can_really_approve?
