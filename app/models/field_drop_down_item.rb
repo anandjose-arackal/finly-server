@@ -23,7 +23,7 @@ class FieldDropDownItem < ApplicationRecord
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
 
-  has_many :user_drop_down_item_mappings , class_name: 'UserDropDownItemMapping', foreign_key: :drop_down_item_id
+  has_many :user_drop_down_item_mappings, class_name: 'UserDropDownItemMapping', foreign_key: :drop_down_item_id
   has_many :affected_users, through: :user_drop_down_item_mappings, source: :user
 
   validates :name, presence: true
@@ -44,8 +44,8 @@ class FieldDropDownItem < ApplicationRecord
   default_scope { unscope(:where) }
 
   def as_json(options={})
-    # dependent_field_ids = ParentDependentFieldConfigurationMapping.where(parent_type: "FieldDropDownItem", parent_id: self.id).pluck(:dependent_field_configuration_id)
-    # dependent_field_configs = FieldConfiguration.where(id: dependent_field_ids).select(:field_name, :id, )
+    dependent_field_ids = ParentDependentFieldConfigurationMapping.where(parent_type: "FieldDropDownItem", parent_id: self.id).pluck(:dependent_field_configuration_id)
+    # dependent_field_configs = FieldConfiguration.where(id: dependent_field_ids)
     # dependent = dependent_field_configurations
     # {
     #     id: id,
@@ -59,8 +59,9 @@ class FieldDropDownItem < ApplicationRecord
     {
         id: id,
         name: name,
-        # dependent_field_configurations: dependent,
-        dependent_cf_present: dependent_field_configuration_ids.present?
+        dependent_field_configurations: dependent_field_configurations.as_json(called_from_drop_down: true),
+        custom_field_name: self.field_configuration&.field_name,
+        dependent_cf_present: dependent_field_ids.present?
     }
   end
 
