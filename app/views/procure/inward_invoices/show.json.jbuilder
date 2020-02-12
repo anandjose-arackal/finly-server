@@ -345,6 +345,8 @@ end
 
 if @result.invoice.procurement.purchase_order.present?
   json.reviewal_chain @result.invoice.get_reviewal_chain('PoInvoiceProvider')
+elsif @result.invoice.payment_agreement_id.present?
+  json.reviewal_chain @result.invoice.get_reviewal_chain('AgreementInvoiceProvider')
 else
   json.reviewal_chain @result.invoice.get_reviewal_chain('NonPoInvoiceProvider')
 end
