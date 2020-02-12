@@ -30,6 +30,10 @@ class Procurements::InwardDocuments::CreateSrn < Procurements::InwardDocuments::
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
 
+    if self.purchase_order.voided?
+      add_message :error, "This Purchase Order is voided. No further actions can be taken."
+    end
+
     if all_items_accepted?(self.purchase_order)
       add_message :error, "Cant add new Receipt Note if previous Receipt Note has all items shipped."
     end

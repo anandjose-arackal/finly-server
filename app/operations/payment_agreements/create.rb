@@ -28,10 +28,20 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     validate_item_quantity
     ActiveRecord::Base.transaction do
       if self.payment_agreement.save
+        # checks to see if items are there or not
+        # checks to see if general_invoice or rental_invoice have same items
         validate_invoice_line_items unless has_errors?
+
+        # For fixed periodic, prepaid yes/no should be same of all invoices
         validate_prepaid_consistency unless has_errors?
+
+        # checks to see if atleast one security deposit but not more, is there for all vendors
         security_deposit_validation unless has_errors?
+
+        # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
         validate_invoice_frequency unless has_errors?
+
+        
         validate_invoice_start_end_date unless has_errors?
         fixed_periodic_grouped_vendor_validations unless has_errors?
         check_agreement_item_presence unless has_errors?

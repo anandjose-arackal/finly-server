@@ -1008,11 +1008,12 @@ include Exposures::Model::Exposable
   end
 
   def get_default_provider
-    if self.procurement.present? && self.procurement.purchase_order.present?
-      "PoInvoiceProvider"
-    else
-      "NonPoInvoiceProvider"
-    end
+    # if self.procurement.present? && self.procurement.purchase_order.present?
+    #   "PoInvoiceProvider"
+    # else
+    #   "NonPoInvoiceProvider"
+    # end
+    get_invoice_provider_name
   end
 
   def update_net_amount_value

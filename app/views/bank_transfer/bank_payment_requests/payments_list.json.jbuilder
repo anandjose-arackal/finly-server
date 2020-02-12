@@ -46,6 +46,25 @@ json.payments do
 
     invoice = payment.invoice
 
+    case payment.parent.class.name
+    when 'PurchaseOrder'
+      # since po advance can't be processed in tranches, for now just checking if there are other payments for it or not.
+      # remaining_amount = (payment.parent.advance_amount&.value.to_f - payment.parent.advance_payments.map {|p| p.amount&.value.to_f if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum).round(2)
+      remaining_amount = (payment.parent.advance_payments.map {|p| p.amount&.value.to_f if (PaymentStatus.all_except_failed.include? p.payment_status_id)}.compact.sum).round(2)
+      retriable = payment.retriable? && remaining_amount <= 0
+    when 'Invoice'
+      retriable = payment.retriable? && payment.parent.payable
+    when 'BeneficiaryPayment'
+      retriable = payment.retriable?
+    else
+      retriable = payment.retriable?
+    end
+
+    json.retriable do
+      json.retriable retriable
+      json.change_mode payment.payment_order.failed?
+    end
+
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
@@ -53,11 +72,6 @@ json.payments do
         json.original_amount precision_value invoice.amount&.value
       else
         json.original_amount precision_value invoice.original_amount&.value
-      end
-
-      json.retriable do
-        json.retriable (payment.retriable? && invoice.payable)
-        json.change_mode payment.payment_order.failed?
       end
 
       json.invoice do

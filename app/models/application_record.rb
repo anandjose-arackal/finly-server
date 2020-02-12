@@ -6,6 +6,6 @@ include Exposures::Model::Exposable
 
   self.abstract_class = true
 
-  # include SoftDeletable
+  include SoftDeletable
 
 end
