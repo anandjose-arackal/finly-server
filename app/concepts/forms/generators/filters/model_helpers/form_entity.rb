@@ -13,7 +13,7 @@ module Forms::Generators::Filters::ModelHelpers::FormEntity
         label: label,
         hint: hint,
         type: field_type,
-        filter_key: field_path,
+        filter_key: field_path.gsub("/", "_"),
         options: filter_options,
         multiple: multiple
     }
