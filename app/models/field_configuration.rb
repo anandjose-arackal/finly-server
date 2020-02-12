@@ -208,11 +208,12 @@ class FieldConfiguration < ApplicationRecord
     user_level_custom_fields = self.user_level_field
     if field_type_id == FieldType.id_for(:drop_down)
       # options = drop_down_items.exclude_deleted
-      if user_level_custom_fields
-       options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
-      else
-        options = drop_down_items.exclude_deleted.includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
-      end
+      options = drop_down_items.includes(:dependent_field_configurations).find_each(batch_size: 100).lazy.flat_map {|ddi| ddi if ddi.is_deleted == false}.reject(&:nil?)
+      # if user_level_custom_fields
+      #  options = drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
+      # else
+      #   options = drop_down_items.exclude_deleted.includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
+      # end
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
