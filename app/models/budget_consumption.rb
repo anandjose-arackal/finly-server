@@ -13,6 +13,7 @@
 #  updated_at                   :datetime         not null
 #  budget_amount_id             :integer
 #  remaining_amount_id          :integer
+#  deleted_at                   :datetime
 #
 
 class BudgetConsumption < ApplicationRecord

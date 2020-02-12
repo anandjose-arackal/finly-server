@@ -10,6 +10,7 @@
 #  updated_at         :datetime         not null
 #  created_by_user_id :integer
 #  company_id         :integer
+#  deleted_at         :datetime
 #
 
 require 'rails_helper'

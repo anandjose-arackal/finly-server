@@ -16,6 +16,7 @@
 #  name               :string(255)
 #  start_date         :datetime
 #  end_date           :datetime
+#  deleted_at         :datetime
 #
 
 require 'rails_helper'

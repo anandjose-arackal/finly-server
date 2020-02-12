@@ -16,6 +16,7 @@
 #  name               :string(255)
 #  start_date         :datetime
 #  end_date           :datetime
+#  deleted_at         :datetime
 #
 
 class BudgetGroup < ApplicationRecord
@@ -25,7 +26,9 @@ class BudgetGroup < ApplicationRecord
 
   has_many :budget_group_criteria
   has_many :budgets
-  # defining the scopes for this model
+
+  accepts_nested_attributes_for :budget_group_criteria
+
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
