@@ -9,7 +9,7 @@ class Procurements::Invoices::BulkTakeControl < Procurements::Invoices::Base
       return
     end
 
-    self.invoices = Procurements::Invoices::Index.(user, params).invoices.with_id(invoice_ids)
+    self.invoices = Procurements::Invoices::Index.(user, params).invoices.scope_all_except_voided.with_id(invoice_ids)
   end
 
   def validate

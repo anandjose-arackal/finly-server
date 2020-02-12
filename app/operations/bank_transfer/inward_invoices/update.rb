@@ -265,6 +265,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
       end
     end
+
+    if self.inward_invoice.voided?
+      add_message :error, "Invoice status is \"Void\". No further actions can be taken."
+      return
+    end
   end
 
   def pre_process
