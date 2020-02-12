@@ -3,7 +3,8 @@
 # Invoice freqency is allowed to be monthy only, hence considering 'month' as default period
 class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
 
-  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoices, :invoice_type, :vendor_id, :escalated_reference_invoice, :effective_end_date, :reference_invoice_type, :upcoming_invoice_params, :reference_invoice_ids, :base_start_date, :current_month_end_date, :count, :ordered_upcoming_invoice_dates, :base_end_date, :options, :user
+  attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoices, :invoice_type, :vendor_id, :escalated_reference_invoice, :effective_end_date, :reference_invoice_type, :upcoming_invoice_params, :reference_invoice_ids, :base_start_date, :current_month_end_date, :count, :ordered_upcoming_invoice_dates, :base_end_date, :options, :user,
+    :ri_dates, :gi_dates
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -57,6 +58,11 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     if payment_agreement.terminated?
       add_message :error, 'Payment Agreement has been terminated, unable to create upcoming invoices'
     end
+  end
+
+  def pre_process
+    self.ri_dates = payment_agreement.fixed_periodic_rental_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: [true, false]).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
+    self.gi_dates = payment_agreement.fixed_periodic_general_invoices.where(billing_type_id: BillingType.id_for(:fixed_periodic), is_payment_agreement_upcoming_invoice: [true, false]).where(fixed_periodic_template: true).pluck(:start_date, :end_date)
   end
 
   def process
@@ -262,7 +268,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
 
   def get_payment_agreement_upcoming_date(start_date, end_date, prepaid)
     # return start_date # FOR TESTING ONLY
-    prepaid ? start_date.beginning_of_month : (end_date.end_of_month + 1)
+    prepaid ? start_date.beginning_of_month : (end_date + 1)
   end
 
   def create_invoice_amount(amount)
@@ -276,11 +282,19 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     final_end_date = reference_invoices.last.end_date
     # upcoming_invoices_count = get_upcoming_invoice_count(invoice_frequency_number, initial_start_date, current_month_end_date)
     upcoming_invoice_dates = get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, final_end_date, reference_invoices)
+    klass_name = reference_invoices.first.class.name
+    case klass_name
+    when "GeneralInvoice"
+      upcoming_invoice_dates = upcoming_invoice_dates.values - gi_dates
+    when "RentalInvoice"
+      upcoming_invoice_dates = upcoming_invoice_dates.values - ri_dates
+    end
     options = {
       # invoice_frequency_number: invoice_frequency_number,
       # initial_start_date: initial_start_date,
       # current_month_end_date: current_month_end_date,
-      upcoming_invoice_dates: upcoming_invoice_dates.values
+      # upcoming_invoice_dates: upcoming_invoice_dates.values
+      upcoming_invoice_dates: upcoming_invoice_dates
     }
     return setup_upcoming_invoices_params(reference_invoice_ids, options)
   end
@@ -488,10 +502,10 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     execution_date = self.payment_agreement.execution_date.to_date
     self.base_start_date = Date.parse("01 Aug 2019")
     self.base_end_date = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: vendor_id).order(:start_date).last.end_date
-      self.vendor_id = vendor_id
-      # params[:vendor_id] = vendor_id
-      self.reference_invoice_type = invoice_type
-      self.invoice_type = invoice_type
+    self.vendor_id = vendor_id
+    # params[:vendor_id] = vendor_id
+    self.reference_invoice_type = invoice_type
+    self.invoice_type = invoice_type
     if self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: self.vendor_id).where("Date(start_date) >= ? AND DATE(start_date) <= ?", base_start_date, base_end_date).present?
       self.reference_invoice_ids = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(vendor_id: self.vendor_id).where("Date(start_date) >= ? AND DATE(start_date) <= ?", base_start_date, base_end_date).pluck(:id)
       # params[:reference_invoice_ids] = reference_invoice_ids
@@ -527,7 +541,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
       start_date = end_date + 1
       break if end_date >= final_end_date
     end
-    ideal_end_dates 
+    ideal_end_dates
   end
 
 
