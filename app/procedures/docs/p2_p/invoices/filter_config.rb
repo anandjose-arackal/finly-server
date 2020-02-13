@@ -1,4 +1,4 @@
-class Filters::TestApi < Filters::API
+class Docs::P2P::Invoices::FilterConfig < Filters::API
 
   attribute :invoice_id, label: "Invoice ID", type: :text
   attribute :created_at, type: :datetime
