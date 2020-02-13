@@ -1,5 +1,6 @@
 # Used to create users without invitation
 class Users::Create < Admin::Users::Create
+  include Security
 
   def user_model
     User
@@ -16,8 +17,9 @@ class Users::Create < Admin::Users::Create
 
   def pre_process
     # set dummy password for this user that will be reset on OTP verification
-    self.new_user_params[:password] = "dummypassword"
-    self.new_user_params[:password_confirmation] = "dummypassword"
+    dafault_password = Security.generate_default_password
+    self.new_user_params[:password] = default_password
+    self.new_user_params[:password_confirmation] = default_password
 
     self.new_user_params.permit!
   end
@@ -25,17 +27,17 @@ class Users::Create < Admin::Users::Create
   def process
     self.created_user = self.company.users.build(new_user_params)
     created_user.skip_confirmation_notification!
-    if created_user.save
-      created_user.activate
-      # created_user.otp_confirm
-      created_user.update(verified: true, default_password: true)
-    else
+    unless created_user.save
       add_message :error, created_user.errors.full_messages
       return
     end
   end
 
   def post_process
+    unless created_user.pending_activation
+      created_user.activate
+      created_user.update(verified: true, default_password: true)
+    end
     add_message :success, "User successfully created"
   end
 
@@ -44,7 +46,7 @@ class Users::Create < Admin::Users::Create
   private
 
   def parse_user_params
-    user_params = params.permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name)
+    user_params = params.permit(:email, :mobile_number, :first_name, :last_name, :mothers_maiden_name, :pending_activation)
     user_params[:profile_attributes] = params.permit(:date_of_birth, :gender, :address_1,
                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id)
 
@@ -70,6 +72,21 @@ class Users::Create < Admin::Users::Create
                                                         invoicing_system: !!params[:invoicing]}
 
     user_params
+  end
+
+  def generate_default_password
+    char_array = [("a".."z").to_a,
+                  ("A".."Z").to_a,
+                  ("0".."9").to_a,
+                  %q(#?!@$%^&*-).chars]
+    all_values  = char_array.flatten
+    arr=[]
+    6.times.map do
+      arr = char_array.map(&:sample)
+      (5 - char_array.size).times{ arr << all_values.sample}
+      arr.shuffle.join
+    end
+    "#{arr.join()}#{SecureRandom.base64(10)}"
   end
 
 end

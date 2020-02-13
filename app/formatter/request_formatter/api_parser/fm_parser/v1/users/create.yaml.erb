@@ -7,6 +7,10 @@ user:
   first_name: <%= params[:first_name] %>
   last_name: <%= params[:last_name] %>
   mothers_maiden_name: <%= params[:mothers_maiden_name] %>
+  pending_activation: <%= true %>
+  expense_management: <%= params[:expense_management] %>
+  yes_bank_account_transfer: <%= params[:yes_bank_account_transfer] %>
+  travel_request: <%= params[:travel_request] %>
   profile_attributes:
     date_of_birth: <%= params[:date_of_birth] %>
     gender: <%= params[:gender] %>
@@ -15,14 +19,5 @@ user:
     city: <%= params[:city] %>
     state_id: <%= params[:state_id] %>
     pin_code: <%= params[:pin_code] %>
-  role_mapping_attributes:
-  <% if params[:admin] %>
-    - <%= UserRole.id_for(:admin) %>
-  <% end %>
-  <% if params[:finance_manager] %>
-    - <%= UserRole.id_for(:finance_manager) %>
-  <% end %>
-  <% if params[:manager] %>
-    - <%= UserRole.id_for(:manager) %>
-  <% end %>
-    - <%= UserRole.id_for(:employee) %>
+    employee_id: <%= params[:employee_id] %>
+    payrole_id: <%= params[:payrole_id] %>
