@@ -1,7 +1,7 @@
 module Forms::Generators::Filters::ApiEntityHelper
   extend ActiveSupport::Concern
 
-  DEFAULT_FILTERS = %i(
+  DEFAULT_OPERATORS = %i(
             eq
             not_eq
             cont_any
@@ -13,18 +13,18 @@ module Forms::Generators::Filters::ApiEntityHelper
         )
 
   module ClassMethods
-    def filters(*list)
-      @filters ||= DEFAULT_FILTERS
+    def operators(*list)
+      @operators ||= DEFAULT_OPERATORS
       if list.present?
-        @filters += list
-        @filters.uniq!
+        @operators += list
+        @operators.uniq!
       end
-      @filters
+      @operators
     end
   end
 
-  def filters
-    self.class.filters
+  def operators
+    self.class.operators
   end
 
   def filter_form(options = {})
@@ -34,7 +34,7 @@ module Forms::Generators::Filters::ApiEntityHelper
         hint: hint,
         type: registered_type,
         filter_key: field_path,
-        filters: filters,
+        operators: operators,
         multiple: multiple
     }
     if self.class.consumes_choices?

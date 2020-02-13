@@ -1,6 +1,6 @@
 class Exposures::API::Attribute
 
-  attr_accessor :name, :includes, :record_attribute, :exposure, :block
+  attr_accessor :name, :includes, :record_attribute, :exposure, :data_type, :block
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   def initialize(name:, includes: [], record_attribute: false, exposure: false, block: nil)

@@ -4,8 +4,8 @@ module Forms::Generators::Filters::ModelHelpers::FormEntity
     Forms::API::Entity::Registry.types[field_type]
   end
 
-  def filter_options
-    field_type_klass.filters
+  def operators
+    field_type_klass.operators
   end
 
   def filter_form(options = {})
@@ -14,7 +14,7 @@ module Forms::Generators::Filters::ModelHelpers::FormEntity
         hint: hint,
         type: field_type,
         filter_key: field_path.gsub("/", "_"),
-        options: filter_options,
+        operators: operators,
         multiple: multiple
     }
     if field_type_klass.consumes_choices?
