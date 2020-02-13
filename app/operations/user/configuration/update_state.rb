@@ -31,7 +31,7 @@ class User::Configuration::UpdateState < BaseOperation
   end
 
   def init
-    id = (params[:id] or params[:to_user_id])
+    id = (params[:id] or params[:to_user_id] or params[:user_id])
     self.to_user = User::Team::Index.(user, params).with_id(id).first rescue nil
   end
 
@@ -57,7 +57,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def post_process
     unless to_user.active?
-      to_user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorize)).update_all(status_id: UserSession.id_for(:revoked))
+      to_user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorized)).update_all(status_id: UserSessionStatus.id_for(:revoked))
     end
   end
 
