@@ -102,9 +102,9 @@ Rails.application.configure do
   ################## SETTINGS FOR SENDGRID ##########################
   config.mailer_config = config_for(:mailer_config)
   config.action_mailer.delivery_method = :smtp
-  if config.mailer_config[:mailcatcher].present?
+  if config.mailer_config["mailcatcher"].present?
     config.action_mailer.smtp_settings = {
-        :address => '127.0.0.1', :port => config.mailer_config[:port]
+        :address => '127.0.0.1', :port => config.mailer_config["port"]
     }
     config.action_mailer.raise_delivery_errors = false
   else
