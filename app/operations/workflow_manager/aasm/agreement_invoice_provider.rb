@@ -11,7 +11,7 @@ class WorkflowManager::Aasm::AgreementInvoiceProvider < WorkflowManager::Aasm::B
     state :unpaid
     state :partially_paid
     state :paid
-    state :void
+    state :voided
 
     event :submit do
       # transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
