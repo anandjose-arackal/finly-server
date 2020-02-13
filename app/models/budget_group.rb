@@ -29,6 +29,8 @@ class BudgetGroup < ApplicationRecord
 
   accepts_nested_attributes_for :budget_group_criteria
 
+  validates :start_date, presence: true
+  validates :end_date, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {

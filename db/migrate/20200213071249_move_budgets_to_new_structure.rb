@@ -6,6 +6,7 @@ class MoveBudgetsToNewStructure < ActiveRecord::Migration[5.2]
       # First creating the Budget Group from the Budget data - we can safely assume that each budget will be a
       # a different budget group for the time being
       budget_group = BudgetGroup.create(
+          name: budget.name,
           company_id: budget.company_id,
           period_id: budget.period_id,
           start_date: budget.start_date,
@@ -31,6 +32,7 @@ class MoveBudgetsToNewStructure < ActiveRecord::Migration[5.2]
       # creating the budget group criterium object
       # which will implicitly create all the individual budget objects
       parent_budget_group_criterium = BudgetGroupCriterium.create(
+          name: budget.name,
           budget_group_id: budget_group.id,
           created_by_user_id: budget.user_id,
           company_id: budget.company_id,
@@ -56,6 +58,7 @@ class MoveBudgetsToNewStructure < ActiveRecord::Migration[5.2]
         # creating the budget group criterium object
         # which will implicitly create all the individual budget objects
         budget_group_criterium = BudgetGroupCriterium.create(
+            name: child_budget.name,
             parent_id: parent_budget_group_criterium.id,
             budget_group_id: budget_group.id,
             created_by_user_id: budget.user_id,

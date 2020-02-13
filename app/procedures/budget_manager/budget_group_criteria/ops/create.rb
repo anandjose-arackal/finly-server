@@ -21,9 +21,8 @@ class BudgetManager::BudgetGroupCriteria::Ops::Create < Transactions::API
   step Contract::Persist()
 
   def set_parent_criterium!(options, params:, model:, current_user:, **)
-    params.permit!
     budget_criterium = model
-    parent_criterium = current_user.company.budget_group_criteria.find_by(id: params&.dig(:budget_group_criterion, :ancestry))
+    parent_criterium = current_user.company.budget_group_criteria.find_by(id: params&.dig("budget_group_criterion", "ancestry"))
 
     budget_criterium.ancestry = parent_criterium&.id
     true
