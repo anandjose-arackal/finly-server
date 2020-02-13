@@ -1,6 +1,5 @@
 # Used to create users without invitation
 class Users::Create < Admin::Users::Create
-  include Security
 
   def user_model
     User
@@ -17,7 +16,7 @@ class Users::Create < Admin::Users::Create
 
   def pre_process
     # set dummy password for this user that will be reset on OTP verification
-    dafault_password = Security.generate_default_password
+    default_password = Security.generate_default_password
     self.new_user_params[:password] = default_password
     self.new_user_params[:password_confirmation] = default_password
 

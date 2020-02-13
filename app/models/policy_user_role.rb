@@ -21,6 +21,14 @@ class PolicyUserRole < ApplicationRecord
   validates :user_id, presence: true
   validates :policy_id, presence: true
 
+  after_create :activate_user
+
+  def activate_user
+    return if self.policy.default
+    return unless self.user.pending_activation
+    user.update_attributes(pending_activation: false)
+  end
+
   scope :with_id, -> (ids) {
     where(id: ids)
   }

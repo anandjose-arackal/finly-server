@@ -45,6 +45,15 @@ class UserRoleMapping < ApplicationRecord
     employee_role_presence
   end
 
+  after_create :activate_user
+
+  def activate_user
+    return unless self.user.pending_activation
+    if self.is_admin? || self.is_finance_manager? || self.is_manager? || self.is_auditor?
+     user.update_attributes(pending_activation: false)
+    end
+  end
+
   def is_admin?
     self.user_role_id == UserRole.admin_id
   end

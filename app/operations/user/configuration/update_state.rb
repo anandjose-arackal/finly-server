@@ -55,6 +55,12 @@ class User::Configuration::UpdateState < BaseOperation
     add_message :error, to_user.errors.full_messages
   end
 
+  def post_process
+    unless to_user.active?
+      to_user.user_sessions.where(status_id: UserSessionStatus.id_for(:authorize)).update_all(status_id: UserSession.id_for(:revoked))
+    end
+  end
+
   private
 
   def state_params
