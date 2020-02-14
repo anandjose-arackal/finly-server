@@ -80,12 +80,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         end
       end
 
-      if purchase_order_items.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-        if op.success?
-          self.budgets = op.budget_data
-        end
-      end
+      # if purchase_order_items.present?
+      #   op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+      #   if op.success?
+      #     self.budgets = op.budget_data
+      #   end
+      # end
     end
 
     def get_actions

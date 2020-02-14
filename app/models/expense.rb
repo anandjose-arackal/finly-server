@@ -1236,6 +1236,6 @@ class Expense < ApplicationRecord
   end
 
   def budget_trail_destroy
-    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
   end
 end
