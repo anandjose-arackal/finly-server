@@ -89,7 +89,7 @@ class FixMissedCardTransactions
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
       trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
 
-      operation = Scripts::MissedCardTransactionCreate.(trans_params)
+      operation = Script::MissedCardTransactionCreate.(trans_params)
       puts "Operation Result: #{operation.success?}"
     end
   end
