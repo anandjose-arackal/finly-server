@@ -43,7 +43,7 @@ class Settlement::SMoneyRequests::Processing::Cancel < Settlement::SMoneyRequest
     # i.e. if the report is being settled via Finly, only if the order is either pending, or failed can it be cancelled
     # in_progress will not come in here because if it's being processed, we cannot cancel it halfway
     if self.money_request_processor.process_via_finly?
-      unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed)].include?(self.money_request_processor.payment_order&.payment_order_status_id)
+      unless [PaymentOrderStatus.id_for(:pending), PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:partially_completed)].include?(self.money_request_processor.payment_order&.payment_order_status_id)
         add_message :error, 'Batch cannot be cancelled at this stage'
         return
       end
