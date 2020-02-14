@@ -9,6 +9,7 @@ class BudgetManager::BudgetsTrb::Ops::Update < Transactions::API
   # later populating based on the params sent
   step Model(Budget, :find)
 
+  # step :debugging
 
   # calling the contract to assign all the relevant attributes. This step only "assigns" the variables so to speak,
   # but doesn't really do anything yet. That happens in the next step
@@ -19,5 +20,9 @@ class BudgetManager::BudgetsTrb::Ops::Update < Transactions::API
 
   # this step actually persists the Model
   step Contract::Persist()
+
+  def debugging(options, current_user:, params:, **)
+    current_user
+  end
 
 end

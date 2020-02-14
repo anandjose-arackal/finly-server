@@ -48,7 +48,7 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def update
-    endpoint BudgetManager::BudgetsTrb::Ops::Create
+    endpoint BudgetManager::BudgetsTrb::Ops::Update
     # @result = BudgetManager::BudgetsTrb::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
