@@ -27,7 +27,7 @@ class IndexBuilder::Templates::Base
     self.class.handle
   end
 
-  def build(user, exposure)
+  def build(context, user, exposure)
     data = {}
     self.class.fields.each do |field|
       value = nil
@@ -35,8 +35,8 @@ class IndexBuilder::Templates::Base
       if retriever.is_a?(String)
         value =  exposure.template(retriever)
       elsif retriever.is_a?(Symbol)
-        if respond_to?(retriever)
-          value = send(retriever)
+        if context.respond_to?(retriever)
+          value = context.send(retriever, user, exposure)
         else
           value = exposure.send(retriever)
         end

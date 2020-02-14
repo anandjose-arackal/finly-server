@@ -21,7 +21,7 @@ class IndexBuilder::API::Attribute
   end
 
   def build(context, user, record)
-    template.build(user, record)
+    template.build(context,user, record)
   end
 
   module Builder

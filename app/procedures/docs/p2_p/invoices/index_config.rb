@@ -6,5 +6,4 @@ class Docs::P2P::Invoices::IndexConfig < IndexBuilder::API
   # attribute :created_by, template: IndexBuilder::Templates::SimpleText.({primary: "{{record.user.name}}"})
   # attribute :updated_by, template: IndexBuilder::Templates::SimpleText.(primary: "{{record.user.name}}")
 
-
 end
