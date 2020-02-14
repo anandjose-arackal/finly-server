@@ -8,4 +8,8 @@ class YesBankVendorExposure < Exposures::API
     business_name
   end
 
+  def vendor_id
+    record.vendor_id
+  end
+
 end

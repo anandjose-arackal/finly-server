@@ -3,11 +3,12 @@ class Exposures::API::Attribute
   attr_accessor :name, :includes, :record_attribute, :exposure, :data_type, :block
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
-  def initialize(name:, includes: [], record_attribute: false, exposure: false, block: nil)
+  def initialize(name:, includes: [], record_attribute: false, exposure: false, data_type: nil, block: nil)
     self.name = name
     self.includes = includes
     self.record_attribute = record_attribute
     self.exposure = exposure
+    self.data_type = data_type
     self.block = block
   end
 
@@ -30,7 +31,7 @@ class Exposures::API::Attribute
         end
 
         return value unless exposure
-        return value if value.class <= Exposure::API
+        return value if value.class <= Exposures::API
         raise "#{value.class.name} does not have an exposure defined" unless value.respond_to?(:to_exposure)
         return value.to_exposure
       end
