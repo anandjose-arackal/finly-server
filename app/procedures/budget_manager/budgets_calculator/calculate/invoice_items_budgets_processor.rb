@@ -37,7 +37,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         location_id: invoice_item.parent.location_id,
         department_id: invoice_item.department_id,
         date: invoice_item.parent.date,
-        entity_status_id: invoice_item.parent.status_id,
+        entity_status_id: invoice_item.parent.invoice_status_id,
         entity_created_at: invoice_item.invoice.created_at,
         entity_submitted_at: invoice_item.invoice.submitted_at,
         amount_attributes: {
