@@ -23,7 +23,7 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
       return
     end
 
-    unless invoice.approved? || invoice.auto_approved?
+    unless self.invoice.approved? || self.invoice.auto_approved?
       add_message :error, "Only approved and auto approved invoice can be voided."
       return
     end
