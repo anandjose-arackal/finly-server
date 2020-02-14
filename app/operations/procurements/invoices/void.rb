@@ -16,6 +16,7 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
   def validate
     unless self.invoice.present?
       add_message :error, 'Invoice not found'
+      return
     end
 
     unless user.vendor_payments_admin?
