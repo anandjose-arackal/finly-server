@@ -1,5 +1,6 @@
 class IndexBuilder::API
-  include IndexBuilder::API::Attribute::Builder
+  include Attribute::Builder
   include DynamicAttributes
+
 
 end
