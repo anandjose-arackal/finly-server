@@ -131,14 +131,14 @@ class PurchaseOrderItem < ApplicationRecord
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
     if self.purchase_order.voided? || self.purchase_order.rejected? || self.purchase_order.retracted? || self.purchase_order.open?
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     else
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
     end
   end
 
   def budget_trail_destroy
-    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
   end
 
 end

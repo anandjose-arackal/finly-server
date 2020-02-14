@@ -1228,9 +1228,9 @@ class Expense < ApplicationRecord
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
     if self.report.present?
       if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+        BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
       else
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+        BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
       end
     end
   end
