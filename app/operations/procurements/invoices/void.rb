@@ -9,7 +9,7 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
   end
 
   def init
-    invoice_id = params[:id] || params[:invoice_id]
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
   end
 
