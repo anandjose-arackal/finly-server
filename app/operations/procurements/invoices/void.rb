@@ -1,5 +1,5 @@
 class Procurements::Invoices::Void < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params
+  attr_accessor :invoice, :procurement, :invoice_params, :workflow_output
 
   def pre_validate
     if params[:note].blank?
@@ -47,7 +47,7 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
     end
     self.workflow_output = op.workflow_output
     self.invoice.update(rejection_note: params[:note])
-    # todo release all the budgets #todo-sreeram
+    # todo release all the budgets DONE IN MODEL
     update_associated_documents
   end
 
