@@ -29,4 +29,8 @@ Resolver::Router.draw do
     route 'default', Docs::Trips::Resolver
   end
 
+  scope :invoices do
+    route "default", Docs::P2P::Invoices::Resolver
+  end
+
 end
