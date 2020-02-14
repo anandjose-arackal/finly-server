@@ -33,10 +33,8 @@ class Users::Create < Admin::Users::Create
   end
 
   def post_process
-    unless created_user.pending_activation
-      created_user.activate
-      created_user.update(verified: true, default_password: true)
-    end
+    created_user.activate
+    created_user.update(verified: true, default_password: true)
     add_message :success, "User successfully created"
   end
 
