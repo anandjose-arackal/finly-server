@@ -1,7 +1,7 @@
 class IndexSegment::Policy < ApplicationPolicy
 
   def create?
-    owner?
+    true
   end
 
   def update?

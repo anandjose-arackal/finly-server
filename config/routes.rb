@@ -4052,7 +4052,7 @@ Rails.application.routes.draw do
   get 'index/:route/config', to: "index#fetch_config"
   get 'index/:route', to: "index#show"
 
-  resources :views, controller: 'index_view_segments', except: [:index]
+  resources :views, controller: 'index_view_segments', except: [:show]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

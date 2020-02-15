@@ -33,4 +33,8 @@ Resolver::Router.draw do
     route "default", Docs::P2P::Invoices::Resolver
   end
 
+  scope :index_segment_views do
+    route "default", Docs::P2P::Invoices::Resolver
+  end
+
 end

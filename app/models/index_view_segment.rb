@@ -25,4 +25,6 @@ class IndexViewSegment < ApplicationRecord
 
   serialize :filters, JSON
   serialize :columns, JSON
+
+  event_channel :index_view_segments
 end

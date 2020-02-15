@@ -1,11 +1,15 @@
-class IndexViewSegmentsController < ApplicationController
+class IndexViewSegmentsController < BaseControllers::WebBase
+  layout 'trailblazers'
+
   def create
+    endpoint IndexSegment::Ops::Create
   end
 
   def update
   end
 
-  def show
+  def index
+    endpoint IndexSegment::Ops::Index
   end
 
   def destroy
