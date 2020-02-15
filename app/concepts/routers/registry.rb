@@ -12,10 +12,14 @@ class Routers::Registry
     registry[route]
   end
 
+  # Fixme: This is required to clear previous routes when the loader is loading the files in development env. Need to figure out a better way
   def self.routers
     @routers ||= [
         AutoComplete::Router,
-        Resolver::Router
+        Resolver::Router,
+        Filters::Router,
+        IndexBuilder::Router,
+        Resolver::Router,
     ]
   end
 
