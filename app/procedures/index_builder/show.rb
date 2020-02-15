@@ -36,7 +36,7 @@ class IndexBuilder::Show < Transactions::API
   def load_config(context, builder:, current_user:, params:, **)
     context['model.index'] = []
     context['model.records'].each do |record|
-      context['model.index'] << builder.build(current_user, record.to_exposure)
+      context['model.index'] << builder.build(current_user, record.to_exposure, params[:fields])
     end
 
     true
