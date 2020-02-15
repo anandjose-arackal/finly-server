@@ -17,9 +17,9 @@ class Forms::TestContract < Forms::Generators::Contracts::API
       property :employee_id
     end
     property :t_bag
-    collection :role_mapping, deserializer: -> (input, represented, **) { debugger } do
-
-    end
+    # collection :role_mapping, deserializer: -> (input, represented, **) { debugger } do
+    #
+    # end
     validate :test
 
     def test
