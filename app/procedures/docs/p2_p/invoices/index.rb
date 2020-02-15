@@ -6,10 +6,13 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
             fixed: true,
             sort: :vendor_business_name,
             includes: [:vendor],
-            template: IndexBuilder::Templates::PrimaryMultiline.({primary: "{{record.vendor.business_name}}", sub_text_1: "{{record.vendor.vendor_id}}"})
+            template: IndexBuilder::Templates::PrimaryMultiline.(
+                {
+                    primary: "{{record.vendor.business_name}}",
+                    sub_text_1: "Vendor ID: {{record.vendor.vendor_id}}"
+                }
+            )
   attribute :created_at, template: IndexBuilder::Templates::SimpleText.({primary: :created_at}), default: true
-  # attribute :updated_at, template: IndexBuilder::Templates::SimpleText.({primary: :updated_at})
-  # attribute :created_by, template: IndexBuilder::Templates::SimpleText.({primary: "{{record.user.name}}"})
-  # attribute :updated_by, template: IndexBuilder::Templates::SimpleText.(primary: "{{record.user.name}}")
+  attribute :invoice_number, template: IndexBuilder::Templates::SimpleText.({primary: :invoice_id}), default: true
 
 end
