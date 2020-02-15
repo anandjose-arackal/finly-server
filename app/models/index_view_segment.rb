@@ -27,4 +27,6 @@ class IndexViewSegment < ApplicationRecord
   serialize :columns, JSON
 
   event_channel :index_view_segments
+
+  default_scope {order(name: :asc)}
 end

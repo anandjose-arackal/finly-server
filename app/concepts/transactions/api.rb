@@ -22,6 +22,16 @@ class Transactions::API < Trailblazer::Operation
     end
   end
 
+  def self.ModelDestroy(key: :model)
+    Transactions::Task.build id: "destroy" do |context, **|
+      unless context[key].destroy
+        return on_error context, :base, context[key].errors.full_messages
+      end
+
+      true
+    end
+  end
+
   def self.call(options = {}, &handlers)
     result = super(options)
     match_result(options, result, &handlers)

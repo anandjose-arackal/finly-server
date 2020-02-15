@@ -6,6 +6,7 @@ class IndexViewSegmentsController < BaseControllers::WebBase
   end
 
   def update
+    endpoint IndexSegment::Ops::Update
   end
 
   def index
@@ -13,5 +14,6 @@ class IndexViewSegmentsController < BaseControllers::WebBase
   end
 
   def destroy
+    endpoint IndexSegment::Ops::Destroy
   end
 end
