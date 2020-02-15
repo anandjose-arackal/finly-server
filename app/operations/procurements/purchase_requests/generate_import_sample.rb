@@ -91,7 +91,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
 
     cost_center_headers = ["Cost Center ID", "Cost Center Name"]
     cost_center_contents = []
-    cost_centers = user.company.cost_centers.where(application: "vp")
+    cost_centers = user.company.cost_centers.non_deleted.where(application: "vp")
     if cost_centers.present?
       cost_centers.each do |cost_center|
         cost_center_contents << [cost_center.id, cost_center.name]

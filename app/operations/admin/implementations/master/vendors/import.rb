@@ -32,11 +32,15 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     #support for multiple gstin locations in import
     vendor = check_existing_vendor(vendor_params["vendor"])
     if vendor && vendor_params["vendor"]["gstin_locations_attributes"]
-      vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
-      unless vendor.save
-        return result false, vendor.errors.full_messages
+      if check_existing_location(vendor, vendor_params["vendor"]["gstin_locations_attributes"].first)
+        vendor.gstin_locations.build(vendor_params["vendor"]["gstin_locations_attributes"])
+        unless vendor.save
+          return result false, vendor.errors.full_messages
+        end
+        return result true, 'Created Successfully'
+      else
+        return result false, 'Existing Vendor and Existing Gstin Location'
       end
-      return result true, 'Created Successfully'
     end
 
     vendor = self.company.yes_bank_vendors.build(vendor_params["vendor"])
@@ -198,5 +202,10 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
   def check_existing_vendor(vendor_params)
     return false if vendor_params["vendor_id"].blank?
     existing_vendor = company.yes_bank_vendors.non_deleted.find_by_vendor_id vendor_params["vendor_id"]
+  end
+
+  def check_existing_location(vendor, gstin_location_params)
+    return false if gstin_location_params["gstin"].blank?
+    vendor.gstin_locations.where(gstin: gstin_location_params["gstin"]).blank?
   end
 end

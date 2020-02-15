@@ -34,6 +34,11 @@ class User::GroupEntities < User::Base
       add_message :error, "Your corporate doesn't have group entity feature enabled"
       return
     end
+
+    if RequestStore.store[:actual_current_user].present?
+      add_message :error, "Group Entity switch disabled during user delegation"
+      return
+    end
   end
 
   def process

@@ -20,14 +20,13 @@
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
 #  status_id                       :integer
-#  utr                             :string(255)
-#  date_of_payment                 :date
 #  deleted_at                      :datetime
 #
 
 # Security deposit is required to create rental invoice in payment agreements
 
 class SecurityDeposit < ApplicationRecord
+  include SoftDeletable
 
   belongs_to :vendor,  class_name: 'YesBankVendor'
   belongs_to :cost_center, optional: true

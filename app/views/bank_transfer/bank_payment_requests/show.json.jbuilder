@@ -54,7 +54,7 @@ json.invoice_line_items_categories do
 end
 
 json.cost_centers do
-  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+  json.array!(current_company.cost_centers.non_deleted.with_application(RequestStoreUtil.current_app)) do |cost_center|
     json.id cost_center.id
     json.name cost_center.name
   end

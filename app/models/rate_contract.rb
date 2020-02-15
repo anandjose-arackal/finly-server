@@ -16,6 +16,7 @@
 #  company_id              :integer
 #  rate_contract_number    :string(255)
 #  deleted_at              :datetime
+#  rate_contract_number    :string(255)
 #
 
 class RateContract < ApplicationRecord

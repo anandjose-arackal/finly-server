@@ -126,4 +126,16 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  def revise
+    @result = PaymentAgreements::Revise.(current_user, params)
+    respond
+  end
+
+
+  # Used for revised agreements
+  def editable_fields
+    @result = PaymentAgreements::EditableFields.(current_user, params)
+    respond
+  end
+
 end

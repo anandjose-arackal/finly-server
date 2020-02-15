@@ -42,8 +42,7 @@
     <% if @user && @user.company.id == 7%>
         <img src="https://www.finly.io/common/images/logos/itzcash-white.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: left">
     <% elsif @user && [1, 2, 189, 213].include?(@user.company.id) %>
-      <img src="<%= @user.company&.configuration&.logo&.url(:thumb) %>" width="120" height="auto">
-      </div> %>" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+      <img src="<%= @user.company&.configuration&.logo&.url(:thumb) %>" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
       <!--<h2 style="font-size: 40px;text-align: right;font-weight: normal;margin-bottom: 10px"></h2>-->
     <% else %>
         <h2 style="font-size: 40px;text-align: left;font-weight: normal;margin-bottom: 10px"><%=@user.company.name if @user.present?%></h2>

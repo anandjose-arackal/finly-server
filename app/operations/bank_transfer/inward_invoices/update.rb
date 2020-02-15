@@ -238,6 +238,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    if self.inward_invoice_params[:date].blank?
+      add_message :error, "Invoice date is mandatory"
+      return
+    end
+
     # Credit Note Check
     if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
       self.inward_invoice_params[:credit_note_adjustments_attributes].filter {|cna| cna[:id].blank?}.each do |cna|

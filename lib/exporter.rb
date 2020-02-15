@@ -136,7 +136,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def generate_xls_file
       file = Tempfile.new(['export', '.xlsx'])
-      workbook = ::WriteXLSX.new(file)
+      workbook = ::WriteXLSX.new(file, strings_to_urls: false)
       worksheet = workbook.add_worksheet('Sheet 1')
 
       self.headers.each_with_index do |item, index|
@@ -144,7 +144,31 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       self.contents.each_with_index do |items, row|
         items.each_with_index do |item, column|
-          worksheet.write(1 + row, column, item)
+          if item.is_a?(Hash)
+            case item[:type]
+            when 'string'
+              if item[:value].present?
+                worksheet.write_string(1 + row, column, item[:value])
+              else
+                worksheet.write_blank(1 + row, column)
+              end
+            when 'number'
+              worksheet.write_number(1 + row, column, item[:value])
+            when 'date'
+              if item[:value].present?
+                date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
+                date = item[:value].strftime('%d-%m-%Y')
+                worksheet.write_date_time(1 + row, column, date, date_format)
+              else
+                worksheet.write_blank(1 + row, column)
+              end
+            when 'currency'
+            else
+              worksheet.write_string(1 + row, column, item[:value])
+            end
+          else
+            worksheet.write(1 + row, column, item)
+          end
         end
       end
       workbook.close
@@ -207,7 +231,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       file = Tempfile.new([filename, '.xlsx'])
 
       # Open Temporary file with WriteXLSX
-      workbook = ::WriteXLSX.new(file.path)
+      workbook = ::WriteXLSX.new(file.path, strings_to_urls: false)
 
       # Write to xlsx file
       self.sheets.each do |sheet|
