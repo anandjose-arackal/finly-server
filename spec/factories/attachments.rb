@@ -15,6 +15,7 @@
 #  updated_at        :datetime         not null
 #  description       :text(65535)
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 FactoryBot.define do

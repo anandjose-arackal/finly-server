@@ -15,6 +15,7 @@
 #  source_account_type  :string(255)
 #  application          :string(255)
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 class AutoReloadConfig < ApplicationRecord

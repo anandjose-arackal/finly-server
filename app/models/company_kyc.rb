@@ -54,6 +54,7 @@
 #  customer_type_id                          :integer
 #  user_confirmed                            :boolean          default(FALSE)
 #  uuid                                      :string(36)
+#  deleted_at                                :datetime
 #
 
 class CompanyKyc < ApplicationRecord

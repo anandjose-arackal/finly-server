@@ -15,6 +15,7 @@
 #  payment_receivable_status_id :integer
 #  payment_id                   :integer
 #  uuid                         :string(36)
+#  deleted_at                   :datetime
 #
 
 class PaymentReceivable < ApplicationRecord

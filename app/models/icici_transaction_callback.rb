@@ -16,6 +16,7 @@
 #  updated_at :datetime         not null
 #  reconciled :boolean          default(FALSE)
 #  uuid       :string(36)
+#  deleted_at :datetime
 #
 
 class IciciTransactionCallback < ApplicationRecord

@@ -36,6 +36,7 @@
 #  amount_id            :integer
 #  quick_pay            :string(255)      default("N")
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 require 'rails_helper'

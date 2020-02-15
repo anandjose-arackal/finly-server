@@ -13,6 +13,7 @@
 #  created_by_id     :integer
 #  company_id        :integer
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 class TemporaryFile < ApplicationRecord

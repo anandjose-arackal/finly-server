@@ -20,6 +20,7 @@
 #  original_track_id         :integer
 #  cash_on_hand_deduction_id :integer
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class Trail < ApplicationRecord

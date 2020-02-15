@@ -23,6 +23,7 @@
 #  message              :text(65535)
 #  application          :string(255)
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 class Notification < ApplicationRecord

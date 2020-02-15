@@ -2,9 +2,10 @@
 #
 # Table name: outward_invoice_trail_actions
 #
-#  id   :integer          not null, primary key
-#  name :string(255)
-#  uuid :string(36)
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  uuid       :string(36)
+#  deleted_at :datetime
 #
 
 class OutwardInvoiceTrailAction < ApplicationRecord

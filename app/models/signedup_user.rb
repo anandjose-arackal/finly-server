@@ -12,6 +12,7 @@
 #  updated_at         :datetime         not null
 #  company_name       :string(255)
 #  uuid               :string(36)
+#  deleted_at         :datetime
 #
 
 require 'bcrypt'

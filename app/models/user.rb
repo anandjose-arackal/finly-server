@@ -60,6 +60,7 @@
 #  default_company_id        :integer
 #  finly_id                  :string(36)
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord

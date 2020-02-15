@@ -33,6 +33,7 @@
 #  cash_on_hand_withdrawal_id              :integer
 #  cash_on_hand_balance_id                 :integer
 #  uuid                                    :string(36)
+#  deleted_at                              :datetime
 #
 
 class CompanyBalanceHistory < ApplicationRecord

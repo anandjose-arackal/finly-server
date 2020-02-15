@@ -17,6 +17,7 @@
 #  user_id                   :integer
 #  vendor_poc_id             :integer
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class ProcurementAttachment < ApplicationRecord

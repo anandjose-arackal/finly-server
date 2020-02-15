@@ -15,5 +15,6 @@
 #  updated_at              :datetime         not null
 #  creator_id              :integer
 #  uuid                    :string(36)
+#  deleted_at              :datetime
 #
 

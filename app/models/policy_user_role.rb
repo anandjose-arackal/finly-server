@@ -11,6 +11,7 @@
 #  min_amount   :decimal(20, 5)   default(0.0)
 #  max_amount   :decimal(20, 5)
 #  uuid         :string(36)
+#  deleted_at   :datetime
 #
 
 class PolicyUserRole < ApplicationRecord

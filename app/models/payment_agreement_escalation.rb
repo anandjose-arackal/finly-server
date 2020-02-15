@@ -13,6 +13,7 @@
 #  end_date             :datetime
 #  revised_amount_id    :integer
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 class PaymentAgreementEscalation < ApplicationRecord

@@ -21,6 +21,7 @@
 #  date                        :datetime
 #  sequence_number             :integer
 #  uuid                        :string(36)
+#  deleted_at                  :datetime
 #
 
 class FinlyTransaction < ApplicationRecord

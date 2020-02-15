@@ -10,6 +10,7 @@
 #  updated_at :datetime         not null
 #  gl_code    :string(255)
 #  uuid       :string(36)
+#  deleted_at :datetime
 #
 
 class MoneyRequestItemCategory < ApplicationRecord

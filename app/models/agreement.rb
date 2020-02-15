@@ -14,6 +14,7 @@
 #  updated_at        :datetime         not null
 #  url               :string(255)
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 class Agreement < ApplicationRecord

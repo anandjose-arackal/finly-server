@@ -21,6 +21,7 @@
 #  mouse_pos_y               :integer
 #  ip                        :string(255)
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class UserSessionEvent < ApplicationRecord

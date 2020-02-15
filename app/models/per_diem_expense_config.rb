@@ -8,6 +8,7 @@
 #  updated_at :datetime         not null
 #  policy_id  :integer          not null
 #  uuid       :string(36)
+#  deleted_at :datetime
 #
 
 class PerDiemExpenseConfig < ApplicationRecord

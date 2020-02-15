@@ -23,6 +23,7 @@
 #  reversal_response          :text(65535)
 #  reversal_api_counter       :integer          default(0)
 #  uuid                       :string(36)
+#  deleted_at                 :datetime
 #
 
 

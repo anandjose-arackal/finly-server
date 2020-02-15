@@ -35,6 +35,7 @@
 #  purchase_order_item_id :integer
 #  billable_amount_id     :integer
 #  uuid                   :string(36)
+#  deleted_at             :datetime
 #
 
 class InvoiceLineItem < ApplicationRecord

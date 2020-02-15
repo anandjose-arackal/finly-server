@@ -16,6 +16,7 @@
 #  conditions       :text(65535)
 #  task_schedule_id :integer
 #  uuid             :string(36)       not null, primary key
+#  deleted_at       :datetime
 #
 
 class TaskWorkflow < ApplicationRecord

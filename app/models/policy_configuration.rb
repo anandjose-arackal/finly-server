@@ -22,6 +22,7 @@
 #  booking_type_other      :boolean          default(TRUE)
 #  trips_money_request     :boolean          default(TRUE)
 #  uuid                    :string(36)
+#  deleted_at              :datetime
 #
 
 class PolicyConfiguration < ApplicationRecord

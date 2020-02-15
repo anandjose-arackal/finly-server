@@ -19,6 +19,7 @@
 #  admin_note                :text(65535)
 #  company_id                :integer          not null
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class CardAssignRequest < ApplicationRecord

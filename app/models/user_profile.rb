@@ -28,6 +28,7 @@
 #  signature_updated_at   :datetime
 #  signature_title        :string(255)
 #  uuid                   :string(36)
+#  deleted_at             :datetime
 #
 
 class UserProfile < ApplicationRecord

@@ -10,6 +10,7 @@
 #  is_valid          :boolean          default(TRUE)
 #  view_role_id      :integer
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 class EmailAuthorization < ApplicationRecord

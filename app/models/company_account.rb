@@ -10,6 +10,7 @@
 #  updated_at              :datetime         not null
 #  company_account_type_id :integer
 #  uuid                    :string(36)
+#  deleted_at              :datetime
 #
 
 class CompanyAccount < ApplicationRecord

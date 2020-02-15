@@ -10,6 +10,7 @@
 #  source             :text(65535)
 #  source_description :text(65535)
 #  uuid               :string(36)
+#  deleted_at         :datetime
 #
 
 class ResourceRequest < ApplicationRecord

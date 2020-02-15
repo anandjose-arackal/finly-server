@@ -12,6 +12,7 @@
 #  contactable_type :string(255)
 #  designation      :string(255)
 #  uuid             :string(36)
+#  deleted_at       :datetime
 #
 
 class Contact < ApplicationRecord

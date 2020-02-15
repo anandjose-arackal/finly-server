@@ -14,6 +14,7 @@
 #  invalid_username :boolean          default(FALSE)
 #  invalid_password :boolean          default(FALSE)
 #  uuid             :string(36)
+#  deleted_at       :datetime
 #
 
 require 'rails_helper'

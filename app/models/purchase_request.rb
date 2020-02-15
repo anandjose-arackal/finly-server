@@ -22,6 +22,7 @@
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
 #  uuid                       :string(36)
+#  deleted_at                 :datetime
 #
 
 class PurchaseRequest < ApplicationRecord

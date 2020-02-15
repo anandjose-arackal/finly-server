@@ -15,6 +15,7 @@
 #  product              :string(255)
 #  prepaid_cards        :string(255)
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 class ProductPricingQuery < ApplicationRecord

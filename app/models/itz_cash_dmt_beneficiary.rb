@@ -25,6 +25,7 @@
 #  default                :boolean
 #  reimbursement          :boolean          default(FALSE)
 #  uuid                   :string(36)
+#  deleted_at             :datetime
 #
 
 class ItzCashDmtBeneficiary < ApplicationRecord

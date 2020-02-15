@@ -19,6 +19,7 @@
 #  finly_sso_path                     :string(255)
 #  label                              :string(255)
 #  uuid                               :string(36)
+#  deleted_at                         :datetime
 #
 
 require 'rails_helper'

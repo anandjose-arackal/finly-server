@@ -13,6 +13,7 @@
 #  source_description :text(65535)
 #  referrer           :string(255)
 #  uuid               :string(36)
+#  deleted_at         :datetime
 #
 
 class PreviewRegistration < ApplicationRecord

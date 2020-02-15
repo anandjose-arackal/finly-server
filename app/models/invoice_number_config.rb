@@ -11,6 +11,7 @@
 #  invoice_number_config_type_id :integer
 #  purpose_id                    :integer
 #  uuid                          :string(36)
+#  deleted_at                    :datetime
 #
 
 class InvoiceNumberConfig < ApplicationRecord

@@ -47,6 +47,7 @@
 #  field_path                   :string(255)
 #  parent_id                    :string(255)
 #  populate_if_empty            :string(255)
+#  associate_custom_fields      :boolean          default(FALSE)
 #
 
 require 'rails_helper'

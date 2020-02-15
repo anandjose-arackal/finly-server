@@ -9,6 +9,7 @@
 #  updated_at   :datetime         not null
 #  symbol       :string(255)
 #  uuid         :string(36)
+#  deleted_at   :datetime
 #
 
 

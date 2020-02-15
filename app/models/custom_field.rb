@@ -16,6 +16,7 @@
 #  company_id             :integer
 #  configured_field_value :text(65535)
 #  uuid                   :string(36)
+#  deleted_at             :datetime
 #
 
 class CustomField < ApplicationRecord

@@ -47,6 +47,7 @@
 #  scopes                      :string(255)
 #  admin_access_requested_by   :string(255)
 #  uuid                        :string(36)
+#  deleted_at                  :datetime
 #
 
 FactoryBot.define do

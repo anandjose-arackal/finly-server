@@ -12,6 +12,7 @@
 #  associated_object_id   :integer
 #  associated_object_type :string(255)
 #  uuid                   :string(36)
+#  deleted_at             :datetime
 #
 
 # Transaction type: credit, debit

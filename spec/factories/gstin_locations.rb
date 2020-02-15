@@ -18,6 +18,7 @@
 #  address           :text(65535)
 #  gl_code           :string(255)
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 FactoryBot.define do

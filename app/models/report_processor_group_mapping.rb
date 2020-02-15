@@ -18,6 +18,7 @@
 #  marked_as_closed           :boolean
 #  bank_reference_number      :string(255)
 #  uuid                       :string(36)
+#  deleted_at                 :datetime
 #
 
 class ReportProcessorGroupMapping < ApplicationRecord

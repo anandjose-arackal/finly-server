@@ -21,6 +21,7 @@
 #  beneficiary_full_name       :string(255)
 #  transfer_mode_id            :integer
 #  uuid                        :string(36)
+#  deleted_at                  :datetime
 #
 
 class YesBankTransaction < ApplicationRecord

@@ -13,6 +13,7 @@
 #  enabled              :boolean          default(FALSE)
 #  transfer_mode        :string(255)
 #  uuid                 :string(36)
+#  deleted_at           :datetime
 #
 
 class CompanyFundsAutoTransferConfig < ApplicationRecord

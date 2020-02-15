@@ -6,6 +6,7 @@
 #  name         :string(255)
 #  abbreviation :string(255)
 #  uuid         :string(36)
+#  deleted_at   :datetime
 #
 
 class ChannelType < ApplicationRecord

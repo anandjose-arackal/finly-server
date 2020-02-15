@@ -16,6 +16,7 @@
 #  bpr_voucher_enabled           :boolean
 #  bpr_voucher_configuration     :text(4294967295)
 #  uuid                          :string(36)
+#  deleted_at                    :datetime
 #
 
 class TallyConfiguration < ApplicationRecord

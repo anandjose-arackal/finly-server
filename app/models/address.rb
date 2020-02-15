@@ -18,6 +18,7 @@
 #  address_name :string(255)
 #  landmark     :text(65535)
 #  uuid         :string(36)
+#  deleted_at   :datetime
 #
 
 class Address < ApplicationRecord

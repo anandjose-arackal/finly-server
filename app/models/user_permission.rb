@@ -12,6 +12,7 @@
 #  crud_inventory_item_po     :boolean          default(TRUE)
 #  crud_inventory_item_non_po :boolean          default(TRUE)
 #  uuid                       :string(36)
+#  deleted_at                 :datetime
 #
 
 class UserPermission < ApplicationRecord

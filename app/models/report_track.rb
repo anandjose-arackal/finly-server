@@ -17,6 +17,7 @@
 #  cash_in_hand_deduction_id :integer
 #  delegated_action_user_id  :integer
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class ReportTrack < ApplicationRecord

@@ -9,6 +9,7 @@
 #  balance_id :integer
 #  enabled    :boolean          default(FALSE)
 #  uuid       :string(36)
+#  deleted_at :datetime
 #
 
 class KotakBankCompanyAccount < ApplicationRecord

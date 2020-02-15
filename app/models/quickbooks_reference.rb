@@ -9,6 +9,7 @@
 #  updated_at        :datetime         not null
 #  reference_type_id :integer
 #  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 class QuickbooksReference < ApplicationRecord

@@ -12,6 +12,7 @@
 #  current_value       :string(255)
 #  changed_column_name :string(255)
 #  uuid                :string(36)
+#  deleted_at          :datetime
 #
 
 class BudgetModificationTrail < ApplicationRecord

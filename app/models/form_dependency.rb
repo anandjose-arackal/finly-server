@@ -10,6 +10,7 @@
 #  updated_at            :datetime         not null
 #  uuid                  :string(36)       primary key
 #  form_id               :string(255)      not null
+#  deleted_at            :datetime
 #
 
 class FormDependency < ApplicationRecord

@@ -11,6 +11,7 @@
 #  company_id    :integer
 #  creator_id    :integer
 #  uuid          :string(36)
+#  deleted_at    :datetime
 #
 
 class PolicyLocationDepartmentMapping < ApplicationRecord

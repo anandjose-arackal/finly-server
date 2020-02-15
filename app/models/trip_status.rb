@@ -2,8 +2,9 @@
 #
 # Table name: trip_statuses
 #
-#  id   :bigint           not null, primary key
-#  name :string(255)      not null
+#  id         :bigint           not null, primary key
+#  name       :string(255)      not null
+#  deleted_at :datetime
 #
 
 class TripStatus < ApplicationRecord

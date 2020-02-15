@@ -28,6 +28,7 @@
 #  accuracy_radius                   :integer
 #  user_finly_id                     :string(255)
 #  uuid                              :string(36)
+#  deleted_at                        :datetime
 #
 
 class UserIp < ApplicationRecord

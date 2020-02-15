@@ -29,6 +29,7 @@
 #  success_items             :integer          default(0)
 #  failed_items              :integer          default(0)
 #  uuid                      :string(36)
+#  deleted_at                :datetime
 #
 
 class AdminImplementationRequest < ApplicationRecord
