@@ -1,5 +1,5 @@
-class IndexBuilder::API::Attribute
-  attr_accessor :field_key, :label, :template, :default, :sort, :includes, :fixed
+class IndexBuilder::API::Column
+  attr_accessor :column_key, :label, :template, :default, :sort, :includes, :fixed
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   def initialize(params)
@@ -10,7 +10,7 @@ class IndexBuilder::API::Attribute
 
   def config(user)
     {
-        field_key: field_key,
+        column_key: column_key,
         label: label,
         type: template.handle,
         sort: sort,
@@ -28,24 +28,24 @@ class IndexBuilder::API::Attribute
     included do
       include DynamicAttributes
 
-      class_attr :attributes, default: {}
-      class_attr :fixed_attribute
+      class_attr :columns, default: {}
+      class_attr :fixed_column
     end
 
     class_methods do
-      # Check if the attribute is defined
-      def exists?(field_key)
-        attributes[field_key].present?
+      # Check if the column is defined
+      def exists?(column_key)
+        columns[column_key].present?
       end
 
-      def attribute(field_key, default: false, label: nil, sort: false, template:, includes: [], fixed: false)
-        raise "#{field_key} is already defined for class #{self.name}" if exists?(field_key)
+      def column(column_key, default: false, label: nil, sort: false, template:, includes: [], fixed: false)
+        raise "#{column_key} is already defined for class #{self.name}" if exists?(column_key)
 
-        label ||= field_key.to_s.humanize
+        label ||= column_key.to_s.humanize
 
-        attribute = IndexBuilder::API::Attribute.new(
+        column = IndexBuilder::API::Column.new(
             {
-                field_key: field_key,
+                column_key: column_key,
                 label: label,
                 sort: sort,
                 includes: includes,
@@ -55,8 +55,8 @@ class IndexBuilder::API::Attribute
             }
         )
 
-        fixed_attribute(attribute) if fixed
-        attributes[field_key] = attribute
+        fixed_column(column) if fixed
+        columns[column_key] = column
       end
     end
   end

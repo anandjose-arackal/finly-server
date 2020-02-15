@@ -2,7 +2,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   resolver Docs::P2P::Invoices::Resolver
 
-  attribute :vendor, label: 'Vendor Details',
+  column :vendor, label: 'Vendor Details',
             fixed: true,
             sort: :vendor_business_name,
             includes: [:vendor],
@@ -12,7 +12,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
                     sub_text_1: "Vendor ID: {{record.vendor.vendor_id}}"
                 }
             )
-  attribute :created_at, template: IndexBuilder::Templates::SimpleText.({primary: :created_at}), default: true
-  attribute :invoice_number, template: IndexBuilder::Templates::SimpleText.({primary: :invoice_id}), default: true
+  column :created_at, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :created_at})
+  column :invoice_number, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :invoice_id})
 
 end

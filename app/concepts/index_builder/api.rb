@@ -1,39 +1,39 @@
 class IndexBuilder::API
-  include Attribute::Builder
+  include Column::Builder
   include DynamicAttributes
 
   class_attr :resolver
 
   def self.config(user)
     config = {fixed: [], dynamic: []}
-    attributes.each do |field_key, attribute|
-      if attribute.fixed
-        config[:fixed] << attribute.config(user)
+    columns.each do |column_key, column|
+      if column.fixed
+        config[:fixed] << column.config(user)
       else
-        config[:dynamic] << attribute.config(user)
+        config[:dynamic] << column.config(user)
       end
     end
     config
   end
 
-  def self.build(user, record, fields)
+  def self.build(user, record, required_columns)
     map = {}
-    attributes.each do |field_key, attribute|
-      next if fields.present? and not (fields.include?(field_key.to_s) or fields.include?(field_key.to_sym))
-      next if fields.blank? and not attribute.default
+    self.columns.each do |column_key, column|
+      next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
+      next if required_columns.blank? and not column.default
 
-      map[attribute.field_key] = attribute.build(self, user, record)
+      map[column.column_key] = column.build(self, user, record)
     end
     map
   end
 
-  def self.include_associations!(collection, fields)
+  def self.include_associations!(collection, required_columns)
     includes = []
-    attrs =  attributes.select do |field_key, attr|
-      (fields.blank? and attr.default) or (fields.present? and (fields.include?(field_key.to_s) or fields.include?(field_key.to_sym)))
+    attrs =  columns.select do |column_key, attr|
+      (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end
-    attrs.each do |field_key, attribute|
-      includes += attribute.includes
+    attrs.each do |column_key, column|
+      includes += column.includes
     end
     collection.includes(includes.uniq)
   end

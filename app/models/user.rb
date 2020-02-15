@@ -279,6 +279,8 @@ include Exposures::Model::Exposable
   has_many :group_users, through: :users_with_group_mapping, foreign_key: :user_id
   # has_one :feature_access, as: :accessible
 
+  has_many :index_view_segments
+
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile

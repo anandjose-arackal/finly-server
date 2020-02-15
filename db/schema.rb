@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_07_104931) do
+ActiveRecord::Schema.define(version: 2020_02_15_064336) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4346,6 +4346,29 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.boolean "reconciled", default: false
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+  end
+
+  create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "screen", null: false
+    t.string "name", null: false
+    t.text "filters"
+    t.text "columns"
+    t.boolean "system_view", default: false
+    t.integer "company_id"
+    t.integer "user_id"
+    t.datetime "last_viewed_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_index_view_segments_on_company_id"
+    t.index ["deleted_at"], name: "index_index_view_segments_on_deleted_at"
+    t.index ["last_viewed_at"], name: "index_index_view_segments_on_last_viewed_at"
+    t.index ["name"], name: "index_index_view_segments_on_name"
+    t.index ["screen"], name: "index_index_view_segments_on_screen"
+    t.index ["system_view"], name: "index_index_view_segments_on_system_view"
+    t.index ["user_id"], name: "index_index_view_segments_on_user_id"
+    t.index ["uuid"], name: "index_index_view_segments_on_uuid"
   end
 
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
