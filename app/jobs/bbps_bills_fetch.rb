@@ -34,9 +34,9 @@ class BbpsBillsFetch < ApplicationJob
       bill_period = result.bill_period
 
       # Find by bill Number if present
-      if result.bill_number.present? && result.bill_number != "NA"
-        bill = subscription.bbps_bills.where('bill_number = ?', result.bill_number).first
-      elsif (result.bill_date.present? && result.bill_date != "NA") && (result.due_date.present? && result.due_date != "NA")
+      # if result.bill_number.present? && result.bill_number != "NA"
+      #   bill = subscription.bbps_bills.where('bill_number = ?', result.bill_number).first
+      if (result.bill_date.present? && result.bill_date != "NA") && (result.due_date.present? && result.due_date != "NA")
         bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
       elsif result.bill_period.present? && result.bill_period != "NA"
         bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
@@ -52,7 +52,7 @@ class BbpsBillsFetch < ApplicationJob
       #   bill = subscription.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
       # end
 
-      return unless result.ref_no.blank? || bill.blank?
+      return if result.ref_no.blank?
 
       # Do not create bill if bill for same year and period exists
       # Update bill's reference number
