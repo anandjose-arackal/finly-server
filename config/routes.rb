@@ -2457,6 +2457,10 @@
 
 Rails.application.routes.draw do
 
+  get 'index_view_segments/create'
+  get 'index_view_segments/update'
+  get 'index_view_segments/show'
+  get 'index_view_segments/destroy'
   get 'unique_identifiers/index'
   get 'unique_identifiers/set'
   get 'qukickbooks_configurations/create'
