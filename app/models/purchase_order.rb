@@ -254,7 +254,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil,
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.ids_for([:po_processing, :closed])], advance_amount_id: nil,
               purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
                                           PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
                                           PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
@@ -264,7 +264,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :show_only_po_which_have_advances, -> (show_it = false) {
     if StringUtils.to_bool(show_it)
-      where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing]))
+      where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing, :closed]))
     end
   }
 
@@ -698,6 +698,10 @@ class PurchaseOrder < ApplicationRecord
 
   def advance_amount_status_empty
     self.advance_amount_status.blank?
+  end
+
+  def advance_closed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:closed)
   end
 
   def updatable?
