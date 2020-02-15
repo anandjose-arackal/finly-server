@@ -27,8 +27,8 @@ class IndexBuilder::Show < Transactions::API
     true
   end
 
-  def include_associations(context, builder:, **)
-    context['model.records'] = builder.include_associations!(context['model.records'])
+  def include_associations(context, builder:, params:, **)
+    context['model.records'] = builder.include_associations!(context['model.records'], params[:fields])
 
     true
   end
