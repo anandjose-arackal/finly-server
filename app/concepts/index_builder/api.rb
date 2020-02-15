@@ -5,9 +5,13 @@ class IndexBuilder::API
   class_attr :resolver
 
   def self.config(user)
-    config = []
+    config = {fixed: [], dynamic: []}
     attributes.each do |field_key, attribute|
-      config << attribute.config(user)
+      if attribute.fixed
+        config[:fixed] << attribute.config(user)
+      else
+        config[:dynamic] << attribute.config(user)
+      end
     end
     config
   end
