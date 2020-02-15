@@ -54,14 +54,14 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
     #   self.spent_amount = processor_instance.spent_amount
     #   return self.spent_amount
     # end
-    # processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    # spent_amount = processor_instance.spent_amount
+    processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    spent_amount = processor_instance.spent_amount
   end
 
   def usage_percentage(budget)
-    # processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    # spent_amount = processor_instance.spent_amount
-    # return ((spent_amount / budget.budget_amount&.value.to_f) * 100).round(2)
+    processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    spent_amount = processor_instance.spent_amount
+    return ((spent_amount / budget.budget_amount&.value.to_f) * 100).round(2)
   end
 
 end
