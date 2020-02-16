@@ -6,17 +6,18 @@ class Api::V1::BaseMobileApiController < BaseControllers::MobileBase
   end
 
   protected
-  def respond(opts={})
+
+  def respond(opts = {})
     if opts.present?
       if opts[:response] == :failure
         respond_to do |format|
-          format.json { render 'api/v1/shared/failure' }
+          format.json {render 'api/v1/shared/failure'}
         end
         return
       end
       if opts[:response] == :success
         respond_to do |format|
-          format.json { render 'api/v1/shared/success' }
+          format.json {render 'api/v1/shared/success'}
         end
         return
       end

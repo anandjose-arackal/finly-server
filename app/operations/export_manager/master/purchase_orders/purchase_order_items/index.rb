@@ -23,7 +23,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :tax_amount
     attribute :total_amount
   end
-    
+
   section :po_details do
     attribute :procurement_name
     attribute :po_number
@@ -46,7 +46,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :approval_pending_level_name
     attribute :approval_pending_reviewers
     attribute :approved_reviewers
-    
+
     attribute :department
     attribute :sub_department
     attribute :cost_center
@@ -168,10 +168,10 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     purchase_order(item)&.procurement.vendor&.mobile_number
   end
 
-   def vendor_state_code(item)
-     sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
-     (sc.present?) ? (sprintf '%02d', sc) : ''
-   end
+  def vendor_state_code(item)
+    sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
+    (sc.present?) ? (sprintf '%02d', sc) : ''
+  end
 
   def vendor_pan(item)
     purchase_order(item)&.procurement.vendor&.pan

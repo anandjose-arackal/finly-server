@@ -93,7 +93,7 @@ end
 json.id_proof_back do
   json.file_format kyc&.file_format(kyc&.id_proof_back)
   json.file_type kyc.file_format(kyc.id_proof_back)
-  json.original  (Rails.env.production? ? kyc&.id_proof_back&.url : "/api/#{kyc&.id_proof_back&.url}")
+  json.original (Rails.env.production? ? kyc&.id_proof_back&.url : "/api/#{kyc&.id_proof_back&.url}")
   json.thumb (Rails.env.production? ? kyc&.id_proof_back&.url(:thumb) : "/api/#{kyc&.id_proof_back&.url(:thumb)}")
 end
 json.profile do

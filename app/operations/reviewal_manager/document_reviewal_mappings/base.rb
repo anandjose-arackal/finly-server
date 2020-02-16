@@ -22,6 +22,12 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
       amount = document&.total_amount&.value
     when 'PaymentAgreement'
       amount = document.total_amount.value rescue 0
+    when 'BbpsBillerSubscription'
+      amount = 0
+    when 'BbpsBill'
+      amount = document.amount.value rescue 0
+    when 'CreditNote'
+      amount = document.net_adjustable_amount.value rescue 0
     when 'YesBankVendor'
       amount = 1
     else

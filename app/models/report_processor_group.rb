@@ -6,7 +6,7 @@
 #  status_id                 :integer          not null
 #  is_deleted                :boolean          default(FALSE)
 #  payment_file_generated    :boolean          default(FALSE)
-#  payment_file_generated_at :datetime         default(NULL)
+#  payment_file_generated_at :datetime
 #  scheduled_at              :date
 #  completed_at              :datetime
 #  total_amount_id           :integer          not null
@@ -24,6 +24,7 @@
 #  updated_at                :datetime         not null
 #  marked_as_closed          :boolean
 #  tally_exported            :boolean          default(FALSE)
+#  deleted_at                :datetime
 #
 
 class ReportProcessorGroup < ApplicationRecord

@@ -4,10 +4,11 @@ class WorkflowManager::Aasm::BaseProvider
   attr_accessor :document_state, :document, :user, :violations_present, :policy, :policy_id,
                 :current_level, :next_level, :previous_level, :forwarded_to_user,
                 :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name, :error_message,
-                :reject_to_user, :reject_to_level
+                :reject_to_user, :reject_to_level, :messages
 
   def initialize(user, params)
     self.user = user
+    self.messages = {success: [], error: []}
 
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -39,6 +40,7 @@ class WorkflowManager::Aasm::BaseProvider
     aasm.current_state = self.document_state
   end
 
+  # Not being Used?!
   def document_amount
     amount = 0
     case document.class.name
@@ -60,6 +62,9 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Update the status of the document
     update_status
+
+    # Add Success Message
+    add_success_message
   end
 
   def update_dlrms
@@ -212,6 +217,34 @@ class WorkflowManager::Aasm::BaseProvider
     self.document.update(self.document_update_params)
   end
 
+  def add_success_message
+    case aasm.current_event
+    when :submit, 'submit'
+      if aasm.current_state == :auto_approved
+        self.messages[:success].push "#{document_human_name} submitted"
+        self.messages[:success].push "#{document_human_name} has been auto approved"
+      else
+        self.messages[:success].push "#{document_human_name} submitted"
+      end
+    when :retract, 'retract'
+      self.messages[:success].push "#{document_human_name} retracted"
+    when :reject, 'reject'
+      self.messages[:success].push "#{document_human_name} rejected"
+    when :approve, 'approve'
+      self.messages[:success].push "#{document_human_name} approved"
+    when :take_control, 'take_control'
+      self.messages[:success].push "You've taken control of this #{document_human_name}"
+    when :return_control, 'return_control'
+      self.messages[:success].push "You've returned control of this #{document_human_name}"
+    when :return_control, 'return_control'
+      self.messages[:success].push "You've returned control of this #{document_human_name}"
+    when :void, 'void'
+      self.messages[:success].push "#{document_human_name} voided"
+    else
+      self.messages[:success].push "Successfully Performed Action"
+    end
+  end
+
   def reviewers_not_present?
     self.reviewers.blank?
   end
@@ -230,5 +263,13 @@ class WorkflowManager::Aasm::BaseProvider
 
   def reject_to_level?
     reject_to_level.present? and reject_to_user.present?
+  end
+
+  def document_human_name
+    if document.class.respond_to?(:human_name)
+      document.class.human_name
+    else
+      document.class.model_name.human.split(" ").map(&:capitalize).join(" ")
+    end
   end
 end

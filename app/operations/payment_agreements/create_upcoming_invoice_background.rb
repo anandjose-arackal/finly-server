@@ -4,7 +4,7 @@
 class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
 
   attr_accessor :payment_agreement, :previous_upcoming_invoice, :next_invoice_due_date, :valid_amount_invoice, :new_upcoming_invoices, :invoice_type, :vendor_id, :escalated_reference_invoice, :effective_end_date, :reference_invoice_type, :upcoming_invoice_params, :reference_invoice_ids, :base_start_date, :current_month_end_date, :count, :ordered_upcoming_invoice_dates, :base_end_date, :options, :user,
-    :ri_dates, :gi_dates
+                :ri_dates, :gi_dates
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -214,7 +214,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     effective_start_date = (effective_start_date < start_date) ? effective_start_date : start_date
     # reference_invocies_in_range = get_reference_invoices_between_dates(start_date, end_date)
     # if reference_invocies_in_range.blank?
-      reference_invocies_in_range = get_reference_invoices(effective_start_date, current_month_end_date)
+    reference_invocies_in_range = get_reference_invoices(effective_start_date, current_month_end_date)
     # end
     reference_invoice = reference_invocies_in_range.where(start_date: start_date).first
     if reference_invoice.blank?
@@ -257,7 +257,6 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
   end
 
 
-
   def get_reference_invoices(start_date = nil, end_date = nil)
     self.payment_agreement.send(invoice_type.pluralize.to_sym).where(id: reference_invoice_ids).order(:start_date)
   end
@@ -290,11 +289,11 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
       upcoming_invoice_dates = upcoming_invoice_dates.values - ri_dates
     end
     options = {
-      # invoice_frequency_number: invoice_frequency_number,
-      # initial_start_date: initial_start_date,
-      # current_month_end_date: current_month_end_date,
-      # upcoming_invoice_dates: upcoming_invoice_dates.values
-      upcoming_invoice_dates: upcoming_invoice_dates
+        # invoice_frequency_number: invoice_frequency_number,
+        # initial_start_date: initial_start_date,
+        # current_month_end_date: current_month_end_date,
+        # upcoming_invoice_dates: upcoming_invoice_dates.values
+        upcoming_invoice_dates: upcoming_invoice_dates
     }
     return setup_upcoming_invoices_params(reference_invoice_ids, options)
   end
@@ -342,8 +341,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
   end
 
 
-
-  # Return hash of first and last date of the invoices 
+  # Return hash of first and last date of the invoices
   def get_upcoming_invoice_dates(invoice_frequency_number, initial_start_date, final_end_date, reference_invoices)
     upcoming_invoice_dates = {}
     # ordered_upcoming_invoice_dates key is for sorting. Helps to find which invoice is to be generated first
@@ -353,7 +351,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
     ideal_dates = get_invoice_ideal_end_dates(reference_invoices)
     # Last end date can be before current month in case of escalation
     # i_end_date = reference_invoices.where("(Date(start_date) >= ? AND DATE(start_date) <= ?) OR (Date(end_date) >= ? AND DATE(end_date) <= ?)", start_date, end_date, start_date, end_date).order(:start_date).last.end_date
-     # last_end_date = (i_end_date <= end_date) ? i_end_date : end_date
+    # last_end_date = (i_end_date <= end_date) ? i_end_date : end_date
     last_end_date = reference_invoices.last.end_date
     months_count = month_between_dates(start_date, end_date)
     invoice_frequency_number = reference_invoices.first.invoice_frequency.number # In months
@@ -389,7 +387,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
   end
 
   def agreement_invoice_dates(reference_invoices)
-    reference_invoices.order(:start_date).collect{|i| [i.start_date, i.end_date]}
+    reference_invoices.order(:start_date).collect {|i| [i.start_date, i.end_date]}
   end
 
 
@@ -430,7 +428,7 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
       add_message :error, 'Start date cannot be greater than end date'
       return
     end
-  end 
+  end
 
 
   # Inclusive of current month
@@ -454,7 +452,6 @@ class PaymentAgreements::CreateUpcomingInvoiceBackground < BackgroundOperation
   def get_current_month_end_date
     reference_invoices = self.payment_agreement.send(invoice_type.pluralize.to_sym).fixed_periodic_type.where(id: reference_invoice_ids).order(:start_date)
     return reference_invoices.last.end_date
-
 
 
     # initial_start_date = reference_invoices.first.start_date
