@@ -88,36 +88,36 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     bill = nil
 
     if (data.due_date.present? && data.due_date != "NA" && data.due_date != "9999-01-01") && (data.bill_date.present? && data.bill_date != "NA" && data.bill_date != "0001-01-01")
-      bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(data.bill_date), Date.parse(data.due_date))
+      bill = model.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(data.bill_date), Date.parse(data.due_date))
     elsif data.due_date.present? && data.due_date != "NA" && data.due_date != "9999-01-01"
-      bill = subscription.bbps_bills.where("due_date = ?", Date.parse(data.due_date))
+      bill = model.bbps_bills.where("due_date = ?", Date.parse(data.due_date))
     elsif data.bill_date.present? && data.bill_date != "NA" && data.bill_date != "0000-01-01"
-      bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(data.bill_date))
+      bill = model.bbps_bills.where("bill_date = ?", Date.parse(data.bill_date))
     elsif data.bill_period.present? && data.bill_period != "NA"
       # Received the following kinds of bill numbers
       # ["1", nil, "december", "march", "may", "Monthly", "JANUARY", "MONTHLY", "FEBRUARY", "0.0", "JAN 20", "202002", "DECEMBER"]
 
       if bill_periods.include?(bill_period.to_s.downcase) # Deals with Months
-        bill = subscription.bbps_bills.where(bill_period: data.bill_period)
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
       elsif ["monthly"].includes?(bill_period.to_s.downcase) # Deals with Monthly; Also changes it to current month
         bill_period = Date.today.strftime("%b")
-        bill = subscription.bbps_bills.where(bill_period: data.bill_period)
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
       elsif bill_periods.filter {|month| period.downcase.index(month)}.present? # Deals with 'JAN 20'
         bill_period = bill_periods.filter {|month| period.downcase.index(month)}[0]
-        bill = subscription.bbps_bills.where(bill_period: data.bill_period)
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
       else
-        # bill = subscription.bbps_bills.where("extract(year from created_at) = ?", Date.today.strftime("%Y")).where("extract(month from created_at) = ?", Date.today.strftime("%b"))
+        # bill = model.bbps_bills.where("extract(year from created_at) = ?", Date.today.strftime("%Y")).where("extract(month from created_at) = ?", Date.today.strftime("%b"))
         Event::EAlert::Create.(nil,
-            title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-            description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
-            subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+            title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
+            description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+            subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
         )
       end
     else
       Event::EAlert::Create.(nil,
-          title: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}",
-          description: "Subscription: #{subscription.as_json} \n Bills: #{subscription.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
-          subject: "Ambiguous Bill Creation #{subscription.id} . #{bill&.id}"
+          title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
+          description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+          subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
       )
     end
 
