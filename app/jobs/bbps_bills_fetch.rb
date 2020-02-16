@@ -7,7 +7,7 @@ class BbpsBillsFetch < ApplicationJob
     autofetched = true
 
     bbps_subscriptions.each do |subscription|
-      last_bill = subscription.bbps_bill.reorder('created_at acs').last
+      last_bill = subscription.bbps_bills.reorder('created_at asc').last
       will_create = false
 
       if last_bill.present?

@@ -151,7 +151,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     return true if result['bill'].present?
     authorizer = Docs::UtilityBills::Subscriptions::Authorizer.new(current_user, model)
 
-    last_bill = model.bbps_bill.reorder('created_at acs').last
+    last_bill = model.bbps_bills.reorder('created_at asc').last
     will_create = false
 
     if last_bill.present?
