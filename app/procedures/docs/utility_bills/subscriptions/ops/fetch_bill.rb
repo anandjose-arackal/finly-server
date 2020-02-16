@@ -78,7 +78,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
     amount = (data.amount.to_f / 100).round(2)
 
-    unless amount.to_i == 0
+    if amount.to_i <= 0
       add_message(options, :error, :base, "No New Bills Available with Processable Amount")
       return
     end
