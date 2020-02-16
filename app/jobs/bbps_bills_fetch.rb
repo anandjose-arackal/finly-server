@@ -52,7 +52,7 @@ class BbpsBillsFetch < ApplicationJob
       amount = (result.amount.to_f / 100).round(2)
 
       # Skipping bill creation if amount is zero
-      return if amount.to_i == 0
+      return if amount.to_i <= 0
 
       bill_date_year = Date.parse(result.bill_date).strftime("%Y")
       bill_period = result.bill_period
