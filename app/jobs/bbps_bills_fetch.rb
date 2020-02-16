@@ -59,23 +59,23 @@ class BbpsBillsFetch < ApplicationJob
       bill = nil
 
       if (result.due_date.present? && result.due_date != "NA" && result.due_date != "9999-01-01") && (result.bill_date.present? && result.bill_date != "NA" && result.bill_date != "0001-01-01")
-        bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date))
+        bill = subscription.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(result.bill_date), Date.parse(result.due_date)).first
       elsif result.due_date.present? && result.due_date != "NA" && result.due_date != "9999-01-01"
-        bill = subscription.bbps_bills.where("due_date = ?", Date.parse(result.due_date))
+        bill = subscription.bbps_bills.where("due_date = ?", Date.parse(result.due_date)).first
       elsif result.bill_date.present? && result.bill_date != "NA" && result.bill_date != "0000-01-01"
-        bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(result.bill_date))
+        bill = subscription.bbps_bills.where("bill_date = ?", Date.parse(result.bill_date)).first
       elsif result.bill_period.present? && result.bill_period != "NA"
         # Received the following kinds of bill numbers
         # ["1", nil, "december", "march", "may", "Monthly", "JANUARY", "MONTHLY", "FEBRUARY", "0.0", "JAN 20", "202002", "DECEMBER"]
 
         if bill_periods.include?(bill_period.to_s.downcase) # Deals with Months
-          bill = subscription.bbps_bills.where(bill_period: result.bill_period)
+          bill = subscription.bbps_bills.where(bill_period: result.bill_period).first
         elsif ["monthly"].includes?(bill_period.to_s.downcase) # Deals with Monthly; Also changes it to current month
           bill_period = Date.today.strftime("%b")
-          bill = subscription.bbps_bills.where(bill_period: result.bill_period)
+          bill = subscription.bbps_bills.where(bill_period: result.bill_period).first
         elsif bill_periods.filter {|month| period.downcase.index(month)}.present? # Deals with 'JAN 20'
           bill_period = bill_periods.filter {|month| period.downcase.index(month)}[0]
-          bill = subscription.bbps_bills.where(bill_period: result.bill_period)
+          bill = subscription.bbps_bills.where(bill_period: result.bill_period).first
         else
           # bill = subscription.bbps_bills.where("extract(year from created_at) = ?", Date.today.strftime("%Y")).where("extract(month from created_at) = ?", Date.today.strftime("%b"))
           Event::EAlert::Create.(nil,
