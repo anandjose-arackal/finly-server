@@ -1,6 +1,7 @@
 class IndexBuilder::API
   include Column::Builder
   include DynamicAttributes
+  include IndexBuilder::Counter::DSL
 
   class_attr :resolver
 
@@ -29,7 +30,7 @@ class IndexBuilder::API
 
   def self.include_associations!(collection, required_columns)
     includes = []
-    attrs =  columns.select do |column_key, attr|
+    attrs = columns.select do |column_key, attr|
       (required_columns.blank? and attr.default) or (required_columns.present? and (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym)))
     end
     attrs.each do |column_key, column|
