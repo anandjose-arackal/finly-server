@@ -128,7 +128,7 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill < Transactions:
         convenience_fee_desc: data.convenience_fee_desc,
         early_payment_fee: get_amount_from_response(data.early_payment_fee),
         late_payment_fee: get_amount_from_response(data.late_payment_fee),
-        model_id: subscription.id,
+        model_id: model.id,
         autofetched: true,
         order_number: data.ref_no,
         order_number_type: "BillFetch"
