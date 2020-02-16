@@ -1,4 +1,5 @@
 class IndexController < BaseControllers::WebBase
+  layout 'trailblazers'
 
   def fetch_config
     endpoint IndexBuilder::Config
