@@ -87,7 +87,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
-    if self.purchase_order.closed? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
+    if self.purchase_order&.closed? && self.purchase_order&.advance_payments.blank? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
       add_message :error, "PO is Closed and no PO advance payments found. Advance amount has to be paid in full in this Invoice. Please set the Advance Adjustment Amount to \"NO\" and proceed."
       return
     end
