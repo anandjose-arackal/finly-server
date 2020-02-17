@@ -3,10 +3,13 @@ if Rails.env.production? and File.exists?("#{Rails.root}/config/bunny.yml")
   MQ_PUBLISHER = Bunny.new(bunny_config)
   Sneakers.configure :connection => MQ_PUBLISHER,
                      :start_worker_delay => 0.2, # When workers do frenzy-die, randomize to avoid resource starvation
-                     :workers => 4 # Number of per-cpu processes to run
+                     :workers => 4, # Number of per-cpu processes to run
+                     :exchange_type => :topic
 else
   MQ_PUBLISHER = Bunny.new
   Sneakers.configure :connection => MQ_PUBLISHER,
                      :start_worker_delay => 0.2, # When workers do frenzy-die, randomize to avoid resource starvation
-                     :workers => 4 # Number of per-cpu processes to run
+                     :workers => 4, # Number of per-cpu processes to run
+                     :exchange_type => :topic
+
 end

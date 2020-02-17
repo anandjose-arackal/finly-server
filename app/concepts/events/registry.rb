@@ -1,7 +1,9 @@
 class Events::Registry
 
   def self.add_event(klass, event, consumer_key)
-    raise "Key #{consumer_key} is already taken" if find_by_consumer_key(consumer_key).present?
+    # raise "Key #{consumer_key} is already taken" if find_by_consumer_key(consumer_key).present?
+
+    return if events(event)[consumer_key] == klass
 
     events(event)[consumer_key] = klass
   end
@@ -23,6 +25,10 @@ class Events::Registry
     end
 
     nil
+  end
+
+  def self.with_consumer_key(consumer_key)
+    events.values.reject {|h| h.empty?}.filter {|h| h.keys.first == consumer_key}.map(&:values).flatten
   end
 
   def self.async_events(event, consumer_key: NoObject)

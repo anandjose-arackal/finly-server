@@ -23,8 +23,8 @@ class Events::Publisher
 
     def self.call(routing_key, payload, current_user: nil, ignore_failure: false, consumer_key:)
       if consumer_key != NoObject
-        consumer = Events::Registry.find_by_consumer_key(consumer_key)
-        execute_consumer(consumer, payload, current_user) if consumer
+        consumers = Events::Registry.with_consumer_key(consumer_key)
+        consumers.each {|consumer| execute_consumer(consumer, payload, current_user) if consumer}
       else
         execute_all_consumers(routing_key, payload, current_user, ignore_failure)
       end
@@ -70,7 +70,9 @@ class Events::Publisher
 
     def self.publish_to_consumer(consumer_key, payload)
       # Find the consumer and run a background job
-      Events::Registry.find_by_consumer_key(consumer_key)&.perform_async(Events::Serializer.encode(payload))
+      # Events::Registry.find_by_consumer_key(consumer_key)&.perform_async(Events::Serializer.encode(payload))
+      consumers = Events::Registry.with_consumer_key(consumer_key)
+      consumers.each {|consumer| consumer&.perform_async(Events::Serializer.encode(payload))}
     end
 
     def self.publish_to_all_consumers(routing_key, payload, persistence)

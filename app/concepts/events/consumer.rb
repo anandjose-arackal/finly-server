@@ -7,12 +7,10 @@ module Events::Consumer
 
   module ClassMethods
     def consumes_event!(event, consumer_key:, name:, sync: false, options: {})
-      if event == "bbps_biller_subscription.submit"
-        # puts "event", event
-      end
-      raise "Name is not defined for consumer #{self.event_name}" if name.nil?
+
+      # raise "Name is not defined for consumer #{self.event_name}" if name.nil?
       raise "Event is not defined for consumer #{self.event_name}" if event.nil?
-      raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
+      # raise "Consumer Key is not defined for consumer #{self.event_name}" if consumer_key.nil?
 
       async! unless sync
       @event = event
@@ -21,11 +19,12 @@ module Events::Consumer
       @consumes_event = true
       @event_name = name
 
-      Events::Registry.add_event self, event, consumer_key
+      Events::Registry.add_event self, event, consumer_key if consumer_key.present? && consumer_key != NoObject
 
 
       if async?
         include Sneakers::Worker
+
         from_queue event, options
       end
     end
