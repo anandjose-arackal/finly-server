@@ -58,10 +58,6 @@ class Personalizer::Adapters::Company74::ExportTemplates74::AllStatementsTemplat
     end
   end
 
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
-
   def merchant(finly_transaction)
     merchant = ''
     if finly_transaction.credit?

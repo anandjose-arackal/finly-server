@@ -39,6 +39,9 @@
 #  vendor_portal                  :boolean          default(FALSE)
 #  utility_bills_enabled          :boolean          default(FALSE)
 #  analytics_system               :boolean
+#  request_encryption_enabled     :boolean          default(FALSE)
+#  user_level_custom_fields       :boolean          default(FALSE)
+#  deleted_at                     :datetime
 #
 
 class FeatureSubscription < ApplicationRecord

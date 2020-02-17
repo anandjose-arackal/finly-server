@@ -77,6 +77,7 @@ class BbpsBillerSubscription < ApplicationRecord
 
   has_many :pocs, class_name: 'User', through: :subscription_pocs, source: :user
   has_many :bbps_bills, class_name: 'BbpsBill', foreign_key: :subscription_id
+  has_many :attachments, as: :resource, dependent: :destroy
 
   after_update :cleanup # Destroy Biller Subscription fields for other billers if any
 
@@ -172,7 +173,9 @@ class BbpsBillerSubscription < ApplicationRecord
         reminder_before_days: reminder_before_days,
         customer_email: customer_email,
         customer_name: customer_name,
-        customer_pan: customer_pan
+        last_paid_at: last_paid_at&.strftime("%I:%M %p, %d %b %Y"),
+        customer_pan: customer_pan,
+        attachments: attachments.as_json
     }
   end
 
@@ -291,5 +294,9 @@ class BbpsBillerSubscription < ApplicationRecord
 
   def self.open_statuses
     self.status_ids(:draft, :retracted, :rejected)
+  end
+
+  def self.human_name(options = {})
+    options[:plural] ? 'Utility Bill Masters' : 'Utility Bill Master'
   end
 end

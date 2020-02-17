@@ -37,9 +37,9 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
-            report.id,
             Date.today.strftime('%d/%m/%Y'),
+            report.id,
+            report.approved_at&.strftime('%d/%m/%Y'),
             '',
             '',
             print_ledger_name(expense),
@@ -54,9 +54,9 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
         self.contents << [
             'JOURNAL',
             report.id,
-            Date.today.strftime('%d-%b'),
-            report.id,
             Date.today.strftime('%d/%m/%Y'),
+            report.id,
+            report.approved_at&.strftime('%d/%m/%Y'),
             '',
             '',
             expense.user&.profile&.employee_id,
@@ -145,11 +145,6 @@ class Personalizer::Adapters::Company144::ExportTemplates144::TallyJournalTempla
     return gl unless STANZA_INDIRECT_GL_CODE_MAPPING.keys.include?(gl)
     return gl unless expense.report.policy.name.downcase.include?('indirect')
     STANZA_INDIRECT_GL_CODE_MAPPING[gl]
-  end
-
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
   end
 
 end

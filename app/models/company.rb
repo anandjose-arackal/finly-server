@@ -12,6 +12,7 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
+#  deleted_at       :datetime
 #
 
 class Company < ApplicationRecord
@@ -341,6 +342,10 @@ class Company < ApplicationRecord
 
   def itz_cash_d_code_enabled?
     self.feature_subscription.itz_cash_d_code_enabled
+  end
+
+  def request_encryption_enabled?
+    self.feature_subscription.request_encryption_enabled?
   end
 
   def cards_enabled?

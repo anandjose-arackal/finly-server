@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class PaymentAgreementStatus < ApplicationRecord
@@ -23,7 +24,8 @@ class PaymentAgreementStatus < ApplicationRecord
         :closed,
         :invoice_created,
         :payment_ticket_created,
-        :terminated
+        :terminated,
+        :revised
     ]
   end
 
@@ -58,6 +60,10 @@ class PaymentAgreementStatus < ApplicationRecord
 
   def terminated?
     self.id == PaymentAgreementStatus.id_for(:terminated)
+  end
+
+  def revised?
+    self.id == PaymentAgreementStatus.id_for(:revised)
   end
 
 end

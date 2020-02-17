@@ -33,7 +33,8 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
   attribute :po_status
   attribute :po_number
   attribute :po_payment_term
-  attribute :po_date
+  attribute :po_creation_date
+  attribute :po_closed_date
   attribute :po_delivery_date
   attribute :po_submitted_on
   attribute :is_po_approved
@@ -193,12 +194,17 @@ class ExportManager::Master::PurchaseOrders::Index < ExportManager::Builders::Sp
     purchase_order&.delivery_date&.strftime("%d-%b-%Y")
   end
 
-  def po_date(purchase_order)
+  def po_creation_date(purchase_order)
     purchase_order&.created_at&.strftime("%d-%b-%Y")
+  end
+
+  def po_closed_date(purchase_order)
+    purchase_order.trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
   end
 
   def po_submitted_on(purchase_order)
     # todo
+    purchase_order.trails&.where(action_id: TrailAction.id_for(:submit))&.last&.created_at&.strftime("%d-%b-%Y")
   end
 
   def is_po_approved(purchase_order)

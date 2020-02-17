@@ -18,7 +18,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.violations_present = !!params[:violations_present]
     self.chain = []
 
-    self.provider_names = %w( PurchaseOrderProvider PoInvoiceProvider NonPoInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider BbpsBillerSubscriptionProvider BbpsBillProvider CreditNoteProvider )
+    self.provider_names = %w( PurchaseOrderProvider PoInvoiceProvider NonPoInvoiceProvider AgreementInvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider PaymentAgreementProvider BbpsBillerSubscriptionProvider BbpsBillAutofetchedProvider BbpsBillNonAutofetchedProvider CreditNoteProvider )
 
     policy_id = params[:policy_id] || params['policy_id'] || document.policy_id
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil

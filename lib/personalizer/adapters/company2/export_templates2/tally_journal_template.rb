@@ -151,8 +151,5 @@ class Personalizer::Adapters::Company2::ExportTemplates2::TallyJournalTemplate <
   end
 
 
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
 
 end

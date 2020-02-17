@@ -61,6 +61,7 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
 
     has_scope :filter_field_type_id, type: :array
     has_scope :filter_parent_type_id, type: :array
+    has_scope :filter_parent_drop_down_item_id
 
     def init
       self.field_configurations = params[:field_configurations]

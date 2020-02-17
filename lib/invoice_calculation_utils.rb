@@ -35,7 +35,7 @@ class InvoiceCalculationUtils
 
     # If po invoice has po advance, then adjust the balance due
     unless self.invoice.class.name == 'OutwardInvoice'
-      if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
+      if self.invoice.po_advance.present? && self.invoice.advance_amount_required && self.invoice.po_adjusted_advance[:value].present?
         self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
       end
     end
@@ -295,6 +295,8 @@ class InvoiceCalculationUtils
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.tds_applicable_amount, tds)
     self.tds_amount = (self.tds_applicable_amount - new_gross_amount) rescue 0
+    # self.tds_amount = self.tds_amount.round(-1) # round the tds to the nearest 10. This is as per income tax rules to calculate tds, section 288b
+    self.tds_amount = self.tds_amount.ceil # round the tds to the nearest digit as of now.
   end
 
   def calculate_advance_paid

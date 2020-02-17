@@ -12,6 +12,17 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
     def init
       self.bank_payment_request = params[:bank_payment_request]
     end
+
+    def construct_response
+      response_hash = {
+          "bank_payment_request_id" => self.bank_payment_request.id
+      }
+      json_response = response_hash.to_json
+      path = Dir.home + '/certificates/encryption_certificates/qkr.crt'
+      cert = OpenSSL::X509::Certificate.new(File.read(path))
+      public_key = cert.public_key
+      encrypted_response = Base64.encode64(public_key.public_encrypt(json_response))
+    end
   end
 
   class BankTransfer::Payments::ApiPayments::BulkInitiatePayment::BulkFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
@@ -90,6 +101,7 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
   end
 
   def process
+    initiating_account = retrieve_initiating_account(user.company)
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
@@ -99,7 +111,7 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
             currency_id: 1
         },
         payment_mode: self.payment_mode,
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account.class.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",

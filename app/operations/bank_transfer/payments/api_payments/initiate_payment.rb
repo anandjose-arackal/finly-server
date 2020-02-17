@@ -7,12 +7,63 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
 
   class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payment_order, :bank_payment_request
+    attr_accessor :payment_order, :bank_payment_request, :response
 
     def init
       self.payment_order = params[:payment_order]
       self.bank_payment_request = params[:bank_payment_request]
     end
+
+    # def construct_response
+    #   response_hash = {
+    #       "summary" => {
+    #           "order_status" => {
+    #               "name" => self.bank_payment_request.status_name(current_user.id)&.humanize,
+    #               "identifier" => self.bank_payment_request.status_name(current_user.id)
+    #           },
+    #           "policy" => {
+    #               "id" => self.bank_payment_request.policy&.id,
+    #               "name" => self.bank_payment_request.policy&.name
+    #           },
+    #           "bank_transfer_type" => self.payment_order.payment_mode&.upcase,
+    #           "payment_type" => self.payment_order.payment_type&.humanize,
+    #           "scheduled_at" => self.payment_order.scheduled_at&.strftime("%d %b %Y"),
+    #           "processed_at" => self.payment_order.processed_at&.strftime("%d %b %Y"),
+    #           "amount_requested" => self.payment_order.amount_requested&.value,
+    #           "amount_processed" => self.payment_order.amount_processed&.value,
+    #           "description" => self.bank_payment_request.description,
+    #           "note" => self.payment_order.note,
+    #           "initiating_user" => self.bank_payment_request.owner.name,
+    #           "name" => self.bank_payment_request.name
+    #       },
+    #       "payments" => payments_array
+    #   }
+    #   json_response = response_hash.to_json
+    #   path = Dir.home + '/certificates/encryption_certificates/qkr_8192.crt'
+    #   cert = OpenSSL::X509::Certificate.new(File.read(path))
+    #   public_key = cert.public_key
+    #   encrypted_response = Base64.encode64(public_key.public_encrypt(json_response))
+    # end
+
+    # def payments_array
+    #   result = []
+    #   self.payment_order.payments.each do |payment|
+    #     result << {
+    #         "owner_name" => payment.receiving_account&.account_owner&.name,
+    #         "name" => payment.receiving_account&.name,
+    #         "account_number" => payment.receiving_account.account_number,
+    #         "ifsc" => payment.receiving_account.ifsc,
+    #         "net_amount" => payment.amount_value,
+    #         "status" => payment.payment_status_name,
+    #         "id" => payment.id,
+    #         "note" => payment.note,
+    #         "system_messages" => payment.system_messages.as_json,
+    #         "payment_mode" => payment.payment_mode,
+    #         "bank_reference_number" => payment.reference_resource&.bank_reference_number
+    #     }
+    #   end
+    #   result
+    # end
   end
 
   def pre_validate
@@ -134,6 +185,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
   end
 
   def create_bank_payment_request
+    initiating_account = retrieve_initiating_account(user.company)
     payment_params = {
         payment_type_id: PaymentType.id_for(:credit),
         application: "vp",
@@ -141,8 +193,8 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
         receiving_user_id: self.bank_account.account_owner_id,
         initiating_user_type: "User",
         initiating_user_id: user.id,
-        initiating_account_type: YesBankCompanyAccount.name,
-        initiating_account_id: user.company.yes_bank_company_account.id,
+        initiating_account_type: initiating_account.class.name,
+        initiating_account_id: initiating_account.id,
         receiving_account_type: "BankAccount",
         receiving_account_id: self.bank_account.id,
         payment_status_id: PaymentStatus.id_for(:pending_approval),
@@ -168,7 +220,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
           currency_id: 1
       },
         payment_mode: params[:mode],
-        initiating_account_type: YesBankCompanyAccount.name,
+        initiating_account_type: initiating_account.class.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
@@ -200,5 +252,6 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
     end
     self.payment_order = self.bank_payment_request.payment_order
   end
+
 
 end
