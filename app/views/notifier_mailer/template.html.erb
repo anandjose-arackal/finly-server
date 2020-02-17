@@ -1,339 +1,95 @@
-<style type="text/css">
-  body {
-    margin: 0;
-    padding: 0;
-  }
+<div class="wrapper-main">
+  <div class="mail-container">
+    <div class="section-header">
+      <img src="./images/company_logo.png" width="100" height="auto"/>
+      <a href="https://www.finly.io/login">Login</a>
+    </div>
+    <div class="section-body">
 
-  table,
-  td,
-  tr {
-    vertical-align: top;
-    border-collapse: collapse;
-  }
+      <!--
+        Common Banner on the Basis of IF-ElSE condition
+       -->
+      <div class="banner-wrapper">
+        <img src="./images/BG/Report_Rejected.png"/>
+        <div class="banner-details">
+          <span class="main-header"><%= @payload["title"] %></span>
+          <% if @payload["sub_header"].present? %>
+            <span class="sub-header"><%= @payload["sub_header"] %></span>
+          <% end %>
+        </div>
+      </div>
+      <!-- END -->
 
-  * {
-    line-height: inherit;
-  }
-
-  a[x-apple-data-detectors=true] {
-    color: inherit !important;
-    text-decoration: none !important;
-  }
-</style>
-<style id="media-query" type="text/css">
-  @media (max-width: 620px) {
-
-    .block-grid,
-    .col {
-      min-width: 320px !important;
-      max-width: 100% !important;
-      display: block !important;
-    }
-
-    .block-grid {
-      width: 100% !important;
-    }
-
-    .col {
-      width: 100% !important;
-    }
-
-    .col > div {
-      margin: 0 auto;
-    }
-
-    img.fullwidth,
-    img.fullwidthOnMobile {
-      max-width: 100% !important;
-    }
-
-    .no-stack .col {
-      min-width: 0 !important;
-      display: table-cell !important;
-    }
-
-    .no-stack.two-up .col {
-      width: 50% !important;
-    }
-
-    .no-stack .col.num4 {
-      width: 33% !important;
-    }
-
-    .no-stack .col.num8 {
-      width: 66% !important;
-    }
-
-    .no-stack .col.num4 {
-      width: 33% !important;
-    }
-
-    .no-stack .col.num3 {
-      width: 25% !important;
-    }
-
-    .no-stack .col.num6 {
-      width: 50% !important;
-    }
-
-    .no-stack .col.num9 {
-      width: 75% !important;
-    }
-
-    .video-block {
-      max-width: none !important;
-    }
-
-    .mobile_hide {
-      min-height: 0px;
-      max-height: 0px;
-      max-width: 0px;
-      display: none;
-      overflow: hidden;
-      font-size: 0px;
-    }
-
-    .desktop_hide {
-      display: block !important;
-      max-height: none !important;
-    }
-  }
-</style>
-<div class="clean-body" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: #FFFFFF;">
-  <!--[if IE]>
-  <div class="ie-browser"><![endif]-->
-  <table bgcolor="#FFFFFF" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="table-layout: fixed; vertical-align: top; min-width: 320px; Margin: 0 auto; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #FFFFFF; width: 100%;" valign="top" width="100%">
-    <tbody>
-    <tr style="vertical-align: top;" valign="top">
-      <td style="word-break: break-word; vertical-align: top;" valign="top">
-        <!--[if (mso)|(IE)]>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td align="center" style="background-color:#FFFFFF"><![endif]-->
-        <div style="background-color:transparent;">
-          <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-            <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-              <!--[if (mso)|(IE)]>
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;">
-                <tr>
-                  <td align="center">
-                    <table cellpadding="0" cellspacing="0" border="0" style="width:600px">
-                      <tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-              <!--[if (mso)|(IE)]>
-              <td align="center" width="300"
-                  style="background-color:transparent;width:300px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num6" style="max-width: 320px; min-width: 300px; display: table-cell; vertical-align: top; width: 300px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <div align="center" class="img-container center autowidth" style="padding-right: 0px;padding-left: 0px;">
-                      <!--[if mso]>
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                        <tr style="line-height:0px">
-                          <td style="padding-right: 0px;padding-left: 0px;"
-                              align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth" src="" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 100px; display: block;" title="Image" width="100"/>
-                      <!--[if mso]></td></tr></table><![endif]-->
-                    </div>
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td>
-              <td align="center" width="300"
-                  style="background-color:transparent;width:300px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num6" style="max-width: 320px; min-width: 300px; display: table-cell; vertical-align: top; width: 300px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <div align="center" class="img-container center autowidth" style="padding-right: 0px;padding-left: 0px;">
-                      <!--[if mso]>
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                        <tr style="line-height:0px">
-                          <td style="padding-right: 0px;padding-left: 0px;"
-                              align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth" src="" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 100px; display: block;" title="Image" width="100"/>
-                      <!--[if mso]></td></tr></table><![endif]-->
-                    </div>
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-            </div>
+      <!-- Message Body FOR "EXPENSE REPORTS" -->
+      <div class="mailer-details-wrapper">
+        <div class="user-message">
+          <div class="header">
+            <span class="circle"></span>
+            <span class="user-name">Vivek AG</span>
+          </div>
+          <div class="body">
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi ex laboriosam impedit eligendi distinctio
+            voluptatem libero harum nobis odit tempore consequuntur, ipsum, culpa, autem neque fugit adipisci voluptas
+            perspiciatis maiores.
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus expedita mollitia nobis dolores nisi
+            suscipit consequuntur praesentium nesciunt consectetur autem eaque consequatur cumque, nemo adipisci minima
+            quasi sed earum architecto.
           </div>
         </div>
-        <div style="background-color:transparent;">
-          <div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-            <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-              <!--[if (mso)|(IE)]>
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;">
-                <tr>
-                  <td align="center">
-                    <table cellpadding="0" cellspacing="0" border="0" style="width:600px">
-                      <tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-              <!--[if (mso)|(IE)]>
-              <td align="center" width="600"
-                  style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <!--[if mso]>
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+        <% if @payload["tables"].present? %>
+          <% @payload["tables"].each_with_index do |table, index| %>
+            <div class="items-list">
+              <% if table["header"].present? %>
+                <div class="items-list-header">
+                  <span class="list-item-count">3 Expenses</span>
+                  <span class="list-item-total">Total : 15,829</span>
+                </div>
+              <% end %>
+
+              <% if table["content"].present? %>
+                <table class="table-items-list">
+                  <% if table["content"]["thead"].present? %>
+                    <thead>
+                    <tr>
+                      <% table["content"]["thead"].each do |header| %>
+                        <th><%= header %></th>
+                      <% end %>
+                    </tr>
+                    </thead>
+                  <% end %>
+
+                  <% if table["content"]["tbody"].present? && table["content"]["tbody"].is_a?(Array) %>
+                    <tbody>
+                    <% table["content"]["tbody"].each do |tr| %>
                       <tr>
-                        <td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-                    <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-                      <div style="line-height: 2; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 24px;">
-                        <p style="text-align: center; line-height: 2; word-break: break-word; font-size: 18px; mso-line-height-alt: 36px; margin: 0;">
-                          <span style="font-size: 18px;">You have successfully retracted the Utility Bill #19821</span>
-                        </p>
-                      </div>
-                    </div>
-                    <!--[if mso]></td></tr></table><![endif]-->
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+                        <% tr.each do |cell| %>
+                          <td><%= cell %></td>
+                        <% end %>
+                      </tr>
+                    <% end %>
+                    </tbody>
+                  <% end %>
+                </table>
+              <% end %>
             </div>
+            <div class="divider"></div>
+          <% end %>
+        <% end %>
+        <% if @payload["actions"].present? %>
+          <div class="redirect-section actions">
+            <% @payload["actions"].each do |action| %>
+              <a href="<%= action.href %>" class="button"><%= action.title %></a>
+            <% end %>
           </div>
-        </div>
-        <div style="background-color:transparent;">
-          <div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-            <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-              <!--[if (mso)|(IE)]>
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;">
-                <tr>
-                  <td align="center">
-                    <table cellpadding="0" cellspacing="0" border="0" style="width:600px">
-                      <tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-              <!--[if (mso)|(IE)]>
-              <td align="center" width="600"
-                  style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <!--[if mso]>
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-                    <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-                      <div style="font-size: 14px; line-height: 1.2; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px;">
-                        <p style="font-size: 14px; line-height: 1.2; mso-line-height-alt: 17px; margin: 0;">I'm a new
-                          Text block ready for your content.</p>
-                      </div>
-                    </div>
-                    <!--[if mso]></td></tr></table><![endif]-->
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-            </div>
-          </div>
-        </div>
-        <div style="background-color:transparent;">
-          <div class="block-grid three-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-            <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-              <!--[if (mso)|(IE)]>
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;">
-                <tr>
-                  <td align="center">
-                    <table cellpadding="0" cellspacing="0" border="0" style="width:600px">
-                      <tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-              <!--[if (mso)|(IE)]>
-              <td align="center" width="200"
-                  style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <div></div>
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td>
-              <td align="center" width="200"
-                  style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <div></div>
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td>
-              <td align="center" width="200"
-                  style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;"
-                  valign="top">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-              <div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
-                <div style="width:100% !important;">
-                  <!--[if (!mso)&(!IE)]><!-->
-                  <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-                    <!--<![endif]-->
-                    <div></div>
-                    <!--[if (!mso)&(!IE)]><!-->
-                  </div>
-                  <!--<![endif]-->
-                </div>
-              </div>
-              <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-              <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-            </div>
-          </div>
-        </div>
-        <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <!--[if (IE)]></div><![endif]-->
+        <% end %>
+      </div>
+      <!-- END -->
+    </div>
+    <div class="section-footer">
+      <span class="footer-item">Thanks!<br/>Team Finly.</span>
+      <span class="footer-item">Spend Management for Businesses.</span>
+      <span class="footer-item">Download App : <a href="#">iOS</a><a href="#">Android</a></span>
+    </div>
+  </div>
 </div>
