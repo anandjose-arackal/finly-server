@@ -208,6 +208,17 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         end
       end
     end
+
+    def generate_csv_file
+      file = Tempfile.new(['export', '.csv'])
+      CSV.open(file, 'w', write_headers: true, headers: headers) do |csv|
+        self.contents&.each do |content|
+          csv << content
+        end
+      end
+      file.rewind
+      file
+    end
     # Handle CSV END
   end
 
