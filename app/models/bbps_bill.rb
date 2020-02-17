@@ -208,6 +208,7 @@ class BbpsBill < ApplicationRecord
           # biller_category_name: biller_category_name,
           amount: amount.as_json,
           customer_fields: subscription.all_customer_fields,
+          paid_at: paid_at,
       }
       return data
     end
@@ -243,6 +244,7 @@ class BbpsBill < ApplicationRecord
         bill_date: bill_date,
         bill_period: bill_period,
         bill_number: bill_number,
+        paid_at: paid_at,
 
         late_payment_fee_selected: late_payment_fee_selected,
         early_payment_fee_selected: early_payment_fee_selected,
