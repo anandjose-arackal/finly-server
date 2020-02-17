@@ -459,7 +459,7 @@ class User < ApplicationRecord
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
+    ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
@@ -468,7 +468,7 @@ class User < ApplicationRecord
 
   scope :user_search, -> (term) {
     if term.present?
-      ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
+      ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
                                        "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
       ids.uniq!
       self.where(id: ids)
@@ -491,12 +491,12 @@ class User < ApplicationRecord
     query = ''
     if active
       query += ' OR ' unless query.blank?
-      query += "`users`.`active` = 1 AND `users`.`invitation_token` IS NULL AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+      query += "`users`.`active` = 1 AND `users`.`default_password` IS FALSE AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
       # query += '(active = 1 AND invitation_token IS NULL AND (NOT ((first_name = ' ' OR first_name IS NULL))) AND (mobile_only_invite != 1)'
     end
     if pending
       query += ' OR ' unless query.blank?
-      query += "(first_name = '' OR invitation_token IS NOT NULL OR mobile_only_invite = 1)"
+      query += "(first_name = '' OR default_password = 1 OR mobile_only_invite = 1)"
       # query += 'first_name = ' ' OR invitation_token IS NOT NULL OR mobile_only_invite = 1'
     end
     if inactive
