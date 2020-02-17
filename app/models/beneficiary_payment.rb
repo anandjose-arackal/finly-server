@@ -39,6 +39,7 @@
 #  resource_template_id            :integer
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
+#  deleted_at                      :datetime
 #
 
 #                 :id => :integer,
@@ -280,6 +281,14 @@ class BeneficiaryPayment < ApplicationRecord
       self.balance_due.update(value: balance_due_amount)
     else
       self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
+    end
+
+    # quick fix for abp
+    # payable amount has no definition in that document. just there for display purposes.
+    if self.payable_amount.present?
+      self.payable_amount.update(value: balance_due_amount)
+    else
+      self.payable_amount = Amount.new(value: balance_due_amount, currency_id: 1)
     end
 
     # # adding the payment amount to the params if  the object is present

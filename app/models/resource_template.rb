@@ -9,6 +9,7 @@
 #  last_used_at  :datetime
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
+#  deleted_at    :datetime
 #
 
 class ResourceTemplate < ApplicationRecord

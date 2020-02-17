@@ -25,6 +25,7 @@ class PaymentAgreements::Update < PaymentAgreements::Base
     validate_item_quantity
     ActiveRecord::Base.transaction do
       if self.payment_agreement.save
+        validate_invoice_line_items unless has_errors?
         validate_prepaid_consistency unless has_errors? 
         security_deposit_validation unless has_errors?
         validate_invoice_frequency unless has_errors?
@@ -60,14 +61,16 @@ class PaymentAgreements::Update < PaymentAgreements::Base
       if payment_agreement.valid?
         # Set validation of DLRMs
         if PaymentAgreement.status_ids(:draft, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
-          dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-            reviewal_document: self.payment_agreement,
-            document_reviewer_mappings_params: document_reviewer_mappings_params
-          })
-          unless dlrm_validation_op.success?
-            add_message :error, dlrm_validation_op.messages[:error]
-            raise ActiveRecord::Rollback
-            return
+          if payment_agreement.dlrms.present?
+            dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+                reviewal_document: self.payment_agreement,
+                document_reviewer_mappings_params: document_reviewer_mappings_params
+            })
+            unless dlrm_validation_op.success?
+              add_message :error, dlrm_validation_op.messages[:error]
+              raise ActiveRecord::Rollback
+              return
+            end
           end
         end
       end

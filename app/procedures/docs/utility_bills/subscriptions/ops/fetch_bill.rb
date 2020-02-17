@@ -14,6 +14,8 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
 
   step :update_bill
 
+  step :check_create_permission
+
   def init(options, params:, **)
     params[:id] = params[:subscription_id]
   end
@@ -68,15 +70,60 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
   end
 
   def check_bill_presence(options, model:, result:, **)
+    data = result['data']
+    unless data&.status == 'Y'
+      add_message(options, :error, :base, "Could Not Fetch Bill")
+      return
+    end
 
-    if result['data'].status == 'Y'
-      bill_date_year = Date.parse(result['data'].bill_date).strftime("%Y")
-      bill_period = result['data'].bill_period
-      bill = model.bbps_bills.where('extract(year from bill_date) = ?', bill_date_year).where('lower(bill_period) = ?', bill_period.downcase).first
+    amount = (data.amount.to_f / 100).round(2)
 
-      if bill.present?
-        result['bill'] = bill
+    if amount.to_i <= 0
+      add_message(options, :error, :base, "No New Bills Available with Processable Amount")
+      return
+    end
+
+    bill_date_year = Date.parse(data.bill_date).strftime("%Y")
+    bill_period = data.bill_period
+    bill = nil
+
+    if (data.due_date.present? && data.due_date != "NA" && data.due_date != "9999-01-01") && (data.bill_date.present? && data.bill_date != "NA" && data.bill_date != "0001-01-01")
+      bill = model.bbps_bills.where("bill_date = ? AND due_date = ?", Date.parse(data.bill_date), Date.parse(data.due_date))
+    elsif data.due_date.present? && data.due_date != "NA" && data.due_date != "9999-01-01"
+      bill = model.bbps_bills.where("due_date = ?", Date.parse(data.due_date))
+    elsif data.bill_date.present? && data.bill_date != "NA" && data.bill_date != "0000-01-01"
+      bill = model.bbps_bills.where("bill_date = ?", Date.parse(data.bill_date))
+    elsif data.bill_period.present? && data.bill_period != "NA"
+      # Received the following kinds of bill numbers
+      # ["1", nil, "december", "march", "may", "Monthly", "JANUARY", "MONTHLY", "FEBRUARY", "0.0", "JAN 20", "202002", "DECEMBER"]
+
+      if bill_periods.include?(bill_period.to_s.downcase) # Deals with Months
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
+      elsif ["monthly"].includes?(bill_period.to_s.downcase) # Deals with Monthly; Also changes it to current month
+        bill_period = Date.today.strftime("%b")
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
+      elsif bill_periods.filter {|month| period.downcase.index(month)}.present? # Deals with 'JAN 20'
+        bill_period = bill_periods.filter {|month| period.downcase.index(month)}[0]
+        bill = model.bbps_bills.where(bill_period: data.bill_period)
+      else
+        # bill = model.bbps_bills.where("extract(year from created_at) = ?", Date.today.strftime("%Y")).where("extract(month from created_at) = ?", Date.today.strftime("%b"))
+        Event::EAlert::Create.(nil,
+            title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
+            description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+            subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
+        )
       end
+    else
+      Event::EAlert::Create.(nil,
+          title: "Ambiguous Bill Creation #{model.id} . #{bill&.id}",
+          description: "Subscription: #{model.as_json} \n Bills: #{model.bbps_bills.last.as_json} \n Response: #{data.as_json["table"]}",
+          subject: "Ambiguous Bill Creation #{model.id} . #{bill&.id}"
+      )
+    end
+
+
+    if bill.present?
+      result['bill'] = bill
     end
 
     true
@@ -98,6 +145,31 @@ class Docs::UtilityBills::Subscriptions::Ops::FetchBill < Transactions::API
     # Persist Contract
 
     result['bill'].update(order_number: result['data'].ref_no, order_number_type: "BillFetch")
+  end
+
+  def check_create_permission(options, current_user:, model:, result:, **)
+    return true if result['bill'].present?
+    authorizer = Docs::UtilityBills::Subscriptions::Authorizer.new(current_user, model)
+
+    last_bill = model.bbps_bills.reorder('created_at asc').last
+    will_create = false
+
+    if last_bill.present?
+      if last_bill.bill_date.present? && last_bill.bill_date != Date.parse('01-01-0001')
+        if Date.today > (last_bill.bill_date + 30.days)
+          will_create = true
+        end
+      else
+        date = last_bill.created_at + 21.days
+        if Date.today >= date
+          will_create = true
+        end
+      end
+    end
+
+    result['can_create_bill'] = authorizer.add_bill? && will_create
+
+    true
   end
 
   private

@@ -26,6 +26,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   # Creates DLRMs post creation of document
   step :setup_dlrm
 
+  # Update Attachments
+  step :update_attachments
+
   step Transactions::Messages::SuccessMessage('Utility Bill Master created successfully')
 
   def check(ctx, options, **)
@@ -76,5 +79,13 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
     else
       false
     end
+  end
+
+  def update_attachments(options, model:, params:, **)
+    attachments = Attachment.where(id: params[:attachment_ids])
+    attachment_ids = attachments.where(resource_type: nil, resource_id: nil).or(attachments.where(resource: model)).pluck(:id)
+
+    Attachment.where(id: attachment_ids).update(resource_id: model.id, resource_type: model.class.name)
+    true
   end
 end

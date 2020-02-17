@@ -23,17 +23,18 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :tax_amount
     attribute :total_amount
   end
-    
+
   section :po_details do
     attribute :procurement_name
     attribute :po_number
-    attribute :po_date
+    attribute :po_creation_date
+    attribute :po_closed_date
     attribute :created_by
     attribute :policy
     attribute :vendor_name
     attribute :vendor_business_name
     attribute :vendor_mobile_number
-    # attribute :vendor_state_code
+    attribute :vendor_state_code
     attribute :vendor_gstin
     attribute :vendor_pan
     attribute :vendor_tds_rate
@@ -45,7 +46,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     attribute :approval_pending_level_name
     attribute :approval_pending_reviewers
     attribute :approved_reviewers
-    
+
     attribute :department
     attribute :sub_department
     attribute :cost_center
@@ -85,8 +86,12 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     purchase_order(item)&.po_number
   end
 
-  def po_date(item)
+  def po_creation_date(item)
     purchase_order(item)&.created_at&.strftime "%d-%b-%Y"
+  end
+
+  def po_closed_date(item)
+    purchase_order(item).trails&.find_by(action_id: TrailAction.id_for(:close))&.created_at&.strftime("%d-%b-%Y")
   end
 
   def created_by(item)
@@ -163,10 +168,10 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
     purchase_order(item)&.procurement.vendor&.mobile_number
   end
 
-  # def vendor_state_code(item)
-  #   sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
-  #   (sc.present?) ? (sprintf '%02d', sc) : ''
-  # end
+  def vendor_state_code(item)
+    sc = purchase_order(item)&.procurement.vendor&.state_code&.state_code
+    (sc.present?) ? (sprintf '%02d', sc) : ''
+  end
 
   def vendor_pan(item)
     purchase_order(item)&.procurement.vendor&.pan

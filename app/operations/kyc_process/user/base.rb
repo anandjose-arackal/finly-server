@@ -1,5 +1,5 @@
 class KycProcess::User::Base < BaseOperation
-  attr_accessor :individual_kyc,:update_user,:kyc_operation_phone_number
+  attr_accessor :individual_kyc, :update_user, :kyc_operation_phone_number
 
   def pre_validate
     if user.blank? or params&.dig(:id).blank?

@@ -100,6 +100,7 @@
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
 #  include_tax_and_tds                   :boolean          default(FALSE)
+#  rcm_enabled                           :boolean
 #
 
 # These are temporary invoices to get an idea what real invoice will be like. Payment are not made against them
@@ -168,6 +169,7 @@ class GeneralInvoice < ApplicationRecord
     
     exclude_association :trails
     exclude_association :invoices
+    exclude_association :items
   end
 
 
@@ -233,6 +235,14 @@ class GeneralInvoice < ApplicationRecord
   }
   scope :filter_to_date, -> (end_date) {
     where(end_date: end_date.to_date)
+  }
+
+  scope :filter_upcoming_invoice_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.parse('01-01-2050') if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where("DATE(payment_agreement_upcoming_date) >= ? AND DATE(payment_agreement_upcoming_date) <= ?", from, to)
   }
 
   # Columns mapped with actual invoice columns
@@ -349,22 +359,23 @@ class GeneralInvoice < ApplicationRecord
 
   def payment_history_json
     {
-      id: self.id,
-      invoice_number: self.get_invoice_number,
-      vendor_name: self.vendor&.display_name,
-      due_date: self.due_date&.to_date,
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      status: self&.status&.name&.titleize,
-      creation_date: self.created_at.to_date,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      agreement_type: self.class.name.underscore,
-      payment_agreement_id: self.payment_agreement_id,
-      vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number,
-      start_date: self.start_date,
-      end_date: self.end_date
-
+        id: self.id,
+        invoice_number: self.get_invoice_number,
+        vendor_name: self.vendor&.display_name,
+        due_date: self.due_date&.to_date,
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+        status: self&.status&.name&.titleize,
+        creation_date: self.created_at.to_date,
+        tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+        agreement_type: self.class.name.underscore,
+        payment_agreement_id: self.payment_agreement_id,
+        vendor_id: self.vendor_id,
+        agreement_number: self.payment_agreement&.get_agreement_number,
+        start_date: self.start_date,
+        end_date: self.end_date,
+        allow_add_invoice: allowed_to_add_invoice?,
+        invoice_created: agreement_invoice_created?
 
     }
   end
@@ -400,6 +411,17 @@ class GeneralInvoice < ApplicationRecord
     if self.available_invoice_amount&.value.present?
       precision_value(self.available_invoice_amount&.value)
     end
+  end
+
+  def allowed_to_add_invoice?
+    self.is_payment_agreement_upcoming_invoice && self.payment_agreement_upcoming_date <= Date.today && self.payment_agreement.is_agreement_invoice_initiating_user? && self.payment_agreement.approved?
+  end
+
+  def agreement_invoice_created?
+    user = RequestStore.store[:current_user]
+    user = RequestStore.store[:current_user]
+    agreement_invoice = user.company.inward_invoices.find_by_agreement_item_id self.id
+    agreement_invoice.present?
   end
 
 end

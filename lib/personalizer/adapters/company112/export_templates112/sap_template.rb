@@ -41,9 +41,6 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
     end
   end
 
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
-  end
 
   def profit_center(user)
     user.gl_config&.dig(:"New Profit centre")

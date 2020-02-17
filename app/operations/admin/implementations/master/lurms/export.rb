@@ -8,10 +8,10 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
       :id => 'ID',
       :policy => 'Policy Name',
       :policy_creation_flag => 'For New Policy Y / or Blank',
-      :user_id => 'User Email / Mobile',
+      :user_id => 'User Employee ID / Email / Mobile',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
-      :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :reviewer_email_mobile => 'Reviewer Employee ID / Email / Mobile',
       :with_exception => 'With Exception Y/N',
       :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
@@ -54,11 +54,14 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def reviewer_email_mobile(lurm)
-    user = lurm.reviewer&.email
-    if user.blank?
-      lurm.reviewer&.mobile_number
+    identifier = lurm.reviewer&.profile&.employee_id
+    if identifier.blank?
+      identifier = lurm.reviewer&.email
     end
-    user
+    if identifier.blank?
+      identifier = lurm.reviewer&.mobile_number
+    end
+    identifier
   end
 
   def with_exception(lurm)
@@ -70,6 +73,8 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def user_id(lurm)
+    identifier = lurm.reviewer&.profile&.employee_id
+    return identifier if identifier.present?
     lurm.user&.email&.present? ? lurm.user&.email : lurm.user&.mobile_number
   end
 
@@ -116,7 +121,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
       contents[provider] = []
       policy_ids = apply_scopes(company.policies).pluck(:id)
       level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity_type: provider).pluck(:id)
-      data = LevelUserReviewerMapping.where(level_id: level_ids).where.not(user_id: nil)
+      data = LevelUserReviewerMapping.where(level_id: level_ids).where.not(user_id: nil).includes(:level, :policy, reviewer: :profile, user: :profile)
       total_count += data.count
       self.implementation_request.update(requested_items: data.count)
       data.each_with_index do |entry, index|
