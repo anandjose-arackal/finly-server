@@ -38,6 +38,7 @@ json.result do
     json.tax_amount invoice_line_item.tax_amount&.value
     json.tax_rate invoice_line_item.tax_rate&.rate
     json.tax_type invoice_line_item.tax_rate&.name
+    json.tax_internal_id invoice_line_item.tax_rate&.internal_id
     json.tds_nature invoice.tds_slab&.name
     json.tds_amount invoice.tds_amount&.value || 0.0
     json.tds_percentage invoice.tds_slab&.tds || 0.0
@@ -68,6 +69,7 @@ json.result do
     json.gst_type invoice.gst_type&.name&.titleize rescue nil
     json.line_item_type invoice_line_item&.inventory_line_item&.supply_item_type&.name&.humanize
     json.line_item_expense_type invoice_line_item&.inventory_line_item&.item_expense_type&.name&.humanize
+    json.nature_of_item invoice_line_item&.invoice_line_item&.product_type&.name&.humanize
 
     # extra fields
     json.buyer_location_state invoice.location&.state&.name
