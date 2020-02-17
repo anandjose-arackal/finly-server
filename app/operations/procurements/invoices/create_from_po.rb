@@ -67,7 +67,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
         if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
-          calculcate_po_adjusted_advance unless self.purchase_order.closed?
+          calculcate_po_adjusted_advance
         end
       end
 
