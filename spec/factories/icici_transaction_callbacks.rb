@@ -15,6 +15,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  reconciled :boolean          default(FALSE)
+#  deleted_at :datetime
 #
 
 FactoryBot.define do

@@ -1,7 +1,7 @@
 class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::Base
 
   register_handle :payment_agreement_show
-  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate, :revise ]
+  register_actions [:edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate, :revise]
 
   def initialize(user=nil, params=nil)
     super
@@ -18,7 +18,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
     return false if payment_agreement.terminated? || payment_agreement.revised?
 
     # if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
-    if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.awaiting_approval? )
+    if user.vendor_payments_admin? && !user.is_payment_agreement_initiator? && (payment_agreement.awaiting_approval?)
       return true if payment_agreement.action_users(:return_control).include?(user)
     end
 
@@ -29,8 +29,8 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
       end 
     end
 
-    if user.is_payment_agreement_initiator? && document_owner? 
-      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?# || payment_agreement.revised?
+    if user.is_payment_agreement_initiator? && document_owner?
+      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted? # || payment_agreement.revised?
         return true
       end 
     end

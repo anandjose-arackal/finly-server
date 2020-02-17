@@ -22,7 +22,7 @@ class Policy::ApprovalWorkflows::DownloadLevelReviewerMappings < Policy::Approva
 
   def process
     users = self.policy.users
-    providers = ["ReportProvider", "MoneyRequestProvider", "TravelRequestProvider", "PurchaseOrderProvider", "InvoiceProvider", "PoInvoiceProvider", "NonPoInvoiceProvider", "BankPaymentRequestProvider"]
+    providers = ["ReportProvider", "MoneyRequestProvider", "TravelRequestProvider", "PurchaseOrderProvider", "InvoiceProvider", "PoInvoiceProvider", "NonPoInvoiceProvider", "BankPaymentRequestProvider", "BbpsBillerSubscriptionProvider", "BbpsBillAutofetchedProvider", "BbpsBillNonAutofetchedProvider", "CreditNoteProvider"]
     provider_mappings = {}
     providers.each do |provider|
       # for each set of iterations we will have an array of arrays,

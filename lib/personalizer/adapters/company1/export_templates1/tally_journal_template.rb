@@ -132,6 +132,4 @@ class Personalizer::Adapters::Company1::ExportTemplates1::TallyJournalTemplate <
   end
 
 
-
-
 end

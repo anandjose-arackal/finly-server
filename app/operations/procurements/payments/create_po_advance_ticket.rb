@@ -313,7 +313,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       vendor = purchase_order.vendor
       # bank_account = vendor.bank_accounts.where(default_account: true).first
       bank_account = purchase_order.bank_account
-      set_payment_params={
+      set_payment_params = {
           name: vendor.name,
           bank_account_number: bank_account&.account_number,
           ifsc: bank_account.ifsc,

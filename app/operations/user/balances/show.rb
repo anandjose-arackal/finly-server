@@ -262,7 +262,7 @@ class User::Balances::Show < User::Base
       selected_user.cards.each do |card|
         # card.manager_view_balance false for reimbursement cards
         # Reimbursement card balance only visible for owner
-        balance = (card.manager_view_balance || card.user_id == self.selected_user&.id ) ? self.card_info[card.id][:balance] : nil
+        balance = (card.manager_view_balance || card.user_id == self.selected_user&.id) ? self.card_info[card.id][:balance] : nil
         disabler = card.disabled_by_user&.name
         disabler_role = card.disabled_by_role&.name
         self.balances[:cards] << {
