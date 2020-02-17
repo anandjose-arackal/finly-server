@@ -8,6 +8,7 @@
 #  enabled    :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class UtilityBillsAccount < ApplicationRecord

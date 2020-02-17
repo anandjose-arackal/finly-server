@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
 
   def init
     users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount],report_processor_group_mapping:[:payment] )
+    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile}, expenses: [:category, :amount], report_processor_group_mapping: [:payment])
     self.reports = apply_scopes(self.reports, params)
     self.categories = user.company.categories
 
@@ -171,7 +171,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
   end
 
   def invoice_number(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'invoice_number' }&.first
+    expence.custom_fields.map {|cf| cf.string_value if cf.field_key == 'invoice_number'}&.first
   end
 
   def retrieve_account(expense)

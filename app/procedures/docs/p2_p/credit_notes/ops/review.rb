@@ -54,9 +54,12 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
 
     }
     op = WorkflowManager::Base.(current_user, parameters)
-    unless op.success?
-      add_message(options, :error, :base, op.messages.errors)
+
+    op.messages.slice(:error, :success, :info).each do |key, val|
+      next if key == :errors_meta
+      add_message options, key, :base, val
     end
+
     op.success?
   end
 

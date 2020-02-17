@@ -5,7 +5,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
 
   end
 
-  def initialize(params, messages={})
+  def initialize(params, messages = {})
     self.params = params
     self.messages = messages
   end
@@ -118,7 +118,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
           # add to cash on hand only if it's an expense card
 
           return true unless card.card_program.create_expense
-          payment = Payment.where(reference_resource_id: transaction.id, reference_resource_type: 'CardTransaction',receiving_account_type: 'UserPocket', payment_type_id: 19).first
+          payment = Payment.where(reference_resource_id: transaction.id, reference_resource_type: 'CardTransaction', receiving_account_type: 'UserPocket', payment_type_id: 19).first
           if payment.blank?
             # add to cash on hand
             atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
@@ -225,7 +225,7 @@ class Script::MissedCardTransactionCreate < BaseOperation
   def post_process
     # Create Finly Transaction
     if self.transaction.present? and transaction.success? and not ['Branch TopUp', 'Balance Adjustment Debit'].include?(self.transaction.merchant_name)
-      if FinlyTransaction.where(associated_transaction_id: transaction.id,associated_transaction_type: 'CardTransaction').first.nil?
+      if FinlyTransaction.where(associated_transaction_id: transaction.id, associated_transaction_type: 'CardTransaction').first.nil?
         account = self.transaction.card
         if transaction.credit?
           transaction_type_id = TransactionType.id_for(:credit)
