@@ -26,6 +26,12 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
       "A New Utility Bill is Available for #{subscription.name} - #{subscription.sequence_id}"
     end
 
+    assign :hero do |user, params|
+      hero = {
+          bg_image: "bg_document_approved.png"
+      }
+    end
+
     assign :tables do |user, params|
       bill = params[:record]
       tables = []
