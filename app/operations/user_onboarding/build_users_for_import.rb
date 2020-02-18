@@ -183,7 +183,6 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
 
   def setup_user_profile(options)
     if options[:profile_attributes].nil?
-      binding.pry
       options[:profile_attributes] ={employee_id: nil}
       end
     options
