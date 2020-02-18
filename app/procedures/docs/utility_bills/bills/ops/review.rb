@@ -1,11 +1,5 @@
 class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
 
-  # schema do
-  #   params do
-  #     required('aasm_event')
-  #   end
-  # end
-
   step :init
   step Model(BbpsBill, :find_by)
   step :verify_policy
@@ -37,6 +31,11 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
         aasm_event: params[:aasm_event],
     }
     op = WorkflowManager::Base.(current_user, parameters)
+    op.messages.slice(:error, :success, :info).each do |key, val|
+      next if key == :errors_meta
+      add_message options, key, :base, val
+    end
+
     op.success?
   end
 

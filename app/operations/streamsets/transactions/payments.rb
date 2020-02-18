@@ -12,7 +12,7 @@ class Streamsets::Transactions::Payments < BaseOperation
       return
     end
     ticket_type = params[:ticket_type] || ['invoice', 'purchase_order', "beneficiary", nil]
-	  bank_payment_requests = op.payment_requests.where(ticket_type: ticket_type)
+    bank_payment_requests = op.payment_requests.where(ticket_type: ticket_type)
 	  payment_order_ids = bank_payment_requests.pluck(:payment_order_id)
 
 	  self.payments = Payment.where(payment_order_id: payment_order_ids)

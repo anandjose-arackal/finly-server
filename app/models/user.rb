@@ -1562,6 +1562,7 @@ class User < ApplicationRecord
   def is_agreement_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
   end
+
   ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)

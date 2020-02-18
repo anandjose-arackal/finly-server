@@ -3,7 +3,7 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   attr_accessor :bbps_bill
 
   register_handle :bbps_bills_show
-  register_actions [:update_and_submit, :submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
+  register_actions [:update_and_submit, :edit, :policy_editable, :retract, :approve, :reject, :take_control,
                     :return_control, :destroy, :view_payment_ticket, :raise_dispute,
                     :bill_validate, :download_receipt, :transaction_status]
 
@@ -20,12 +20,13 @@ class ActionsManager::Master::Bbps::Bills::Show < ActionsManager::Master::Base
   end
 
   def update_and_submit
-    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && bbps_bill.autofetched
+    # !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && bbps_bill.autofetched
+    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user)
   end
 
-  def submit
-    !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && !bbps_bill.autofetched
-  end
+  # def submit
+  #   !bbps_bill.bill_validation_required? && (bbps_bill.open? || bbps_bill.retracted? || bbps_bill.rejected?) && bbps_bill.subscription.pocs.include?(user) && !bbps_bill.autofetched
+  # end
 
   def edit
     (BbpsBill.open_statuses.include?(bbps_bill.status_id) && bbps_bill.subscription.pocs.include?(user)) || (bbps_bill.awaiting_approval? && bbps_bill.get_reviewers.include?(user))

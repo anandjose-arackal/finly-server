@@ -201,7 +201,7 @@ class UserRole < ApplicationRecord
       credit_note_initiator: 46,
       credit_note_reviewer: 47,
       credit_note_auditor: 48,
-      
+
       # Payment Agreement Invoice
       agreement_invoice_initiator: 49,
       agreement_invoice_reviewer: 50,

@@ -23,5 +23,5 @@ class UserDropDownItemMapping < ApplicationRecord
   scope :with_user_id, -> (user_ids) {
     where(user_id: user_ids)
   }
-  
+
 end

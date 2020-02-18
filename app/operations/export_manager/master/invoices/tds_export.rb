@@ -42,7 +42,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   def input
     invoices_presenter = fetch_invoices
     return if has_errors?
-    
+
     invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid])).left_joins(:payments)
   end
 

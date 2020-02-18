@@ -34,6 +34,7 @@
 #  original_source_updated_at   :datetime
 #  deleted_at                   :datetime
 #  receipt_email_status_id      :bigint
+#  deleted_at                   :datetime
 #
 
 require 'fileutils'

@@ -14,6 +14,7 @@
 #  uploader_id                :integer
 #  deleted_at                 :datetime
 #  allow_delete               :boolean          default(TRUE)
+#  deleted_at                 :datetime
 #
 
 class PaymentOrderAttachment < ApplicationRecord

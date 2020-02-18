@@ -992,12 +992,13 @@ class Invoice < ApplicationRecord
   # end
 
   def get_invoice_provider_name
-    if self.procurement.purchase_order.present?
-      return 'PoInvoiceProvider'
+    # if self.procurement.present? && self.procurement.purchase_order.present?
+    if self.procurement&.purchase_order.present?
+      'PoInvoiceProvider'
     elsif self.payment_agreement_id.present?
-      return 'AgreementInvoiceProvider'
+      'AgreementInvoiceProvider'
     else
-      return 'NonPoInvoiceProvider'
+      'NonPoInvoiceProvider'
     end
   end
 

@@ -26,6 +26,7 @@
 #  show_po_approved_trail           :boolean          default(FALSE)
 #  deleted_at                       :datetime
 #  email_purchase_order_initiator   :boolean
+#  deleted_at                       :datetime
 #
 
 class CompanyConfiguration < ApplicationRecord
