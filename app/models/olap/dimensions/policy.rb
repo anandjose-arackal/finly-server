@@ -22,10 +22,11 @@
 #
 
 class Olap::Dimensions::Policy < OlapRecord
-  include Analytics::Mapper
+  include Events::Consumer
+include Analytics::Mapper
 
   transaction_model ::Policy
-  events 'policy.update', 'policy.create', 'policy.destroy'
+  consume 'policy.update', 'policy.create', 'policy.destroy'
 
   map :name
   map :company_id

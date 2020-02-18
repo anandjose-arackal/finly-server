@@ -21,10 +21,11 @@
 #
 
 class Olap::Dimensions::Department < OlapRecord
-  include Analytics::Mapper
+  include Events::Consumer
+include Analytics::Mapper
 
   transaction_model ::Department
-  events 'department.update', 'department.create', 'department.destroy'
+  consume 'department.update', 'department.create', 'department.destroy'
 
   map :name
   map :company_id

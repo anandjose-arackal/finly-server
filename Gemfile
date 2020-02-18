@@ -102,6 +102,7 @@ gem 'mysql2', '~> 0.5'
 gem 'will_paginate', '~> 3.1.6'
 
 gem 'sneakers', '~> 2.12'
+gem 'hutch', '~> 0.27'
 
 gem 'jwt', '~> 2.2'
 

@@ -17,10 +17,11 @@
 #
 
 class Olap::Dimensions::TdsRate < OlapRecord
-  include Analytics::Mapper
+  include Events::Consumer
+include Analytics::Mapper
 
   transaction_model ::TdsRatesList
-  events 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
+  consume 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
 
   map :name
   map :tds

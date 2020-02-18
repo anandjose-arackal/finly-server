@@ -33,10 +33,11 @@
 #
 
 class Olap::Dimensions::User < OlapRecord
-  include Analytics::Mapper
+  include Events::Consumer
+include Analytics::Mapper
 
   transaction_model ::User
-  events 'user.update', 'user.create', 'user.destroy'
+  consume 'user.update', 'user.create', 'user.destroy'
 
   required_relationships([:profile])
 

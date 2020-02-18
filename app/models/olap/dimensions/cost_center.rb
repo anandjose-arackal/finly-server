@@ -20,10 +20,11 @@
 #
 
 class Olap::Dimensions::CostCenter < OlapRecord
-  include Analytics::Mapper
+  include Events::Consumer
+include Analytics::Mapper
 
   transaction_model ::CostCenter
-  events 'cost_center.update', 'cost_center.create', 'cost_center.destroy'
+  consume 'cost_center.update', 'cost_center.create', 'cost_center.destroy'
 
   map :name
   map :application
