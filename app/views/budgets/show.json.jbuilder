@@ -32,6 +32,8 @@ json.budget_trail_items do
   json.purchase_request_items_count 10
 end
 
+json.budget_group_details budget.budget_group
+
 # json.amounts do
 #   json.budget_amount do
 #     # json.extract! @result.budget.budget_amount, :id, :value

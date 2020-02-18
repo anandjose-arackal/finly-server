@@ -114,6 +114,11 @@ class BudgetGroupCriterium < ApplicationRecord
   # this will hold data about all the different time ranges of this particular
   # budget criteria - so it will contain details of the budgets will the different timeframes
   def as_json(options = {})
+    time_periods = []
+    budgets.select(:start_date, :end_date).each do |budget|
+      time_period = "#{budget.start_date&.strftime("%d %B %Y")} - #{budget.end_date&.strftime("%d %B %Y")}"
+      time_periods << time_period
+    end
     {
         id: id,
         name: name,
@@ -123,7 +128,8 @@ class BudgetGroupCriterium < ApplicationRecord
         total_budgets: self.budgets.count,
         budget_group_criteria_mappings: budget_group_criteria_mappings,
         sub_criteria: self.children,
-        budgets: budgets
+        budgets: budgets,
+        time_periods: time_periods
     }
   end
 
