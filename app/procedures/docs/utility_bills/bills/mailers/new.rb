@@ -30,20 +30,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
       bill = params[:record]
       tables = []
 
-      table = {
-          content: {
-              tbody: [
-                  ["Biller", bill.biller.name],
-                  ["Name", bill.subscription.name],
-                  ["Amount", "#{bill.amount.currency.country_code} #{bill.amount.value}"],
-                  ["Bill Date", bill.bill_date],
-                  ["Due Date", bill.due_date],
-                  ["Type", "Autofetched"]
-              ]
-          }
-      }
-
-      tables.push(table)
+      tables.push(Docs::UtilityBills::Bills::Mailers::TableBuilder.(bill))
     end
   end
 
@@ -72,20 +59,9 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
     end
 
     assign :tables do |user, params|
-      bill = params[:record]
       tables = []
 
-      table = {
-          content: {
-              tbody: [
-                  ["Biller", bill.biller.name],
-                  ["Name", bill.subscription.name],
-                  ["Type": "Manual Entry"]
-              ]
-          }
-      }
-
-      tables.push(table)
+      tables.push(Docs::UtilityBills::Bills::Mailers::TableBuilder.(params[:record]))
     end
   end
 end
