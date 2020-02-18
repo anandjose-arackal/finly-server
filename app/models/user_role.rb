@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class UserRole < ApplicationRecord
@@ -200,7 +201,7 @@ class UserRole < ApplicationRecord
       credit_note_initiator: 46,
       credit_note_reviewer: 47,
       credit_note_auditor: 48,
-      
+
       # Payment Agreement Invoice
       agreement_invoice_initiator: 49,
       agreement_invoice_reviewer: 50,

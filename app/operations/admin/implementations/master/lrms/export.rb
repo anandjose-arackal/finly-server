@@ -120,7 +120,7 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
       contents[provider] = []
       policy_ids = apply_scopes(company.policies).pluck(:id)
       level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity_type: provider).pluck(:id)
-      data = LevelReviewerMapping.non_deleted.where(level_id: level_ids).includes(level: :policy,reviewer: :profile)
+      data = LevelReviewerMapping.non_deleted.where(level_id: level_ids).includes(level: :policy, reviewer: :profile)
       total_count += data.count
       self.implementation_request.update(requested_items: data.count)
       data.each_with_index do |entry, index|

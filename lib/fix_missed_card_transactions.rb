@@ -1,9 +1,9 @@
 class FixMissedCardTransactions
   def self.perform
-    messages =[]
+    messages = []
     File.readlines("#{Dir.home}/finly_scripts/transaction_missed.log").each do |line|
-      messages << line.gsub( / *\n+/, "" )
-    end;nil
+      messages << line.gsub(/ *\n+/, "")
+    end; nil
 
     failed = []
     messages.each do |message|

@@ -3,6 +3,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
   def initialize(user, params)
     self.user = user
 
+    self.messages = {success: [], error: []}
     self.document = params[:document]
     self.violations_present = params[:violations_present]
     self.forwarded_to_user = params[:forwarded_to_user]

@@ -108,8 +108,8 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
   end
 
   def find_pocs(pocs, required: false)
-    ids = pocs.split(",").map { |item| item.strip }
-    users = ids.map { |id| find_user(id, required: required) }
+    ids = pocs.split(",").map {|item| item.strip}
+    users = ids.map {|id| find_user(id, required: required)}
     pocs = users.map do |user_result|
       return user_result unless user_result.success?
 

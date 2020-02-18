@@ -41,7 +41,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
         # Invoice frequency should be same for all agreement items. E.g. If agreement has four rentals under fixed periodic, all rental should have same invoice frequency
         validate_invoice_frequency unless has_errors?
 
-        
+
         validate_invoice_start_end_date unless has_errors?
         fixed_periodic_grouped_vendor_validations unless has_errors?
         check_agreement_item_presence unless has_errors?

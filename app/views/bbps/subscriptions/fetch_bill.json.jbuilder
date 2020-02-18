@@ -5,6 +5,7 @@ if @op.success?
     json.late_payment_fee @op['result']['data']["late_payment_fee"].to_f / 100
     json.early_payment_fee @op['result']['data']["early_payment_fee"].to_f / 100
     json.merge! @op['result']['data'].as_json["table"].except("amount", "convenience_fee", "late_payment_fee", "early_payment_fee")
+    json.can_create_bill @op['result']['can_create_bill']
   end
   if @op['result']['bill'].present?
     json.bill @op['result']['bill'].as_json
