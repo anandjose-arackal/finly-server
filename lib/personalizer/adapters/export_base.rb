@@ -7,7 +7,7 @@ class Personalizer::Adapters::ExportBase < BaseOperation
     if params[:type] == 'xls'
       file = operation.generate_xls_file
     elsif params[:type] == 'csv'
-      file = operation.generate_csv
+      file = operation.generate_csv_file
     end
     # Create a temporary file to save it to s3 and provide the download link to frontend
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.days)
