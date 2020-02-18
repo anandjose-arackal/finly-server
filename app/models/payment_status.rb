@@ -107,6 +107,27 @@ class PaymentStatus < ApplicationRecord
     ]
   end
 
+  def self.ids_for_pending_payment_bucket
+    [
+        PaymentStatus.id_for(:pending_approval),
+        PaymentStatus.id_for(:failed)
+    ]
+  end
+
+  def self.ids_for_paid_bucket
+    [
+        PaymentStatus.id_for(:completed),
+        PaymentStatus.id_for(:scheduled),
+    ]
+  end
+
+  def self.ids_for_payment_processing_bucket
+    [
+        PaymentStatus.id_for(:initiated),
+        PaymentStatus.id_for(:processing)
+    ]
+  end
+
 end
 
 

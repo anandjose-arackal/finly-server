@@ -64,4 +64,23 @@ class InwardInvoiceStatus < ApplicationRecord
     self.id == InwardInvoiceStatus.id_for(:initiated)
   end
 
+
+  # this will encapsulate all IDs of an invoice that come under the committed bucket of a budget
+  def self.ids_for_committed_bucket
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:retracted),
+        InwardInvoiceStatus.id_for(:processing)
+    ]
+  end
+
+  def self.ids_for_pending_payment_bucket
+    [
+        InwardInvoiceStatus.id_for(:approved),
+        InwardInvoiceStatus.id_for(:auto_approved),
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:unpaid)
+    ]
+  end
+
 end
