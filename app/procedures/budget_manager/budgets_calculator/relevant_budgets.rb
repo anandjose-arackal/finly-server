@@ -1,5 +1,5 @@
-# this operation takes a particular object and returns all budgets that apply to this particular
-# object and require calculation
+# this operation will return all the budgets that apply to a particular document and
+# return the respective budgets along with the consumption for each of them
 class BudgetManager::BudgetsCalculator::RelevantBudgets < BudgetManager::BudgetsCalculator::Base
 
   attr_accessor :relevant_budgets, :object

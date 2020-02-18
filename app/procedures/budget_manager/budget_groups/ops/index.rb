@@ -15,5 +15,8 @@ class BudgetManager::BudgetGroups::Ops::Index < Transactions::API
   def index!(options, current_user:, params:, **)
     options["budget_groups"] = current_user.company.budget_groups
     options["budget_groups"] = apply_scopes(options["budget_groups"], params)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 30
+    options["budget_groups"] = options["budget_groups"].paginate(page: page, per_page: per_page)
   end
 end
