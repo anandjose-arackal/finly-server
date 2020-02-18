@@ -12,7 +12,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
-    self.payment = bank_transaction.payment
+    self.payment = bank_transaction.reference_payment
     self.payment_order = self.payment&.payment_order
     self.error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
   end
@@ -68,7 +68,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_reference_number = op.bank_reference_number
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing), bank_response: op.request_status.upcase, bank_reference_number: bank_reference_number)
         begin
-          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+          bank_transaction.reference_payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         rescue => error
           self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
           error.backtrace.each do |line|
@@ -82,7 +82,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
                                       content: "Payment processed. Awaiting credit confirmation")&.save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         begin
-          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+          bank_transaction.reference_payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         rescue => error
           self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
           error.backtrace.each do |line|
@@ -118,7 +118,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     else
       if Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         begin
-          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+          bank_transaction.reference_payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         rescue => error
           self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
           error.backtrace.each do |line|
