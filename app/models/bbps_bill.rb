@@ -51,8 +51,11 @@
 class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
+  include EventProducer
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
+
+  event_channel 'bbps_bill'
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay

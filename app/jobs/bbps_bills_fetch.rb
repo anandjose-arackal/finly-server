@@ -138,6 +138,15 @@ class BbpsBillsFetch < ApplicationJob
           order_number_type: "BillFetch"
       }
       op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
+      if op.success?
+        broadcast_params = {
+            event: 'bbps_bill.new_bill.autofetched',
+            # event: bbps_bill.manual_auto_fetched.new,
+            document: op['result']['model'],
+            # previous_state: aasm.current_state
+        }
+        Notifier::Broadcaster.(user, broadcast_params)
+      end
     else
       params = {
           amount: 0,

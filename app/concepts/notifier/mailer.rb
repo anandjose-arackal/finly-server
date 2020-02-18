@@ -8,6 +8,15 @@ class Notifier::Mailer < Notifier::API
   assign :subject, "Finly Notification"
   assign :body_header, "New Notification from Finly"
 
+  assign :company do |user, params|
+    company_id = params[:record].respond_to?(:company_id) ? params[:record].company_id : User.find(params[:record].send(params[:record].class.document_owner_attribute)).company_id
+    company = Company.find company_id
+    company = {
+        logo_url: company.configuration.logo.url(:thumb),
+        name: company.name
+    }
+  end
+
   def permissions(ctx, options)
     true
   end
@@ -46,5 +55,4 @@ class Notifier::Mailer < Notifier::API
     NotifierMailer.delay.send_mail(payload.to_json.to_s)
     true
   end
-
 end

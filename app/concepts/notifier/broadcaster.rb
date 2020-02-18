@@ -17,7 +17,7 @@ class Notifier::Broadcaster
         previous_state: params[:previous_state]
     }
 
-    routes(params[:event]).each do |route|
+    routes(params[:event]&.to_sym).each do |route|
       event_channel = document.class.respond_to?(:event_channel) ? document.class.event_channel : document.class.table_name
       Events::Publisher.broadcast "#{event_channel}.#{event}.#{route}",
                                   Events::Payload::Record.(document, user, event, options),
@@ -45,7 +45,9 @@ class Notifier::Broadcaster
         release: ['released_by', 'released_for'],
         create_payment_ticket: ['payment_ticket_created_by', 'payment_ticket_created_for'],
         deactivate: ['deactived_by', 'deactivated_for'],
-        reactivate: ['reactivated_by', 'reactivated_for']
+        reactivate: ['reactivated_by', 'reactivated_for'],
+        # new_bill: ['autofetched', 'manual'],
+        new_bill: ['autofetched']
     }
   end
 

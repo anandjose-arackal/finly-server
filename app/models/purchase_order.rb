@@ -1154,5 +1154,4 @@ class PurchaseOrder < ApplicationRecord
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
   end
-
 end
