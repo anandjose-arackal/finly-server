@@ -48,8 +48,13 @@ class Events::Publisher
   # Broadcasting the payload asynchronously to all listeners
   class Async
     def self.call(routing_key, payload, current_user: nil)
-      Hutch.connect
-      return unless Hutch.connected?
+      begin
+        Hutch.connect
+      rescue Hutch::ConnectionError => e
+        raise e if Rails.env.production?
+
+        return
+      end
 
       # Publish to all consumers
       Hutch.publish(
