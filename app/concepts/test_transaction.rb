@@ -1,15 +1,15 @@
 class TestTransaction < Transactions::API
 
-  class EventOne
-    include Events::Consumer
-
-    consumes_event!('user.*', sync: false, options: {})
-
-    def work(user, params)
-      puts "Receive event 1 : #{user} params: #{params}"
-    end
-
-  end
+  # class EventOne
+  #   include Events::Consumer
+  #
+  #   consumes_event!('user.*', sync: false, options: {})
+  #
+  #   def work(user, params)
+  #     puts "Receive event 1 : #{user} params: #{params}"
+  #   end
+  #
+  # end
 
   # class EventTwo
   #   include Events::Consumer
