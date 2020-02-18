@@ -10,9 +10,7 @@ class Events::Publisher
     payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
     payload.reject! { |k, v| v.nil? } # Remove all nil values
 
-    # if Rails.env.production?
     Async.(routing_key, payload, current_user: current_user)
-    # end
     Sync.(routing_key, payload, current_user: current_user, ignore_failure: ignore_failure)
   end
 
@@ -51,6 +49,8 @@ class Events::Publisher
   class Async
     def self.call(routing_key, payload, current_user: nil)
       Hutch.connect
+      return unless Hutch.connected?
+
       # Publish to all consumers
       Hutch.publish(
           routing_key,
