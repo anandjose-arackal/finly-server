@@ -12,9 +12,6 @@ class Bbps::BillsController < BaseControllers::WebBase
 
   def filters_config
     endpoint Docs::UtilityBills::Bills::Configs::Filters
-    respond_to do |format|
-      format.json {}
-    end
   end
 
   def update

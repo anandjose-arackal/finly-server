@@ -37,7 +37,10 @@ class Docs::P2P::CreditNotes::Authorizer
         @user.is_po_invoice_auditor? ||
         @user.is_non_po_invoice_initiator? ||
         @user.is_non_po_invoice_reviewer? ||
-        @user.is_non_po_invoice_auditor?
+        @user.is_non_po_invoice_auditor? ||
+        @user.is_agreement_invoice_initiator? ||
+        @user.is_agreement_invoice_reviewer? ||
+        @user.is_agreement_invoice_auditor?
   end
 
   def show?

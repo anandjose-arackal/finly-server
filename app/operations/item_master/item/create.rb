@@ -23,11 +23,13 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
       supply_item_type = SupplyItemType.name_for(supply_item_type_id.to_i)
 
       if supply_item_type == 'po_item'
-        unless user.permission.crud_inventory_item_po
+        # unless user.permission.crud_inventory_item_non_po
+        unless user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
           add_message :error, "You don't have permission for this action"
         end
       elsif supply_item_type == 'non_po_item'
-        unless user.permission.crud_inventory_item_non_po
+        # unless user.permission.crud_inventory_item_non_po
+        unless user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
           add_message :error, "You don't have permission for this action"
         end
       end

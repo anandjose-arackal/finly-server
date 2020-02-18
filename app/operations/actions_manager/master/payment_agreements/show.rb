@@ -1,7 +1,7 @@
 class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::Base
 
   register_handle :payment_agreement_show
-  register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate ]
+  register_actions [:edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control, :delete, :policy_editable, :terminate, :revise]
 
   def initialize(user=nil, params=nil)
     super
@@ -15,9 +15,10 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
 
 
   def edit_btn
-    return false if payment_agreement.terminated?
+    return false if payment_agreement.terminated? || payment_agreement.revised?
 
-    if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
+    # if user.vendor_payments_admin? && !user.is_payment_agreement_initiator?  && ( payment_agreement.retracted? || payment_agreement.rejected? || payment_agreement.awaiting_approval? )
+    if user.vendor_payments_admin? && !user.is_payment_agreement_initiator? && (payment_agreement.awaiting_approval?)
       return true if payment_agreement.action_users(:return_control).include?(user)
     end
 
@@ -28,8 +29,8 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
       end 
     end
 
-    if user.is_payment_agreement_initiator? && document_owner? 
-      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted?
+    if user.is_payment_agreement_initiator? && document_owner?
+      if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted? # || payment_agreement.revised?
         return true
       end 
     end
@@ -164,7 +165,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def delete
-    payment_agreement.draft? || payment_agreement.retracted? || payment_agreement.rejected?
+    (payment_agreement.draft? || payment_agreement.retracted? || payment_agreement.rejected?) && (document_owner?)
   end
 
   def policy_editable
@@ -172,7 +173,15 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
   end
 
   def terminate
-    user.vendor_payments_admin? && payment_agreement.approved?
+    user.vendor_payments_admin? && (payment_agreement.approved? || payment_agreement.auto_approved?)
+  end
+
+  def revise
+    (user.vendor_payments_admin? || document_owner?) && (payment_agreement.approved? || payment_agreement.auto_approved?) && actual_invoice_absent
+  end
+
+  def actual_invoice_absent
+    self.payment_agreement.agreement_invoices.blank? && self.payment_agreement.recurring_invoices.blank?
   end
 
 end

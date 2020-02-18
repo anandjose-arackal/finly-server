@@ -6,6 +6,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  name       :string(255)
+#  deleted_at :datetime
 #
 
 class TransferMode < ApplicationRecord

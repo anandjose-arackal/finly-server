@@ -1,4 +1,5 @@
 class Admin::Implementations::Processor::Import < Admin::Implementations::Processor::Base
+  include Admin::Implementations::Processor::Finders
 
   class Admin::Implementations::Processor::Import::Result
     attr_accessor :message, :success

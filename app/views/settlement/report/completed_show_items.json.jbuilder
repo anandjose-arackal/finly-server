@@ -1,6 +1,8 @@
 user_count = 0
 report_count = 0
 item_count = 0
+rpg = @result.report_processor_group
+
 json.items do
   json.array! @result.paginated_mappings do |item|
     if item.status.completed?
@@ -36,8 +38,8 @@ json.items do
         json.total_amount do
           json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
         end
-        json.utr_number report.bank_reference_number
-        json.source_account report.source_account
+        json.utr_number report.bank_reference_number.present? ? report.bank_reference_number : utr
+        json.source_account rpg.payment_type == 'bank_transfer' ? 'Bank Transfer' : report.source_account
       end
     end
     json.system_messages do
