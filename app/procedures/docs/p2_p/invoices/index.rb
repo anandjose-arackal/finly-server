@@ -18,6 +18,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   counter -> (collection) do
     counter = IndexBuilder::Counter.new :invoice_status_id
     counts = collection.group(:invoice_status_id).count
+    counter.add nil, "All", counts.values.reduce(0, :+)
     InwardInvoiceStatus.all.each do |status|
       counter.add status.id, status.name.humanize, counts[status.id]
     end
