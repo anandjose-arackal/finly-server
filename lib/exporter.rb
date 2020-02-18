@@ -213,7 +213,15 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       file = Tempfile.new(['export', '.csv'])
       CSV.open(file, 'w', write_headers: true, headers: headers) do |csv|
         self.contents&.each do |content|
-          csv << content
+          row =[]
+          content.each do |column|
+            if column.is_a?(Hash)
+              (column[:type] == 'date' ?  row << column[:value].strftime('%d-%m-%Y') : row << column[:value])
+            else
+              row << column
+            end
+          end
+          csv << row
         end
       end
       file.rewind
