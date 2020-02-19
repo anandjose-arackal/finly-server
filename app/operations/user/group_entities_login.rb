@@ -52,11 +52,6 @@ class User::GroupEntitiesLogin < User::Base
       return
     end
 
-    if user&.company&.normal_login_blocked?
-      add_message :error, "Your corporate has blocked password-based logins. Please contact your administrator"
-      return
-    end
-
     if RequestStore.store[:actual_current_user].present?
       add_message :error, "Group Entity switch disabled during user delegation"
       return
