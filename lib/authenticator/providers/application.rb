@@ -19,10 +19,13 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
 
     self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
 
-    # adding condition here to check if the company has normal logins blocked thanks to SSO
-    fail_with_event :on_normal_login_blocked, "Your corporate has blocked password-based logins. Please contact your administrator"
+    # # adding condition here to check if the company has normal logins blocked thanks to SSO
+    if self.unauthenticated_user_obj&.company&.normal_login_blocked?
+      fail_with_event :on_normal_login_blocked, "Your corporate has blocked password-based logins. Please contact your administrator"
+      return
+    end
 
-    self.unauthenticated_user_obj
+    self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
   end
 
   def on_blank_username(message)
@@ -64,6 +67,7 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
       params[:user] = self.unauthenticated_user_obj
       params[:message] = message || "Your corporate has blocked password-based logins. Please contact your administrator"
       UserSessions::Create.(:failed, params)
+      fail
     end
   end
 
