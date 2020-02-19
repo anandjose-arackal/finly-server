@@ -28,6 +28,7 @@
 #  rejected_by_id                  :integer
 #  deleted_at                      :datetime
 #  action_taken_at                 :datetime
+#  deleted_at                      :datetime
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord

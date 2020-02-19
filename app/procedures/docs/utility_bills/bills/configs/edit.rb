@@ -11,7 +11,8 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
     result['reviewal_chains'] = []
 
     if model.present? && model.user_id == current_user.id && BbpsBill.status_ids(:open, :retracted, :rejected).include?(model.status_id)
-      parameters = {reviewal_document: model, provider_name: 'BbpsBillProvider'}
+      parameters = {reviewal_document: model}
+      parameters[:provider_name] = model.autofetched ? 'BbpsBillAutofetchedProvider' : 'BbpsBillNonAutofetchedProvider'
       result['policies'].each do |policy|
         parameters['policy_id'] = policy.id
         chain = {
@@ -22,7 +23,7 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
         result['reviewal_chains'].push(chain)
       end
     else
-      parameters = {provider_name: 'BbpsBillProvider'}
+      parameters = {provider_name: 'BbpsBillAutofetchedProvider'}
       result['policies'].each do |policy|
         parameters['policy_id'] = policy.id
         chain = {

@@ -19,6 +19,12 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
     procurement = inward_document.procurement
 
     self.purchase_order = procurement.purchase_order
+    if procurement.po_revisions.present?
+      po_revision = procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = po_revision
+      end
+    end
   end
 
   def success
@@ -58,6 +64,9 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
     # return if purchase_order.validate_if_owner(user)
     # return if purchase_order.validate_if_admin(user)
     # return if purchase_order.validate_if_reviewer(user)
+    return if user.is_po_invoice_initiator?(self.purchase_order)
+    return if user.is_po_invoice_reviewer?(self.purchase_order)
+    return if user.is_po_invoice_auditor?(self.purchase_order)
     raise_unauthorized_exception
   end
 
