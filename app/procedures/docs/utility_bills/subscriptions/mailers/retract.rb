@@ -1,27 +1,30 @@
-class Docs::UtilityBills::Subscriptions::Mailers::Retract < Notifier::Mailer
+class Docs::UtilityBills::Subscriptions::Mailers::Retract < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # 'rejected_by', 'rejected_to'
 
   class Docs::UtilityBills::Subscriptions::Mailers::Retract::RetractedBy < Docs::UtilityBills::Subscriptions::Mailers::Retract
 
-    consumes_event! 'bbps_biller_subscription.retract.retracted_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.retract'
 
     assign :to do |user, params|
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have retracted the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Retracted"
+
+    assign :sub_header do |user, params|
       "You have retracted the utility bill master #{params[:record].sequence_id}"
     end
   end
 
   class Docs::UtilityBills::Subscriptions::Mailers::Retract::RetractedFrom < Docs::UtilityBills::Subscriptions::Mailers::Retract
 
-    consumes_event! 'bbps_biller_subscription.retract.retracted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.retract'
 
     assign :to do |user, params|
       record = params[:record]
@@ -30,11 +33,15 @@ class Docs::UtilityBills::Subscriptions::Mailers::Retract < Notifier::Mailer
       User.where(id: user_ids).pluck(:email)
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "#{user.name} has retracted the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Retracted"
+
+    assign :sub_header do |user, params|
       "#{user.name} has retracted the utility bill master #{params[:record].sequence_id}"
     end
   end

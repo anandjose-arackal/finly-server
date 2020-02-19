@@ -6,7 +6,8 @@ class Notifier::Mailer < Notifier::API
 
   assign :from, "noreply@finly.io"
   assign :subject, "Finly Notification"
-  assign :body_header, "New Notification from Finly"
+  # assign :body_header, "New Notification from Finly"
+  assign :hero_bg_image, "bg_default"
 
   assign :company do |user, params|
     company_id = params[:record].respond_to?(:company_id) ? params[:record].company_id : User.find(params[:record].send(params[:record].class.document_owner_attribute)).company_id

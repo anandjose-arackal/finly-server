@@ -2,7 +2,7 @@ class Notifier::API < Transactions::API
   include DynamicAttributes
   include Events::Consumer
 
-  def on_event(user, payload)
+  def work(user, payload)
     self.class.(params: payload, current_user: user)
   end
 
@@ -42,7 +42,7 @@ class Notifier::API < Transactions::API
     true
   end
 
-  def validate(options, payload:, **)
+  def validate(options, params:, **)
     true
   end
 

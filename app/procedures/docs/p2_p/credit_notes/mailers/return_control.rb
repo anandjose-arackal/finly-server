@@ -4,7 +4,7 @@ class Docs::P2P::CreditNotes::Mailers::ReturnControl < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::ReturnControl::ReturnedControlBy < Docs::P2P::CreditNotes::Mailers::ReturnControl
 
-    consumes_event! 'credit_note.return_control.returned_control_by', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.return_control'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::P2P::CreditNotes::Mailers::ReturnControl < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::ReturnControl::ReturnedControlFrom < Docs::P2P::CreditNotes::Mailers::ReturnControl
 
-    consumes_event! 'credit_note.return_control.returned_control_from', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.return_control'
 
     assign :to do |user, params|
       record = params[:record]

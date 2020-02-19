@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl
 
   class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlBy < Notifier::Mailer
 
-    consumes_event! 'bbps_bill.take_control.taken_control_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.take_control'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl
 
   class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlFrom < Notifier::Mailer
 
-    consumes_event! 'bbps_bill.take_control.taken_control_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.take_control'
 
     assign :to do |user, params|
       record = params[:record]

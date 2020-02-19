@@ -1,10 +1,8 @@
-class Docs::UtilityBills::Bills::Mailers::Retract < Notifier::Mailer
-
-  # 'rejected_by', 'rejected_to'
+class Docs::UtilityBills::Bills::Mailers::Retract < Docs::UtilityBills::Bills::Mailers::Base
 
   class Docs::UtilityBills::Bills::Mailers::Retract::RetractedBy < Docs::UtilityBills::Bills::Mailers::Retract
 
-    consumes_event! 'bbps_bill.retract.retracted_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.retract'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +19,7 @@ class Docs::UtilityBills::Bills::Mailers::Retract < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Retract::RetractedFrom < Docs::UtilityBills::Bills::Mailers::Retract
 
-    consumes_event! 'bbps_bill.retract.retracted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.retract'
 
     assign :to do |user, params|
       record = params[:record]

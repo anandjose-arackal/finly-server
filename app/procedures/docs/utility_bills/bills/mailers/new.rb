@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::New::Autofetched < Docs::UtilityBills::Bills::Mailers::New
 
-    consumes_event! 'bbps_bill.new_bill.autofetched', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.new_bill'
 
     assign :to do |user, params|
       bill = params[:record]
@@ -26,11 +26,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
       "A New Utility Bill is Available for #{subscription.name} - #{subscription.sequence_id}"
     end
 
-    assign :hero do |user, params|
-      hero = {
-          bg_image: "bg_document_approved.png"
-      }
-    end
+    assign :hero_bg_image, "bg_document_approved.png"
 
     assign :tables do |user, params|
       bill = params[:record]
@@ -42,7 +38,7 @@ class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::New::Manual < Docs::UtilityBills::Bills::Mailers::New
 
-    consumes_event! 'bbps_bill.new_bill.manual', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.new_bill'
 
     assign :to do |user, params|
       bill = params[:record]

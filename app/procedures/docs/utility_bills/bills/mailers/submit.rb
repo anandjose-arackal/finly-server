@@ -2,7 +2,7 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Submit::SubmittedFrom < Docs::UtilityBills::Bills::Mailers::Submit
 
-    consumes_event! 'bbps_bill.submit.submitted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.submit'
 
     assign :to do |user, params|
       [user.email]
@@ -19,7 +19,7 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Submit::SubmittedTo < Docs::UtilityBills::Bills::Mailers::Submit
 
-    consumes_event! 'bbps_bill.submit.submitted_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.submit'
 
     assign :to do |user, params|
       [user.email]

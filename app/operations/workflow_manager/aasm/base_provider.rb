@@ -249,19 +249,7 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def broadcast_event
-    broadcast_params = {
-        event: aasm.current_event,
-        document: document,
-        previous_state: aasm.current_state
-    }
-
-    Notifier::Broadcaster.(user, broadcast_params)
-    # routing_key, message, current_user: nil, consumer_key: NoObject, persistence: true, ignore_failure: false
-    # event_channel = document.class.respond_to?(:event_channel) ? document.class.event_channel : document.class.table_name
-    # Events::Publisher.broadcast "#{event_channel}.#{aasm.current_event}",
-    #                             Events::Payload::Record.(document, user, aasm.current_event, {from_status: aasm.current_state}),
-    #                             current_user: user
-    # current_user: user, consumer_key: "#{event_channel}.#{aasm.current_event}"
+    Events::Publisher::Record::Transition(document, user, aasm.current_event, aasm.current_state)
   end
 
   def reviewers_not_present?

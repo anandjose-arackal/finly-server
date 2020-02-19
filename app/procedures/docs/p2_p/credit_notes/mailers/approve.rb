@@ -4,7 +4,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedBy < Notifier::Mailer
 
-    consumes_event! 'credit_note.approve.approved_by', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.approve'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedTo < Docs::P2P::CreditNotes::Mailers::Approve
 
-    consumes_event! 'credit_note.approve.approved_to', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.approve'
 
     def validate(options, document:, **)
       return if document.approved?
@@ -43,7 +43,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedFor < Docs::P2P::CreditNotes::Mailers::Approve
 
-    consumes_event! 'credit_note.approve.approved_for', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.approve'
 
     def validate(options, document:, **)
       return unless document.approved?

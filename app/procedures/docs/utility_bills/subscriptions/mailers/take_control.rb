@@ -1,27 +1,29 @@
-class Docs::UtilityBills::Subscriptions::Mailers::TakeControl
+class Docs::UtilityBills::Subscriptions::Mailers::TakeControl < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # 'taken_control_by', 'taken_control_from'
+  class Docs::UtilityBills::Subscriptions::Mailers::TakeControl::TakenControlBy < Docs::UtilityBills::Subscriptions::Mailers::TakeControl
 
-  class Docs::UtilityBills::Subscriptions::Mailers::TakeControl::TakenControlBy < Notifier::Mailer
-
-    consumes_event! 'bbps_biller_subscription.take_control.taken_control_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.take_control'
 
     assign :to do |user, params|
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have taken control of the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Taken Control"
+
+    assign :sub_header do |user, params|
       "You have taken control of the utility bill master #{params[:record].sequence_id}"
     end
   end
 
-  class Docs::UtilityBills::Subscriptions::Mailers::TakeControl::TakenControlFrom < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::TakeControl::TakenControlFrom < Docs::UtilityBills::Subscriptions::Mailers::TakeControl
 
-    consumes_event! 'bbps_biller_subscription.take_control.taken_control_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.take_control'
 
     assign :to do |user, params|
       record = params[:record]
@@ -29,11 +31,15 @@ class Docs::UtilityBills::Subscriptions::Mailers::TakeControl
       User.where(id: user_ids).pluck(:email)
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "#{user.name} has taken control of the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Taken Control"
+
+    assign :sub_header do |user, params|
       "#{user.name} has taken control of the utility bill master #{params[:record].sequence_id}"
     end
   end

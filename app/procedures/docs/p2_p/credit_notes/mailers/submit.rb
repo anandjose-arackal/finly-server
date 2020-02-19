@@ -1,10 +1,8 @@
 class Docs::P2P::CreditNotes::Mailers::Submit < Notifier::Mailer
 
-  # consumes_event! 'credit_note.submit', consumer_key: 'Docs::P2P::CreditNotes::Mailers::Submitted', name: 'Docs::P2P::CreditNotes::Mailers::Submitted'
-
   class Docs::P2P::CreditNotes::Mailers::Submit::SubmittedFrom < Docs::P2P::CreditNotes::Mailers::Submit
 
-    consumes_event! 'credit_note.submit.submitted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.submit'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +19,7 @@ class Docs::P2P::CreditNotes::Mailers::Submit < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Submit::SubmittedTo < Docs::P2P::CreditNotes::Mailers::Submit
 
-    consumes_event! 'credit_note.submit.submitted_to', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.submit'
 
     assign :to do |user, params|
       [user.email]

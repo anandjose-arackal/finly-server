@@ -1,37 +1,43 @@
-class Docs::UtilityBills::Subscriptions::Mailers::Reject
+class Docs::UtilityBills::Subscriptions::Mailers::Reject < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # 'rejected_by', 'rejected_to'
+  class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedBy < Docs::UtilityBills::Subscriptions::Mailers::Reject
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedBy < Notifier::Mailer
-
-    consumes_event! 'bbps_biller_subscription.reject.rejected_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.reject'
 
     assign :to do |user, params|
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have rejected the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Rejected"
+
+    assign :sub_header do |user, params|
       "You have rejected the utility bill master #{params[:record].sequence_id}"
     end
   end
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedTo < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::Reject::RejectedTo < Docs::UtilityBills::Subscriptions::Mailers::Reject
 
-    consumes_event! 'bbps_biller_subscription.reject.rejected_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.reject'
 
     assign :to do |user, params|
-      [params[:document]&.user&.email]
+      [params[:record]&.user&.email]
     end
+
+    assign :hero_bg_image, "bg_danger"
 
     assign :subject do |user, params|
       "#{user.name} has rejected the utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Rejected"
+
+    assign :sub_header do |user, params|
       "#{user.name} has rejected the utility bill master #{params[:record].sequence_id}"
     end
   end

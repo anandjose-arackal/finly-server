@@ -19,7 +19,7 @@ class Notifier::Broadcaster
 
     routes(params[:event]&.to_sym).each do |route|
       event_channel = document.class.respond_to?(:event_channel) ? document.class.event_channel : document.class.table_name
-      Events::Publisher.broadcast "#{event_channel}.#{event}.#{route}",
+      Events::Publisher.broadcast "#{event_channel}.#{event}",
                                   Events::Payload::Record.(document, user, event, options),
                                   current_user: user
     end

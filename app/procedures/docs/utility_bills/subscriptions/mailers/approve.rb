@@ -1,54 +1,64 @@
-class Docs::UtilityBills::Subscriptions::Mailers::Approve
+class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # 'approved_by', 'approved_to', 'approved_for'
+  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedBy < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedBy < Notifier::Mailer
-
-    consumes_event! 'bbps_biller_subscription.approve.approved_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.approve'
 
     assign :to do |user, params|
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
-      "You have successfully approved utility bill master #{params[:record].sequence_id}"
+      "Approved Utility Bill Master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Approved"
+
+    assign :sub_header do |user, params|
       "You have successfully approved utility bill master #{params[:record].sequence_id}"
     end
   end
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedTo < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedTo < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-    consumes_event! 'bbps_biller_subscription.approve.approved_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.approve'
 
-    def validate(options, document:, **)
-      return if document.approved?
+    def validate(options, params:, **)
+      return if params[:record].approved?
       true
     end
 
     assign :to do |user, params|
-      [params[:document].get_reviewers.pluck(:email)]
+      params[:record].get_reviewers.pluck(:email)
     end
+
+    assign :hero_bg_image, "bg_warning"
 
     assign :subject do |user, params|
       "#{user.name} has approved the utility bill master #{params[:record].sequence_id} and is awaiting your approval"
     end
 
     assign :title do |user, params|
+      "Utility Bill Master Awaiting Your Approval"
+    end
+
+    assign :sub_header do |user, params|
       "#{user.name} has approved the utility bill master #{params[:record].sequence_id} and is awaiting your approval"
     end
   end
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedFor < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::Approve::ApprovedFor < Docs::UtilityBills::Subscriptions::Mailers::Approve
 
-    consumes_event! 'bbps_biller_subscription.approve.approved_for', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.approve'
 
-    def validate(options, document:, **)
-      return unless document.approved?
+    def validate(options, params:, **)
+      return unless params[:record].approved?
       true
     end
+
+    assign :hero_bg_image, "bg_warning"
 
     assign :to do |user, params|
       [params[:document].user&.email]
@@ -57,6 +67,8 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve
     assign :subject do |user, params|
       "#{user.name} has approved the utility bill master #{params[:record].sequence_id}"
     end
+
+    assign :title, "Utility Bill Master Approved"
 
     assign :title do |user, params|
       "#{user.name} has approved the utility bill master #{params[:record].sequence_id}"

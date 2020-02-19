@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Mailers::Reject < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Reject::RejectedBy < Docs::UtilityBills::Bills::Mailers::Reject
 
-    consumes_event! 'bbps_bill.reject.rejected_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.reject'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::UtilityBills::Bills::Mailers::Reject < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Reject::RejectedTo < Docs::UtilityBills::Bills::Mailers::Reject
 
-    consumes_event! 'bbps_bill.reject.rejected_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.reject'
 
     assign :to do |user, params|
       [params[:document]&.user&.email]

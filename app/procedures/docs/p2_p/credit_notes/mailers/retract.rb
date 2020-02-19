@@ -4,7 +4,7 @@ class Docs::P2P::CreditNotes::Mailers::Retract < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Retract::RetractedBy < Docs::P2P::CreditNotes::Mailers::Retract
 
-    consumes_event! 'credit_note.retract.retracted_by', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.retract'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::P2P::CreditNotes::Mailers::Retract < Notifier::Mailer
 
   class Docs::P2P::CreditNotes::Mailers::Retract::RetractedFrom < Docs::P2P::CreditNotes::Mailers::Retract
 
-    consumes_event! 'credit_note.retract.retracted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'credit_note.retract'
 
     assign :to do |user, params|
       record = params[:record]

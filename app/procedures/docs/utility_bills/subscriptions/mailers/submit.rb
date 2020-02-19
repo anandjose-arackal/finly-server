@@ -1,37 +1,45 @@
-class Docs::UtilityBills::Subscriptions::Mailers::Submit
+class Docs::UtilityBills::Subscriptions::Mailers::Submit < Docs::UtilityBills::Subscriptions::Mailers::Base
 
-  # consumes_event! 'bbps_biller_subscription.submit', consumer_key: 'Docs::UtilityBills::Subscriptions::Mailers::Submitted', name: 'Docs::UtilityBills::Subscriptions::Mailers::Submitted'
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Submit::SubmittedFrom < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::Submit::SubmittedFrom < Docs::UtilityBills::Subscriptions::Mailers::Submit
 
-    consumes_event! 'bbps_biller_subscription.submit.submitted_from', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.submit'
 
     assign :to do |user, params|
       [user.email]
     end
+
+    assign :hero_bg_image, "bg_default"
 
     assign :subject do |user, params|
       "You have successfully submitted utility bill master #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Submitted for Approval"
+
+    assign :sub_header do |user, params|
       "You have successfully submitted utility bill master #{params[:record].sequence_id}"
     end
+
   end
 
-  class Docs::UtilityBills::Subscriptions::Mailers::Submit::SubmittedTo < Notifier::Mailer
+  class Docs::UtilityBills::Subscriptions::Mailers::Submit::SubmittedTo < Docs::UtilityBills::Subscriptions::Mailers::Submit
 
-    consumes_event! 'bbps_biller_subscription.submit.submitted_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_biller_subscription.submit'
 
     assign :to do |user, params|
-      [user.email]
+      params[:record].get_reviewers.pluck(:email)
     end
+
+    assign :hero_bg_image, "bg_warning"
 
     assign :subject do |user, params|
       "#{user.name} has submitted utility bill master #{params[:record].sequence_id} and is awaiting your approval"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Master Awaiting Your Approval"
+
+    assign :sub_header do |user, params|
       "#{user.name} has submitted utility bill master #{params[:record].sequence_id} and is awaiting your approval"
     end
   end

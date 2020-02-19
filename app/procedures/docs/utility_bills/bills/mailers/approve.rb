@@ -4,7 +4,7 @@ class Docs::UtilityBills::Bills::Mailers::Approve < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Approve::ApprovedBy < Docs::UtilityBills::Bills::Mailers::Approve
 
-    consumes_event! 'bbps_bill.approve.approved_by', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.approve'
 
     assign :to do |user, params|
       [user.email]
@@ -21,7 +21,7 @@ class Docs::UtilityBills::Bills::Mailers::Approve < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Approve::ApprovedTo < Docs::UtilityBills::Bills::Mailers::Approve
 
-    consumes_event! 'bbps_bill.approve.approved_to', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.approve'
 
     def validate(options, document:, **)
       return if document.approved?
@@ -43,7 +43,7 @@ class Docs::UtilityBills::Bills::Mailers::Approve < Notifier::Mailer
 
   class Docs::UtilityBills::Bills::Mailers::Approve::ApprovedFor < Docs::UtilityBills::Bills::Mailers::Approve
 
-    consumes_event! 'bbps_bill.approve.approved_for', consumer_key: self.name, name: self.name
+    consumes_event! 'bbps_bill.approve'
 
     def validate(options, document:, **)
       return unless document.approved?
