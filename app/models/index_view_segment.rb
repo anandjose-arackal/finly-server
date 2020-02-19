@@ -18,12 +18,13 @@
 #
 
 class IndexViewSegment < ApplicationRecord
-  include UUIDHelper
+  include UUIDHelper, ::Filters::Store
 
   belongs_to :user
   belongs_to :company
 
-  serialize :filters, JSON
+  filter_store :filters
+  # serialize :filters, JSON
   serialize :columns, JSON
 
   event_channel :index_view_segments
