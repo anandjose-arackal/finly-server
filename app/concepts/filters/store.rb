@@ -1,4 +1,5 @@
 # ActiveRecord concern that initializes stored filters
+# Todo: Untested
 module Filters::Store
   extend ActiveSupport::Concern
 
