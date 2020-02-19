@@ -64,6 +64,7 @@
 class Filters::Schema::Validation
   extend Dry::Monads[:result]
 
+  # Fixme: Not validating filters unless the params has "g" attribute
   def self.check(params)
     return Success() unless params&.dig(:g).present?
 
