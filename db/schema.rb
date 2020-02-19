@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_13_071249) do
+ActiveRecord::Schema.define(version: 2020_02_19_112508) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -818,6 +818,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.integer "category_id"
     t.string "hsn_sac"
     t.string "quick_pay", default: "N"
+    t.datetime "last_paid_at"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -912,6 +913,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.string "order_number_type"
     t.integer "tax_rate_id"
     t.string "hsn_sac"
+    t.datetime "paid_at"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -1436,6 +1438,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.datetime "start_date"
     t.datetime "end_date"
     t.datetime "deleted_at"
+    t.integer "budget_date_type_id"
     t.index ["company_id"], name: "index_budget_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
   end
@@ -1586,6 +1589,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.boolean "invoice"
     t.integer "budget_group_criterium_id"
     t.boolean "active", default: false
+    t.integer "budget_date_type_id"
     t.index ["budget_amount_id"], name: "index_budgets_on_budget_amount_id"
     t.index ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id"
     t.index ["company_id"], name: "index_budgets_on_company_id"
@@ -1781,6 +1785,13 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.string "mcc_restriction_type"
     t.datetime "deleted_at"
     t.index ["card_id"], name: "index_card_restrictions_on_card_id"
+  end
+
+  create_table "card_service_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "card_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3523,6 +3534,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.datetime "deleted_at"
     t.boolean "analytics_system"
     t.boolean "sso_login_enforced", default: false
+    t.integer "card_service_provider_id"
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -7032,6 +7044,7 @@ ActiveRecord::Schema.define(version: 2020_02_13_071249) do
     t.integer "location_id"
     t.integer "cost_center_id"
     t.integer "reference_payment_id"
+    t.integer "company_id"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"

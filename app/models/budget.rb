@@ -27,6 +27,7 @@
 #  invoice                      :boolean
 #  budget_group_criterium_id    :integer
 #  active                       :boolean          default(FALSE)
+#  budget_date_type_id          :integer
 #
 
 class Budget < ApplicationRecord
@@ -202,6 +203,10 @@ class Budget < ApplicationRecord
     where budget_group_id: budget_group_id
   }
 
+  scope :with_budget_criteria_id, -> (budget_criteria_ids) {
+    where budget_group_criterium_id: budget_criteria_ids
+  }
+
   # scope :filter_criteria, -> (criteria) {
   #   case criteria
   #   when 'budget', :budget, '1'
@@ -318,6 +323,10 @@ class Budget < ApplicationRecord
 
   def validate_if_admin?(user)
     user.admin? || user.vp_admin_or_auditor?
+  end
+
+  def within_timeframe?(date)
+    true if (start_date <= date and end_date >= date)
   end
 
   private

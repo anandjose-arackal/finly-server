@@ -43,6 +43,7 @@
 #  location_id                        :integer
 #  cost_center_id                     :integer
 #  reference_payment_id               :integer
+#  company_id                         :integer
 #
 
 class Report < ApplicationRecord
@@ -83,6 +84,7 @@ class Report < ApplicationRecord
   # belongs_to :money_request
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department"
+  belongs_to :cost_center, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

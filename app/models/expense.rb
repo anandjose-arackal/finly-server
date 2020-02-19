@@ -1138,6 +1138,29 @@ class Expense < ApplicationRecord
     amount_value
   end
 
+  def self.as_json(options = {})
+    {
+        id: id,
+        note: note,
+        amount_value: amount_value,
+        currency_symbol: currency_symbol,
+        currency_country_code: currency_country_code,
+        merchant_name: merchant_name,
+        date: date,
+        expense_type_name: expense_type_name,
+        expense_status_name: expense_status_name,
+        category_id: category_id,
+        category_name: category&.name,
+        reimbursable: reimbursable,
+        spent_from_id: spent_from_id,
+        spent_from_name: spent_from&.name,
+        tax_rate_value: tax_rate&.value,
+        distance_value: distance_value,
+        gst_percentage: gst_percentage,
+        expense_tax_type: expense_tax_type
+    }
+  end
+
   private
 
   # cannot add an expense with future date

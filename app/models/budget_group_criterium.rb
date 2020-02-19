@@ -164,6 +164,7 @@ class BudgetGroupCriterium < ApplicationRecord
                                company_id: self.company_id,
                                budget_group_id: self.budget_group.id,
                                user_id: self.budget_group.created_by_user_id,
+                               budget_date_type_id: self.budget_group.budget_date_type_id,
                                budget_amount_attributes: {
                                    value: 0,
                                    currency_id: 1

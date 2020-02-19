@@ -86,7 +86,6 @@
 #  id_proof_back_content_type  :string(255)
 #  id_proof_back_file_size     :bigint
 #  id_proof_back_updated_at    :datetime
-#  deleted_at                  :datetime
 #
 
 require 'fileutils'

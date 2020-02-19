@@ -23,6 +23,10 @@ class BudgetManager::BudgetsCalculator::BudgetsComputer < Transactions::API
   # the previous step
   step :persist_buckets!
 
+  # the below step will retrieve all the relevant entities that are consuming this particular budget
+  # along with the various document line items that consume this budget
+  step :prepare_budgetable_entities!
+
   # failure :return_errors!
 
   def initialize!(options, budget:, **)
@@ -132,6 +136,23 @@ class BudgetManager::BudgetsCalculator::BudgetsComputer < Transactions::API
       return false
     end
     return true
+  end
+
+  def prepare_budgetable_entities!(options, **)
+    expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
+    purchase_request_items = PurchaseRequestItem.with_id(self.budget_trails.with_entity_type("PurchaseRequestItem").pluck(:entity_id))
+    purchase_order_items = PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id))
+    invoice_items = InvoiceLineItem.with_id(self.budget_trails.with_entity_type("InvoiceLineItem").pluck(:entity_id))
+    payments = Payment.with_id(self.budget_trails.with_entity_type("Payment").pluck(:entity_id))
+    result = {
+        expenses: expenses,
+        payments: payments,
+        purchase_request_items: purchase_request_items,
+        invoice_items: invoice_items,
+        purchase_order_items: purchase_order_items
+    }
+    # adding all the above data so that the items can be accessed outside this operation
+    options["result"] = result
   end
 
 end

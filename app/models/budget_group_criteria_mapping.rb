@@ -24,6 +24,10 @@ class BudgetGroupCriteriaMapping < ApplicationRecord
     where budgetable_id: budgetable_id
   }
 
+  scope :with_budget_group_criteria_id, -> (budget_group_criteria_id) {
+    where(budget_group_criterium_id: budget_group_criteria_id)
+  }
+
   def as_json(options = {})
     {
         id: id,
