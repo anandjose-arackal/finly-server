@@ -12,7 +12,7 @@
 class AdvanceAmountStatus < ApplicationRecord
   include Seedable
   def self.values
-    %w( to_be_processed initiated paid failed pending po_processing )
+    %w( to_be_processed initiated paid failed pending po_processing closed)
   end
 
   def to_be_processed?
@@ -37,5 +37,9 @@ class AdvanceAmountStatus < ApplicationRecord
 
   def po_processing?
     self.id == AdvanceAmountStatus.id_for(:po_processing)
+  end
+
+  def closed?
+    self.id == AdvanceAmountStatus.id_for(:closed)
   end
 end

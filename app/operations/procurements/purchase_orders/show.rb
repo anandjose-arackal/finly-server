@@ -237,6 +237,9 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     # Give access to grn initiator once PO is approved
     return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
     return if params[:skip_for_mailer]
+    return if user.is_po_invoice_initiator?(purchase_order)
+    return if user.is_po_invoice_reviewer?(purchase_order)
+    return if user.is_po_invoice_auditor?(purchase_order)
     raise_unauthorized_exception
   end
 end
