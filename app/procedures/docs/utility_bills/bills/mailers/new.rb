@@ -1,7 +1,5 @@
 class Docs::UtilityBills::Bills::Mailers::New < Notifier::Mailer
 
-  # 'autofetched', 'manual'
-
   class Docs::UtilityBills::Bills::Mailers::New::Autofetched < Docs::UtilityBills::Bills::Mailers::New
 
     consumes_event! 'bbps_bill.new_bill'

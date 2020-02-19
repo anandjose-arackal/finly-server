@@ -1,4 +1,4 @@
-class Docs::UtilityBills::Bills::Mailers::Submit < Notifier::Mailer
+class Docs::UtilityBills::Bills::Mailers::Submit < Docs::UtilityBills::Bills::Mailers::Base
 
   class Docs::UtilityBills::Bills::Mailers::Submit::SubmittedFrom < Docs::UtilityBills::Bills::Mailers::Submit
 
@@ -8,11 +8,15 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Notifier::Mailer
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have successfully submitted utility bill #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Submitted"
+
+    assign :sub_header do |user, params|
       "You have successfully submitted utility bill #{params[:record].sequence_id}"
     end
   end
@@ -22,15 +26,19 @@ class Docs::UtilityBills::Bills::Mailers::Submit < Notifier::Mailer
     consumes_event! 'bbps_bill.submit'
 
     assign :to do |user, params|
-      [user.email]
+      params[:record].get_reviewers.pluck(:email)
     end
+
+    assign :hero_bg_image, "bg_warning"
 
     assign :subject do |user, params|
       "#{user.name} has submitted utility bill #{params[:record].sequence_id} and is awaiting your approval"
     end
 
-    assign :title do |user, params|
-      "#{user.name} has submitted utility bill #{params[:record].sequence_id} and is awaiting your approval"
+    assign :title, "Utility Bill Awaiting Your Approval"
+
+    assign :sub_header do |user, params|
+      "#{user.name} has submitted the utility bill #{params[:record].sequence_id} and is awaiting your approval"
     end
   end
 end

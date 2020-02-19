@@ -1,6 +1,4 @@
-class Docs::UtilityBills::Bills::Mailers::Reject < Notifier::Mailer
-
-  # 'rejected_by', 'rejected_to'
+class Docs::UtilityBills::Bills::Mailers::Reject < Docs::UtilityBills::Bills::Mailers::Base
 
   class Docs::UtilityBills::Bills::Mailers::Reject::RejectedBy < Docs::UtilityBills::Bills::Mailers::Reject
 
@@ -10,11 +8,15 @@ class Docs::UtilityBills::Bills::Mailers::Reject < Notifier::Mailer
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have rejected the utility bill #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Rejected"
+
+    assign :sub_header do |user, params|
       "You have rejected the utility bill #{params[:record].sequence_id}"
     end
   end
@@ -24,14 +26,18 @@ class Docs::UtilityBills::Bills::Mailers::Reject < Notifier::Mailer
     consumes_event! 'bbps_bill.reject'
 
     assign :to do |user, params|
-      [params[:document]&.user&.email]
+      [params[:record]&.user&.email]
     end
+
+    assign :hero_bg_image, "bg_danger"
 
     assign :subject do |user, params|
       "#{user.name} has rejected the utility bill #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Rejected"
+
+    assign :sub_header do |user, params|
       "#{user.name} has rejected the utility bill #{params[:record].sequence_id}"
     end
   end

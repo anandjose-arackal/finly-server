@@ -1,8 +1,6 @@
-class Docs::UtilityBills::Bills::Mailers::TakeControl
+class Docs::UtilityBills::Bills::Mailers::TakeControl < Docs::UtilityBills::Bills::Mailers::Base
 
-  # 'taken_control_by', 'taken_control_from'
-
-  class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlBy < Notifier::Mailer
+  class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlBy < Docs::UtilityBills::Bills::Mailers::TakeControl
 
     consumes_event! 'bbps_bill.take_control'
 
@@ -10,16 +8,20 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have taken control of the utility bill #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Taken Control"
+
+    assign :sub_header do |user, params|
       "You have taken control of the utility bill #{params[:record].sequence_id}"
     end
   end
 
-  class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlFrom < Notifier::Mailer
+  class Docs::UtilityBills::Bills::Mailers::TakeControl::TakenControlFrom < Docs::UtilityBills::Bills::Mailers::TakeControl
 
     consumes_event! 'bbps_bill.take_control'
 
@@ -29,11 +31,15 @@ class Docs::UtilityBills::Bills::Mailers::TakeControl
       User.where(id: user_ids).pluck(:email)
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "#{user.name} has taken control of the utility bill #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Utility Bill Taken Control"
+
+    assign :sub_header do |user, params|
       "#{user.name} has taken control of the utility bill #{params[:record].sequence_id}"
     end
   end
