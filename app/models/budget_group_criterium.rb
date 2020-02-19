@@ -127,6 +127,12 @@ class BudgetGroupCriterium < ApplicationRecord
         period: self.budget_group.period&.name,
         total_budgets: self.budgets.count,
         budget_group_criteria_mappings: budget_group_criteria_mappings,
+        budgetable_vendors: budgetable_vendors,
+        budgetable_categories: budgetable_categories,
+        budgetable_cost_centers: budgetable_cost_centers,
+        budgetable_locations: budgetable_locations,
+        budgetable_users: budgetable_users,
+        budgetable_departments: budgetable_departments,
         sub_criteria: self.children,
         budgets: budgets,
         time_periods: time_periods
