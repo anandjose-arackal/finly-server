@@ -21,6 +21,7 @@
 #  tds_applicable             :boolean
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  uuid                       :string(36)       not null
 #
 
 require 'rails_helper'

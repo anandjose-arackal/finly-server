@@ -16,11 +16,14 @@
 #  poc_designation   :string(255)
 #  location          :string(255)
 #  address           :text(65535)
+#  gl_code           :string(255)
+#  uuid              :string(36)
 #  deleted_at        :datetime
 #
 
 class GstinLocation < ApplicationRecord
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   belongs_to :vendor, class_name: "YesBankVendor", optional: true
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true

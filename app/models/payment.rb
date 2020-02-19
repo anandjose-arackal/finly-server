@@ -52,11 +52,13 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
+#  uuid                           :string(36)
 #
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'

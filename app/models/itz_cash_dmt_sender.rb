@@ -10,6 +10,7 @@
 #  updated_at      :datetime         not null
 #  status_id       :integer          not null
 #  otp_verified    :boolean          default(FALSE), not null
+#  uuid            :string(36)
 #  deleted_at      :datetime
 #
 

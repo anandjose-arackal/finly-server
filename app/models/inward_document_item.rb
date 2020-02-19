@@ -23,6 +23,7 @@
 #  order_amount             :decimal(20, 5)   default(0.0)
 #  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  product_type_id          :integer          default(1)
+#  uuid                     :string(36)
 #
 
 class InwardDocumentItem < ApplicationRecord

@@ -7,6 +7,7 @@
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  field_multiselect_selection_id :integer
+#  uuid                           :string(36)
 #  deleted_at                     :datetime
 #
 

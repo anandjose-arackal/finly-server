@@ -95,11 +95,14 @@
 #  payable                         :boolean          default(FALSE)
 #  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  uuid                            :string(36)
 #
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil, CustomFieldFilterSupport
   include LiquidDroppable
+  include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
   include Sequenced::ActsAsSequenced
   # include EventProducer
 

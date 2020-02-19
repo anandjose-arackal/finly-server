@@ -11,6 +11,7 @@
 #  is_deleted  :boolean          default(FALSE), not null
 #  deleted_at  :datetime
 #  default     :boolean          default(FALSE)
+#  uuid        :string(36)
 #
 
 class ProcurementTerm < ApplicationRecord

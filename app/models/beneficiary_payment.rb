@@ -39,6 +39,7 @@
 #  resource_template_id            :integer
 #  creator_id                      :integer
 #  payment_agreement_upcoming_date :date
+#  uuid                            :string(36)
 #  deleted_at                      :datetime
 #
 

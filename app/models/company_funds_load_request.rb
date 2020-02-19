@@ -13,6 +13,7 @@
 #  updated_at           :datetime         not null
 #  bank_type_id         :integer
 #  is_active            :boolean          default(TRUE)
+#  uuid                 :string(36)
 #  deleted_at           :datetime
 #
 

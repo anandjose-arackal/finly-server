@@ -20,6 +20,7 @@
 #  mobile_number             :string(255)      not null
 #  encrypted_master_password :string(255)
 #  authorized_ip             :string(255)
+#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

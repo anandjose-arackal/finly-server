@@ -2457,6 +2457,10 @@
 
 Rails.application.routes.draw do
 
+  get 'index_view_segments/create'
+  get 'index_view_segments/update'
+  get 'index_view_segments/show'
+  get 'index_view_segments/destroy'
   get 'unique_identifiers/index'
   get 'unique_identifiers/set'
   get 'qukickbooks_configurations/create'
@@ -3033,6 +3037,13 @@ Rails.application.routes.draw do
 
   ######################### TRAVEL REQUESTS API START ##########################
 
+  # get 'trips', to: 'trips#index'
+  get 'trips/:id/header', to: 'trips#show_header'
+  get 'trips/:id/passengers', to: 'trips#show_passengers'
+  get 'trips/:id/routes', to: 'trips#show_routes'
+  get 'trips/:id/booking_requests', to: 'trips#show_booking_requests'
+  resources :trips
+
   get 'travel_requests/count', to: 'travel_requests#count'
   get 'travel_requests/config', to: 'travel_requests#configuration'
   resources :travel_requests do
@@ -3267,6 +3278,7 @@ Rails.application.routes.draw do
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
   get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
+  get 'autocomplete/:entity', to: 'autocomplete#route'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
@@ -3829,7 +3841,6 @@ Rails.application.routes.draw do
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
 
 
-
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'
     get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
@@ -4037,6 +4048,13 @@ Rails.application.routes.draw do
 
 
   get 'accounting_exports', to: 'accounting_exports#index'
+
+  get 'filters/:route', to: "filters#index"
+  get 'index/:route/config', to: "index#fetch_config"
+  get 'index/:route/counts', to: 'index#counts'
+  get 'index/:route', to: "index#show"
+
+  resources :views, controller: 'index_view_segments', except: [:show]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

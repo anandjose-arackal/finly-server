@@ -14,6 +14,7 @@
 #  email                        :string(255)
 #  payment_receivable_status_id :integer
 #  payment_id                   :integer
+#  uuid                         :string(36)
 #  deleted_at                   :datetime
 #
 

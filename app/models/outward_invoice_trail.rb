@@ -15,6 +15,7 @@
 #  associated_transaction_id   :integer
 #  associated_transaction_type :string(255)
 #  date                        :date
+#  uuid                        :string(36)
 #  deleted_at                  :datetime
 #
 

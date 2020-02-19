@@ -11,6 +11,7 @@
 #  yes_bank_account_transfer :boolean
 #  invoicing_system          :boolean          default(FALSE)
 #  travel_request            :boolean          default(FALSE)
+#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

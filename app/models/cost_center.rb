@@ -13,12 +13,14 @@
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)
+#  uuid             :string(36)
 #
 
 class CostCenter < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'cost_center'

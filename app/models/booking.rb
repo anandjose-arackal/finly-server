@@ -14,6 +14,7 @@
 #  destination_id     :integer          not null
 #  parent_booking_id  :integer
 #  reject_reason      :text(65535)
+#  uuid               :string(36)
 #  deleted_at         :datetime
 #
 

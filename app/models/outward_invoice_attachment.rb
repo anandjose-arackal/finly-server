@@ -13,6 +13,7 @@
 #  updated_at              :datetime         not null
 #  company_id              :integer
 #  user_id                 :integer
+#  uuid                    :string(36)
 #  deleted_at              :datetime
 #
 

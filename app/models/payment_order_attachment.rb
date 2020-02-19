@@ -13,6 +13,7 @@
 #  description                :text(65535)
 #  uploader_id                :integer
 #  allow_delete               :boolean          default(TRUE)
+#  uuid                       :string(36)
 #  deleted_at                 :datetime
 #
 

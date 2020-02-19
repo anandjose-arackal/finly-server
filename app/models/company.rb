@@ -12,12 +12,14 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
+#  uuid             :string(36)
 #  deleted_at       :datetime
 #
 
 class Company < ApplicationRecord
   include Constants
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'company'
@@ -26,6 +28,7 @@ class Company < ApplicationRecord
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
+  has_many :trips
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable

@@ -8,12 +8,14 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  state_code :string(255)
+#  uuid       :string(36)
 #  deleted_at :datetime
 #
 
 class State < ApplicationRecord
   include Seedable
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   STATES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},
             {:code => 'S04', :name => 'Arunachal Pradesh'}, {:code => 'S05', :name => 'Assam'}, {:code => 'S06', :name => 'Bihar'}, {:code => 'S07', :name => 'Chattisgarh'},

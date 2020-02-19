@@ -12,6 +12,7 @@
 #  quickbooks_updated_at             :datetime
 #  active                            :boolean
 #  quickbooks_additional_information :text(65535)
+#  uuid                              :string(36)
 #  deleted_at                        :datetime
 #
 

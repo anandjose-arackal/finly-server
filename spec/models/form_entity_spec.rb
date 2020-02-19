@@ -38,10 +38,16 @@
 #  allow_clearing_default_value :boolean
 #  options                      :text(65535)
 #  chained                      :text(65535)
-#  data_provider                :text(65535)
 #  deleted_at                   :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  scope                        :text(65535)
+#  internal                     :boolean          default(FALSE)
+#  is_modified                  :boolean          default(FALSE)
+#  field_path                   :string(255)
+#  parent_id                    :string(255)
+#  populate_if_empty            :string(255)
+#  associate_custom_fields      :boolean          default(FALSE)
 #
 
 require 'rails_helper'

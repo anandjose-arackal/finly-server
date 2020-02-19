@@ -47,6 +47,7 @@
 #  tds                     :decimal(10, 5)
 #  tds_amount_id           :integer
 #  deleted_at              :datetime
+#  uuid                    :string(36)
 #
 
 #  gst_type_id: 1 - IGST

@@ -20,6 +20,7 @@
 #  updated_at                  :datetime         not null
 #  date                        :datetime
 #  sequence_number             :integer
+#  uuid                        :string(36)
 #  deleted_at                  :datetime
 #
 

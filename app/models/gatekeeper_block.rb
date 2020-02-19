@@ -15,6 +15,7 @@
 #  rule          :string(255)
 #  level         :integer          default(1), not null
 #  admin_user_id :integer
+#  uuid          :string(36)
 #  deleted_at    :datetime
 #
 

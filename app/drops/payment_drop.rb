@@ -1,25 +1,25 @@
 class PaymentDrop < Drop
 
   def date
-    @object.date
+    record.date
   end
 
   def narration
-    @object.note
+    record.note
   end
 
   def reference_id
-    @object.external_reference_id
+    record.external_reference_id
   end
 
   def gl_name
-    @object.gl_name
+    record.gl_name
   end
 
   def vendor
-    return nil unless @object.receiving_user_type == "YesBankVendor"
+    return nil unless record.receiving_user_type == "YesBankVendor"
 
-    @object.receiving_user&.to_liquid
+    record.receiving_user&.to_liquid
   end
 
   def beneficiary
@@ -27,7 +27,7 @@ class PaymentDrop < Drop
   end
 
   def amount
-    @object.amount&.value || 0
+    record.amount&.value || 0
   end
 
 end

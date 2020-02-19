@@ -3,7 +3,6 @@ module EventProducer
 
   included do
     include DynamicAttributes
-    class_attr :event_channel, default: self.name.underscore
     class_attr :record_events, default: []
     class_attr :collection_events, default: []
 
@@ -11,6 +10,12 @@ module EventProducer
   end
 
   module ClassMethods
+    def event_channel(name = NoObject)
+      @event_channel = name unless name == NoObject
+
+      @event_channel || self.table_name
+    end
+
     def record_event?(event)
       return false if event.blank?
       record_events.include?(event) or record_events.include?(event.gsub("#{event_channel}.", ""))

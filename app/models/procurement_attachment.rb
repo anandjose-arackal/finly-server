@@ -16,6 +16,7 @@
 #  updated_at                :datetime         not null
 #  user_id                   :integer
 #  vendor_poc_id             :integer
+#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

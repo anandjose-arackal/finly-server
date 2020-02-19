@@ -17,6 +17,8 @@
 #  date              :date
 #  sub_department_id :integer
 #  procurement_id    :integer
+#  uuid              :string(36)
+#  deleted_at        :datetime
 #
 
 class BudgetTrail < ApplicationRecord

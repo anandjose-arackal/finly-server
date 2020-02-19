@@ -8,6 +8,7 @@
 #  updated_at  :datetime         not null
 #  name        :string(255)      not null
 #  application :string(255)
+#  uuid        :string(36)
 #  deleted_at  :datetime
 #
 

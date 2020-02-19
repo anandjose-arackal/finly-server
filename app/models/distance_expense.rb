@@ -18,6 +18,7 @@
 #  distance_rate_id                  :integer
 #  distance_unit_id                  :integer
 #  deleted_at                        :datetime
+#  uuid                              :string(36)
 #
 
 class DistanceExpense < ApplicationRecord

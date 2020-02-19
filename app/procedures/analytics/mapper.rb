@@ -4,7 +4,6 @@ module Analytics::Mapper
   extend ActiveSupport::Concern
 
   included do
-    include Events::Consumer
     include DynamicAttributes
 
     class_attr :is_sync, default: false
@@ -87,13 +86,11 @@ module Analytics::Mapper
       is_sync
     end
 
-    def events(*list)
+    def consume(*events)
       raise "Event is already defined" if @events.present?
 
-      @events = list
-      @events.each do |event|
-        EventHandler.build(self, event)
-      end
+      @events = events
+      consumes_event!(*events, sync: sync?)
     end
 
     def sync(after: nil)
@@ -107,6 +104,21 @@ module Analytics::Mapper
 
   def in_sync?(record, payload = {})
     finly_ref_updated_at == record.updated_at
+  end
+
+  def work(user, payload)
+    puts "User: #{user} payload: #{payload}"
+    olap_model = self.class.olap_model || self.class
+    input = olap_model.input.call(user, payload)
+    input = [input] unless input.respond_to?(:each)
+    input.each do |record|
+      sync = Analytics::Synchronizer::Persist.(params: {record: record, olap_model: olap_model, payload: payload})
+      if sync.failure? and not sync[:in_sync]
+        # Todo log failure with reason
+        raise "Sync Error: #{sync.errors}}"
+      end
+    end
+    Success()
   end
 
 end

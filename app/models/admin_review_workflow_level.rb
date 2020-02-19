@@ -11,6 +11,7 @@
 #  reviewer                 :boolean          default(FALSE), not null
 #  admin_user_id            :integer          not null
 #  email_triggered_at       :datetime
+#  uuid                     :string(36)
 #  deleted_at               :datetime
 #
 

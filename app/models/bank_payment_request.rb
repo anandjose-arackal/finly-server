@@ -37,6 +37,7 @@
 #  expected_payments            :integer          default(0)
 #  ticket_type                  :string(255)
 #  transfer_mode_id             :integer
+#  uuid                         :string(36)
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -45,6 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           Transitionable,
           CustomFieldFilterSupport
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy

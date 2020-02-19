@@ -25,6 +25,7 @@
 #  show_custom_fields_in_pdf        :boolean          default(TRUE)
 #  show_po_approved_trail           :boolean          default(FALSE)
 #  email_purchase_order_initiator   :boolean
+#  uuid                             :string(36)
 #  deleted_at                       :datetime
 #
 

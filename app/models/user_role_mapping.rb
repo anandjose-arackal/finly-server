@@ -10,6 +10,7 @@
 #  purpose_id            :integer
 #  company_department_id :integer
 #  branch_location_id    :integer
+#  uuid                  :string(36)
 #  deleted_at            :datetime
 #
 

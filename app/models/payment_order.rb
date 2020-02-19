@@ -29,11 +29,13 @@
 #  bank_account_provider_id  :integer
 #  deleted_at                :datetime
 #  transfer_mode_id          :integer
+#  uuid                      :string(36)
 #
 
 class PaymentOrder < ApplicationRecord
   include PostOperationExecution, SoftDeletable
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   CONFIG = {
       meal_card: {

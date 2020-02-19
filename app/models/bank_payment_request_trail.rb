@@ -14,6 +14,7 @@
 #  updated_at              :datetime         not null
 #  action_for_user_id      :integer
 #  action_for_user_role_id :integer
+#  uuid                    :string(36)
 #  deleted_at              :datetime
 #
 

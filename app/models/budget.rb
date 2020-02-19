@@ -21,6 +21,7 @@
 #  expense          :boolean
 #  ancestry         :string(255)
 #  deleted_at       :datetime
+#  uuid             :string(36)
 #
 
 class Budget < ApplicationRecord

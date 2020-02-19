@@ -16,6 +16,7 @@
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
 #  bank_reference_number      :string(255)
+#  uuid                       :string(36)
 #  deleted_at                 :datetime
 #
 

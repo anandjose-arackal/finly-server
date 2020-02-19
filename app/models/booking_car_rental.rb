@@ -25,6 +25,7 @@
 #  is_deleted      :boolean          default(FALSE)
 #  booking_id      :integer
 #  deleted_at      :datetime
+#  uuid            :string(36)
 #
 
 class BookingCarRental < ApplicationRecord

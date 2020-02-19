@@ -1,4 +1,4 @@
-class TaskManager::Workflows::Contracts::Task < Transactions::Contract
+class TaskManager::Workflows::Contracts::Task < Reform::Form
   include TaskManager::Actions::FileManager::Validations
 
   property :uuid

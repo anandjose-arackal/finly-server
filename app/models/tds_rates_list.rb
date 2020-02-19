@@ -10,10 +10,12 @@
 #  company_id :integer
 #  gl_code    :string(255)
 #  deleted_at :datetime
+#  uuid       :string(36)
 #
 
 class TdsRatesList < ApplicationRecord
-  include LiquidDroppable, SoftDeletable
+  include LiquidDroppable
+  include Exposures::Model::Exposable, SoftDeletable
   include EventProducer
 
   event_channel 'tds_rate'
