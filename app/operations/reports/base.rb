@@ -139,10 +139,10 @@ class Reports::Base < BaseOperation
       self.budgets = []
 
       if self.report.expenses.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-        if op.success?
-          self.budgets = op.budget_data
-        end
+        # op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
+        # if op.success?
+        #   self.budgets = op.budget_data
+        # end
       end
     end
 
