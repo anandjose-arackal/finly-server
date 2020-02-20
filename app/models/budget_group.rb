@@ -34,6 +34,8 @@ class BudgetGroup < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  default_scope { order(created_at: :desc) }
+
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
     id = id.split(",")
@@ -69,6 +71,18 @@ class BudgetGroup < ApplicationRecord
     where.not(id: id)
   }
 
+  scope :filter_month, -> (month) {
+    if month.present?
+      where('extract(month from start_date) <= ? AND extract(month from end_date) >= ?', month, month)
+    end
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from start_date) = ? OR extract(year from end_date) = ?', year, year)
+  }
 
   def as_json(options = {})
     {

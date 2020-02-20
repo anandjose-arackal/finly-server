@@ -4,6 +4,8 @@ class BudgetManager::BudgetGroups::Ops::Index < Transactions::API
 
   has_scope :with_period_id
   has_scope :filter_search
+  has_scope :filter_month
+  has_scope :filter_year
 
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
