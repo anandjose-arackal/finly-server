@@ -14,6 +14,7 @@
 #  budget_amount_id             :integer
 #  remaining_amount_id          :integer
 #  deleted_at                   :datetime
+#  total_consumed_amount_id     :integer
 #
 
 require 'rails_helper'

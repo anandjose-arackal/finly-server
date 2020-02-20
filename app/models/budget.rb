@@ -70,6 +70,7 @@ class Budget < ApplicationRecord
 
   after_create :set_budget_consumption
   after_create :reflect_budget_group_attributes
+  after_save :update_consumption_model
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
@@ -252,7 +253,9 @@ class Budget < ApplicationRecord
       name: name,
       start_date: start_date&.strftime("%d-%b-%y"),
       end_date: end_date&.strftime("%d-%b-%y"),
-      budget_amount: budget_amount.as_json,
+      budget_amount: budget_consumption.budget_amount.as_json,
+      spent_amount: budget_consumption.total_consumed_amount.as_json,
+      budget_consumption: budget_consumption,
       # spent_amount: processor_instance.spent_amount,
       associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name:vendor.name}},
       associated_categories: budget_group_criterium&.budgetable_categories.as_json,
@@ -386,9 +389,20 @@ class Budget < ApplicationRecord
             remaining_amount_attributes: {
                 value: 0,
                 currency: Currency.first
+            },
+            total_consumed_amount_attributes: {
+                value: 0,
+                currency: Currency.first
             }
     )
     budget_consumption.save
+  end
+
+  def update_consumption_model
+    budget_consumption = self.budget_consumption
+    # TODO - tempoorary
+    budget_consumption.budget_amount.update(value: self.budget_amount.value)
+    # TODO - call to Budgets Computer that updates this particular budget
   end
 
   def reflect_budget_group_attributes

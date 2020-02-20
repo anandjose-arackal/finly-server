@@ -43,6 +43,10 @@ class CostCenter < ApplicationRecord
     where application: app
   }
 
+  scope :with_id, -> (ids) {
+    where id: ids
+  }
+
   scope :vendor_payments_only, -> {
     where application: "vp"
   }

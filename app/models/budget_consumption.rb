@@ -14,6 +14,7 @@
 #  budget_amount_id             :integer
 #  remaining_amount_id          :integer
 #  deleted_at                   :datetime
+#  total_consumed_amount_id     :integer
 #
 
 class BudgetConsumption < ApplicationRecord
@@ -26,6 +27,7 @@ class BudgetConsumption < ApplicationRecord
   belongs_to :payment_processing_amount, class_name: "Amount"
   belongs_to :paid_amount, class_name: "Amount"
   belongs_to :remaining_amount, class_name: "Amount"
+  belongs_to :total_consumed_amount, class_name: "Amount"
 
   accepts_nested_attributes_for :budget_amount, :pending_amount, :committed_amount, :pending_payment_amount,
                                 :payment_processing_amount, :paid_amount, :remaining_amount
@@ -40,7 +42,8 @@ class BudgetConsumption < ApplicationRecord
         pending_payment_amount: pending_payment_amount,
         payment_processing_amount: payment_processing_amount,
         paid_amount: paid_amount,
-        remaining_amount: remaining_amount
+        remaining_amount: remaining_amount,
+        total_consumed_amount: total_consumed_amount
     }
   end
 end

@@ -1,4 +1,4 @@
-class BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsProcessor < BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
+class BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor < BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor
 
   def save_trail(purchase_request_item)
     trail = BudgetTrail.find_by(entity_type: "PurchaseRequestItem", entity_id: purchase_request_item.id)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_19_112508) do
+ActiveRecord::Schema.define(version: 2020_02_20_092709) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -863,6 +863,7 @@ ActiveRecord::Schema.define(version: 2020_02_19_112508) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.boolean "disabled", default: false
     t.index ["biller_id"], name: "index_bbps_billers_on_biller_id"
     t.index ["created_at"], name: "index_bbps_billers_on_created_at"
     t.index ["parent_biller_id"], name: "index_bbps_billers_on_parent_biller_id"
@@ -1377,6 +1378,7 @@ ActiveRecord::Schema.define(version: 2020_02_19_112508) do
     t.integer "budget_amount_id"
     t.integer "remaining_amount_id"
     t.datetime "deleted_at"
+    t.integer "total_consumed_amount_id"
     t.index ["budget_id"], name: "index_budget_consumptions_on_budget_id"
     t.index ["committed_amount_id"], name: "index_budget_consumptions_on_committed_amount_id"
     t.index ["paid_amount_id"], name: "index_budget_consumptions_on_paid_amount_id"

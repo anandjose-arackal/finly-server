@@ -39,6 +39,10 @@ class BudgetGroupCriterium < ApplicationRecord
 
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
+  scope :with_id, -> (ids) do
+    where id: ids
+  end
+
   scope :with_budgetable_vendors, -> (vendor_ids) {
     if vendor_ids.present?
       # extracting all budgets that don't have a vendor criteria

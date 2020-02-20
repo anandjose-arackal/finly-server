@@ -23,12 +23,19 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     self.document = document
     self.company = document.company
     case document.class.name
-    when "PurchaseOrder", "Invoice", "PurchaseRequestItem"
+    when "PurchaseOrder", "Invoice"
       # in this case users will not be there because there's no such thing as
       # a user consuming a PO, it is always with respect to the other criteria
       self.departments = Department.with_id(document.items.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
       self.vendors = [document.vendor]
+      self.locations = [document.location]
+      self.categories = Category.with_id(document.items.pluck(:category_id).compact)
+      self.users = []
+    when "PurchaseRequest"
+      self.departments = Department.with_id(document.items.pluck(:department_id).compact)
+      self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
+      self.vendors = []
       self.locations = [document.location]
       self.categories = Category.with_id(document.items.pluck(:category_id).compact)
       self.users = []
@@ -61,18 +68,18 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     criteria_mappings = BudgetGroupCriteriaMapping.with_budget_group_criteria_id(budget_criteria.pluck(:id))
     # first extract all criteria mappings that apply to this particular combination of departments, locations, cost centers etc
     applicable_criteria_mappings = criteria_mappings.where("(budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))
-                                                              OR budgetable_type = ? AND budgetable_id IN (?))",
+                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
+                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
+                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
+                                                              OR (budgetable_type = ? AND budgetable_id IN (?))
+                                                              OR (budgetable_type = ? AND budgetable_id IN (?))",
                                                               "Department", self.departments.pluck(:id),
                                                               "Location", self.locations.pluck(:id),
                                                               "CostCenter", self.cost_centers.pluck(:id),
                                                               "YesBankVendor", self.vendors.pluck(:id),
                                                               "User", self.users.pluck(:id),
                                                               "Category", self.categories.pluck(:id))
+
 
     # applicable_criteria_mapping_ids = criteria_mappings.with_budgetable_type("Department").with_budgetable_id(self.departments.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("CostCenter").with_budgetable_id(self.cost_centers.pluck(:id)).pluck(:id)
@@ -82,6 +89,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("User").with_budgetable_id(self.users.pluck(:id)).pluck(:id)
 
     self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
+    true
   end
 
   # these are the budgets that will finally be applied to this particular document
@@ -95,24 +103,15 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       date_type_id = budget.budget_date_type_id
       dates = get_dates_from_document(document, date_type_id)
       dates.each do |date|
-        budget_ids += budget.id if budget.within_timeframe?(date)
+        budget_ids << budget.id if budget.within_timeframe?(date)
       end
     end
     budgets = Budget.with_id(budget_ids)
     result = {
         budgets: budgets
     }
-    op["result"] = result
+    options["result"] = result
 
-      # self.applicable_budget_group_criteria.each do |budget_group_criteria|
-    #   date_type_id = budget_group_criteria.budget_group.budget_date_type_id
-    #   dates = get_dates_from_document(document, date_type_id)
-    #   dates.each do |date|
-    #     budget_group_criteria.budgets.each do |budget|
-    #       budget_ids += budget.id if budget.within_timeframe?(date)
-    #     end
-    #   end
-    # end
   end
 
 
@@ -126,6 +125,8 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         dates << document.created_at.to_date
       when BudgetDateType.id_for(:entity_submitted_at)
         dates << document.submitted_at.to_date
+      else
+        dates << document.created_at.to_date
       end
     when "Report"
       case date_type_id
@@ -135,6 +136,8 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         dates += document.expenses.pluck(:created_at).map(&:to_date)
       when BudgetDateType.id_for(:entity_submitted_at)
         dates << document.submitted_at
+      else
+        dates << document.created_at.to_date
       end
     when "Invoice"
       case date_type_id
@@ -144,6 +147,8 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         dates << document.created_at
       when BudgetDateType.id_for(:entity_submitted_at)
         dates << document.submitted_at
+      else
+        dates << document.created_at.to_date
       end
     when "BankPaymentRequest"
       case date_type_id
@@ -153,6 +158,8 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         dates << document.created_at
       when BudgetDateType.id_for(:entity_submitted_at)
         dates << document.submitted_at
+      else
+        dates << document.created_at.to_date
       end
     end
 
