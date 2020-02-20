@@ -1,6 +1,6 @@
 class BudgetManager::BudgetsTrb::Ops::Update < Transactions::API
 
-  attr_accessor :budget_group
+  attr_accessor :budget_group, :original_amount, :budget_modification_type_id
 
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
@@ -22,20 +22,30 @@ class BudgetManager::BudgetsTrb::Ops::Update < Transactions::API
   # this step actually persists the Model
   step Contract::Persist()
 
+  step :add_modification_trails!
+
   def setup_budget_values!(options, params:, model:, **)
     type = params.dig("budget", "type")
+    budget_amount = model.budget_amount&.value
     change_amount = params.dig("budget", "budget_amount", "value").to_f
     case type
     when "reduce"
-      budget_amount = model.budget_amount&.value
       new_budget_amount = budget_amount.to_f - change_amount
       params["budget"]["budget_amount"] = {"value" => new_budget_amount}
+      self.budget_modification_type_id = BudgetModificationAction.id_for(:reduce_amount)
     else
-      budget_amount = model.budget_amount&.value
       new_budget_amount = budget_amount.to_f + change_amount
       params["budget"]["budget_amount"] = {"value" => new_budget_amount}
+      self.budget_modification_type_id = BudgetModificationAction.id_for(:add_amount)
     end
     true
+  end
+
+  def add_modification_trails!(options, current_user:, model:, **)
+    budget = model
+    budget.budget_modification_trails.build(action_user_id: current_user.id,
+                                            action_id: self.budget_modification_type_id,
+                                            current_value: budget.budget_amount&.value).save
   end
 
 end
