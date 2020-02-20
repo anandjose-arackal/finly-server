@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Mailers::ReturnControl < Notifier::Mailer
+class Docs::P2P::CreditNotes::Mailers::ReturnControl < Docs::P2P::CreditNotes::Mailers::Base
 
   # 'returned_control_by', 'returned_control_from'
 
@@ -10,11 +10,15 @@ class Docs::P2P::CreditNotes::Mailers::ReturnControl < Notifier::Mailer
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have returned control of the credit note #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Control Returned"
+
+    assign :sub_header do |user, params|
       "You have returned control of the credit note #{params[:record].sequence_id}"
     end
   end
@@ -29,11 +33,15 @@ class Docs::P2P::CreditNotes::Mailers::ReturnControl < Notifier::Mailer
       User.where(id: user_ids).pluck(:email)
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "#{user.name} has returned control of the credit note #{params[:record].sequence_id} to you"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Control Returned"
+
+    assign :sub_header do |user, params|
       "#{user.name} has returned control of the credit note #{params[:record].sequence_id} to you"
     end
   end

@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Mailers::TakeControl < Notifier::Mailer
+class Docs::P2P::CreditNotes::Mailers::TakeControl < Docs::P2P::CreditNotes::Mailers::Base
 
   # 'taken_control_by', 'taken_control_from'
 
@@ -10,11 +10,15 @@ class Docs::P2P::CreditNotes::Mailers::TakeControl < Notifier::Mailer
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have taken control of the credit note #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Taken Control"
+
+    assign :sub_header do |user, params|
       "You have taken control of the credit note #{params[:record].sequence_id}"
     end
   end
@@ -29,9 +33,13 @@ class Docs::P2P::CreditNotes::Mailers::TakeControl < Notifier::Mailer
       User.where(id: user_ids).pluck(:email)
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "#{user.name} has taken control of the credit note #{params[:record].sequence_id}"
     end
+
+    assign :title, "Credit Note Taken Control"
 
     assign :title do |user, params|
       "#{user.name} has taken control of the credit note #{params[:record].sequence_id}"

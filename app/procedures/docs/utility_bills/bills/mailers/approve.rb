@@ -60,7 +60,7 @@ class Docs::UtilityBills::Bills::Mailers::Approve < Docs::UtilityBills::Bills::M
       [params[:document].user&.email]
     end
 
-    assign :hero_bg_image, "bg_warning"
+    assign :hero_bg_image, "bg_success"
 
     assign :subject do |user, params|
       "#{user.name} has approved the utility bill #{params[:record].sequence_id}"

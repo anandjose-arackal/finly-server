@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
+class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers::Base
 
   # 'approved_by', 'approved_to', 'approved_for'
 
@@ -10,11 +10,15 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
       [user.email]
     end
 
+    assign :hero_bg_image, "bg_default"
+
     assign :subject do |user, params|
       "You have successfully approved the credit note #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Approved"
+
+    assign :sub_header do |user, params|
       "You have successfully approved the credit note #{params[:record].sequence_id}"
     end
   end
@@ -23,8 +27,8 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
 
     consumes_event! 'credit_note.approve'
 
-    def validate(options, document:, **)
-      return if document.approved?
+    def validate(options, params:, **)
+      return if params[:record].approved?
       true
     end
 
@@ -32,11 +36,15 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
       [params[:record].get_reviewers.pluck(:email)]
     end
 
+    assign :hero_bg_image, "bg_warning"
+
     assign :subject do |user, params|
       "#{user.name} has approved the credit note #{params[:record].sequence_id} and is awaiting your approval"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Awaiting Your Approval"
+
+    assign :sub_header do |user, params|
       "#{user.name} has approved the credit note #{params[:record].sequence_id} and is awaiting your approval"
     end
   end
@@ -45,8 +53,8 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
 
     consumes_event! 'credit_note.approve'
 
-    def validate(options, document:, **)
-      return unless document.approved?
+    def validate(options, params:, **)
+      return unless params[:record].approved?
       true
     end
 
@@ -54,11 +62,15 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Notifier::Mailer
       [params[:document].user&.email]
     end
 
+    assign :hero_bg_image, "bg_success"
+
     assign :subject do |user, params|
       "#{user.name} has approved the creidt note #{params[:record].sequence_id}"
     end
 
-    assign :title do |user, params|
+    assign :title, "Credit Note Approved"
+
+    assign :sub_header do |user, params|
       "#{user.name} has approved the credit note #{params[:record].sequence_id}"
     end
   end

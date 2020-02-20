@@ -58,7 +58,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::
       true
     end
 
-    assign :hero_bg_image, "bg_warning"
+    assign :hero_bg_image, "bg_success"
 
     assign :to do |user, params|
       [params[:document].user&.email]
