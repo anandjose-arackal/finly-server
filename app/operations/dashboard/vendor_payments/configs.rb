@@ -45,7 +45,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         request_types[:payment_agreements] = false
       end
     else
-      user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
+      if user.enforce_policy_enabled?
+        user_roles = user.policy_user_roles.joins(:policy).where({policies:{default: false}}).pluck('policy_user_roles.id').uniq
+      else
+        user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
+      end
       user_roles.each do |role_id|
         if reviewer_role_ids.include?(role_id)
           request_types[:awaiting_action] = true
