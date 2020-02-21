@@ -46,7 +46,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       end
     else
       if user.enforce_policy_enabled?
-        user_roles = user.policy_user_roles.joins(:policy).where({policies:{default: false}}).pluck('policy_user_roles.id').uniq
+        user_roles = user.policy_user_roles.joins(:policy).where({policies:{default: false}}).pluck('policy_user_roles.user_role_id').uniq
       else
         user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
       end
@@ -55,9 +55,6 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:awaiting_action] = true
         end
         case role_id
-        # when UserRole.id_for(:admin) ########## Admin role check removed as PUR usually doesn't contain admin role
-        #   request_types.keys.map {|key| request_types[key] = true }
-        #   break
         when UserRole.id_for(:purchase_request_initiator)
           request_types[:purchase_requests] = true
         when UserRole.id_for(:purchase_order_initiator)
@@ -65,14 +62,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           request_types[:approved_purchase_request_items] = true
         when UserRole.id_for(:goods_receiver)
           request_types[:grns] = true
-        # when UserRole.id_for(:invoice_initiator)
-          # request_types[:po_invoices] = true
-          # request_types[:non_po_invoices] = true
         when UserRole.id_for(:po_invoice_initiator)
           request_types[:po_invoices] = true
         when UserRole.id_for(:non_po_invoice_initiator)
           request_types[:non_po_invoices] = true
-
         when UserRole.id_for(:bank_payment_request_initiator)
           request_types[:payment_tickets] = true
         when UserRole.id_for(:bank_payment_request_creditor)
@@ -80,10 +73,6 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
           if user.company.procurement_enabled?
             request_types[:po_advances] = true
           end
-        # when UserRole.id_for(:vendor_creator)
-        #   if user.company.vendor_empanelment_workflow_enabled?
-        #     request_types[:vendors] = true
-        #   end
         when UserRole.id_for(:payment_agreement_initiator), UserRole.id_for(:agreement_invoice_initiator)
           request_types[:payment_agreements] = true
         when UserRole.id_for(:inventory_manager)
