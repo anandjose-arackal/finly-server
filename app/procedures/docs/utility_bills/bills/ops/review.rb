@@ -5,6 +5,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   step :verify_policy
   # step :set_default_params
   step :transition
+  step :post_process
 
   fail :check
 
@@ -37,6 +38,13 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
     end
 
     op.success?
+  end
+
+  def post_process(options, params:, model:, **)
+    if params[:note].present?
+      model.update(review_note: params[:note])
+    end
+    true
   end
 
 

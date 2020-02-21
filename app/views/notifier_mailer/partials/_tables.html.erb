@@ -1,15 +1,19 @@
 <% if tables.present? %>
   <% tables.each_with_index do |table, index| %>
     <div class="items-list">
-      <% if table["header"].present? %>
-        <div class="items-list-header" style="padding: 15px;border-top: 1px solid #eee;font-size: 19px;font-weight: 600;">
-          <span class="list-item-count" style="color: #e95869;">3 Expenses</span>
-          <span class="list-item-total" style="float: right;">Total : 15,829</span>
+      <% if table["header"].present? && (table["header"]["title"].present? || table["header"]["body"].present?) %>
+        <div class="items-list-header" style="padding: 15px;font-size: 19px;font-weight: 600;">
+          <% if table["header"]["title"].present? %>
+            <span class="list-item-count" style="color: #e95869;"><%= table["header"]["title"] %></span>
+          <% end %>
+          <% if table["header"]["body"].present? %>
+            <span class="list-item-total"><%= table["header"]["body"] %></span>
+          <% end %>
         </div>
       <% end %>
 
       <% if table["content"].present? %>
-        <table class="table-items-list" style="margin: 0;width: 100%;background: #edeff1;">
+        <table class="table-items-list" style="margin: 0;width: 100%;">
           <% if table["content"]["thead"].present? %>
             <thead>
             <tr>
@@ -24,8 +28,17 @@
             <tbody>
             <% table["content"]["tbody"].each do |tr| %>
               <tr>
-                <% tr.each do |cell| %>
-                  <td style="height: 70px;font-size: 13px;padding-left: 15px;padding-right: 15px;text-align: right;"><%= cell %></td>
+                <% tr.each_with_index do |cell, index| %>
+                  <td style="
+                  height: 40px;
+                      font-size: 13px;
+                      padding-left: 15px;
+                      padding-right: 15px;
+                      text-align: right;
+                      <% if index == 0 %>
+                      text-align: left;
+                      <% end %>
+                  "><%= cell %></td>
                 <% end %>
               </tr>
             <% end %>

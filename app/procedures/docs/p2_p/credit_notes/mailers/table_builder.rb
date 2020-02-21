@@ -16,6 +16,10 @@ class Docs::P2P::CreditNotes::Mailers::TableBuilder
 
   def process
     self.table = {
+        header: {
+            title: "Credit Note Details",
+            body: ""
+        },
         content: {
             thead: [],
             tbody: []
@@ -40,7 +44,7 @@ class Docs::P2P::CreditNotes::Mailers::TableBuilder
   def tbody
     [
         ["Credit Note Number", "#{record.sequence_id}"],
-        ["Vendor", "#{record.vendor&.name} - #{record.vendor.vendor_id}"],
+        ["Vendor", "#{record.vendor&.display_name} - #{record.vendor.vendor_id}"],
         ["Invoice ID", "#{record.invoice&.invoice_id}"],
         ["Invoice Number", "#{record.invoice&.invoice_number}"],
         [

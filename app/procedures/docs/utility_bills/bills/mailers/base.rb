@@ -3,4 +3,6 @@ class Docs::UtilityBills::Bills::Mailers::Base < Notifier::Mailer
     tables = []
     tables.push(Docs::UtilityBills::Bills::Mailers::TableBuilder.(params[:record]))
   end
+
+  assign :bg_icon, "ico_bill"
 end

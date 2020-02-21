@@ -26,7 +26,15 @@ class Docs::P2P::CreditNotes::Mailers::Reject < Docs::P2P::CreditNotes::Mailers:
     consumes_event! 'credit_note.reject'
 
     assign :to do |user, params|
-      [params[:document]&.user&.email]
+      [params[:record]&.user&.email]
+    end
+
+    assign :body_quote_text do |user, params|
+      params[:record].review_note
+    end
+
+    assign :body_quote_by do |user, params|
+      user.name
     end
 
     assign :hero_bg_image, "bg_danger"

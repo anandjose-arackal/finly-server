@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_15_064336) do
+ActiveRecord::Schema.define(version: 2020_02_21_081015) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -808,6 +808,7 @@ ActiveRecord::Schema.define(version: 2020_02_15_064336) do
     t.string "hsn_sac"
     t.string "quick_pay", default: "N"
     t.datetime "last_paid_at"
+    t.text "review_note"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -903,6 +904,7 @@ ActiveRecord::Schema.define(version: 2020_02_15_064336) do
     t.integer "tax_rate_id"
     t.string "hsn_sac"
     t.datetime "paid_at"
+    t.text "review_note"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -2343,6 +2345,7 @@ ActiveRecord::Schema.define(version: 2020_02_15_064336) do
     t.datetime "approved_at"
     t.string "credit_note_number"
     t.datetime "last_adjusted_at"
+    t.text "review_note"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -3624,6 +3627,7 @@ ActiveRecord::Schema.define(version: 2020_02_15_064336) do
     t.string "field_key", null: false
     t.string "value"
     t.string "value_text"
+    t.datetime "deleted_at"
     t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
     t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
     t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
@@ -7597,6 +7601,7 @@ ActiveRecord::Schema.define(version: 2020_02_15_064336) do
 
   create_table "trip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", null: false
+    t.datetime "deleted_at"
     t.index ["name"], name: "index_trip_statuses_on_name"
   end
 

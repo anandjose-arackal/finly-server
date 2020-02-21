@@ -41,7 +41,7 @@ class Docs::P2P::CreditNotes::Mailers::TakeControl < Docs::P2P::CreditNotes::Mai
 
     assign :title, "Credit Note Taken Control"
 
-    assign :title do |user, params|
+    assign :sub_header do |user, params|
       "#{user.name} has taken control of the credit note #{params[:record].sequence_id}"
     end
   end

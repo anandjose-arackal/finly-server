@@ -16,6 +16,10 @@ class Docs::UtilityBills::Subscriptions::Mailers::TableBuilder
 
   def process
     self.table = {
+        header: {
+            title: "Utility Bill Master Details",
+            body: ""
+        },
         content: {
             thead: [],
             tbody: []

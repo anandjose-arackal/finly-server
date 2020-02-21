@@ -36,13 +36,13 @@ class Docs::P2P::CreditNotes::Mailers::ReturnControl < Docs::P2P::CreditNotes::M
     assign :hero_bg_image, "bg_default"
 
     assign :subject do |user, params|
-      "#{user.name} has returned control of the credit note #{params[:record].sequence_id} to you"
+      "#{user.name} has returned control of the credit note #{params[:record].sequence_id}"
     end
 
     assign :title, "Credit Note Control Returned"
 
     assign :sub_header do |user, params|
-      "#{user.name} has returned control of the credit note #{params[:record].sequence_id} to you"
+      "#{user.name} has returned control of the credit note #{params[:record].sequence_id} & is awaiting your approval"
     end
   end
 end

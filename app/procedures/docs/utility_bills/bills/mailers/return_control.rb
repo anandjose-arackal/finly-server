@@ -11,7 +11,7 @@ class Docs::UtilityBills::Bills::Mailers::ReturnControl < Docs::UtilityBills::Bi
     assign :hero_bg_image, "bg_default"
 
     assign :subject do |user, params|
-      "You have taken control of the utility bill #{params[:record].sequence_id}"
+      "You have returned control of the utility bill #{params[:record].sequence_id}"
     end
 
     assign :title, "Utility Bill Control Returned"
