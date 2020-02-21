@@ -83,7 +83,6 @@ json.budget_trail_items do
         json.name purchase_request_item.purchase_request.description
         json.location purchase_request_item.purchase_request.location&.name
         json.department purchase_request_item.purchase_request.department&.name
-        json.sub_department purchase_request_item.purchase_request.sub_department&.name
         json.amount purchase_request_item.estimated_amount&.value
         json.date purchase_request_item.created_at&.to_date
       end
