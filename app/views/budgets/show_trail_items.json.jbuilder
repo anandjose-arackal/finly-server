@@ -9,7 +9,7 @@ expenses = Expense.all.limit(10)
 payments = Payment.all.limit(10)
 purchase_request_items = PurchaseRequestItem.all.limit(10)
 purchase_order_items = PurchaseOrderItem.all.limit(10)
-invoice_items = InvoiceLineItem.all.limit(10)
+invoice_items = InvoiceLineItem.all.where(parent_type: "Invoice").limit(10)
 
 json.budget_trail_items do
   index = 1
