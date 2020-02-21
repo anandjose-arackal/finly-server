@@ -407,6 +407,7 @@ class Budget < ApplicationRecord
     budget_consumption = self.budget_consumption
     # TODO - tempoorary
     budget_consumption.budget_amount.update(value: self.budget_amount.value)
+    budget_consumption.remaining_amount.update(value: self.budget_amount.value)
     # TODO - call to Budgets Computer that updates this particular budget
   end
 
