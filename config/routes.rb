@@ -1610,10 +1610,10 @@
 #                                          process_template_file POST   /budgets/:budget_id/process_template_file(.:format)                                                                 budgets#process_template_file
 #                                                    sub_budgets GET    /budgets/:id/children(.:format)                                                                                     budgets#sub_budgets
 #                                            bulk_update_budgets POST   /budgets/bulk_update(.:format)                                                                                      budgets#bulk_update
+#                                                    trail_items GET    /budgets/:id/trail_items(.:format)                                                                                  budgets#show_trail_items
 #                                              budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                           budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                                  budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
-#                                             budget_trail_items GET    /budgets/:budget_id/trail_items(.:format)                                                                           budgets#show_trail_items
 #                                                        budgets GET    /budgets(.:format)                                                                                                  budgets#index
 #                                                                POST   /budgets(.:format)                                                                                                  budgets#create
 #                                                     new_budget GET    /budgets/new(.:format)                                                                                              budgets#new
@@ -1778,6 +1778,7 @@
 #                          procure_inward_invoice_apply_template POST   /procure/inward_invoices/:inward_invoice_id/apply_template(.:format)                                                procure/inward_invoices#template_apply
 #                                  procure_inward_invoice_delete DELETE /procure/inward_invoices/:inward_invoice_id/delete(.:format)                                                        procure/inward_invoices#destroy
 #                             procure_inward_invoice_save_submit PUT    /procure/inward_invoices/:inward_invoice_id/save_submit(.:format)                                                   procure/inward_invoices#save_submit
+#                                    procure_inward_invoice_void PUT    /procure/inward_invoices/:inward_invoice_id/void(.:format)                                                          procure/inward_invoices#void
 #                                        procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#index
 #                                                                POST   /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#create
 #                                     new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                              procure/inward_invoices#new
@@ -1957,6 +1958,7 @@
 #                            bbps_subscription_update_and_submit PUT    /bbps/subscriptions/:subscription_id/update_and_submit(.:format)                                                    bbps/subscriptions#update_and_submit
 #                                     bbps_subscription_add_bill PATCH  /bbps/subscriptions/:subscription_id/add_bill(.:format)                                                             bbps/subscriptions#add_bill
 #                                   bbps_subscription_fetch_bill GET    /bbps/subscriptions/:subscription_id/fetch_bill(.:format)                                                           bbps/subscriptions#fetch_bill
+#                        bbps_subscription_fetch_and_create_bill PATCH  /bbps/subscriptions/:subscription_id/fetch_and_create_bill(.:format)                                                bbps/subscriptions#fetch_and_create_bill
 #                                             bbps_subscriptions GET    /bbps/subscriptions(.:format)                                                                                       bbps/subscriptions#index
 #                                                                POST   /bbps/subscriptions(.:format)                                                                                       bbps/subscriptions#create
 #                                          new_bbps_subscription GET    /bbps/subscriptions/new(.:format)                                                                                   bbps/subscriptions#new
@@ -3854,11 +3856,12 @@ Rails.application.routes.draw do
   get 'budgets/:id/children', to: 'budgets#sub_budgets', as: :sub_budgets
   post 'budgets/bulk_update', to: 'budgets#bulk_update', as: :bulk_update_budgets
   ## Budget apis start ##
+
+  get 'budgets/:id/trail_items', to: 'budgets#show_trail_items', as: :trail_items
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
     patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
     get 'modification_trails', to: 'budgets#trails', as: :trails
-    get 'trail_items', to: 'budgets#show_trail_items', as: :trail_items
   end
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 

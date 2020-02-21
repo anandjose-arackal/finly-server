@@ -19,8 +19,12 @@ class BudgetsController < BaseControllers::WebBase
 
   # TODO - have to move this to TRB
   def show_trail_items
-    @result = Budgets::ShowTrailItems.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::ShowTrailItems
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::ShowTrailItems.(current_user, params)
+    # respond
   end
 
   def sub_budgets

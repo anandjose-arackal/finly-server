@@ -1,7 +1,7 @@
 # this vanilla operation will be called with Name.({"budget": budget})
 # which will make the budgets object available inside the options hash
 
-class BudgetManager::BudgetsCalculator::BudgetsComputer < Transactions::API
+class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transactions::API
 
 
   attr_accessor :budget, :budget_trails, :budget_consumption,

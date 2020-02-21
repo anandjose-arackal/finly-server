@@ -1,4 +1,4 @@
-class BudgetManager::BudgetsTrb::ShowTrailItems < Transactions::API
+class BudgetManager::BudgetsTrb::Ops::ShowTrailItems < Transactions::API
 
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
@@ -14,10 +14,11 @@ class BudgetManager::BudgetsTrb::ShowTrailItems < Transactions::API
   def retrieve_trail_items!(options, model:, **)
     budget = model
     # calling the budgets computer model that computes the budgets for me
-    op = BudgetManager::BudgetsCalculator::BudgetsComputer.({budget: budget})
-    if op.success?
-      options["result"] = op["result"]
-    end
+    # TODO - uncomment the below once done
+    # op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget})
+    # if op.success?
+    #   options["result"] = op["result"]
+    # end
     true
   end
 end
