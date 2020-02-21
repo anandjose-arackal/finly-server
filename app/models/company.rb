@@ -417,6 +417,10 @@ class Company < ApplicationRecord
     self.feature_subscription.utility_bills_enabled
   end
 
+  def normal_login_blocked?
+    self.feature_subscription.sso_login_enforced
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|

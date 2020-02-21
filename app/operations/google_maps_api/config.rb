@@ -1,4 +1,4 @@
-class GoogleMaps::Config < BaseOperation
+class GoogleMapsApi::Config < BaseOperation
   attr_accessor :token
 
   def pre_validate
@@ -25,10 +25,10 @@ class GoogleMaps::Config < BaseOperation
   end
 
   def success
-    GoogleMaps::Config::Success.new(user, {token: self.token}, messages)
+    GoogleMapsApi::Config::Success.new(user, {token: self.token}, messages)
   end
 
-  class GoogleMaps::Config::Success < BaseOperation::BasePresenter::SuccessPresenter
+  class GoogleMapsApi::Config::Success < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :token
 
     def init

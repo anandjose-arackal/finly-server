@@ -1,4 +1,4 @@
-class BudgetManager::BudgetsTrb::Deactivate < Transactions::API
+class BudgetManager::BudgetsTrb::Ops::Deactivate < Transactions::API
 
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)

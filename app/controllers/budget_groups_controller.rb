@@ -31,7 +31,7 @@ class BudgetGroupsController < BaseControllers::WebBase
   end
 
   def destroy
-    endpoint BudgetManager::BudgetGroups::Deactivate
+    endpoint BudgetManager::BudgetGroups::Ops::Deactivate
     respond_to do |format|
       format.json {}
     end

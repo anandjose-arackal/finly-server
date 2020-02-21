@@ -18,6 +18,7 @@
 #  end_date            :datetime
 #  deleted_at          :datetime
 #  budget_date_type_id :integer
+#  active              :boolean          default(TRUE)
 #
 
 class BudgetGroup < ApplicationRecord
@@ -82,6 +83,10 @@ class BudgetGroup < ApplicationRecord
       year = Date.today.year
     end
     where('extract(year from start_date) = ? OR extract(year from end_date) = ?', year, year)
+  }
+
+  scope :active, -> {
+    where active: true
   }
 
   def as_json(options = {})

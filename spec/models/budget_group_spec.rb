@@ -18,6 +18,7 @@
 #  end_date            :datetime
 #  deleted_at          :datetime
 #  budget_date_type_id :integer
+#  active              :boolean          default(TRUE)
 #
 
 require 'rails_helper'
