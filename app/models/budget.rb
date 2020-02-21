@@ -251,6 +251,7 @@ class Budget < ApplicationRecord
   {
       id: id,
       name: name,
+      active: active,
       start_date: start_date&.strftime("%d-%b-%y"),
       end_date: end_date&.strftime("%d-%b-%y"),
       budget_amount: budget_consumption.budget_amount.as_json,
@@ -387,7 +388,7 @@ class Budget < ApplicationRecord
                 currency: Currency.first
             },
             remaining_amount_attributes: {
-                value: 0,
+                value: self.budget_amount.value,
                 currency: Currency.first
             },
             total_consumed_amount_attributes: {

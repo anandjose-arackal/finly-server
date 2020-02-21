@@ -2,7 +2,8 @@ class BudgetManager::BudgetGroupCriteria::Ops::Index < Transactions::API
 
   include HasScope
 
-  has_scope
+  has_scope :filter_search
+
   # the below line accepts a bunch of roles and allows only users with those roles to do this action
   step Transactions::Authorization::Roles(:budget_manager, :admin)
 

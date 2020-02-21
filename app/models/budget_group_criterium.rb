@@ -115,6 +115,10 @@ class BudgetGroupCriterium < ApplicationRecord
     end
   }
 
+  scope :filter_search, -> (term) {
+    where('name like ?', "%#{term}%")
+  }
+
   # this will hold data about all the different time ranges of this particular
   # budget criteria - so it will contain details of the budgets will the different timeframes
   def as_json(options = {})

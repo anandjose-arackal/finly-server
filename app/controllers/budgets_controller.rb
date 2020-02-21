@@ -4,22 +4,16 @@ class BudgetsController < BaseControllers::WebBase
 
   def index
     endpoint BudgetManager::BudgetsTrb::Ops::Index
-    # @result = BudgetManager::BudgetsTrb::Ops::Index.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
-    # @result = Budgets::Index.(current_user, params)
-    # respond
   end
 
   def show
     endpoint BudgetManager::BudgetsTrb::Ops::Show
-    # @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
-    # @result = Budgets::Show.(current_user, params)
-    # respond
   end
 
 
@@ -31,32 +25,23 @@ class BudgetsController < BaseControllers::WebBase
 
   def sub_budgets
     endpoint BudgetManager::BudgetsTrb::Ops::Show
-    # @result = BudgetManager::BudgetsTrb::Ops::Show.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
-    # @result = Budgets::SubBudgets.(current_user, params)
-    # respond
   end
 
   def create
     endpoint BudgetManager::BudgetsTrb::Ops::Create
-    # @result = BudgetManager::BudgetsTrb::Ops::Create.(params.to_unsafe_h, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
-    # @result = Budgets::Create.(current_user, params)
-    # respond
   end
 
   def update
     endpoint BudgetManager::BudgetsTrb::Ops::Update
-    # @result = BudgetManager::BudgetsTrb::Ops::Update.(params, "current_user" => current_user)
     respond_to do |format|
       format.json {}
     end
-    # @result = Budgets::Update.(current_user, params)
-    # respond
   end
 
   def bulk_update
@@ -69,8 +54,12 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def destroy
-    @result = Budgets::Destroy.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Deactivate
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Destroy.(current_user, params)
+    # respond
   end
 
   # def configuration
