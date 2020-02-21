@@ -1,5 +1,5 @@
 budget = @op["model"]
-json.extract! budget, :id, :name, :user
+json.extract! budget, :id, :name, :user, :active
 
 json.applicable_entities do
   json.purchase_order budget.purchase_order
