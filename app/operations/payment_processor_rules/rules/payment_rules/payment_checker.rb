@@ -14,6 +14,8 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
           if precision_value(processed_amount + payment.amount_value) > precision_value(invoice.balance_due&.value.to_f)
             add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
             message "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
+            # also marking the payment as failed here
+            payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             fail
           end
         end
@@ -28,6 +30,8 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
           if precision_value(processed_amount + payment.amount_value) > precision_value(purchase_order.advance_amount&.value)
             add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the PO Advance amount"
             message "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the PO Advance amount"
+            # also marking the payment as failed here
+            payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             fail
           end
         end
@@ -64,13 +68,14 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         bank_transactions = payment.reference_resources
         # what we're doing below is that unless all previous bank_transactions have a failed or rejected status
         # the API call for this payment shall not happen
-        if bank_transactions.present?
+        bank_transactions.each do |bank_transaction|
 
           # TODO - call the common status checker class and update the status of this bank transaction
 
-          unless bank_transactions.pluck(:transfer_status_id).uniq.sort == BankTransferStatus.ids_for(:failed, :rejected)
+          unless BankTransferStatus.ids_for(:failed, :rejected).include?(bank_transaction.transfer_status_id)
             add_system_message :error, payment, "Payment cannot be processed as there is a pending transaction for this payment with the bank"
             message "Payment cannot be processed as there is a pending transaction for this payment with the bank"
+            payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             fail
           end
         end
@@ -88,7 +93,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         bank_transaction = params[:bank_transaction]
         payment = params[:payment]
         # i.e. unless this bank transaction has been persisted, it's an error
-        unless bank_transaction.exists?
+        unless bank_transaction.persisted?
           payment.system_messages.build(
               content: "Payment cannot be processed at this time - #{bank_transaction.errors.full_messages.to_sentence}",
               system_message_type_id: SystemMessageType.id_for(:error).save

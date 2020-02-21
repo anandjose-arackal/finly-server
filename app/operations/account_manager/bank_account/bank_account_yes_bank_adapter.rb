@@ -57,7 +57,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     # created inside this adapter. Also logging the errors for this particular state
     op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 
@@ -65,7 +65,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     # previous bank transactions have failed
     op = PaymentProcessorRules::Event.(:ensure_all_previous_payments_have_failed, {payment: payment, options: options})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 
@@ -80,7 +80,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     # checking to ensure that two bank transactions having the same ID can't be present for a single payment
     op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 

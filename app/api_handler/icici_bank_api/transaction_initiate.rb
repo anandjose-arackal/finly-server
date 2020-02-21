@@ -70,7 +70,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: self.icici_bank_transaction.unique_reference_number.to_s,
+        UNIQUEID: self.icici_bank_transaction.unique_request_number.to_s,
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
         CREDITACC: self.receiving_account.account_number,
         # CREDITACC: "000405002777",

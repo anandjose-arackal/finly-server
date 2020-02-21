@@ -55,6 +55,10 @@ class BbpsYesBankTransaction < ApplicationRecord
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
   delegate :amount_value, to: :amount
 
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
+
   # stub method for reference number that is generated at bank's end
   def bank_reference_number
     self.bbps_ref_id

@@ -70,6 +70,10 @@ class IciciBankTransaction < ApplicationRecord
     where(transfer_type: "RTG")
   }
 
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
+
   def bank_reference_number
     self.utr
   end

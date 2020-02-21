@@ -34,7 +34,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
     op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 
@@ -54,7 +54,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     # created inside this adapter. Also logging the errors for this particular state
     op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 

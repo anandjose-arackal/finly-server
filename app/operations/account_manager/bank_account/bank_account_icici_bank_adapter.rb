@@ -34,7 +34,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
     op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 
@@ -52,12 +52,12 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     end
 
 
-    # ensure that a new bank transction is created inside the payments adapter
-    # the below case will be reached only if the particular bank transction is not
+    # ensure that a new bank transaction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transaction is not
     # created inside this adapter. Also logging the errors for this particular state
     op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return false
     end
 
@@ -72,7 +72,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # checking to ensure that two bank transactions having the same ID can't be present for a single payment
     op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
     unless op.success?
-      add_message :error, op.message
+      self.errors << op.message
       return
     end
 

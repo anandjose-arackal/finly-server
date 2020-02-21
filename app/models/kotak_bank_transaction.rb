@@ -53,6 +53,10 @@ class KotakBankTransaction < ApplicationRecord
     where(transfer_status_id: BankTransferStatus.id_for(:completed))
   }
 
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
+
   scope :status_check_required, -> {
     where transfer_status_id: [
         BankTransferStatus.id_for(:completed),
