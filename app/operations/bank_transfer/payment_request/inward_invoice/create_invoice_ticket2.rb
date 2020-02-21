@@ -161,6 +161,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return false
       end
 
+      if invoice.voided?
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, has been \"Voided\". Please remove them before creating a payment ticket."
+        return
+      end
+
       if total_payments >= invoice_amount.round(2)
         # invoice.update payable: false
         self.update_payable_for_invoices << invoice.id

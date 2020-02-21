@@ -11,6 +11,7 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  section_type :string(255)
+#  deleted_at   :datetime
 #
 
 class FormSection < ApplicationRecord
