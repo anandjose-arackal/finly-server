@@ -39,6 +39,7 @@ erd.pdf
 /public/system/company_configurations/*
 /public/system/company_kycs/*
 /public/system/individual_kycs/*
+/public/system/attachments/*
 /public/system/payment_order_attachments/*
 /public/system/agreements/*
 /public/system/invoice_attachments/*
