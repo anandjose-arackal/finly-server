@@ -4,7 +4,7 @@
     <legend align="center" style="padding: 10px;">
       <% if Rails.env.production? %>
         <% if payload["body_quote_icon"].present? %>
-          <img src="/common/images/mailers/icons/<%= payload["hero_bg_icon"] %>.png" style="width: 40px;">
+          <img src="/common/images/mailers/icons/<%= payload["body_quote_icon"] %>.png" style="width: 40px;">
         <% else %>
           <img src="http://localhost:3001/common/images/mailers/icons/icon_quote_rejection.png" style="width: 40px;">
         <% end %>
