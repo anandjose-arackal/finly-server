@@ -208,7 +208,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
-        'UNIQUE_REFERENCE_NUMBER' => self.bank_transaction.unique_reference_number,
+        'UNIQUE_REFERENCE_NUMBER' => self.bank_transaction.unique_request_number,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,

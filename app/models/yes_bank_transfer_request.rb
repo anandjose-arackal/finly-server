@@ -27,12 +27,12 @@ class YesBankTransferRequest < NonPersistentModel
         transfer_type: get_transfer_type(transfer_type, ifsc),
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
-        unique_reference_number: set_unique_reference(unique_reference_number),
+        unique_reference_number: set_unique_reference(unique_reference_number, transfer_type, beneficiary_account_number),
         company_id: company_id
     })
   end
 
-  def self.set_unique_reference(unique_reference_number)
+  def self.set_unique_reference(unique_reference_number, transfer_type, beneficiary_account_number)
     if unique_reference_number.present?
       return unique_reference_number
     end
@@ -40,7 +40,7 @@ class YesBankTransferRequest < NonPersistentModel
     loop do
       ref = "FINLY#{transfer_type&.upcase}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
       if YesBankTransaction.find_by(unique_request_number: ref).blank?
-        self.unique_reference_number = ref
+        return ref
         break
       end
     end
@@ -83,5 +83,7 @@ class YesBankTransferRequest < NonPersistentModel
     end
     transfer_type
   end
+
+  alias_method :unique_request_number, :unique_reference_number
 
 end

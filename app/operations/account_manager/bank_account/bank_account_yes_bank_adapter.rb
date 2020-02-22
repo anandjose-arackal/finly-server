@@ -28,6 +28,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
+    # in the case of yes bank since the same unique ID can be reused,
+    # we will not be creating any new bank transactions
     bank_transaction = payment.reference_resources.first
 
     # if the payment is either completed, processing or a possible failure, it cannot be processed
@@ -207,7 +209,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.unique_request_number,
+    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
