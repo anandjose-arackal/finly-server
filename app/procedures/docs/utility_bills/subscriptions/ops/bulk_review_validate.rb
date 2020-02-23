@@ -27,7 +27,7 @@ class Docs::UtilityBills::Subscriptions::Ops::BulkReviewValidate < Transactions:
   def validate(options, current_user:, params:, records:, **)
     result = []
     records.each do |record|
-      policy = Docs::UtilityBills::Bills::Authorizer.new(current_user, record)
+      policy = Docs::UtilityBills::Subscriptions::Authorizer.new(current_user, record)
 
       data = record.as_json
       data["can_perform"] = policy.send((params['action_type'].to_s + '?').to_sym)

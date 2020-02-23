@@ -88,6 +88,13 @@ class BbpsBill < ApplicationRecord
 
   default_scope {order('bbps_bills.created_at DESC')}
 
+  scope :with_ids, -> (ids) {
+    where(id: ids)
+  }
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
   scope :filter_status, -> (status) {
     case status
     when 'payables', :payables
