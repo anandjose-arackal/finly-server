@@ -11,4 +11,19 @@ class ActionsManager::Master::Bbps::Bills::Index < ActionsManager::Master::Base
     false
   end
 
+  def bulk_approve
+    user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) || user.vendor_payment_admin?
+  end
+
+  def bulk_reject
+    user.has_policy_role?(UserRole.id_for(:utility_bill_reviewer)) || user.vendor_payment_admin?
+  end
+
+  def bulk_take_control
+    user.vendor_payment_admin?
+  end
+
+  def bulk_return_control
+    user.vendor_payment_admin?
+  end
 end
