@@ -116,7 +116,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   scope :includes_for_index, -> {
-    includes(:pocs)
+    includes(:pocs, :department, :cost_center, :policy, :location, :biller, :status, :category, :user, :attachments, :tax_rate)
   }
 
   scope :filter_department_id, -> (id) {
