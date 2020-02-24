@@ -65,11 +65,11 @@ json.result do
     json.created_by invoice.created_by&.name
     json.created_at invoice.created_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.po_date invoice_line_item.purchase_order_item&.purchase_order&.created_at&.strftime("%Y-%m-%d %H:%M:%S")
-    json.gl_code invoice_line_item.inventory_line_item.category.gl_code rescue nil
+    json.gl_code invoice_line_item.inventory_line_item&.category&.gl_code rescue nil
     json.gst_type invoice.gst_type&.name&.titleize rescue nil
     json.line_item_type invoice_line_item&.inventory_line_item&.supply_item_type&.name&.humanize
     json.line_item_expense_type invoice_line_item&.inventory_line_item&.item_expense_type&.name&.humanize
-    json.nature_of_item invoice_line_item&.invoice_line_item&.product_type&.name&.humanize
+    json.nature_of_item invoice_line_item&.inventory_line_item&.product_type&.name&.humanize
 
     # extra fields
     json.buyer_location_state invoice.location&.state&.name
