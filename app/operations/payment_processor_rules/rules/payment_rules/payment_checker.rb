@@ -9,7 +9,8 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         payment = params[:payment]
         if payment.parent_type == "Invoice"
           invoice = payment.parent
-          successful_payments = invoice.payments.all_except_failed
+          # i.e. includes all payments except the one being considered right now
+          successful_payments = invoice.payments.without_id(payment.id).all_except_failed
           processed_amount = successful_payments.joins(:amount).sum(:value).to_f
           if precision_value(processed_amount + payment.amount_value) > precision_value(invoice.balance_due&.value.to_f)
             add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this invoice exceeds the invoice amount"
@@ -25,7 +26,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
         payment = params[:payment]
         if payment.parent_type == "PurchaseOrder"
           purchase_order = payment.parent
-          successful_payments = purchase_order.advance_payments.all_except_failed
+          successful_payments = purchase_order.advance_payments.without_id(payment.id).all_except_failed
           processed_amount = successful_payments.joins(:amount).sum(:value).to_f
           if precision_value(processed_amount + payment.amount_value) > precision_value(purchase_order.advance_amount&.value)
             add_system_message :error, payment, "This payment cannot be processed as the sum total of payments against this PO Advance exceeds the PO Advance amount"
@@ -45,18 +46,11 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
 
       rule "Payments must not have multiple bank transactions generated within a span of 10 minutes" do
         payment = params[:payment]
-        bank_transactions = payment.reference_resources
-        first_bank_transaction = payment.reference_resources.first
-        if bank_transactions.count > 1
-          first_created_at = first_bank_transaction.created_at
-          bank_transactions.without_id(first_bank_transaction.id).each do |bank_transaction|
-            if bank_transaction.created_at - first_created_at > 10.minutes
-              add_system_message :error, payment, "Payment cannot be processed at the moment as there is another transaction in process for this payment"
-              message "Payment cannot be processed at the moment as there is another transaction in process for this payment"
-              fail
-            end
-            first_created_at = bank_transaction.created_at
-          end
+        latest_bank_transaction = payment.reference_resources.first # this gives the latest transaction because the reference_resources are returned in descending order of created_at
+        if DateUtils.local_date_time - latest_bank_transaction.created_at < 10.minutes
+          add_system_message :error, payment, "Payment cannot be processed at the moment as there is another transaction in process for this payment"
+          message "Payment cannot be processed at the moment as there is another transaction in process for this payment"
+          fail
         end
       end
     end
@@ -78,6 +72,20 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
             payment.update(payment_status_id: PaymentStatus.id_for(:failed))
             fail
           end
+        end
+      end
+    end
+
+    premise :yes_bank_payments_cannot_have_multiple_bank_transactions do
+
+      # the below rule is because yes bank allows multiple retries with the same reference number, a facility not provided by other banks
+      rule "For a given YesBank payment, once cannot have more than one bank transaction" do
+        payment = params[:payment]
+        if payment.reference_resources.count > 1
+          add_system_message :error, payment, "Payment cannot be retried at this moment"
+          message "Payment cannot be retried at this moment"
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+          fail
         end
       end
     end

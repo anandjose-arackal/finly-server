@@ -38,6 +38,13 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       return false
     end
 
+    # checking to ensure that two bank transactions cannot be retried in quick succession - minimum time pf 10 minutes required before each retry
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return
+    end
+
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated

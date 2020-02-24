@@ -46,6 +46,14 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
+    # Check for two bank transactions is not an issue here because YesBank supports retries with the same reference number
+    # However, as a result we need to add a check to ensure that there is only one bank transaction against it
+    op = PaymentProcessorRules::Event.(:yes_bank_payments_cannot_have_multiple_bank_transactions, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
     if bank_transaction.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
@@ -78,13 +86,6 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     #   )
     #   return false
     # end
-
-    # checking to ensure that two bank transactions having the same ID can't be present for a single payment
-    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
-    unless op.success?
-      self.errors << op.message
-      return false
-    end
 
     op = YesBankApi::Transfer::BankTransfer.({
         transfer_request: transfer_request,
@@ -226,6 +227,9 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
      unless bank_transaction.update(reference_payment_id: payment.id)
        Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
      end
+
+     # additionally also update the payment reference_resource_type to YesBankTransaction
+     payment.update(reference_resource_type: payment.company&.feature_subscription&.bank_transaction_class)
 
     # payment.with_lock do
     #   if payment.reference_resource.present?

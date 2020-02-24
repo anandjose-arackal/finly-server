@@ -26,7 +26,7 @@ class AccountManager::IciciBankAccount::IciciBankCompanyAccountAdapter < Account
 
   def balance(options = {})
     # TODO - remove the below line later
-    return 99999999999999999
+    return 99999999999999999 if Rails.env.development?
     return 99999999999999999 if options[:payment_process]
     self.company = self.account.company
     handle = self.object_id
