@@ -815,6 +815,8 @@ class Payment < ApplicationRecord
 
         if total_payments < invoice_amount
           parent_details.update payable: true
+        else
+          parent_details.update payable: false
         end
       end
     end

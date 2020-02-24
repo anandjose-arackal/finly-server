@@ -1269,7 +1269,7 @@ class User < ApplicationRecord
   end
 
   def enforce_policy_enabled?
-    self.enforce_policy.enabled
+    self.enforce_policy&.enabled
   end
 
   def superadmin?
