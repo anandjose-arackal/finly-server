@@ -3859,6 +3859,7 @@ Rails.application.routes.draw do
       post 'apply_template', to: 'inward_invoices#template_apply'
       delete 'delete', to: 'inward_invoices#destroy'
       put 'save_submit', to: 'inward_invoices#save_submit'
+      put 'void', to: 'inward_invoices#void'
     end
 
     resources :delivery_challans
@@ -4005,6 +4006,7 @@ Rails.application.routes.draw do
       put 'update_and_submit', to: 'subscriptions#update_and_submit'
       patch 'add_bill', to: 'subscriptions#add_bill'
       get 'fetch_bill', to: 'subscriptions#fetch_bill'
+      patch 'fetch_and_create_bill', to: 'subscriptions#fetch_and_create_bill'
     end
 
     get 'bills/edit_config', to: 'bills#edit_config'

@@ -5,6 +5,7 @@
 #  id           :integer          not null, primary key
 #  name         :string(255)
 #  abbreviation :string(255)
+#  deleted_at   :datetime
 #
 
 class ChannelType < ApplicationRecord

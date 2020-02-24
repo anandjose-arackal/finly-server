@@ -258,8 +258,8 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   end
 
   # def team
-    # return nil unless user.manager? || user.finance_manager?
-    # user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
+  # return nil unless user.manager? || user.finance_manager?
+  # user.finance_manager? ? team_settlements&.merge({name: "Team"}) : team_users&.merge({name: "Team"})
 
   # end
 
@@ -293,16 +293,18 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   def delegator?
     # when actual current user present, we disallow any non-personal navigation in the app.
     return false if RequestStore.store[:actual_current_user].blank?
-    block = proc { return nil }
+    block = proc {return nil}
 
     # here define all methods which you want to show for the delegated user
     all_actions = allowed_tabs + allowed_menus + allowed_modules
 
-    all_actions.each {|action| override_actions(self, action, block) }
+    all_actions.each {|action| override_actions(self, action, block)}
   end
 
   def override_actions(obj, action, block)
-    klass = class << obj; self; end
+    klass = class << obj;
+      self;
+    end
     klass.send(:define_method, action, block)
   end
 
@@ -323,7 +325,12 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
 
   def get_structure(section)
     # flatten the nav structure
-    self.data_map[self.class.name][section].map {|a| r = []; if a.is_a?(Hash) then r << a.keys; r << a.values else r << a end}.flatten.compact
+    self.data_map[self.class.name][section].map {|a| r = [];
+    if a.is_a?(Hash) then
+      r << a.keys; r << a.values
+    else
+      r << a
+    end}.flatten.compact
   end
 
 

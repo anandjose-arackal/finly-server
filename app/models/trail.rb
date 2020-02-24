@@ -6,7 +6,6 @@
 #  parent_id                 :integer
 #  parent_type               :string(255)
 #  action_user_id            :integer
-#  action_user_type          :string(255)
 #  action_id                 :integer
 #  action_user_role_id       :integer
 #  action_level_id           :integer
@@ -19,6 +18,7 @@
 #  original_track_type       :string(255)
 #  original_track_id         :integer
 #  cash_on_hand_deduction_id :integer
+#  deleted_at                :datetime
 #
 
 class Trail < ApplicationRecord

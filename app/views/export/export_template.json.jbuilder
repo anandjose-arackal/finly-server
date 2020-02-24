@@ -1,1 +1,1 @@
-json.file_url  @result.file_url
+json.file_url @result.file_url
