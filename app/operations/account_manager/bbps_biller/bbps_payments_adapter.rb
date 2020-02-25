@@ -117,8 +117,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   private
 
   def create_bbps_bank_transaction(payment)
-    if payment.reference_resource.present?
-      return payment.reference_resource
+    if payment.reference_resources.present?
+      return payment.reference_resources.first
     end
     bill = payment.parent
     bank_transaction = payment.company.bbps_yes_bank_transactions.build(
