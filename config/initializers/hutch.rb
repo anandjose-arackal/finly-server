@@ -1,6 +1,6 @@
-if Rails.env.development?
-  Hutch.connect
-end
+# if Rails.env.development?
+#   Hutch.connect
+# end
 # Todo handle production
 # if Rails.env.production? and File.exists?("#{Rails.root}/config/bunny.yml")
 #   bunny_config = Rails.application.config_for(:bunny)&.with_indifferent_access

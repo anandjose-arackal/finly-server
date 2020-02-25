@@ -27,7 +27,7 @@ class Exposures::API::Attribute
             value = record.send(name)
           end
         else
-          value = block.call
+          value = instance_eval &block
         end
 
         return value unless exposure

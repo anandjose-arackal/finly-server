@@ -5,6 +5,7 @@ class InvoiceExposure < Exposures::API
   attribute :vendor_location, record_attribute: :gstin_location, exposure: true, includes: [:gstin_location]
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
   attribute :date, record_attribute: true
+  attribute :due_date, record_attribute: true
   attribute :approved_at, record_attribute: true
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
@@ -22,8 +23,9 @@ class InvoiceExposure < Exposures::API
   attribute :tds_amount, includes: [:tds_amount] do
     record.tds_amount&.value || 0
   end
-  attribute :tds_slab, record_attribute: true, exposure: true
-  attribute :line_items, record_attribute: :invoice_items, exposure: true
+  attribute :tds_slab, record_attribute: true, exposure: true, includes: [:tds_slab]
+  # Fixme: Performance incase the number of line items it high
+  attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:line_items]
 
   attribute :po_number, includes: [{procurement: :purchase_order}] do
     record&.procurement&.purchase_order&.po_number
