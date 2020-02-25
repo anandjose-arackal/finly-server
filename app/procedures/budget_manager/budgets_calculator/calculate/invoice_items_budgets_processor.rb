@@ -38,8 +38,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         department_id: invoice_item.department_id,
         date: invoice_item.parent.date,
         entity_status_id: invoice_item.parent.invoice_status_id,
-        entity_created_at: invoice_item.invoice.created_at,
-        entity_submitted_at: invoice_item.invoice.submitted_at,
+        entity_created_at: invoice_item.parent.created_at,
+        entity_submitted_at: invoice_item.parent.submitted_at,
         amount_attributes: {
             value: invoice_item.net_amount&.value,
             currency_id: invoice_item.net_amount&.currency_id
