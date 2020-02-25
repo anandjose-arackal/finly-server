@@ -1,9 +1,11 @@
 class Authenticator::Providers::Application < Authenticator::Providers::Base
 
+  attr_accessor :scopes
+
   def self.accept?(request)
-    scopes = request.params[:scope]
-    scopes = [scopes] unless scopes.respond_to?(:each)
-    scopes&.size == 1 and ["web", "mobile", "chrome", "api", "streamsets"].include?(scopes&.first) and !RequestStore.store[:multi_entity_login] and !RequestStore.store[:sso]
+    self.scopes = request.params[:scope]
+    self.scopes = [self.scopes] unless self.scopes.respond_to?(:each)
+    self.scopes&.size == 1 and ["web", "mobile", "chrome", "api", "streamsets"].include?(self.scopes&.first) and !RequestStore.store[:multi_entity_login] and !RequestStore.store[:sso]
   end
 
   def model
@@ -20,7 +22,7 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
     self.unauthenticated_user_obj ||= model.find_for_database_authentication(username: username, company_id: company_id)
 
     # # adding condition here to check if the company has normal logins blocked thanks to SSO
-    if self.unauthenticated_user_obj&.company&.normal_login_blocked?
+    if self.unauthenticated_user_obj&.company&.normal_login_blocked? and ["web"].include?(self.scopes.first)
       fail_with_event :on_normal_login_blocked, "Your corporate has blocked password-based logins. Please contact your administrator"
       return
     end
