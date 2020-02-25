@@ -180,4 +180,9 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
     # render json: data.as_json
   end
 
+  def void
+    @result = Procurements::Invoices::Void.(current_user, params)
+    respond
+  end
+
 end

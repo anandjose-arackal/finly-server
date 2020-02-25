@@ -76,6 +76,7 @@
 #  kyc_2_back_updated_at       :datetime
 #  kyc_1_number                :string(255)
 #  kyc_2_number                :string(255)
+#  deleted_at                  :datetime
 #  initiated                   :boolean
 #  id_proof_front_file_name    :string(255)
 #  id_proof_front_content_type :string(255)
@@ -85,6 +86,7 @@
 #  id_proof_back_content_type  :string(255)
 #  id_proof_back_file_size     :bigint
 #  id_proof_back_updated_at    :datetime
+#  deleted_at                  :datetime
 #
 
 require 'fileutils'
@@ -128,6 +130,12 @@ class IndividualKyc < ApplicationRecord
   has_attached_file :kyc_file_2, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
   ## DEPRICATED END ##
+
+  has_attached_file :id_proof_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_front, content_type: CONTENT_TYPES
+
+  has_attached_file :id_proof_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :id_proof_back, content_type: CONTENT_TYPES
 
   has_attached_file :aadhar_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :aadhar_front, content_type: CONTENT_TYPES

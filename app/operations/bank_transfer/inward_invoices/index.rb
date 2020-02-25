@@ -35,6 +35,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_rcm_enabled
     has_scope :filter_custom_text_selection, type: :array
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_invoice_status, type: :array # used for streamsets
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_with_credit_note
 
@@ -55,15 +56,15 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     end
 
     def po_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:tax_invoice))
+      get_count([InwardInvoiceType.id_for(:tax_invoice)])
     end
 
     def non_po_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:non_po_invoice))
+      get_count([InwardInvoiceType.id_for(:non_po_invoice)])
     end
 
     def agreement_invoice_status_count
-      get_count(InwardInvoiceType.id_for(:recurring_invoice))
+      get_count([InwardInvoiceType.id_for(:recurring_invoice), InwardInvoiceType.id_for(:agreement_invoice)])
     end
 
     def get_count(id)

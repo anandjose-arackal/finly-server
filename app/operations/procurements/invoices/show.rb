@@ -27,7 +27,16 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # self.departments = user.company.departments
 
       # self.locations = user.company.locations
-      params[:filter_role_id] =  invoice.get_invoice_provider_name == 'PoInvoiceProvider' ? [UserRole.id_for(:po_invoice_initiator)] : [UserRole.id_for(:non_po_invoice_initiator)]
+
+      case get_invoice_provider_name
+      when 'PoInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:po_invoice_initiator)]
+      when 'NonPoInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:non_po_invoice_initiator)]
+      when 'AgreementInvoiceProvider'
+        params[:filter_role_id] = [UserRole.id_for(:agreement_invoice_initiator)]
+      end
+
       # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.departments = Company::Departments::Index.(invoice.created_by, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(invoice.created_by, params).policy_location_filter_mapping&.leaves
@@ -37,7 +46,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
       end
-      self.cost_centers = user.company.cost_centers
+      self.cost_centers = user.company.cost_centers.non_deleted
       self.tax_rates = user.company.tax_rates
       self.gstin_locations = self.invoice.vendor&.gstin_locations
       self.variable_periodic_invoice = (self.invoice.open? || self.invoice.rejected? || self.invoice.retracted?) && (self.invoice.billing_type_id == BillingType.id_for(:variable_periodic))
@@ -167,7 +176,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     end
 
     def get_reviewal_chain
-      params[:provider_name] = invoice.get_invoice_provider_name
+      # params[:provider_name] = invoice.get_invoice_provider_name
+      params[:provider_name] = get_invoice_provider_name
       op = ::ReviewalManager::ReviewalChain.(user, params)
       op.chain
     end
@@ -197,12 +207,18 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         #   return true
         # end
       # end
-      provider_name = invoice.get_invoice_provider_name
+      provider_name = get_invoice_provider_name
       invoice.get_reviewers(nil, provider_name).include?(user)
     end
   
     def get_invoice_provider_name
-      self.invoice.procurement.purchase_order.present? ? 'PoInvoiceProvider' : 'NonPoInvoiceProvider'
+      if self.invoice.procurement.purchase_order.present?
+        return 'PoInvoiceProvider'
+      elsif self.invoice.payment_agreement_id.present?
+        return 'AgreementInvoiceProvider'
+      else
+        return 'NonPoInvoiceProvider'
+      end
     end
   end
 
@@ -259,6 +275,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if user.is_bank_payment_request_creditor?
     return if user.is_credit_note_initiator?
     return if user.is_credit_note_reviewer?
+    return if user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor?
     # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
     # return if validate_po_access
     add_message :error, 'You are not authorized to view this document, Please contact your Admin.'

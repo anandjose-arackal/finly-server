@@ -2,7 +2,11 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
 
   register_handle :non_po_tax_invoice_show
   #Validate input if required
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items, :take_control, :return_control, :forward, :disable_agreement_related_fields, :create_credit_note]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind,
+                    :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete,
+                    :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn,
+                    :export_invoice_items, :take_control, :return_control, :forward, :disable_agreement_related_fields,
+                    :create_credit_note, :create_items, :void]
 
   def initialize(user=nil, params={})
     super
@@ -29,13 +33,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def reject
-    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
@@ -45,13 +49,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   # end
 
   def approve
-    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin?
+    if invoice.is_non_po_reviewing_user? || user.vendor_payment_admin? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
 
   def forward
-    if invoice.is_non_po_reviewing_user?
+    if invoice.is_non_po_reviewing_user? || user.is_agreement_invoice_reviewer?
       invoice.processing? && user_in_level?
     end
   end
@@ -85,7 +89,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       invoice.processing? && document_owner?
     end
   end
@@ -118,13 +122,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def delete
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
 
   def save_and_submit
-    if user.is_non_po_invoice_initiator?
+    if user.is_non_po_invoice_initiator? || user.is_agreement_invoice_initiator?
       ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
     end
   end
@@ -183,6 +187,14 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
 
   def create_credit_note
     InwardInvoiceStatus.ids_for(:paid).include?(invoice.invoice_status_id) && user.has_policy_role?(UserRole.id_for(:credit_note_initiator)) && invoice.credit_note.blank?
+  end
+
+  def create_items
+    user.is_inventory_manager? || user.is_item_master_manager? || user.vendor_payment_admin?
+  end
+
+  def void
+    user.vendor_payments_admin? && (invoice.approved? || invoice.auto_approved?) && invoice.payments.blank?
   end
 
 end

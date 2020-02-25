@@ -34,6 +34,7 @@
 #  biller_time_out                :string(255)
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
+#  deleted_at                     :datetime
 #
 
 class BbpsBiller < ApplicationRecord
@@ -60,6 +61,10 @@ class BbpsBiller < ApplicationRecord
 
   def account_number
     ""
+  end
+
+  def account_owner
+    self.biller_name
   end
 
   def ifsc

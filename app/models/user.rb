@@ -59,6 +59,7 @@
 #  location_id               :integer
 #  default_company_id        :integer
 #  finly_id                  :string(36)
+#  deleted_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -140,6 +141,9 @@ class User < ApplicationRecord
   has_many :user_pockets
 
   has_many :export_jobs, foreign_key: :created_by_id
+
+  # adding association to drop down items
+  has_many :user_drop_down_item_mappings
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
@@ -280,7 +284,8 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :quickbooks_user
   accepts_nested_attributes_for :enforce_policy
 
-  delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
+  delegate :employee_id, to: :profile, allow_nil: true
   delegate :company_name, to: :company
 
   ############# Devise validateable validations ############
@@ -343,6 +348,8 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:po_invoice_reviewer)).distinct
     when 'NonPoInvoiceProvider', :NonPoInvoiceProvider
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:non_po_invoice_reviewer)).distinct
+    when 'AgreementInvoiceProvider', :AgreementInvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:agreement_invoice_reviewer)).distinct
     end
   }
 
@@ -453,7 +460,7 @@ class User < ApplicationRecord
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
+    ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
@@ -462,7 +469,7 @@ class User < ApplicationRecord
 
   scope :user_search, -> (term) {
     if term.present?
-      ids = self.joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
+      ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
                                        "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
       ids.uniq!
       self.where(id: ids)
@@ -485,17 +492,17 @@ class User < ApplicationRecord
     query = ''
     if active
       query += ' OR ' unless query.blank?
-      query += "`users`.`active` = 1 AND `users`.`invitation_token` IS NULL AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+      query += "`users`.`active` = 1 AND `users`.`default_password` IS FALSE AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL)))"
       # query += '(active = 1 AND invitation_token IS NULL AND (NOT ((first_name = ' ' OR first_name IS NULL))) AND (mobile_only_invite != 1)'
     end
     if pending
       query += ' OR ' unless query.blank?
-      query += "(first_name = '' OR invitation_token IS NOT NULL OR mobile_only_invite = 1)"
+      query += "(first_name = '' OR default_password = 1)"
       # query += 'first_name = ' ' OR invitation_token IS NOT NULL OR mobile_only_invite = 1'
     end
     if inactive
       query += ' OR ' unless query.blank?
-      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+      query += "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL)))"
       # query += "active = 0 AND (NOT ((first_name = '' OR first_name IS NULL))) AND (mobile_only_invite != 1)"
     end
     if query.present?
@@ -566,8 +573,8 @@ class User < ApplicationRecord
     where('created_at <= ?', end_date)
   }
 
-  scope :signed_up, -> {where(invitation_token: nil).where.not(first_name: [nil, ""]).where.not(mobile_only_invite: true)}
-  scope :pending, -> {where('first_name = ? OR invitation_token IS NOT ? OR mobile_only_invite = ?', "", nil, true)}
+  scope :signed_up, -> {where(invitation_token: nil).where.not(first_name: [nil, ""])}
+  scope :pending, -> {where('first_name = ? OR default_password IS FALSE', "")}
   scope :only_employees, -> {where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq}
   scope :sort_by_name, -> {order(first_name: :asc, last_name: :asc)}
   scope :with_balance_sheet, -> {includes(:balance_sheet => [:cash_in_hand, :approved_reports_total])}
@@ -979,7 +986,7 @@ class User < ApplicationRecord
   end
 
   def name
-    return nil if first_name.blank? and last_name.blank?
+    return "" if first_name.blank? and last_name.blank?
     name = first_name
     "#{first_name} #{last_name}"
   end
@@ -1253,7 +1260,7 @@ class User < ApplicationRecord
   end
 
   def manager_activateable?
-    self.invitation_token.blank? and self.email.blank? and self.mobile_only_invite
+    !self.default_password and self.email.blank?
   end
 
   def otp_confirm
@@ -1261,7 +1268,7 @@ class User < ApplicationRecord
   end
 
   def enforce_policy_enabled?
-    self.enforce_policy.enabled
+    self.enforce_policy&.enabled
   end
 
   def superadmin?
@@ -1336,11 +1343,11 @@ class User < ApplicationRecord
 
   # returns the sate of the particular user - active, inactive or pending
   def user_state
-    if self.active && self.invitation_token.nil? && !self.first_name.blank? && !self.mobile_only_invite
+    if self.active && !self.default_password && !self.first_name.blank?
       return 1
-    elsif self.mobile_only_invite || self.first_name.nil? || !self.invitation_token.blank?
+    elsif self.first_name.nil? || self.default_password
       return 2
-    elsif !self.active && !self.first_name.blank? && !self.mobile_only_invite
+    elsif !self.active && !self.first_name.blank?
       return 3
     end
   end
@@ -1407,12 +1414,12 @@ class User < ApplicationRecord
   end
 
   def status
-    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
-    if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL)))"
+    if self.active and !self.default_password and !(self.first_name.blank? || self.last_name.blank?)
       return "Active"
-    elsif self.first_name.blank? || self.invitation_token.present? || self.mobile_only_invite
+    elsif self.first_name.blank? || self.default_password
       return "Pending"
-    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?)
       return "Inactive"
     end
   end
@@ -1530,7 +1537,7 @@ class User < ApplicationRecord
   end
 
 
-  # Agreement Based Payments Role
+  ########### Agreement Based Payments Role End #############
   def is_payment_agreement_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
   end
@@ -1542,6 +1549,20 @@ class User < ApplicationRecord
   def is_payment_agreement_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
   end
+
+  def is_agreement_invoice_initiator?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_initiator), document)
+  end
+
+  def is_agreement_invoice_reviewer?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_reviewer), document)
+  end
+
+  def is_agreement_invoice_auditor?(document = nil)
+    self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
+  end
+
+  ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:po_invoice_initiator), document)
@@ -1644,7 +1665,7 @@ class User < ApplicationRecord
 
   def associated_group_role_ids
     associated_user_ids = associated_group_users.pluck(:id)
-    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id) + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id)
+    UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id).uniq + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id).uniq
   end
 
   protected

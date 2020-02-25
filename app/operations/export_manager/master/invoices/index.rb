@@ -30,6 +30,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :finance_approved_date
     attribute :due_date
     attribute :invoice_discount
+    attribute :attachments
+    attribute :approval_pending_reviewers
   end
 
   section :purchase do
@@ -100,7 +102,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoices_presenter = fetch_invoices
     return if has_errors?
 
-    invoices = invoices_presenter.invoices
+    invoices = invoices_presenter.invoices.scope_all_except_voided
     InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
   end
 
@@ -362,6 +364,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
 
   def due_date(invoice_line_item)
     invoice_line_item.parent&.due_date&.strftime("%d-%b-%Y")
+  end
+
+  def attachments(invoice_line_item)
+    invoice_line_item.parent.attachments.map {|a| a.file.url(:original, timestamp: false)}.compact.join(", ")
+  end
+
+  def approval_pending_reviewers(invoice_line_item)
+    invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
 

@@ -21,6 +21,8 @@ Crono.perform(TaxBenefitProcess).every 1.day, at: {hour: 00, min: 25}
 Crono.perform(BankTransferProcess).every 1.day, at: {hour: 9, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
 Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
+Crono.perform(FixSpuriousPayments).every 1.day, at: {hour: 06, min: 30}
+Crono.perform(CheckForFailedNeftTransactions).every 1.hour
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
 Crono.perform(YesBankStatusChecker).every 15.minutes
 Crono.perform(IciciStatusChecker).every 15.minutes
@@ -37,11 +39,10 @@ Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}
 Crono.perform(IciciStatementsFetch).every 30.minutes
 Crono.perform(KotakBankTransferStatusChecker).every 5.minutes
 Crono.perform(BbpsBillsFetch).every 1.day, at: {hour: 8, min: 00}
-# Crono.perform(FixSpuriousPayments).every 30.minutes
 
 # Always scope scheduled mailers to production env to avoid accidental email trigger via development/staging environment
 # if Rails.env.production?
-#   Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 9, min: 00}
+#    Crono.perform(ReportsAwaitingApproval).every 1.day, at: {hour: 18, min: 00}
 # end
 # Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 10, min: 00}
 Crono.perform(ReminderAwaitingApproval).every 1.day, at: {hour: 18, min: 00}

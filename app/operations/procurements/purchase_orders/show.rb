@@ -47,7 +47,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         self.sub_departments = purchase_order.user.company.departments.leaves
       end
 
-      self.cost_centers = user.company.cost_centers
+      self.cost_centers = user.company.cost_centers.non_deleted
       self.tax_rates = user.company.tax_rates
       self.tds_slabs = TdsSlabs::Index.(user, params)
 
@@ -231,9 +231,15 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_auditor(user)
     # Payment ticket credtor has access to inward invoice show, hence giving access to view purchase order too
     return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
+    return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), purchase_order)
+    return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), purchase_order)
+    return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor), purchase_order)
     # Give access to grn initiator once PO is approved
     return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
     return if params[:skip_for_mailer]
+    return if user.is_po_invoice_initiator?(purchase_order)
+    return if user.is_po_invoice_reviewer?(purchase_order)
+    return if user.is_po_invoice_auditor?(purchase_order)
     raise_unauthorized_exception
   end
 end

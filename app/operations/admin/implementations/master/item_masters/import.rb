@@ -12,6 +12,7 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
       :po_item =>  "PO Item (Y/N)",
       :non_po_item => "Non PO Item (Y/N)",
       :good_service => "Goods or Service ( G / S)",
+      :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
       :destroy => "Destroy"
@@ -67,8 +68,8 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     if category_id.nil? && data[:category].present?
       messages << "Associated Category Not Found"
     end
-    hsn_sac = data[:hsn_sac].blank? ? nil : data[:hsn_sac].to_i
-    item_code = data[:item_code].to_s
+    hsn_sac = data[:hsn_sac].blank? ? nil : data[:hsn_sac]
+    item_number = (data[:item_number].to_s.blank? ? nil : data[:item_number].to_s)
     discount = data[:discount].to_f&.round(2)
     rate = data[:rate].to_f&.round(2)
     item_expense_type_id = item_expense_types.where(name: data[:item_expense_type].to_s&.downcase)&.first&.id
@@ -92,17 +93,43 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     elsif data[:non_po_item].to_s&.upcase == "Y"
       supply_item_type_id = supply_item_types.find_by_name("non_po_item").id
     end
+    if product_type_id.nil?
+      messages << "Item Type Goods/Service Need to Specify"
+    end
+
+    tds_applicable = nil
+    if data[:tds_applicable].to_s&.upcase == "Y"
+      tds_applicable = true
+    elsif data[:tds_applicable].to_s&.upcase == "N"
+      tds_applicable = false
+    else
+      messages << "TDS Applicable or Not, Need to specify"
+    end
+
+    if product_type_id.nil?
+      messages << "Item Type Goods/Service Need to specify"
+    end
+
     [{
         description: description,
         category_id: category_id,
-        hsn_sac: hsn_sac,
-        item_code: item_code,
+        hsn_sac: clean_up_data(hsn_sac),
+        item_number: item_number,
         item_expense_type_id: item_expense_type_id,
         supply_item_type_id: supply_item_type_id,
         product_type_id: product_type_id,
         discount: discount,
-        rate: rate
+        rate: rate,
+        tds_applicable: tds_applicable
     }, messages]
+  end
+
+  def clean_up_data(text)
+    if text.is_a?(Float) || text.is_a?(Integer)
+      text.to_i.to_s
+    else
+      text.to_s.strip
+    end
   end
 
 end

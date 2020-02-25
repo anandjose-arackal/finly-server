@@ -15,7 +15,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    self.inward_invoice = user.company.inward_invoices.find_by(id: id)
+    self.inward_invoice = user.company.inward_invoices.scope_all_except_voided.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
 
@@ -68,7 +68,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     
     # checking for duplicates within this particular company
-    current_company_invoices = current_company.inward_invoices
+    current_company_invoices = current_company.inward_invoices.scope_all_except_voided
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
@@ -84,6 +84,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     if self.inward_invoice_params[:delivery_location_id].blank?
       add_message :error, "Please specify a Shipping Address."
+      return
+    end
+
+    if self.purchase_order&.advance_payments.blank? && StringUtils.to_bool(params[:invoice][:advance_amount_required])
+      add_message :error, "No PO advance payments found. You would need to process the PO advance amount in this Invoice. To proceed, please set the Advance Adjustment Amount to \"NO\" and continue."
       return
     end
 
@@ -238,6 +243,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    if self.inward_invoice_params[:date].blank?
+      add_message :error, "Invoice date is mandatory"
+      return
+    end
+
     # Credit Note Check
     if self.inward_invoice_params[:credit_note_adjustments_attributes].present?
       self.inward_invoice_params[:credit_note_adjustments_attributes].filter {|cna| cna[:id].blank?}.each do |cna|
@@ -259,6 +269,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         end
         # cna[:amount_attributes][:value] = precision_value(cna[:amount_attributes][:value])
       end
+    end
+
+    if self.inward_invoice.voided?
+      add_message :error, "Invoice status is \"Void\". No further actions can be taken."
+      return
     end
   end
 

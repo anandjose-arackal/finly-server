@@ -12,7 +12,7 @@ class Streamsets::Transactions::Expenses < BaseOperation
       return
     end
 
-    reports = op.reports.where(created_at: (Time.zone.yesterday.beginning_of_day)..(Time.zone.yesterday.end_of_day), report_status_id: ReportStatus.ids_for([:approved, :auto_approved, :settlement_confirmed, :closed, :settled]))
+    reports = op.reports
     self.expenses = Expense.where(report_id: reports.pluck(:id)).include_details
 
   end

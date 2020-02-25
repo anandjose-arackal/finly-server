@@ -35,7 +35,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
         'Reference Code',
         'SAC',
         'Ref. Invoice No.',
-        'PAYMENT MODE',
+        'Payment Mode',
     ]
     self.contents = []
     sl_no = 1
@@ -49,18 +49,18 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             report.id,
             'JV',
             report.submitted_at.strftime("%Y%m"),
-            expense.date.strftime("%d/%m/%Y"),
+            {value: expense.date, type: 'date'},
             "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
             expense.amount.value,
             '',
-            expense.date.strftime("%d/%m/%Y"),
+            {value: expense.date, type: 'date'},
             'I',
             '',
             '',
             '',
             retrieve_account(expense),
             retrieve_sub_account(expense),
-            (report.user.gl_config&.dig(:location_code).present? ? "'#{"%05d" % report.user.gl_config&.dig(:location_code)}" : ''),
+            {value: (report.user.gl_config&.dig(:location_code).present? ? sprintf("%05d", report.user.gl_config&.dig(:location_code)) : ''), type: "string"},
             report.user.gl_config&.dig(:cost_center),
             '',
             '',
@@ -79,7 +79,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
           report.id,
           'JV',
           report.submitted_at.strftime("%Y%m"),
-          report.submitted_at.strftime("%d/%m/%Y"),
+          {value: report.submitted_at, type: 'date'},
           "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
           '',
           '',
@@ -110,7 +110,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
               sl_no,
               report.id,
               'BP',
-              report.submitted_at.strftime("%Y%m"),
+              {value: report.submitted_at, type: 'date'},
               report.submitted_at.strftime("%Y%m"),
               "Being Payment made against various Payment IDs #{payment.id}",
               payment.amount.value,
@@ -139,8 +139,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
               sl_no,
               report.id,
               'BP',
-              report.submitted_at.strftime("%Y%m"),
-              report.submitted_at.strftime("%d/%m/%Y"),
+              {value: report.submitted_at, type: 'date'},
+              {value: report.submitted_at, type: 'date'},
               "Being Payment made against various Payment IDs #{payment.id}",
               '',
               '',
@@ -178,19 +178,14 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
     parent_category_id = expense.category&.ancestry
     if parent_category_id.present?
       parent = self.categories.find(parent_category_id.to_i)
-      return "'#{parent.gl_code}"
+      return "#{parent.gl_code}"
     else
-      return "'#{expense.category&.gl_code}"
+      return "#{expense.category&.gl_code}"
     end
   end
 
   def retrieve_sub_account(expense)
-    "'#{expense.category&.gl_code}"
-  end
-
-
-  def success
-    Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
+    "#{expense.category&.gl_code}"
   end
 
 end

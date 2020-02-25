@@ -11,6 +11,7 @@
 #  updated_at             :datetime         not null
 #  associated_object_id   :integer
 #  associated_object_type :string(255)
+#  deleted_at             :datetime
 #
 
 # Transaction type: credit, debit

@@ -26,7 +26,9 @@
 #  min                             :decimal(20, 5)   default(0.0)
 #  max                             :decimal(20, 5)
 #  rejected_by_id                  :integer
+#  deleted_at                      :datetime
 #  action_taken_at                 :datetime
+#  deleted_at                      :datetime
 #
 
 FactoryBot.define do

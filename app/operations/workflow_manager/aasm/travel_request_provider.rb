@@ -2,6 +2,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
 
   def initialize(user, params)
     self.user = user
+    self.messages = {success: [], error: []}
 
     self.document = params[:document]
     self.violations_present = params[:violations_present]
