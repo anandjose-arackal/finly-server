@@ -1,7 +1,9 @@
 json.extract! expense, :id, :date, :note, :report_id, :expense_type_id,
               :distance_value, :maps_distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name, :reimbursable, :from_cash_on_hand
+              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name, :reimbursable, :from_cash_on_hand,:usage_date_type
 json.incomplete expense.incomplete?
+json.usage_date_start DateUtils.date_formatted expense.usage_date_start
+json.usage_date_end DateUtils.date_formatted expense.usage_date_end
 if expense.distance_expense?
   json.distance_type expense.distance_expense&.type_id
   json.odometer_reading_start expense.distance_expense&.odometer_reading_start
