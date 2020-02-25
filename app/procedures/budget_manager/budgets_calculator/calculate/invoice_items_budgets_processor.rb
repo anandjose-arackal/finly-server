@@ -45,11 +45,11 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
             currency_id: invoice_item.net_amount&.currency_id
         },
         amount_before_tax_attributes: {
-            value: invoice_item.amount_before_tax,
+            value: invoice_item.taxable_amount&.value,
             currency_id: invoice_item.net_amount&.currency_id
         },
         amount_after_tax_attributes: {
-            value: invoice_item.amount_after_tax,
+            value: invoice_item.net_amount&.value,
             currency_id: invoice_item.net_amount&.currency_id
         }
     }
