@@ -59,6 +59,7 @@ class FormEntity < ApplicationRecord
   belongs_to :form_section
   belongs_to :form
   belongs_to :parent, class_name: 'FormEntity', optional: true, primary_key: :uuid, foreign_key: :parent_id
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
   has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
@@ -125,4 +126,5 @@ class FormEntity < ApplicationRecord
         field_path: field_path
     }
   end
+
 end
