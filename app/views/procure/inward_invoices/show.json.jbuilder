@@ -69,7 +69,7 @@ json.invoice do
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
   json.po_adjusted_advance invoice.po_adjusted_advance
   json.advance_amount_required invoice.advance_amount_required
-  json.po_advance_tds_present (@result.respond_to?('purchase_order')) ? @result.purchase_order.advance_tds_slab.present? : false
+  json.po_advance_tds_present (@result.respond_to?('purchase_order')) ? @result.purchase_order&.advance_tds_slab.present? : false
   json.user invoice.created_by.as_json rescue nil
   json.available_credits invoice.available_credits
 
