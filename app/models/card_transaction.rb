@@ -47,7 +47,7 @@ class CardTransaction < ApplicationRecord
 
   has_one :card_expense, dependent: :destroy
 
-  belongs_to :reference_payment, class_name: "Payment"
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
 

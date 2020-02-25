@@ -4,6 +4,8 @@
 # money_request: money_request being marked as approved
 #
 
+################## DEPRECATED ###############################
+
 class Settlement::SMoneyRequests::Approved < MoneyRequests::Base
   attr_accessor :money_request
 

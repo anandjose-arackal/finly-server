@@ -8,5 +8,6 @@ class AddPaymentDetailsToReferenceResourceTransactions < ActiveRecord::Migration
     # add_column :reports, :reference_payment_id, :integer, references: "Payment", foreign_key: true, index: true
     # add_column :card_transactions, :reference_payment_id, :integer, references: "Payment", foreign_key: true, index: true
     # add_column :yes_bank_transactions, :reference_payment_id, :integer, references: "Payment", foreign_key: true, index: true
+    # add_column :money_requests, :reference_payment_id, :integer, references: "Payment", foreign_key: true, index: true
   end
 end
