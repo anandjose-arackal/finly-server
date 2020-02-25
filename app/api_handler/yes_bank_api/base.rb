@@ -163,6 +163,17 @@ class YesBankApi::Base < BaseHandler
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    # rescue Faraday::SSLError
+    #   debugger
+    #   # temporarily making this so that the bank transaction gives off a success
+    #   self.transfer_status_id = 1
+    #   self.bank_transaction = payment.reference_resources.first
+    #   self.bank_transaction.update(
+    #       bank_reference_number: "afbioheakdfbkasdfjbg",
+    #       transfer_status_id: self.transfer_status_id,
+    #       bank_response: "",
+    #       beneficiary_full_name: "some shit"
+    #   )
     end
 
   end

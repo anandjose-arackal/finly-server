@@ -716,7 +716,7 @@ class Payment < ApplicationRecord
 
   def utr
     return super unless super.blank?
-    return self.reference_resources.first.try(:utr)
+    return self.reference_resources.first&.try(:utr) || self.reference_resource&.utr
   end
 
   private

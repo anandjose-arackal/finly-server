@@ -47,7 +47,7 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
       rule "Payments must not have multiple bank transactions generated within a span of 10 minutes" do
         payment = params[:payment]
         latest_bank_transaction = payment.reference_resources.first # this gives the latest transaction because the reference_resources are returned in descending order of created_at
-        if DateUtils.local_date_time - latest_bank_transaction.created_at < 10.minutes
+        if latest_bank_transaction.present? && (DateUtils.local_date_time - latest_bank_transaction.created_at < 10.minutes)
           add_system_message :error, payment, "Payment cannot be processed at the moment as there is another transaction in process for this payment"
           message "Payment cannot be processed at the moment as there is another transaction in process for this payment"
           fail

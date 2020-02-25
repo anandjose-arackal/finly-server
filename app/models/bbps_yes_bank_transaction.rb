@@ -64,5 +64,9 @@ class BbpsYesBankTransaction < ApplicationRecord
     self.bbps_ref_id
   end
 
+  def utr
+    self.bbps_ref_id
+  end
+
 end
 
