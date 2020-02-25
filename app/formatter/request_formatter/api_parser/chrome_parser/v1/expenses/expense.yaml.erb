@@ -5,9 +5,6 @@ expense:
   reimbursable: <%= params[:expense][:reimbursable] %>
   note: <%= params[:expense][:note] %>
   category_id: <%= params[:expense][:category_id] %>
-  usage_date_type: <%= params[:expense][:usage_date_type] %>
-  usage_date_start: <%= params[:expense][:usage_date_start] %>
-  usage_date_end: <%= params[:expense][:usage_date_end] %>
   manual_expense_attributes:
     merchant: <%= params[:expense][:merchant] %>
   <% if params[:expense][:amount].present? %>
