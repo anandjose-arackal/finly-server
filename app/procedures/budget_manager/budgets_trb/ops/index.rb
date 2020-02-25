@@ -14,7 +14,7 @@ class BudgetManager::BudgetsTrb::Ops::Index < Transactions::API
   step :index!
 
   def index!(options, current_user:, params:, **)
-    options["budgets"] = current_user.company.budgets.active
+    options["budgets"] = current_user.company.budgets
     options["budgets"] = apply_scopes(options["budgets"], params)
   end
 end
