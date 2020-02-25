@@ -2,6 +2,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   resolver Docs::P2P::Invoices::Resolver
 
+  # Fixed column is always default true
   column :vendor, label: 'Vendor Details',
          fixed: true,
          sort: :vendor_business_name,
@@ -30,8 +31,8 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   column :cost_center, default: true, includes: [:cost_center], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.cost_center.name}}"})
   column :department, default: true, includes: [:department], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.department.name}}"})
   column :vendor_location, default: false, includes: [:gstin_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.vendor_location.location}}"})
-  column :billing_location, default: false, includes: [:billing_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.billing_location.name}}"})
-  column :shipping_location, default: false, includes: [:shipping_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.shipping_location.name}}"})
+  column :billing_location, default: false, includes: [:location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.billing_location.name}}"})
+  column :shipping_location, default: false, includes: [:delivery_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.shipping_location.name}}"})
   column :approved_at, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :approved_at})
 
   counter -> (collection) do

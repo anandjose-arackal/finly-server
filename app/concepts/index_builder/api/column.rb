@@ -49,7 +49,7 @@ class IndexBuilder::API::Column
                 label: label,
                 sort: sort,
                 includes: includes,
-                default: default,
+                default: (default || fixed),
                 template: template,
                 fixed: fixed
             }
