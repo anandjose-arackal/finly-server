@@ -253,7 +253,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def total_amount(invoice_line_item)
-    invoice_line_item.amount&.value
+    (invoice_line_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)) ? invoice_line_item.billable_amount&.value : invoice_line_item.amount&.value
   end
 
   def tax_amount(invoice_line_item)
