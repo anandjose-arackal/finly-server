@@ -64,7 +64,7 @@ class BbpsBiller < ApplicationRecord
   end
 
   def account_owner
-    self.biller_name
+    self
   end
 
   def ifsc
