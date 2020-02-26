@@ -1,25 +1,43 @@
 class IndexBuilder::API::Column
-  attr_accessor :column_key, :label, :template, :default, :sort, :includes, :fixed
+  include IndexBuilder::ContentTypes::Registry
+
+  attr_accessor :column_key, :label, :default, :sort, :includes, :fixed, :block
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
   def initialize(params)
     params.each_pair do |key, value|
       send(:"#{key}=", value)
     end
+
+    instance_eval &block if block.present?
+  end
+
+  def fields
+    @fields ||= []
+  end
+
+  def field(*args)
+    opts = args.extract_options!
+    klass = IndexBuilder::ContentTypes::Registry.types[args.first]
+    field = klass.new(opts)
+    fields << field
   end
 
   def config(user)
     {
         column_key: column_key,
         label: label,
-        type: template.handle,
         sort: sort,
         default: default,
     }
   end
 
   def build(context, user, record)
-    template.build(context, user, record)
+    values = []
+    fields.each do |field|
+      values << field.build(context, user, record)
+    end
+    values
   end
 
   module Builder
@@ -38,8 +56,17 @@ class IndexBuilder::API::Column
         columns[column_key].present?
       end
 
-      def column(column_key, default: false, label: nil, sort: false, template:, includes: [], fixed: false)
+      def column(column_key, default: false, label: nil, sort: false, includes: [], fixed: false, fields:[], &block)
         raise "#{column_key} is already defined for class #{self.name}" if exists?(column_key)
+        raise "#{column_key} does not have associated fields" unless block_given? or fields.present?
+
+        if not block_given? and fields.present?
+          block = lambda do |*args|
+            fields.each do |field_value|
+                field :text, value: field_value
+            end
+          end
+        end
 
         label ||= column_key.to_s.humanize
 
@@ -50,8 +77,8 @@ class IndexBuilder::API::Column
                 sort: sort,
                 includes: includes,
                 default: (default || fixed),
-                template: template,
-                fixed: fixed
+                fixed: fixed,
+                block: block
             }
         )
 

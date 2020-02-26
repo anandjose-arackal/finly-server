@@ -3,37 +3,85 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
   resolver Docs::P2P::Invoices::Resolver
 
   # Fixed column is always default true
-  column :vendor, label: 'Vendor Details',
-         fixed: true,
-         sort: :vendor_business_name,
-         includes: [:vendor],
-         template: IndexBuilder::Templates::PrimaryMultiline.(
-             {
-                 primary: "{{record.vendor.business_name}}",
-                 sub_text_1: "Vendor ID: {{record.vendor.vendor_id}}"
-             }
-         )
-  column :created_at, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :created_at})
-  column :created_by, default: true, includes: [:created_by], template: IndexBuilder::Templates::PrimaryMultiline.(
-      {
-          primary: "{{record.created_by.name}}",
-          sub_text_1: "{{record.created_by.email}}"
-      }
-  )
-  column :invoice_number, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :invoice_id})
-  column :invoice_date, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :date})
-  column :due_date, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :due_date})
-  column :net_amount, default: true, includes: [:net_amount], template: IndexBuilder::Templates::SimpleText.({primary: :net_amount})
-  column :gross_amount, default: true, includes: [:gross_amount], template: IndexBuilder::Templates::SimpleText.({primary: :gross_amount})
-  column :tds_amount, default: true, includes: [:tds_amount], template: IndexBuilder::Templates::SimpleText.({primary: :tds_amount})
-  column :tds_slab, default: true, includes: [:tds_slab], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.tds_slab.name}}"})
-  column :po_number, default: true, includes: [{procurement: :purchase_order}], template: IndexBuilder::Templates::SimpleText.({primary: :po_number})
-  column :cost_center, default: true, includes: [:cost_center], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.cost_center.name}}"})
-  column :department, default: true, includes: [:department], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.department.name}}"})
-  column :vendor_location, default: false, includes: [:gstin_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.vendor_location.location}}"})
-  column :billing_location, default: false, includes: [:location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.billing_location.name}}"})
-  column :shipping_location, default: false, includes: [:delivery_location], template: IndexBuilder::Templates::SimpleText.({primary: "{{record.shipping_location.name}}"})
-  column :approved_at, default: true, template: IndexBuilder::Templates::SimpleText.({primary: :approved_at})
+  column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
+    text value: "{{record.vendor.business_name}}", type: 'primary'
+    text value: "Vendor ID: {{record.vendor.vendor_id}}"
+  end
+
+  column :created_by, default: true, includes: [:created_by] do
+    text value: "{{record.created_by.name}}"
+    text value: "{{record.created_by.email}}"
+  end
+
+  column :created_at, default: true do
+    date value: :created_at
+  end
+
+  column :invoice_id, default: true do
+    text :invoice_id
+  end
+
+  column :invoice_number, default: true do
+    text :invoice_number
+  end
+
+  column :invoice_date, default: true do
+    date :invoice_date
+  end
+
+  column :due_date, default: true do
+    date value: :due_date
+  end
+
+  column :net_amount, default: true, includes: [net_amount: :currency] do
+    amount value: "{{record.net_amount.value}}",
+           currency_code: "{{record.net_amount.currency.country_code}}",
+           currency_symbol: "{{record.net_amount.currency.symbol}}"
+  end
+
+  column :gross_amount, default: true, includes: [gross_amount: :currency] do
+    amount value: "{{record.gross_amount.value}}",
+           currency_code: "{{record.gross_amount.currency.country_code}}",
+           currency_symbol: "{{record.gross_amount.currency.symbol}}"
+  end
+
+  column :tds_amount, default: true, includes: [tds_amount: :currency] do
+    amount value: "{{record.tds_amount.value}}",
+           currency_code: "{{record.tds_amount.currency.country_code}}",
+           currency_symbol: "{{record.tds_amount.currency.symbol}}"
+  end
+
+  column :tds_slab, default: true, includes: [:tds_slab] do
+    text "{{record.tds_slab.name}}"
+  end
+
+  column :po_number, default: true, includes: [{procurement: :purchase_order}] do
+    text :po_number
+  end
+
+  column :cost_center, default: true, includes: [:cost_center] do
+    text "{{record.cost_center.name}}"
+  end
+
+  column :department, default: true, includes: [:department] do
+    text "{{record.department.name}}"
+  end
+
+  column :vendor_location, default: false, includes: [:gstin_location] do
+    text "{{record.vendor_location.location}}"
+  end
+
+  column :billing_location, default: false, includes: [:location] do
+    text "{{record.billing_location.name}}"
+  end
+
+  column :shipping_location, default: false, includes: [:delivery_location] do
+    text "{{record.shipping_location.name}}"
+  end
+
+  column :approved_at, default: true do
+    date :approved_at
+  end
 
   counter -> (collection) do
     counter = IndexBuilder::Counter.new :invoice_status_id

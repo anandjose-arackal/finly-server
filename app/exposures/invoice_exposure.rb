@@ -14,13 +14,23 @@ class InvoiceExposure < Exposures::API
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
-  attribute :net_amount, includes: [:net_amount] do
+  attribute :created_by, record_attribute: true
+  attribute :net_amount, exposure: true, includes: [:net_amount] do
+    record.net_amount
+  end
+  attribute :net_amount_value, includes: [:net_amount] do
     record.net_amount&.value || 0
   end
-  attribute :gross_amount, includes: [:gross_amount] do
+  attribute :gross_amount, exposure: true, includes: [:gross_amount] do
+    record.gross_amount
+  end
+  attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0
   end
-  attribute :tds_amount, includes: [:tds_amount] do
+  attribute :tds_amount, exposure: true, includes: [:tds_amount] do
+    record.tds_amount
+  end
+  attribute :tds_amount_value, includes: [:tds_amount] do
     record.tds_amount&.value || 0
   end
   attribute :tds_slab, record_attribute: true, exposure: true, includes: [:tds_slab]
