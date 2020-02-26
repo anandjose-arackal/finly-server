@@ -57,20 +57,9 @@ class IndexBuilder::ContentTypes::Base
       else
         value = retriever
       end
-      data[attribute[:name]] = format(value)
+      data[attribute[:name]] = value
     end
     data
-  end
-
-  def format(value)
-    # case value.class.to_s
-    # when "ActiveSupport::TimeWithZone", "DateTime"
-    #   value.strftime "%I:%M %p, %d-%b-%Y"
-    # when "Date"
-    #   value.strftime "%d-%b-%Y"
-    # else
-    value&.to_s
-    # end
   end
 
 end

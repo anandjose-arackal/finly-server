@@ -4,7 +4,7 @@ class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
-    text value: "{{record.vendor.business_name}}", type: 'primary'
+    text value: "{{record.vendor.business_name}}", format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
   end
 
