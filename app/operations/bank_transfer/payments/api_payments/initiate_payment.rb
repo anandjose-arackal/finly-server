@@ -14,56 +14,6 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       self.bank_payment_request = params[:bank_payment_request]
     end
 
-    # def construct_response
-    #   response_hash = {
-    #       "summary" => {
-    #           "order_status" => {
-    #               "name" => self.bank_payment_request.status_name(current_user.id)&.humanize,
-    #               "identifier" => self.bank_payment_request.status_name(current_user.id)
-    #           },
-    #           "policy" => {
-    #               "id" => self.bank_payment_request.policy&.id,
-    #               "name" => self.bank_payment_request.policy&.name
-    #           },
-    #           "bank_transfer_type" => self.payment_order.payment_mode&.upcase,
-    #           "payment_type" => self.payment_order.payment_type&.humanize,
-    #           "scheduled_at" => self.payment_order.scheduled_at&.strftime("%d %b %Y"),
-    #           "processed_at" => self.payment_order.processed_at&.strftime("%d %b %Y"),
-    #           "amount_requested" => self.payment_order.amount_requested&.value,
-    #           "amount_processed" => self.payment_order.amount_processed&.value,
-    #           "description" => self.bank_payment_request.description,
-    #           "note" => self.payment_order.note,
-    #           "initiating_user" => self.bank_payment_request.owner.name,
-    #           "name" => self.bank_payment_request.name
-    #       },
-    #       "payments" => payments_array
-    #   }
-    #   json_response = response_hash.to_json
-    #   path = Dir.home + '/certificates/encryption_certificates/qkr_8192.crt'
-    #   cert = OpenSSL::X509::Certificate.new(File.read(path))
-    #   public_key = cert.public_key
-    #   encrypted_response = Base64.encode64(public_key.public_encrypt(json_response))
-    # end
-
-    # def payments_array
-    #   result = []
-    #   self.payment_order.payments.each do |payment|
-    #     result << {
-    #         "owner_name" => payment.receiving_account&.account_owner&.name,
-    #         "name" => payment.receiving_account&.name,
-    #         "account_number" => payment.receiving_account.account_number,
-    #         "ifsc" => payment.receiving_account.ifsc,
-    #         "net_amount" => payment.amount_value,
-    #         "status" => payment.payment_status_name,
-    #         "id" => payment.id,
-    #         "note" => payment.note,
-    #         "system_messages" => payment.system_messages.as_json,
-    #         "payment_mode" => payment.payment_mode,
-    #         "bank_reference_number" => payment.reference_resource&.bank_reference_number
-    #     }
-    #   end
-    #   result
-    # end
   end
 
   def pre_validate

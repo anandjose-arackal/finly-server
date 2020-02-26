@@ -682,7 +682,7 @@ module Transitionable
         when :non_po_invoice_auditor, 'non_po_invoice_auditor'
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :po_invoice_initiator, 'po_invoice_initiator'
-          if self.table_name == 'credit_notes'
+          if ['credit_notes', 'purchase_orders'].include? self.table_name
             data = data.or(role_based_initiator_associated_items(user, role_id))
           else
             data = data.or(user.company.inward_invoices.where(created_by_user_id: user.id, invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)))

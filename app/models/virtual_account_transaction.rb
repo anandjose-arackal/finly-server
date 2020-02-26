@@ -25,6 +25,7 @@
 #  beneficiary_account_no     :string(255)
 #  uuid                       :string(36)
 #  deleted_at                 :datetime
+#  reference_payment_id       :integer
 #
 
 class VirtualAccountTransaction < ApplicationRecord

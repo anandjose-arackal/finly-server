@@ -67,7 +67,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_team
-    return nil unless user.is_purchase_order_reviewer?
+    return nil unless user.is_purchase_order_reviewer? || user.is_po_invoice_initiator?
     # {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
     {name: 'Team POs', indent: true, id: 'procure', url: 'purchase_orders/params={"team_po":"true"}'}
   end

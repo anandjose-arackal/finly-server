@@ -7,7 +7,6 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
             name: 'SAP',
             description: 'SAP exportable format. Exports expenses',
             formats: [
-                {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
         },
