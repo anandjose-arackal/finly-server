@@ -24,7 +24,7 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
   end
 
   class Procurements::PurchaseRequests::Show::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_request, :line_items_count, :line_items, :policies, :reviewal_chain, :is_any_po_created
+    attr_accessor :purchase_request, :line_items_count, :line_items, :policies, :reviewal_chain, :is_any_po_created, :budgets
 
     def init
       self.purchase_request = params[:purchase_request]
@@ -33,6 +33,10 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
       self.reviewal_chain = purchase_request.get_reviewal_chain if !purchase_request.draft? && !purchase_request.retracted? && !purchase_request.rejected?
       po_created = purchase_request&.purchase_request_items&.joins(:purchase_order_item).present? rescue nil
       self.is_any_po_created = !!po_created
+
+      # extracting the relevant budgets here
+      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_request, current_user: User.first})
+      self.budgets = op["result"][:budgets] rescue []
 
       # self.policies = Policy::VendorPayments::Index.(user, params).policies
       # self.reviewal_chains = []

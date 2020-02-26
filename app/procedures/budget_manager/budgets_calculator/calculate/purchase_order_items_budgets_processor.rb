@@ -20,6 +20,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
         entity_submitted_at: purchase_order_item.purchase_order.submitted_at,
         procurement_id: purchase_order_item.purchase_order.procurement_id,
         entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
+        vendor_id: purchase_order_item.purchase_order.vendor_id,
         amount_attributes: {
             value: purchase_order_item.total_amount&.value,
             currency_id: purchase_order_item.total_amount&.currency_id

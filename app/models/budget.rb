@@ -261,6 +261,7 @@ class Budget < ApplicationRecord
       budget_amount: budget_consumption.budget_amount.as_json,
       spent_amount: budget_consumption.total_consumed_amount.as_json,
       budget_consumption: budget_consumption,
+      budget_group: budget_group,
       # spent_amount: processor_instance.spent_amount,
       associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name:vendor.name}},
       associated_categories: budget_group_criterium&.budgetable_categories.as_json,
@@ -404,11 +405,13 @@ class Budget < ApplicationRecord
   end
 
   def update_consumption_model
-    budget_consumption = self.budget_consumption
-    # TODO - tempoorary
-    budget_consumption.budget_amount.update(value: self.budget_amount.value)
-    budget_consumption.remaining_amount.update(value: self.budget_amount.value)
-    # TODO - call to Budgets Computer that updates this particular budget
+    # budget_consumption = self.budget_consumption
+    # this will update the budget consumption model with the right details
+    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: self, current_user: User.first})
+
+    # # TODO - tempoorary
+    # budget_consumption.budget_amount.update(value: self.budget_amount.value)
+    # budget_consumption.remaining_amount.update(value: self.budget_amount.value)
   end
 
   def reflect_budget_group_attributes

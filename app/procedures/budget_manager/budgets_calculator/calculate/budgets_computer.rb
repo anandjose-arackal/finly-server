@@ -52,13 +52,21 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
   def retrieve_trails!(options, **)
     budget_group_criterium = self.budget.budget_group_criterium
-    criterial_mapping = budget_group_criterium.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
-    category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
-    cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
-    department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
-    location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
-    vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
-    user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
+
+    category_ids = budget_group_criterium.budgetable_categories.pluck(:id)
+    cost_center_ids = budget_group_criterium.budgetable_cost_centers.pluck(:id)
+    department_ids = budget_group_criterium.budgetable_departments.pluck(:id)
+    location_ids = budget_group_criterium.budgetable_locations.pluck(:id)
+    vendor_ids = budget_group_criterium.budgetable_vendors.pluck(:id)
+    user_ids = budget_group_criterium.budgetable_users.pluck(:id)
+
+    # criterial_mapping = budget_group_criterium.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
+    # category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
+    # cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
+    # department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
+    # location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
+    # vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
+    # user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
 
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
@@ -68,22 +76,29 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     budgetable_entities << "Payment" if self.budget.payment
     budgetable_entities << "PurchaseRequestItem" if self.budget.purchase_request
 
+    # debugger
+
     self.budget_trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date, self.date_to_be_considered).with_vendors(vendor_ids)
                  .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
                  .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
                  .with_budgetable_entities(budgetable_entities)
+
+    # debugger
     true
   end
 
   # here we calculate the various buckets
   def calculate_buckets!(options, **)
+
+    # debugger
     # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
-    pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:approved, :auto_approved))
+    pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
                          .joins(self.amount_to_be_considered).sum(:value)
 
     pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket)
                           .joins(self.amount_to_be_considered).sum(:value)
 
+    # debugger
 
     # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
     # One thing to note here is that when some of the items of aa PO have been billed (i.e. have an invoice created against them) we need to consider only those items
@@ -92,6 +107,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
     committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).joins(self.amount_to_be_considered).sum(:value)
 
+
+    # debugger
 
     # calculating pending payment amount - wil include all invoice items that are approved and above, and also all payments that are yet o be credited
     pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
@@ -102,10 +119,24 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket)
                                     .joins(self.amount_to_be_considered).sum(:value)
 
+    # debugger
+
     paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket)
                       .joins(self.amount_to_be_considered).sum(:value)
 
+    total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
+
+    remaining_amount = self.budget.budget_amount&.value - (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
+
+    if remaining_amount < 0
+      remaining_amount = 0
+    end
+
     self.budget_consumption.assign_attributes(
+                               budget_amount_attributes: {
+                                   id: self.budget_consumption.budget_amount_id,
+                                   value: self.budget.budget_amount&.value
+                               },
                                pending_amount_attributes: {
                                    id: self.budget_consumption.pending_amount_id,
                                    value: pending_amount
@@ -115,7 +146,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
                                    value: committed_amount
                                },
                                pending_payment_amount_attributes: {
-                                   id: self.budget_consumption.pending_payment_amount,
+                                   id: self.budget_consumption.pending_payment_amount_id,
                                    value: pending_payment_amount
                                },
                                payment_processing_amount_attributes: {
@@ -125,14 +156,23 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
                                paid_amount_attributes: {
                                    id: self.budget_consumption.paid_amount_id,
                                    value: paid_amount
+                               },
+                               remaining_amount_attributes: {
+                                   id: self.budget_consumption.remaining_amount_id,
+                                   value: remaining_amount
+                               },
+                               total_consumed_amount_attributes: {
+                                   id: self.budget_consumption.total_consumed_amount_id,
+                                   value: total_consumed_amount
                                }
     )
+    # debugger
     true
   end
 
   def persist_buckets!(options, **)
     unless self.budget_consumption.save
-      errors.add(:budget_consumption, "The budget consumption could not be saved because #{self.budget_consumption.errors.full_messages.to_sentence}")
+      add_message(options, :error, :budget_consumption, "The budget consumption could not be saved because #{self.budget_consumption.errors.full_messages.to_sentence}")
       return false
     end
     return true

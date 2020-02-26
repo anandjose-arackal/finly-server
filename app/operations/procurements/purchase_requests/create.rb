@@ -71,7 +71,6 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
         end
       end
     rescue => error
-      debugger
       add_message :error, 'Unable to create!'
     end
 

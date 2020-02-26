@@ -67,8 +67,7 @@ class BudgetTrail < ApplicationRecord
     unless department_ids.blank?
       # ids = where(department_id: department_ids).pluck(:id)
       # ids += where(sub_department_id: department_ids).pluck(:id)
-      ids = where('department_id IN (?) OR sub_department_id IN (?)', department_ids, department_ids).pluck(:id)
-      where(id: ids)
+      where('department_id IN (?) OR sub_department_id IN (?)', department_ids, department_ids)
     end
   }
 

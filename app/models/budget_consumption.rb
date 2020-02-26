@@ -36,14 +36,14 @@ class BudgetConsumption < ApplicationRecord
     {
         budget_id: budget.id,
         budget_name: budget.name,
-        budget_amount: budget_amount,
-        pending_amount: pending_amount,
-        committed_amount: committed_amount,
-        pending_payment_amount: pending_payment_amount,
-        payment_processing_amount: payment_processing_amount,
-        paid_amount: paid_amount,
-        remaining_amount: remaining_amount,
-        total_consumed_amount: total_consumed_amount
+        budget_amount: budget_amount.as_json(rounded: true),
+        pending_amount: pending_amount.as_json(rounded: true),
+        committed_amount: committed_amount.as_json(rounded: true),
+        pending_payment_amount: pending_payment_amount.as_json(rounded: true),
+        payment_processing_amount: payment_processing_amount.as_json(rounded: true),
+        paid_amount: paid_amount.as_json(rounded: true),
+        remaining_amount: remaining_amount.as_json(rounded: true),
+        total_consumed_amount: total_consumed_amount.as_json(rounded: true)
     }
   end
 end
