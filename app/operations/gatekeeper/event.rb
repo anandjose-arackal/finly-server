@@ -18,9 +18,9 @@ class Gatekeeper::Event
     return success_verdict require_otp: false unless ENABLED
     return success_verdict require_otp: false if RequestStoreUtil.current_user.class.name == AdminUser.name
 
-    if RequestStoreUtil.security_policy and not RequestStoreUtil.security_policy.gatekeeper.enabled?
-      return success_verdict require_otp: false
-    end
+    # if RequestStoreUtil.security_policy and not RequestStoreUtil.security_policy.gatekeeper.enabled?
+    #   return success_verdict require_otp: false
+    # end
 
     require_otp = false
     response_message = nil
