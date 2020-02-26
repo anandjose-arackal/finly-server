@@ -29,7 +29,7 @@ class NotifierMailer < ApplicationMailer
       end
     end
 
-    @payload["to"] && @payload["to"].each do |email|
+    @payload["to"].compact && @payload["to"].compact.each do |email|
       mail to: email,
            # from: payload[:from],
            subject: @payload["subject"],

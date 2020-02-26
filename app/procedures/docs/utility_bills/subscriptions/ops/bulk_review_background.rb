@@ -33,7 +33,7 @@ class Docs::UtilityBills::Subscriptions::Ops::BulkReviewBackground < Transaction
     records.each do |record|
       parameters = {
           aasm_event: action_type,
-          id: record.id
+          subscription_id: record.id
       }
 
       op = Docs::UtilityBills::Subscriptions::Ops::Review.(params: parameters, current_user: current_user)

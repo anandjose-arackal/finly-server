@@ -22,4 +22,12 @@ class ActionsManager::Master::Bbps::Subscriptions::Index < ActionsManager::Maste
   def bulk_return_control
     user.vendor_payment_admin?
   end
+
+  def bulk_deactivate
+    user.vendor_payment_admin?
+  end
+
+  def bulk_reactivate
+    user.vendor_payment_admin?
+  end
 end

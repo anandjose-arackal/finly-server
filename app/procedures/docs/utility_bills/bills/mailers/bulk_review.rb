@@ -41,6 +41,6 @@ class Docs::UtilityBills::Bills::Mailers::BulkReview < Docs::UtilityBills::Bills
     action_type = params["action_type"] || "action"
     action_type = action_type.humanize.split(" ").map(&:capitalize).join(" ")
     datetime = DateUtils.parse_datetime(params["performed_at"])
-    "Result for Bulk #{action_type} performed at #{datetime.strftime("%I:%M %p, %d %b %Y")}"
+    "Result for Bulk #{action_type} Performed at #{datetime.strftime("%I:%M %p, %d %b %Y")}"
   end
 end

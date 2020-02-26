@@ -17,7 +17,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   def verify_policy(options, current_user:, params:, model:, **)
     policy = Docs::UtilityBills::Bills::Authorizer.new(current_user, model)
 
-    success = policy.send((params['aasm_event'].to_s + '?').to_sym)
+    success = policy.send((params[:aasm_event].to_s + '?').to_sym)
 
     unless success
       return false
