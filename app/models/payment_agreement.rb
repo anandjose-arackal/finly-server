@@ -58,7 +58,7 @@ class PaymentAgreement < ApplicationRecord
   has_many :recurring_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
   has_many :agreement_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:recurring_invoice))}, class_name: 'Invoice', dependent: :destroy
 
-  # has_many :invoices
+# has_many :invoices
   has_many :beneficiary_payments, dependent: :destroy
   
   has_many :notify_users, as: :document, dependent: :destroy 
@@ -79,7 +79,7 @@ class PaymentAgreement < ApplicationRecord
     exclude_association :dlrms
   end
 
-  # validates_associated :invoices
+# validates_associated :invoices
   attr_accessor :selected_invoice_frequency_attributes
 
   validates :title, presence: true
@@ -112,9 +112,9 @@ class PaymentAgreement < ApplicationRecord
     end
   }
 
-  # scope :filter_vendor_name, -> (name){
-  #   joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
-  # }
+# scope :filter_vendor_name, -> (name){
+#   joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
+# }
 
   scope :with_ids, -> (ids) {
     where id: ids
@@ -216,7 +216,7 @@ class PaymentAgreement < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  # Repitition for dashboard
+# Repitition for dashboard
   scope :filter_by_status_id,  -> (status_id) {
     if status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
@@ -276,7 +276,7 @@ class PaymentAgreement < ApplicationRecord
     with_ids(ids)
   }
 
-  scope :exclude_revision, -> { where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
+  scope :exclude_revision, -> {where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
 
 
   def as_json(options={})
@@ -300,14 +300,14 @@ class PaymentAgreement < ApplicationRecord
         renewal_reminder_date: self.renewal_reminder_date,
         vendors: get_related_vendors(options),
         custom_fields: self.custom_fields,
-        termination_details: { termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
+        termination_details: {termination_reason: self.termination_reason, terminated_at: self.terminated_at&.strftime("%d-%m-%Y  %I:%M %p"), terminated_by: self.terminated_by&.name},
         revised: self.revision_of_pa_id.present?,
         revision_of_pa_id: self.revision_of_pa_id,
         revision_of_pa_order_number: self&.revision_of_pa&.get_agreement_number,
         revision_reason: self.revision_reason,
         termination_reason: self.termination_reason,
         reject_note: self.reject_note
-      }
+    }
   end
 
   def self.document_owner_attribute
@@ -338,13 +338,13 @@ class PaymentAgreement < ApplicationRecord
     return status_ids.flatten.compact
   end
 
-  # For user role as payment agreement initiator
+# For user role as payment agreement initiator
   def is_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), self)
   end
 
-  # For user role as payment agreement reviewer
+# For user role as payment agreement reviewer
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), self)

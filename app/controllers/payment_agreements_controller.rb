@@ -125,7 +125,7 @@ class PaymentAgreementsController < BaseControllers::WebBase
     @result = PaymentAgreements::Terminate.(current_user, params)
     respond
   end
-  
+
   def revise
     @result = PaymentAgreements::Revise.(current_user, params)
     respond

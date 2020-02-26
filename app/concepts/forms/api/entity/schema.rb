@@ -113,6 +113,7 @@ module Forms::API::Entity::Schema
     @scope = value unless value == NoObject
     @scope
   end
+
   alias_method :scope=, :scope
 
   # def auto_complete(route: nil, filters: {})

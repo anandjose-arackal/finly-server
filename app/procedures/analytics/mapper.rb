@@ -7,25 +7,34 @@ module Analytics::Mapper
     include DynamicAttributes
 
     class_attr :is_sync, default: false
-    class_attr :transaction_model
-    class_attr :field_mappings
+    # class_attr :transaction_model
+    class_attr :field_mappings, default: []
     class_attr :olap_model
     class_attr :required_relationships, default: []
     class_attr :input, default: -> (user, payload) {payload[:record]}
 
-    define_singleton_method :field_mappings do
-      next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
-      self.attribute_field_mappings ||= []
-      set_defaults
-      self.attribute_field_mappings
-    end
+    # define_singleton_method :field_mappings do
+    #   # next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
+    #   # self.attribute_field_mappings ||= []
+    #   value = instance_variable_get("@attribute_field_mappings")
+    #   next value unless value.nil?
+    #   instance_variable_set("@attribute_field_mappings", value || [])
+    #   set_defaults
+    #   # self.attribute_field_mappings
+    #   instance_variable_get("@attribute_field_mappings")
+    # end
 
     define_singleton_method :transaction_model do |klass = NoObject|
       unless klass == NoObject
         Analytics::Master.register klass, self
-        self.attribute_transaction_model = klass
+        # self.attribute_transaction_model = klass
+        instance_variable_set("@attribute_transaction_model", klass)
+        # super(klass)
+        #
+        # klass.super
       end
-      self.attribute_transaction_model
+      # self.attribute_transaction_model
+      instance_variable_get("@attribute_transaction_model")
     end
   end
 

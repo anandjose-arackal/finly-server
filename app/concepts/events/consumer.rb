@@ -69,7 +69,7 @@ module Events::Consumer
   end
 
   def work(user, message)
-    puts "Work called"
+    puts "Work called #{self.class.name}"
   end
 
   # def on_schedule

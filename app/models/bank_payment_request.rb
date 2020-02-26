@@ -46,7 +46,7 @@ class BankPaymentRequest < ApplicationRecord
           Transitionable,
           CustomFieldFilterSupport
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
@@ -612,8 +612,8 @@ include Exposures::Model::Exposable
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
-  def self.human_name
-    'Payment Ticket'
+  def self.human_name(options = {})
+    options[:plural] ? 'Payment Tickets' : 'Payment Ticket'
   end
 
   def self.role_based_associated_status_ids(user)

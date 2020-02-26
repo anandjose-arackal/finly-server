@@ -33,7 +33,7 @@ class Forms::Generators::Contracts::API
     properties = self.properties
     functions = self.functions
     entities_map = {}
-    form.entities.includes(:entities).each { |e| entities_map[e.field_path] = e }
+    form.entities.includes(:entities).each {|e| entities_map[e.field_path] = e}
     root_custom_fields = form.entities.root.custom_fields
     load_custom_fields = load_custom_fields?
     klass = Class.new(Forms::Reform) do

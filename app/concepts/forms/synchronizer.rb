@@ -1,7 +1,7 @@
 class Forms::Synchronizer
 
   def self.call
-    Forms::Router.forms.each { |form| Forms::Synchronizer.sync(form) }
+    Forms::Router.forms.each {|form| Forms::Synchronizer.sync(form)}
   end
 
   def self.sync(form)

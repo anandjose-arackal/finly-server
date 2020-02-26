@@ -1,6 +1,7 @@
 class Personalizer::Adapters::ExportBase < BaseOperation
 
   attr_accessor :export_file_path
+
   def success
     operation = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
     if params[:type] == 'xls'

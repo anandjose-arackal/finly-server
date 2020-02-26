@@ -1,0 +1,8 @@
+<div class="section-header" style="padding: 15px 0;">
+  <% if Rails.env.production? %>
+    <img src="<%= company['logo_url'].present? ? company['logo_url'] : company['name'] %>" height="35" width="auto">
+  <% else %>
+    <img src="http://localhost:3001/common/images/logos/logo_black_xs.png" height="35" width="auto">
+  <% end %>
+  <a href="https://www.finly.io/login" style="float: right;font-weight: 600;margin-top: 5px;font-size: 17px;">Login</a>
+</div>

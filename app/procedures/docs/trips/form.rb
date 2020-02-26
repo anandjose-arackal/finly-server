@@ -4,8 +4,8 @@ class Docs::Trips::Form < Forms::API
 
   section :header, associate_custom_fields: true do
     auto_number :trip_id, sequence: {prefix: "TRF/{{\"now\" | date: \"%y-%m\" }}/", start_at: '000001'}
-    dropdown :created_by, required: true, visible: false#, class_name: 'User'
-    dropdown :company, required: true#, class_name: 'Company', internal: true
+    dropdown :created_by, required: true, visible: false #, class_name: 'User'
+    dropdown :company, required: true #, class_name: 'Company', internal: true
     # lookup :department_id, scope: Forms::API::Entity::Scope[:auto_complete].scope('departments', filters: {}), required: true
     # lookup :location_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('locations', filters: {}), required: true
     # lookup :cost_center_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('cost_centers', filters: {}), required: true

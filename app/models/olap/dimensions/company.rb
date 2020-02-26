@@ -20,7 +20,7 @@
 
 class Olap::Dimensions::Company < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::Company
   consume 'company.update', 'company.create', 'company.destroy'

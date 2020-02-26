@@ -205,7 +205,12 @@ class FieldConfiguration < ApplicationRecord
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     if options[:called_from_drop_down]
-      return super
+      result = {
+          field_type: {id: field_type.id,
+                       name: field_type.name},
+          label: field_name
+      }
+      return super.merge(result)
     end
     options = []
     # user_level_custom_fields = RequestStore.store[:current_user]&.company&.feature_subscription&.user_level_custom_fields? ? true : false

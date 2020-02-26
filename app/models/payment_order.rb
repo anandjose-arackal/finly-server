@@ -35,7 +35,7 @@
 class PaymentOrder < ApplicationRecord
   include PostOperationExecution, SoftDeletable
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
 
   CONFIG = {
       meal_card: {

@@ -147,20 +147,24 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           if item.is_a?(Hash)
             case item[:type]
             when 'string'
-              worksheet.write_string(1 + row, column, item[:value])
+              if item[:value].present?
+                worksheet.write_string(1 + row, column, item[:value])
+              else
+                worksheet.write_blank(1 + row, column)
+              end
             when 'number'
               worksheet.write_number(1 + row, column, item[:value])
             when 'date'
               if item[:value].present?
-               date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
-               date = item[:value].strftime('%d-%m-%Y')
-               worksheet.write_date_time(1 + row, column, date, date_format)
+                date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
+                date = item[:value].strftime('%d-%m-%Y')
+                worksheet.write_date_time(1 + row, column, date, date_format)
               else
                 worksheet.write_blank(1 + row, column)
               end
             when 'currency'
             else
-               worksheet.write_string(1 + row, column, item[:value])
+              worksheet.write_string(1 + row, column, item[:value])
             end
           else
             worksheet.write(1 + row, column, item)

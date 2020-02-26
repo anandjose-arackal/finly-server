@@ -62,6 +62,10 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     endpoint Docs::UtilityBills::Subscriptions::Ops::FetchBill
   end
 
+  def fetch_and_create_bill
+    endpoint Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill
+  end
+
   def update_and_submit
     params[:id] = params[:id] || params[:_id]
     endpoint Docs::UtilityBills::Subscriptions::Ops::UpdateAndSubmit

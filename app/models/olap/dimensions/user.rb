@@ -34,7 +34,7 @@
 
 class Olap::Dimensions::User < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::User
   consume 'user.update', 'user.create', 'user.destroy'

@@ -35,7 +35,7 @@
 
 class Olap::Dimensions::Item < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::Item
   consume 'item.update', 'item.create', 'item.destroy'

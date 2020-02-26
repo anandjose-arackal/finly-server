@@ -5,7 +5,7 @@ class Forms::Generators::Contracts::EntityBuilder::Validations::MaxValue < Forms
   def transform!
     return unless value
 
-    validates << [name, numericality: { greater_than_or_equal_to: value}]
+    validates << [name, numericality: {greater_than_or_equal_to: value}]
   end
 
 

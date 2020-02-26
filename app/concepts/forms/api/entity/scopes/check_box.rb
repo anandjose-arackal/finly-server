@@ -7,7 +7,7 @@ class Forms::API::Entity::Scopes::CheckBox < Forms::API::Entity::Scopes::Base
   # end
 
   def find_by_id(choice, user: nil)
-      form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
+    form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
   end
 
   def find_by_name(choice, user: nil)

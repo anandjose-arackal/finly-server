@@ -66,7 +66,7 @@
 class User < ApplicationRecord
   include OperationCallbacks
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'user'

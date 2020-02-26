@@ -21,7 +21,7 @@ class TripPassenger < ApplicationRecord
 
   has_many :custom_fields, as: :document, class_name: "FormCustomField", primary_key: :uuid
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name,

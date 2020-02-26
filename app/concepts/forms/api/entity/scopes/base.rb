@@ -39,7 +39,7 @@ class Forms::API::Entity::Scopes::Base
     raise "scope is not defined for #{self.class}"
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         type: self.type
     }

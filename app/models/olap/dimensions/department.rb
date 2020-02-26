@@ -22,7 +22,7 @@
 
 class Olap::Dimensions::Department < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::Department
   consume 'department.update', 'department.create', 'department.destroy'

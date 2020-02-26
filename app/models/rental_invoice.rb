@@ -227,7 +227,7 @@ class RentalInvoice < ApplicationRecord
     where(end_date: end_date.to_date)
   }
 
-  scope :filter_upcoming_invoice_date, -> (from, to){
+  scope :filter_upcoming_invoice_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.parse('01-01-2050') if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
@@ -321,23 +321,23 @@ class RentalInvoice < ApplicationRecord
 
   def payment_history_json
     {
-      id: self.id,
-      invoice_number: self.get_invoice_number,
-      vendor_name: self.vendor&.display_name,
-      due_date: self.due_date&.to_date,
-      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
-      balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
-      status: self&.status&.name&.titleize,
-      creation_date: self.created_at.to_date,
-      tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
-      agreement_type: self.class.name.underscore,
-      payment_agreement_id: self.payment_agreement_id,
-      vendor_id: self.vendor_id,
-      agreement_number: self.payment_agreement&.get_agreement_number,
-      start_date: self.start_date,
-      end_date: self.end_date,
-      allow_add_invoice: allowed_to_add_invoice?,
-      invoice_created: agreement_invoice_created?
+        id: self.id,
+        invoice_number: self.get_invoice_number,
+        vendor_name: self.vendor&.display_name,
+        due_date: self.due_date&.to_date,
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id},
+        balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
+        status: self&.status&.name&.titleize,
+        creation_date: self.created_at.to_date,
+        tds_slab_attributes: {id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds},
+        agreement_type: self.class.name.underscore,
+        payment_agreement_id: self.payment_agreement_id,
+        vendor_id: self.vendor_id,
+        agreement_number: self.payment_agreement&.get_agreement_number,
+        start_date: self.start_date,
+        end_date: self.end_date,
+        allow_add_invoice: allowed_to_add_invoice?,
+        invoice_created: agreement_invoice_created?
 
     }
   end

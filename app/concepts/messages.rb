@@ -41,7 +41,7 @@ class Messages
     options[message_type] = {} if options[message_type].nil?
     options[message_type][key] = [] if options[message_type][key].nil?
     message = [message] unless message.respond_to?(:each)
-    message.each { |m| options[message_type][key] << m }
+    message.each {|m| options[message_type][key] << m}
   end
 
   def self.AddSchema(options, errors_list)

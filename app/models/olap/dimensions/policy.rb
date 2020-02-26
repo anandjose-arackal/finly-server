@@ -23,7 +23,7 @@
 
 class Olap::Dimensions::Policy < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::Policy
   consume 'policy.update', 'policy.create', 'policy.destroy'

@@ -21,7 +21,7 @@ class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'department'

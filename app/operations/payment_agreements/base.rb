@@ -227,7 +227,7 @@ class PaymentAgreements::Base < BaseOperation
       else
         amt = (item.rate * item.quantity)
       end
-      amount_arr << (amt*tds_percentage/100).ceil # round the tds to the nearest digit as of now. This is as per IT rule
+      amount_arr << (amt * tds_percentage / 100).ceil # round the tds to the nearest digit as of now. This is as per IT rule
     end
     return amount_arr.sum
   end
@@ -875,7 +875,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.general_invoices.fixed_periodic_type.present?
       self.payment_agreement.general_invoices.fixed_periodic_type.each do |general_invoice|
         if general_invoice.items.present?
-          g_item_ids << general_invoice.invoice_items.collect{|i| i.inventory_line_item_id}
+          g_item_ids << general_invoice.invoice_items.collect {|i| i.inventory_line_item_id}
         else
           add_message :error, "All general invoice line items should have atleast one inventory item"
         end
@@ -884,7 +884,7 @@ class PaymentAgreements::Base < BaseOperation
     if self.payment_agreement.rental_invoices.fixed_periodic_type.present?
       self.payment_agreement.rental_invoices.fixed_periodic_type.each do |rental_invoice|
         if rental_invoice.items.present?
-          r_item_ids << rental_invoice.invoice_items.collect{|i| i.inventory_line_item_id}
+          r_item_ids << rental_invoice.invoice_items.collect {|i| i.inventory_line_item_id}
         else
           add_message :error, "All rental invoice line items should have atleast one inventory item"
         end

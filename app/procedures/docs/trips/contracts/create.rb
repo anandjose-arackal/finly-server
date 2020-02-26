@@ -5,7 +5,7 @@ class Docs::Trips::Contracts::Create < Forms::Generators::Contracts::API
 
   property :company, validates: {presence: true}
   property :created_by, validates: {presence: true}
-  property :status_id, deserializer: -> (input, represented, **) { represented.status_id = TripStatus.id_for(:draft) }
+  property :status_id, deserializer: -> (input, represented, **) {represented.status_id = TripStatus.id_for(:draft)}
   property :trip_id, writable: false
   property :policy_id
   property :start_date

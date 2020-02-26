@@ -33,7 +33,7 @@ class IndexBuilder::Templates::Base
       value = nil
       retriever = send(field)
       if retriever.is_a?(String)
-        value =  exposure.template(retriever)
+        value = exposure.template(retriever)
       elsif retriever.is_a?(Symbol)
         if context.respond_to?(retriever)
           value = context.send(retriever, user, exposure)

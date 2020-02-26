@@ -33,7 +33,7 @@ class FieldDropDownItem < ApplicationRecord
   scope :with_field_configuration_id, -> (id) {
     where field_configuration_id: id
   }
-  scope :filter_user_id,->(user_id) do
+  scope :filter_user_id, ->(user_id) do
     joins(:user_drop_down_item_mappings).where('user_drop_down_item_mappings.user_id = ?', user_id)
   end
 

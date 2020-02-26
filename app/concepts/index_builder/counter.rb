@@ -23,7 +23,7 @@ class IndexBuilder::Counter
     counts << {filter_id: filter_id, label: label, count: (count || 0)}
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         filter_key: filter_key,
         counts: counts

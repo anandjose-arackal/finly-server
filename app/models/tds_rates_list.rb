@@ -15,7 +15,7 @@
 
 class TdsRatesList < ApplicationRecord
   include LiquidDroppable
-include Exposures::Model::Exposable, SoftDeletable
+  include Exposures::Model::Exposable, SoftDeletable
   include EventProducer
 
   event_channel 'tds_rate'

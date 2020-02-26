@@ -36,12 +36,12 @@ class Forms::API::Dependency::Item
   def initialize(controlling_field:, dependent_field:, dependency_mappings:)
     self.controlling_field = controlling_field
     self.dependent_field = dependent_field
-    self.dependency_mappings = dependency_mappings.map { |mapping| DependencyMapping.new(**mapping) }
+    self.dependency_mappings = dependency_mappings.map {|mapping| DependencyMapping.new(**mapping)}
   end
 
   def find_or_create(user, form)
     entities = {}.with_indifferent_access
-    form.entities.each { |f| entities[f.field_path] = f }
+    form.entities.each {|f| entities[f.field_path] = f}
     dependency = form.dependencies.where(
         controlling_entity_id: entities[controlling_field].id,
         dependent_entity_id: entities[dependent_field].id).first

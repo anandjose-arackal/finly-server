@@ -53,6 +53,6 @@ class Trip < ApplicationRecord
 
   acts_as_sequenced column: :trip_id, purpose: :trip, editable: false, prefix: 'TRF/'
 
-  scope :non_draft, -> { where.not status_id: TripStatus.id_for(:draft) }
+  scope :non_draft, -> {where.not status_id: TripStatus.id_for(:draft)}
 
 end

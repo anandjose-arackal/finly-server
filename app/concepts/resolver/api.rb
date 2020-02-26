@@ -36,6 +36,7 @@ class Resolver::API
   def entity
     self.class.entity
   end
+
   alias_method :scope, :entity
 
   def load(params)

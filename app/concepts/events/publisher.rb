@@ -8,7 +8,7 @@ class Events::Publisher
   def self.broadcast(routing_key, message, current_user: nil, ignore_failure: false)
 
     payload = {message: message, current_user: (current_user || RequestStoreUtil.current_user)}
-    payload.reject! { |k, v| v.nil? } # Remove all nil values
+    payload.reject! {|k, v| v.nil?} # Remove all nil values
 
     Async.(routing_key, payload, current_user: current_user)
     Sync.(routing_key, payload, current_user: current_user, ignore_failure: ignore_failure)

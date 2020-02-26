@@ -25,7 +25,7 @@
 
 class Olap::Dimensions::TaxRate < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::TaxRate
   consume 'tax_rate.update', 'tax_rate.create', 'tax_rate.destroy'

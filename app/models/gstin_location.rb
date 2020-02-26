@@ -23,7 +23,7 @@
 
 class GstinLocation < ApplicationRecord
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
 
   belongs_to :vendor, class_name: "YesBankVendor", optional: true
   belongs_to :gstin_master, class_name: "Gstin", foreign_key: :gstin_id, optional: true

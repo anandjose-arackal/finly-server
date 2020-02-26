@@ -54,7 +54,7 @@ class FormDependency < ApplicationRecord
           if [controlling_choices.to_s].include?(mapping.controlling_choice_id)
             # Required
             if mapping.dependent_required
-              blank_values = dependent_choices.select { |v| v.blank? }
+              blank_values = dependent_choices.select {|v| v.blank?}
               blank_error = true if blank_values.present?
             end
 
@@ -77,7 +77,7 @@ class FormDependency < ApplicationRecord
         end
       end
 
-      validate -> () { dependency_validation(dependency) }
+      validate -> () {dependency_validation(dependency)}
     end
   end
 end

@@ -9,7 +9,7 @@ class Transactions::Contracts::PreProcessors::SkipDestroy < Transactions::Contra
     if model_klass and not StringUtils.to_bool(options[:skip_destroy])
       options[:populator] = -> (model: nil, collection:, fragment:, index: nil, options:, **) do
         if collection
-          item = collection.find { |item| [fragment["id"].to_s, fragment["uuid"].to_s].include?(item.id.to_s) }
+          item = collection.find {|item| [fragment["id"].to_s, fragment["uuid"].to_s].include?(item.id.to_s)}
 
           if fragment["_destroy"]
             collection.destroy(item) if item

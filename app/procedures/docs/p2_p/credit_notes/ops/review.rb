@@ -11,6 +11,7 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
   step :validation
   step :verify_policy
   step :transition
+  step :post_process
 
   fail :check
 
@@ -50,14 +51,25 @@ class Docs::P2P::CreditNotes::Ops::Review < Transactions::API
         document: model,
         aasm_event: params[:aasm_event],
         reject_to_user: params[:reject_to_user],
-        reject_to_level: params[:reject_to_level]
+        reject_to_level: params[:reject_to_level],
+        note: params[:note]
 
     }
     op = WorkflowManager::Base.(current_user, parameters)
-    unless op.success?
-      add_message(options, :error, :base, op.messages.errors)
+
+    op.messages.slice(:error, :success, :info).each do |key, val|
+      next if key == :errors_meta
+      add_message options, key, :base, val
     end
+
     op.success?
+  end
+
+  def post_process(options, params:, model:, **)
+    if params[:note].present?
+      model.update(review_note: params[:note])
+    end
+    true
   end
 
 

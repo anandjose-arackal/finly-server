@@ -23,7 +23,7 @@
 class TaxRate < ApplicationRecord
   include SoftDeletable
   include LiquidDroppable
-include Exposures::Model::Exposable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'tax_rate'

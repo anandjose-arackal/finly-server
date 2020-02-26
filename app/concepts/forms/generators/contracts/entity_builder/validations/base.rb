@@ -10,7 +10,7 @@ class Forms::Generators::Contracts::EntityBuilder::Validations::Base
     @validates ||= []
   end
 
-  def  validate
+  def validate
     @validate ||= []
   end
 

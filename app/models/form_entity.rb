@@ -70,9 +70,9 @@ class FormEntity < ApplicationRecord
   serialize :chained, JSON
   serialize :scope, JSON
 
-  scope :root, -> { where parent_id: nil }
-  scope :system_fields, -> { where.not custom_field: true }
-  scope :custom_fields, -> { where custom_field: true }
+  scope :root, -> {where parent_id: nil}
+  scope :system_fields, -> {where.not custom_field: true}
+  scope :custom_fields, -> {where custom_field: true}
 
   def populate_if_empty
     val = super()

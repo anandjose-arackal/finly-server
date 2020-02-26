@@ -12,11 +12,11 @@ class Forms::API::Entity::Base
   attribute :form
   attribute :section
   attribute :field_key
-  attribute :field_path, default: ->(*args) { self.field_key&.to_s }
-  attribute :label, default: ->(*args) { self.field_key&.to_s&.humanize }
+  attribute :field_path, default: ->(*args) {self.field_key&.to_s}
+  attribute :label, default: ->(*args) {self.field_key&.to_s&.humanize}
   attribute :placeholder, default: "Enter value"
   attribute :hint
-  attribute :field_type, default: ->(*args) { self.registered_type }
+  attribute :field_type, default: ->(*args) {self.registered_type}
   attribute :default_value
   attribute :editable, default: true
   attribute :required, default: false

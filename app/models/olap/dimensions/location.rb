@@ -33,7 +33,7 @@
 
 class Olap::Dimensions::Location < OlapRecord
   include Events::Consumer
-include Analytics::Mapper
+  include Analytics::Mapper
 
   transaction_model ::BranchLocation
   consume 'branch_location.update', 'branch_location.create', 'branch_location.destroy'

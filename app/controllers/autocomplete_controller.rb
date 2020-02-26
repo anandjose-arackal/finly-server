@@ -13,7 +13,7 @@ class AutocompleteController < BaseControllers::WebBase
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
     respond_to do |format|
-      format.json { render json: merchants.as_json }
+      format.json {render json: merchants.as_json}
     end
   end
 

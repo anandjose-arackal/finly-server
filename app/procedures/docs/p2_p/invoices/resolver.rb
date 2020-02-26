@@ -11,7 +11,7 @@ class Docs::P2P::Invoices::Resolver < Resolver::API
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
+      invoices = ::Invoice.associated_items(user, ::Invoice.roles)
       invoices = invoices.non_beneficiary.created_at_desc rescue ::Invoice.none #unless invoices.blank?
     end
 

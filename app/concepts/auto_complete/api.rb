@@ -48,7 +48,7 @@ class AutoComplete::API < Transactions::API
   end
 
   def json_builder
-   self.class.json_builder
+    self.class.json_builder
   end
 
   def resolver_builder(context, options)

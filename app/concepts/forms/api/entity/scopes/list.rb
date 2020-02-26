@@ -15,7 +15,7 @@ class Forms::API::Entity::Scopes::List < Forms::API::Entity::Scopes::Base
   end
 
   def self.scope(*args)
-    {type: :list, choices: args&.map { |m| m.slice(:value, :active) }}
+    {type: :list, choices: args&.map {|m| m.slice(:value, :active)}}
   end
 
 end

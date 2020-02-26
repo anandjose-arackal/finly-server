@@ -3278,10 +3278,10 @@ Rails.application.routes.draw do
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
   get 'autocomplete/bbps_billers', to: 'autocomplete#bbps_billers'
-  get 'autocomplete/:entity', to: 'autocomplete#route'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
+  get 'autocomplete/:entity', to: 'autocomplete#route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -4016,6 +4016,7 @@ Rails.application.routes.draw do
       put 'update_and_submit', to: 'subscriptions#update_and_submit'
       patch 'add_bill', to: 'subscriptions#add_bill'
       get 'fetch_bill', to: 'subscriptions#fetch_bill'
+      patch 'fetch_and_create_bill', to: 'subscriptions#fetch_and_create_bill'
     end
 
     get 'bills/edit_config', to: 'bills#edit_config'

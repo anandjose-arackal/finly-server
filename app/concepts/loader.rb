@@ -5,7 +5,7 @@ class Loader
 
     ActiveSupport::Reloader.to_prepare do
       block.call if block_given?
-      Dir.glob(Rails.root.join(dir)).each { |f| load(f) } if dir
+      Dir.glob(Rails.root.join(dir)).each {|f| load(f)} if dir
       load Rails.root.join(path) if path
     end
   end
