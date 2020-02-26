@@ -36,7 +36,7 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
 
       # extracting the relevant budgets here
       op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_request, current_user: User.first})
-      self.budgets = op["result"][:budgets] rescue []
+      self.budgets = op["result"][:budgets]
 
       # self.policies = Policy::VendorPayments::Index.(user, params).policies
       # self.reviewal_chains = []

@@ -43,7 +43,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       # calling applicable budgets so that the relevant budgets are shown
       op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
-      self.budgets = op["result"][:budgets] rescue []
+      self.budgets = op["result"][:budgets]
 
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.leaves
