@@ -26,6 +26,10 @@ class Procurements::InwardDocuments::CreateSrn < Procurements::InwardDocuments::
       add_message :error, 'Purchase Order not found for this procurement, cannot create Receipt Note'
     end
 
+    if self.purchase_order.processing?
+      add_message :error, "This Purchase Order is not yet approved. cannot create Receipt Note"
+    end
+
     if self.purchase_order.closed?
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
