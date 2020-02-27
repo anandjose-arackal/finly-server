@@ -12,6 +12,7 @@ namespace :load do
     set :hutch_log, -> {File.join(shared_path, 'log', 'hutch.log')}
     # set :hutch_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :hutch_role, -> {:hutch}
+    set :hutch_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :hutch_env, fetch(:rack_env, fetch(:rails_env, 'production'))
   end
 end
