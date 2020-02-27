@@ -85,6 +85,8 @@ json.result do
     json.poc_mobile_number invoice.vendor_location&.poc_mobile_number
 
     json.beneficiary_ifsc invoice.bank_account&.ifsc
+    json.beneficiary_account_number invoice.bank_account&.account_number
+    json.beneficiary_account_name invoice.bank_account&.name
 
     json.invoice_creator_name "#{invoice.created_by&.first_name} #{invoice.created_by&.last_name}"
     json.invoice_creator_employee_id invoice.created_by&.employee_id
