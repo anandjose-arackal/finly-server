@@ -46,7 +46,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     end
 
     # setting the relevant date type for this budget
-    self.date_to_be_considered = self.budget.budget_date_type.name
+    self.date_to_be_considered = self.budget.budget_date_type&.name || "entity_created_at"
     true
   end
 
