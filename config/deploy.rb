@@ -118,16 +118,19 @@ case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
     :background_production_bgg, :background_production_bgp, :background_production_bgpc, :background_production_olap
   linked_files << 'config/sidekiq.yml'
+  linked_files << 'config/hutch.yml'
   linked_files << 'config/elastic_apm.yml'
   linked_files << 'config/bunny.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"
+  linked_files << 'config/hutch.yml'
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
   linked_files << 'config/bunny.yml'
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
+  linked_files << 'config/hutch.yml'
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
