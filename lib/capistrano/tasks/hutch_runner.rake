@@ -23,7 +23,7 @@ namespace :hutch do
       within release_path do
         args = "#{fetch(:hutch_runner)} >> #{fetch(:hutch_log)} 2>&1 & echo $! > #{fetch(:hutch_pid)}"
         with rails_env: fetch(:hutch_env) do
-          execute(:bundle, :exec, :hutch, args) unless process_exists?(pid_file)
+          execute(:bundle, :exec, :hutch, args) unless process_exists?(fetch(:hutch_pid))
         end
       end
     end
