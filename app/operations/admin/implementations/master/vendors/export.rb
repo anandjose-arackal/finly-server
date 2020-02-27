@@ -85,7 +85,7 @@ class Admin::Implementations::Master::Vendors::Export < Admin::Implementations::
 
   def account_number(vendor)
     bank_account_number = vendor.bank_accounts&.first&.account_number rescue ''
-    {value: bank_account_number , type: "string"}
+    {value: bank_account_number, type: "string"}
   end
 
   def ifsc(vendor)

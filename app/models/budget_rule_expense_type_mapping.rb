@@ -7,6 +7,7 @@
 #  expense_type_id :integer          not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  deleted_at      :datetime
 #
 
 class BudgetRuleExpenseTypeMapping < ApplicationRecord

@@ -73,7 +73,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def user_id(lurm)
-    identifier = lurm.reviewer&.profile&.employee_id
+    identifier = lurm.user&.profile&.employee_id
     return identifier if identifier.present?
     lurm.user&.email&.present? ? lurm.user&.email : lurm.user&.mobile_number
   end
@@ -121,7 +121,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
       contents[provider] = []
       policy_ids = apply_scopes(company.policies).pluck(:id)
       level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity_type: provider).pluck(:id)
-      data = LevelUserReviewerMapping.where(level_id: level_ids).where.not(user_id: nil).includes(:level, :policy,reviewer: :profile, user: :profile)
+      data = LevelUserReviewerMapping.where(level_id: level_ids).where.not(user_id: nil).includes(:level, :policy, reviewer: :profile, user: :profile)
       total_count += data.count
       self.implementation_request.update(requested_items: data.count)
       data.each_with_index do |entry, index|

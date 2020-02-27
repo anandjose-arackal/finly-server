@@ -216,7 +216,7 @@ class BankPaymentRequest < ApplicationRecord
                                                           #     {payment_order: [bank_payment_request: [:status]]},
                                                           #     :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
-  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
+  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [:receiving_account,
                                                                              :initiating_user,:parent,:payment_status,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
                                                                              {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
@@ -610,8 +610,8 @@ class BankPaymentRequest < ApplicationRecord
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
-  def self.human_name
-    'Payment Ticket'
+  def self.human_name(options = {})
+    options[:plural] ? 'Payment Tickets' : 'Payment Ticket'
   end
 
   def self.role_based_associated_status_ids(user)

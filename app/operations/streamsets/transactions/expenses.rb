@@ -13,7 +13,7 @@ class Streamsets::Transactions::Expenses < BaseOperation
     end
 
     reports = op.reports
-  	self.expenses = Expense.where(report_id: reports.pluck(:id)).include_details
+    self.expenses = Expense.where(report_id: reports.pluck(:id)).include_details
 
   end
 

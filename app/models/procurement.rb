@@ -16,8 +16,6 @@
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
 #  deleted_at            :datetime
-#  vendor_poc_id         :integer
-#  vlpm_id               :integer
 #
 
 class Procurement < ApplicationRecord

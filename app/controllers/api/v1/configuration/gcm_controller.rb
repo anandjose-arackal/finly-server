@@ -1,4 +1,4 @@
-class Api::V1::Configuration::GcmController <  Api::V1::BaseMobileApiController
+class Api::V1::Configuration::GcmController < Api::V1::BaseMobileApiController
   protect_from_forgery with: :null_session
 
 

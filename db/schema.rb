@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_07_104931) do
+ActiveRecord::Schema.define(version: 2020_02_10_062332) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -762,12 +762,14 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "bbps_biller_subscription_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["name"], name: "index_bbps_biller_subscription_statuses_on_name"
   end
 
@@ -2350,6 +2352,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
 
   create_table "credit_note_item_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
+    t.datetime "deleted_at"
   end
 
   create_table "credit_note_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2396,6 +2399,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "credit_notes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -3373,6 +3377,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["created_at"], name: "index_export_job_statuses_on_created_at"
     t.index ["name"], name: "index_export_job_statuses_on_name"
     t.index ["updated_at"], name: "index_export_job_statuses_on_updated_at"
@@ -3512,6 +3517,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.boolean "utility_bills_enabled", default: false
     t.datetime "deleted_at"
     t.boolean "analytics_system"
+    t.boolean "sso_login_enforced", default: false
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -3794,6 +3800,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["name"], name: "index_form_dependency_types_on_name"
   end
 
@@ -5533,6 +5540,9 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.integer "terminated_by_id"
     t.text "termination_reason"
     t.datetime "deleted_at"
+    t.integer "revision_of_pa_id"
+    t.text "revision_reason"
+    t.integer "revised_by_id"
     t.index ["total_amount_id"], name: "index_payment_agreements_on_total_amount_id"
   end
 
@@ -6626,6 +6636,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["name"], name: "index_receipt_email_statuses_on_name"
   end
 
@@ -7216,6 +7227,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
   end
 
   create_table "sso_keys", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -7555,6 +7567,7 @@ ActiveRecord::Schema.define(version: 2020_02_07_104931) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
+    t.datetime "deleted_at"
     t.index ["name"], name: "index_transfer_modes_on_name"
   end
 

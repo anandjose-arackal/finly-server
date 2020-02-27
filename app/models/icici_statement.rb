@@ -16,6 +16,7 @@
 #  updated_at          :datetime         not null
 #  company_id          :integer
 #  remarks             :text(65535)
+#  deleted_at          :datetime
 #
 
 class IciciStatement < ApplicationRecord

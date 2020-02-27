@@ -120,12 +120,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def agreement_invoices
-    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_credit_note_initiator? || user.is_credit_note_reviewer?)
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_credit_note_initiator? || user.is_credit_note_reviewer?)
     {name: 'Agreement Invoices', indent: true, id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"agreement_invoice"}'}
   end
 
   def upcoming_invoices
-    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator?)
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator?)
     {name: 'Upcoming Invoices', id: 'payables', url: 'upcoming_invoices'}
   end
 
@@ -192,7 +192,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_payment_agreements
-    return nil unless (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
+    return nil unless (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
     {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
   end
 

@@ -14,5 +14,6 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  creator_id              :integer
+#  deleted_at              :datetime
 #
 

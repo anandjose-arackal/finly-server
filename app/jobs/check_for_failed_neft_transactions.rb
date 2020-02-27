@@ -16,7 +16,7 @@ class CheckForFailedNeftTransactions < ApplicationJob
         next if utr.blank?
 
         # first making the UTR the same as the one we store in the DB
-        utr = "0#{utr[0..(utr.length-3)]}"
+        utr = "0#{utr[0..(utr.length - 3)]}"
 
         # find the bank transaction that has the above UTR
         bank_transaction = IciciBankTransaction.find_by(utr: utr)

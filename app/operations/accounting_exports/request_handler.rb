@@ -63,7 +63,7 @@ class AccountingExports::RequestHandler < BaseOperation
 
   def init_processor
     return nil if self.master.blank?
-    self.master.new(user,params.to_h)
+    self.master.new(user, params.to_h)
   end
 
 end

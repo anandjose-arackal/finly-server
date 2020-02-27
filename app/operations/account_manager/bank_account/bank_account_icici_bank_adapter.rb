@@ -65,11 +65,11 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       if bank_transaction.pending_utr?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
-        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
+        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
-        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
+        store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       end
     else
       # the difference between this and a failure is that the money is not debited back to the account till we're sure
