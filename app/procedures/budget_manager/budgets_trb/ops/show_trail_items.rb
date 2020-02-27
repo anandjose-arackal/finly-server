@@ -14,11 +14,11 @@ class BudgetManager::BudgetsTrb::Ops::ShowTrailItems < Transactions::API
   def retrieve_trail_items!(options, model:, **)
     budget = model
     # calling the budgets computer model that computes the budgets for me
-    # TODO - uncomment the below once done
-    # op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget})
-    # if op.success?
-    #   options["result"] = op["result"]
-    # end
+
+    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first})
+    if op.success?
+      options["result"] = op["result"]
+    end
     true
   end
 end

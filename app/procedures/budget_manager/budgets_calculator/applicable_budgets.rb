@@ -28,32 +28,33 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       # a user consuming a PO, it is always with respect to the other criteria
       self.departments = Department.with_id(document.items.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
-      self.vendors = [document.vendor]
-      self.locations = [document.location]
+      self.vendors = [document.vendor].compact
+      self.locations = [document.location].compact
       self.categories = Category.with_id(document.items.pluck(:category_id).compact)
       self.users = []
     when "PurchaseRequest"
       self.departments = Department.with_id(document.items.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.items.pluck(:cost_center_id).compact)
       self.vendors = []
-      self.locations = [document.location]
+      self.locations = [document.location].compact
       self.categories = Category.with_id(document.items.pluck(:category_id).compact)
       self.users = []
     when "BankPaymentRequest", "PaymentOrder"
       self.departments = Department.with_id(document.payments.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.payments.pluck(:cost_center_id).compact)
-      self.vendors = payment.receiving_user.is_a?(YesBankVendor) ? [payment.receiving_account] : []
+      self.vendors = payment.receiving_user.is_a?(YesBankVendor) ? [payment.receiving_account].compact : []
       self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
       self.categories = Category.with_id(document.payments.pluck(:category_id).compact)
       self.users = []
     when "Report", "Expense"
-      self.departments = [document.department]
-      self.cost_centers = [document.cost_center]
+      self.departments = [document.department].compact
+      self.cost_centers = [document.cost_center].compact
       # here vendors doesn't make sense because expenses don't have a vendor per se
       self.vendors = []
       self.categories = Category.with_id(document.expenses.pluck(:category_id).compact)
       # here users will be the owner of the report as all expenses are incurred by them
-      self.users = [document.user]
+      self.users = [document.user].compact
+      self.locations = []
     else
       raise "Invalid Document Type passed to ApplicableBudgets Class"
     end
@@ -88,6 +89,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("YesBankVendor").with_budgetable_id(self.vendors.pluck(:id)).pluck(:id)
     # applicable_criteria_mapping_ids += criteria_mappings.with_budgetable_type("User").with_budgetable_id(self.users.pluck(:id)).pluck(:id)
 
+
     self.applicable_budget_group_criteria = BudgetGroupCriterium.with_id(applicable_criteria_mappings.pluck(:budget_group_criterium_id))
     true
   end
@@ -111,7 +113,6 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         budgets: budgets
     }
     options["result"] = result
-
   end
 
 
@@ -124,7 +125,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       when BudgetDateType.id_for(:entity_date), BudgetDateType.id_for(:entity_created_at)
         dates << document.created_at.to_date
       when BudgetDateType.id_for(:entity_submitted_at)
-        dates << document.submitted_at.to_date
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
       else
         dates << document.created_at.to_date
       end
@@ -135,7 +136,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       when BudgetDateType.id_for(:entity_created_at)
         dates += document.expenses.pluck(:created_at).map(&:to_date)
       when BudgetDateType.id_for(:entity_submitted_at)
-        dates << document.submitted_at
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
       else
         dates << document.created_at.to_date
       end
@@ -144,9 +145,9 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       when BudgetDateType.id_for(:entity_date)
         dates << document.date
       when BudgetDateType.id_for(:entity_created_at)
-        dates << document.created_at
+        dates << document.created_at.to_date
       when BudgetDateType.id_for(:entity_submitted_at)
-        dates << document.submitted_at
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
       else
         dates << document.created_at.to_date
       end
@@ -155,15 +156,15 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       when BudgetDateType.id_for(:entity_date)
         dates += document.payments.pluck(:date)
       when BudgetDateType.id_for(:entity_created_at)
-        dates << document.created_at
+        dates << document.created_at&.to_date
       when BudgetDateType.id_for(:entity_submitted_at)
-        dates << document.submitted_at
+        dates << (document.submitted_at&.to_date || document.created_at.to_date)
       else
         dates << document.created_at.to_date
       end
     end
 
-    return dates
+    return dates.compact
   end
 
 end

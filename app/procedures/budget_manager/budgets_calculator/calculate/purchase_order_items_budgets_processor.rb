@@ -17,7 +17,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
         department_id: purchase_order_item.department_id,
         date: purchase_order_item.purchase_order.created_at,
         entity_created_at: purchase_order_item.purchase_order.created_at,
-        entity_submitted_at: purchase_order_item.purchase_order.submitted_at,
+        entity_submitted_at: (purchase_order_item.purchase_order.submitted_at || purchase_order_item.purchase_order.created_at),
         procurement_id: purchase_order_item.purchase_order.procurement_id,
         entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
         vendor_id: purchase_order_item.purchase_order.vendor_id,

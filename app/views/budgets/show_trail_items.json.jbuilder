@@ -1,15 +1,15 @@
-# expenses = @op.dig("result", "expenses")
-# payments = @op.dig("result", "payments")
-# purchase_request_items = @op.dig("result", "purchase_request_items")
-# purchase_order_items = @op.dig("result", "purchase_order_items")
-# invoice_items = @op.dig("result", "purchase_order_items")
+expenses = @op["result"][:expenses] || []
+payments = @op["result"][:payments] || []
+purchase_request_items = @op["result"][:purchase_request_items] || []
+purchase_order_items = @op["result"][:purchase_order_items] || []
+invoice_items = @op["result"][:purchase_order_items] || []
 
-# TODO - change the below code to reflect the actual data
-expenses = Expense.all.limit(10)
-payments = Payment.all.limit(10)
-purchase_request_items = PurchaseRequestItem.all.limit(10)
-purchase_order_items = PurchaseOrderItem.all.limit(10)
-invoice_items = InvoiceLineItem.all.where(parent_type: "Invoice").limit(10)
+# # TODO - change the below code to reflect the actual data
+# expenses = Expense.all.limit(10)
+# payments = Payment.all.limit(10)
+# purchase_request_items = PurchaseRequestItem.all.limit(10)
+# purchase_order_items = PurchaseOrderItem.all.limit(10)
+# invoice_items = InvoiceLineItem.all.where(parent_type: "Invoice").limit(10)
 
 json.budget_trail_items do
   index = 1
