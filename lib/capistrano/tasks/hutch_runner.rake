@@ -13,7 +13,7 @@ namespace :load do
     # set :hutch_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
     set :hutch_role, -> {:hutch}
     set :hutch_env, -> {fetch(:rack_env, fetch(:rails_env, fetch(:stage)))}
-    set :hutch_env, fetch(:rack_env, fetch(:rails_env, 'production'))
+    set :hutch_env, -> {fetch(:rack_env, fetch(:rails_env, 'production'))}
   end
 end
 
