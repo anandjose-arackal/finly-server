@@ -113,7 +113,7 @@ linked_files = %w{
   config/integrations.yml
   config/insights_config.yml
   config/bbps_config.yml
-config/hutch.yml
+  config/hutch.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production, :foreground_production, :console_production, :api_production, :background_production_console,
