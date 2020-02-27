@@ -2,17 +2,17 @@
   <fieldset style="margin: 0px 70px 40px;border: 2px solid #E74C3C;border-radius: 8px;">
 
     <legend align="center" style="padding: 10px;">
-      <% if Rails.env.production? %>
-        <% if payload["body_quote_icon"].present? %>
-          <img src="/common/images/mailers/icons/<%= payload["body_quote_icon"] %>.png" style="width: 40px;">
-        <% else %>
-          <img src="http://localhost:3001/common/images/mailers/icons/icon_quote_rejection.png" style="width: 40px;">
-        <% end %>
-      <% else %>
+      <% if Rails.env.development? %>
         <% if payload["body_quote_icon"].present? %>
           <img src="http://localhost:3001/common/images/mailers/icons/<%= payload["body_quote_icon"] %>.png" style="width: 40px;">
         <% else %>
           <img src="http://localhost:3001/common/images/mailers/icons/icon_quote_rejection.png" style="width: 40px">
+        <% end %>
+      <% else %>
+        <% if payload["body_quote_icon"].present? %>
+          <img src="/common/images/mailers/icons/<%= payload["body_quote_icon"] %>.png" style="width: 40px;">
+        <% else %>
+          <img src="http://localhost:3001/common/images/mailers/icons/icon_quote_rejection.png" style="width: 40px;">
         <% end %>
       <% end %>
     </legend>
