@@ -10,16 +10,15 @@ class UserOnboarding::ConfigurationData < UserOnboarding::Base
     case RequestStore.store[:current_app]
     when 'vp', :vp
       self.user_roles = ::UserRole::VP_ROLES
-      self.policies = ::Policy::VendorPayments::Index.(user, params).try(:policies)
     when 'em', :em
 			self.user_roles = ::UserRole::VALUES_EM
-			params[:view] = 'admin'
-			self.policies = ::Policy::Index.(user, params).try(:policies)
 
       unless user.company.travel_desk_enabled? # checks to see if client paid for it
         self.user_roles.delete(:travel_manager)
       end
     end
+    params[:view] = 'admin'
+    self.policies = ::Policy::Index.(user, params).try(:policies)
 
   end
 
