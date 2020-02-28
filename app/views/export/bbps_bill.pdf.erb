@@ -28,7 +28,7 @@
   </tr>
   <tr>
     <td>Transaction Ref ID</td>
-    <td><%= @bill.payments&.first&.reference_resource&.bbps_ref_id || "--" %></td>
+    <td><%= @bill.payments&.first&.bbps_bank_transaction&.bbps_ref_id || "--" %></td>
   </tr>
   <tr>
     <td>Payment Mode</td>
@@ -40,7 +40,7 @@
   </tr>
   <tr>
     <td>Transaction Date &amp; Time</td>
-    <td><%= @bill.payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y") %></td>
+    <td><%= @bill.payments&.first&.bbps_bank_transaction&.created_at&.strftime("%I:%M %p, %d %b %Y") %></td>
   </tr>
   <tr>
     <td>Status</td>

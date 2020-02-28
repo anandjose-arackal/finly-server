@@ -75,6 +75,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
     end
 
     self.crediting_payments.each do |payment|
+      # debugger
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && ([PaymentStatus.id_for(:completed)].include?(payment.payment_status_id))
         processed_amount += payment.amount_value
