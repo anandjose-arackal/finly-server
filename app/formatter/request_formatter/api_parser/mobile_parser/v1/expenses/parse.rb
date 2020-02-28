@@ -17,8 +17,10 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
       map[:expense][:reimbursable] = StringUtils.to_bool map[:expense][:reimbursable]
     end
 
-    if map&.dig(:expense, :usage_date_type).blank?
-      map[:expense][:usage_date_type] = "none"
+    if map&.dig(:expense).present?
+      if map&.dig(:expense, :usage_date_type).blank?
+        map[:expense][:usage_date_type] = "none"
+      end
     end
 
     # Load receipt seperately has yaml cannot handle images
