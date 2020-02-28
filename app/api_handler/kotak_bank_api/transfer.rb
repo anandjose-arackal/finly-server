@@ -250,6 +250,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
+        'DESCRIPTION' => "#{beneficiary_name} - #{payment&.id}",
         # 'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_TYPE' => resolve_transfer_type(beneficiary_ifsc, transfer_request.transfer_type),
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,

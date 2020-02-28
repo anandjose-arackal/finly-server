@@ -41,6 +41,8 @@ json.payments do
     json.category_name payment.category&.name
     json.department_id payment.department_id
     json.department_name payment.department&.name
+    json.cost_center_id payment.cost_center_id
+    json.cost_center_name payment.cost_center&.name
 
     invoice = payment.invoice
 

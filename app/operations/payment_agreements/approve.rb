@@ -80,7 +80,7 @@ class PaymentAgreements::Approve < PaymentAgreements::Base
       date = invoice_template.prepaid ? invoice_template.start_date : invoice_template.end_date
       invoice_template.update(payment_agreement_upcoming_date: date)
     end
- end
+  end
 
 
 end

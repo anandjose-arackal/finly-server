@@ -94,10 +94,10 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
     lurm_params = set_params(data)
     lurm = LevelUserReviewerMapping.find_by id: lurm_params[:id]
     unless lurm.present?
-      return result  false,"Mapping not found"
+      return result false, "Mapping not found"
     else
       if lurm.destroy
-        return result  true,"Level Reviewer Mapping Destroyed"
+        return result true, "Level Reviewer Mapping Destroyed"
       end
     end
   end
@@ -270,7 +270,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "PaymentAgreementProvider" => "payment_agreement_reviewer",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_reviewer",
         "BbpsBillProvider" => "utility_bill_reviewer",
-        "CreditNoteProvider"=> "credit_note_reviewer"}
+        "CreditNoteProvider" => "credit_note_reviewer"}
 
     entity_user = get_user_entity(reviewer_id)
     if application == 'em' && entity_user.present? && entity_user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)
@@ -342,7 +342,7 @@ class Admin::Implementations::Master::Lurms::Import < Admin::Implementations::Pr
         "PaymentAgreementProvider" => "payment_agreement_initiator",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_initiator",
         "BbpsBillProvider" => "utility_bill_initiator",
-        "CreditNoteProvider"=> "credit_note_initiator"}
+        "CreditNoteProvider" => "credit_note_initiator"}
 
     if application == 'em' && entity_user.present? && policy.user_mapping.where(user_id: entity_user.id).first&.nil?
       policy.user_mapping.create(user_id: entity_user.id)

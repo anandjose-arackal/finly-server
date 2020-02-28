@@ -202,9 +202,12 @@ class CustomField::SetFields < CustomField::Base
     acceptable_dropdown_values = []
     dropdown_field_ids = self.field_configurations.enabled.filter_dropdowns.pluck(:id)
     completed = false
+    # user_level_custom_fields = current_company&.feature_subscription&.user_level_custom_fields? ? true :false
+
     until completed
       completed = true
       self.field_configurations.each do |config|
+        user_level_custom_fields = config.user_level_field
         next unless config.enabled
         next unless dropdown_field_ids.include?(config.id)
         acceptable_value = false
@@ -212,9 +215,16 @@ class CustomField::SetFields < CustomField::Base
           # If root field, add the value to acceptable dropdown values
           acceptable_value = true
         else
-          if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value.to_i)}
-            # if acceptable_dropdown_values.include?(config.parent_id.to_s)
-            acceptable_value = true
+          if user_level_custom_fields
+            if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.filter_user_id(user&.id).pluck(:id).include?(drop_down_value.to_i)}
+              # if acceptable_dropdown_values.include?(config.parent_id.to_s)
+              acceptable_value = true
+            end
+          else
+            if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value.to_i)}
+              # if acceptable_dropdown_values.include?(config.parent_id.to_s)
+              acceptable_value = true
+            end
           end
         end
         if acceptable_value and not acceptable_dropdown_values.include?(all_field_values[config.id.to_s])

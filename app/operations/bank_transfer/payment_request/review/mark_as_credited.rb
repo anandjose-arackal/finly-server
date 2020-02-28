@@ -37,6 +37,15 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       if payment_request.open? || payment_request.retracted? || payment_request.rejected? || payment_request.credited?
         add_message :error, "Payment Order: #{payment_request.name} cannot be marked as Credited as it is #{payment_request.status.name.humanize}"
       end
+
+      case payment_request.payments.first.class.name
+      when 'Invoice'
+        payments = payment_request.payments.joins(:invoice).where(invoices: {invoice_status_id: InwardInvoiceStatus.id_for(:voided)})
+        if payments.present?
+          add_message :error, "Payments with IDs #{payments.pluck(:id).join(", ")} have invoices which are voided. Please remove them before marking the Ticket as credited."
+          return
+        end
+      end
     end
     return if has_errors?
   end

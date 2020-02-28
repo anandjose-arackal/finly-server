@@ -7,12 +7,13 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
 
   class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payment_order, :bank_payment_request
+    attr_accessor :payment_order, :bank_payment_request, :response
 
     def init
       self.payment_order = params[:payment_order]
       self.bank_payment_request = params[:bank_payment_request]
     end
+
   end
 
   def pre_validate

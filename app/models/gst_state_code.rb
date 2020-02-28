@@ -7,6 +7,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  state_code :string(255)
+#  deleted_at :datetime
 #
 
 class GstStateCode < ApplicationRecord
