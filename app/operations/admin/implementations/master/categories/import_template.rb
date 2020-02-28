@@ -11,6 +11,8 @@ class Admin::Implementations::Master::Categories::ImportTemplates < Admin::Imple
       :expense_management =>"Expense Management (Y for Enable",
       :vendor_payments =>"Vendor Payment (Y for Enable)",
       :inward_invoice_line_items => "Inward Invoice Line Item (Y for Enable)",
+      :gst_applicable => "GST Applicable (Y for Enable)",
+      :tds_applicable => "TDS Applicable (Y for Enable)",
       :destroy => "Destroy"
   })
 
