@@ -18,7 +18,7 @@ json.result do
     json.vendor_ref_no invoice.vendor&.vendor_id
     json.vendor_gstin invoice.gstin_location&.gstin
     json.transaction_period_from invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
-    json.transaction_period_to invoice.transaction_service_period_from&.strftime("%Y-%m-%d %H:%M:%S")
+    json.transaction_period_to invoice.transaction_service_period_to&.strftime("%Y-%m-%d %H:%M:%S")
     json.invoice_status invoice.status&.name&.humanize
     json.category invoice_line_item.category&.name
     json.quantity invoice_line_item.quantity
