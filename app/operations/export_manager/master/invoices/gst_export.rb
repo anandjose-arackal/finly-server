@@ -176,7 +176,7 @@ class ExportManager::Master::Invoices::GstExport < ExportManager::Builders::Spre
   end
 
   def country(invoice_line_item)
-    invoice_line_item.amount.currency.country
+    invoice_line_item.amount&.currency&.country
   end
 
   def vendor_name(invoice_line_item)
