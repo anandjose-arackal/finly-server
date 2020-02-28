@@ -12,7 +12,11 @@ class FixSpuriousPayments < ApplicationJob
       # now find the latest credit trail and check to ensure it wasn't credited in the last 1 day
       # if it was, then skip to the next payment because we have nothing to do here
       credit_trail = bpr.trails.where(action_id: TrailAction.id_for(:credit)).reorder(created_at: :desc).first
-      next if credit_trail&.created_at > (DateTime.now - 1.day)
+      # next if (credit_trail.blank? && !payment.api_initiated) || (credit_trail&.created_at > (DateTime.now - 1.day))
+
+      unless payment.api_initiated?
+        next if credit_trail.blank? || (credit_trail&.created_at > (DateTime.now - 1.day))
+      end
 
       # case 1 - if the payment is in pending state because of the bank account being on hold or disabled
       if payment.receiving_account_type == "BankAccount" && (payment.receiving_account.on_hold? || payment.receiving_account.disabled?)

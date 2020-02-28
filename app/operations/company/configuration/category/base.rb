@@ -29,9 +29,9 @@ class Company::Configuration::Category::Base < BaseOperation
 
     def mobile_optimized_categories
       cat = []
-      self.categories.roots.each do |category|
+      self.categories.roots.active.each do |category|
         if category.children.present?
-          category.children.each do |c|
+          category.children.active.each do |c|
             cat << {id: c.id, name: "#{category.name } - #{c.name}", active: c.active, gst_applicable: c.gst_applicable, tds_applicable: c.tds_applicable}
           end
         else

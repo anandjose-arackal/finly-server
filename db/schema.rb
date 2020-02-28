@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_19_123348) do
+ActiveRecord::Schema.define(version: 2020_02_10_062332) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -818,7 +818,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.integer "category_id"
     t.string "hsn_sac"
     t.string "quick_pay", default: "N"
-    t.datetime "last_paid_at"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -863,7 +862,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
-    t.boolean "disabled", default: false
     t.index ["biller_id"], name: "index_bbps_billers_on_biller_id"
     t.index ["created_at"], name: "index_bbps_billers_on_created_at"
     t.index ["parent_biller_id"], name: "index_bbps_billers_on_parent_biller_id"
@@ -914,7 +912,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.string "order_number_type"
     t.integer "tax_rate_id"
     t.string "hsn_sac"
-    t.datetime "paid_at"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -1377,7 +1374,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.datetime "updated_at", null: false
     t.integer "budget_amount_id"
     t.integer "remaining_amount_id"
-    t.datetime "deleted_at"
     t.index ["budget_id"], name: "index_budget_consumptions_on_budget_id"
     t.index ["committed_amount_id"], name: "index_budget_consumptions_on_committed_amount_id"
     t.index ["paid_amount_id"], name: "index_budget_consumptions_on_paid_amount_id"
@@ -1400,7 +1396,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
   end
 
   create_table "budget_group_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1411,7 +1406,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.datetime "updated_at", null: false
     t.integer "created_by_user_id"
     t.integer "company_id"
-    t.datetime "deleted_at"
     t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
   end
 
@@ -1421,7 +1415,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.string "budgetable_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
   end
 
   create_table "budget_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1438,8 +1431,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.string "name"
     t.datetime "start_date"
     t.datetime "end_date"
-    t.datetime "deleted_at"
-    t.integer "budget_date_type_id"
     t.index ["company_id"], name: "index_budget_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
   end
@@ -1590,7 +1581,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.boolean "invoice"
     t.integer "budget_group_criterium_id"
     t.boolean "active", default: false
-    t.integer "budget_date_type_id"
     t.index ["budget_amount_id"], name: "index_budgets_on_budget_amount_id"
     t.index ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id"
     t.index ["company_id"], name: "index_budgets_on_company_id"
@@ -1786,13 +1776,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.string "mcc_restriction_type"
     t.datetime "deleted_at"
     t.index ["card_id"], name: "index_card_restrictions_on_card_id"
-  end
-
-  create_table "card_service_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
   end
 
   create_table "card_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3535,7 +3518,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.datetime "deleted_at"
     t.boolean "analytics_system"
     t.boolean "sso_login_enforced", default: false
-    t.integer "card_service_provider_id"
     t.index ["grn_enabled"], name: "index_feature_subscriptions_on_grn_enabled"
     t.index ["srn_enabled"], name: "index_feature_subscriptions_on_srn_enabled"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
@@ -6934,7 +6916,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.datetime "updated_at", null: false
     t.boolean "marked_as_closed"
     t.boolean "tally_exported", default: false
-    t.datetime "deleted_at"
     t.index ["company_id"], name: "index_report_processor_groups_on_company_id"
     t.index ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id"
     t.index ["created_by_user_role_id"], name: "index_report_processor_groups_on_created_by_user_role_id"
@@ -7045,7 +7026,6 @@ ActiveRecord::Schema.define(version: 2020_02_19_123348) do
     t.integer "location_id"
     t.integer "cost_center_id"
     t.integer "reference_payment_id"
-    t.integer "company_id"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"

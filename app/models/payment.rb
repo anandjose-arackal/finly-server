@@ -52,6 +52,9 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
+#  reference_payment_id           :integer
+#  last_retried_at                :datetime
+#  utr                            :string(255)
 #
 
 class Payment < ApplicationRecord
@@ -812,6 +815,8 @@ class Payment < ApplicationRecord
 
         if total_payments < invoice_amount
           parent_details.update payable: true
+        else
+          parent_details.update payable: false
         end
       end
     end
