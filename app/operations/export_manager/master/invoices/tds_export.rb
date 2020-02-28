@@ -110,7 +110,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   # TODO ADD TOTAL INVOICE AMOUNT amt + gst DONE
 
   def total_invoice_amount(invoice)
-    invoice.gross_amount&.value + invoice.tax_amount&.value
+    invoice.gross_amount&.value.to_f + invoice.tax_amount&.value.to_f
   end
 
   def invoice_number(invoice)
