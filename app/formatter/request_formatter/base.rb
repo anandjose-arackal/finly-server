@@ -24,7 +24,7 @@ class RequestFormatter::Base < BaseOperation
     output = YamlUtils.load_yaml_erb(path, {user: user, params: yaml_formatter.yaml_params, yaml_formatter: yaml_formatter})
     # Used for replacing the placeholders with actual values again.
     map = yaml_formatter.process_yaml_output output
-    Formatter.remove_blanks map
+    #Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
     map
   end
