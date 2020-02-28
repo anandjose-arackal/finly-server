@@ -11,6 +11,8 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       :expense_management =>"Expense Management (Y for Enable",
       :vendor_payments =>"Vendor Payment (Y for Enable",
       :inward_invoice_line_items => "Inward Invoice Line Item (Y for Enable)",
+      :gst_applicable => "GST Applicable (Y for Enable)",
+      :tds_applicable => "TDS Applicable (Y for Enable)",
       :destroy => "Destroy"
   })
 
@@ -79,6 +81,8 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       expense_management = data[:expense_management].to_s.upcase == 'Y' ? true : false
       vendor_payment = data[:vendor_payments].to_s.upcase == 'Y' ? true : false
       inward_invoice_line_items = data[:inward_invoice_line_items].to_s.upcase == 'Y' ? true : false
+      gst_applicable = data[:gst_applicable].to_s.upcase == 'Y' ? true : false
+      tds_applicable = data[:tds_applicable].to_s.upcase == 'Y' ? true : false
       ancestry = parent&.to_s
       active = data[:active].to_s.upcase == 'N' ? false : true
 
@@ -90,6 +94,8 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
               expense_management: expense_management,
               vendor_payments: vendor_payment,
               inward_invoice_line_items: inward_invoice_line_items,
+              gst_applicable:gst_applicable,
+              tds_applicable:tds_applicable,
               ancestry: ancestry
       }
       [params,messages]
