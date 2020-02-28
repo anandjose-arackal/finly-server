@@ -48,11 +48,27 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
     # Check for two bank transactions is not an issue here because YesBank supports retries with the same reference number
     # However, as a result we need to add a check to ensure that there is only one bank transaction against it
-    op = PaymentProcessorRules::Event.(:yes_bank_payments_cannot_have_multiple_bank_transactions, {payment: payment, options: options})
+    op = PaymentProcessorRules::Event.(:yes_bank_payments_cannot_have_multiple_unique_ids, {payment: payment, options: options})
     unless op.success?
       self.errors << op.message
       return false
     end
+
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
+    # checking to ensure that two bank transactions cannot be retried in quick succession - minimum time pf 10 minutes required before each retry
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return
+    end
+
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
     if bank_transaction.blank? && payment.in_progress?
@@ -66,14 +82,6 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     # the below case will be reached only if the particular bank transction is not
     # created inside this adapter. Also logging the errors for this particular state
     op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
-    unless op.success?
-      self.errors << op.message
-      return false
-    end
-
-    # adding another rule to ensure that if this is a retry, then all
-    # previous bank transactions have failed
-    op = PaymentProcessorRules::Event.(:ensure_all_previous_payments_have_failed, {payment: payment, options: options})
     unless op.success?
       self.errors << op.message
       return false
@@ -229,7 +237,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
      end
 
      # additionally also update the payment reference_resource_type to YesBankTransaction
-     payment.update(reference_resource_type: payment.company&.feature_subscription&.bank_transaction_class)
+    payment.update(reference_resource_type: bank_transaction.class.name)
 
     # payment.with_lock do
     #   if payment.reference_resource.present?

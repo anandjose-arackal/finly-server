@@ -195,6 +195,9 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
     end
 
+    # additionally also update the payment reference_resource_type to YesBankTransaction
+    payment.update(reference_resource_type: bank_transaction.class.name)
+
     # payment.with_lock do
     #   if payment.reference_resource.present?
     #     return false

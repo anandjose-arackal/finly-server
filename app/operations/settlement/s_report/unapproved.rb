@@ -54,6 +54,7 @@ class Settlement::SReport::Unapproved < Reports::Base
           payment = op.payment_order.payments.first
           # updating the reference payment of the report to the payment in question
           self.report.update(reference_payment_id: payment.id)
+          payment.update(reference_resource_type: self.report.class.name)
           # payment.update(reference_resource: self.report)
         else
           # add a condition here so that if this fails, we are notified or at least initimated in some way

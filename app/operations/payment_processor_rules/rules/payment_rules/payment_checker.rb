@@ -76,12 +76,12 @@ PaymentProcessorRules::Checker.new 'PaymentChecker' do
       end
     end
 
-    premise :yes_bank_payments_cannot_have_multiple_bank_transactions do
+    premise :yes_bank_payments_cannot_have_multiple_unique_ids do
 
       # the below rule is because yes bank allows multiple retries with the same reference number, a facility not provided by other banks
-      rule "For a given YesBank payment, once cannot have more than one bank transaction" do
+      rule "For a given YesBank payment, once cannot have more than one bank transaction with unique request numbers" do
         payment = params[:payment]
-        if payment.reference_resources.count > 1
+        if payment.reference_resources.pluck(:unique_request_number).uniq.count > 1
           add_system_message :error, payment, "Payment cannot be retried at this moment"
           message "Payment cannot be retried at this moment"
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))
