@@ -3983,6 +3983,7 @@ Rails.application.routes.draw do
       get 'transactions/expenses', to: 'streamsets/v1/transactions#expenses'
       get 'transactions/invoices', to: 'streamsets/v1/transactions#invoices'
       get 'transactions/payments', to: 'streamsets/v1/transactions#payments'
+      get 'transactions/statements', to: 'streamsets/v1/transactions#statements'
     end
   end
 

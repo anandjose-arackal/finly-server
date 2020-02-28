@@ -15,4 +15,9 @@ class Streamsets::V1::TransactionsController < BaseControllers::StreamsetsBase
     respond
   end
 
+  def statements
+    @result = Streamsets::Transactions::Statements.(current_user, params)
+    respond
+  end
+
 end
