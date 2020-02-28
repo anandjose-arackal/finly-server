@@ -217,6 +217,6 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def void
-    user.vendor_payments_admin? && (invoice.approved? || invoice.auto_approved? || invocie.unpaid?) && invoice.payments.blank?
+    user.vendor_payments_admin? && (invoice.approved? || invoice.auto_approved? || invoice.unpaid?) && invoice.payments.blank?
   end
 end
