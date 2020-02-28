@@ -56,6 +56,7 @@ public/system/vendor_attachments/*
 /sample_bank_transfer.xls
 config/data/bypass_authorized_users.yml
 config/gstin_verification_config.yml
+config/hutch.yml
 public/system/temporary_files/
 public/system/admin_implementation_requests/*
 
