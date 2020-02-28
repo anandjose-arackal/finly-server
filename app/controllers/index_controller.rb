@@ -19,8 +19,17 @@ class IndexController < BaseControllers::WebBase
     end
   end
 
-  def counts
-    endpoint IndexBuilder::Count
+  def status_counts
+    endpoint IndexBuilder::StatusCount
+    if @op.success?
+      render json: {success: true, data: @op['counter']}
+    else
+      respond response: :failure, message: "Invalid Request"
+    end
+  end
+
+  def record_counts
+    endpoint IndexBuilder::RecordCount
     if @op.success?
       render json: {success: true, data: @op['counter']}
     else

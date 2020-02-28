@@ -1,4 +1,4 @@
-class IndexBuilder::Count < Transactions::API
+class IndexBuilder::StatusCount < Transactions::API
 
   step :find_builder
   step :verify_counter

@@ -4052,7 +4052,8 @@ Rails.application.routes.draw do
 
   get 'filters/:route', to: "filters#index"
   get 'index/:route/config', to: "index#fetch_config"
-  get 'index/:route/counts', to: 'index#counts'
+  get 'index/:route/record_counts', to: 'index#record_counts'
+  get 'index/:route/status_counts', to: 'index#status_counts'
   get 'index/:route', to: "index#show"
 
   resources :views, controller: 'index_view_segments', except: [:show]
