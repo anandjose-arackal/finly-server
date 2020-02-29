@@ -194,7 +194,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def void
-    user.vendor_payments_admin? && (invoice.approved? || invoice.auto_approved?) && invoice.payments.blank?
+    user.vendor_payments_admin? && (invoice.approved? || invoice.auto_approved? || invoice.unpaid?) && invoice.payments.blank?
   end
 
 end
