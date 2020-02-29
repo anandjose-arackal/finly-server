@@ -16,10 +16,27 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   def credit(payment, options = {})
     # first we determine if the associated payment to this particular transaction is completed or not
     bill = payment.parent
-    bank_transaction = payment.reference_resource
+
+    # now the bank transaction will be the first in the list of reference resources
+    bank_transaction = payment.reference_resources.first
     if bank_transaction.present? and !bank_transaction.retriable?
       self.errors << "This bill payment cannot be processed at this time"
       return false
+    end
+
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
+    # checking to ensure that two bank transactions cannot be retried in quick succession - minimum time pf 10 minutes required before each retry
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return
     end
 
     bank_transaction = create_bbps_bank_transaction(payment)
@@ -115,8 +132,8 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
   private
 
   def create_bbps_bank_transaction(payment)
-    if payment.reference_resource.present?
-      return payment.reference_resource
+    if payment.reference_resources.present?
+      return payment.reference_resources.first
     end
     bill = payment.parent
     bank_transaction = payment.company.bbps_yes_bank_transactions.build(
@@ -137,16 +154,25 @@ class AccountManager::BbpsBiller::BbpsPaymentsAdapter < AccountManager::BaseAdap
         })
     bank_transaction.save
 
-    payment.with_lock do
-      if payment.reference_resource.present?
-        return false
-      end
-      unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
+    # now updating the bank transaction and associating it with the payment according to new
+    # structure
+    unless bank_transaction.update(reference_payment_id: payment.id)
+      Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
     end
 
-    return bank_transaction
+    # additionally also update the payment reference_resource_type to YesBankTransaction
+    payment.update(reference_resource_type: bank_transaction.class.name)
+
+    # payment.with_lock do
+    #   if payment.reference_resource.present?
+    #     return false
+    #   end
+    #   unless payment.update(reference_resource: bank_transaction)
+    #     Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+    #   end
+    # end
+
+    bank_transaction
   end
 
   # this particular method returns the order number if it's already generated,

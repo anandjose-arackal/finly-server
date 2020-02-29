@@ -531,6 +531,7 @@ def payment_params(payment)
     payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
     payment_mode: self.payment_mode,
     transfer_mode_id: self.bank_payment_request.transfer_mode_id,
+		reference_resource_type: self.bank_payment_request&.owner&.company&.feature_subscription&.bank_transaction_class&.name,
     note: payment[:note],
     # payment_notification_users: payment[:payment_notification_users],
     date: DateUtils.local_date,

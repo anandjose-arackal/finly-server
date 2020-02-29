@@ -115,6 +115,7 @@ class BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground <
           beneficiary_payment_id: beneficiary_payment&.id,
           parent_type: set_payment_parent_type,
           parent_id: set_payment_parent_id,
+          reference_resource_type: self.bank_payment_request&.owner&.company&.feature_subscription&.bank_transaction_class&.name,
           invoice_attributes: {
               category_id: payment[:category_id],
               cost_center_id: payment[:cost_center_id],

@@ -106,4 +106,12 @@ class PurchaseOrderStatus < ApplicationRecord
         PurchaseOrderStatus.id_for(:closed)
     ]
   end
+
+  def self.status_ids_for_grn_addable
+    [
+       PurchaseOrderStatus.id_for(:approved),
+       PurchaseOrderStatus.id_for(:sent_to_vendor),
+       PurchaseOrderStatus.id_for(:vendor_confirmed)
+    ]
+  end
 end
