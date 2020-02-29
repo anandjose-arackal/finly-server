@@ -61,7 +61,7 @@ class ReminderAwaitingApproval < ApplicationJob
     if reviewer_ids.present?
       # Double check for company
       params = {}
-      User.where(company_id: [140, 209]).where(id: reviewer_ids).each do |user|
+      User.where(company_id: [140, 209, 184]).where(id: reviewer_ids).each do |user|
         if user.email.present?
           params[:purchase_orders] = PurchaseOrder.awaiting_action_items(user.id)
           params[:non_po_invoices] = Invoice.awaiting_action_items(user.id).filter_invoice_type('non_po_invoice')

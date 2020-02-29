@@ -13,6 +13,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
               :po_item =>  "PO Item (Y/N)",
               :non_po_item => "Non PO Item (Y/N)",
               :good_service => "Goods or Service ( G / S)",
+              :tds_applicable => "TDS Applicable (Y/N)",
               :discount => "Discount",
               :rate => "Rate",
               :destroy => "Destroy"
@@ -67,6 +68,10 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
 
   def rate(item)
     item.rate
+  end
+
+  def tds_applicable(item)
+    (item.tds_applicable? ? 'Y' : 'N')
   end
 
   def destroy(item)

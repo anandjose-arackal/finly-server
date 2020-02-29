@@ -10,6 +10,8 @@ class MultiEntityLogin::TokenController < Oauth::TokenController
     token = Doorkeeper::AccessToken.find_by(token: params[:auth_token])
     session = UserSession.find_by(access_token_id: token&.id)
 
+    @token.update authentication_type: token.authentication_type
+
     merged_params = params.merge(
         {
             user_device: session.user_device,

@@ -15,6 +15,9 @@ expense:
   merchant_bill_no: <%= params[:merchant_bill_no] %>
   gst_type_id: <%= params[:gst_type_id] %>
   tax_rate_id: <%= params[:tax_rate_id] %>
+  usage_date_type: <%= params[:usage_date_type] %>
+  usage_date_start: <%= params[:usage_date_start] %>
+  usage_date_end: <%= params[:usage_date_end] %>
   <% type = yaml_formatter.value_for_placeholder params[:type] %>
   <% if type == '1' or type == 1 %>
   manual_expense_attributes:

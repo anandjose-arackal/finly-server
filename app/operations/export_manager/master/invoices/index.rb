@@ -102,7 +102,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoices_presenter = fetch_invoices
     return if has_errors?
 
-    invoices = invoices_presenter.invoices
+    invoices = invoices_presenter.invoices.scope_all_except_voided
     InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
   end
 
@@ -253,7 +253,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def total_amount(invoice_line_item)
-    invoice_line_item.amount&.value
+    (invoice_line_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)) ? invoice_line_item.billable_amount&.value : invoice_line_item.amount&.value
   end
 
   def tax_amount(invoice_line_item)

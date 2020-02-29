@@ -64,8 +64,6 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
             message "Payment cannot be processed in this state"
             fail
           end
-          # update payment to in progress
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         end
       end
     end

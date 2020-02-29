@@ -24,10 +24,13 @@
 #  receiving_account_credited :boolean
 #  beneficiary_account_no     :string(255)
 #  deleted_at                 :datetime
+#  reference_payment_id       :integer
 #
 
 class VirtualAccountTransaction < ApplicationRecord
   include SystemLoggable
+
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
   belongs_to :virtual_account, optional: true, class_name: "VirtualBankAccount"

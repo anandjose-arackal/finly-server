@@ -66,13 +66,15 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def post_process
     # handle the various error cases here
     # case 500
-    case self.response.status
+    case self.response&.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        self.bank_transaction.update(transfer_status_id: self.transfer_status_id)
       when 401
         add_message :error, "Unauthorized."
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        self.bank_transaction.update(transfer_status_id: self.transfer_status_id)
       when 500
         self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
@@ -99,6 +101,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         if self.error_code.blank?
           self.transfer_request.bank_error_message = "#{parsed_response&.dig("errorResponse")&.dig("errorResponse")} + #{parsed_response&.dig("errorResponse")&.dig("moreInformation")}"
         end
+        # updating the bank transaction here itself so that we don't have to inside the adapter
+        self.bank_transaction.update(bank_error_message: self.transfer_request.bank_error_message, transfer_status_id: self.transfer_status_id)
       when 200
         self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
@@ -113,6 +117,14 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
             self.transfer_status_id = BankTransferStatus.id_for(:processing)
           end
         end
+
+        # updating the bank transaction here itself
+        self.bank_transaction.update(
+          bank_reference_number: self.transfer_request.bank_reference_number,
+          transfer_status_id: self.transfer_status_id,
+          bank_response: self.transfer_request.transaction_result,
+          beneficiary_full_name: self.transfer_request.beneficiary_full_name
+        )
       else
         # do nothing?
     end
@@ -196,7 +208,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
-        'UNIQUE_REFERENCE_NUMBER' => transfer_request.unique_reference_number,
+        'UNIQUE_REFERENCE_NUMBER' => self.bank_transaction.unique_request_number,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,
