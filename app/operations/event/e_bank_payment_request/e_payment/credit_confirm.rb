@@ -52,11 +52,11 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
 
   def mailer_body(user)
     "You have received a credit of ₹#{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. <br/><br/>
-    The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}"
+    The transaction number for your reference is: #{payment.utr}"
   end
 
   def sms_message
-    "You have received Rs.#{payment.amount_value} from #{receiving_user.company.name} in your A/c: XX#{payment.receiving_account.account_number.last(4)} Ref no:#{payment.reference_resource.bank_reference_number} via Finly Spend Mgmt"
+    "You have received Rs.#{payment.amount_value} from #{receiving_user.company.name} in your A/c: XX#{payment.receiving_account.account_number.last(4)} Ref no:#{payment.utr} via Finly Spend Mgmt"
   end
 
 

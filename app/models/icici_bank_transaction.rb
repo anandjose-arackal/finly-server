@@ -38,6 +38,7 @@ class IciciBankTransaction < ApplicationRecord
   belongs_to :company
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
+  belongs_to :reference_payment, class_name: "Payment"
 
   has_one :payment, as: :reference_resource
 
@@ -66,6 +67,10 @@ class IciciBankTransaction < ApplicationRecord
 
   scope :rtgs, -> {
     where(transfer_type: "RTG")
+  }
+
+  scope :without_id, -> (id) {
+    where.not(id: id)
   }
 
   def bank_reference_number

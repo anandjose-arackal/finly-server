@@ -16,7 +16,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
-    bank_transaction = payment.reference_resource
+    bank_transaction = payment.reference_resources.first
 
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
@@ -30,25 +30,50 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       reference_number = nil
     end
 
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
+    # checking to ensure that two bank transactions cannot be retried in quick succession - minimum time pf 10 minutes required before each retry
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return
+    end
+
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource&.retriable?
+    if bank_transaction&.retriable?
       bank_transaction.update_columns(unique_reference_number: transfer_request.unique_reference_number)
-    elsif payment.reference_resource.blank? && payment.in_progress?
+    elsif bank_transaction.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
-      bank_transaction = payment.reference_resource
+      bank_transaction = payment.reference_resources.first
     end
 
-
-    unless bank_transaction
-      payment.system_messages.build(
-                                 content: "Payment cannot be processed at this time",
-                                 system_message_type_id: SystemMessageType.id_for(:error).save
-      )
+    # ensure that a new bank transction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transction is not
+    # created inside this adapter. Also logging the errors for this particular state
+    op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
+    unless op.success?
+      self.errors << op.message
       return false
     end
+
+
+
+    # unless bank_transaction
+    #   payment.system_messages.build(
+    #                              content: "Payment cannot be processed at this time",
+    #                              system_message_type_id: SystemMessageType.id_for(:error).save
+    #   )
+    #   return false
+    # end
 
     # Initiates transaction
     op = KotakBankApi::Transfer.({
@@ -188,6 +213,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
         beneficiary_name: self.account.name,
         transfer_status_id: transfer_status_id,
         transfer_mode_id: payment.transfer_mode_id,
+        reference_payment_id: payment.id,
         narration: payment.note,
         amount_attributes: {
             value: payment.amount_value,
@@ -196,14 +222,24 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     }
     bank_transaction = company.kotak_bank_transactions.new(kotak_bank_transaction_params)
     bank_transaction.save
-    payment.with_lock do
-      if payment.reference_resource.present?
-        return false
-      end
-      unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
+
+    # now updating the bank transaction and associating it with the payment according to new
+    # structure
+    unless bank_transaction.update(reference_payment_id: payment.id)
+      Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
     end
+
+    # additionally also update the payment reference_resource_type to YesBankTransaction
+    payment.update(reference_resource_type: bank_transaction.class.name)
+
+    # payment.with_lock do
+    #   if payment.reference_resource.present?
+    #     return false
+    #   end
+    #   unless payment.update(reference_resource: bank_transaction)
+    #     Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+    #   end
+    # end
     bank_transaction
   end
 

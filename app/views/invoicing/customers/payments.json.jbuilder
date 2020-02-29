@@ -1,7 +1,7 @@
 json.array!(@result.payments_received) do |payment|
   # this will include the details of each payment as well as the invoices that
   # this particular payment has fulfilled
-  virtual_account_transaction = payment.reference_resource
+  virtual_account_transaction = payment.virtual_account_transaction
   # first details of the remitter account from which this transaction came through
   json.remitter_account_number virtual_account_transaction.remitter_account_no
   json.remitter_account_ifsc virtual_account_transaction.remitter_account_ifsc
