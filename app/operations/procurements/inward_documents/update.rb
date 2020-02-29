@@ -51,6 +51,11 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+    if self.purchase_order.voided?
+      add_message :error, "The Purchase Order associated with this procurement is voided. No further actions can be taken."
+      return
+    end
+
     # if invoice was added after adding a grn, block modification of current grn
     if self.procurement.documents&.first&.class&.name == "Invoice"
       add_message :error, "You have added an Invoice for this Receipt Note. If you want to modify it, delete the invoice."

@@ -32,6 +32,7 @@
 #  cash_on_hand_load_id                    :integer
 #  cash_on_hand_withdrawal_id              :integer
 #  cash_on_hand_balance_id                 :integer
+#  deleted_at                              :datetime
 #
 
 class CompanyBalanceHistory < ApplicationRecord

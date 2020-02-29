@@ -14,6 +14,7 @@
 #  updated_at                :datetime         not null
 #  address                   :text(65535)
 #  pin                       :text(65535)
+#  deleted_at                :datetime
 #
 
 class CollectCompanyDetail < ApplicationRecord

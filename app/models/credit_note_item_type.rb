@@ -2,8 +2,9 @@
 #
 # Table name: credit_note_item_types
 #
-#  id   :bigint           not null, primary key
-#  name :string(255)
+#  id         :bigint           not null, primary key
+#  name       :string(255)
+#  deleted_at :datetime
 #
 
 class CreditNoteItemType < ApplicationRecord

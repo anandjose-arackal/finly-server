@@ -1,6 +1,7 @@
 class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aasm::BaseProvider
 
   def initialize(user, params)
+    self.messages = {success: [], error: []}
     self.document = params[:document]
     self.violations_present = params[:violations_present]
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute

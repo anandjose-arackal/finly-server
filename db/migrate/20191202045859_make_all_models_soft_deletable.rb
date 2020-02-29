@@ -24,7 +24,7 @@ class MakeAllModelsSoftDeletable < ActiveRecord::Migration[5.2]
     # end
     ################## ABOVE STEP IS BEFORE DEPLOY ########################
 
-    models = ApplicationRecord.connection.tables.map { |table| table.capitalize.singularize.camelize }
+    models = ApplicationRecord.connection.tables.map {|table| table.capitalize.singularize.camelize}
     models.each do |model|
       begin
         klass = model.constantize

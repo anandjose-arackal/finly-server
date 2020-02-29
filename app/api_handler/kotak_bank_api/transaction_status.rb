@@ -42,7 +42,7 @@ class KotakBankApi::TransactionStatus < KotakBankApi::Base
     super()
     self.request_reference_number = params[:request_reference_number] || params[:unique_reference_number]
     self.bank_transaction = params[:bank_transaction]
-    self.payment = self.bank_transaction.payment
+    self.payment = self.bank_transaction.reference_payment
     set_xml_params
   end
 

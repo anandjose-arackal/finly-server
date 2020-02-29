@@ -16,7 +16,7 @@ json.items do
     json.receiving_account_type item.processor_accountable_type
     json.receiving_account item.processor_accountable
     json.note item.note
-    utr = (item.bank_reference_number.present?) ? item.bank_reference_number : item.payment&.reference_resource&.bank_reference_number
+    utr = (item.bank_reference_number.present?) ? item.bank_reference_number : item.payment&.utr
     json.utr utr
     json.money_requests do
       json.array! item.money_requests do |money_request|

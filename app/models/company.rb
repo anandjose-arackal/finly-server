@@ -12,6 +12,8 @@
 #  test_account     :boolean          default(FALSE)
 #  subdomain        :string(255)
 #  group_id         :integer
+#  deleted_at       :datetime
+#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord
@@ -409,6 +411,10 @@ class Company < ApplicationRecord
 
   def utility_bills_enabled?
     self.feature_subscription.utility_bills_enabled
+  end
+
+  def normal_login_blocked?
+    self.feature_subscription.sso_login_enforced
   end
 
   def more_than_one_subscription?

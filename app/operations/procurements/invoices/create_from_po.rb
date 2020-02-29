@@ -24,7 +24,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       end
     end
 
-    self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:invoice_items) : nil
+    self.previous_invoices = (self.procurement.invoices.scope_all_except_voided.present?) ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
 
@@ -66,7 +66,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
-        if self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?
+        if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
           calculcate_po_adjusted_advance
         end
       end

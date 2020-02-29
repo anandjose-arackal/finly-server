@@ -8,6 +8,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  whitelisted_ip_type_id :integer          not null
+#  deleted_at             :datetime
 #
 
 class WhitelistedIp < ApplicationRecord

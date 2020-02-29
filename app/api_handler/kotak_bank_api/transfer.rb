@@ -167,9 +167,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     # create the bank transaction right here
     #
     self.company = Company.find_by(id: self.transfer_request.company_id)
-    if self.payment&.reference_resource&.is_a?(KotakBankTransaction) || self.bank_transaction.present?
-      # just update the bank transaction with the latest details
-      self.bank_transaction = self.bank_transaction || payment.reference_resource
+    self.bank_transaction = payment.reference_resources.first
+    if self.bank_transaction.is_a?(KotakBankTransaction)
       # UTR is never updated here, as Kotak Bank Payment api never returns UTR
       self.bank_transaction.update(
                           transfer_status_id: self.transfer_status_id,
@@ -250,6 +249,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
+        'DESCRIPTION' => "#{beneficiary_name} - #{payment&.id}",
         # 'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_TYPE' => resolve_transfer_type(beneficiary_ifsc, transfer_request.transfer_type),
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,

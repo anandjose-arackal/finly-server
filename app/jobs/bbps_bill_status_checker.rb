@@ -6,7 +6,7 @@ class BbpsBillStatusChecker < ApplicationJob
       bill = payment.parent
       next unless bill.present? && bill.class.name == "BbpsBill"
       order_number = bill.order_number
-      bank_transaction = payment.reference_resource
+      bank_transaction = payment.bbps_bank_transaction
       params = {
           order_number: order_number
       }
@@ -17,6 +17,16 @@ class BbpsBillStatusChecker < ApplicationJob
           payment.payment_order.update_order_status
           payment.payment_order.update_processed_amount
           bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+
+          # Update last paid on date for subscription
+          # transaction_date = result&.transaction_details&.
+          transaction_details = JSON.parse result.transaction_details rescue {}
+          date = transaction_details&.dig("TxnStatusComplainResp")&.dig("txnList")&.dig("txnDetail")&.first&.dig("txnDate")
+          parsed_datetime = DateUtils.parseDatetime(date)
+          if date.present? && parsed_datetime.present?
+            payment&.parent&.update(paid_at: parsed_datetime)
+            payment&.parent&.subscription&.update(last_paid_at: parsed_datetime)
+          end
         end
         op.error do |result|
           puts "Error: #{result}"

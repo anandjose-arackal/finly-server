@@ -25,7 +25,10 @@
 #  transfer_status_id    :integer
 #  company_id            :integer
 #  request_id            :string(255)
+#  deleted_at            :datetime
 #  transfer_mode_id      :integer
+#  reference_payment_id  :integer
+#  bank_error_message    :text(16777215)
 #
 
 class IciciBankTransaction < ApplicationRecord
@@ -36,6 +39,7 @@ class IciciBankTransaction < ApplicationRecord
   belongs_to :company
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
+  belongs_to :reference_payment, class_name: "Payment"
 
   has_one :payment, as: :reference_resource
 
@@ -64,6 +68,10 @@ class IciciBankTransaction < ApplicationRecord
 
   scope :rtgs, -> {
     where(transfer_type: "RTG")
+  }
+
+  scope :without_id, -> (id) {
+    where.not(id: id)
   }
 
   def bank_reference_number

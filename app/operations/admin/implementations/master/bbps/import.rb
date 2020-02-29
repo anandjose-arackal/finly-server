@@ -94,6 +94,9 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
     params[:tax_rate_id] = (yield find_tax_rate(data[:tax_rate]))&.id
     biller = yield find_bbps_biller(data[:bbps_biller_id], required: true)
     params[:bbps_biller_id] = biller.id
+    params[:fetch_requirement] = biller.fetch_requirement
+    params[:support_bill_validation] = biller.support_bill_validation
+    params[:auto_generate_bill] = true
     params[:customer_param_key_1] = biller.biller_customer_params[0]&.dig('param_name')
     params[:customer_param_key_2] = biller.biller_customer_params[1]&.dig('param_name')
     params[:customer_param_key_3] = biller.biller_customer_params[2]&.dig('param_name')
@@ -105,8 +108,8 @@ class Admin::Implementations::Master::BBPS::Import < Admin::Implementations::Pro
   end
 
   def find_pocs(pocs, required: false)
-    ids = pocs.split(",").map { |item| item.strip }
-    users = ids.map { |id| find_user(id, required: required) }
+    ids = pocs.split(",").map {|item| item.strip}
+    users = ids.map {|id| find_user(id, required: required)}
     pocs = users.map do |user_result|
       return user_result unless user_result.success?
 
