@@ -107,7 +107,8 @@ Rails.application.configure do
         :address => '127.0.0.1', :port => config.mailer_config["port"]
     }
     config.action_mailer.raise_delivery_errors = false
-    config.action_mailer.default_url_options = {host: config.mailer_config["host"]}
+    # config.action_mailer.default_url_options = {host: config.mailer_config["host"]}
+    config.action_mailer.default_url_options[:host] = config.mailer_config["host"]
   else
     config.action_mailer.default_url_options = {host: 'staging.finly.io'}
     config.action_mailer.smtp_settings = {
