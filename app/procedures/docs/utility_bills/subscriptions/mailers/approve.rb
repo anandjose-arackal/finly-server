@@ -61,7 +61,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::Approve < Docs::UtilityBills::
     assign :hero_bg_image, "bg_success"
 
     assign :to do |user, params|
-      [params[:document].user&.email]
+      [params[:record].user&.email]
     end
 
     assign :subject do |user, params|
