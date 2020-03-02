@@ -280,9 +280,6 @@ group :development do
   gem "lol_dba"
 end
 
-group :staging do
-  gem 'bullet', '~> 5.9.0'
-end
 
 # gem 'backup'
 
