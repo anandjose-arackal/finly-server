@@ -11,9 +11,9 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def personalizer
     {
-        init: {
-            before: Personalizer::Process.new([:expense, :manual_split], :init, self)
-        }
+      init: {
+        before: Personalizer::Process.new([:expense, :manual_split], :init, self)
+      }
     }
   end
 
@@ -47,8 +47,15 @@ class Expense::Manual::Split < Expense::Manual::Base
     self.expenses_params&.each do |expense_params|
       expense = user.expenses.build(expense_params[:expense_params])
       unless expense.valid?
-        expense.errors.full_messages&.each do |error|
-          add_message :error, "Split #{expense_params[:index]}: #{error}"
+        expense.errors.messages&.each do |error_key, error|
+          message = expense.errors.full_messages_for(error_key.to_sym)
+          if ['date', 'spent_from_id'].include?(error_key.to_s).first
+            add_message :error, message
+          elsif 'manual_expense.merchant' == error_key.to_s
+            add_message :error, "Merchant can't be blank"
+          else
+            add_message :error, "Split #{expense_params[:index]}: #{message}"
+          end
         end
       end
       return if has_errors?

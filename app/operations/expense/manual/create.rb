@@ -91,6 +91,11 @@ class Expense::Manual::Create < Expense::Manual::Base
       return
     end
 
+    if self.expense_params.dig(:manual_expense_attributes, :merchant).blank?
+      add_message :error, 'Merchant can\'t be blank'
+      return
+    end
+
     if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
       add_message :error, 'Error in Spend Account'
       return

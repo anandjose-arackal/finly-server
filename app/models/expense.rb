@@ -1147,6 +1147,7 @@ class Expense < ApplicationRecord
         errors.add(:expense, "needs to have an associated distance expense")
       end
     when ExpenseType.time_expense_id
+
       if self.time_expense.blank?
         errors.add(:expense, "needs to have an associated time expense")
       end
@@ -1175,6 +1176,7 @@ class Expense < ApplicationRecord
         errors.add(:distance, "expense cannot be blank")
       end
     when ExpenseType.time_expense_id
+
       if self.time_expense.blank?
         errors.add(:time, "expense cannot be blank")
       end
