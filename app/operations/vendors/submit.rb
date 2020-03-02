@@ -16,9 +16,16 @@ class Vendors::Submit < Vendors::Base
   end
 
   def process
+
+    params[:reviewal_document] = self.vendor
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
+
     params[:document] = self.vendor
     params[:aasm_event] = 'submit'
-
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]

@@ -194,7 +194,7 @@ class InvoiceLineItem < ApplicationRecord
 
   def budget_trail_entry
     if self.parent&.is_a?(Invoice)
-      if self.parent.open? || self.parent.rejected? || self.parent.retracted?
+      if self.parent.open? || self.parent.rejected? || self.parent.retracted? || self.parent.voided?
         BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
       else
         BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)

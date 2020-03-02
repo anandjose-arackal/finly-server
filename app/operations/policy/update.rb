@@ -16,11 +16,8 @@ class Policy::Update < Policy::Base
   end
 
   def init
-    if vendor_payments?
-      self.policy = Policy::VendorPayments::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
-    else
-      self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
-    end
+    params[:view] = "admin"
+    self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
     self.update_resource_type = params[:update_resource_type]
   end
 
