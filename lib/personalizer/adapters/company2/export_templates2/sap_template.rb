@@ -5,7 +5,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
 
   def init
     if params.dig(:filter_date, :from).present?
-      params.merge!({filter_approved_date: {from: params.dig(:filter_date, :from), to: params.dig(:filter_date, :from)}})
+      params.merge!({filter_approved_date: {from: params.dig(:filter_date, :from), to: params.dig(:filter_date, :to)}})
     end
 
     if params[:view].present?
