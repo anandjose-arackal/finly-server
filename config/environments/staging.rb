@@ -108,7 +108,7 @@ Rails.application.configure do
     }
     config.action_mailer.raise_delivery_errors = false
     # config.action_mailer.default_url_options = {host: config.mailer_config["host"]}
-    config.action_mailer.default_url_options[:host] = config.mailer_config["host"]
+    config.action_mailer.default_url_options = {host: 'qa3.finly.io'}
   else
     config.action_mailer.default_url_options = {host: 'staging.finly.io'}
     config.action_mailer.smtp_settings = {
