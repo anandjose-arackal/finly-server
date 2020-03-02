@@ -232,7 +232,7 @@ class BbpsBillerSubscription < ApplicationRecord
     'BbpsBillerSubscriptionStatus'
   end
 
-  def role_based_initiator_associated_items(user, role_id, options = {})
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       super
     elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)

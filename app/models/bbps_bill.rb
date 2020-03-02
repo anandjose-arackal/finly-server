@@ -358,7 +358,7 @@ class BbpsBill < ApplicationRecord
     end
   end
 
-  def role_based_reviewer_associated_items(user, role_id, options={})
+  def self.role_based_reviewer_associated_items(user, role_id, options = {})
     policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
 
     if role_id == UserRole.id_for(:utility_bill_reviewer)
