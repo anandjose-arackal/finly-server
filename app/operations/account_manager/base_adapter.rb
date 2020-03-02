@@ -108,7 +108,7 @@ class AccountManager::BaseAdapter
             value: closing_balance,
             currency_id: currency_id
         },
-        associated_transaction: payment.reference_resource,
+        associated_transaction: payment.reference_resources.first,
         payment: payment,
         company_id: company_id,
         date: DateTime.now
@@ -144,7 +144,7 @@ class AccountManager::BaseAdapter
             receiving_account_number: payment.receiving_account&.account_number,
             receiving_account_ifsc: payment.receiving_account&.ifsc
         },
-        bank_reference_number: payment.reference_resource&.bank_reference_number
+        bank_reference_number: payment.utr
     }
     if payment.failed?
       post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence

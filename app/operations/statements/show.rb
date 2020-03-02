@@ -27,7 +27,16 @@ class Statements::Show < Statements::Base
       when :card_transfer_credits
         self.account = user.company.itz_cash_company_account
       when :bank_transfer_credits
-        self.account = user.company.yes_bank_company_account
+        case user.company.feature_subscription.bank_service_provider
+        when "YES"
+          self.account = user.company.yes_bank_company_account
+        when "ICICI"
+          self.account = user.company.icici_bank_company_account
+        when "KOTAK"
+          self.account = user.company.kotak_bank_company_account
+        else
+          self.account = user.company.yes_bank_company_account
+        end
       end
     when :user
       user_presenter = User::Show.(user, params)

@@ -8,5 +8,6 @@ class AssociateBankTransactionToPayment
       payment.update_columns(utr: reference_transaction.try(:utr))
       reference_transaction&.update_columns(reference_payment_id: payment.id)
     end
+
   end
 end

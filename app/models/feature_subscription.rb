@@ -39,6 +39,10 @@
 #  gstin_verification_enabled     :boolean          default(FALSE)
 #  user_level_custom_fields       :boolean          default(FALSE)
 #  utility_bills_enabled          :boolean          default(FALSE)
+#  analytics_system               :boolean
+#  request_encryption_enabled     :boolean          default(FALSE)
+#  user_level_custom_fields       :boolean          default(FALSE)
+#  utility_bills_enabled          :boolean          default(FALSE)
 #  deleted_at                     :datetime
 #  analytics_system               :boolean
 #  sso_login_enforced             :boolean          default(FALSE)
@@ -58,6 +62,21 @@ class FeatureSubscription < ApplicationRecord
       return true
     end
     false
+  end
+
+  # this is only for when we are using the workaround
+  # for multi bank support
+  def bank_transaction_class
+    case self.bank_service_provider
+    when "YES"
+      return YesBankTransaction
+    when "ICICI"
+      return IciciBankTransaction
+    when "KOTAK"
+      return KotakBankTransaction
+    else
+      return YesBankTransaction
+    end
   end
 
 end

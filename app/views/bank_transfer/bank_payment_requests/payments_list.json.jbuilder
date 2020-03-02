@@ -34,8 +34,8 @@ json.payments do
     json.system_messages do
       json.array! (payment.system_messages)
     end
-    json.bank_reference_number payment.reference_resource&.bank_reference_number
-    json.credited_at payment.reference_resource&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
+    json.bank_reference_number payment.utr
+    json.credited_at payment.reference_resources.first&.created_at&.strftime("%B %d, %Y - %H:%M:%S")
     json.payment_notification_users payment&.parent&.payment_notification_users rescue nil
     json.category_id payment.category_id
     json.category_name payment.category&.name

@@ -1,6 +1,6 @@
 json.result do
   json.array!(@result.paginated_payments) do |payment|
-    virtual_trans = payment.reference_resource
+    virtual_trans = payment.virtual_account_transaction
     json.source_account do
       json.name virtual_trans&.remitter_full_name
       json.ifsc virtual_trans&.remitter_account_ifsc
@@ -8,7 +8,7 @@ json.result do
     end
     json.amount payment.amount_value
     json.utr virtual_trans&.transfer_id
-    json.note payment.reference_resource&.note
+    json.note payment.virtual_account_transaction&.note
     json.date payment.date
     json.virtual_account do
       json.account_number virtual_trans&.virtual_account&.account_number
