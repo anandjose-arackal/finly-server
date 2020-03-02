@@ -29,6 +29,14 @@ class Docs::UtilityBills::Subscriptions::Mailers::Reject < Docs::UtilityBills::S
       [params[:record]&.user&.email]
     end
 
+    assign :body_quote_text do |user, params|
+      params[:record].reload.review_note
+    end
+
+    assign :body_quote_by do |user, params|
+      user.name
+    end
+
     assign :hero_bg_image, "bg_danger"
 
     assign :subject do |user, params|

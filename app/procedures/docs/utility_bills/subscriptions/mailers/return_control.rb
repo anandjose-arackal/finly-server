@@ -36,7 +36,7 @@ class Docs::UtilityBills::Subscriptions::Mailers::ReturnControl < Docs::UtilityB
     assign :hero_bg_image, "bg_warning"
 
     assign :subject do |user, params|
-      "#{user.name} has taken control of the utility bill master #{params[:record].sequence_id}"
+      "#{user.name} has returned control of the utility bill master #{params[:record].sequence_id}"
     end
 
     assign :title, "Utility Bill Master Control Returned"
