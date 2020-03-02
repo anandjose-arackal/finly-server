@@ -79,6 +79,7 @@ config/secure_storage_config.yml
 config/elastic_apm.yml
 config/deploy/config/*
 config/sidekiq.yml
+config/hutch.yml
 .ruby-version
 
 public/tmp
