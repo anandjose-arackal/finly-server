@@ -16,6 +16,10 @@ module Transitionable
       self.send(self.class.document_owner_attribute)
     end
 
+    def taken_control?
+      self.document_level_reviewer_mappings.with_level_id(self.level.id).first.taken_control
+    end
+
     def associated_users(type=nil)
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
       user_ids = []
