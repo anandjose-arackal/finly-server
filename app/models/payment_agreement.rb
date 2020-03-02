@@ -497,4 +497,15 @@ class PaymentAgreement < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
   end
 
+  def get_custom_fields(options)
+    #default return custom fields but index not needed custom fields
+    if options[:load_custom_fields].nil?
+      self.custom_fields
+    elsif options[:load_custom_fields].present? && options[:load_custom_fields] == true
+      self.custom_fields
+    elsif options[:load_custom_fields] && options[:load_custom_fields] == false
+      nil
+    end
+  end
+
 end
