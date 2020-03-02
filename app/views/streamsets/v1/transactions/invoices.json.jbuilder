@@ -79,6 +79,7 @@ json.result do
     json.delivery_location_code invoice.delivery_location&.location_code
 
     json.gstin_location_state invoice.gstin_location&.state&.name
+    json.gstin_location_city invoice.gstin_location&.location
     json.gstin_location_code invoice.gstin_location&.state&.state_code
 
     json.poc_email invoice.vendor_location&.poc_email

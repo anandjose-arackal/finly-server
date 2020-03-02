@@ -1,5 +1,7 @@
 json.result do
   json.array!(@result.paginated_expenses) do |expense|
+    user = expense.user
+    report = expense.report
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
                   :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                   :expense_tax_type_id
@@ -7,8 +9,15 @@ json.result do
     json.updated_at expense.updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.user expense.user
     json.user_employee_id expense.user&.profile&.employee_id
+    json.user_cost_center user.cost_center&.name
+    json.user_cost_center_code user.cost_center&.cost_center_code
+    json.user_location user.location&.name
+    json.user_location_code user.location&.location_code
+    json.user_department user.department&.name
+    json.user_department_code user.department&.department_code
     json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
     json.expense_type expense.expense_type&.name
+    json.total_expenses report&.expenses&.count
 
     json.usage_dates do
       json.type expense.usage_date_type

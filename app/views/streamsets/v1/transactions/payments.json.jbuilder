@@ -44,6 +44,7 @@ json.result do
     json.invoice_delivery_location_code payment.invoice.delivery_location&.location_code rescue ""
 
     json.invoice_gstin_location_state payment&.invoice&.gstin_location&.state&.name rescue ""
+    json.invoice_gstin_location_city payment&.invoice&.gstin_location&.location rescue ""
     json.invoice_gstin_location_code payment&.invoice&.gstin_location&.state&.state_code rescue ""
     json.invoice_department_code payment.invoice&.items&.first.department&.department_code rescue ""
 
