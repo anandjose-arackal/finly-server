@@ -278,6 +278,10 @@ class PaymentAgreement < ApplicationRecord
   scope :exclude_revision, -> {where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
 
 
+  scope :include_for_index, -> {includes(:policy, :creator, :status, :custom_fields, :security_deposits,:beneficiary_payments,:rental_invoices, :general_invoices )}
+
+
+
   def as_json(options={})
     {
         id: self.id,
