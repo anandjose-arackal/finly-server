@@ -44,13 +44,13 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
     if params[:note].present?
       model.update(review_note: params[:note])
     end
-    true
 
     if params[:aasm_event].present? && params[:aasm_event].to_sym == :submit
       unless model.user_id.present?
         model.update(user_id: current_user.id)
       end
     end
+    true
   end
 
 
