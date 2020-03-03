@@ -228,6 +228,7 @@ class BbpsBill < ApplicationRecord
         biller: subscription.biller.as_json({index: true}),
         autofetched: autofetched,
         # name: name,
+        name: subscription.name,
         sequence_id: sequence_id,
         department: department.as_json,
         cost_center: cost_center.as_json,
