@@ -10,4 +10,12 @@ class FormsController < BaseControllers::WebBase
     endpoint Forms::Ops::Config
   end
 
+  def dependency_config
+    # endpoint Forms::Ops::DependencyConfig
+  end
+
+  def dependency_choice_mapping
+    # endpoint Forms::Ops::DependencyConfig
+  end
+
 end
