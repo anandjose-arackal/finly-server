@@ -1041,8 +1041,6 @@ class PurchaseOrder < ApplicationRecord
         :purchase_order_reviewer,
         :purchase_order_auditor,
         :po_invoice_initiator,
-        :po_invoice_reviewer,
-        :po_invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
@@ -1151,7 +1149,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
-    if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator, :po_invoice_reviewer, :po_invoice_auditor]).include? role_id
+    if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator]).include? role_id
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
       return user.company.purchase_orders.where(policy_id: policy_ids, purchase_order_status_id: finance_associated_status_ids)
     end

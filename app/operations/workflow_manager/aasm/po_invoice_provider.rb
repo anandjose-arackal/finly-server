@@ -58,7 +58,7 @@ class WorkflowManager::Aasm::PoInvoiceProvider < WorkflowManager::Aasm::BaseProv
     end
 
     event :void do
-      transitions :from => [:approved, :auto_approved], to: :voided, guard: [:user_is_admin?, :no_payments?]
+      transitions :from => [:approved, :auto_approved, :unpaid], to: :voided, guard: [:user_is_admin?, :no_payments?]
     end
 
     after_all_events :change_state

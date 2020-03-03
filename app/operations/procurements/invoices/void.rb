@@ -24,8 +24,8 @@ class Procurements::Invoices::Void < Procurements::Invoices::Base
       return
     end
 
-    unless self.invoice.approved? || self.invoice.auto_approved?
-      add_message :error, "Only approved and auto approved invoice can be voided."
+    unless self.invoice.approved? || self.invoice.auto_approved? || self.invoice.unpaid?
+      add_message :error, "Only approved, auto approved or unpaid invoice can be voided."
       return
     end
 
