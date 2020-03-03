@@ -3,6 +3,7 @@ class Filters::API::Attribute
   attr_accessor :field_key, :label, :field_type, :auto_complete_route, :hint, :simple
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
+  # Simple is used to identify if the filter should be a part of the simple filter or not
   def initialize(field_key:, label:, hint:, field_type:, auto_complete_route: nil, simple: false)
     self.field_key = field_key
     self.label = label
