@@ -6,8 +6,12 @@ class Forms::API::Entity::Scopes::Enum < Forms::API::Entity::Scopes::Base
     Object.const_get(scope[:enum].to_s)
   end
 
-  def keys
-    scope[:keys]
+  def value
+    scope[:value]
+  end
+
+  def name
+    scope[:name]
   end
 
   def find_by_id(choice, user: nil)
@@ -18,17 +22,17 @@ class Forms::API::Entity::Scopes::Enum < Forms::API::Entity::Scopes::Base
     klass.where(name: choice).first
   end
 
-  def self.scope(klass, id: :id, name: :name)
-    {type: :enum, enum: klass.to_s, id: id, name: name}
+  def self.scope(klass, value: :id, name: :name)
+    {type: :enum, enum: klass.to_s, value: value, name: name}
   end
 
   def choices
     list = []
     klass.all.each do |item|
-      map = {}
-      map[:id] = keys[:id]
-      map[:name] = keys[:name]
-      list << map
+      list << {
+          value: item.send(value),
+          name: item.send(name),
+      }
     end
     list
   end

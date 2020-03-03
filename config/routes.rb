@@ -4000,6 +4000,7 @@ Rails.application.routes.draw do
 
   # get 'form_entities', to: 'form_entities#index'
   # resources :form_entities
+  get 'forms/config/:name', to: 'forms#form_config'
   resources :forms
 
   resources :insights

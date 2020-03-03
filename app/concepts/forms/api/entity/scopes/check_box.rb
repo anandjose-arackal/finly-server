@@ -24,7 +24,7 @@ class Forms::API::Entity::Scopes::CheckBox < Forms::API::Entity::Scopes::Base
   end
 
   def self.scope
-    {type: :checkbox, choices: [{id: "true", name: "true", active: true}, {id: "false", name: "false", active: true}]}
+    {type: :checkbox, choices: [{value: "true", active: true}, {value: "false", active: true}]}
   end
 
 end
