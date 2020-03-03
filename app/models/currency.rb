@@ -22,6 +22,12 @@ class Currency < ApplicationRecord
     1
   end
 
+  def display_text
+    text = country_code
+    text = "#{text} (#{self.symbol})" if self.symbol.present?
+    text
+  end
+
   def as_json(options = {})
     {
         id: self.id,

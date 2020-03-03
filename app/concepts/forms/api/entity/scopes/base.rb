@@ -40,9 +40,7 @@ class Forms::API::Entity::Scopes::Base
   end
 
   def as_json(options = {})
-    {
-        type: self.type
-    }
+    scope
   end
 
 end
