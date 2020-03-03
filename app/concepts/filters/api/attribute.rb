@@ -1,14 +1,14 @@
 class Filters::API::Attribute
 
-  attr_accessor :field_key, :label, :field_type, :scope, :hint, :simple
+  attr_accessor :field_key, :label, :field_type, :auto_complete_route, :hint, :simple
 
   # Includes: Used for capturing the data points to be included to optimize the fetch for the current record
-  def initialize(field_key:, label:, hint:, field_type:, scope: nil, simple: false)
+  def initialize(field_key:, label:, hint:, field_type:, auto_complete_route: nil, simple: false)
     self.field_key = field_key
     self.label = label
     self.hint = hint
     self.field_type = field_type
-    self.scope = scope
+    self.auto_complete_route = auto_complete_route
     self.simple = simple
   end
 
@@ -25,7 +25,7 @@ class Filters::API::Attribute
         simple: simple,
         operators: operators
     }
-    params[:scope] = scope if scope
+    params[:auto_complete_route] = auto_complete_route if auto_complete_route
     params
   end
 
@@ -42,7 +42,7 @@ class Filters::API::Attribute
         attributes[filter_key].present?
       end
 
-      def attribute(field_key, label: nil, type: :text, hint: "Select Value", scope: nil, simple: false)
+      def attribute(field_key, label: nil, type: :text, hint: "Select Value", auto_complete_route: nil, simple: false)
         raise "#{field_key} is already defined for class #{self.name}" if exists?(field_key)
 
         label ||= field_key.to_s.humanize
@@ -53,7 +53,7 @@ class Filters::API::Attribute
                 label: label,
                 field_type: type,
                 hint: hint,
-                scope: scope,
+                auto_complete_route: auto_complete_route,
                 simple: simple
             }
         )
