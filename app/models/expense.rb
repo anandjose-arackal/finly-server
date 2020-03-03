@@ -1199,6 +1199,7 @@ class Expense < ApplicationRecord
   end
 
   def validate_usage_dates
+    return if ['none', nil].include?(usage_date_type)
     if (usage_date_start.present? or usage_date_end.present?) and usage_date_type.blank?
       errors.add :usage_date_type, 'has not been defined'
       return
