@@ -203,7 +203,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
         payments: payments,
         purchase_request_items: purchase_request_items,
         invoice_items: invoice_items,
-        purchase_order_items: purchase_order_items
+        purchase_order_items: purchase_order_items,
+        budget_trails: self.budget_trails
     }
     # adding all the above data so that the items can be accessed outside this operation
     options["result"] = result
