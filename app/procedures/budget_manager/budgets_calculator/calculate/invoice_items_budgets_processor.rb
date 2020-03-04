@@ -40,14 +40,15 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_ratio = (invoice_item.net_amount&.value.to_f / po_item.total_amount&.value.to_f) rescue 1
       end
 
-      billed_amount_after_tax = po_item.amount_after_tax * billed_ratio
-      billed_amount_before_tax = po_item.amount_before_tax * billed_ratio
+      billed_amount_after_tax = po_item.after_tax_amount * billed_ratio
+      billed_amount_before_tax = po_item.before_tax_amount * billed_ratio
     else
       po_item = nil
       billed_quantity = 0
       billed_amount_after_tax = invoice_item.after_tax_amount
       billed_amount_before_tax = invoice_item.before_tax_amount
     end
+
 
     if (InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(invoice_item.parent.invoice_status_id))
       billed = true

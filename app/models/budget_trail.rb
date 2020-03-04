@@ -131,11 +131,11 @@ class BudgetTrail < ApplicationRecord
 
   def set_po_trail_attributes
     if self.po_trail_item_id.present?
-      # updating the billed flag of the parent PO Trail Item to false as it should not end up in the calculation again
-      remaining_amount_before_tax = po_trail_item.remaining_amount_before_tax_value - self.billed_amount_before_tax_value
-      remaining_amount_after_tax = po_trail_item.remaining_amount_after_tax_value - self.billed_amount_after_tax_value
-      remaining_quantity = po_trail_item.remaining_quantity - self.billed_quantity
-      po_trail_item.update(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
+      invoice_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.po_trail_item_id)
+      remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value)
+      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value)
+      remaining_quantity = po_trail_item&.entity&.quantity - invoice_trails.sum(:billed_quantity)
+      po_trail_item.update_columns(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
     end
   end
 

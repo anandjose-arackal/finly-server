@@ -984,7 +984,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def budget_trail_entry
-    if self.voided? || self.rejected? || self.retracted? || self.open?
+    if self.voided? || self.rejected?
       # this will delete the trails of all the items within this particular purchase order
       self.items.each do |item|
         BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)

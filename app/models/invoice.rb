@@ -1141,7 +1141,7 @@ class Invoice < ApplicationRecord
 
   def budget_trail_entry
     # as of now, no condition is being used to determine when to add the invoice to the budget trail
-    if self.open? || self.rejected? || self.retracted? || self.voided?
+    if self.rejected? || self.voided?
       self.invoice_items.each do |invoice_item|
         BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
       end

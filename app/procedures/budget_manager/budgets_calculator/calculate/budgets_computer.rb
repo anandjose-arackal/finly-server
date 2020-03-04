@@ -107,6 +107,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
     pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(po_item_amount_to_be_considered)
 
+    pending_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
+
     # debugger
 
     # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
@@ -133,6 +135,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
     paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket)
                       .joins(self.amount_to_be_considered).sum(:value)
+
+    paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_paid_bucket).joins(self.amount_to_be_considered).sum(:value)
 
     total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
 
