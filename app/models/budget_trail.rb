@@ -2,29 +2,42 @@
 #
 # Table name: budget_trails
 #
-#  id                   :integer          not null, primary key
-#  entity_id            :integer
-#  entity_type          :string(255)
-#  category_id          :integer
-#  cost_center_id       :integer
-#  location_id          :integer
-#  vendor_id            :integer
-#  amount_id            :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  user_id              :integer
-#  department_id        :integer
-#  entity_date          :date
-#  sub_department_id    :integer
-#  procurement_id       :integer
-#  entity_status_id     :integer
-#  amount_before_tax_id :integer
-#  amount_after_tax_id  :integer
-#  entity_created_at    :datetime
-#  entity_submitted_at  :datetime
-#  billed               :boolean          default(FALSE)
-#  deleted_at           :datetime
-#  date                 :datetime
+#  id                                :integer          not null, primary key
+#  entity_id                         :integer
+#  entity_type                       :string(255)
+#  category_id                       :integer
+#  cost_center_id                    :integer
+#  location_id                       :integer
+#  vendor_id                         :integer
+#  amount_id                         :integer
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  user_id                           :integer
+#  department_id                     :integer
+#  entity_date                       :date
+#  sub_department_id                 :integer
+#  procurement_id                    :integer
+#  entity_status_id                  :integer
+#  amount_before_tax_id              :integer
+#  amount_after_tax_id               :integer
+#  entity_created_at                 :datetime
+#  entity_submitted_at               :datetime
+#  billed                            :boolean          default(FALSE)
+#  deleted_at                        :datetime
+#  date                              :datetime
+#  amount_after_tax_value            :decimal(20, 10)
+#  amount_before_tax_value           :decimal(20, 10)
+#  billed_count                      :integer
+#  po_trail_item_id                  :integer
+#  remaining_amount_value            :decimal(20, 10)
+#  billed_quantity                   :integer
+#  billed_rate                       :decimal(20, 10)
+#  remaining_quantity                :integer
+#  revised                           :boolean          default(FALSE)
+#  billed_amount_before_tax_value    :decimal(20, 10)
+#  remaining_amount_after_tax_value  :decimal(20, 10)
+#  billed_amount_after_tax_value     :decimal(20, 10)
+#  remaining_amount_before_tax_value :decimal(20, 10)
 #
 
 class BudgetTrail < ApplicationRecord
@@ -41,11 +54,18 @@ class BudgetTrail < ApplicationRecord
   belongs_to :procurement, optional: true
   belongs_to :amount_after_tax, class_name: "Amount"
   belongs_to :amount_before_tax, class_name: "Amount"
+  belongs_to :po_trail_item, class_name: "BudgetTrail", optional: true
+
+  after_save :set_po_trail_attributes
 
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
   scope :within_date, -> (start_date, end_date, date_to_be_considered) {
     where("#{date_to_be_considered} >= ? AND #{date_to_be_considered} <= ?", start_date, end_date)
+  }
+
+  scope :billed, -> {
+    where billed: true
   }
 
   scope :not_billed, -> {
@@ -106,5 +126,17 @@ class BudgetTrail < ApplicationRecord
   scope :with_entity_status_id, -> (entity_status_id) {
     where entity_status_id: entity_status_id
   }
+
+  private
+
+  def set_po_trail_attributes
+    if self.po_trail_item_id.present?
+      # updating the billed flag of the parent PO Trail Item to false as it should not end up in the calculation again
+      remaining_amount_before_tax = po_trail_item.remaining_amount_before_tax_value - self.billed_amount_before_tax_value
+      remaining_amount_after_tax = po_trail_item.remaining_amount_after_tax_value - self.billed_amount_after_tax_value
+      remaining_quantity = po_trail_item.remaining_quantity - self.billed_quantity
+      po_trail_item.update(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
+    end
+  end
 
 end

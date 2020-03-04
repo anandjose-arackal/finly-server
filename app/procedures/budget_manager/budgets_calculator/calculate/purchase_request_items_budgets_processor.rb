@@ -21,14 +21,17 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsPr
         entity_submitted_at: purchase_request_item.purchase_request.submitted_at,
         entity_status_id: purchase_request_item.purchase_request.purchase_request_status_id,
         amount_attributes: {
+            id: trail&.amount&.id,
             value: purchase_request_item.estimated_amount&.value,
             currency_id: purchase_request_item.estimated_amount&.currency_id
         },
         amount_before_tax_attributes: {
+            id: trail&.amount_before_tax&.id,
             value: purchase_request_item.estimated_amount&.value,
             currency_id: purchase_request_item.estimated_amount&.currency_id
         },
         amount_after_tax_attributes: {
+            id: trail&.amount_after_tax&.id,
             value: purchase_request_item.estimated_amount&.value,
             currency_id: purchase_request_item.estimated_amount&.currency_id
         }

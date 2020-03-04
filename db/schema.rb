@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_21_080554) do
+ActiveRecord::Schema.define(version: 2020_03_03_230228) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1564,6 +1564,19 @@ ActiveRecord::Schema.define(version: 2020_02_21_080554) do
     t.boolean "billed", default: false
     t.datetime "deleted_at"
     t.datetime "date"
+    t.decimal "amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "amount_before_tax_value", precision: 20, scale: 10
+    t.integer "billed_count"
+    t.integer "po_trail_item_id"
+    t.decimal "remaining_amount_value", precision: 20, scale: 10
+    t.integer "billed_quantity"
+    t.decimal "billed_rate", precision: 20, scale: 10
+    t.integer "remaining_quantity"
+    t.boolean "revised", default: false
+    t.decimal "billed_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "billed_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_before_tax_value", precision: 20, scale: 10
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -4190,6 +4203,23 @@ ActiveRecord::Schema.define(version: 2020_02_21_080554) do
     t.datetime "deleted_at"
   end
 
+  create_table "icici_virtual_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.integer "balance_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["balance_id"], name: "index_icici_virtual_accounts_on_balance_id"
+    t.index ["company_id"], name: "index_icici_virtual_accounts_on_company_id"
+  end
+
+  create_table "icici_virtual_cards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "card_number"
+    t.integer "company_id"
+    t.integer "balance_id"
+    t.index ["balance_id"], name: "index_icici_virtual_cards_on_balance_id"
+    t.index ["company_id"], name: "index_icici_virtual_cards_on_company_id"
+  end
+
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -4837,6 +4867,7 @@ ActiveRecord::Schema.define(version: 2020_02_21_080554) do
     t.datetime "deleted_at"
     t.integer "reference_payment_id"
     t.text "bank_error_message", limit: 16777215
+    t.integer "transfer_mode_id"
     t.index ["amount_id"], name: "index_kotak_bank_transactions_on_amount_id"
     t.index ["beneficiary_account_id"], name: "index_kotak_bank_transactions_on_beneficiary_account_id"
     t.index ["company_id"], name: "index_kotak_bank_transactions_on_company_id"

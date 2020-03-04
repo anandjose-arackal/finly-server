@@ -2,7 +2,7 @@ expenses = @op["result"][:expenses] || []
 payments = @op["result"][:payments] || []
 purchase_request_items = @op["result"][:purchase_request_items] || []
 purchase_order_items = @op["result"][:purchase_order_items] || []
-invoice_items = @op["result"][:purchase_order_items] || []
+invoice_items = @op["result"][:invoice_items] || []
 
 # # TODO - change the below code to reflect the actual data
 # expenses = Expense.all.limit(10)

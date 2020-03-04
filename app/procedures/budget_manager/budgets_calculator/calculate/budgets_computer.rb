@@ -90,32 +90,42 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   # here we calculate the various buckets
   def calculate_buckets!(options, **)
 
+    # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
+    case amount_to_be_considered
+    when :amount_after_tax
+      po_item_amount_to_be_considered = :remaining_amount_after_tax_value
+      invoice_item_amount_to_be_considered = :billed_amount_after_tax_value
+    when :amount_before_tax
+      po_item_amount_to_be_considered = :remaining_amount_before_tax_value
+      invoice_item_amount_to_be_considered = :remaining_amount_before_tax_value
+    end
+
     # debugger
     # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
     pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
                          .joins(self.amount_to_be_considered).sum(:value)
 
-    pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket)
-                          .joins(self.amount_to_be_considered).sum(:value)
+    pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(po_item_amount_to_be_considered)
 
     # debugger
 
     # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
     # One thing to note here is that when some of the items of aa PO have been billed (i.e. have an invoice created against them) we need to consider only those items
     # which have not yet been moved to an invoice that has been approved
-    committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).not_billed.joins(self.amount_to_be_considered).sum(:value)
+    committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum(po_item_amount_to_be_considered)
 
-    committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).joins(self.amount_to_be_considered).sum(:value)
+    committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum(invoice_item_amount_to_be_considered)
 
 
     # debugger
 
-    # calculating pending payment amount - wil include all invoice items that are approved and above, and also all payments that are yet o be credited
-    pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+    # calculating pending payment amount - wil include all invoice items that are approved and above, but not the ones that have payments initiated against them
+    # TODO - partially paid invoices cases
+    pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).billed.sum(invoice_item_amount_to_be_considered)
 
-    pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+    # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
 
-    # calculating payments that have been credited, but are pending confirmation of credit
+    # calculating all payments that are yet to be approved or credited. All except the final completed status of the payment shows here
     payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket)
                                     .joins(self.amount_to_be_considered).sum(:value)
 

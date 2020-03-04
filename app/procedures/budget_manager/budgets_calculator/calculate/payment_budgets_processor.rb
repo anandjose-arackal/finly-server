@@ -21,14 +21,17 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         entity_created_at: payment.bank_payment_request.created_at,
         entity_submitted_at: payment.bank_payment_request.submitted_at,
         amount_attributes: {
+            id: trail&.amount&.id,
             value: payment.amount.value,
             currency_id: payment.amount.currency_id
         },
         amount_before_tax_attributes: {
+            id: trail&.amount_before_tax&.id,
             value: payment.amount_value,
             currency_id: payment.amount.currency_id
         },
         amount_after_tax_attributes: {
+            id: trail&.amount_after_tax&.id,
             value: payment.amount_value,
             currency_id: payment.amount.currency_id
         }

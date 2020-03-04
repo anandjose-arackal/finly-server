@@ -22,14 +22,17 @@ class BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < Bud
         entity_submitted_at: expense.report.submitted_at,
         entity_status_id: expense.report.report_status_id,
         amount_attributes: {
+            id: trail&.amount&.id,
             value: expense.amount&.value,
             currency_id: expense.amount&.currency_id
         },
         amount_before_tax_attributes: {
+            id: trail&.amount_before_tax&.id,
             value: expense.amount_before_tax,
             currency_id: expense.amount.currency_id
         },
         amount_after_tax_attributes: {
+            id: trail&.amount_after_tax&.id,
             value: expense.amount_after_tax,
             currency_id: expense.amount.currency_id
         }

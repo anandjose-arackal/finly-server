@@ -78,7 +78,6 @@ class InwardInvoiceStatus < ApplicationRecord
     [
         InwardInvoiceStatus.id_for(:approved),
         InwardInvoiceStatus.id_for(:auto_approved),
-        InwardInvoiceStatus.id_for(:initiated),
         InwardInvoiceStatus.id_for(:unpaid)
     ]
   end

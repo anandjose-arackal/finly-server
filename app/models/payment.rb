@@ -691,6 +691,10 @@ class Payment < ApplicationRecord
     end
   end
 
+  def bank_payment_request
+    return self.payment_order&.bank_payment_request
+  end
+
   def payment_mode
     mode || super
   end

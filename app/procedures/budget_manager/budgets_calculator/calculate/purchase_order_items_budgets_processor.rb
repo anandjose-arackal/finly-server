@@ -7,6 +7,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
     else
       trail_id = nil
     end
+
     self.trail_hash = {
         id: trail_id,
         entity: purchase_order_item,
@@ -21,15 +22,21 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
         procurement_id: purchase_order_item.purchase_order.procurement_id,
         entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
         vendor_id: purchase_order_item.purchase_order.vendor_id,
+        remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
+        remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
+        remaining_quantity: purchase_order_item.quantity,
         amount_attributes: {
+            id: trail&.amount&.id,
             value: purchase_order_item.total_amount&.value,
             currency_id: purchase_order_item.total_amount&.currency_id
         },
         amount_before_tax_attributes: {
+            id: trail&.amount_before_tax&.id,
             value: purchase_order_item.before_tax_amount,
             currency_id: purchase_order_item.total_amount&.currency_id
         },
         amount_after_tax_attributes: {
+            id: trail&.amount_after_tax&.id,
             value: purchase_order_item.after_tax_amount,
             currency_id: purchase_order_item.total_amount&.currency_id
         }
