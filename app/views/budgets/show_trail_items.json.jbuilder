@@ -20,7 +20,7 @@ json.budget_trail_items do
       json.array!(expenses) do |expense|
         json.user_name expense.user&.name
         json.category_name expense.category&.name
-        json.date expense.date.strftime("%Y-%B-%d")
+        json.date expense.date.strftime("%d-%b-%Y")
         json.amount expense.amount&.value
         json.index index
         index += 1
@@ -31,11 +31,11 @@ json.budget_trail_items do
     # list of payments that need to be processed
     json.payments do
       json.array!(payments) do |payment|
-        json.vendor payment.receiving_user&.name
+        json.vendor payment.receiving_user&.business_name
         json.category_name payment.category&.name
         json.department payment.department&.name
         json.amount payment.amount&.value
-        json.date payment.date.strftime("%Y-%B-%d")
+        json.date payment.date.strftime("%d-%b-%Y")
         json.index index
         index += 1
       end
@@ -48,7 +48,7 @@ json.budget_trail_items do
         json.name purchase_order_item.description
         json.cost_center_name purchase_order_item.purchase_order.cost_center&.name
         json.amount purchase_order_item.total_amount&.value
-        json.date purchase_order_item.purchase_order.delivery_date
+        json.date purchase_order_item.purchase_order&.created_at&.strftime("%d-%b-%Y")
         json.location purchase_order_item.purchase_order.location&.name
         json.department purchase_order_item.purchase_order.department&.name
         json.sub_department purchase_order_item.purchase_order.sub_department&.name
@@ -65,7 +65,7 @@ json.budget_trail_items do
         json.name invoice_line_item.description
         json.cost_center_name invoice_line_item.parent.cost_center&.name
         json.amount invoice_line_item.net_amount&.value
-        json.date invoice_line_item.parent.date&.strftime("%Y-%B-%d")
+        json.date invoice_line_item.parent.created_at&.strftime("%d-%b-%Y")
         json.location invoice_line_item.parent.location&.name
         json.department invoice_line_item.parent.department&.name
         json.sub_department invoice_line_item.parent&.sub_department&.name
