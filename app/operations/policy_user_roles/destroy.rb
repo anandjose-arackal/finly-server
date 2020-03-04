@@ -27,7 +27,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
 
     if self.policy_user_role.destroy
       if associated_lurms.present?
-        associated_lurms.map.(&:destroy)
+        associated_lurms.map(&:destroy)
         add_message :success, "Associated User Reviewer Mappings Successfully Removed "
       end
       add_message :success, "Successfully removed user"
