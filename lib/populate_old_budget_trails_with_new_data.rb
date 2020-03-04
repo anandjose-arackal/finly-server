@@ -8,33 +8,33 @@ class PopulateOldBudgetTrailsWithNewData
     # ###########################################################################
     # FIRST we do it for all PO Line Items
     #
-    BudgetTrail.where(entity_type: "PurchaseOrderItem").find_each do |trail|
-      purchase_order_item = trail.entity
-      next if purchase_order_item.blank?
-      trail.update(
-          remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
-          remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
-          remaining_quantity: purchase_order_item.quantity,
-          entity_created_at: purchase_order_item.purchase_order.created_at,
-          entity_submitted_at: (purchase_order_item.purchase_order.submitted_at || purchase_order_item.purchase_order.created_at),
-          entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
-          amount_attributes: {
-              id: trail&.amount&.id,
-              value: purchase_order_item.total_amount&.value,
-              currency_id: purchase_order_item.total_amount&.currency_id
-          },
-          amount_before_tax_attributes: {
-              id: trail&.amount_before_tax&.id,
-              value: purchase_order_item.before_tax_amount,
-              currency_id: purchase_order_item.total_amount&.currency_id
-          },
-          amount_after_tax_attributes: {
-              id: trail&.amount_after_tax&.id,
-              value: purchase_order_item.after_tax_amount,
-              currency_id: purchase_order_item.total_amount&.currency_id
-          }
-      )
-    end
+    # BudgetTrail.where(entity_type: "PurchaseOrderItem").find_each do |trail|
+    #   purchase_order_item = trail.entity
+    #   next if purchase_order_item.blank?
+    #   trail.update(
+    #       remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
+    #       remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
+    #       remaining_quantity: purchase_order_item.quantity,
+    #       entity_created_at: purchase_order_item.purchase_order.created_at,
+    #       entity_submitted_at: (purchase_order_item.purchase_order.submitted_at || purchase_order_item.purchase_order.created_at),
+    #       entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
+    #       amount_attributes: {
+    #           id: trail&.amount&.id,
+    #           value: purchase_order_item.total_amount&.value,
+    #           currency_id: purchase_order_item.total_amount&.currency_id
+    #       },
+    #       amount_before_tax_attributes: {
+    #           id: trail&.amount_before_tax&.id,
+    #           value: purchase_order_item.before_tax_amount,
+    #           currency_id: purchase_order_item.total_amount&.currency_id
+    #       },
+    #       amount_after_tax_attributes: {
+    #           id: trail&.amount_after_tax&.id,
+    #           value: purchase_order_item.after_tax_amount,
+    #           currency_id: purchase_order_item.total_amount&.currency_id
+    #       }
+    #   )
+    # end
 
     ###############################################################################
     # SECOND we do it for all invoice items
@@ -50,8 +50,8 @@ class PopulateOldBudgetTrailsWithNewData
           billed_ratio = (invoice_item.net_amount&.value.to_f / po_item&.total_amount&.value.to_f) rescue 1
         end
 
-        billed_amount_after_tax = po_item.after_tax_amount * billed_ratio
-        billed_amount_before_tax = po_item.before_tax_amount * billed_ratio
+        billed_amount_after_tax = po_item&.after_tax_amount * billed_ratio
+        billed_amount_before_tax = po_item&.before_tax_amount * billed_ratio
       else
         po_item = nil
         billed_quantity = 0
