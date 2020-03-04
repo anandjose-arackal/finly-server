@@ -50,8 +50,8 @@ class PopulateOldBudgetTrailsWithNewData
           billed_ratio = (invoice_item.net_amount&.value.to_f / po_item&.total_amount&.value.to_f) rescue 1
         end
 
-        billed_amount_after_tax = po_item&.after_tax_amount * billed_ratio
-        billed_amount_before_tax = po_item&.before_tax_amount * billed_ratio
+        billed_amount_after_tax = po_item&.after_tax_amount.to_f * billed_ratio
+        billed_amount_before_tax = po_item&.before_tax_amount.to_f * billed_ratio
       else
         po_item = nil
         billed_quantity = 0
