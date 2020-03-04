@@ -104,7 +104,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
       else
         policies = policies.with_application(:vp)
         policies.each do |policy|
-          users = company.users.joins(:policy_user_roles).where(policy_user_roles:{policy_id: policy.id},policy_user_roles:{ user_role_id: UserRole.id_for(role_provider_mapping[provider])})
+          users = company.users.joins(:policy_user_roles).where(policy_user_roles:{policy_id: policy.id},policy_user_roles:{ user_role_id: UserRole.id_for(role_provider_mapping[provider].to_sym)})
           levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings: [reviewer: :profile]}, {level_reviewer_mappings: [reviewer: :profile]}).order(level_number: :asc)
           users.each do |emp|
             policy_details = {"Policy" => policy.name}
