@@ -19,7 +19,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
       validate_reviewer_in_approval_flow if %w(purchase_order_reviewer invoice_reviewer bank_payment_request_reviewer).include?(reviewer_type)
   end
 
-  def before_process
+  def pre_process
     self.associated_lurms = get_associated_reviewal_mappings
   end
 
