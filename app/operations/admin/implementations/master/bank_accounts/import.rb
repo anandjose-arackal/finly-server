@@ -8,6 +8,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
       :user_id => "User Email / Mobile NUmber",
       :account_number => "Account Number",
       :ifsc => "IFSC",
+      :default_account => "Default Account (Y)",
       :destroy => "Destroy"
   })
   attr_accessor :bank_account_params
@@ -77,11 +78,13 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     account_number = clean_up_data data[:account_number]
     account_number.is_a?(String) ? account_number.gsub!("'", "") : ''
     ifsc = data[:ifsc]
+    default_account = data[:default_account].upcase == Y ? true : false
     params = {
         name: name,
         user: user_entity,
         account_number: clean_up_data(account_number),
-        ifsc: ifsc
+        ifsc: ifsc,
+        default_account: default_account
     }
     [params, messages]
   end
