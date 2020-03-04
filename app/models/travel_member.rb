@@ -16,7 +16,6 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  gender             :string(255)
-#  uuid               :string(36)
 #  deleted_at         :datetime
 #
 

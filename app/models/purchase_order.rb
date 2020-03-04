@@ -65,8 +65,8 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
-#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
@@ -75,7 +75,6 @@
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
-#  uuid                         :string(36)
 #
 
 class PurchaseOrder < ApplicationRecord

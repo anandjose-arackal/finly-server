@@ -10,7 +10,6 @@
 #  is_deleted             :boolean          default(FALSE)
 #  field_key              :string(255)
 #  deleted_at             :datetime
-#  uuid                   :string(36)
 #
 
 class FieldDropDownItem < ApplicationRecord

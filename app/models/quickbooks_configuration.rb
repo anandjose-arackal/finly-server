@@ -14,7 +14,6 @@
 #  reimbursable_account_id         :integer
 #  non_reimbursable_account_id     :integer
 #  company_id                      :integer
-#  uuid                            :string(36)
 #  deleted_at                      :datetime
 #
 

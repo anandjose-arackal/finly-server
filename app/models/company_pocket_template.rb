@@ -9,7 +9,6 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  active              :boolean          default(TRUE)
-#  uuid                :string(36)
 #  deleted_at          :datetime
 #
 

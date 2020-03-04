@@ -53,7 +53,6 @@
 #  certificate_of_registration_updated_at    :datetime
 #  customer_type_id                          :integer
 #  user_confirmed                            :boolean          default(FALSE)
-#  uuid                                      :string(36)
 #  deleted_at                                :datetime
 #
 

@@ -10,7 +10,6 @@
 #  is_deleted         :boolean          default(FALSE)
 #  user_group_id      :integer
 #  deleted_at         :datetime
-#  uuid               :string(36)
 #
 
 class UserGroupItemMapping < ApplicationRecord

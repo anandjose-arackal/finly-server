@@ -6,6 +6,8 @@
 #  name                    :string(255)      not null
 #  export_type             :string(255)
 #  created_by_id           :integer
+#  company_id              :bigint           not null
+#  request_params          :text(4294967295)
 #  completed_at            :datetime
 #  total_records           :integer
 #  completed_records       :integer
@@ -17,19 +19,14 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  status_id               :integer          not null
-#  company_id              :bigint           not null
-#  request_params          :text(4294967295)
 #  deleted_at              :datetime
 #  master                  :string(255)
 #  description             :string(255)
-#  processing_record_type  :string(255)
-#  processing_record_id    :bigint
 #  record_type             :string(255)
 #  record_id               :bigint
 #  crash_stacktrace        :text(65535)
 #  message                 :text(65535)
 #  note                    :text(65535)
-#  uuid                    :string(36)
 #
 
 require 'rails_helper'

@@ -8,7 +8,6 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  user_team_id       :integer
-#  uuid               :string(36)
 #  deleted_at         :datetime
 #
 

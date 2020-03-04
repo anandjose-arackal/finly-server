@@ -28,7 +28,6 @@
 #  active               :boolean          default(TRUE)
 #  item_expense_type_id :integer
 #  tds_applicable       :boolean          default(TRUE)
-#  uuid                 :string(36)
 #
 
 class Item < ApplicationRecord

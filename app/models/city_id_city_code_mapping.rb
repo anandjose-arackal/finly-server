@@ -7,7 +7,6 @@
 #  city_code  :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  uuid       :string(36)
 #  deleted_at :datetime
 #
 

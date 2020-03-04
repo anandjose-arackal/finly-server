@@ -16,7 +16,6 @@
 #  initiating_user_type    :string(255)
 #  receiving_user_id       :integer
 #  receiving_user_type     :string(255)
-#  uuid                    :string(36)
 #  deleted_at              :datetime
 #
 

@@ -25,9 +25,8 @@
 #  transfer_status_id    :integer
 #  company_id            :integer
 #  request_id            :string(255)
-#  deleted_at            :datetime
 #  transfer_mode_id      :integer
-#  reference_payment_id  :integer
+#  deleted_at            :datetime
 #  bank_error_message    :text(16777215)
 #
 

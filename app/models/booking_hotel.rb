@@ -20,7 +20,6 @@
 #  checkout_time    :time
 #  booking_id       :integer
 #  deleted_at       :datetime
-#  uuid             :string(36)
 #
 
 class BookingHotel < ApplicationRecord

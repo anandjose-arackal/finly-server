@@ -96,11 +96,10 @@
 #  prepaid                               :boolean
 #  fixed_periodic_template               :boolean
 #  escalation_percentage                 :float(24)
-#  override_invoice_id                   :string(255)
 #  total_invoice_amount_id               :integer
 #  available_invoice_amount_id           :integer
+#  override_invoice_id                   :string(255)
 #  include_tax_and_tds                   :boolean          default(FALSE)
-#  uuid                                  :string(36)
 #  rcm_enabled                           :boolean
 #
 

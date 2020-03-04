@@ -14,7 +14,6 @@
 #  updated_at                :datetime         not null
 #  address                   :text(65535)
 #  pin                       :text(65535)
-#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

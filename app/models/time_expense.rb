@@ -9,7 +9,6 @@
 #  updated_at     :datetime         not null
 #  time_object_id :integer
 #  deleted_at     :datetime
-#  uuid           :string(36)
 #
 
 class TimeExpense < ApplicationRecord

@@ -23,7 +23,6 @@
 #  updated_at             :datetime         not null
 #  purchase_order_item_id :integer
 #  product_id             :string(255)
-#  uuid                   :string(36)
 #  deleted_at             :datetime
 #
 

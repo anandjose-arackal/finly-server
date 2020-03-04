@@ -178,7 +178,6 @@
 #  is_deleted  :boolean          default(FALSE)
 #  MYR         :decimal(20, 5)
 #  deleted_at  :datetime
-#  uuid        :string(36)
 #
 
 class Amount < ApplicationRecord

@@ -2,29 +2,22 @@
 #
 # Table name: budget_trails
 #
-#  id                   :integer          not null, primary key
-#  entity_id            :integer
-#  entity_type          :string(255)
-#  category_id          :integer
-#  cost_center_id       :integer
-#  location_id          :integer
-#  vendor_id            :integer
-#  amount_id            :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  user_id              :integer
-#  department_id        :integer
-#  entity_date          :date
-#  sub_department_id    :integer
-#  procurement_id       :integer
-#  entity_status_id     :integer
-#  amount_before_tax_id :integer
-#  amount_after_tax_id  :integer
-#  entity_created_at    :datetime
-#  entity_submitted_at  :datetime
-#  billed               :boolean          default(FALSE)
-#  deleted_at           :datetime
-#  date                 :datetime
+#  id                :integer          not null, primary key
+#  entity_id         :integer
+#  entity_type       :string(255)
+#  category_id       :integer
+#  cost_center_id    :integer
+#  location_id       :integer
+#  vendor_id         :integer
+#  amount_id         :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  user_id           :integer
+#  department_id     :integer
+#  date              :date
+#  sub_department_id :integer
+#  procurement_id    :integer
+#  deleted_at        :datetime
 #
 
 class BudgetTrail < ApplicationRecord

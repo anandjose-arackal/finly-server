@@ -24,7 +24,6 @@
 #  updated_at             :datetime         not null
 #  default                :boolean
 #  reimbursement          :boolean          default(FALSE)
-#  uuid                   :string(36)
 #  deleted_at             :datetime
 #
 

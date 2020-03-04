@@ -10,7 +10,6 @@
 #  company_id :integer
 #  gl_code    :string(255)
 #  deleted_at :datetime
-#  uuid       :string(36)
 #
 
 class TdsRatesList < ApplicationRecord

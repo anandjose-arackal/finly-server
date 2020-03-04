@@ -9,7 +9,6 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  deleted_at     :datetime
-#  uuid           :string(36)
 #
 
 class CreditNoteAdjustment < ApplicationRecord

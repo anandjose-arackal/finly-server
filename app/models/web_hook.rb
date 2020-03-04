@@ -12,7 +12,6 @@
 #  updated_at         :datetime         not null
 #  headers            :text(65535)
 #  deleted_at         :datetime
-#  uuid               :string(36)
 #
 
 class WebHook < ApplicationRecord
