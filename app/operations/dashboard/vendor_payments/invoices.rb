@@ -10,7 +10,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
   end
 
   def success
-    params[:invoices] = self.invoices
+    params[:invoices] = self.invoices.scope_all_except_voided
     Dashboard::VendorPayments::Invoices::DashboardPresenter.new(user, params, messages)
   end
 

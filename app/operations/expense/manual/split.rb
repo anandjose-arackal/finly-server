@@ -49,17 +49,24 @@ class Expense::Manual::Split < Expense::Manual::Base
       unless expense.valid?
         expense.errors.messages&.each do |error_key, error|
           message = expense.errors.full_messages_for(error_key.to_sym)
-          if ['date', 'spent_from_id'].include?(error_key.to_s).first
+          if ['date', 'spent_from_id'].include?(error_key.to_s)
             add_message :error, message
           elsif 'manual_expense.merchant' == error_key.to_s
             add_message :error, "Merchant can't be blank"
           else
-            add_message :error, "Split #{expense_params[:index]}: #{message}"
+            add_message :error, "Split #{expense_params[:index]}: #{message.first}"
           end
         end
       end
+
+      if expense_params.dig(:expense_params, :amount_attributes, :value).eql?'undefined' || expense_params.dig(:expense_params, :amount_attributes, :value).to_f <= 0 
+        add_message :error, "Split #{expense_params[:index]}: Amount must be greater than 0"
+      end
+
       return if has_errors?
       # Create custom fields only for validations. Fields will be saved later
+
+
       custom_fields = expense_params[:custom_fields]
       if custom_fields.present?
         validate_custom_fields(expense, custom_fields, expense_params[:index])

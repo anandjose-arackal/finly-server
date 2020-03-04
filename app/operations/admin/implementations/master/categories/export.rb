@@ -11,6 +11,8 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
       :expense_management =>"Expense Management (Y for Enable",
       :vendor_payments =>"Vendor Payment (Y for Enable)",
       :inward_invoice_line_items => "Inward Invoice Line Item (Y for Enable)",
+      :gst_applicable => "GST Applicable (Y for Enable)",
+      :tds_applicable => "TDS Applicable (Y for Enable)",
       :destroy => "Destroy"
   })
 
@@ -52,6 +54,14 @@ class Admin::Implementations::Master::Categories::Export < Admin::Implementation
 
   def inward_invoice_line_items(category)
     category.inward_invoice_line_items? ? 'Y' : ''
+  end
+
+  def gst_applicable(category)
+    category.gst_applicable? ? 'Y' : ''
+  end
+
+  def tds_applicable(category)
+    category.tds_applicable? ? 'Y' : ''
   end
 
   def destroy(category)

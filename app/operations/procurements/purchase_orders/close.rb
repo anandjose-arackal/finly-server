@@ -26,6 +26,7 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
   def post_process
     add_message :success, 'Successfully Closed Purchase Order'
     update_purchase_request_status
+    update_purchase_order_advance
   end
 
   def update_purchase_request_status
@@ -65,6 +66,15 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
         purchase_order.purchase_request_items.where.not(status_id: PurchaseRequestItemStatus.id_for(:po_closed)).each do |purchase_request_item|
           purchase_request_item.update(status_id: PurchaseRequestItemStatus.id_for(:po_closed))
         end
+      end
+    end
+  end
+
+  def update_purchase_order_advance
+    if purchase_order.advance_amount&.present? and purchase_order.advance_payments.blank?
+      if purchase_order.advance_amount.value > 0
+        purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:closed)
+        purchase_order.save
       end
     end
   end

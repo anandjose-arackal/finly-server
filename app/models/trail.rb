@@ -6,7 +6,6 @@
 #  parent_id                 :integer
 #  parent_type               :string(255)
 #  action_user_id            :integer
-#  action_user_type          :string(255)
 #  action_id                 :integer
 #  action_user_role_id       :integer
 #  action_level_id           :integer
@@ -188,6 +187,8 @@ class Trail < ApplicationRecord
         action = " deactivated"
       when TrailAction.id_for(:reactivate)
         action = " reactivated"
+      when TrailAction.id_for(:settle)
+        action = " settled"
       else
         action = ""
     end

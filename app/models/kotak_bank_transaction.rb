@@ -23,6 +23,8 @@
 #  reversal_response          :text(65535)
 #  reversal_api_counter       :integer          default(0)
 #  deleted_at                 :datetime
+#  reference_payment_id       :integer
+#  bank_error_message         :text(16777215)
 #
 
 
@@ -34,6 +36,8 @@ class KotakBankTransaction < ApplicationRecord
   belongs_to :transfer_status, class_name: 'BankTransferStatus', optional: true
 
   has_one :payment, as: :reference_resource
+
+  belongs_to :reference_payment, class_name: "Payment"
 
   validates :unique_reference_number, presence: true
   # validates :amount_id, presence: true
@@ -47,6 +51,10 @@ class KotakBankTransaction < ApplicationRecord
   # scope :successful_transactions, -> {where response_status_code: "000" }
   scope :completed, -> {
     where(transfer_status_id: BankTransferStatus.id_for(:completed))
+  }
+
+  scope :without_id, -> (id) {
+    where.not(id: id)
   }
 
   scope :status_check_required, -> {

@@ -98,7 +98,8 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       return
     end
     
-    if self.time_expense_params.dig(:time_expense_attributes, :value).to_f <= 0
+
+    if self.time_expense_params.dig(:time_expense_attributes, :time_object_attributes, :value).to_f <= 0
       add_message :error, 'Total time must be greater then 0'
       return
     end

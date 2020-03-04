@@ -4,6 +4,8 @@
 # money_request: money_request being marked as approved
 #
 
+################## DEPRECATED ###############################
+
 class Settlement::SMoneyRequests::Approved < MoneyRequests::Base
   attr_accessor :money_request
 
@@ -111,7 +113,9 @@ class Settlement::SMoneyRequests::Approved < MoneyRequests::Base
       op = AccountManager::Payments::PaymentProcessor.(self.money_request.user, payment_request: payment_request)
       if op.success?
         payment = op.payment_order.payments.first
-        payment.update(reference_resource: self.money_request)
+        # setting the reference payment of the money request as the payment in question
+        self.money_request.update(reference_payment_id: payment.id)
+        # payment.update(reference_resource: self.money_request)
       end
     end
     ######### end of cash on hand deduction ########

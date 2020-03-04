@@ -5,7 +5,7 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    self.invoice = user.company.inward_invoices.find_by id: invoice_id
+    self.invoice = user.company.inward_invoices.scope_all_except_voided.find_by id: invoice_id
     self.flag_save = false
     self.flag_submit = false
   end
