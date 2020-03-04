@@ -74,6 +74,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
       result_hash = []
       policies = apply_scopes(company.policies)
       if %w(ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider).include?(provider)
+        policies = policies.with_application(:em)
         policies.each do |policy|
           users = policy.users.includes(:profile)
           levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings: [reviewer: :profile]}, {level_reviewer_mappings: [reviewer: :profile]}).order(level_number: :asc)
@@ -101,6 +102,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
           end
         end
       else
+        policies = policies.with_application(:vp)
         policies.each do |policy|
           users = company.users.joins(:policy_user_roles).where(policy_user_roles:{policy_id: policy.id},policy_user_roles:{ user_role_id: UserRole.id_for(role_provider_mapping[provider])})
           levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings: [reviewer: :profile]}, {level_reviewer_mappings: [reviewer: :profile]}).order(level_number: :asc)
