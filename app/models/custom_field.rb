@@ -14,6 +14,7 @@
 #  dependent_parent_type  :string(255)
 #  field_key              :string(255)
 #  configured_field_value :text(65535)
+#  deleted_at             :datetime
 #
 
 class CustomField < ApplicationRecord
@@ -169,6 +170,7 @@ class CustomField < ApplicationRecord
   end
 
   def as_json(options = {})
+    user_level_custom_fields = self.field_configuration.user_level_field
     case
     when options[:report_show]
       return report_show
@@ -179,7 +181,12 @@ class CustomField < ApplicationRecord
       dependent_field_configuration_ids = []
       has_dependent_cf = false
       if field_configuration.field_type_id == FieldType.id_for(:drop_down)
-        options = field_configuration.drop_down_items.exclude_deleted
+        if user_level_custom_fields
+          option_ids = field_configuration.drop_down_items.exclude_deleted.filter_user_id(RequestStore.store[:current_user]&.id).includes(:dependent_field_configurations).find_each(batch_size: 100).reject(&:nil?)
+          options = FieldDropDownItem.where(id: option_ids)
+        else
+          options = field_configuration.drop_down_items.exclude_deleted
+        end
         # options.each do |option|
         #   if option.dependent_field_configurations.present?
         #     dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)

@@ -2,8 +2,9 @@
 #
 # Table name: outward_invoice_types
 #
-#  id   :integer          not null, primary key
-#  name :string(255)
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  deleted_at :datetime
 #
 
 class OutwardInvoiceType < ApplicationRecord

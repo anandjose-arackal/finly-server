@@ -42,6 +42,9 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_invoice_status, type: :array # used for streamsets
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_with_credit_note
+    has_scope :filter_department_id
+    has_scope :filter_location_id
+    has_scope :filter_cost_center_id
 
     # Sorting
     has_scope :sort_invoice_id

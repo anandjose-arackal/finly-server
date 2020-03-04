@@ -18,6 +18,7 @@
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
 #  non_personal_fund_transfer    :boolean
+#  deleted_at                    :datetime
 #
 
 class CardProgram < ApplicationRecord

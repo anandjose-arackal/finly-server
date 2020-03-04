@@ -5,6 +5,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def initialize(params)
     self.transfer_request = params[:transfer_request]
     self.payment = params[:payment]
+    self.icici_bank_transaction = params[:bank_transaction]
     self.params = {}
   end
 
@@ -20,10 +21,16 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
     unless transfer_request.class.name == "IciciBankTransferRequest"
       add_message :error, "Invalid parameters"
+      return
     end
 
     unless transfer_request.valid?
       add_message :error, transfer_request.errors
+      return
+    end
+
+    unless self.icici_bank_transaction.present?
+      add_message :error, "Bank transaction not present"
       return
     end
   end
@@ -32,7 +39,6 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     self.company = self.payment.payment_order.company
     # self.company = Company.second
     super # so that the variables are initialized from the config file
-    self.icici_bank_transaction = self.payment.reference_resource
     self.receiving_account = self.payment.receiving_account
     super()
   end
@@ -48,11 +54,15 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     if self.payment.neft?
       remarks = remarks[0..30]
     end
-    if self.receiving_account&.account_owner.is_a?(YesBankVendor)
-      payee_name = self.receiving_account.account_owner.business_name
-    else
-      payee_name = self.receiving_account.account_owner.name
-    end
+
+    # payee_name will always be the bank account's name henceforth
+    payee_name = self.receiving_account&.name
+
+    # if self.receiving_account&.account_owner.is_a?(YesBankVendor)
+    #   payee_name = self.receiving_account.account_owner.business_name
+    # else
+    #   payee_name = self.receiving_account.account_owner.name
+    # end
 
     {
         AGGRID: self.company_details["AGGR_ID"],
@@ -60,7 +70,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
         CORPID: self.company_details["CORP_ID"],
         USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        UNIQUEID: self.transfer_request.unique_reference_number.to_s,
+        UNIQUEID: self.icici_bank_transaction.unique_request_number.to_s,
         DEBITACC: self.company_details["DEBIT_ACC_NO"],
         CREDITACC: self.receiving_account.account_number,
         # CREDITACC: "000405002777",

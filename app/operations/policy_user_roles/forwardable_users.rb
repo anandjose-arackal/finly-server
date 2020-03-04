@@ -59,6 +59,8 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       role_id = UserRole.id_for(:po_invoice_reviewer)
     when 'non_po_invoice_provider'
       role_id = UserRole.id_for(:non_po_invoice_reviewer)
+    when 'agreement_invoice_provider'
+      role_id = UserRole.id_for(:agreement_invoice_reviewer)
     end
     self.policy_user_roles = self.policy.policy_user_roles.with_role_id(role_id)
   end

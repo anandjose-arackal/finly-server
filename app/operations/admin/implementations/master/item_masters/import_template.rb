@@ -12,6 +12,7 @@ class Admin::Implementations::Master::ItemMasters::ImportTemplates < Admin::Impl
       :po_item =>  "PO Item (Y/N)",
       :non_po_item => "Non PO Item (Y/N)",
       :good_service => "Goods or Service ( G / S)",
+      :tds_applicable => "TDS Applicable (Y/N)",
       :discount => "Discount",
       :rate => "Rate",
       :destroy => "Destroy"

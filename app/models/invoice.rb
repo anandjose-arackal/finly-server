@@ -80,21 +80,18 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  narration                       :text(65535)
 #  po_number                       :string(255)
+#  narration                       :text(65535)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
-#  vendor_poc_id                   :integer
-#  vlpm_id                         :integer
-#  client_note                     :text(65535)
 #  payment_agreement_id            :integer
 #  vendor_location_id              :integer
 #  billing_type_id                 :integer
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
 #  payable                         :boolean          default(FALSE)
-#  cn_adjusted_amount_id           :integer
 #  rcm_enabled                     :boolean          default(FALSE)
+#  cn_adjusted_amount_id           :integer
 #
 
 class Invoice < ApplicationRecord
@@ -209,7 +206,7 @@ class Invoice < ApplicationRecord
   delegate :paid_amount_value, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
-           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, to: :invoice_status, allow_nil: true
+           :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
@@ -487,6 +484,8 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+  scope :filter_cost_center_id, -> (cost_center_id) {where(cost_center_id: cost_center_id)}
+
   scope :show_only_invoices_which_are_forwarded, -> (show_it = false) {
     if StringUtils.to_bool(show_it)
       self.joins(:document_level_reviewer_mappings).where('document_level_reviewer_mappings.forwarded is true')
@@ -533,6 +532,9 @@ class Invoice < ApplicationRecord
     where invoice_status_id: InwardInvoiceStatus.ids_for(status)
   }
 
+  scope :scope_all_except_voided, -> {
+    where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
+  }
 
   after_create :set_defaults
   after_save :budget_trail_entry
@@ -996,21 +998,23 @@ class Invoice < ApplicationRecord
   # end
 
   def get_invoice_provider_name
-    if self.procurement.purchase_order.present?
-      return 'PoInvoiceProvider'
+    # if self.procurement.present? && self.procurement.purchase_order.present?
+    if self.procurement&.purchase_order.present?
+      'PoInvoiceProvider'
     elsif self.payment_agreement_id.present?
-      return 'AgreementInvoiceProvider'
+      'AgreementInvoiceProvider'
     else
-      return 'NonPoInvoiceProvider'
+      'NonPoInvoiceProvider'
     end
   end
 
   def get_default_provider
-    if self.procurement.present? && self.procurement.purchase_order.present?
-      "PoInvoiceProvider"
-    else
-      "NonPoInvoiceProvider"
-    end
+    # if self.procurement.present? && self.procurement.purchase_order.present?
+    #   "PoInvoiceProvider"
+    # else
+    #   "NonPoInvoiceProvider"
+    # end
+    get_invoice_provider_name
   end
 
   def update_net_amount_value
@@ -1130,7 +1134,7 @@ class Invoice < ApplicationRecord
 
   def budget_trail_entry
     # as of now, no condition is being used to determine when to add the invoice to the budget trail
-    if self.open? || self.rejected? || self.retracted?
+    if self.open? || self.rejected? || self.retracted? || self.voided?
       self.invoice_items.each do |invoice_item|
         BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
       end

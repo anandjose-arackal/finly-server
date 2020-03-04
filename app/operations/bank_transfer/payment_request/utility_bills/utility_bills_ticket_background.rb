@@ -59,6 +59,7 @@ class BankTransfer::PaymentRequest::UtilityBills::UtilityBillsTicketBackground <
           purchase_order_id: payment[:purchase_order_id],
           payment_mode: self.payment_mode,
           transfer_mode_id: self.transfer_mode_id,
+          reference_resource_type: "BbpsYesBankTransaction",
           amount_attributes: {
               value: payment[:requested_amount],
               currency_id: Currency.first.id

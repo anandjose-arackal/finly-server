@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class PurchaseOrderStatus < ApplicationRecord
@@ -83,6 +84,14 @@ class PurchaseOrderStatus < ApplicationRecord
   def self.status_ids_for_reviewer
     [
       PurchaseOrderStatus.id_for(:processing)
+    ]
+  end
+
+  def self.status_ids_for_grn_addable
+    [
+       PurchaseOrderStatus.id_for(:approved),
+       PurchaseOrderStatus.id_for(:sent_to_vendor),
+       PurchaseOrderStatus.id_for(:vendor_confirmed)
     ]
   end
 end

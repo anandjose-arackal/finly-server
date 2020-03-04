@@ -7,7 +7,6 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
             name: 'SAP',
             description: 'SAP exportable format. Exports expenses',
             formats: [
-                {name: 'Export as CSV', extension: 'csv'},
                 {name: 'Export as XLS', extension: 'xls'}
             ]
         },
@@ -16,7 +15,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
             name: 'Tally Journal Uploader',
             description: 'Tally exportable format.',
             formats: [
-                {name: 'Export as XLS', extension: 'xls'}
+                {name: 'Export as XLSX', extension: 'xlsx'}
             ]
         }
     }

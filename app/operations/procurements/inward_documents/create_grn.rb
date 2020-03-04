@@ -23,15 +23,23 @@ class Procurements::InwardDocuments::CreateGrn < Procurements::InwardDocuments::
 
   def validate
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create Receipt Note'
+      add_message :error, 'Purchase Order not found for this procurement. Cannot create Receipt Note'
+    end
+
+    unless PurchaseOrderStatus.status_ids_for_grn_addable.include?(purchase_order.purchase_order_status_id)
+      add_message :error, "This Purchase Order is not yet approved. Cannot create Receipt Note"
     end
 
     if self.purchase_order.closed?
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
 
+    if self.purchase_order.voided?
+      add_message :error, "This Purchase Order is voided. No further actions can be taken."
+    end
+
     if all_items_accepted?(self.purchase_order)
-      add_message :error, "Cant add new Receipt Note if previous Receipt Note has all items shipped."
+      add_message :error, "Cannot add new Receipt Note if previous Receipt Note has all items shipped."
     end
 
 

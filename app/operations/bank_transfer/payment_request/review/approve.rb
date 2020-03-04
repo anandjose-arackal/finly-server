@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :auto_approve, :payable_amounts, :payment_to_invoices, :inward_invoices
+  attr_accessor :auto_approve, :payable_amounts, :payment_to_invoices, :inward_invoices, :payment_ids
 
   def authorized_user_type
     [:manager, :finance_manager, :admin]
@@ -12,9 +12,11 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
 
     self.payable_amounts = {}
     ids = []
+    self.payment_ids = []
     self.payment_to_invoices = {}
     self.bank_payment_request.payment_order.payments.each do |payment|
       break unless payment.parent_type == 'Invoice'
+      payment_ids << payment.id
       ids << payment.parent_id
       self.payment_to_invoices[payment.parent_id.to_i] = payment
       self.payable_amounts[payment.parent_id.to_i] = payment.amount&.value.to_f
@@ -33,6 +35,12 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     #   add_message :error, "Payment Order cannot be approved in this state"
     #   return
     # end
+    invoices = self.inward_invoices.where(invoice_status_id: InwardInvoiceStatus.id_for(:voided))
+    if invoices.present?
+      add_message :error, "Payments with IDs #{payment_ids.join(", ")} have invoices which are voided. Please remove them before taking any action."
+      return
+    end
+
     invoice_check
   end
 

@@ -42,7 +42,7 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   def input
     invoices_presenter = fetch_invoices
     return if has_errors?
-    
+
     invoices = invoices_presenter.invoices.where(invoice_status_id: InwardInvoiceStatus.ids_for([:partially_paid, :paid])).left_joins(:payments)
   end
 
@@ -78,11 +78,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   end
 
   def pan(invoice)
-    invoice.vendor.pan
+    invoice.vendor&.pan
   end
 
   def vendor_id(invoice)
-    invoice.vendor.vendor_id
+    invoice.vendor&.vendor_id
   end
 
   def vendor_name(invoice)
@@ -96,21 +96,21 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   end
 
   def amount_paid(invoice)
-    invoice.payments.successful.map {|p| p.amount.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
+    invoice.payments.successful.map {|p| p.amount&.value if (p.payment_status_id == PaymentStatus.id_for(:completed))}.compact.sum
   end
 
   def cgst_sgst_amount(invoice)
-    invoice.gst_type_id == GstType.id_for(:cgst_sgst) ? invoice.tax_amount.value / 2.0 : 0
+    invoice.gst_type_id == GstType.id_for(:cgst_sgst) ? invoice.tax_amount&.value.to_f / 2.0 : 0
   end
 
   def igst_amount(invoice)
-    invoice.gst_type_id == GstType.id_for(:igst) ? invoice.tax_amount.value : 0
+    invoice.gst_type_id == GstType.id_for(:igst) ? invoice.tax_amount&.value.to_f : 0
   end
 
   # TODO ADD TOTAL INVOICE AMOUNT amt + gst DONE
 
   def total_invoice_amount(invoice)
-    invoice.gross_amount&.value + invoice.tax_amount&.value
+    invoice.gross_amount&.value.to_f + invoice.tax_amount&.value.to_f
   end
 
   def invoice_number(invoice)
@@ -129,11 +129,11 @@ class ExportManager::Master::Invoices::TdsExport < ExportManager::Builders::Spre
   # TODO TDS TAX SECTION DONE
 
   def tds_name(invoice)
-    invoice.tds_slab.name
+    invoice.tds_slab&.name
   end
 
   def tds_amount(invoice)
-    invoice.tds_amount.value
+    invoice.tds_amount&.value
   end
 
   def tds_rate(invoice)

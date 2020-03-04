@@ -11,6 +11,7 @@
 #  budget              :decimal(10, )
 #  limit_type_id       :integer
 #  allowed             :boolean
+#  deleted_at          :datetime
 #
 
 class CardLimit < ApplicationRecord

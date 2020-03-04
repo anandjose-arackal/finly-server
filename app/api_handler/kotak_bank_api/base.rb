@@ -155,9 +155,10 @@ class KotakBankApi::Base < BaseHandler
       self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
-      if self.payment&.reference_resource&.is_a?(KotakBankTransaction)
+
+      self.bank_transaction = payment.reference_resources.first
+      if self.bank_transaction&.is_a?(KotakBankTransaction)
         # just update the bank transaction with the latest details
-        self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
             bank_reference_number: self.transfer_request.bank_reference_number,
             transfer_status_id: self.transfer_status_id,
