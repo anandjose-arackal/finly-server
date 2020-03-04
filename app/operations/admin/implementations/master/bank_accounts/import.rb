@@ -78,7 +78,7 @@ class Admin::Implementations::Master::BankAccounts::Import < Admin::Implementati
     account_number = clean_up_data data[:account_number]
     account_number.is_a?(String) ? account_number.gsub!("'", "") : ''
     ifsc = data[:ifsc]
-    default_account = (data[:default_account].upcase == 'Y' ? true : false)
+    default_account = (data[:default_account].to_s.upcase == 'Y' ? true : false)
     params = {
         name: name,
         user: user_entity,
