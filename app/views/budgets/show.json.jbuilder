@@ -17,20 +17,20 @@ json.budget_consumption budget_consumption
 
 json.budget_criteria budget.budget_criteria_as_json
 
-json.budget_trail_items do
-  # TODO - change below to actual numbers lol
-  json.expenses Expense.limit(10)
-  json.payments Payment.limit(10)
-  json.purchase_order_items PurchaseOrderItem.limit(10)
-  json.invoice_items InvoiceLineItem.limit(10)
-  json.purchase_request_items PurchaseRequestItem.limit(10)
-
-  json.expenses_count 10
-  json.payments_count 10
-  json.purchase_order_items_count 10
-  json.invoice_items_count 10
-  json.purchase_request_items_count 10
-end
+# json.budget_trail_items do
+#   # TODO - change below to actual numbers lol
+#   json.expenses Expense.limit(10)
+#   json.payments Payment.limit(10)
+#   json.purchase_order_items PurchaseOrderItem.limit(10)
+#   json.invoice_items InvoiceLineItem.limit(10)
+#   json.purchase_request_items PurchaseRequestItem.limit(10)
+#
+#   json.expenses_count 10
+#   json.payments_count 10
+#   json.purchase_order_items_count 10
+#   json.invoice_items_count 10
+#   json.purchase_request_items_count 10
+# end
 
 json.budget_group_details budget.budget_group
 

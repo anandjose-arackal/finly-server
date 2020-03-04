@@ -130,7 +130,7 @@ class BudgetGroupCriterium < ApplicationRecord
     {
         id: id,
         name: name,
-        created_at: created_at.strftime("%Y-%m-%d"),
+        created_at: created_at.strftime("%d-%b-%Y"),
         period_id: self.budget_group.period_id,
         period: self.budget_group.period&.name,
         total_budgets: self.budgets.count,
