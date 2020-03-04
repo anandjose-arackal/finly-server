@@ -41,7 +41,7 @@ class Docs::UtilityBills::Bills::Ops::BulkReview < Transactions::API
 
   def process(options, params:, performable_record_ids:, current_user:, **)
     params[:ids] = performable_record_ids
-    params[:performed_at] = DateTime.now
+    params[:performed_at] = Time.zone.now
     Docs::UtilityBills::Bills::Ops::BulkReviewBackground.call_async(params: params, current_user: current_user)
     true
   end
