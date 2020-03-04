@@ -1,10 +1,5 @@
 json.partial! '/mobile/v2/reports/report', report: @result.report
-manager_name = ''
-manager_name = @result.manager.name if @result.manager.present?
-finance_manager_name = ''
-finance_manager_name = @result.finance_manager.name if @result.finance_manager.present?
-json.manager_name manager_name
-json.finance_manager_name finance_manager_name
+json.reviewers @result.report&.get_reviewers.map {|user| user.name}
 json.total do
   json.value @result.total
   json.currency do

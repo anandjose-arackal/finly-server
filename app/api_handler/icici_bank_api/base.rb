@@ -151,18 +151,28 @@ class IciciBankApi::Base < BaseHandler
       self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
-      if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
-        # just update the bank transaction with the latest details
-        self.bank_transaction = payment.reference_resource
-        self.bank_transaction.update(
-            transfer_status_id: self.transfer_status_id
-        )
+
+      self.bank_transaction = payment.reference_resources.first
+      if self.bank_transaction.is_a?(IciciBankTransaction)
+        self.bank_transaction.update(transfer_status_id: self.transfer_status_id)
       else
-        # if payment object exists but it didn't have an associated bank transaction object
-        if self.payment.present? && self.payment.reference_resource.blank?
+        if self.payment.present? && self.bank_transaction.blank?
           Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
         end
       end
+
+        # if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
+        #   # just update the bank transaction with the latest details
+        #   self.bank_transaction = payment.reference_resource
+        #   self.bank_transaction.update(
+        #       transfer_status_id: self.transfer_status_id
+        #   )
+        # else
+        #   # if payment object exists but it didn't have an associated bank transaction object
+        #   if self.payment.present? && self.payment.reference_resource.blank?
+        #     Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        #   end
+        # end
 
     rescue Faraday::ResourceNotFound
       self.end_time = DateUtils.local_date_time
@@ -189,18 +199,26 @@ class IciciBankApi::Base < BaseHandler
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
 
-      if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
-        # just update the bank transaction with the latest details
-        self.bank_transaction = payment.reference_resource
-        self.bank_transaction.update(
-            transfer_status_id: self.transfer_status_id
-        )
+      self.bank_transaction = payment.reference_resources.first
+      if self.bank_transaction.is_a?(IciciBankTransaction)
+        self.bank_transaction.update(transfer_status_id: self.transfer_status_id)
       else
-        # this is an anomaly, so send email and flag it
-        if self.payment.present? && self.payment.reference_resource.blank?
+        if self.payment.present? && self.bank_transaction.blank?
           Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
         end
       end
+      # if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
+      #   # just update the bank transaction with the latest details
+      #   self.bank_transaction = payment.reference_resource
+      #   self.bank_transaction.update(
+      #       transfer_status_id: self.transfer_status_id
+      #   )
+      # else
+      #   # this is an anomaly, so send email and flag it
+      #   if self.payment.present? && self.payment.reference_resource.blank?
+      #     Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+      #   end
+      # end
     end
   end
 

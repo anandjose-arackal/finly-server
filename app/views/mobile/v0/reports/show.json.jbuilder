@@ -1,7 +1,4 @@
-manager_name = @result.manager.name rescue nil
-finance_manager_name = @result.finance_manager.name rescue nil
-json.manager_name manager_name
-json.finance_manager_name finance_manager_name
+json.reviewers @result.report&.get_reviewers.map {|user| user.name}
 json.total do
   json.value @result.total
   json.currency do

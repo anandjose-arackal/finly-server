@@ -218,11 +218,11 @@ class BankPaymentRequest < ApplicationRecord
                                                           #     {payment_order: [bank_payment_request: [:status]]},
                                                           #     :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
-  scope :include_for_data_retrieval, -> {includes(:policy,payment_order: {payments: [{receiving_account: :account_owner},
-                                                                             :initiating_user,:parent,:payment_status,
-                                                                             {payment_order: [bank_payment_request: [:status, :controlling_user]]},
-                                                                             {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
-                                                                             :amount]})}
+  scope :include_for_data_retrieval, -> {includes(:policy, payment_order: {payments: [:receiving_account,
+                                                                                      :initiating_user, :parent, :payment_status,
+                                                                                      {payment_order: [bank_payment_request: [:status, :controlling_user]]},
+                                                                                      {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
+                                                                                      :amount]})}
 
   scope :filter_date, -> (date_from, date_to) {
     date_from = "1990-01-01" if date_from.blank?
@@ -270,8 +270,9 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
-  invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
+  scope :includes_details, -> do
+    includes(:level, :status, :owner, :policy, {requested_amount: :currency}, payment_order: [{amount_requested: :currency}, payments: [:payment_status, :system_messages, :receiving_account, :initiating_user, {amount: :currency},
+                                                                                                                                        invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
   scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}

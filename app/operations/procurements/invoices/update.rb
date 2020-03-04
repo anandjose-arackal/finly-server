@@ -8,7 +8,7 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
     self.purchase_order = self.procurement.purchase_order
 
     invoice_id = params[:id] || params[:invoice_id]
-    self.invoice = user.company.invoices.find_by(id: invoice_id)
+    self.invoice = user.company.invoices.scope_all_except_voided.find_by(id: invoice_id)
     self.invoice_params = set_invoice_parameters
 
     if self.procurement.po_revisions.present?

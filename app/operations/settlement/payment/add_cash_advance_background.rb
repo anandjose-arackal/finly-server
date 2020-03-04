@@ -78,7 +78,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
     if op.success?
       self.payment = op.payments.first
-      bank_transaction = self.payment.reload.reference_resource
+      bank_transaction = self.payment.reload.reference_resources.first
       self.payment.update(destination_pocket_id: self.destination_pocket.id) # storing the original receiving account so that once the bank account transaction goes through it can be credited to cash on hand
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
@@ -88,8 +88,10 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
         payment = op.payments.first
+        # setting the reference resource for the cash on hand payment to the bank transfer payment
+        self.payment.update(reference_payment_id: payment.id)
         # setting the reference resource for the cash on hand payment as the bank transfer payment
-        payment.update(reference_resource: self.payment)
+        # payment.update(reference_resource: self.payment)
       end
       return true
     end

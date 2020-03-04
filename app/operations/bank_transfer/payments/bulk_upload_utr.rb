@@ -1,7 +1,7 @@
 class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   attr_accessor :payments_data, :file, :result_array, :headers, :all_payments, :update_payments, :new_transactions, :existing_transactions,
-                :all_transactions
+                :all_transactions, :bank_transaction_class
 
   def pre_validate
     if user.blank? || params.blank?
@@ -18,6 +18,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
     self.payments_data = ImportUtil.load_spreadsheet_quickly(file, [:payment_id, :utr, :processed_date], {skip_empty_lines: true})
     self.result_array = []
     self.headers = retrieve_headers
+    self.bank_transaction_class = user.company.feature_subscription.bank_transaction_class
   end
 
   def validate
@@ -30,13 +31,12 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   def pre_process
     payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.ids_for(:vendor_payment, :advance_against_purchase_order)).pluck(:id)
     self.all_payments = Payment.with_payment_order_id(payment_order_ids).to_a
-    self.all_transactions = YesBankTransaction.where(company_id: user.company_id).pluck(:bank_reference_number)
+    self.all_transactions = bank_transaction_class.where(company_id: user.company_id).pluck(:bank_reference_number)
   end
 
   def process
     self.new_transactions = []
     self.existing_transactions = []
-    self.update_payments = []
 
     self.payments_data.each_with_index do |payment_data, index|
       self.result_array << payment_data.values
@@ -62,19 +62,26 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         self.result_array[index] << "Only completed payments can have an attached UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource.bank_reference_number.present?
+      if payment.reference_resources.present? && payment.utr.present?
         self.result_array[index] << "This payment already has an associated UTR"
         next
       end
-      if payment.reference_resource.present? && payment.reference_resource&.is_a?(YesBankTransaction)
+      if payment.reference_resources.present? && payment.receiving_account_type == "BankAccount"
         # payment.reference_resource.update(bank_reference_number: utr)
-        reference_resource = payment.reference_resource
-        reference_resource.bank_reference_number = utr
+        reference_resource = payment.reference_resources.first
+        # setting the utr of this transaction irrespective of the type of the transaction
+        # so if the particular class has "bank_reference_number" as an attribute, then set that,
+        # otherwise set the attribute "utr"
+        if reference_resource&.class&.column_names&.include?("bank_reference_number")
+          reference_resource.bank_reference_number = utr
+        else
+          reference_resource.utr = utr
+        end
         existing_transactions << reference_resource
       else
         # disallow duplicate utr to be updated
         if self.all_transactions.include? utr.to_s.strip
-          p_id = YesBankTransaction.where(company_id: user.company_id, bank_reference_number: utr).first&.payment&.id
+          p_id = bank_transaction_class.where(company_id: user.company_id, bank_reference_number: utr).first&.payment&.id
           self.result_array[index] << "UTR already exists for some other payment. See Payment ID - #{p_id}"
           next
         elsif self.payments_data[0, index].to_a.pluck(:utr).include? utr.to_s.strip
@@ -84,22 +91,19 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         end
         # create a bank transaction for this particular payment
         amount = Amount.create(value: payment.amount_value, currency_id: 1)
-        new_transactions << YesBankTransaction.new(transfer_type: payment.payment_mode,
-                                                   bank_reference_number: utr,
-                                                   company_id: user.company_id,
-                                                   transfer_status_id: BankTransferStatus.id_for(:completed),
-                                                   bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
-                                                   beneficiary_bank_account_id: payment.receiving_account&.id,
-                                                   amount_id: amount.id,
-                                                   created_at: credited_at)
-        # payment.update(reference_resource: bank_transaction)
-        payment.reference_resource = new_transactions.last
-        self.update_payments << payment
+        new_transactions << bank_transaction_class.new(transfer_type: payment.payment_mode,
+                                                       bank_reference_number: utr,
+                                                       company_id: user.company_id,
+                                                       transfer_status_id: BankTransferStatus.id_for(:completed),
+                                                       bank_transaction_type_id: BankTransactionType.id_for(:outside_finly),
+                                                       beneficiary_bank_account_id: payment.receiving_account&.id,
+                                                       reference_payment_id: payment.id,
+                                                       amount_id: amount.id,
+                                                       credited_at: credited_at)
       end
       # add a success message to the result array
       self.result_array[index] << "Success!"
     end
-    update_details
   end
 
   def post_process
@@ -122,32 +126,40 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
   end
 
   def update_details
+    # it will update the existing bank transactions with the bank_reference_number if present
     exec_statement self.existing_transactions, true, [:bank_reference_number]
+    # will insert new records into bank transactions
     exec_statement self.new_transactions
-    payments_without_transactions = payment_details
-    exec_statement payments_without_transactions, true, [:reference_resource_id, :reference_resource_type]
+    # payments_without_transactions = payment_details
+    # updating_transactions = payment_details
+    # exec_statement updating_transactions, true, [:reference_payment_id]
+    # exec_statement payments_without_transactions, true, [:reference_resource_id, :reference_resource_type]
   end
 
-  def payment_details
-    transactions = []
-    utrs = self.new_transactions.pluck :bank_reference_number
-    newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
-    transactions = []
-    utrs.each do |utr|
-      transactions << newly_created_transactions.find {|transaction| transaction if transaction.bank_reference_number == utr}
-    end
-    return false if transactions.blank?
-
-    payments = []
-    transactions.each_with_index do |transaction, index|
-      next if transaction.blank?
-      payment = self.update_payments.find {|payment| payment if payment.reference_resource.bank_reference_number == transaction.bank_reference_number}
-      payment.reference_resource_type = 'YesBankTransaction'
-      payment.reference_resource_id = transaction.id
-      payments << payment
-    end
-    payments
-  end
+  # def payment_details
+  #   transactions = []
+  #   utrs = self.new_transactions.pluck :bank_reference_number
+  #   newly_created_transactions = YesBankTransaction.where bank_reference_number: utrs
+  #
+  #   transactions = []
+  #   utrs.each do |utr|
+  #     transactions << newly_created_transactions.find {|transaction| transaction if transaction.bank_reference_number == utr}
+  #   end
+  #   return false if transactions.blank?
+  #
+  #   updating_transactions = []
+  #   # payments = []
+  #   transactions.each_with_index do |transaction, index|
+  #     next if transaction.blank?
+  #     payment = self.update_payments.find {|payment| payment if payment.reference_resource.bank_reference_number == transaction.bank_reference_number}
+  #     transaction.reference_payment_id = payment.id
+  #     # payment.reference_resource_type = 'YesBankTransaction'
+  #     # payment.reference_resource_id = transaction.id
+  #     updating_transactions << transaction
+  #     # payments << payment
+  #   end
+  #   updating_transactions
+  # end
 
   def exec_statement(batch, update=false, keys=[])
     if batch.blank?

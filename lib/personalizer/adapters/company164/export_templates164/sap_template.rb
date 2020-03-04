@@ -1,9 +1,37 @@
 class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Personalizer::Adapters::ExportBase
-  attr_accessor :headers, :contents, :reports, :categories
+  attr_accessor :headers, :contents, :reports, :categories, :role_id
+
+  has_scope :filter_approved_date, using: [:from, :to], type: :hash
 
   def init
-    users = user.company.users
-    self.reports = Report.where(user_id: users.pluck(:id)).processed.includes({user: :profile},expenses:[:category,:amount],report_processor_group_mapping:[:payment] )
+    if params.dig(:filter_date, :from).present?
+      params.merge!({filter_approved_date: {from: params.dig(:filter_date, :from), to: params.dig(:filter_date, :to)}})
+    end
+
+    if params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
+    end
+
+    if self.role_id.blank?
+      add_message :error, 'You are not authorized to do this'
+    end
+
+    case self.role_id
+    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+      if self.user.company_admin? || self.user.auditor?
+        self.reports = Report.admin_associated_items(user).not_open
+      elsif user.policy_admin?
+        # todo Take care of policy admins
+        self.reports = Report.admin_associated_items(user).not_open
+      end
+    when UserRole.id_for(:manager)
+      self.reports = Report.reviewer_associated_items(user).not_open
+    when UserRole.id_for(:finance_manager)
+      self.reports = Report.finance_associated_items(user).not_open
+    end
+
+    self.reports = reports.processed.includes({user: :profile}, expenses: [:category, :amount], report_processor_group_mapping: [:payment])
     self.reports = apply_scopes(self.reports, params)
     self.categories = user.company.categories
 
@@ -49,7 +77,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
             report.id,
             'JV',
             report.submitted_at.strftime("%Y%m"),
-            {value: expense.date, type: 'date'},
+            {value: report.approved_at, type: 'date'},
             "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
             expense.amount.value,
             '',
@@ -79,7 +107,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
           report.id,
           'JV',
           report.submitted_at.strftime("%Y%m"),
-          {value: report.submitted_at, type: 'date'},
+          {value: report.approved_at, type: 'date'},
           "Being expenses settled against report ID #{report.id} of #{report.user.name} with #{report.user.employee_id}",
           '',
           '',
@@ -170,8 +198,8 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
     end
   end
 
-  def invoice_number(expence)
-    expence.custom_fields.map { |cf| cf.string_value if cf.field_key == 'invoice_number' }&.first
+  def invoice_number(expense)
+    expense.custom_fields.map {|cf| cf.string_value if cf.field_key == 'invoice_number'}&.first
   end
 
   def retrieve_account(expense)

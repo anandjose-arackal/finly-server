@@ -38,10 +38,11 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
-#  uuid                               :string(36)
+#  location_id                        :integer
+#  cost_center_id                     :integer
+#  reference_payment_id               :integer
 #
 
 class Report < ApplicationRecord
@@ -84,6 +85,8 @@ class Report < ApplicationRecord
   belongs_to :sub_department, optional: true, class_name: "Department"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
+
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, optional: true, class_name: 'Amount'

@@ -11,7 +11,7 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
-    self.payment = bank_transaction.payment
+    self.payment = bank_transaction.reference_payment
     self.payment_order = self.payment&.payment_order
   end
 
