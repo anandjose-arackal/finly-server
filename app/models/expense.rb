@@ -116,7 +116,7 @@ class Expense < ApplicationRecord
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
-  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', 'none', nil]}
+  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', 'none', nil, ""]}
   validates_presence_of :spent_from_id, message: 'Please select a Spend Account to create an expense', if: Proc.new {|exp| !exp.card_expense?}
   validate :validate_usage_dates
   validate :no_future_date
@@ -1236,6 +1236,7 @@ class Expense < ApplicationRecord
   end
 
   def validate_usage_dates
+    return if ['none', nil].include?(usage_date_type)
     if (usage_date_start.present? or usage_date_end.present?) and usage_date_type.blank?
       errors.add :usage_date_type, 'has not been defined'
       return
