@@ -9,9 +9,9 @@ class Docs::Trips::Form < Forms::API
     # lookup :department_id, scope: Forms::API::Entity::Scope[:auto_complete].scope('departments', filters: {}), required: true
     # lookup :location_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('locations', filters: {}), required: true
     # lookup :cost_center_id, scope: Forms::API::Entity::Scopes::AutoComplete.scope('cost_centers', filters: {}), required: true
-    dropdown :status_id, scope: Forms::API::Entity::Scope[:enum].scope(TripStatus, value: :id, name: :name), required: true, default_value: 1
-    dropdown :trip_type_id, scope: Forms::API::Entity::Scope[:enum].scope(TripType), required: true
-    dropdown :policy_id, scope: Forms::API::Entity::Scope[:auto_complete].scope('policies', filters: {}), required: true
+    dropdown :status_id, scope: Entity::Scope[:enum].scope(TripStatus, value: :id, name: :name), required: true, default_value: 1
+    dropdown :trip_type_id, scope: Entity::Scope[:enum].scope(TripType), required: true
+    dropdown :policy_id, scope: Entity::Scope[:auto_complete].scope('policies', q: {}, form_type: :trip), required: true
     date :start_date, required: true
     date :end_date, required: true
     text :purpose, required: true

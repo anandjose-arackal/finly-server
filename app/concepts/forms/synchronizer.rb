@@ -74,7 +74,7 @@ class Forms::Synchronizer
   end
 
   def self.sync_dependency(company, form_model, dependency)
-    # dependency.find_or_create(company.users.first, dependency)
+    dependency.find_or_create(company.users.first, form_model)
   end
 
 end

@@ -6,8 +6,8 @@ class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Bas
     scope[:route]
   end
 
-  def filters
-    scope[:filters]
+  def scope_params
+    scope[:scope_params]
   end
 
   def klass
@@ -24,8 +24,14 @@ class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Bas
     result['model.records']&.first
   end
 
-  def self.scope(route, filters)
-    {type: :auto_complete, route: route.to_s, filters: filters}
+  def values(params, user:)
+    params = params.deep_merge(scope_params)
+    result = klass.(params: params, current_user: user)
+    result['model.records']
+  end
+
+  def self.scope(route, scope_params)
+    {type: :auto_complete, route: route.to_s, scope_params: scope_params}
   end
 
   def as_json(options = {})

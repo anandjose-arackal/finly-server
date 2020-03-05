@@ -14,6 +14,16 @@ class Forms::API::Dependency::Item
     end
 
     def map(user, form, controlling_entity, dependent_entity)
+      dependency_choice_mappings_attributes = self.dependent_choices.map do |dependent_choice|
+        {
+            form_id: form.id,
+            company_id: user.company_id,
+            controlling_entity: controlling_entity,
+            controlling_choice: controlling_entity.scope.find_by_name(controlling_choice, user: user),
+            dependent_choice: dependent_entity.scope.find_by_name(dependent_choice, user: user)
+        }
+      end
+
       {
           form_id: form.id,
           company_id: user.company_id,
@@ -21,13 +31,9 @@ class Forms::API::Dependency::Item
           dependent_required: self.dependent_required,
           dependent_editable: self.dependent_editable,
           dependent_visible: self.dependent_visible,
-          dependency_choice_mappings_attributes: self.dependent_choices.map do |dependent_choice|
-            {
-                form_id: form.id,
-                company_id: user.company_id,
-                dependent_choice: dependent_entity.scope.find_by_name(dependent_choice, user: user)
-            }
-          end
+          has_dependent_choices: dependency_choice_mappings_attributes.present?,
+          lazy_load_dependent_choices: (dependency_choice_mappings_attributes.present? and dependency_choice_mappings_attributes.size > 30),
+          dependency_choice_mappings_attributes: dependency_choice_mappings_attributes
       }
     end
 
@@ -36,16 +42,20 @@ class Forms::API::Dependency::Item
   def initialize(controlling_field:, dependent_field:, dependency_mappings:)
     self.controlling_field = controlling_field
     self.dependent_field = dependent_field
-    self.dependency_mappings = dependency_mappings.map {|mapping| DependencyMapping.new(**mapping)}
+    self.dependency_mappings = dependency_mappings.map { |mapping| DependencyMapping.new(**mapping) }
   end
 
   def find_or_create(user, form)
     entities = {}.with_indifferent_access
-    form.entities.each {|f| entities[f.field_path] = f}
+    form.entities.each { |f| entities[f.field_path] = f }
     dependency = form.dependencies.where(
         controlling_entity_id: entities[controlling_field].id,
         dependent_entity_id: entities[dependent_field].id).first
     return dependency if dependency
+
+    dependency_mapping_attributes = dependency_mappings&.map do |mapping|
+      mapping.map(user, form, entities[controlling_field], entities[dependent_field])
+    end
 
     form.dependencies.create(
         {
@@ -53,9 +63,7 @@ class Forms::API::Dependency::Item
             company_id: user.company_id,
             controlling_entity_id: entities[controlling_field].id,
             dependent_entity_id: entities[dependent_field].id,
-            dependency_mappings_attributes: dependency_mappings&.map do |mapping|
-              mapping.map(user, form, entities[controlling_field], entities[dependent_field])
-            end
+            dependency_mappings_attributes: dependency_mapping_attributes
         }
     )
   end
