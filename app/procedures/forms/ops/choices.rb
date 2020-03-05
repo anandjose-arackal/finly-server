@@ -63,7 +63,7 @@ class Forms::Ops::Choices < Transactions::API
 
   def fetch(context, filter_query:, entity:, user:, **)
     params = {q: filter_query}
-    context[:values] = entity.scope.values(params, user: user)
+    context[:choices] = entity.scope.as_json(params: params, user: user)
   end
 
   protected
