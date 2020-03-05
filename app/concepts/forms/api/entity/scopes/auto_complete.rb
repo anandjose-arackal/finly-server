@@ -25,7 +25,7 @@ class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Bas
   end
 
   def values(params, user:)
-    params = params.deep_merge(scope_params)
+    params = params.with_indifferent_access.deep_merge(scope_params.with_indifferent_access)
     result = klass.(params: params, current_user: user)
     result['model.records']
   end

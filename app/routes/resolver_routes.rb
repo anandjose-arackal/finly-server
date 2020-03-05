@@ -37,4 +37,8 @@ Resolver::Router.draw do
     route "default", IndexSegment::Resolver
   end
 
+  scope :policies do
+    route "default", Masters::Policies::Resolver
+  end
+
 end

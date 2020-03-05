@@ -123,6 +123,8 @@ class User < ApplicationRecord
   has_many :finance_report_tracks, -> {finance_manager_role}, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> {distinct}, source: :report, through: :finance_report_tracks
   has_many :policy_user_roles
+  # Fixme: Replace this with policies as policies should ideally be deprecated
+  has_many :policy_user_roles_policies, -> {where(:'policy_user_roles.deleted_at' => nil)}, through: :policy_user_roles, dependent: :destroy
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
