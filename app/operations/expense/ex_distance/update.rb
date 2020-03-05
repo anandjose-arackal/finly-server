@@ -21,12 +21,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
 
   def personalizer
     {
-        process: {
-            before: Personalizer::Process.new([:expense, :distance_update], :process, self)
-        },
-        pre_process: {
-            before: Personalizer::Process.new([:expense, :distance_update], :pre_process, self)
-        }
+      process: {
+        before: Personalizer::Process.new([:expense, :distance_update], :process, self)
+      },
+      pre_process: {
+        before: Personalizer::Process.new([:expense, :distance_update], :pre_process, self)
+      }
     }
   end
 

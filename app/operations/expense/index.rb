@@ -41,6 +41,7 @@ class Expense::Index < Expense::Base
   end
 
   def process
+
     if role_id.blank? or role_id == UserRole.employee_id
       self.expenses = user.expenses
     elsif params.present? and params[:controller].present? and params[:controller] == 'expenses' and params[:action] == 'index'
@@ -54,6 +55,7 @@ class Expense::Index < Expense::Base
       self.expenses = Expense.with_user_or_report(team_user_ids, report_ids) if team_user_ids.present? or report_ids.present?
     end
     self.expenses = Expense.none if self.expenses.nil?
+    
   end
 
   def post_process

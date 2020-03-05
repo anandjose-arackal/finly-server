@@ -127,8 +127,7 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def split_expense_params
     expenses_params = []
-    base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
-                                                  :usage_date_start, :usage_date_end, :usage_date_type,
+    base_params = params.require(:expense).permit(:expense_type_id, :usage_date_start, :usage_date_end, :usage_date_type,
                                                   :report_id, :reimbursable, :date, :spent_from_id, :created_by_id,
                                                   :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id,
                                                   :state_of_expense_id, :hsn_sac, :merchant_bill_no, :tax_rate_id,
