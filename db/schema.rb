@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_03_121422) do
+ActiveRecord::Schema.define(version: 2020_03_05_141324) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3939,6 +3939,9 @@ ActiveRecord::Schema.define(version: 2020_03_03_121422) do
     t.string "form_id", null: false
     t.string "dependent_choice_type"
     t.datetime "deleted_at"
+    t.string "controlling_entity_id"
+    t.string "controlling_choice_id"
+    t.string "controlling_choice_type"
     t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
     t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
     t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
@@ -3959,6 +3962,7 @@ ActiveRecord::Schema.define(version: 2020_03_03_121422) do
     t.string "controlling_choice_type"
     t.datetime "deleted_at"
     t.boolean "has_dependent_choices"
+    t.boolean "lazy_load_dependent_choices"
     t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
     t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
     t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
@@ -4029,7 +4033,7 @@ ActiveRecord::Schema.define(version: 2020_03_03_121422) do
     t.string "form_section_id", limit: 36, null: false
     t.string "form_entity_id", limit: 36, null: false
     t.integer "created_by_user_id"
-    t.string "value", null: false
+    t.string "name", null: false
     t.integer "position", null: false
     t.boolean "active", default: true
     t.datetime "deleted_at"

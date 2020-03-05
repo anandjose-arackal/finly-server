@@ -6,41 +6,46 @@ class Forms::API::Entity::Scopes::Enum < Forms::API::Entity::Scopes::Base
     Object.const_get(scope[:enum].to_s)
   end
 
-  def value
-    scope[:value]
+  def id
+    scope[:id]
   end
 
   def name
     scope[:name]
   end
 
-  def find_by_id(choice, user: nil)
-    klass.where(id: choice).first
+  def choices(params: {}, user: nil)
+    klass.all
   end
 
-  def find_by_name(choice, user: nil)
-    klass.where(name: choice).first
+  def choices_json(params: {}, user: nil)
+    choices(params: {}, user: nil).as_json
   end
 
-  def self.scope(klass, value: :id, name: :name)
-    {type: :enum, enum: klass.to_s, value: value, name: name}
+  def find_by_id(id, params: {}, user: nil)
+    choices(params: params, user: user).where(id: id).first
   end
 
-  def choices
-    list = []
-    klass.all.each do |item|
-      list << {
-          value: item.send(value),
-          name: item.send(name),
-      }
-    end
-    list
+  def find_by_name(name, params: {}, user: nil)
+    choices(params: params, user: user).where(name: name).first
+  end
+
+  def self.scope(klass, id: :id, name: :name)
+    {type: :enum, enum: klass.to_s, id: id, name: name}
   end
 
   def as_json(options={})
+    list = []
+    klass.all.each do |item|
+      list << {
+          id: item.send(id),
+          name: item.send(name),
+      }
+    end
+
     {
-        type: :enum,
-        choices: choices
+        partial: false,
+        choices: list
     }
   end
 

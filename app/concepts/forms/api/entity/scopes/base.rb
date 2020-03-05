@@ -19,12 +19,20 @@ class Forms::API::Entity::Scopes::Base
     self.form_entity = form_entity
   end
 
-  def find_by_id(choice, user: nil)
+  def find_by_id(id, params: {}, user: nil)
     raise "Find is not defined for #{klass}"
   end
 
-  def find_by_name(choice, user: nil)
+  def find_by_name(name, params: {}, user: nil)
     raise "Find is not defined for #{klass}"
+  end
+
+  def choices(params, user:)
+    raise "Choices is not defined for #{klass}"
+  end
+
+  def choices_json(params: {}, user: nil)
+    raise "Choices JSON is not defined for #{klass}"
   end
 
   def valid?(id: nil, name: nil, user: nil)

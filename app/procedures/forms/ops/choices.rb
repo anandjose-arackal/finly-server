@@ -18,6 +18,7 @@ class Forms::Ops::Choices < Transactions::API
   step :init_entity
   pass :init_dependency_mappings
   pass :scope_choices
+  pass :scope_user
   pass :fetch
 
   def init_entity(context, model:, params:, **)
@@ -38,7 +39,7 @@ class Forms::Ops::Choices < Transactions::API
   end
 
   def scope_choices(context, dependency_choice_mappings: [], **)
-    context[:q] = {}
+    context[:filter_query] = {}
     return if dependency_choice_mappings.count == 0
 
     map = {}
@@ -51,11 +52,18 @@ class Forms::Ops::Choices < Transactions::API
       intersecting_choices ||= value_arr
       intersecting_choices = intersecting_choices & value_arr
     end
-    context[:q] = {id_in: intersecting_choices}
+    context[:filter_query] = {id_in: intersecting_choices}
   end
 
-  def fetch(context, q:, entity:, current_user:, **)
-    context[:values] = entity.scope.values(filter: q, user: current_user)
+  # Pick the document owner. If the document is not created, pick the current_user
+  def scope_user(context, current_user:, **)
+    # Todo: Scope user based on document owner and use current user as a fallback
+    context[:user] = current_user
+  end
+
+  def fetch(context, filter_query:, entity:, user:, **)
+    params = {q: filter_query}
+    context[:values] = entity.scope.values(params, user: user)
   end
 
   protected

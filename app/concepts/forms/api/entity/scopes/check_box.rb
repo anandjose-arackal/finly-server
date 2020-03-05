@@ -6,12 +6,20 @@ class Forms::API::Entity::Scopes::CheckBox < Forms::API::Entity::Scopes::Base
   #   args[:checkbox]
   # end
 
-  def find_by_id(choice, user: nil)
-    form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
+  def choices(params: {}, user: nil)
+    form_entity.choices
   end
 
-  def find_by_name(choice, user: nil)
-    form_entity.choices.find_by("value = #{choice} OR id = #{choice}")
+  def choices_json(params: {}, user: nil)
+    choices(params: {}, user: nil).as_json
+  end
+
+  def find_by_id(id, params: {}, user: nil)
+    choices(params: params, user: user).find_by("name = #{id} OR id = #{id}")
+  end
+
+  def find_by_name(name, params: {}, user: nil)
+    choices(params: params, user: user).find_by("name = #{name} OR id = #{name}")
   end
 
   def valid?(id: nil, name: nil, user: nil)
@@ -24,7 +32,11 @@ class Forms::API::Entity::Scopes::CheckBox < Forms::API::Entity::Scopes::Base
   end
 
   def self.scope
-    {type: :checkbox, choices: [{value: "true", active: true}, {value: "false", active: true}]}
+    {type: :checkbox, choices: [{name: "true", active: true}, {name: "false", active: true}]}
+  end
+
+  def as_json(params: {}, user: nil)
+    {partial: false, choices: choices(params: params, user: user).as_json}
   end
 
 end

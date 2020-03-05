@@ -12,9 +12,11 @@ class AutoComplete::API < Transactions::API
   step :render
 
   def define_pagination(context, params:, **)
-    params[:page] = 1
+    params[:page] ||= 1
     params[:per_page] = self.class.max_per_page if params[:per_page].blank?
     params[:per_page] = [params[:per_page], self.class.max_per_page].min
+    context[:page] = params[:page]
+    context[:per_page] = params[:per_page]
   end
 
   def render(context, options)

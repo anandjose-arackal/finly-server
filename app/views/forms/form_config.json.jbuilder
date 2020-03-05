@@ -18,7 +18,7 @@ form.sections.each do |section|
       json.custom_field entity.custom_field
       json.options entity.options
       if entity.scope.present?
-        json.scope entity.scope
+        json.scope entity.scope.as_json(params: @op["params"], user: @op["current_user"] )
       end
     end
   end
