@@ -9,79 +9,49 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   validate :input
 
   attribute :report_id
+  attribute :report_name
+  attribute :report_status_name
+  attribute :report_creator
+  attribute :created_at
+  attribute :report_creator_employee_id
+  attribute :report_creator_payroll_id
 
   def input
-    result = ::ItemMaster::Item::Index.(user, params)
+    result = ::Reports::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    items = result.inventory_line_items.includes_for_export
-    items
+    reports = result.reports
+    Expense.where(report_id: reports.pluck(:id)).include_details
   end
 
-  def item_number(item)
-    item.item_number
+  def report_id(expense)
+    expense.report.id
   end
 
-  def gl_code(item)
-    item.item_code
+  def report_name(expense)
+    expense.report.name
   end
 
-  def description(item)
-    item.description
+  def report_status_name(expense)
+    expense.report.status.name
   end
 
-  def product_type(item)
-    item.product_type&.name&.humanize
+  def report_creator(expense)
+    expense.report.user.name
   end
 
-  def active(item)
-    item.active
+  def report_creator_employee_id(expense)
+    expense.report.user.employee_id
   end
 
-  def category(item)
-    item.category&.name
+  def report_creator_payroll_id(expense)
+    expense.report.user.payroll_id
   end
 
-  def hsn_sac(item)
-    item.hsn_sac
-  end
-
-  def sku(item)
-    item.sku
-  end
-
-  def unit_of_measurement(item)
-    item.unit_of_measurement
-  end
-
-  def expense_type(item)
-    item.item_expense_type&.name&.humanize
-  end
-
-  def tds_applicable(item)
-    item.tds_applicable
-  end
-
-  def tax_rate(item)
-    "#{item.tax_rate&.name} - #{item.tax_rate&.rate}"
-  end
-
-  def item_rate(item)
-    item.rate
-  end
-
-  def supply_item_type(item)
-    item.supply_item_type&.name&.humanize
-  end
-
-  def created_user(item)
-    "#{item.user&.first_name} #{item.user&.last_name}"
-  end
-
-  def created_at(item)
-    item.created_at&.strftime('%d-%b-%Y')
+  def created_at(expense)
+    expense.report.created_at&.strftime('%d-%b-%Y')
   end
 
 
