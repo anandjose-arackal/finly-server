@@ -21,6 +21,8 @@ class BbpsBillsFetch < ApplicationJob
             will_create = true
           end
         end
+      else
+        will_create = true
       end
 
 

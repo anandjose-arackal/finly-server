@@ -95,7 +95,7 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
       if bank_transaction.possible_failure?
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
         create_system_message_for_possible_failure(payment)
-        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
+        store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         # Payment with pending transaction will rerun through CronJobs

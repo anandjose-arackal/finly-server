@@ -77,7 +77,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
       add_message :error, "Unauthorized."
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
     when 500
-      self.parsed_response = Hash.from_xml(response.body)
+      add_message :error, "Schema Validation Error"
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
     when 200
       self.parsed_response = Hash.from_xml(response.body)
 

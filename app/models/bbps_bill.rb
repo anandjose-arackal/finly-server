@@ -291,7 +291,7 @@ class BbpsBill < ApplicationRecord
         bill_number: bill_number,
         bill_date: bill_date,
         due_date: due_date,
-        transaction_ref_id: payments&.first&.bbps_bank_transction&.bbps_ref_id,
+        transaction_ref_id: payments&.first&.bbps_bank_transaction&.bbps_ref_id,
         payment_mode: "BSC",
         bill_amount: payments&.first&.amount.as_json,
         transaction_date: paid_at&.strftime("%I:%M %p, %d %b %Y"),

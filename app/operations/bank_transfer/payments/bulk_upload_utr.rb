@@ -5,7 +5,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid parameters"
+      add_message :error, "Invalid parameters"
       return
     end
     if params[:file].blank?
@@ -99,7 +99,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
                                                   beneficiary_bank_account_id: payment.receiving_account&.id,
                                                   reference_payment_id: payment.id,
                                                   amount_id: amount.id,
-                                                  credited_at: credited_at)
+                                                  created_at: credited_at)
       end
       # add a success message to the result array
       self.result_array[index] << "Success!"
