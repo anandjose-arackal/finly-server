@@ -3,43 +3,54 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
   bus Admin::Implementations::Master::BaseMaster
   subscribe 'policy_user_role.import'
   headers({
-           "Vendor Payments" => {:policy_name => 'Policy Name',
-                                 :user_id => 'User Email / Mobile / Employee Id',
-                                 :purchase_request_initiator => 'Purchase Request Initiator',
-                                 :purchase_request_reviewer => 'Purchase Request Reviewer',
-                                 :purchase_request_auditor => 'Purchase Request Auditor',
-                                 :purchase_order_initiator => 'Purchase Order Intiator',
-                                 :purchase_order_reviewer => 'Purchase Order Reviwer',
-                                 :purchase_order_auditor => 'Purchase Order Auditor',
-                                 :goods_receiver => 'Goods Receiver',
-                                 :po_invoice_initiator => "PO Invoice Initiator",
-                                 :po_invoice_reviewer => "PO Invoice Reviewer",
-                                 :po_invoice_auditor => "PO Invoice Auditor",
-                                 :non_po_invoice_initiator => "Non PO Invoice Initiator",
-                                 :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
-                                 :non_po_invoice_auditor => "Non PO INvoice Auditor",
-                                 :bank_payment_request_initiator => 'Bank Payment Request Initiator',
-                                 :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
-                                 :bank_payment_request_creditor => 'Bank Payment Request Creditor',
-                                 :bank_payment_request_auditor => 'Bank Payment Request Auditor',
-                                 :item_master_manager => 'Item Master Manager',
-                                 :inventory_manager => 'Inventory Manager',
-                                 :vendor_creator => 'Vendor Creator',
-                                 :vendor_reviewer => 'Vendor Reviewer',
-                                 :vendor_auditor => 'Vendor Auditor',
-                                 :payment_agreement_initiator => "Payment Agreement Initiator",
-                                 :payment_agreement_reviewer => "Payment Agreement Reviewer",
-                                 :payment_agreement_auditor => "Payement Agreement Auditor",
-                                 :budget_manager => 'Budget Manager'},
-
-           "Expense Management" => {
-               :policy_name => 'Policy Name',
-               :user_id => 'User Email / Mobile',
-               :intiator => "Intiator",
-               :manager => "Manager",
-               :finance_manager => "Finance Manager"
-           }
-  })
+              "Vendor Payments" => {:policy_name => 'Policy Name',
+                                    :user_id => 'User Email / Mobile / Employee Id',
+                                    :purchase_request_initiator => 'Purchase Request Initiator',
+                                    :purchase_request_reviewer => 'Purchase Request Reviewer',
+                                    :purchase_request_auditor => 'Purchase Request Auditor',
+                                    :purchase_order_initiator => 'Purchase Order Intiator',
+                                    :purchase_order_reviewer => 'Purchase Order Reviwer',
+                                    :purchase_order_auditor => 'Purchase Order Auditor',
+                                    :goods_receiver => 'Goods Receiver',
+                                    :po_invoice_initiator => "PO Invoice Initiator",
+                                    :po_invoice_reviewer => "PO Invoice Reviewer",
+                                    :po_invoice_auditor => "PO Invoice Auditor",
+                                    :non_po_invoice_initiator => "Non PO Invoice Initiator",
+                                    :non_po_invoice_reviewer => "Non PO Invoice Reviewer",
+                                    :non_po_invoice_auditor => "Non PO INvoice Auditor",
+                                    :bank_payment_request_initiator => 'Bank Payment Request Initiator',
+                                    :bank_payment_request_reviewer => 'Bank Payment Request Reviewer',
+                                    :bank_payment_request_creditor => 'Bank Payment Request Creditor',
+                                    :bank_payment_request_auditor => 'Bank Payment Request Auditor',
+                                    :item_master_manager => 'Item Master Manager',
+                                    :inventory_manager => 'Inventory Manager',
+                                    :vendor_creator => 'Vendor Creator',
+                                    :vendor_reviewer => 'Vendor Reviewer',
+                                    :vendor_auditor => 'Vendor Auditor',
+                                    :vendor_manager => 'Vendor Manager',
+                                    :payment_agreement_initiator => "Payment Agreement Initiator",
+                                    :payment_agreement_reviewer => "Payment Agreement Reviewer",
+                                    :payment_agreement_auditor => "Payment Agreement Auditor",
+                                    :budget_manager => 'Budget Manager',
+                                    :utility_bill_master_initiator => 'Utility Bill Master Initiator',
+                                    :utility_bill_master_reviewer => 'Utility Bill Master Reviewer',
+                                    :utility_bill_initiator => 'Utility Bill Initiator',
+                                    :utility_bill_reviewer => 'Utility Bill Reviewer',
+                                    :credit_note_initiator => 'Credit Note Initiator',
+                                    :credit_note_reviewer => 'Credit Note Reviewer',
+                                    :credit_note_auditor => 'Credit Note Auditor',
+                                    :agreement_invoice_initiator => 'Agreement Invoice Initiator',
+                                    :agreement_invoice_reviewer => 'Agreement Invoice Reviewer',
+                                    :agreement_invoice_auditor => 'Agreement Invoice Auditor'
+              },
+              "Expense Management" => {
+                  :policy_name => 'Policy Name',
+                  :user_id => 'User Email / Mobile',
+                  :initiator => "Initiator",
+                  :manager => "Manager",
+                  :finance_manager => "Finance Manager"
+              }
+          })
 
   attr_accessor :policy_user_params, :application, :policy, :user_profiles
   def process
@@ -237,10 +248,20 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
               vendor_creator: row[import_fields[:vendor_creator]].to_s.upcase,
               vendor_reviewer: row[import_fields[:vendor_reviewer]].to_s.upcase,
               vendor_auditor: row[import_fields[:vendor_auditor]].to_s.upcase,
+              vendor_manager: row[import_fields[:vendor_manager]].to_s.upcase,
               payment_agreement_initiator: row[import_fields[:payment_agreement_initiator]].to_s.upcase,
               payment_agreement_reviewer: row[import_fields[:payment_agreement_reviewer]].to_s.upcase,
               payment_agreement_auditor: row[import_fields[:payment_agreement_auditor]].to_s.upcase,
-              budget_manager: row[import_fields[:budget_manager]].to_s.upcase
+              budget_manager: row[import_fields[:budget_manager]].to_s.upcase,
+              utility_bill_master_initiator: row[import_fields[:utility_bill_master_initiator]].to_s.upcase,
+              utility_bill_initiator: row[import_fields[:utility_bill_initiator]].to_s.upcase,
+              utility_bill_reviewer: row[import_fields[:utility_bill_reviewer]].to_s.upcase,
+              credit_note_initiator: row[import_fields[:credit_note_initiator]].to_s.upcase,
+              credit_note_reviewer: row[import_fields[:credit_note_reviewer]].to_s.upcase,
+              credit_note_auditor: row[import_fields[:credit_note_auditor]].to_s.upcase,
+              agreement_invoice_initiator: row[import_fields[:agreement_invoice_initiator]].to_s.upcase,
+              agreement_invoice_reviewer: row[import_fields[:agreement_invoice_reviewer]].to_s.upcase,
+              agreement_invoice_auditor: row[import_fields[:agreement_invoice_auditor]].to_s.upcase
           }
       }
       params
@@ -283,10 +304,21 @@ class Admin::Implementations::Master::PolicyUserRole::Import < Admin::Implementa
           :vendor_creator => 21,
           :vendor_reviewer => 22,
           :vendor_auditor => 23,
-          :payment_agreement_initiator => 24,
-          :payment_agreement_reviewer => 25,
-          :payment_agreement_auditor=> 26,
-          :budget_manager =>27
+          :vendor_manager => 24,
+          :payment_agreement_initiator => 25,
+          :payment_agreement_reviewer => 26,
+          :payment_agreement_auditor=> 27,
+          :budget_manager =>28,
+          :utility_bill_master_initiator => 29,
+          :utility_bill_master_reviewer => 30,
+          :utility_bill_initiator => 31,
+          :utility_bill_reviewer => 32,
+          :credit_note_initiator => 33,
+          :credit_note_reviewer => 34,
+          :credit_note_auditor => 35,
+          :agreement_invoice_initiator => 36,
+          :agreement_invoice_reviewer => 37,
+          :agreement_invoice_auditor => 38,
     }
     end
   end
