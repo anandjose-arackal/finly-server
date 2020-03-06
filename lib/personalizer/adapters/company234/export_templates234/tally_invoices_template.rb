@@ -59,7 +59,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
           'Invoice  Date': {value: invoice.date, type: 'date'},
           'New Ref': invoice.invoice_number,
           'Ledger Name': invoice.vendor&.display_name,
-          'CR Amt':((invoice.taxable_amount&.value&.to_f || 0) + invoice.tax.to_f),
+          'CR Amt':((invoice.taxable_amount&.value&.to_f || 0) + invoice.tax_amount&.value&.to_f),
           'Cost Centre': invoice.cost_center&.name,
           'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at} towards #{invoice.narration}",
           'Voucher Type': 'Purchase',
@@ -169,7 +169,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
   end
 
   def get_tds_ledger_name(invoice)
-    invoice.tds_slab&.name&.split("194")&.first
+    "Tds #{invoice.tds_slab&.name&.split("194")&.first}"
   end
 
   def get_tax_ledger(tax_type, item)
