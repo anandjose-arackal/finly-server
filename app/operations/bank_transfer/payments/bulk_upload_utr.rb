@@ -104,6 +104,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
       # add a success message to the result array
       self.result_array[index] << "Success!"
     end
+    update_details
   end
 
   def post_process
