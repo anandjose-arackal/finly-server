@@ -77,7 +77,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
       add_message :error, "Unauthorized."
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
     when 500
-      self.parsed_response = Hash.from_xml(response.body)
+      add_message :error, "Schema Validation Error"
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
     when 200
       self.parsed_response = Hash.from_xml(response.body)
 
@@ -167,9 +168,8 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     # create the bank transaction right here
     #
     self.company = Company.find_by(id: self.transfer_request.company_id)
-    if self.payment&.reference_resource&.is_a?(KotakBankTransaction) || self.bank_transaction.present?
-      # just update the bank transaction with the latest details
-      self.bank_transaction = self.bank_transaction || payment.reference_resource
+    self.bank_transaction = payment.reference_resources.first
+    if self.bank_transaction.is_a?(KotakBankTransaction)
       # UTR is never updated here, as Kotak Bank Payment api never returns UTR
       self.bank_transaction.update(
                           transfer_status_id: self.transfer_status_id,
@@ -236,7 +236,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
     #   beneficiary_name = beneficiary_name.sub(character, '')
     # end
     beneficiary_name = beneficiary_name.gsub(/[^0-9A-Za-z]/, '')
-    beneficiary_name = beneficiary_name[0..30]&.strip
+    beneficiary_name = beneficiary_name[0..29]&.strip
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
@@ -250,7 +250,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
         'BENEFICIARY_IFSC' => beneficiary_ifsc,
-        'DESCRIPTION' => "#{beneficiary_name} - #{payment&.id}",
+        'DESCRIPTION' => "#{beneficiary_name[0..28]} - #{payment&.id}",
         # 'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_TYPE' => resolve_transfer_type(beneficiary_ifsc, transfer_request.transfer_type),
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,

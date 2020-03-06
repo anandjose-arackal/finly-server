@@ -15,7 +15,7 @@ end
 json.transactions do
   json.array!(@result.receiving_transactions) do |payment|
     json.extract! payment, :id, :note, :payment_mode
-    json.reference_id payment.reference_resource&.bank_reference_number
+    json.reference_id payment.utr
     json.amount payment.amount&.value
     json.date payment.date
     json.payment_order_id payment.payment_order&.bank_payment_request.id
