@@ -119,6 +119,20 @@ class BudgetGroupCriterium < ApplicationRecord
     where('name like ?', "%#{term}%")
   }
 
+  scope :include_for_index, -> {
+    includes(:budgetable_vendors, :budgetable_departments, :budgetable_categories, :budgetable_cost_centers, :budgetable_locations, :budgetable_users,
+             budgets:
+                 {budget_consumption:
+                      [:budget_amount,
+                       :pending_amount,
+                       :committed_amount,
+                       :pending_payment_amount,
+                       :payment_processing_amount,
+                       :paid_amount,
+                       :remaining_amount]
+                 })
+  }
+
   # this will hold data about all the different time ranges of this particular
   # budget criteria - so it will contain details of the budgets will the different timeframes
   def as_json(options = {})

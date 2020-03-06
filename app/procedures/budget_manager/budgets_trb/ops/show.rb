@@ -6,4 +6,12 @@ class BudgetManager::BudgetsTrb::Ops::Show < Transactions::API
   # now we find the model based on the ID passed from the route
   step Model(Budget, :find)
 
+  step :recalculate_buckets!
+
+  def recalculate_buckets!(options, model:, **)
+    budget = model
+    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: true, calculate_trail_items: false})
+    return true
+  end
+
 end

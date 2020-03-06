@@ -282,8 +282,8 @@ class Budget < ApplicationRecord
   end
 
   def get_sub_budgets_as_json(budget_criteria_id=nil)
-    data =[]
-   budget_group_criterium&.children.each{|child| child.budgets&.each{|budget| data << budget.get_budget_criteria_as_json(budget_criteria_id)}}
+    data = []
+    budget_group_criterium&.children.each{|child| child.budgets&.each{|budget| data << budget.get_budget_criteria_as_json(budget_criteria_id)}}
     data
   end
 
@@ -405,13 +405,7 @@ class Budget < ApplicationRecord
   end
 
   def update_consumption_model
-    # budget_consumption = self.budget_consumption
-    # this will update the budget consumption model with the right details
-    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: self, current_user: User.first})
-
-    # # TODO - tempoorary
-    # budget_consumption.budget_amount.update(value: self.budget_amount.value)
-    # budget_consumption.remaining_amount.update(value: self.budget_amount.value)
+    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: self, current_user: User.first, calculate_buckets: true, calculate_trail_items: false})
   end
 
   def reflect_budget_group_attributes

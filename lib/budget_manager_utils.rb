@@ -6,7 +6,11 @@ class BudgetManagerUtils
     return nil if period.blank?
 
     start_date = Date.parse(start_date) if start_date.is_a?(String)
-    end_date_generated = start_date + 1.send(period.name.downcase)
+    if period.quarter?
+      end_date_generated = start_date + 91.days # because there is not default ruby method for "next quarter"
+    else
+      end_date_generated = start_date + 1.send(period.name.downcase)
+    end
     return end_date_generated > end_date ? end_date : end_date_generated
   end
 end

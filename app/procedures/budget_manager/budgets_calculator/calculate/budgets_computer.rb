@@ -88,99 +88,101 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   end
 
   # here we calculate the various buckets
-  def calculate_buckets!(options, **)
+  def calculate_buckets!(options, calculate_buckets:, **)
 
-    # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
-    case amount_to_be_considered
-    when :amount_after_tax
-      po_item_amount_to_be_considered = :remaining_amount_after_tax_value
-      invoice_item_amount_to_be_considered = :billed_amount_after_tax_value
-    when :amount_before_tax
-      po_item_amount_to_be_considered = :remaining_amount_before_tax_value
-      invoice_item_amount_to_be_considered = :remaining_amount_before_tax_value
+    if calculate_buckets
+      # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
+      case amount_to_be_considered
+      when :amount_after_tax
+        po_item_amount_to_be_considered = :remaining_amount_after_tax_value
+        invoice_item_amount_to_be_considered = :billed_amount_after_tax_value
+      when :amount_before_tax
+        po_item_amount_to_be_considered = :remaining_amount_before_tax_value
+        invoice_item_amount_to_be_considered = :remaining_amount_before_tax_value
+      end
+
+      # debugger
+      # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
+      pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
+                           .joins(self.amount_to_be_considered).sum(:value)
+
+      pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(po_item_amount_to_be_considered)
+
+      pending_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
+
+      # debugger
+
+      # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
+      # One thing to note here is that when some of the items of aa PO have been billed (i.e. have an invoice created against them) we need to consider only those items
+      # which have not yet been moved to an invoice that has been approved
+      committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum(po_item_amount_to_be_considered)
+
+      committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum(invoice_item_amount_to_be_considered)
+
+
+      # debugger
+
+      # calculating pending payment amount - wil include all invoice items that are approved and above, but not the ones that have payments initiated against them
+      # TODO - partially paid invoices cases
+      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).billed.sum(invoice_item_amount_to_be_considered)
+
+      # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+
+      # calculating all payments that are yet to be approved or credited. All except the final completed status of the payment shows here
+      payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket)
+                                      .joins(self.amount_to_be_considered).sum(:value)
+
+      # debugger
+
+      paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket)
+                        .joins(self.amount_to_be_considered).sum(:value)
+
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_paid_bucket).joins(self.amount_to_be_considered).sum(:value)
+
+      total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
+
+      remaining_amount = self.budget.budget_amount&.value - (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
+
+      if remaining_amount < 0
+        remaining_amount = 0
+      end
+
+      self.budget_consumption.assign_attributes(
+                                 budget_amount_attributes: {
+                                     id: self.budget_consumption.budget_amount_id,
+                                     value: self.budget.budget_amount&.value
+                                 },
+                                 pending_amount_attributes: {
+                                     id: self.budget_consumption.pending_amount_id,
+                                     value: pending_amount
+                                 },
+                                 committed_amount_attributes: {
+                                     id: self.budget_consumption.committed_amount_id,
+                                     value: committed_amount
+                                 },
+                                 pending_payment_amount_attributes: {
+                                     id: self.budget_consumption.pending_payment_amount_id,
+                                     value: pending_payment_amount
+                                 },
+                                 payment_processing_amount_attributes: {
+                                     id: self.budget_consumption.payment_processing_amount_id,
+                                     value: payment_processing_amount
+                                 },
+                                 paid_amount_attributes: {
+                                     id: self.budget_consumption.paid_amount_id,
+                                     value: paid_amount
+                                 },
+                                 remaining_amount_attributes: {
+                                     id: self.budget_consumption.remaining_amount_id,
+                                     value: remaining_amount
+                                 },
+                                 total_consumed_amount_attributes: {
+                                     id: self.budget_consumption.total_consumed_amount_id,
+                                     value: total_consumed_amount
+                                 }
+      )
+      # debugger
     end
-
-    # debugger
-    # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
-    pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
-                         .joins(self.amount_to_be_considered).sum(:value)
-
-    pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(po_item_amount_to_be_considered)
-
-    pending_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
-
-    # debugger
-
-    # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
-    # One thing to note here is that when some of the items of aa PO have been billed (i.e. have an invoice created against them) we need to consider only those items
-    # which have not yet been moved to an invoice that has been approved
-    committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum(po_item_amount_to_be_considered)
-
-    committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum(invoice_item_amount_to_be_considered)
-
-
-    # debugger
-
-    # calculating pending payment amount - wil include all invoice items that are approved and above, but not the ones that have payments initiated against them
-    # TODO - partially paid invoices cases
-    pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).billed.sum(invoice_item_amount_to_be_considered)
-
-    # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
-
-    # calculating all payments that are yet to be approved or credited. All except the final completed status of the payment shows here
-    payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket)
-                                    .joins(self.amount_to_be_considered).sum(:value)
-
-    # debugger
-
-    paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket)
-                      .joins(self.amount_to_be_considered).sum(:value)
-
-    paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_paid_bucket).joins(self.amount_to_be_considered).sum(:value)
-
-    total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
-
-    remaining_amount = self.budget.budget_amount&.value - (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
-
-    if remaining_amount < 0
-      remaining_amount = 0
-    end
-
-    self.budget_consumption.assign_attributes(
-                               budget_amount_attributes: {
-                                   id: self.budget_consumption.budget_amount_id,
-                                   value: self.budget.budget_amount&.value
-                               },
-                               pending_amount_attributes: {
-                                   id: self.budget_consumption.pending_amount_id,
-                                   value: pending_amount
-                               },
-                               committed_amount_attributes: {
-                                   id: self.budget_consumption.committed_amount_id,
-                                   value: committed_amount
-                               },
-                               pending_payment_amount_attributes: {
-                                   id: self.budget_consumption.pending_payment_amount_id,
-                                   value: pending_payment_amount
-                               },
-                               payment_processing_amount_attributes: {
-                                   id: self.budget_consumption.payment_processing_amount_id,
-                                   value: payment_processing_amount
-                               },
-                               paid_amount_attributes: {
-                                   id: self.budget_consumption.paid_amount_id,
-                                   value: paid_amount
-                               },
-                               remaining_amount_attributes: {
-                                   id: self.budget_consumption.remaining_amount_id,
-                                   value: remaining_amount
-                               },
-                               total_consumed_amount_attributes: {
-                                   id: self.budget_consumption.total_consumed_amount_id,
-                                   value: total_consumed_amount
-                               }
-    )
-    # debugger
     true
   end
 
@@ -192,20 +194,23 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     return true
   end
 
-  def prepare_budgetable_entities!(options, **)
-    expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
-    purchase_request_items = PurchaseRequestItem.with_id(self.budget_trails.with_entity_type("PurchaseRequestItem").pluck(:entity_id))
-    purchase_order_items = PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id))
-    invoice_items = InvoiceLineItem.with_id(self.budget_trails.with_entity_type("InvoiceLineItem").pluck(:entity_id))
-    payments = Payment.with_id(self.budget_trails.with_entity_type("Payment").pluck(:entity_id))
-    result = {
-        expenses: expenses,
-        payments: payments,
-        purchase_request_items: purchase_request_items,
-        invoice_items: invoice_items,
-        purchase_order_items: purchase_order_items,
-        budget_trails: self.budget_trails
-    }
+  def prepare_budgetable_entities!(options, calculate_trail_items:, **)
+    result = {}
+    if calculate_trail_items
+      expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
+      purchase_request_items = PurchaseRequestItem.with_id(self.budget_trails.with_entity_type("PurchaseRequestItem").pluck(:entity_id))
+      purchase_order_items = PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id))
+      invoice_items = InvoiceLineItem.with_id(self.budget_trails.with_entity_type("InvoiceLineItem").pluck(:entity_id))
+      payments = Payment.with_id(self.budget_trails.with_entity_type("Payment").pluck(:entity_id))
+      result = {
+          expenses: expenses,
+          payments: payments,
+          purchase_request_items: purchase_request_items,
+          invoice_items: invoice_items,
+          purchase_order_items: purchase_order_items,
+          budget_trails: self.budget_trails
+      }
+    end
     # adding all the above data so that the items can be accessed outside this operation
     options["result"] = result
   end
