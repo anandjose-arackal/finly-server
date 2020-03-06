@@ -7,6 +7,16 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
     else
       trail_id = nil
     end
+    if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
+      purchase_order_id = paymnet.parent_id
+      invoice_id = nil
+    elsif payment.payment_purpose_id = PaymentPurpose.id_for(:vendor_payment)
+      purchase_order_id = nil
+      invoice_id = payment.parent_id
+    else
+      purchase_order_id = nil
+      invoice_id = nil
+    end
     self.trail_hash = {
         id: trail_id,
         entity: payment,
@@ -20,6 +30,9 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         entity_status_id: payment.payment_status_id,
         entity_created_at: payment.bank_payment_request.created_at,
         entity_submitted_at: (payment.bank_payment_request.submitted_at || DateUtils.local_date_time),
+        payment_purpose_id: payment.payment_purpose_id,
+        purchase_order_id: purchase_order_id,
+        invoice_id: invoice_id,
         amount_attributes: {
             id: trail&.amount&.id,
             value: payment.amount.value,

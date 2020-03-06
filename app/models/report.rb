@@ -56,6 +56,7 @@ class Report < ApplicationRecord
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
+  belongs_to :company
   belongs_to :status, optional: true, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'

@@ -120,7 +120,9 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum(invoice_item_amount_to_be_considered)
 
 
-      # debugger
+      # # now we need to subtract the amount that has already been paid as a purchase order advance
+      # pos = PurchaseOrder.with_id(PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id)).pluck(:purchase_order_id))
+      # paid_as_po_advance =
 
       # calculating pending payment amount - wil include all invoice items that are approved and above, but not the ones that have payments initiated against them
       # TODO - partially paid invoices cases

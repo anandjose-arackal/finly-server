@@ -134,15 +134,10 @@ class Reports::Base < BaseOperation
         self.policies = Policy.where(id: self.report&.policy&.id)
       end
 
-      # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
-      # self.budgets = budgets_op.budgets
-      self.budgets = []
 
       if self.report.expenses.present?
-        # op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-        # if op.success?
-        #   self.budgets = op.budget_data
-        # end
+        op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.report, current_user: User.first})
+        self.budgets = op["result"][:budgets]
       end
     end
 
