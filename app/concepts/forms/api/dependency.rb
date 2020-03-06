@@ -1,4 +1,4 @@
-class Forms::API::Dependency::Item
+class Forms::API::Dependency
   attr_accessor :map, :controlling_field, :dependent_field, :dependency_mappings
 
   class DependencyMapping

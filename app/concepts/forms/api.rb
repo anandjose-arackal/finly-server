@@ -10,7 +10,7 @@ class Forms::API
   end
 
   def self.dependency(map)
-    dependencies << Forms::API::Dependency::Item.new(map)
+    dependencies << Forms::API::Dependency.new(map)
   end
 
   def self.find_entity(field_path)
