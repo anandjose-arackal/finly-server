@@ -35,8 +35,8 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
     generate_headers
     sl_no = 1
     data.find_each do |inv|
-      rows << total_credit_entries(inv)
-      rows << line_item_entries(inv)
+      total_credit_entries(inv).map{|entry| rows << entry}
+      line_item_entries(inv).map{|entry| rows << entry}
 
       if with_tax(inv)
         gst_item_entries(inv).map{|entry| rows << entry}
@@ -59,8 +59,8 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
           'Invoice  Date': {value: invoice.date, type: 'date'},
           'New Ref': invoice.invoice_number,
           'Ledger Name': invoice.vendor&.display_name,
-          'CR Amt': (invoice.taxable_amount&.value&.to_f || 0) + invoice.tax.to_f,
-          'Cost Centre': {value: invoice.cost_center&.name},
+          'CR Amt':((invoice.taxable_amount&.value&.to_f || 0) + invoice.tax.to_f),
+          'Cost Centre': invoice.cost_center&.name,
           'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at} towards #{invoice.narration}",
           'Voucher Type': 'Purchase',
       }.each do |k, v|
@@ -80,7 +80,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
           'New Ref': invoice.invoice_number,
           'Ledger Name': item.category&.name,
           'DR Amt': item.taxable_amount&.value,
-          'Cost Centre': {value: invoice.cost_center&.name},
+          'Cost Centre': invoice.cost_center&.name,
           'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at.strftime("%d-%m-%Y")} towards #{invoice.narration}",
           'Voucher Type': 'Purchase',
       }.each do |k, v|
@@ -97,7 +97,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
     tax_types.each do |tax_type|
       invoice.items.each do |item|
         next if item.send(tax_type).to_f <= 0
-        row = Row.new(record: item, header: header)
+        row = ExportManager::Builders::Spreadsheet::Row.new(record: item, header: header)
         {
             'Date': {value: invoice.submitted_at, type: 'date'},
             'Voucher No': invoice.invoice_number,
@@ -127,8 +127,8 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
         'New Ref': invoice.invoice_number,
         'Ledger Name': get_tds_ledger_name(invoice),
         'CR Amt': invoice.tds_amount&.value&.to_f,
-        'Cost Centre': {value: invoice.cost_center&.name},
-        'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at} towards #{invoice.narration}",
+        'Cost Centre': invoice.cost_center&.name,
+        'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at.strftime("%d-%m-%Y")} towards #{invoice.narration}",
         'Voucher Type': 'Purchase',
     }.each do |k, v|
       row.add k, v
