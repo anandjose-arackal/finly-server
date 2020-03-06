@@ -176,7 +176,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
     if tax_type == :igst
       "IGST #{item.tax&.to_s&.sub(/\.?0+$/, '')}% Input Credit"
     else
-      ledger = "#{tax_type.to_s.upcase} #{(item.tax/2)&.to_s&.sub(/\.?0+$/, '')}"
+      ledger = "#{tax_type.to_s.upcase} #{(item.tax/2)&.to_s&.sub(/\.?0+$/, '')}%"
       # state will be blank if vendor not have gstin registration and system not mapped
       state = state_code(item).to_s
       state += " - " if state.present?
