@@ -1,13 +1,17 @@
-class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Base
+class Forms::ChoiceProviders::AutoComplete < Forms::ChoiceProviders::Base
 
   register! :auto_complete
 
-  def route
-    scope[:route]
+  def self.config(route, choice_params)
+    {type: :auto_complete, route: route.to_s, choice_params: choice_params}
   end
 
-  def scope_params
-    scope[:scope_params]
+  def route
+    config[:route]
+  end
+
+  def choice_params
+    config[:choice_params]
   end
 
   def klass
@@ -25,17 +29,13 @@ class Forms::API::Entity::Scopes::AutoComplete < Forms::API::Entity::Scopes::Bas
   end
 
   def choices(params: {}, user: nil)
-    params = params.with_indifferent_access.deep_merge(scope_params.with_indifferent_access)
+    params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
     result = klass.(params: params, current_user: user)
     result['model.records']
   end
 
-  def self.scope(route, scope_params)
-    {type: :auto_complete, route: route.to_s, scope_params: scope_params}
-  end
-
   def as_json(params: {}, user: nil)
-    params = params.with_indifferent_access.deep_merge(scope_params.with_indifferent_access)
+    params = params.with_indifferent_access.deep_merge(choice_params.with_indifferent_access)
     result = klass.(params: params, current_user: user)
 
     partial = result['model.records.json'].size == result["per_page"]

@@ -2,7 +2,7 @@ class Forms::API::Entity::Types::CheckBox < Forms::API::Entity::Base
   register :checkbox
 
   def initialize(section, field_key, parent_path, opts = {}, &block)
-    super(section, field_key, parent_path, opts.merge(scope: Forms::API::Entity::Scope[:checkbox].scope), &block)
+    super(section, field_key, parent_path, opts.merge(choices_provider: Forms::ChoiceProvider[:checkbox].config), &block)
   end
 
   # hint 'Select option'

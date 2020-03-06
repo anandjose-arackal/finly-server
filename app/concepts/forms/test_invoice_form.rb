@@ -6,7 +6,7 @@ class Forms::TestInvoiceForm < Forms::API
   #   date :date, required: true
   #   date :due_date, required: true
   #   text :invoice_number, required: true
-  #   number :gst_type_id, required: true, scope: Forms::API::Entity::Scopes::Enum.new(GstType, :id, :name)
+  #   number :gst_type_id, required: true, scope: Forms::ChoiceProviders::Enum.new(GstType, :id, :name)
   #   number :discount, decimal: true, default_value: 0
   #   amount :discount_amount
   #   amount :gross_amount, required: true
@@ -14,16 +14,16 @@ class Forms::TestInvoiceForm < Forms::API
   #   boolean :inclusive_of_taxes
   #   amount :amount, required: true
   #   number :tds
-  #   # number :tds_slab_id, scope: Forms::API::Entity::Scopes::Resolver.new(Masters::Tds::Resolver, :id, :name)
+  #   # number :tds_slab_id, scope: Forms::ChoiceProviders::Resolver.new(Masters::Tds::Resolver, :id, :name)
   # end
   #
   # section :line_items do
   #   collection :line_items do
   #     text :item_description, hint: "Please enter the name of the field", char_limit: 255
-  #     dropdown :status_id, scope: Forms::API::Entity::Scopes::List({value: 1, name: 'Approved'}, {value: 2, name: 'Pending'})
-  #     dropdown :department_id, scope: Forms::API::Entity::Scopes::AutoComplete('departments', filters: {})
-  #     dropdown :location_id, scope: Forms::API::Entity::Scopes::AutoComplete('locations', filters: {})
-  #     dropdown :cost_center_id, scope: Forms::API::Entity::Scopes::AutoComplete('cost_centers', filters: {})
+  #     dropdown :status_id, scope: Forms::ChoiceProviders::List({value: 1, name: 'Approved'}, {value: 2, name: 'Pending'})
+  #     dropdown :department_id, scope: Forms::ChoiceProviders::AutoComplete('departments', filters: {})
+  #     dropdown :location_id, scope: Forms::ChoiceProviders::AutoComplete('locations', filters: {})
+  #     dropdown :cost_center_id, scope: Forms::ChoiceProviders::AutoComplete('cost_centers', filters: {})
   #     # dropdown :location_id, choices: ReportStatus.all.as_json
   #   end
   # end

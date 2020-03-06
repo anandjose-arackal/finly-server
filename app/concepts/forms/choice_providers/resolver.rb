@@ -1,4 +1,4 @@
-class Forms::API::Entity::Scopes::Resolver < Forms::API::Entity::Scopes::Base
+class Forms::ChoiceProviders::Resolver < Forms::ChoiceProviders::Base
 
   register! :resolver
 

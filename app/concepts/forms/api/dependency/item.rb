@@ -19,15 +19,15 @@ class Forms::API::Dependency::Item
             form_id: form.id,
             company_id: user.company_id,
             controlling_entity: controlling_entity,
-            controlling_choice: controlling_entity.scope.find_by_name(controlling_choice, user: user),
-            dependent_choice: dependent_entity.scope.find_by_name(dependent_choice, user: user)
+            controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
+            dependent_choice: dependent_entity.choices_provider.find_by_name(dependent_choice, user: user)
         }
       end
 
       {
           form_id: form.id,
           company_id: user.company_id,
-          controlling_choice: controlling_entity.scope.find_by_name(controlling_choice, user: user),
+          controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
           dependent_required: self.dependent_required,
           dependent_editable: self.dependent_editable,
           dependent_visible: self.dependent_visible,

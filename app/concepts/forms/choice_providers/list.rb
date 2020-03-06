@@ -1,13 +1,13 @@
-class Forms::API::Entity::Scopes::List < Forms::API::Entity::Scopes::Base
+class Forms::ChoiceProviders::List < Forms::ChoiceProviders::Base
 
   register! :list
 
-  # def self.accept?(args)
-  #   args[:choices].present?
-  # end
+  def self.config(*args)
+    {type: :list, choices: args&.map {|m| m.slice(:name, :active)}}
+  end
 
   def choices(params: {}, user: nil)
-    form_entity.choices
+    form_entity.form_entity_choices
   end
 
   def find_by_id(id, params: {}, user: nil)
@@ -16,10 +16,6 @@ class Forms::API::Entity::Scopes::List < Forms::API::Entity::Scopes::Base
 
   def find_by_name(name, params: {}, user: nil)
     choices(params: params, user: user).find_by(name: name)
-  end
-
-  def self.scope(*args)
-    {type: :list, choices: args&.map {|m| m.slice(:name, :active)}}
   end
 
   def as_json(params: {}, user: nil)

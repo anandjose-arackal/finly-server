@@ -61,13 +61,13 @@ class FormEntity < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
 
   has_many :entities, class_name: 'FormEntity', foreign_key: :parent_id, primary_key: :uuid
-  has_many :choices, class_name: 'FormEntityChoice', dependent: :destroy
+  has_many :form_entity_choices, class_name: 'FormEntityChoice', dependent: :destroy
 
-  accepts_nested_attributes_for :choices
+  accepts_nested_attributes_for :form_entity_choices
 
   serialize :options, JSON
   serialize :chained, JSON
-  serialize :scope, JSON
+  serialize :choices_provider, JSON
 
   scope :root, -> {where parent_id: nil}
   scope :system_fields, -> {where.not custom_field: true}
@@ -80,12 +80,16 @@ class FormEntity < ApplicationRecord
     Object.const_get(val)
   end
 
-  def scope
+  def choices_provider
     val = super()&.with_indifferent_access
     return nil unless val.present?
 
-    handler = Forms::API::Entity::Scope.handler(val[:type])
+    handler = Forms::ChoiceProvider.handler(val[:type])
     handler.new val, self
+  end
+
+  def choices(params: {}, user:)
+    choices_provider&.choices(params: params, user: user)
   end
 
   def schema
@@ -120,7 +124,7 @@ class FormEntity < ApplicationRecord
         allow_clearing_default_value: allow_clearing_default_value,
         options: options,
         chained: chained,
-        scope: scope,
+        choices_provider: choices_provider.config,
         internal: internal,
         field_path: field_path
     }

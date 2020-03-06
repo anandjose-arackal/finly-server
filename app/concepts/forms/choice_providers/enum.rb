@@ -1,17 +1,21 @@
-class Forms::API::Entity::Scopes::Enum < Forms::API::Entity::Scopes::Base
+class Forms::ChoiceProviders::Enum < Forms::ChoiceProviders::Base
 
   register! :enum
 
+  def self.config(klass, id: :id, name: :name)
+    {type: :enum, enum: klass.to_s, id: id, name: name}
+  end
+
   def klass
-    Object.const_get(scope[:enum].to_s)
+    Object.const_get(config[:enum].to_s)
   end
 
   def id
-    scope[:id]
+    config[:id]
   end
 
   def name
-    scope[:name]
+    config[:name]
   end
 
   def choices(params: {}, user: nil)
@@ -28,10 +32,6 @@ class Forms::API::Entity::Scopes::Enum < Forms::API::Entity::Scopes::Base
 
   def find_by_name(name, params: {}, user: nil)
     choices(params: params, user: user).where(name: name).first
-  end
-
-  def self.scope(klass, id: :id, name: :name)
-    {type: :enum, enum: klass.to_s, id: id, name: name}
   end
 
   def as_json(options={})
