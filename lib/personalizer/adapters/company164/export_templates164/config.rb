@@ -8,7 +8,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::Config
             description: 'LMS exportable format. Exports expenses',
             formats: [
                 {name: 'Export as CSV', extension: 'csv'},
-                {name: 'Export as XLS', extension: 'xls'}
+                {name: 'Export as XLSX', extension: 'xlsx'}
             ]
         },
         jv_settled_expense: {
