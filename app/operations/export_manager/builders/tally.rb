@@ -1,24 +1,21 @@
 class ExportManager::Builders::Tally < ExportManager::API
-  include DSL
   include MathUtil
 
-  type :tally
+  type :spreadsheet
 
   class_attr :tally_config_key
 
-  def self.config
-    {}
-  end
+  configurable false
 
-  def tally_config
-    return {} unless self.class.tally_config_key.present?
+  def configuration
+    raise "tally_config_key not defined for #{self.class.name}" unless self.class.tally_config_key.present?
     return {} unless user&.company&.tally_configuration.present?
 
     user.company.tally_configuration&.send(self.class.tally_config_key)
   end
 
   def company_name
-    tally_config[:company_name]
+    configuration[:company_name]
   end
 
   def generator
@@ -28,8 +25,7 @@ class ExportManager::Builders::Tally < ExportManager::API
   def generate
     data.find_each do |record|
       record = record.to_liquid
-      voucher = generate_voucher(record)
-      generator.add_voucher(voucher) if voucher.present?
+      voucher = generate_voucher(generator, record)
       add_ledgers(voucher, record)
     end
 
@@ -45,12 +41,12 @@ class ExportManager::Builders::Tally < ExportManager::API
     end
   end
 
-  def generate_voucher(record)
+  def generate_voucher(generator, record)
     raise "Voucher generation is not implemented for #{self.class.name}"
   end
 
   def add_ledgers(voucher, record)
-
+    raise "Voucher ledger generation has not been defined for #{self.class.name}"
   end
 
 end
