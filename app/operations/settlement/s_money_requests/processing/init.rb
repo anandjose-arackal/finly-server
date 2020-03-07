@@ -57,6 +57,12 @@ class Settlement::SMoneyRequests::Processing::Init < Settlement::SMoneyRequests:
       add_message :error, 'MoneyRequest not found'
       return
     end
+
+    if self.money_requests.pluck(:money_request_processor_mapping_id).compact.present?
+      ids = self.money_requests.where.not(money_request_processor_mapping_id: nil).pluck(:id).join(", ")
+      add_message :error, "Money Requests with ID #{ids} already linked to a batch"
+      return
+    end
   end
 
   def success
