@@ -82,6 +82,14 @@ class InwardInvoiceStatus < ApplicationRecord
     ]
   end
 
+  def self.ids_for_payment_processing_bucket
+    [
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:paid)
+    ]
+  end
+
   def voided?
     self.id == InwardInvoiceStatus.id_for(:voided)
   end

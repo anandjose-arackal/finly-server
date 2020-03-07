@@ -38,6 +38,13 @@
 #  remaining_amount_after_tax_value  :decimal(20, 10)
 #  billed_amount_after_tax_value     :decimal(20, 10)
 #  remaining_amount_before_tax_value :decimal(20, 10)
+#  purchase_order_id                 :integer
+#  invoice_id                        :integer
+#  payment_purpose_id                :integer
+#  paid_amount_before_tax_value      :decimal(20, 10)  default(0.0)
+#  paid_amount_after_tax_value       :decimal(20, 10)  default(0.0)
+#  payment_confirmed                 :boolean          default(FALSE)
+#  reimbursable                      :boolean          default(FALSE)
 #
 
 class BudgetTrail < ApplicationRecord
@@ -89,6 +96,22 @@ class BudgetTrail < ApplicationRecord
       # ids += where(sub_department_id: department_ids).pluck(:id)
       where('department_id IN (?) OR sub_department_id IN (?)', department_ids, department_ids)
     end
+  }
+
+  scope :reimbursable, -> {
+    where reimbursable: true
+  }
+
+  scope :not_payment_confirmed, -> {
+    where.not(payment_confirmed: true)
+  }
+
+  scope :payment_confirmed, -> {
+    where(payment_confirmed: true)
+  }
+
+  scope :without_invoice_or_po, -> {
+    where(invoice_id: nil, purchase_order_id: nil)
   }
 
   scope :with_locations, -> (location_ids) {

@@ -27,8 +27,8 @@ class BudgetGroup < ApplicationRecord
   belongs_to :created_by_user, class_name: "User", optional: true
   belongs_to :budget_date_type, optional: true
 
-  has_many :budget_group_criteria
-  has_many :budgets
+  has_many :budget_group_criteria, dependent: :destroy
+  has_many :budgets, dependent: :destroy
 
   accepts_nested_attributes_for :budget_group_criteria
 

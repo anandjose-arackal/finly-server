@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_06_100049) do
+ActiveRecord::Schema.define(version: 2020_03_07_030331) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1580,6 +1580,10 @@ ActiveRecord::Schema.define(version: 2020_03_06_100049) do
     t.integer "purchase_order_id"
     t.integer "invoice_id"
     t.integer "payment_purpose_id"
+    t.decimal "paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "paid_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.boolean "payment_confirmed", default: false
+    t.boolean "reimbursable", default: false
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -5056,6 +5060,7 @@ ActiveRecord::Schema.define(version: 2020_03_06_100049) do
     t.datetime "updated_at", null: false
     t.string "gl_code"
     t.datetime "deleted_at"
+    t.integer "category_id"
     t.index ["active"], name: "index_money_request_item_categories_on_active"
     t.index ["company_id"], name: "index_money_request_item_categories_on_company_id"
     t.index ["name"], name: "index_money_request_item_categories_on_name"

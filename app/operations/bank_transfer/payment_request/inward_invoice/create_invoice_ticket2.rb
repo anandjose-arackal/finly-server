@@ -263,6 +263,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           category_id: invoice.category_id,
           cost_center_id: invoice.cost_center_id,
           department_id: invoice.department_id,
+          location_id: invoice.location_id,
           date: DateUtils.local_date,
           invoice_id: invoice.id,
           parent_type: invoice&.class.name,

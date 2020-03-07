@@ -468,9 +468,12 @@ class Payment < ApplicationRecord
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
   after_save :add_company_id
+  after_save :update_parent_budget_trails_with_paid_amount
+  after_save :update_payment_confirmed_in_trails
   after_commit :update_parent_status
 
   after_destroy :budget_trail_destroy
+  after_destroy :reset_status
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -783,7 +786,24 @@ class Payment < ApplicationRecord
 
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-    reset_status
+    # along with destroying the trail, we also need to update the paid amount value for all the invoices / POs
+    # that this payment was satisfying. So we have to traverse the payments parents again
+    case self.parent_type
+    when "Invoice"
+      invoice = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
+      percentage_paid_before_tax = self.amount_value / invoice.amount_before_tax
+      percentage_paid_after_tax = self.amount_value / invoice.amount_after_tax
+    when "PurchaseOrder"
+      po = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: po.items.pluck(:id))
+      percentage_paid_before_tax = self.amount_value / po.total_before_tax&.value.to_f
+      percentage_paid_after_tax = self.amount_value / po.total_after_tax&.value.to_f
+    end
+    sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (paid_amount_before_tax_value - #{percentage_paid_before_tax} * `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+    ActiveRecord::Base.connection.execute(sql_before_tax)
+    sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (paid_amount_after_tax_value - #{percentage_paid_after_tax} * `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+    ActiveRecord::Base.connection.execute(sql_after_tax)
   end
 
   def reset_status
@@ -1175,5 +1195,63 @@ class Payment < ApplicationRecord
   def available_credits_amount
     adj_amount =  self.parent.credit_note_adjustments.joins(:amount).pluck('amounts.value').sum rescue nil
     precision_value(adj_amount)
+  end
+
+
+  # this method will update the invoice pr PO budget trails with the paid amount
+  # * distributed equally *. Will later be refactored to include cost allocation based division
+  def update_parent_budget_trails_with_paid_amount
+    # the below is to ensure that payments that are made against an invoice or PO Advance are
+    # respectively updating the paid amount for the respective invoice and PO line item trails proportionally.
+    # Proportinality will only be a use case if it's a partial payment, otherwise the amount is fully consumed
+    case self.parent_type
+    when "Invoice"
+      invoice = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
+      percentage_paid_before_tax = self.amount_value / invoice.amount_before_tax
+      percentage_paid_after_tax = self.amount_value / invoice.amount_after_tax
+    when "PurchaseOrder"
+      po = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: po.items.pluck(:id))
+      percentage_paid_before_tax = self.amount_value / po.total_before_tax&.value.to_f
+      percentage_paid_after_tax = self.amount_value / po.total_after_tax&.value.to_f
+    end
+    sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (paid_amount_before_tax_value + #{percentage_paid_before_tax} * `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+    ActiveRecord::Base.connection.execute(sql_before_tax)
+    sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (paid_amount_after_tax_value + #{percentage_paid_after_tax} * `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+    ActiveRecord::Base.connection.execute(sql_after_tax)
+
+    # the below is to do the same, but with report reimbursements and their respective expenses
+    # We will be extracting the report_processor_group_mapping for this payment, and then updating the
+    # paid amount for all the expenses inside all those reports that have been paid against
+    if PaymentPurpose.ids_for(:reimbursement, :reimbursement_outside_finly).include?(self.payment_purpose_id)
+      report_processor_mapping = ReportProcessorGroupMapping.find_by(payment_id: self.id)
+      report_ids = report_processor_mapping.reports.pluck(:id)
+      expense_trails = BudgetTrail.where(entity_type: "Expense", entity_id: Expense.with_report_id(report_ids).pluck(:id))
+      sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      ActiveRecord::Base.connection.execute(sql_before_tax)
+      sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      ActiveRecord::Base.connection.execute(sql_after_tax)
+    end
+  end
+
+
+  def update_payment_confirmed_in_trails
+    case self.parent_type
+    when "Invoice"
+      invoice = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
+    when "PurchaseOrder"
+      po = self.parent
+      parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: po.items.pluck(:id))
+    end
+
+    # todo include trails frpom advances given to the user as well
+
+    if self.completed?
+      parent_trails.update_all(payment_confirmed: true)
+    else
+      parent_trails.update_all(payment_confirmed: false)
+    end
   end
 end

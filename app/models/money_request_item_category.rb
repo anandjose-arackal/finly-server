@@ -2,18 +2,20 @@
 #
 # Table name: money_request_item_categories
 #
-#  id         :integer          not null, primary key
-#  company_id :integer          not null
-#  name       :string(255)      not null
-#  active     :boolean          default(TRUE), not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  gl_code    :string(255)
-#  deleted_at :datetime
+#  id          :integer          not null, primary key
+#  company_id  :integer          not null
+#  name        :string(255)      not null
+#  active      :boolean          default(TRUE), not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  gl_code     :string(255)
+#  deleted_at  :datetime
+#  category_id :integer
 #
 
 class MoneyRequestItemCategory < ApplicationRecord
   belongs_to :company, optional: true
+  belongs_to :category, optional: true
 
   validates :name, presence: true
   validates :company, presence: true

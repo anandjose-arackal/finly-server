@@ -94,11 +94,13 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
       case amount_to_be_considered
       when :amount_after_tax
-        po_item_amount_to_be_considered = :remaining_amount_after_tax_value
-        invoice_item_amount_to_be_considered = :billed_amount_after_tax_value
+        po_item_amount_to_be_considered = "remaining_amount_after_tax_value"
+        invoice_item_amount_to_be_considered = "billed_amount_after_tax_value"
+        paid_amount_to_be_considered = "paid_amount_before_tax_value"
       when :amount_before_tax
-        po_item_amount_to_be_considered = :remaining_amount_before_tax_value
-        invoice_item_amount_to_be_considered = :remaining_amount_before_tax_value
+        po_item_amount_to_be_considered = "remaining_amount_before_tax_value"
+        invoice_item_amount_to_be_considered = "remaining_amount_before_tax_value"
+        paid_amount_to_be_considered = "paid_amount_after_tax_value"
       end
 
       # debugger
@@ -106,18 +108,18 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       pending_amount = self.budget_trails.with_entity_type("PurchaseRequestItem").with_entity_status_id(PurchaseRequestStatus.ids_for(:awaiting_approval, :approved, :auto_approved))
                            .joins(self.amount_to_be_considered).sum(:value)
 
-      pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum(po_item_amount_to_be_considered)
+      pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered}")
 
-      pending_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
+      pending_amount += self.budget_trails.with_entity_type("Expense").reimbursable.with_entity_status_id(ReportStatus.ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
 
       # debugger
 
       # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
       # One thing to note here is that when some of the items of aa PO have been billed (i.e. have an invoice created against them) we need to consider only those items
       # which have not yet been moved to an invoice that has been approved
-      committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum(po_item_amount_to_be_considered)
+      committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered}")
 
-      committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum(invoice_item_amount_to_be_considered)
+      committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).not_billed.sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered}")
 
 
       # # now we need to subtract the amount that has already been paid as a purchase order advance
@@ -125,21 +127,37 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # paid_as_po_advance =
 
       # calculating pending payment amount - wil include all invoice items that are approved and above, but not the ones that have payments initiated against them
-      # TODO - partially paid invoices cases
-      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).billed.sum(invoice_item_amount_to_be_considered)
+
+      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).billed.sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered}")
+
+      pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).reimbursable.not_payment_confirmed.joins(self.amount_to_be_considered).sum(:value)
 
       # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
 
       # calculating all payments that are yet to be approved or credited. All except the final completed status of the payment shows here
-      payment_processing_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket)
+      # To do this we are going to rely on the invoice line items, purchase order items, and expenses budget trails to tell us the paid amount
+      # that would have been proportionately divided among the various line items
+      payment_processing_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_payment_processing_bucket).not_payment_confirmed.sum(paid_amount_to_be_considered)
+      payment_processing_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).not_payment_confirmed.sum(paid_amount_to_be_considered)
+      # TODO - add money request items here after they have been completely implemented
+
+      payment_processing_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket).without_invoice_or_po
                                       .joins(self.amount_to_be_considered).sum(:value)
 
-      # debugger
 
-      paid_amount = self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket)
-                        .joins(self.amount_to_be_considered).sum(:value)
 
-      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ExpenseStatus.status_ids_for_paid_bucket).joins(self.amount_to_be_considered).sum(:value)
+      # Paid amount will be calculated exactly like the above processing amount, except that these payments have a confirmation
+      # of having been credited to the beneficiary. SO we can filter them out using the payment_confirmed flag which is toggled everytime a payment's
+      # status changes
+      #
+      paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_payment_processing_bucket).payment_confirmed.sum(paid_amount_to_be_considered)
+      paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).payment_confirmed.sum(paid_amount_to_be_considered)
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.payment_confirmed.joins(self.amount_to_be_considered).sum(:value)
+
+      # TODO - add money request items once they have been completely implemented
+
+      paid_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket).without_invoice_or_po
+                         .joins(self.amount_to_be_considered).sum(:value)
 
       total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
 

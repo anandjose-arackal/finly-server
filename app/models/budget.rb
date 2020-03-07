@@ -35,7 +35,7 @@ class Budget < ApplicationRecord
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
-  has_one :budget_consumption
+  has_one :budget_consumption, dependent: :destroy
 
   belongs_to :budget_date_type, optional: true
   belongs_to :user, optional: true

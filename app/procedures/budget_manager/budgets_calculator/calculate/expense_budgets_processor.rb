@@ -21,6 +21,9 @@ class BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < Bud
         entity_created_at: expense.created_at,
         entity_submitted_at: expense.report.submitted_at,
         entity_status_id: expense.report.report_status_id,
+        reimbursable: expense.reimbursable,
+        billed_amount_before_tax_value: expense.amount_before_tax,
+        billed_amount_after_tax_value: expense.amount_after_tax,
         amount_attributes: {
             id: trail&.amount&.id,
             value: expense.amount&.value,
