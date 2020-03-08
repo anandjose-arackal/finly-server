@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_08_070857) do
+ActiveRecord::Schema.define(version: 2020_03_08_142514) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1566,11 +1566,9 @@ ActiveRecord::Schema.define(version: 2020_03_08_070857) do
     t.datetime "date"
     t.decimal "amount_after_tax_value", precision: 20, scale: 10
     t.decimal "amount_before_tax_value", precision: 20, scale: 10
-    t.integer "billed_count"
     t.integer "po_trail_item_id"
     t.decimal "remaining_amount_value", precision: 20, scale: 10
     t.integer "billed_quantity"
-    t.decimal "billed_rate", precision: 20, scale: 10
     t.integer "remaining_quantity"
     t.boolean "revised", default: false
     t.decimal "billed_amount_before_tax_value", precision: 20, scale: 10
@@ -1582,7 +1580,6 @@ ActiveRecord::Schema.define(version: 2020_03_08_070857) do
     t.integer "payment_purpose_id"
     t.decimal "paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "paid_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
-    t.boolean "payment_confirmed", default: false
     t.boolean "reimbursable", default: false
     t.decimal "payment_processing_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "payment_processing_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"

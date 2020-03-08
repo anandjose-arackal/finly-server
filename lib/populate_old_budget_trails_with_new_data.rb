@@ -137,7 +137,7 @@ class PopulateOldBudgetTrailsWithNewData
       next if payment.blank?
       payment.save
       if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
-        purchase_order_id = paymnet.parent_id
+        purchase_order_id = payment.parent_id
         invoice_id = nil
       elsif payment.payment_purpose_id = PaymentPurpose.id_for(:vendor_payment)
         purchase_order_id = nil

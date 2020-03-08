@@ -1212,20 +1212,24 @@ class Payment < ApplicationRecord
     # the below is to do the same, but with report reimbursements and their respective expenses
     # We will be extracting the report_processor_group_mapping for this payment, and then updating the
     # paid amount for all the expenses inside all those reports that have been paid against
-    if PaymentPurpose.ids_for(:reimbursement, :reimbursement_outside_finly).include?(self.payment_purpose_id)
+    if PaymentPurpose.ids_for(:reimbursement, :reimbursement_outside_finly).include?(self.payment_order.payment_purpose_id)
       report_processor_mapping = ReportProcessorGroupMapping.find_by(payment_id: self.id)
       report_ids = report_processor_mapping.reports.pluck(:id)
       expense_trails = BudgetTrail.where(entity_type: "Expense", entity_id: Expense.with_report_id(report_ids).pluck(:id))
       if self.completed?
-        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
-      else
-        sql_before_tax = "UPDATE `budget_trails` SET `payment_processing_amount_before_tax_value` = `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = `billed_amount_before_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      # below will only come in if we want to track the settlements that are in processing but not credited yet. So
+      # that amount will go into the payment processing bucket. As of now, the amount moves diretly from the pending payment bucket to paid bucket
+      # else
+      #   sql_before_tax = "UPDATE `budget_trails` SET `payment_processing_amount_before_tax_value` = `billed_amount_before_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
       end
       ActiveRecord::Base.connection.execute(sql_before_tax)
       if self.completed?
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
-      else
-        sql_after_tax = "UPDATE `budget_trails` SET `payment_processing_amount_after_tax_value` = `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = `billed_amount_after_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+        # below will only come in if we want to track the settlements that are in processing but not credited yet. So
+        # that amount will go into the payment processing bucket. As of now, the amount moves diretly from the pending payment bucket to paid bucket
+      # else
+      #   sql_after_tax = "UPDATE `budget_trails` SET `payment_processing_amount_after_tax_value` = `billed_amount_after_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
       end
       ActiveRecord::Base.connection.execute(sql_after_tax)
     end
@@ -1242,27 +1246,5 @@ class Payment < ApplicationRecord
 
   def budget_trail_destroy
     BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-    # # along with destroying the trail, we also need to update the paid amount value for all the invoices / POs
-    # # that this payment was satisfying. So we have to traverse the payments parents again
-    # payment_trail = BudgetTrail.find_by(entity_type: "Payment", entity_id: self.id)
-    # if self.parent_type.present?
-    #   case self.parent_type
-    #   when "Invoice"
-    #     invoice = self.parent
-    #     parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
-    #     percentage_paid_before_tax = self.amount_value / invoice.amount_before_tax
-    #     percentage_paid_after_tax = self.amount_value / invoice.amount_after_tax
-    #   when "PurchaseOrder"
-    #     po = self.parent
-    #     parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: po.items.pluck(:id))
-    #     percentage_paid_before_tax = self.amount_value / po.total_before_tax&.value.to_f
-    #     percentage_paid_after_tax = self.amount_value / po.total_after_tax&.value.to_f
-    #   end
-    #   sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (paid_amount_before_tax_value - #{percentage_paid_before_tax} * `billed_amount_before_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
-    #   ActiveRecord::Base.connection.execute(sql_before_tax)
-    #   sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (paid_amount_after_tax_value - #{percentage_paid_after_tax} * `billed_amount_after_tax_value`) WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
-    #   ActiveRecord::Base.connection.execute(sql_after_tax)
-    #   payment_trail.update(billed: false)
-    # end
   end
 end

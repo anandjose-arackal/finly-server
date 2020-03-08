@@ -27,11 +27,9 @@
 #  date                                       :datetime
 #  amount_after_tax_value                     :decimal(20, 10)
 #  amount_before_tax_value                    :decimal(20, 10)
-#  billed_count                               :integer
 #  po_trail_item_id                           :integer
 #  remaining_amount_value                     :decimal(20, 10)
 #  billed_quantity                            :integer
-#  billed_rate                                :decimal(20, 10)
 #  remaining_quantity                         :integer
 #  revised                                    :boolean          default(FALSE)
 #  billed_amount_before_tax_value             :decimal(20, 10)
@@ -43,10 +41,9 @@
 #  payment_purpose_id                         :integer
 #  paid_amount_before_tax_value               :decimal(20, 10)  default(0.0)
 #  paid_amount_after_tax_value                :decimal(20, 10)  default(0.0)
-#  payment_confirmed                          :boolean          default(FALSE)
 #  reimbursable                               :boolean          default(FALSE)
-#  payment_processing_amount_before_tax_value :decimal(20, 10)
-#  payment_processing_amount_after_tax_value  :decimal(20, 10)
+#  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
+#  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
 #
 
 class BudgetTrail < ApplicationRecord

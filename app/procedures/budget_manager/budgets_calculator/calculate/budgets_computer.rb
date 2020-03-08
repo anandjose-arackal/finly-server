@@ -141,13 +141,13 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
 
 
-      # Paid amount will be calculated exactly like the above processing amount, except that these payments have a confirmation
-      # of having been credited to the beneficiary. SO we can filter them out using the payment_confirmed flag which is toggled everytime a payment's
-      # status changes
-      #
+      # Paid amount will be calculated from the paid amount attribute inside the PO Item, Invoice and Expense budget trails,
+      # because that is calculated keeping in mind the various ways in which partial payments can be made
+      # You can find the callbacks that handle that inside the payment model - look for method `calculate_paid_amount_in_parent_trails`
       paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
-      paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).payment_confirmed.sum(paid_amount_to_be_considered)
-      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.payment_confirmed.joins(self.amount_to_be_considered).sum(:value)
+      paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
+
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.joins(self.amount_to_be_considered).sum(:value)
 
       # TODO - add money request items once they have been completely implemented
 
