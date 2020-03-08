@@ -69,6 +69,7 @@ class InwardInvoiceStatus < ApplicationRecord
   def self.ids_for_committed_bucket
     [
         InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:rejected),
         InwardInvoiceStatus.id_for(:retracted),
         InwardInvoiceStatus.id_for(:processing)
     ]
@@ -78,7 +79,9 @@ class InwardInvoiceStatus < ApplicationRecord
     [
         InwardInvoiceStatus.id_for(:approved),
         InwardInvoiceStatus.id_for(:auto_approved),
-        InwardInvoiceStatus.id_for(:unpaid)
+        InwardInvoiceStatus.id_for(:unpaid),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:initiated),
     ]
   end
 

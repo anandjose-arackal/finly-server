@@ -2,49 +2,51 @@
 #
 # Table name: budget_trails
 #
-#  id                                :integer          not null, primary key
-#  entity_id                         :integer
-#  entity_type                       :string(255)
-#  category_id                       :integer
-#  cost_center_id                    :integer
-#  location_id                       :integer
-#  vendor_id                         :integer
-#  amount_id                         :integer
-#  created_at                        :datetime         not null
-#  updated_at                        :datetime         not null
-#  user_id                           :integer
-#  department_id                     :integer
-#  entity_date                       :date
-#  sub_department_id                 :integer
-#  procurement_id                    :integer
-#  entity_status_id                  :integer
-#  amount_before_tax_id              :integer
-#  amount_after_tax_id               :integer
-#  entity_created_at                 :datetime
-#  entity_submitted_at               :datetime
-#  billed                            :boolean          default(FALSE)
-#  deleted_at                        :datetime
-#  date                              :datetime
-#  amount_after_tax_value            :decimal(20, 10)
-#  amount_before_tax_value           :decimal(20, 10)
-#  billed_count                      :integer
-#  po_trail_item_id                  :integer
-#  remaining_amount_value            :decimal(20, 10)
-#  billed_quantity                   :integer
-#  billed_rate                       :decimal(20, 10)
-#  remaining_quantity                :integer
-#  revised                           :boolean          default(FALSE)
-#  billed_amount_before_tax_value    :decimal(20, 10)
-#  remaining_amount_after_tax_value  :decimal(20, 10)
-#  billed_amount_after_tax_value     :decimal(20, 10)
-#  remaining_amount_before_tax_value :decimal(20, 10)
-#  purchase_order_id                 :integer
-#  invoice_id                        :integer
-#  payment_purpose_id                :integer
-#  paid_amount_before_tax_value      :decimal(20, 10)  default(0.0)
-#  paid_amount_after_tax_value       :decimal(20, 10)  default(0.0)
-#  payment_confirmed                 :boolean          default(FALSE)
-#  reimbursable                      :boolean          default(FALSE)
+#  id                                         :integer          not null, primary key
+#  entity_id                                  :integer
+#  entity_type                                :string(255)
+#  category_id                                :integer
+#  cost_center_id                             :integer
+#  location_id                                :integer
+#  vendor_id                                  :integer
+#  amount_id                                  :integer
+#  created_at                                 :datetime         not null
+#  updated_at                                 :datetime         not null
+#  user_id                                    :integer
+#  department_id                              :integer
+#  entity_date                                :date
+#  sub_department_id                          :integer
+#  procurement_id                             :integer
+#  entity_status_id                           :integer
+#  amount_before_tax_id                       :integer
+#  amount_after_tax_id                        :integer
+#  entity_created_at                          :datetime
+#  entity_submitted_at                        :datetime
+#  billed                                     :boolean          default(FALSE)
+#  deleted_at                                 :datetime
+#  date                                       :datetime
+#  amount_after_tax_value                     :decimal(20, 10)
+#  amount_before_tax_value                    :decimal(20, 10)
+#  billed_count                               :integer
+#  po_trail_item_id                           :integer
+#  remaining_amount_value                     :decimal(20, 10)
+#  billed_quantity                            :integer
+#  billed_rate                                :decimal(20, 10)
+#  remaining_quantity                         :integer
+#  revised                                    :boolean          default(FALSE)
+#  billed_amount_before_tax_value             :decimal(20, 10)
+#  remaining_amount_after_tax_value           :decimal(20, 10)
+#  billed_amount_after_tax_value              :decimal(20, 10)
+#  remaining_amount_before_tax_value          :decimal(20, 10)
+#  purchase_order_id                          :integer
+#  invoice_id                                 :integer
+#  payment_purpose_id                         :integer
+#  paid_amount_before_tax_value               :decimal(20, 10)  default(0.0)
+#  paid_amount_after_tax_value                :decimal(20, 10)  default(0.0)
+#  payment_confirmed                          :boolean          default(FALSE)
+#  reimbursable                               :boolean          default(FALSE)
+#  payment_processing_amount_before_tax_value :decimal(20, 10)
+#  payment_processing_amount_after_tax_value  :decimal(20, 10)
 #
 
 class BudgetTrail < ApplicationRecord

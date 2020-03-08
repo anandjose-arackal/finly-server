@@ -50,7 +50,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     end
 
 
-    if (InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(invoice_item.parent.invoice_status_id))
+    if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
       billed = true
     else
       billed = false
