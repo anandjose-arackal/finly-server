@@ -3,64 +3,97 @@ class ExportController < BaseControllers::WebBase
 
   set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor
 
+  # def report
+  #   params = RequestStore.store[:params]
+  #   case params[:download_type] # Format should be json
+  #   when :xls, 'xls' # Used for 'export all' operations
+  #     respond response: :success, message: 'You will receive email shortly'
+  #     # params = RequestStore.store[:params]
+  #     parameters = params.permit!
+  #     # Convert to hash for sidekiq support
+  #     @result = Export::Reports::AsXmlBackground.call_async(current_user, parameters.to_hash)
+  #     return
+  #   end
+  #   respond_to do |format|
+  #     format.csv {
+  #       @report = Export::Reports::AsCsv.(current_user, params)
+  #       report_names = @report.report_names.blank? ? "report_#{Date.today.day}_#{Date.today.month}_#{Date.today.year}" : @report.report_names
+  #       send_data @report.data, filename: "#{report_names}.csv"
+  #     }
+  #     format.xls { # User for report/show export
+  #       @report = Export::Reports::AsXml.(current_user, params)
+  #       @header = @report.header
+  #       @data = @report.data
+  #     }
+  #     format.pdf {
+  #       op = Reports::ExportHandler.(current_user, params)
+  #       local_variables = op.local_variables
+  #       template = op.template
+  #       local_variables[:op] = op
+  #       @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
+  #       @result.render(self)
+  #     }
+  #     format.zip {
+  #       @result = Export::Reports::WithReceipts.(current_user, params)
+  #       if @result.success?
+  #         @result.render self
+  #       else
+  #         render json: {success: false}
+  #       end
+  #     }
+  #   end
+  # end
+
   def report
-    params = RequestStore.store[:params]
-    case params[:download_type] # Format should be json
-    when :xls, 'xls' # Used for 'export all' operations
-      respond response: :success, message: 'You will receive email shortly'
-      # params = RequestStore.store[:params]
-      parameters = params.permit!
-      # Convert to hash for sidekiq support
-      @result = Export::Reports::AsXmlBackground.call_async(current_user, parameters.to_hash)
-      return
-    end
-    respond_to do |format|
-      format.csv {
-        @report = Export::Reports::AsCsv.(current_user, params)
-        report_names = @report.report_names.blank? ? "report_#{Date.today.day}_#{Date.today.month}_#{Date.today.year}" : @report.report_names
-        send_data @report.data, filename: "#{report_names}.csv"
+    params[:type] = 'reports'
+    result = ExportManager::RequestHandler.(current_user, params)
+    if result.success?
+      @response = {
+          success: true,
+          job_id: result.export_job&.id,
+          messages: result.messages
       }
-      format.xls { # User for report/show export
-        @report = Export::Reports::AsXml.(current_user, params)
-        @header = @report.header
-        @data = @report.data
-      }
-      format.pdf {
-        op = Reports::ExportHandler.(current_user, params)
-        local_variables = op.local_variables
-        template = op.template
-        local_variables[:op] = op
-        @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
-        @result.render(self)
-      }
-      format.zip {
-        @result = Export::Reports::WithReceipts.(current_user, params)
-        if @result.success?
-          @result.render self
-        else
-          render json: {success: false}
-        end
-      }
+      # respond_to do |format|
+      #   format.json { render json: @response.as_json }
+      # end
+      render json: @response.as_json
+    else
+      respond response: :failure, message: result.messages[:error]
     end
   end
 
+  # def expense
+  #   respond_to do |format|
+  #     format.csv {
+  #       @result = Expense::Exports::AsCsv.(current_user, params)
+  #       send_data @result.data, filename: "#{@result.file_name}"
+  #     }
+  #     format.xls {
+  #       @result = Expense::Exports::AsXml.(current_user, params)
+  #     }
+  #     format.zip {
+  #       @result = Expense::Exports::WithReceipts.(current_user, params)
+  #       if @result.success?
+  #         @result.render self
+  #       else
+  #         render json: {success: false}
+  #       end
+  #     }
+  #   end
+  # end
+
   def expense
-    respond_to do |format|
-      format.csv {
-        @result = Expense::Exports::AsCsv.(current_user, params)
-        send_data @result.data, filename: "#{@result.file_name}"
+    params[:type] = 'expenses'
+    result = ExportManager::RequestHandler.(current_user, params)
+    if result.success?
+      @response = {
+          success: true,
+          job_id: result.export_job&.id,
+          messages: result.messages
       }
-      format.xls {
-        @result = Expense::Exports::AsXml.(current_user, params)
-      }
-      format.zip {
-        @result = Expense::Exports::WithReceipts.(current_user, params)
-        if @result.success?
-          @result.render self
-        else
-          render json: {success: false}
-        end
-      }
+      render json: @response.as_json
+    else
+      respond response: :failure, message: result.messages[:error]
     end
   end
 
@@ -93,17 +126,32 @@ class ExportController < BaseControllers::WebBase
     end
   end
 
+  # def money_request
+  #   respond_to do |format|
+  #     format.csv {
+  #       @money_request = Export::MoneyRequest::AsCsv.(current_user, params)
+  #       send_data @money_request.data, filename: "#{@money_request.money_request_name}.csv"
+  #     }
+  #     format.xls {
+  #       @money_request = Export::MoneyRequest::AsXml.(current_user, params)
+  #       @header = @money_request.header
+  #       @data = @money_request.data
+  #     }
+  #   end
+  # end
+
   def money_request
-    respond_to do |format|
-      format.csv {
-        @money_request = Export::MoneyRequest::AsCsv.(current_user, params)
-        send_data @money_request.data, filename: "#{@money_request.money_request_name}.csv"
+    params[:type] = 'money_requests'
+    result = ExportManager::RequestHandler.(current_user, params)
+    if result.success?
+      @response = {
+          success: true,
+          job_id: result.export_job&.id,
+          messages: result.messages
       }
-      format.xls {
-        @money_request = Export::MoneyRequest::AsXml.(current_user, params)
-        @header = @money_request.header
-        @data = @money_request.data
-      }
+      render json: @response.as_json
+    else
+      respond response: :failure, message: result.messages[:error]
     end
   end
 
