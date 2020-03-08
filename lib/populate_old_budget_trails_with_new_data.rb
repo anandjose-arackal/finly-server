@@ -12,12 +12,12 @@ class PopulateOldBudgetTrailsWithNewData
       purchase_order_item = trail.entity
       next if purchase_order_item.blank?
       trail.update(
-          remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
-          remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
           remaining_quantity: purchase_order_item.quantity,
           entity_created_at: purchase_order_item.purchase_order.created_at,
           entity_submitted_at: (purchase_order_item.purchase_order.submitted_at || purchase_order_item.purchase_order.created_at),
           entity_status_id: purchase_order_item.purchase_order.purchase_order_status_id,
+          remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
+          remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
           amount_attributes: {
               id: trail&.amount&.id,
               value: purchase_order_item.total_amount&.value,
@@ -59,7 +59,7 @@ class PopulateOldBudgetTrailsWithNewData
         billed_amount_before_tax = invoice_item.before_tax_amount
       end
 
-      if (InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(invoice_item.parent.invoice_status_id))
+      if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
         billed = true
       else
         billed = false
@@ -101,9 +101,16 @@ class PopulateOldBudgetTrailsWithNewData
       expense = trail.entity
       next if expense.blank?
       trail.update(
+          cost_center_id: expense.report.cost_center_id,
+          department_id: expense.report.department_id,
+          location_id: expense.report.location_id,
+          date: expense.date,
           entity_created_at: expense.created_at,
           entity_submitted_at: expense.report&.submitted_at,
           entity_status_id: expense.report&.report_status_id,
+          reimbursable: expense.reimbursable,
+          billed_amount_before_tax_value: expense.amount_before_tax,
+          billed_amount_after_tax_value: expense.amount_after_tax,
           amount_attributes: {
               id: trail&.amount&.id,
               value: expense.amount&.value,
@@ -128,10 +135,23 @@ class PopulateOldBudgetTrailsWithNewData
     BudgetTrail.where(entity_type: "Payment").find_each do |trail|
       payment = trail.entity
       next if payment.blank?
+      if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
+        purchase_order_id = paymnet.parent_id
+        invoice_id = nil
+      elsif payment.payment_purpose_id = PaymentPurpose.id_for(:vendor_payment)
+        purchase_order_id = nil
+        invoice_id = (payment.parent_type == "Invoice" ? payment.parent_id : nil)
+      else
+        purchase_order_id = nil
+        invoice_id = nil
+      end
       trail.update(
           entity_status_id: payment.payment_status_id,
           entity_created_at: payment.payment_order&.bank_payment_request&.created_at,
           entity_submitted_at: payment.payment_order&.bank_payment_request&.submitted_at,
+          payment_purpose_id: payment.payment_purpose_id,
+          purchase_order_id: purchase_order_id,
+          invoice_id: invoice_id,
           amount_attributes: {
               id: trail&.amount&.id,
               value: payment.amount.value,
