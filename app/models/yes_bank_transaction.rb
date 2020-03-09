@@ -32,7 +32,7 @@ class YesBankTransaction < ApplicationRecord
   belongs_to :bank_transaction_type, optional: true
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
-  belongs_to :reference_payment, class_name: "Payment"
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
 
@@ -43,6 +43,7 @@ class YesBankTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :company, presence: true
   validates :transfer_type, presence: true
+  validates :reference_payment, presence: true, unless: :account_name_check?
 
   accepts_nested_attributes_for :amount
 

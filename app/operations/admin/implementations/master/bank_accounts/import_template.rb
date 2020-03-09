@@ -8,6 +8,7 @@ class Admin::Implementations::Master::BankAccounts::ImportTemplates < Admin::Imp
       :user_id => "User Email / Mobile NUmber",
       :account_number => "Account Number",
       :ifsc => "IFSC",
+      :default_account => "Default Account (Y)",
       :destroy => "Destroy"
   })
 
