@@ -42,6 +42,10 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   attribute :receipt_link
   attribute :expense_igst
   attribute :expense_sgst_cgst
+  attribute :bank_reference_number
+  attribute :source_account
+  attribute :settlement_date
+  attribute :finance_approved_date
 
   section :expense_custom_fields do
     attribute :expense_custom_fields, dynamic: true
@@ -49,6 +53,10 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
 
   section :report_custom_fields do
     attribute :report_custom_fields, dynamic: true
+  end
+
+  section :report_approvers do
+    attribute :reviewal_chain, dynamic: true
   end
 
   def expense_custom_fields(row, expense)
@@ -60,6 +68,21 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   def report_custom_fields(row, expense)
     expense.report.custom_fields.includes(:field_configuration).each do |custom_field|
       row.add(custom_field.field_configuration&.field_name, custom_field.string_value)
+    end
+  end
+
+  def reviewal_chain(row, expense)
+    expense.report&.dlrms.each_with_index do |dlrm, index|
+      level_number = dlrm.level_number
+      action = dlrm.action&.name&.humanize
+      action_taker = dlrm.action_taken_by&.first_name
+      action_date = dlrm.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
+      reviewer_name = dlrm.reviewer.first_name
+      row.add("Level Number #{index}", level_number)
+      row.add("Action Name #{index}", action)
+      row.add("Action Taken By #{index}", action_taker)
+      row.add("Action Date #{index}", action_date)
+      row.add("Reviewer Name #{index}", reviewer_name)
     end
   end
 
@@ -196,7 +219,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def report_creation_date(expense)
-    expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
+    expense&.report&.created_at&.strftime("%d-%m-%Y, %H:%M")
   end
 
   def receipt_link(expense)
@@ -211,6 +234,22 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   def expense_sgst_cgst(expense)
     gst_applicable = expense.category&.gst_applicable?
     ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+  end
+
+  def bank_reference_number(expense)
+    expense.report&.bank_reference_number
+  end
+
+  def source_account(expense)
+    expense.report&.source_account
+  end
+
+  def settlement_date(expense)
+    expense.report&.report_processor_group_mapping&.completed_at&.strftime("%d-%m-%Y, %H:%M")
+  end
+
+  def finance_approved_date(expense)
+    expense.report&.approved_at&.strftime("%d-%b-%Y")
   end
 
 end

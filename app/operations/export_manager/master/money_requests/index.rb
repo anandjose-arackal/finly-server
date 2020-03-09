@@ -20,9 +20,17 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
   attribute :purpose
   attribute :destination_account
   attribute :account_payment_type
+  attribute :bank_reference_number
+  attribute :source_account
+  attribute :settlement_date
+  attribute :finance_approved_date
 
   section :money_request_item_categories do
     attribute :item_categories, dynamic: true
+  end
+
+  section :money_request_approvers do
+    attribute :reviewal_chain, dynamic: true
   end
 
   def item_categories(row, money_request)
@@ -32,6 +40,21 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
       item = money_request&.items.find {|mr| mr.money_request_item_category_id == category.id}
       value = item.present? ? item.amount&.value : '0.0'
       row.add(category&.name, value)
+    end
+  end
+
+  def reviewal_chain(row, money_request)
+    money_request&.dlrms.each_with_index do |dlrm, index|
+      level_number = dlrm.level_number
+      action = dlrm.action&.name&.humanize
+      action_taker = dlrm.action_taken_by&.first_name
+      action_date = dlrm.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
+      reviewer_name = dlrm.reviewer&.first_name
+      row.add("Level Number #{index}", level_number)
+      row.add("Action Name #{index}", action)
+      row.add("Action Taken By #{index}", action_taker)
+      row.add("Action Date #{index}", action_date)
+      row.add("Reviewer Name #{index}", reviewer_name)
     end
   end
 
@@ -93,6 +116,22 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
 
   def account_payment_type(money_request)
     money_request.payment_mode&.name&.upcase
+  end
+
+  def bank_reference_number(money_request)
+    money_request.bank_reference_number
+  end
+
+  def source_account(money_request)
+    money_request.source_account
+  end
+
+  def settlement_date(money_request)
+    money_request.money_request_processor_mapping&.completed_at&.strftime("%d-%m-%Y, %H:%M")
+  end
+
+  def finance_approved_date(money_request)
+    money_request&.approved_at&.strftime("%d-%b-%Y")
   end
 
 end
