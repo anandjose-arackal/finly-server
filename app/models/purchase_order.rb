@@ -813,6 +813,15 @@ class PurchaseOrder < ApplicationRecord
   end
 
 
+  def amount_before_tax
+    self.total_before_tax&.value
+  end
+
+  def amount_after_tax
+    self.total_after_tax&.value
+  end
+
+
   private
 
   # def populate_advance_amount
