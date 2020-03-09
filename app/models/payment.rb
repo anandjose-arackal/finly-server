@@ -1184,7 +1184,7 @@ class Payment < ApplicationRecord
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
       when "PurchaseOrder"
         purchase_order = self.parent
-        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: po.items.pluck(:id))
+        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: purchase_order.items.pluck(:id))
         paid_amount = purchase_order.payments.successful.joins(:amount).sum(:value)
         payment_processing_amount = purchase_order.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / purchase_order.amount_before_tax
