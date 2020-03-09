@@ -3,7 +3,17 @@ class IndexBuilder::API
   include DynamicAttributes
   include IndexBuilder::Counter::DSL
 
-  class_attr :resolver
+  def self.resolver(klass = nil, params: {})
+    @resolver = {klass: klass, params: params} if klass
+
+    @resolver
+  end
+
+  def self.reference(id = nil, args = {})
+    @reference = {id: id, args: args}  if id.present?
+
+    @reference ||= {id: '{{record.id}}', args: {}}
+  end
 
   def self.config(user)
     config = {fixed: [], dynamic: []}
@@ -17,15 +27,11 @@ class IndexBuilder::API
     config
   end
 
-  def self.build(user, record, required_columns)
-    map = {}
-    self.columns.each do |column_key, column|
-      next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
-      next if required_columns.blank? and not column.default
+  def self.resolve(context)
+    # Todo support resolver[:params] to be a proc to execute dynamic filters
+    context["params"].deep_merge!(resolver[:params])
 
-      map[column.column_key] = column.build(self, user, record)
-    end
-    map
+    Resolver::Transactions::Resolve.with(context, resolver[:klass], paginate: true, filter: true)
   end
 
   def self.include_associations!(collection, required_columns)
@@ -37,6 +43,17 @@ class IndexBuilder::API
       includes += column.includes
     end
     collection.includes(includes.uniq)
+  end
+
+  def self.build(user, record, required_columns)
+    map = {}
+    self.columns.each do |column_key, column|
+      next if required_columns.present? and not (required_columns.include?(column_key.to_s) or required_columns.include?(column_key.to_sym))
+      next if required_columns.blank? and not column.default
+
+      map[column.column_key] = column.build(self, user, record)
+    end
+    {reference: record.template(reference), columns: map}
   end
 
 end

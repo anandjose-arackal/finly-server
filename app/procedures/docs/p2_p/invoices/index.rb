@@ -1,6 +1,7 @@
 class Docs::P2P::Invoices::Index < IndexBuilder::API
 
   resolver Docs::P2P::Invoices::Resolver
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

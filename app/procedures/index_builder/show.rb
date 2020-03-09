@@ -22,8 +22,8 @@ class IndexBuilder::Show < Transactions::API
   end
 
   def resolve(context, builder:, params:, **)
-    # Todo fetch includes
-    Resolver::Transactions::Resolve.with(context, builder.resolver, paginate: true, filter: true, includes: builder)
+    builder.resolve(context)
+
     true
   end
 
