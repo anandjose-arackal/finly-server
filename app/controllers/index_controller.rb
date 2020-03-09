@@ -12,7 +12,6 @@ class IndexController < BaseControllers::WebBase
 
   def show
     endpoint IndexBuilder::Show
-    debugger
     if @op.success?
       render json: {success: true, data: @op['model.index']}
     else
