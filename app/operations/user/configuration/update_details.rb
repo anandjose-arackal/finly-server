@@ -24,7 +24,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def process
-    user = UserProfile.find_by(employee_id: update_params[:employee_id])&.user if params[:employee_id].present? 
+    user = UserProfile.find_by(user_id: params[:user_id])&.user if ( params[:user_id].present? )
     messages[:error] << 'User not found with the given Employee ID' if user.blank?
     messages[:error] = user.errors.full_messages unless user.update_attributes!(update_params)
   end
@@ -40,8 +40,8 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def details_params
-    if params[:employee_id].present? 
-      params.permit(:first_name, :last_name, :mobile_number, :mothers_maiden_name,
+    if params[:user_id].present? 
+      params.permit(:user_id, :first_name, :last_name, :mobile_number, :mothers_maiden_name,
                   :department_id, :active, :location_id, :profile_attributes, :gender, :date_of_birth,
                   :employee_id, :payroll_id,:address_1, :address_2, :city, :state_id, :pin_code,)
     else

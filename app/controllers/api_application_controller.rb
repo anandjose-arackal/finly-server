@@ -1,6 +1,6 @@
 class ApiApplicationController < BaseControllers::ApiBase
 
-  # before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) if Rails.env.production? }
+  before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) if Rails.env.production? }
 
   before_action :validate_user_admin
   before_action :append_params
