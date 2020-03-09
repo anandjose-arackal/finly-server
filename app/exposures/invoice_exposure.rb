@@ -3,6 +3,7 @@ class InvoiceExposure < Exposures::API
   attribute :id, record_attribute: true
   attribute :procurement_id, record_attribute: true
   attribute :invoice_id, record_attribute: true
+  attribute :invoice_type, record_attribute: true, exposure: true
   attribute :company, record_attribute: true, exposure: true, includes: [:company]
   attribute :vendor_location, record_attribute: :gstin_location, exposure: true, includes: [:gstin_location]
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
