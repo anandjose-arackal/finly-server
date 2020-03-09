@@ -4038,6 +4038,11 @@ Rails.application.routes.draw do
 
 
   get 'accounting_exports', to: 'accounting_exports#index'
+
+  get 'maps/auto_complete', to: 'maps#auto_complete'
+  get 'maps/places/:id/details', to: 'maps#details'
+  get 'maps/places/recent', to: 'maps#recent_places'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.
