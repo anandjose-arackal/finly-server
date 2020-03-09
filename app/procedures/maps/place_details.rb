@@ -45,7 +45,6 @@ class Maps::PlaceDetails < Transactions::API
   def save_recent(context, model:, params:, current_user:, **)
     return true if current_user.map_location_user_queries.reorder(created_at: :desc).limit(5).pluck(:place_id).include?(model.place_id)
 
-
     current_user.map_location_user_queries.create place_id: model.place_id, map_location_detail: model, name: model.name, address: model.address
   end
 
