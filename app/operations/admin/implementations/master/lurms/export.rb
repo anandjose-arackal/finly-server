@@ -73,7 +73,7 @@ class Admin::Implementations::Master::Lurms::Export < Admin::Implementations::Pr
   end
 
   def user_id(lurm)
-    identifier = lurm.reviewer&.profile&.employee_id
+    identifier = lurm.user&.profile&.employee_id
     return identifier if identifier.present?
     lurm.user&.email&.present? ? lurm.user&.email : lurm.user&.mobile_number
   end

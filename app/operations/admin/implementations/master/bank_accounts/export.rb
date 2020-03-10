@@ -9,6 +9,7 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
       :user_id => "User Email / Mobile NUmber",
       :account_number => "Account Number",
       :ifsc => "IFSC",
+      :default_account => "Default Account (Y)",
       :destroy => "Destroy"
   })
 
@@ -40,6 +41,10 @@ class Admin::Implementations::Master::BankAccounts::Export < Admin::Implementati
 
   def ifsc(bank_account)
     bank_account.ifsc
+  end
+
+  def default_account(bank_account)
+    (bank_account.default_account? ? 'Y' : '')
   end
 
   def destroy(bank_account)

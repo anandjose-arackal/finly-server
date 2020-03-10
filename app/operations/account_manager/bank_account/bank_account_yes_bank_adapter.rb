@@ -28,12 +28,15 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type] || payment.payment_mode
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
-    bank_transaction = payment.reference_resource
+    # in the case of yes bank since the same unique ID can be reused,
+    # we will not be creating any new bank transactions
+    bank_transaction = payment.reference_resources.first
 
-
+    # if the payment is either completed, processing or a possible failure, it cannot be processed
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
+    # if the payment has failed, or is in open state, it can be processed with the already generated unique request number
     elsif bank_transaction&.retriable? || bank_transaction&.open?
       reference_number = bank_transaction.unique_request_number
     else
@@ -43,45 +46,81 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
-    # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && payment.in_progress?
-      bank_transaction = create_bank_transaction(payment, transfer_request)
-    elsif payment.in_progress?
-      bank_transaction = payment.reference_resource
-    end
-
-
-    unless bank_transaction
-      payment.system_messages.build(
-                                 content: "Payment cannot be processed at this time",
-                                 system_message_type_id: SystemMessageType.id_for(:error).save
-      )
+    # Check for two bank transactions is not an issue here because YesBank supports retries with the same reference number
+    # However, as a result we need to add a check to ensure that there is only one bank transaction against it
+    op = PaymentProcessorRules::Event.(:yes_bank_payments_cannot_have_multiple_unique_ids, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
       return false
     end
 
+    # here we are making sure that all transactions against this payment have failed if it's a retry
+    # we are doing this step before creating the new bank transaction - so that the newly created one doesn't cause problems
+    op = PaymentProcessorRules::Event.(:ensure_all_previous_transactions_have_failed_before_allowing_retry, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
+    # checking to ensure that two bank transactions cannot be retried in quick succession - minimum time pf 10 minutes required before each retry
+    op = PaymentProcessorRules::Event.(:ensure_successive_payments_are_not_initiated_within_short_timeframe, {payment: payment, options: options})
+    unless op.success?
+      self.errors << op.message
+      return
+    end
+
+
+    # If the payment doesn't already have a bank transaction, create one before the API call is initiated
+    if bank_transaction.blank? && payment.in_progress?
+      bank_transaction = create_bank_transaction(payment, transfer_request)
+    elsif payment.in_progress?
+      bank_transaction = payment.reference_resources.first
+    end
+
+
+    # ensure that a new bank transction is created inside the payments adapter
+    # the below case will be reached only if the particular bank transction is not
+    # created inside this adapter. Also logging the errors for this particular state
+    op = PaymentProcessorRules::Event.(:bank_transaction_must_exist_before_calling_bank_apis, {payment: payment, options: options, bank_transaction: bank_transaction})
+    unless op.success?
+      self.errors << op.message
+      return false
+    end
+
+    # unless bank_transaction.present?
+    #   payment.system_messages.build(
+    #                              content: "Payment cannot be processed at this time - #{bank_transaction.errors.full_messages.to_sentence}",
+    #                              system_message_type_id: SystemMessageType.id_for(:error).save
+    #   )
+    #   return false
+    # end
+
     op = YesBankApi::Transfer::BankTransfer.({
         transfer_request: transfer_request,
-        payment: payment
+        payment: payment,
+        bank_transaction: bank_transaction
     })
 
-    bank_transaction = op.bank_transaction
-    transfer_request = op.transfer_request
-    # setting the values of the bank transaction here instead of inside the API Handler
-    # create the bank transaction right here
-    if payment&.reference_resource&.is_a?(YesBankTransaction) || bank_transaction.present?
-      # just update the bank transaction with the latest details
-      bank_transaction = bank_transaction || payment.reference_resource
-      bank_transaction.update(
-          bank_reference_number: transfer_request.bank_reference_number,
-          transfer_status_id: op.transfer_status_id,
-          bank_response: transfer_request.transaction_result,
-          beneficiary_full_name: transfer_request.beneficiary_full_name
-      )
-      payment&.update(retry_count: payment.retry_count.to_f + 1)
-    else
-      # this is an anomaly, so send email and flag it
-      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
-    end
+    # bank_transaction = op.bank_transaction
+    # transfer_request = op.transfer_request
+    #
+    #
+    # # setting the values of the bank transaction here instead of inside the API Handler
+    # # create the bank transaction right here
+    # if payment&.reference_resource&.is_a?(YesBankTransaction) || bank_transaction.present?
+    #   # just update the bank transaction with the latest details
+    #   bank_transaction = bank_transaction || payment.reference_resource
+    #   bank_transaction.update(
+    #       bank_reference_number: transfer_request.bank_reference_number,
+    #       transfer_status_id: op.transfer_status_id,
+    #       bank_response: transfer_request.transaction_result,
+    #       beneficiary_full_name: transfer_request.beneficiary_full_name
+    #   )
+    #   payment&.update(retry_count: payment.retry_count.to_f + 1)
+    # else
+    #   # this is an anomaly, so send email and flag it
+    #   Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+    # end
 
 
     if op.success?
@@ -179,7 +218,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
@@ -190,14 +229,24 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
-    payment.with_lock do
-      if payment.reference_resource.present?
-        return false
-      end
-      unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
-    end
+
+     # now updating the bank transaction and associating it with the payment according to new
+     # structure
+     unless bank_transaction.update(reference_payment_id: payment.id)
+       Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
+     end
+
+     # additionally also update the payment reference_resource_type to YesBankTransaction
+    payment.update(reference_resource_type: bank_transaction.class.name)
+
+    # payment.with_lock do
+    #   if payment.reference_resource.present?
+    #     return false
+    #   end
+    #   unless payment.update(reference_resource: bank_transaction)
+    #     Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+    #   end
+    # end
     bank_transaction
   end
 

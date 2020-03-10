@@ -176,7 +176,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     validate_association
 
     # docon does not new items to be added in a po if created from pr
-    if [203, 2].include?(self.purchase_order.company_id) && (self.purchase_order.items.pluck(:purchase_request_item_id).present?)
+    if [203, 2].include?(self.purchase_order.company_id) && (self.purchase_order.items.pluck(:purchase_request_item_id).compact.present?)
       if purchase_order_params[:items_attributes].pluck(:id, :_destroy).any? {|id, des| (id == "" || id == nil) && !!StringUtils.to_bool(des) == false}
         add_message :error, "New items cannot be added if this PO was created from PR."
         return

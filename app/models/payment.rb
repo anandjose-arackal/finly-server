@@ -52,6 +52,9 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
+#  reference_payment_id           :integer
+#  last_retried_at                :datetime
+#  utr                            :string(255)
 #
 
 class Payment < ApplicationRecord
@@ -86,6 +89,8 @@ class Payment < ApplicationRecord
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
 
@@ -366,8 +371,9 @@ class Payment < ApplicationRecord
   }
 
   scope :virtual_account_transaction_purpose, -> (purpose_id) {
-    virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
-    virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
+    virtual_account_transactions = VirtualAccountTransaction.where(reference_payment_id: self.pluck(:id))
+    # virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
+    # virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
     virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:virtual_account_id))
     case purpose_id
       when 1, '1'
@@ -386,7 +392,9 @@ class Payment < ApplicationRecord
         virtual_account_ids = []
     end
     virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
-    where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+    # because virtual account transactions are linked to the payment now via the foreign key, not the orher way around
+    where(id: virtual_account_transactions.pluck(:reference_payment_id))
+    # where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
   }
 
   scope :with_budgetable_category_ids, -> (category_ids) {
@@ -422,7 +430,7 @@ class Payment < ApplicationRecord
   }
 
   scope :include_for_index, -> {
-        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:initiating_user, :receiving_user,
                   :receiving_account,
                   invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
@@ -430,11 +438,11 @@ class Payment < ApplicationRecord
   }
 
   scope :include_minimal_for_index, -> {
-    includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
+    includes(:payment_status, :amount, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_for_streamsets, -> {
-        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+        includes( :payment_status, :amount, :department, :category,:initiating_account,:initiating_user, :receiving_user,
                   receiving_account: [:account_owner],
                   invoice: [:category, :cost_center, :invoice_status, :invoice_type],
                   payment_order: [bank_payment_request: [:status]])
@@ -687,6 +695,30 @@ class Payment < ApplicationRecord
     mode || super
   end
 
+  # adding this association to extract the related
+  # reference resources for this particular payment
+  def reference_resources
+    return [] if reference_resource_type.blank?
+    return reference_resource_type.constantize.where(reference_payment_id: self.id).reorder(created_at: :desc)
+  end
+
+  # since only one virtual account transaction can correspond to a single payment
+  # can change in the future, but unlikely
+  def virtual_account_transaction
+    return nil unless self.reference_resources.first.is_a?(VirtualAccountTransaction)
+    self.reference_resources.first
+  end
+
+  def bbps_bank_transaction
+    return nil unless self.reference_resources.first.is_a?(BbpsYesBankTransaction)
+    self.reference_resources.first
+  end
+
+  def utr
+    return super unless super.blank?
+    return self.reference_resources.first&.try(:utr) || self.reference_resource&.utr
+  end
+
   private
 
   def recalculate_order_summary
@@ -812,6 +844,8 @@ class Payment < ApplicationRecord
 
         if total_payments < invoice_amount
           parent_details.update payable: true
+        else
+          parent_details.update payable: false
         end
       end
     end
