@@ -144,6 +144,25 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     if payment.parent_type == 'PurchaseOrder'
       self.payment_params.delete(:invoice_attributes)
     end
+
+    # if tax invoice po has advance amount, prevent modification of invoice tds slab
+    if payment.parent_type == 'Invoice'
+      procurement = payment.parent.procurement
+      purchase_order = payment.parent.procurement.purchase_order
+      if procurement.po_revisions.present?
+        po_revision = procurement.po_revisions.last
+        if po_revision.present?
+          purchase_order = po_revision
+        end
+      end
+
+      if self.payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
+        if purchase_order.advance_tds_slab_id.present? && (self.payment_params.dig(:invoice_attributes, :tds_slab_id).to_i != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
+          add_message :error, "TDS slab selected for invoice has to match with the TDS slab for PO advance  - #{purchase_order.advance_tds_slab&.name}"
+          return
+        end
+      end
+    end
   end
 
   def process
