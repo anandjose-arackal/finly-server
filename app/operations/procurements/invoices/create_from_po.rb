@@ -108,7 +108,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       return nil
     end
 
-    self.advance = self.purchase_order.advance_amount
+    self.advance = self.purchase_order.requested_advance_amount
 
     receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
 
@@ -176,13 +176,16 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       gstin_location_id: self.purchase_order.gstin_location_id,
       cost_allocation_items: self.purchase_order.cost_allocation_items,
       po_number: self.purchase_order.po_number,
-      discount_type_id: self.purchase_order.discount_type_id
+      discount_type_id: self.purchase_order.discount_type_id,
+      tds_slab_id: self.purchase_order.advance_tds_slab_id
     }
 
     if self.advance.present?
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
         invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+        # invoice_params[:advance_amount_required] = true
+        invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
     end
 
     return invoice_params
