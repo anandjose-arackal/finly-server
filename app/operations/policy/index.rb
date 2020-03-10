@@ -15,7 +15,7 @@ class Policy::Index < Policy::Base
 
   def process
     if admin_view? || auditor_view?
-      if user.company_admin? || user.auditor?
+      if user.company_admin? || user.auditor? || user.vendor_payments_admin?
         if user&.enforce_policy_enabled?
           ids = []
         else
