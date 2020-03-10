@@ -24,7 +24,7 @@ class User::Configuration::UpdateDetails < BaseOperation
   end
 
   def process
-    user = UserProfile.find_by(user_id: params[:user_id])&.user if ( params[:user_id].present? )
+    user = User::Show.(current_user, params)&.selected_user
     messages[:error] << 'User not found with the given Employee ID' if user.blank?
     messages[:error] = user.errors.full_messages unless user.update_attributes!(update_params)
   end
