@@ -39,7 +39,7 @@ class InvoiceCalculationUtils
         if self.invoice.procurement.po_revisions.present?
           po_revision = self.invoice.procurement.po_revisions.last
           if po_revision.present?
-            purchase_order = self.po_revision
+            purchase_order = po_revision
           end
         end
         if self.invoice.procurement.invoices.count < 2
