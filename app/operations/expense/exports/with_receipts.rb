@@ -20,11 +20,11 @@ class Expense::Exports::WithReceipts < Expense::Exports::Base
 
   def process
     self.files = []
-    headers = (default_column_names + cf_headers)
+    headers = (default_column_names + custom_field_column_names)
     contents = []
     # csv << column_names
     expenses.each do |expense|
-      contents << retrieve_data(preferences, expense.report, expense, self.cf_data)
+      contents << retrieve_data(preferences, expense.report, expense, custom_field_column_names)
       expense.receipts&.each do |receipt|
         self.files << {name: receipt.export_image_file_name, url: receipt.image.url}
       end

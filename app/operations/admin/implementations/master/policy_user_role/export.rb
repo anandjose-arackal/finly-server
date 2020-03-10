@@ -151,7 +151,7 @@ class Admin::Implementations::Master::PolicyUserRole::Export < Admin::Implementa
         row << policy.name
         row << user_email_mobile(user)
         user.policy_user_roles.where(purpose_id: 1)
-        user_role_names.map{ |user_role_name| row << (user_based_role_ids[user.id].include?(UserRole.id_for(user_role_name)) ? "Y" : "") }
+        user_role_names.map{ |user_role_name| row << (user_based_role_ids[user.id]&.include?(UserRole.id_for(user_role_name)) ? "Y" : "") }
         result << row
       end
     end
