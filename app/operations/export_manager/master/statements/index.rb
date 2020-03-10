@@ -21,7 +21,7 @@ class ExportManager::Master::Statements::Index < ExportManager::Builders::Spread
 
 
   def input
-    result = Statements::Show.(user, params)
+    result = ::Statements::Show.(user, params)
     unless result&.success?
       add_message :error, result.messages[:error]
       return
