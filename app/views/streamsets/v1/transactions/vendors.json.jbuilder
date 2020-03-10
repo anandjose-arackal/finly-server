@@ -5,16 +5,21 @@ json.result do
     json.trade_name vendor.trade_name
     json.pan vendor.pan
     json.gstin vendor.gstin_locations&.pluck(:gstin)
-    json.extract! vendor, :id, :name, :business_name, :description, :vendor_id
+    json.extract! vendor, :id, :name, :business_name, :description, :vendor_id, :email, :mobile_number
     json.vendor_id vendor&.vendor_id
-    json.vendor_type vendor.vendor_type.as_json
-    json.extract! vendor, :id, :name, :email, :mobile_number
+    json.vendor_type vendor.vendor_type&.as_json
+    json.vendor_disabled vendor.deactivated?
 
     json.status vendor.status.as_json
 
     json.description vendor.description
     json.created_by vendor.created_by&.name
     json.created_at vendor.created_at.strftime "%d %b %y"
+    json.updated_at vendor.updated_at.strftime "%d %b %y"
+    json.vendor_creator vendor.created_by&.json_for_trail({:vendor_show => true})
+
+    json.tds_rates vendor.tds_rates&.as_json
+    json.tds_available vendor.tds_rates.present?
 
     json.bank_accounts do
       json.array!(vendor.bank_accounts.map {|ba| ba if ba.deleted_at == nil}.compact) do |bank_account|
@@ -41,7 +46,7 @@ json.result do
             json.date_of_registration gstin_master&.date_of_registration
             json.gstin gstin_master&.gstin
             json.legal_name_of_business gstin_master&.legal_name_of_business
-            json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(@result.vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
+            json.match_percentile StringUtils.fuzzy_string_match(StringUtils.clear_generic_keywords(vendor.business_name), StringUtils.clear_generic_keywords(gstin_master&.legal_name_of_business))
             json.state gstin_master&.state
             json.status gstin_master&.status
             json.trade_name gstin_master&.trade_name

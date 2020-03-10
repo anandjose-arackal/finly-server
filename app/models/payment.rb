@@ -438,7 +438,7 @@ class Payment < ApplicationRecord
 
   scope :include_for_streamsets, -> {
         includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
+                  :receiving_account,
                   invoice: [:category, :cost_center, :invoice_status, :invoice_type],
                   payment_order: [bank_payment_request: [:status]])
   }

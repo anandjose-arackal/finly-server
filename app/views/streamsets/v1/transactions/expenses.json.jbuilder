@@ -37,6 +37,11 @@ json.result do
       json.balance expense.spent_from&.name
     end
 
+    json.bank_account do
+      # json.merge! expense.user.bank_accounts.where(default_account: true, disabled: false).non_deleted.first.as_json
+      json.merge! expense.user.bank_accounts.default_accounts.first.as_json
+    end
+
     json.distance do
       if expense.distance_expense?
         json.type expense.distance_expense&.type
