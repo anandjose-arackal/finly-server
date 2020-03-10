@@ -2,7 +2,7 @@ class IndexBuilder::StatusCount < Transactions::API
 
   step :find_builder
   step :verify_counter
-  step :resolve
+  pass :resolve
   step :count
 
   schema do
@@ -29,8 +29,7 @@ class IndexBuilder::StatusCount < Transactions::API
   end
 
   def resolve(context, builder:, params:, **)
-    Resolver::Transactions::Resolve.with(context, builder.resolver, paginate: false, filter: true, includes: builder)
-    true
+    builder.resolve(context)
   end
 
 
