@@ -24,6 +24,11 @@ class Maps::PlaceDetails < Transactions::API
     end
 
     parsed_result = result['response.parsed']&.dig('result') || {}
+
+    unless parsed_result['status'] == 'OK'
+      return on_error context, :base, "Invalid request"
+    end
+
     detail = MapLocationDetail.new(
         {
             result: result['response.parsed'],

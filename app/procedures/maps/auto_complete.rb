@@ -21,7 +21,12 @@ class Maps::AutoComplete < Transactions::API
     # Todo: Return the actual error message
     return on_error context, :base, "Error fetching data" unless result.success?
 
-    context[:model] = MapLocationSearch.new input: params[:input], result: result["response.parsed"]
+    parsed_result = result['response.parsed']&.dig('result') || {}
+    unless parsed_result['status'] == 'OK'
+      return on_error context, :base, "Invalid request"
+    end
+
+    context[:model] = MapLocationSearch.new input: params[:id], result: result["response.parsed"]
     unless context[:model].save
       return on_error context, :base, context['model'].errors.full_messages
     end
