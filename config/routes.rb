@@ -4042,7 +4042,7 @@ Rails.application.routes.draw do
   get 'maps/auto_complete', to: 'maps#auto_complete'
   get 'maps/places/:id/details', to: 'maps#details'
   get 'maps/places/recent', to: 'maps#recent_places'
-  get 'maps/way_points/distance_matrix', to: 'maps#recent_places'
+  post 'maps/distance_matrix', to: 'maps#distance_matrix'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
