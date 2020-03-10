@@ -18,7 +18,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations, :budgets, :gstin_locations, :variable_periodic_invoice, :bank_payment_request_policies
+                  :tax_rates, :locations, :budgets, :gstin_locations, :variable_periodic_invoice, :bank_payment_request_policies,
+                  :purchase_order
 
     def init
       self.invoice = params[:invoice]
@@ -80,6 +81,17 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           }
 
           self.reviewal_chains.push(chain)
+        end
+      end
+
+      if self.invoice.procurement.purchase_order.present?
+        procurement = self.invoice.procurement
+        self.purchase_order = procurement.purchase_order
+        if procurement.po_revisions.present?
+          po_revision = procurement.po_revisions.last
+          if po_revision.present?
+            self.purchase_order = po_revision
+          end
         end
       end
     end
