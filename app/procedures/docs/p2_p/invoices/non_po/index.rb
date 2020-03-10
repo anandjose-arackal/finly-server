@@ -1,7 +1,6 @@
-class Docs::P2P::Invoices::PoInvoicesIndex < IndexBuilder::API
+class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
 
-  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_eq": InwardInvoiceType.id_for(:tax_invoice)}}
-
+  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_eq": InwardInvoiceType.id_for(:non_po_invoice)}}
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
 
   # Fixed column is always default true
@@ -55,10 +54,6 @@ class Docs::P2P::Invoices::PoInvoicesIndex < IndexBuilder::API
 
   column :tds_slab, default: true, includes: [:tds_slab] do
     text "{{record.tds_slab.name}}"
-  end
-
-  column :po_number, default: true, includes: [{procurement: :purchase_order}] do
-    text :po_number
   end
 
   column :cost_center, default: true, includes: [:cost_center] do

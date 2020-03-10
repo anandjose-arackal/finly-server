@@ -1,6 +1,7 @@
-class Docs::P2P::Invoices::AgreementInvoicesIndex < IndexBuilder::API
+class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
 
-  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_eq": InwardInvoiceType.ids_for(:general_invoice, :rental_invoice, :recurring_invoice, :agreement_invoice)}}
+  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_eq": InwardInvoiceType.id_for(:tax_invoice)}}
+
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
 
   # Fixed column is always default true
@@ -20,10 +21,6 @@ class Docs::P2P::Invoices::AgreementInvoicesIndex < IndexBuilder::API
 
   column :invoice_id, default: true do
     badge :invoice_id, format: "success"
-  end
-
-  column :invoice_type, default: true do
-    badge value: "{{record.invoice_type.name}}", format: "success"
   end
 
   column :invoice_number, default: true do
@@ -58,6 +55,10 @@ class Docs::P2P::Invoices::AgreementInvoicesIndex < IndexBuilder::API
 
   column :tds_slab, default: true, includes: [:tds_slab] do
     text "{{record.tds_slab.name}}"
+  end
+
+  column :po_number, default: true, includes: [{procurement: :purchase_order}] do
+    text :po_number
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
