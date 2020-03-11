@@ -24,6 +24,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :invoice_status
     attribute :policy
     attribute :narration
+    attribute :invoice_amount
     attribute :advance_amount
     attribute :invoice_net_payable_amount
     attribute :approvers
@@ -374,5 +375,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
+  def invoice_amount(invoice_line_item)
+    invoice_line_item.parent.amount
+  end
 
 end
