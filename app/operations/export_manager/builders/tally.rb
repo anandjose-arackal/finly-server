@@ -1,7 +1,7 @@
 class ExportManager::Builders::Tally < ExportManager::API
   include MathUtil
 
-  type :spreadsheet
+  type :tally
 
   class_attr :tally_config_key
 
