@@ -28,3 +28,9 @@ json.results do
     end
   end
 end
+
+count = 0
+count = @result.general_invoices.count if @result.general_invoices.present?
+count = @result.rental_invoices.count if @result.rental_invoices.present?
+
+json.count count
