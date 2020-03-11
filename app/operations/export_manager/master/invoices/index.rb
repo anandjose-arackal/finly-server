@@ -376,7 +376,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def invoice_amount(invoice_line_item)
-    invoice_line_item.parent.amount
+    invoice_line_item.parent.amount&.value&.to_f ||0
   end
 
 end
