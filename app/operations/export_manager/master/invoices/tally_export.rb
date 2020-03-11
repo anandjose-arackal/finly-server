@@ -1,6 +1,6 @@
 class ExportManager::Master::Invoices::TallyExport < ExportManager::Builders::Tally
 
-  label 'Tally Export - 2'
+  label 'Tally Export'
   description 'Invoices Export'
   handle :tally_invoices
   screen 'invoices.index'

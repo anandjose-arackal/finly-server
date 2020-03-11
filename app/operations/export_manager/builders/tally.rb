@@ -7,6 +7,18 @@ class ExportManager::Builders::Tally < ExportManager::API
 
   configurable false
 
+  validate :filter_ids_present?
+
+  def self.accept?(user, params)
+    user.company.tally_configuration&.invoice_voucher_enabled || false
+  end
+
+  def filter_ids_present?
+    unless params[:filter_ids].present?
+      add_message :error, 'Please select the invoices that you would like to export'
+    end
+  end
+
   def configuration
     raise "tally_config_key not defined for #{self.class.name}" unless self.class.tally_config_key.present?
     return {} unless user&.company&.tally_configuration.present?
@@ -15,7 +27,7 @@ class ExportManager::Builders::Tally < ExportManager::API
   end
 
   def company_name
-    configuration&dig(:company_name)
+    configuration&.dig(:company_name)
   end
 
   def generator
@@ -23,15 +35,20 @@ class ExportManager::Builders::Tally < ExportManager::API
   end
 
   def generate
+
+    index = 1
     data.find_each do |record|
       record = record.to_liquid
       voucher = generate_voucher(generator, record)
       add_ledgers(voucher, record)
+
+      progress_update(index)
+      index += 1
     end
 
     file_data = generator.as_xml
     file = Paperclip::Tempfile.new(['export', '.xml'])
-    open(file.path, 'wb') {|f| f.write file_data}
+    open(file.path, 'wb') { |f| f.write file_data }
 
     if file
       save_attachment file
