@@ -2,6 +2,7 @@ class IndexBuilder::Show < Transactions::API
 
   step :find_builder
   step :resolve
+  step :sanitize_columns
   step :include_associations
   step :load_config
 
@@ -25,6 +26,12 @@ class IndexBuilder::Show < Transactions::API
     builder.resolve(context)
 
     true
+  end
+
+  def sanitize_columns(context, params:, **)
+    if params[:columns].present? and not params[:columns].respond_to?(:each)
+      params[:columns] = params[:columns].split(",")
+    end
   end
 
   def include_associations(context, builder:, params:, **)
