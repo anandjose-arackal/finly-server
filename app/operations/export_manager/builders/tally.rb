@@ -15,7 +15,7 @@ class ExportManager::Builders::Tally < ExportManager::API
   end
 
   def company_name
-    configuration[:company_name]
+    configuration&dig(:company_name)
   end
 
   def generator
