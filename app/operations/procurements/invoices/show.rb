@@ -24,7 +24,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     def init
       self.invoice = params[:invoice]
 
-      unless InwardInvoiceStatus.status_ids_for_owner.include?(invoice.invoice_status_id)
+      if InwardInvoiceStatus.status_ids_for_owner.include?(invoice.invoice_status_id)
         case get_invoice_provider_name
           when 'PoInvoiceProvider'
             params[:filter_role_id] = [UserRole.id_for(:po_invoice_initiator)]
