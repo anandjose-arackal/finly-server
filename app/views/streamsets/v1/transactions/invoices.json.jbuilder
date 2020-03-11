@@ -31,6 +31,7 @@ json.result do
     json.gst_group invoice_line_item&.tax_rate&.name
     json.hsn_sac invoice_line_item.hsn_sac
     json.cost_center invoice_line_item.cost_center&.name
+    json.cost_center_code invoice_line_item.cost_center&.cost_center_code
     json.item_code invoice_line_item.inventory_line_item&.item_code
     json.description invoice_line_item.description
     json.unit_of_measurement invoice_line_item.unit_of_measurement
