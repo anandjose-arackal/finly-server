@@ -17,7 +17,7 @@ class InvoiceExposure < Exposures::API
   attribute :narration, record_attribute: true
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
-  attribute :created_by, record_attribute: true
+  attribute :created_by, record_attribute: true, exposure: true
   attribute :net_amount, exposure: true, includes: [:net_amount] do
     record.net_amount
   end
@@ -43,7 +43,6 @@ class InvoiceExposure < Exposures::API
   attribute :po_number, includes: [{procurement: :purchase_order}] do
     record&.procurement&.purchase_order&.po_number
   end
-  attribute :invoice_date, record_attribute: true
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id

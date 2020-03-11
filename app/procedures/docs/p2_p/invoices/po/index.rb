@@ -19,7 +19,7 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     date value: :created_at
   end
 
-  column :invoice_id, default: true do
+  column :invoice_id, label: "Invoice ID", default: true do
     badge :invoice_id, format: "success"
   end
 
@@ -28,7 +28,7 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
   end
 
   column :invoice_date, default: true do
-    date :invoice_date
+    date :date
   end
 
   column :due_date, default: true do
