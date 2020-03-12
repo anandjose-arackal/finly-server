@@ -20,15 +20,15 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
   end
 
   column :invoice_id, label: "Invoice ID", default: true do
-    badge :invoice_id, format: "success"
+    badge value: :invoice_id, format: "success"
   end
 
   column :invoice_number, default: true do
-    text :invoice_number
+    text value: :invoice_number
   end
 
   column :invoice_date, default: true do
-    date :date
+    date value: :date
   end
 
   column :due_date, default: true do
@@ -54,35 +54,35 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
   end
 
   column :tds_slab, default: true, includes: [:tds_slab] do
-    text "{{record.tds_slab.name}}"
+    text value: "{{record.tds_slab.name}}"
   end
 
   column :po_number, default: true, includes: [{procurement: :purchase_order}] do
-    text :po_number
+    text value: :po_number
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
-    text "{{record.cost_center.name}}"
+    text value: "{{record.cost_center.name}}"
   end
 
   column :department, default: true, includes: [:department] do
-    text "{{record.department.name}}"
+    text value: "{{record.department.name}}"
   end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
-    text "{{record.vendor_location.location}}"
+    text value: "{{record.vendor_location.location}}"
   end
 
   column :billing_location, default: false, includes: [:location] do
-    text "{{record.billing_location.name}}"
+    text value: "{{record.billing_location.name}}"
   end
 
   column :shipping_location, default: false, includes: [:delivery_location] do
-    text "{{record.shipping_location.name}}"
+    text value: "{{record.shipping_location.name}}"
   end
 
   column :approved_at, default: true do
-    date :approved_at
+    date value: :approved_at
   end
 
   counter -> (collection) do
