@@ -2,7 +2,7 @@ class IndexBuilder::Show < Transactions::API
 
   step :find_builder
   step :resolve
-  step :sanitize_columns
+  pass :sanitize_columns
   step :include_associations
   step :load_config
 
