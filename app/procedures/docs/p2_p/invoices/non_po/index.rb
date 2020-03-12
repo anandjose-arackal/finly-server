@@ -27,7 +27,7 @@ class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
   end
 
   column :invoice_date, default: true do
-    date value: :invoice_date
+    date value: :date
   end
 
   column :due_date, default: true do

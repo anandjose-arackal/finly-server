@@ -1,6 +1,6 @@
 class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
 
-  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_eq": InwardInvoiceType.ids_for(:general_invoice, :rental_invoice, :recurring_invoice, :agreement_invoice)}}
+  resolver Docs::P2P::Invoices::Resolver, params: {q: {"invoice_type_id_in": InwardInvoiceType.ids_for(:general_invoice, :rental_invoice, :recurring_invoice, :agreement_invoice)}}
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
 
   # Fixed column is always default true
@@ -19,7 +19,7 @@ class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
   end
 
   column :invoice_id, default: true do
-    badge :invoice_id, format: "success"
+    badge value: :invoice_id, format: "success"
   end
 
   column :invoice_type, default: true do
@@ -27,11 +27,11 @@ class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
   end
 
   column :invoice_number, default: true do
-    text :invoice_number
+    text value: :invoice_number
   end
 
   column :invoice_date, default: true do
-    date :invoice_date
+    date value: :date
   end
 
   column :due_date, default: true do
@@ -57,31 +57,31 @@ class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
   end
 
   column :tds_slab, default: true, includes: [:tds_slab] do
-    text "{{record.tds_slab.name}}"
+    text value: "{{record.tds_slab.name}}"
   end
 
   column :cost_center, default: true, includes: [:cost_center] do
-    text "{{record.cost_center.name}}"
+    text value: "{{record.cost_center.name}}"
   end
 
   column :department, default: true, includes: [:department] do
-    text "{{record.department.name}}"
+    text value: "{{record.department.name}}"
   end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
-    text "{{record.vendor_location.location}}"
+    text value: "{{record.vendor_location.location}}"
   end
 
   column :billing_location, default: false, includes: [:location] do
-    text "{{record.billing_location.name}}"
+    text value: "{{record.billing_location.name}}"
   end
 
   column :shipping_location, default: false, includes: [:delivery_location] do
-    text "{{record.shipping_location.name}}"
+    text value: "{{record.shipping_location.name}}"
   end
 
   column :approved_at, default: true do
-    date :approved_at
+    date value: :approved_at
   end
 
   counter -> (collection) do

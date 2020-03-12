@@ -26,6 +26,10 @@ class IndexBuilder::ContentTypes::Base
   def initialize(params)
     self.params = params
 
+    if params.present? and not params.is_a?(Hash)
+      raise "Invalid field params #{params}"
+    end
+
     params.each_pair do |key, value|
       next if value.nil?
       send :"#{ key }=", value
