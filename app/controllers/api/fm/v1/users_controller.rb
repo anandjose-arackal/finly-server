@@ -32,9 +32,6 @@ class Api::Fm::V1::UsersController < ApiApplicationController
       when 'state', 'status'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'Status updated'
-      when 'details', 'details'
-        operation = User::Configuration::UpdateDetails.new(current_user, params)
-        success_message = 'Details updated'
       else
         # do nothing, ha!
     end
