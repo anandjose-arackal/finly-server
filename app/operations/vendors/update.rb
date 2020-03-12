@@ -248,6 +248,11 @@ class Vendors::Update < Vendors::Base
   end
 
   def post_process
+
+    if vendor.present?
+      vendor.trails.create action_user: user, action_id: TrailAction.id_for(:update), action_level: vendor.trails.last.action_level
+    end
+
     if self.vendor_changes[:bank_account_changed].present?
       Event::EVendors::Update.(user, {document: self.vendor, vendor_changes: self.vendor_changes})
     end
