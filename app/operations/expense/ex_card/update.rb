@@ -35,7 +35,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       end
       if params[:receipt_id]
         # If a new receipt is attached from existing receipts, remove the old receipt
-        self.old_receipt = expense.receipts.first if expense.receipts.present?
+        # self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
       # adding the associated card expense id for the card expense
