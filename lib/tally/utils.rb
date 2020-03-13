@@ -2,7 +2,7 @@ class Tally::Utils
 
 
   def self.to_date(date)
-    return nil if date.nil?
+    return nil if date.blank?
     # return date if date.class.name == String.name
     date = Date.parse date if date.class.name == String.name
 
@@ -18,7 +18,7 @@ class Tally::Utils
     to_bool((value && value < 0))
   end
 
-  def self.format(json, options={})
+  def self.format(json, options = {})
     json.inject({}) do |new_hash, (k, v)|
       if v.nil?
         new_hash[k] = ""
