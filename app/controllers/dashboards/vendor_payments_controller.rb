@@ -42,6 +42,14 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
     respond
   end
 
+  def agreement_invoices
+    params[:filter_inward_invoice_type] = 'agreement_invoice'
+    @result = Dashboard::VendorPayments::Invoices.(current_user, params)
+    respond
+  end
+
+
+
   def purchase_requests
     # to be built
     # now built

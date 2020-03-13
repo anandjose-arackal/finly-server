@@ -12,6 +12,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         purchase_orders: false,
         non_po_invoices: false,
         po_invoices: false,
+        agreement_invoices: false,
         budgets: false,
         po_advances: false,
         grns: false,
@@ -20,7 +21,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         approved_purchase_request_items: false
     }
 
-    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
+    reviewer_role_ids = UserRole.ids_for(:admin, :purchase_request_reviewer, :purchase_order_reviewer, :non_po_invoice_reviewer,:po_invoice_reviewer, :agreement_invoice_reviewer, :vendor_reviewer, :bank_payment_request_reviewer, :payment_agreement_reviewer)
 
     if user.vendor_payments_admin?
       request_types.keys.map {|key| request_types[key] = true }
@@ -29,6 +30,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         request_types[:purchase_orders] = false
         request_types[:po_invoices] = false
         request_types[:non_po_invoices] = false
+        request_types[:agreement_invoices] = false
         request_types[:grns] = false
       end
 
@@ -43,6 +45,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
       unless user.company.agreement_based_payment_system_enabled?
         request_types[:payment_agreements] = false
+        request_types[:agreement_invoices] = false
       end
     else
       if user.enforce_policy_enabled?
@@ -65,6 +68,8 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         when UserRole.id_for(:po_invoice_initiator)
           request_types[:po_invoices] = true
         when UserRole.id_for(:non_po_invoice_initiator)
+          request_types[:non_po_invoices] = true
+        when UserRole.id_for(:agreement_invoice_initiator)
           request_types[:non_po_invoices] = true
         when UserRole.id_for(:bank_payment_request_initiator)
           request_types[:payment_tickets] = true
