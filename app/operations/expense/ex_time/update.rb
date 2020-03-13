@@ -5,12 +5,12 @@ class Expense::ExTime::Update < Expense::ExTime::Base
 
   def personalizer
     {
-        pre_validate: {
-            before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
-        },
-        pre_process: {
-            before: Personalizer::Process.new([:expense, :time_update], :pre_process, self)
-        }
+      pre_validate: {
+        before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+      },
+      pre_process: {
+        before: Personalizer::Process.new([:expense, :time_update], :pre_process, self)
+      }
     }
   end
 
@@ -54,7 +54,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       end
       if params[:receipt_id].present?
         # If a new receipt is attached from existing receipts, remove the old receipt
-        self.old_receipt = expense.receipts.first if expense.receipts.present?
+        # self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end

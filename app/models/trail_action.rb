@@ -25,6 +25,7 @@ class TrailAction < ApplicationRecord
         :return_control,
         :credited,
         :settled,
+        :settle,
         :settlement_confirmed,
         :reimbursed,
         :reimbursement_confirmed,
