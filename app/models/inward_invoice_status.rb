@@ -82,6 +82,7 @@ class InwardInvoiceStatus < ApplicationRecord
         InwardInvoiceStatus.id_for(:unpaid),
         InwardInvoiceStatus.id_for(:partially_paid),
         InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:paid),
     ]
   end
 
