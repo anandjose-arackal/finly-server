@@ -60,14 +60,6 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     vendor_ids = budget_group_criterium.budgetable_vendors.pluck(:id)
     user_ids = budget_group_criterium.budgetable_users.pluck(:id)
 
-    # criterial_mapping = budget_group_criterium.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
-    # category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
-    # cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
-    # department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
-    # location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
-    # vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
-    # user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
-
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
     # adding PO as well as PO Item because both will be considered for the
@@ -87,19 +79,19 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   # here we calculate the various buckets
   def calculate_buckets!(options, calculate_buckets:, **)
 
-    if calculate_buckets
+    if calculate_buckets and not self.budget.active
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
       case amount_to_be_considered
       when :amount_after_tax
         po_item_amount_to_be_considered = "remaining_amount_after_tax_value"
         invoice_item_amount_to_be_considered = "billed_amount_after_tax_value"
-        paid_amount_to_be_considered = "paid_amount_before_tax_value"
-        payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
+        paid_amount_to_be_considered = "paid_amount_after_tax_value"
+        payment_processing_amount_to_be_considered = "payment_processing_amount_after_tax_value"
       when :amount_before_tax
         po_item_amount_to_be_considered = "remaining_amount_before_tax_value"
         invoice_item_amount_to_be_considered = "billed_amount_before_tax_value"
-        paid_amount_to_be_considered = "paid_amount_after_tax_value"
-        payment_processing_amount_to_be_considered = "payment_processing_amount_after_tax_value"
+        paid_amount_to_be_considered = "paid_amount_before_tax_value"
+        payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
       end
 
       # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
