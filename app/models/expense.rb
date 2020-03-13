@@ -602,12 +602,12 @@ class Expense < ApplicationRecord
       end
       if distance_expense&.distance.present?
         rate = distance_expense.vehicle_rate&.rate&.value # rescue nil
-        amount = rate.blank? ? 0 : (self.distance_expense&.distance&.value.to_f * rate)
+        amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
       end
     when ExpenseType.id_for(:time)
       rate = policy.time_expense_config.rate_value # rescue nil
-      amount = rate.blank? ? 0 : (self.time_expense&.time_object&.value.to_f * rate)
+      amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
       return amount
     when ExpenseType.id_for(:per_diem)
       per_diem = self.per_diem_expense.per_diem
@@ -1148,7 +1148,6 @@ class Expense < ApplicationRecord
         errors.add(:expense, "needs to have an associated distance expense")
       end
     when ExpenseType.time_expense_id
-
       if self.time_expense.blank?
         errors.add(:expense, "needs to have an associated time expense")
       end
@@ -1177,7 +1176,6 @@ class Expense < ApplicationRecord
         errors.add(:distance, "expense cannot be blank")
       end
     when ExpenseType.time_expense_id
-
       if self.time_expense.blank?
         errors.add(:time, "expense cannot be blank")
       end
