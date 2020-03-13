@@ -207,7 +207,7 @@ class Invoice < ApplicationRecord
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
-  delegate :payment?, :advance?, to: :invoice_type
+  delegate :payment?, :advance?, :tax_invoice?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
 
@@ -537,7 +537,10 @@ class Invoice < ApplicationRecord
 
   after_create :set_defaults
   after_save :budget_trail_entry
+  # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
+  after_save :handle_po_advance_budget_trails
   after_destroy :budget_trail_destroy
+
 
   template_merge :procurement_id
   template_config do
@@ -1343,6 +1346,36 @@ class Invoice < ApplicationRecord
   def rollback_agreement_invoice
     if self.agreement_item.present?
       self.agreement_item.update(is_payment_agreement_upcoming_invoice: true)
+    end
+  end
+
+
+  # in case this invoice is paid or partially paid and the procurement it belongs to has a PO advance that has been initiated
+  # we need to mark that amount in the "paid_amount" attribute of each of the trail items of this invoice
+  # This will only apply in case it's an invoice raised as part of a PO
+  def handle_po_advance_budget_trails
+    if self.tax_invoice? && (self.paid? || self.partially_paid?)
+      # po = self.procurement.purchase_order
+      # if po.payments.present?
+      #   paid_amount = po.payments.successful.joins(:amount).sum(:value)
+      #   payment_processing_amount = po.payments.payment_processing_bucket.joins(:amount).sum(:value)
+      #   paid_percent_before_tax = paid_amount / self.amount_before_tax
+      #   paid_percent_after_tax = paid_amount / self.amount_after_tax
+      #   processing_percent_before_tax = payment_processing_amount / self.amount_before_tax
+      #   processing_percent_after_tax = payment_processing_amount / self.amount_after_tax
+      #   sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * billed_amount_before_tax_value)
+      #                                           WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_before_tax)
+      #   sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * billed_amount_before_tax_value)
+      #                                         WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_before_tax)
+      #   sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * billed_amount_after_tax_value)
+      #                                           WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_after_tax)
+      #   sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * billed_amount_after_tax_value)
+      #                                        WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_after_tax)
+      # end
     end
   end
 

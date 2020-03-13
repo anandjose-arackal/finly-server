@@ -147,7 +147,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
       paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
 
-      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.joins(self.amount_to_be_considered).sum(:value)
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.joins(paid_amount_to_be_considered).sum(:value)
 
       # TODO - add money request items once they have been completely implemented
 
