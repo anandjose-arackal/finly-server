@@ -186,7 +186,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         else
           reviewer = nil
         end
-        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
+        mapping_exist = self.level.level_reviewer_mappings.non_deleted.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
         self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception) unless mapping_exist.present?
       else
         return  result false, 'Level Number and Name Cant be blank'

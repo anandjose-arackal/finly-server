@@ -97,4 +97,12 @@ class InwardInvoiceStatus < ApplicationRecord
     self.id == InwardInvoiceStatus.id_for(:voided)
   end
 
+  def self.status_ids_for_owner
+    [
+        PurchaseOrderStatus.id_for(:open),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:retracted)
+    ]
+  end
+
 end
