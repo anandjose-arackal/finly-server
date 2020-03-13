@@ -29,7 +29,16 @@ class IndexBuilder::API
 
   def self.resolve(context)
     # Todo support resolver[:params] to be a proc to execute dynamic filters
-    context["params"].deep_merge!(resolver[:params])
+    # context["params"].deep_merge!(resolver[:params])
+
+    # Get requests sends the "q" as a string since it is being sent in the URL. Handling the same
+    if context["params"]["q"].class.name == String.name
+      context["params"]["q"] = JSON.parse(context["params"]["q"])
+    end
+
+    if context["params"]&.dig("q", "g").class.name == String.name
+      context["params"]["q"]["g"] = JSON.parse(context["params"]["q"]["g"])
+    end
 
     Resolver::Transactions::Resolve.with(context, resolver[:klass], paginate: true, filter: true)
   end
