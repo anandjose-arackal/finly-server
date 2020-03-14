@@ -7,15 +7,15 @@ GIT
 
 GIT
   remote: git://github.com/sinatra/sinatra.git
-  revision: a4dd24add24f2dd0e7299b9e68e12038138294d3
+  revision: 0348d701adbd8c4450962790cf933151dddc225f
   branch: master
   specs:
-    rack-protection (2.0.8.1)
+    rack-protection (2.1.0)
       rack
-    sinatra (2.0.8.1)
+    sinatra (2.1.0)
       mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.8.1)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
       tilt (~> 2.0)
 
 GIT
@@ -834,7 +834,7 @@ DEPENDENCIES
   sidekiq (~> 5.2.3)
   sidekiq-logstash (~> 1.0.1)
   simpleconfig (~> 2.0.1)
-  sinatra (~> 2.0.5)!
+  sinatra (~> 2.1.0)!
   skylight (~> 3.1)
   slack-notifier (~> 2.3)
   sneakers (~> 2.12)
