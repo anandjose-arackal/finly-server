@@ -59,6 +59,8 @@ class InvoiceLineItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  delegate :goods?, :service?, to: :inventory_line_item
+
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
@@ -190,6 +192,10 @@ class InvoiceLineItem < ApplicationRecord
     end
   end
 
+  def tds_amount
+    service? ? calculate_tds(self.billable_amount&.value.to_f) : calculate_tds(self.taxable_amount&.value.to_f)
+  end
+
   private
 
   def budget_trail_entry
@@ -207,4 +213,16 @@ class InvoiceLineItem < ApplicationRecord
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
   end
+
+  def tds_percentage
+    return 0.0 unless tds_applicable?
+    self.parent.tds_slab&.tds || 0.0
+  end
+
+  def calculate_tds(amount)
+    new_gross_amount = TaxCalculationUtils.tds_amount(amount, tds_percentage)
+    tds_amount = (amount - new_gross_amount) rescue 0
+    tds_amount.ceil
+  end
+
 end
