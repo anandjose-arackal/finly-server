@@ -147,6 +147,8 @@ class Card::Transaction::Create < BaseOperation
               payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, transaction.transaction_amount_value, reference_resource: self.transaction))
               op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
               if op.success?
+                # i.e. if successful, associate this transaction with the payment
+                transaction.update(reference_payment_id: op.payments.first&.id)
                 return true
               else
                 add_message :error, "Could not add credited amount to cash on hand"
@@ -195,6 +197,7 @@ class Card::Transaction::Create < BaseOperation
               op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
 
               if op.success?
+                transaction.update(reference_payment_id: op.payments.first&.id)
                 return true
               else
                 add_message :error, op.messages[:error]

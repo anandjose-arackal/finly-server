@@ -24,6 +24,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :invoice_status
     attribute :policy
     attribute :narration
+    attribute :invoice_amount
     attribute :advance_amount
     attribute :invoice_net_payable_amount
     attribute :approvers
@@ -253,7 +254,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def total_amount(invoice_line_item)
-    invoice_line_item.amount&.value
+    (invoice_line_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)) ? invoice_line_item.billable_amount&.value : invoice_line_item.amount&.value
   end
 
   def tax_amount(invoice_line_item)
@@ -374,5 +375,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
+  def invoice_amount(invoice_line_item)
+    parent_invoice  = invoice_line_item.parent
+    ((parent_invoice&.balance_due&.value || 0 ) + (parent_invoice&.po_adjusted_advance&.value || 0) || 0)
+  end
 
 end

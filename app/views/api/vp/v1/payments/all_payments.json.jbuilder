@@ -12,7 +12,7 @@ json.array!(@result.paginated_payments.include_for_index) do |payment|
   json.status payment.payment_status_name&.downcase
   json.amount payment.amount_value
   json.initiated_by payment.initiating_user&.name
-  json.utr payment.reference_resource&.bank_reference_number
+  json.utr payment.utr
   json.bank_payment_request_id payment.payment_order.bank_payment_request.id
   json.payment_order_id payment.payment_order.bank_payment_request.id
   json.api_initiated payment.api_initiated
@@ -26,7 +26,7 @@ json.array!(@result.paginated_payments.include_for_index) do |payment|
     end
   end
   json.invoice_date payment.invoice&.date
-  json.credited_date payment.reference_resource&.created_at&.strftime("%Y-%m-%d")
+  json.credited_date payment.reference_resources.first&.created_at&.strftime("%Y-%m-%d")
   json.invoice do
     invoice = payment.invoice
     json.tds invoice&.tds_amount&.value

@@ -47,7 +47,9 @@ class Settlement::SMoneyRequests::Unapproved < MoneyRequests::Base
       op = AccountManager::Payments::PaymentProcessor.(self.money_request.user, payment_request: payment_request)
       if op.success?
         payment = op.payment_order.payments.first
-        payment.update(reference_resource: self.money_request)
+        # setting the reference payment of the money request as the payment in question
+        self.money_request.update(reference_payment_id: payment.id)
+        # payment.update(reference_resource: self.money_request)
       end
     end
     ######### end of cash on hand addition ########

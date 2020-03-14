@@ -232,6 +232,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         return
       end
 
+      if reports.pluck(:report_processor_group_mapping_id).compact.present?
+        ids = reports.where.not(report_processor_group_mapping_id: nil).pluck(:id).join(", ")
+        add_message :error, "Reports with ID #{ids} already linked to a batch"
+        return
+      end
+
       if has_amounts?
         total += config&.dig(:amount, :value)&.to_d || 0
         currency_id = config&.dig(:amount, :currency_id)

@@ -86,6 +86,8 @@ class Report < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  belongs_to :reference_payment, class_name: "Payment", optional: true
+
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, optional: true, class_name: 'Amount'
   accepts_nested_attributes_for :submitted_amount

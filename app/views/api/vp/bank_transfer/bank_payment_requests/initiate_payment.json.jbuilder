@@ -34,6 +34,6 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.payment_mode payment.payment_mode
-    json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.bank_reference_number payment.utr
   end
 end
