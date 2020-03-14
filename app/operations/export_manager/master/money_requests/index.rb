@@ -8,7 +8,7 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
   handle :money_requests
   validate :input
 
-  attribute :money_request_id
+  attribute :finly_ref_no
   attribute :money_request_name
   attribute :money_request_user
   attribute :money_request_status
@@ -70,7 +70,7 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
     result.money_requests.include_details
   end
 
-  def money_request_id(money_request)
+  def finly_ref_no(money_request)
     money_request.id
   end
 

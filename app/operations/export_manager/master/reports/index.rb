@@ -8,7 +8,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   handle :reports
   validate :input
 
-  attribute :report_id
+  attribute :finly_ref_no
   attribute :report_name
   attribute :report_status_name
   attribute :report_creator
@@ -98,7 +98,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
     Expense.where(report_id: reports.pluck(:id)).include_details
   end
 
-  def report_id(expense)
+  def finly_ref_no(expense)
     expense.report.id
   end
 
