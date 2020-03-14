@@ -1183,16 +1183,16 @@ class Payment < ApplicationRecord
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
 
-        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * billed_amount_before_tax_value)
+        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value - tds_value))
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * billed_amount_before_tax_value)
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * (billed_amount_before_tax_value - tds_value))
                                               WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * billed_amount_after_tax_value)
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value - tds_value))
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
-        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * billed_amount_after_tax_value)
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value - tds_value))
                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
       when "PurchaseOrder"

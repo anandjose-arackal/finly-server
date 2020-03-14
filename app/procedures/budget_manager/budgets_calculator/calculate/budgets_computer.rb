@@ -79,7 +79,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   # here we calculate the various buckets
   def calculate_buckets!(options, calculate_buckets:, **)
 
-    if calculate_buckets and not self.budget.active
+    if calculate_buckets and self.budget.active
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
       case amount_to_be_considered
       when :amount_after_tax
