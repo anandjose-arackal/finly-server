@@ -39,9 +39,17 @@ json.result do
       if payment.money_requests.present?
         json.array!(payment.money_requests) do |money_request|
           json.extract! money_request, :id, :name, :bank_reference_number, :source_account
-          json.user money_request.user&.as_json
+          json.user money_request.user&.json_for_trail({:vendor_show => true})
+          json.status money_request.status&.name&.humanize
+          json.created_at money_request.created_at&.strftime("%Y-%m-%d %H:%M:%S")
           json.submitted_at money_request.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
+          json.finance_approved_date money_request.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
+          json.required_by_date money_request.required_by_date&.strftime("%Y-%m-%d %H:%M:%S")
           json.processed_amount money_request.processed_amount&.value
+          json.narration money_request.memo
+          json.bank_account do
+            json.merge! money_request.user.bank_accounts.default_accounts.first.as_json
+          end
         end
       end
     end
