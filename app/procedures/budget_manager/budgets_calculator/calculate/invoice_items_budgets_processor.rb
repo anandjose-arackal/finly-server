@@ -15,19 +15,6 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       return
     end
 
-    # # additionally check if this invoice is part of a procurement and if it is, the procurement shouldn't already exist
-    # procurement_id = invoice_item.parent.procurement_id
-    # procurement = invoice_item.parent.procurement
-    # if procurement.purchase_order.present?
-    #   trail_by_procurement = BudgetTrail.find_by(procurement_id: procurement_id)
-    #   trail_by_procurement = BudgetTrail.with_entity_type(["PurchaseOrderItem"]).with_entity_id(procurement.purchase_order.items.pluck(:id)).first if trail_by_procurement.blank?
-    #   # if this already exists, then it means that the budget has already been considered under a purchase order
-    #   if trail_by_procurement.present? && trail_by_procurement.entity_type == "PurchaseOrderItem"
-    #     return
-    #   end
-    # end
-    #
-
     # if this an invoice from a PO, a few things need to be sorted out first.
     # Firstly, the amount considered in the invoice item should reduce the proporionate amount consumed from the PO invoice item it is linked to
     # now based on whether it's a good ors service, we have to put the billed_amount_value attribute - which contains the amount we want to consider in the budget
@@ -48,7 +35,6 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       billed_amount_after_tax = invoice_item.after_tax_amount
       billed_amount_before_tax = invoice_item.before_tax_amount
     end
-
 
     if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
       billed = true
@@ -79,6 +65,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_amount_before_tax_value: billed_amount_before_tax,
         billed_amount_after_tax_value: billed_amount_after_tax,
         billed_quantity: invoice_item.quantity,
+        tds_value: invoice_item.parent.tds_per_item,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

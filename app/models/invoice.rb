@@ -1088,6 +1088,11 @@ class Invoice < ApplicationRecord
       return custom_fields_config
   end
 
+
+  def tds_per_item
+    self.tds_amount&.value.to_f
+  end
+
   private
 
   # def payment_agreement_updations

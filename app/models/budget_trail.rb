@@ -44,6 +44,7 @@
 #  reimbursable                               :boolean          default(FALSE)
 #  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
 #  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
+#  tds_value                                  :decimal(20, 10)  default(0.0)
 #
 
 class BudgetTrail < ApplicationRecord
@@ -151,11 +152,14 @@ class BudgetTrail < ApplicationRecord
 
   private
 
+  # here we are reducing the amounts against each line item to match the amount that has been invoices
+  # so that it doesn't consume the budget twice.
+  # Additionally, we also have to prorporionally reduce the TDS (if any) in the invoice and proportionally subtract it from the remaining amount of the PO
   def set_po_trail_attributes
     if self.po_trail_item_id.present?
       invoice_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.po_trail_item_id)
-      remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value)
-      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value)
+      remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value) - invoice_trails.sum(:tds_value)
+      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value) - invoice_trails.sum(:tds_value)
       remaining_quantity = po_trail_item&.entity&.quantity - invoice_trails.sum(:billed_quantity)
       po_trail_item.update_columns(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
     end
