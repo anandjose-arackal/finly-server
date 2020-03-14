@@ -157,6 +157,14 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
         remaining_amount = 0
       end
 
+      # TODO - once we combine both committed and penidng payment bucket the below code can be removed
+      # the below essentially takes care of an edge case that occurs when there is a PO advance against
+      # a procurement and we invoice an amount greater than the advance from a PO. It leads to negative committed amounts and some nasty shit
+      if committed_amount < 0
+        pending_payment_amount = pending_payment_amount + committed_amount
+        committed_amount = 0
+      end
+
       self.budget_consumption.assign_attributes(
                                  budget_amount_attributes: {
                                      id: self.budget_consumption.budget_amount_id,
