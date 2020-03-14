@@ -1090,7 +1090,7 @@ class Invoice < ApplicationRecord
 
 
   def tds_per_item
-    self.tds_amount&.value.to_f
+    self.tds_amount&.value.to_f / self.items.count
   end
 
   private
