@@ -100,7 +100,7 @@ class Reports::Index < Reports::Base
     # else
     #   self.reports = user.reports.sort_for_personal
     # end
-
+    # binding.pry
     case self.role_id
     when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
@@ -110,7 +110,11 @@ class Reports::Index < Reports::Base
         self.reports = Report.admin_associated_items(user).not_open
       end
     when UserRole.id_for(:manager)
-      self.reports = Report.reviewer_associated_items(user).not_open
+      if self.user.admin? 
+        self.reports = Report.admin_associated_items(user).not_open
+      else
+        self.reports = Report.reviewer_associated_items(user).not_open
+      end
     when UserRole.id_for(:finance_manager)
       self.reports = Report.finance_associated_items(user).not_open
     else

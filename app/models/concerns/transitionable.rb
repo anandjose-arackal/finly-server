@@ -591,7 +591,7 @@ module Transitionable
           with_reviewer_id(user.id).
           where(forwarded: false).
           where(viewable: true).
-          where(action_taken_by_id: nil).
+          where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
 
