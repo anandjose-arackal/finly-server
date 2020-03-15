@@ -1067,7 +1067,7 @@ class Invoice < ApplicationRecord
   end
 
   def amount_after_tax
-    self.net_amount&.value
+    self.net_amount&.value.to_f + self.tds_amount&.value.to_f
   end
 
   def invoice_payment_status
