@@ -33,7 +33,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
     generate_headers
     sl_no = 1
     data.find_each do |inv|
-      grn = invoice.procurement&.inward_documents&.first
+      grn = inv.procurement&.inward_documents&.first
       inv.items.each do |item|
         line_item_entries(inv, item, grn).map{|entry| rows << entry}
       end
