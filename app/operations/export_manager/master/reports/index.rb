@@ -80,7 +80,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
       action_date = dlrm&.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
       row.add("Action Name for Level #{level_number}", action)
       row.add("Action Taken By for Level #{level_number}", action_taker)
-      row.add("Action Date for Level #{level_number}", action_date)
+      row.add("Action Date for Level #{level_number} (dd/mm/yyyy)", action_date)
       row.add("Reviewer(s) for Level #{level_number}", reviewer_name)
     end
   end
