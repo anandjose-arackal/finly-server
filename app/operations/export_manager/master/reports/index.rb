@@ -72,7 +72,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def reviewal_chain(row, expense)
-    expense.report&.dlrms.group_by(&:level_number) do |level_number, dlrm|
+    expense.report&.dlrms.group_by(&:level_number).map do |level_number, dlrm|
       action_taker = dlrm.find {|d| d if f.action_taken_by_id.present?}
       action = action_taker&.action&.name&.humanize 
       action_date = action_taker&.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
