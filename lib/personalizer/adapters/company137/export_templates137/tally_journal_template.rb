@@ -31,12 +31,13 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
 
   def generate_rows
     generate_headers
-    sl_no = 1
+    sl_no = 0
     data.find_each do |inv|
       grn = inv.procurement&.inward_documents&.first
       inv.items.each do |item|
         line_item_entries(inv, item, grn).map{|entry| rows << entry}
       end
+      sl_no +=1
       progress_update sl_no
     end
   end
@@ -116,17 +117,17 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
 
   def get_order_number(invoice)
     order_number = ""
-    if invoice.invoice_type == 'non_po_invoice'
+    if invoice.invoice_type&.name == 'non_po_invoice'
       order_number = invoice.invoice_id
-    elsif invoice.invoice_type == 'tax_invoice'
+    elsif invoice.invoice_type&.name == 'tax_invoice'
       order_number = invoice&.procurement&.purchase_order&.purchase_order_number
     end
     order_number
   end
 
   def get_order_date(invoice)
-    if invoice.invoice_type == 'non_po_invoice'
-    elsif invoice.invoice_type == 'tax_invoice'
+    if invoice.invoice_type&.name == 'non_po_invoice'
+    elsif invoice.invoice_type&.name == 'tax_invoice'
       invoice.procurement&.purchase_order&.delivery_date&.strftime("%b %d, %y")
     end
   end
