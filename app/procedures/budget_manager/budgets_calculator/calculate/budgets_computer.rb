@@ -115,7 +115,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       # calculating pending payment amount - will include all invoice items that are approved and above, but not the ones that have payments initiated against them
 
-      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - tds_value")
+      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
       pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).reimbursable.joins(self.amount_to_be_considered).sum(:value)
 

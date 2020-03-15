@@ -5,6 +5,6 @@ class BudgetManager::BudgetGroups::Contracts::Base < Reform::Form
   property :company, validates: {presence: true}
   property :start_date, presence: true
   property :end_date, presence: true
-  property :budget_date_type, presence: true
+  property :budget_date_type_id, presence: true
 
 end
