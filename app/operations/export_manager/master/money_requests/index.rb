@@ -45,7 +45,7 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
 
   def reviewal_chain(row, money_request)
     money_request&.dlrms.group_by(&:level_number).map do |level_number, dlrm|
-      action_taker = dlrm.find {|d| d if f.action_taken_by_id.present?}
+      action_taker = dlrm.find {|d| d if d.action_taken_by_id.present?}
       action = action_taker&.action&.name&.humanize 
       action_date = action_taker&.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
       reviewer_name = dlrm.map(&:reviewer).map(&:name).join(", ")
