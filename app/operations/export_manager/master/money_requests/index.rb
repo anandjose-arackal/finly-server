@@ -44,17 +44,15 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
   end
 
   def reviewal_chain(row, money_request)
-    money_request&.dlrms.each_with_index do |dlrm, index|
-      level_number = dlrm.level_number
-      action = dlrm.action&.name&.humanize
-      action_taker = dlrm.action_taken_by&.first_name
-      action_date = dlrm.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
-      reviewer_name = dlrm.reviewer&.first_name
-      row.add("Level Number #{index + 1}", level_number)
-      row.add("Action Name #{index + 1}", action)
-      row.add("Action Taken By #{index + 1}", action_taker)
-      row.add("Action Date #{index + 1}", action_date)
-      row.add("Reviewer Name #{index + 1}", reviewer_name)
+    money_request&.dlrms.group_by(&:level_number) do |level_number, dlrm|
+      action_taker = dlrm.find {|d| d if f.action_taken_by_id.present?}
+      action = action_taker&.action&.name&.humanize 
+      action_date = action_taker&.action_taken_at&.strftime("%d-%m-%Y, %H:%M")
+      reviewer_name = dlrm.map(&:reviewer).map(&:name).join(", ")
+      row.add("Action Name for Level #{level_number}", action)
+      row.add("Action Taken By for Level #{level_number}", action_taker)
+      row.add("Action Date for Level #{level_number}", action_date)
+      row.add("Reviewer(s) for Level #{level_number}", reviewer_name)
     end
   end
 
