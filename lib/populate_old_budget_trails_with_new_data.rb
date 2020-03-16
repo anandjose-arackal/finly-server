@@ -135,7 +135,7 @@ class PopulateOldBudgetTrailsWithNewData
     BudgetTrail.where(entity_type: "Payment").find_each do |trail|
       payment = trail.entity
       next if payment.blank?
-      payment.save
+      # payment.save
       if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
         purchase_order_id = payment.parent_id
         invoice_id = nil
