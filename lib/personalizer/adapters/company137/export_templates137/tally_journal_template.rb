@@ -65,7 +65,7 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
         'Tax Classification':'Purchase Taxable',
         'Taxble value':item&.taxable_amount&.value,
         'Ledger Name':item&.category&.name,
-        'Amount':item&.net_amount&.value,
+        'Amount1':item&.net_amount&.value,
         'CGST Ledger':((item&.cgst.present? && item&.cgst > 0) ? get_cgst_ledger(invoice) : ''),
         'CGST Amt':item&.cgst,
         'SGST Ledger':((item&.sgst.present? && item&.sgst > 0) ? get_sgst_ledger(invoice) : ''),
