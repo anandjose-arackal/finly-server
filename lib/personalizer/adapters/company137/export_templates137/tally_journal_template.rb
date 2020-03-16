@@ -81,6 +81,32 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
 
   end
 
+###############################################################################
+# ExportManager::Builders::Spreadsheet::Row  contains array of hash
+# Hash not support duplicate key
+# Below method is jugad to handle this condition
+###############################################################################
+
+  def generate_spreadsheet
+    contents = []
+    self.rows.each do |row|
+      contents << row.build
+    end
+    headers = header.list.map{ |h| h.include?("Amount") ? 'Amount' : h }
+
+    exporter = Exporter::Spreadsheet.new(self.user, {headers: headers, contents: contents})
+    file = Paperclip::Tempfile.new(file_name)
+    open(file.path, 'wb') do |f|
+      case format
+      when :csv
+        f.write exporter.generate_csv
+      when :xls
+        f.write exporter.generate_xls
+      end
+    end
+    file
+  end
+
 
   def get_voucher_type(invoice)
     state_name = invoice.gstin_location&.state&.name
@@ -157,19 +183,19 @@ class Personalizer::Adapters::Company137::ExportTemplates137::TallyJournalTempla
         'Tax Classification',
         'Taxble value',
         'Ledger Name',
-        'Amount',
+        'Amount1',
         'Interim Reverse Charge IGST',
-        'Amount',
+        'Amount2',
         'Reverse Charge IGST',
-        'Amount',
+        'Amount3',
         'Interim Reverse Charge CGST',
-        'Amount',
+        'Amount4',
         'Reverse Charge CGST',
-        'Amount',
+        'Amount5',
         'Interim Reverse Charge SGST',
-        'Amount',
+        'Amount6',
         'Reverse Charge SGST',
-        'Amount',
+        'Amount7',
         'CGST Ledger',
         'CGST Amt',
         'SGST Ledger',
