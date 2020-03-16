@@ -29,4 +29,21 @@ class BudgetManager::BudgetGroups::Ops::Create < Transactions::API
   # the below will persist the model and send back errors if any
   step Contract::Persist()
 
+  step :set_applicable_documents!
+
+  def set_applicable_documents!(options, params:, model:, current_user:, **)
+    budget_group = model
+    if params&.dig("budget_group", "expense_management")
+      budget_group.expense = true
+    end
+    if params&.dig("budget_group", "vendor_payments")
+      budget_group.payment = true
+      budget_group.purchase_request = true
+      budget_group.invoice = true
+      budget_group.purchase_order = true
+    end
+    budget_group.save!
+    true
+  end
+
 end
