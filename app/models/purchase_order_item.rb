@@ -113,6 +113,15 @@ class PurchaseOrderItem < ApplicationRecord
     self.tax_rate&.rate || super
   end
 
+  def before_tax_amount
+    self.taxable_amount&.value.to_f
+  end
+
+  def after_tax_amount
+    self.total_amount&.value.to_f
+  end
+
+
   private
 
   def budget_trail_entry

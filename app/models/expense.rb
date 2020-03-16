@@ -840,6 +840,7 @@ class Expense < ApplicationRecord
     end
   end
 
+
   def partially_transcribed
     self.system_messages.each do |system_message|
       return true if system_message.system_message_type_id == SystemMessageType.id_for(:error)
@@ -1123,6 +1124,20 @@ class Expense < ApplicationRecord
     end
     field_label_values
   end
+
+
+  def amount_before_tax
+    if self.gst_amount.present?
+      return amount_value - gst_amount.value
+    else
+      return amount_value
+    end
+  end
+
+  def amount_after_tax
+    amount_value
+  end
+
 
   private
 
