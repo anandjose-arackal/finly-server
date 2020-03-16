@@ -6,19 +6,6 @@ GIT
     rack (2.2.0)
 
 GIT
-  remote: git://github.com/sinatra/sinatra.git
-  revision: a4dd24add24f2dd0e7299b9e68e12038138294d3
-  branch: master
-  specs:
-    rack-protection (2.0.8.1)
-      rack
-    sinatra (2.0.8.1)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.8.1)
-      tilt (~> 2.0)
-
-GIT
   remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
   revision: 9ac70c0a33835beb84fc19f9efee47cdcf215898
   specs:
@@ -470,6 +457,8 @@ GEM
       rack (>= 1.0, < 3)
     rack-mini-profiler (1.0.2)
       rack (>= 1.2.0)
+    rack-protection (2.0.8.1)
+      rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.4.1)
@@ -601,6 +590,11 @@ GEM
       sidekiq (>= 3.0, < 6)
     sigdump (0.2.4)
     simpleconfig (2.0.1)
+    sinatra (2.0.8.1)
+      mustermann (~> 1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.8.1)
+      tilt (~> 2.0)
     skylight (3.1.5)
       skylight-core (= 3.1.5)
     skylight-core (3.1.5)
@@ -834,7 +828,7 @@ DEPENDENCIES
   sidekiq (~> 5.2.3)
   sidekiq-logstash (~> 1.0.1)
   simpleconfig (~> 2.0.1)
-  sinatra (~> 2.0.5)!
+  sinatra (~> 2.0, >= 2.0.5)
   skylight (~> 3.1)
   slack-notifier (~> 2.3)
   sneakers (~> 2.12)
