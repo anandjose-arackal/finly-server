@@ -99,7 +99,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, message
       return
     end
-    self.reports = reports_presenter.reports.approved.include_reimbursable_user_accounts
+    self.reports = reports_presenter.reports.approved.not_settled.include_reimbursable_user_accounts
     if not params&.dig(:init_all) and params&.dig(:report_id).present?
       self.reports = self.reports.with_id(params&.dig(:report_id))
     end

@@ -120,7 +120,7 @@ class Reports::Index < Reports::Base
 
   def post_process
     unless self.reports.nil?
-      self.reports = self.reports.exclude_deleted.includes(:policy, :status, expenses: [:amount]) rescue self.reports
+      self.reports = self.reports.exclude_deleted.includes({policy:[ :settlement_currency,:base_currency]}, :status, :user, expenses: [:amount], trails: :action_user) rescue self.reports
     end
     if params[:ref] == '1' and params[:n_id].present?
       Event::EReport::Unset.(user, params)
