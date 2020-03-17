@@ -66,6 +66,12 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     if self.reports.blank?
       add_message :error, 'Report not found'
     end
+
+    if self.reports.pluck(:report_processor_group_mapping_id).compact.present?
+      ids = self.reports.where.not(report_processor_group_mapping_id: nil).pluck(:id).join(", ")
+      add_message :error, "Reports with ID #{ids} already linked to a batch"
+      return
+    end
   end
 
   # Settlement can only be done against a single currency unless outside Finly or mark as settled
@@ -93,7 +99,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, message
       return
     end
-    self.reports = reports_presenter.reports.approved.include_reimbursable_user_accounts
+    self.reports = reports_presenter.reports.approved.not_settled.include_reimbursable_user_accounts
     if not params&.dig(:init_all) and params&.dig(:report_id).present?
       self.reports = self.reports.with_id(params&.dig(:report_id))
     end

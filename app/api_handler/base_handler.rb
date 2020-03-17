@@ -187,9 +187,7 @@ class BaseHandler
         add_message :error, 'Invalid Request Type'
         return
       end
-      unless Rails.env.production?
-        puts "response : #{self.response.body}"
-      end
+      puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       messages[:error] << 'Request timed out. Please try again'
