@@ -111,15 +111,18 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       # # now we need to subtract the amount that has already been paid as a purchase order advance
       # pos = PurchaseOrder.with_id(PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id)).pluck(:purchase_order_id))
-      # paid_as_po_advance =
 
       # calculating pending payment amount - will include all invoice items that are approved and above, but not the ones that have payments initiated against them
 
-      pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+      # pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+      #
+      # pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
 
-      pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+      committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
-      # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+      committed_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
+
+      pending_payment_amount = 0
 
       # calculating all payments that are yet to be approved or credited. All except the final completed status of the payment shows here
       # To do this we are going to rely on the invoice line items, purchase order items, and expenses budget trails to tell us the paid amount
@@ -160,10 +163,10 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # TODO - once we combine both committed and penidng payment bucket the below code can be removed
       # the below essentially takes care of an edge case that occurs when there is a PO advance against
       # a procurement and we invoice an amount greater than the advance from a PO. It leads to negative committed amounts and some nasty shit
-      if committed_amount < 0
-        pending_payment_amount = pending_payment_amount + committed_amount
-        committed_amount = 0
-      end
+      # if committed_amount < 0
+      #   pending_payment_amount = pending_payment_amount + committed_amount
+      #   committed_amount = 0
+      # end
 
       self.budget_consumption.assign_attributes(
                                  budget_amount_attributes: {

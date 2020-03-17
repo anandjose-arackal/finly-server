@@ -5,11 +5,11 @@ purchase_order_items = @op["result"][:purchase_order_items] || []
 invoice_items = @op["result"][:invoice_items] || []
 
 # # TODO - change the below code to reflect the actual data
-# expenses = Expense.all.limit(10)
-# payments = Payment.all.limit(10)
-# purchase_request_items = PurchaseRequestItem.all.limit(10)
-# purchase_order_items = PurchaseOrderItem.all.limit(10)
-# invoice_items = InvoiceLineItem.all.where(parent_type: "Invoice").limit(10)
+# expenses = Expense.all.reorder(created_at: :desc).limit(10)
+# payments = Payment.all.reorder(created_at: :desc).limit(10)
+# purchase_request_items = PurchaseRequestItem.all.reorder(created_at: :desc).limit(10)
+# purchase_order_items = PurchaseOrderItem.all.reorder(created_at: :desc).limit(10)
+# invoice_items = InvoiceLineItem.all.where(parent_type: "Invoice").reorder(created_at: :desc).limit(10)
 
 json.budget_trail_items do
   index = 1
@@ -19,7 +19,7 @@ json.budget_trail_items do
     json.expenses do
       json.array!(expenses) do |expense|
         json.merchant expense.merchant_name
-        json.user_name expense.user&.name
+        json.user expense.user&.name
         json.category_name expense.category&.name
         json.date expense.date.strftime("%d-%b-%Y")
         json.amount expense.amount&.value
