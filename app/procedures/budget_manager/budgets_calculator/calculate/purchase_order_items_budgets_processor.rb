@@ -25,6 +25,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProc
         remaining_amount_before_tax_value: purchase_order_item.before_tax_amount,
         remaining_amount_after_tax_value: purchase_order_item.after_tax_amount,
         remaining_quantity: purchase_order_item.quantity,
+        revised: purchase_order_item.purchase_order.po_revised?,
         amount_attributes: {
             id: trail&.amount&.id,
             value: purchase_order_item.total_amount&.value,

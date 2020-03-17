@@ -102,12 +102,8 @@ class BudgetTrail < ApplicationRecord
     where reimbursable: true
   }
 
-  scope :not_payment_confirmed, -> {
-    where.not(payment_confirmed: true)
-  }
-
-  scope :payment_confirmed, -> {
-    where(payment_confirmed: true)
+  scope :not_revised, -> {
+    where.not revised: true
   }
 
   scope :without_invoice_or_po, -> {
