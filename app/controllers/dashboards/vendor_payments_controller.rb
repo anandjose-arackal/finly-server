@@ -43,7 +43,7 @@ class Dashboards::VendorPaymentsController < BaseControllers::WebBase
   end
 
   def agreement_invoices
-    params[:filter_inward_invoice_type] = 'agreement_invoice'
+    params[:filter_invoice_type] = 'agreement_invoice'
     @result = Dashboard::VendorPayments::Invoices.(current_user, params)
     respond
   end
