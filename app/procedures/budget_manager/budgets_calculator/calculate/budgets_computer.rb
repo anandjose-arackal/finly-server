@@ -68,7 +68,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     budgetable_entities << "Payment" if self.budget.payment
     budgetable_entities << "PurchaseRequestItem" if self.budget.purchase_request
 
-    self.budget_trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date, self.date_to_be_considered).with_vendors(vendor_ids)
+    self.budget_trails = BudgetTrail.not_revised.within_date(self.budget.start_date, self.budget.end_date, self.date_to_be_considered).with_vendors(vendor_ids)
                  .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
                  .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
                  .with_budgetable_entities(budgetable_entities)
