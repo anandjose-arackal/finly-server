@@ -40,7 +40,10 @@ class BudgetTrail < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
 
-  accepts_nested_attributes_for :amount
+  belongs_to :amount_before_tax, class_name: "Amount", optional: true
+  belongs_to :amount_after_tax, class_name: "Amount", optional: true
+
+  accepts_nested_attributes_for :amount, :amount_before_tax, :amount_after_tax
 
   scope :within_date, -> (start_date, end_date) {
     where('date >= ? AND date <= ?', start_date, end_date)
