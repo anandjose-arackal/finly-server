@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_06_110147) do
+ActiveRecord::Schema.define(version: 2020_03_15_214227) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1561,6 +1561,26 @@ ActiveRecord::Schema.define(version: 2020_03_06_110147) do
     t.integer "procurement_id"
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+    t.decimal "payment_processing_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "payment_processing_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "tds_value", precision: 20, scale: 10, default: "0.0"
+    t.boolean "billed", default: false
+    t.integer "entity_status_id"
+    t.boolean "reimbursable", default: false
+    t.integer "amount_before_tax_id"
+    t.integer "amount_after_tax_id"
+    t.datetime "entity_created_at"
+    t.datetime "entity_submitted_at"
+    t.integer "purchase_order_id"
+    t.integer "invoice_id"
+    t.integer "payment_purpose_id"
+    t.integer "po_trail_item_id"
+    t.decimal "billed_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "billed_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "paid_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -5223,6 +5243,52 @@ ActiveRecord::Schema.define(version: 2020_03_06_110147) do
     t.string "uuid", limit: 36
     t.index ["deleted_at"], name: "index_manual_expenses_on_deleted_at"
     t.index ["expense_id"], name: "index_manual_expenses_on_expense_id"
+  end
+
+  create_table "map_location_details", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "icon"
+    t.string "name"
+    t.string "place_id"
+    t.string "url"
+    t.text "address", limit: 4294967295
+    t.text "result", limit: 4294967295
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_map_location_details_on_deleted_at"
+    t.index ["name"], name: "index_map_location_details_on_name"
+    t.index ["place_id"], name: "index_map_location_details_on_place_id"
+    t.index ["uuid"], name: "index_map_location_details_on_uuid"
+  end
+
+  create_table "map_location_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "input"
+    t.text "result", limit: 4294967295
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_map_location_searches_on_deleted_at"
+    t.index ["input"], name: "index_map_location_searches_on_input"
+    t.index ["uuid"], name: "index_map_location_searches_on_uuid"
+  end
+
+  create_table "map_location_user_queries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.text "address"
+    t.string "place_id"
+    t.integer "map_location_detail_id", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_map_location_user_queries_on_deleted_at"
+    t.index ["map_location_detail_id"], name: "index_map_location_user_queries_on_map_location_detail_id"
+    t.index ["place_id"], name: "index_map_location_user_queries_on_place_id"
+    t.index ["user_id"], name: "index_map_location_user_queries_on_user_id"
+    t.index ["uuid"], name: "index_map_location_user_queries_on_uuid"
   end
 
   create_table "mcc_category_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
