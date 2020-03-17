@@ -1,6 +1,6 @@
 json.results do
   json.array!(@result.paginated_payment_agreements) do |payment_agreement|
-    json.merge! payment_agreement.as_json({list_vendors: true})
+    json.merge! payment_agreement.as_json_index({})
     if payment_agreement.general_invoices.present?
       json.agreement_type 'general_invoice'
       json.agreement_type_display_name 'General Invoice'
@@ -11,7 +11,7 @@ json.results do
       # end
     end
 
-    if payment_agreement.rental_invoices.present?
+    if payment_agreement.rental_invoices.exists?
       json.agreement_type 'rental_invoice'
       json.agreement_type_display_name 'Rental Invoice'
       # json.rental_invoices do
@@ -21,7 +21,7 @@ json.results do
       # end
     end
 
-    if payment_agreement.beneficiary_payments.present?
+    if payment_agreement.beneficiary_payments.exists?
       json.agreement_type 'beneficiary_payment'
       json.agreement_type_display_name 'Beneficiary Payment'
       # json.beneficiary_payments do
@@ -31,8 +31,8 @@ json.results do
       # end
     end
 
-    if payment_agreement.rental_invoices.blank?
-      if payment_agreement.security_deposits.present?
+    if payment_agreement.rental_invoices.empty?
+      if payment_agreement.security_deposits.exists?
         json.agreement_type 'security_deposit'
         json.agreement_type_display_name 'Security Deposit'
         # json.security_deposits do
