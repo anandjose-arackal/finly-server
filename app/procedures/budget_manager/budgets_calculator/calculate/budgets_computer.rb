@@ -100,7 +100,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       pending_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_pending_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
-      pending_amount += self.budget_trails.with_entity_type("Expense").reimbursable.with_entity_status_id(ReportStatus.ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
+      pending_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_bucket).joins(self.amount_to_be_considered).sum(:value)
 
 
       # calculating committed amount - PurchaseOrderItems that are above approved status, and InvoiceLineItems that are not everything below approved status
@@ -117,7 +117,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
-      pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).reimbursable.joins(self.amount_to_be_considered).sum(:value)
+      pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
 
       # pending_payment_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
 
@@ -142,7 +142,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # first is for all expenses that were reimbursed through Finly, and hence will have a "paid_amount_..." value that would have been created from the callback inside payments
       paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.sum(paid_amount_to_be_considered)
       # the second is for all expenses that are paid / settled / closed outside of Finly - we look for all cases where "paid_amount_..." is 0 and sum the expense amounts
-      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).reimbursable.where("#{paid_amount_to_be_considered} = 0").joins(self.amount_to_be_considered).sum(:value)
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).where("#{paid_amount_to_be_considered} = 0").joins(self.amount_to_be_considered).sum(:value)
 
       # TODO - add money request items once they have been completely implemented
 

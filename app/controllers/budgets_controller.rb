@@ -16,8 +16,6 @@ class BudgetsController < BaseControllers::WebBase
     end
   end
 
-
-  # TODO - have to move this to TRB
   def show_trail_items
     endpoint BudgetManager::BudgetsTrb::Ops::ShowTrailItems
     respond_to do |format|

@@ -111,7 +111,6 @@ class ReportStatus < ApplicationRecord
     [
         ReportStatus.id_for(:open),
         ReportStatus.id_for(:retracted),
-        ReportStatus.id_for(:rejected),
         ReportStatus.id_for(:processing)
     ]
   end
@@ -128,8 +127,8 @@ class ReportStatus < ApplicationRecord
 
   def self.ids_for_paid_bucket
     [
-        ReportStatus.id_for(:approved),
-        ReportStatus.id_for(:auto_approved),
+        # ReportStatus.id_for(:approved),
+        # ReportStatus.id_for(:auto_approved),
         ReportStatus.id_for(:settled),
         ReportStatus.id_for(:settlement_confirmed),
         ReportStatus.id_for(:closed),
