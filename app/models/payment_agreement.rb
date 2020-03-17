@@ -278,7 +278,7 @@ class PaymentAgreement < ApplicationRecord
   scope :exclude_revision, -> {where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
 
 
-  scope :include_for_index, -> {includes(:policy, :creator, :status, :custom_fields, :security_deposits,:beneficiary_payments,:rental_invoices, :general_invoices )}
+  scope :include_for_index, -> {includes(:policy, :creator, :status, :security_deposits,:beneficiary_payments,:rental_invoices, :general_invoices )}
 
 
 
@@ -310,6 +310,20 @@ class PaymentAgreement < ApplicationRecord
         revision_reason: self.revision_reason,
         termination_reason: self.termination_reason,
         reject_note: self.reject_note
+    }
+  end
+
+
+  def as_json_index(options={})
+    {
+        id: self.id,
+        agreement_number: get_agreement_number,
+        title: self.title,
+        policy_id: self.policy_id,
+        policy: self.policy&.name,
+        created_by: self.creator&.name,
+        status: self.status&.name,
+        vendors: get_related_vendors(options)
     }
   end
 

@@ -1,6 +1,6 @@
 json.results do
   json.array!(@result.paginated_payment_agreements) do |payment_agreement|
-    json.merge! payment_agreement.as_json({list_vendors: true, load_custom_fields: false})
+    json.merge! payment_agreement.as_json_index({})
     if payment_agreement.general_invoices.present?
       json.agreement_type 'general_invoice'
       json.agreement_type_display_name 'General Invoice'
