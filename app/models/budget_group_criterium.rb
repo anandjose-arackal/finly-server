@@ -37,6 +37,8 @@ class BudgetGroupCriterium < ApplicationRecord
   after_create :include_parent_criteria_mappings
   after_create :create_related_budgets
 
+  validate :cannot_create_empty_budget_criteria
+
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
   scope :with_id, -> (ids) do
@@ -195,7 +197,13 @@ class BudgetGroupCriterium < ApplicationRecord
       budget.save
 
       # now setting the start date as the next day of the end date
-      start_date = end_date
+      start_date = end_date + 1.day
+    end
+  end
+
+  def cannot_create_empty_budget_criteria
+    if self.budget_group_criteria_mappings.empty?
+      errors.add(:budget_group_criteria, "cannot have empty criteria")
     end
   end
 
