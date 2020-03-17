@@ -11,7 +11,7 @@ json.results do
       # end
     end
 
-    if payment_agreement.rental_invoices.present?
+    if payment_agreement.rental_invoices.exists?
       json.agreement_type 'rental_invoice'
       json.agreement_type_display_name 'Rental Invoice'
       # json.rental_invoices do
@@ -21,7 +21,7 @@ json.results do
       # end
     end
 
-    if payment_agreement.beneficiary_payments.present?
+    if payment_agreement.beneficiary_payments.exists?
       json.agreement_type 'beneficiary_payment'
       json.agreement_type_display_name 'Beneficiary Payment'
       # json.beneficiary_payments do
@@ -31,8 +31,8 @@ json.results do
       # end
     end
 
-    if payment_agreement.rental_invoices.blank?
-      if payment_agreement.security_deposits.present?
+    if payment_agreement.rental_invoices.empty?
+      if payment_agreement.security_deposits.exists?
         json.agreement_type 'security_deposit'
         json.agreement_type_display_name 'Security Deposit'
         # json.security_deposits do
