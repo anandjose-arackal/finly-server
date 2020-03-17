@@ -15,11 +15,11 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: "{{record.created_by.email}}"
   end
 
-  column :created_at, default: true do
+  column :created_at, sort: :created_at, default: true do
     date value: :created_at
   end
 
-  column :invoice_id, label: "Invoice ID", default: true do
+  column :invoice_id, sort: :invoice_id, label: "Invoice ID", default: true do
     badge value: :invoice_id, format: "success"
   end
 
@@ -27,11 +27,11 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: :invoice_number
   end
 
-  column :invoice_date, default: true do
+  column :invoice_date, sort: :invoice_date, default: true do
     date value: :date
   end
 
-  column :due_date, default: true do
+  column :due_date, sort: :due_date, default: true do
     date value: :due_date
   end
 
@@ -57,15 +57,15 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: "{{record.tds_slab.name}}"
   end
 
-  column :po_number, default: true, includes: [{procurement: :purchase_order}] do
+  column :po_number, sort: :po_number, default: true, includes: [{procurement: :purchase_order}] do
     text value: :po_number
   end
 
-  column :cost_center, default: true, includes: [:cost_center] do
+  column :cost_center, sort: :cost_center_name, default: true, includes: [:cost_center] do
     text value: "{{record.cost_center.name}}"
   end
 
-  column :department, default: true, includes: [:department] do
+  column :department, sort: :department_name, default: true, includes: [:department] do
     text value: "{{record.department.name}}"
   end
 
@@ -73,15 +73,15 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: "{{record.vendor_location.location}}"
   end
 
-  column :billing_location, default: false, includes: [:location] do
+  column :billing_location, sort: :billing_location_name, default: false, includes: [:location] do
     text value: "{{record.billing_location.name}}"
   end
 
-  column :shipping_location, default: false, includes: [:delivery_location] do
+  column :shipping_location, sort: :shipping_location_name, default: false, includes: [:delivery_location] do
     text value: "{{record.shipping_location.name}}"
   end
 
-  column :approved_at, default: true do
+  column :approved_at, sort: :approved_at, default: true do
     date value: :approved_at
   end
 
