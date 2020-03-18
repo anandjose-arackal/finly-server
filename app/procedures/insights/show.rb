@@ -12,6 +12,9 @@ class Insights::Show < Transactions::API
     filters = {}
 
     filters[:company_id] = current_user.company_id
+
+    filters[:company_id] = 2 if Rails.env.uat?
+
     filters[:from] = params[:from] || 1.month.ago.strftime('%Y-%m-%d') if model.can_filter_date
     filters[:to] = params[:to] || Date.today.strftime('%Y-%m-%d') if model.can_filter_date
     filters[:location_id] = Masters::Locations::Resolver.new(current_user).resolve(params: {q: {id_in: params[:location_id_in]}}).pluck(:id) if model.can_filter_location
