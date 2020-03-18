@@ -33,7 +33,7 @@ class Event::EPurchaseRequest::Comment < Event::EPurchaseRequest::Base
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:purchase_request),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
-                                             action_user_id: document.creator.id,
+                                             action_user_id: user.id,
                                              object_id: document.id,
                                              object_type: "PurchaseRequest",
                                              path_object_id: document.id,

@@ -32,7 +32,7 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:invoice),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
-                                             action_user_id: document.created_by.id,
+                                             action_user_id: user.id,
                                              object_id: document.id,
                                              object_type: "Invoice",
                                              path_object_id: document.id,
