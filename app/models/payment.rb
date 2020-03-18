@@ -1177,7 +1177,7 @@ class Payment < ApplicationRecord
       when "Invoice"
         invoice = self.parent
         parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
-        paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value) + invoice.advance_amount&.value.to_f
         payment_processing_amount = invoice.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / invoice.amount_before_tax
         paid_percent_after_tax = paid_amount / invoice.amount_after_tax
