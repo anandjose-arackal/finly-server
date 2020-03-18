@@ -24,6 +24,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     else
       self.payment_agreements = user.payment_agreements
     end
+    self.payment_agreements.include_for_index
   end
 
   def success

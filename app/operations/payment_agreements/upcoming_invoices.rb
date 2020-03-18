@@ -48,21 +48,30 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
 
   class PaymentAgreements::UpcomingInvoices::UpcomingInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices, :policies
+    attr_accessor :invoices, :beneficiary_payments, :security_deposits, :general_invoices, :rental_invoices, :policies,
+                  :paginated_general_invoices, :paginated_rental_invoices
 
     has_scope :filter_upcoming_invoice_date, using: [:from, :to], type: :hash
 
     def init
+      page = params[:page] || 1
+      per_page = params[:per_page] || 30
+      
       self.beneficiary_payments = params[:beneficiary_payments]
       self.security_deposits = params[:security_deposits]
       self.general_invoices = params[:general_invoices]
       if self.general_invoices.present?
         self.general_invoices = apply_scopes(general_invoices, params)
       end
+
+      self.paginated_general_invoices = self.general_invoices.paginate(page: page, per_page: per_page) rescue ::GeneralInvoice.none
+
       self.rental_invoices = params[:rental_invoices]
       if self.rental_invoices.present?
         self.rental_invoices = apply_scopes(rental_invoices, params)
       end
+      self.paginated_rental_invoices = self.rental_invoices.paginate(page: page, per_page: per_page) rescue ::RentalInvoice.none
+
       self.policies = params[:policies]
     end
   end

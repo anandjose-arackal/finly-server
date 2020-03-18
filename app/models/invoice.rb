@@ -365,6 +365,7 @@ class Invoice < ApplicationRecord
   scope :created_at_asc, -> {order(created_at: :asc)}
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+  scope :filter_cost_center_id, -> (id) {where cost_center_id: id} #somewhere FE is using this
 
   # this scope checks for an exact match of invoice number
   scope :with_invoice_number, -> (invoice_number) {where invoice_number: invoice_number}

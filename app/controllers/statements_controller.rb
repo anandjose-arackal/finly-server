@@ -53,9 +53,24 @@ class StatementsController < BaseControllers::WebBase
     end
   end
 
+  # def export
+  #   @result = Statements::AsSpreadsheet.(current_user, params)
+  #   respond
+  # end
+
   def export
-    @result = Statements::AsSpreadsheet.(current_user, params)
-    respond
+    params[:type] = 'statements'
+    result = ExportManager::RequestHandler.(current_user, params)
+    if result.success?
+      @response = {
+          success: true,
+          job_id: result.export_job&.id,
+          messages: result.messages
+      }
+      render json: @response.as_json
+    else
+      respond response: :failure, message: result.messages[:error]
+    end
   end
 
 end

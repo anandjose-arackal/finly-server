@@ -9,14 +9,15 @@ module ExportManager::Builders::Spreadsheet::DSL
       @section = nil
     end
 
-    def attribute(name, column_name: nil, dynamic: false)
+    def attribute(name, column_name: nil, dynamic: false, default: true)
       section = @section || default_section
       attr = ExportManager::Builders::Spreadsheet::Attribute.new(
           {
               name: name,
               column_name: column_name,
               section: section,
-              dynamic: dynamic
+              dynamic: dynamic,
+              default: default,
           }
       )
       section&.add attr
