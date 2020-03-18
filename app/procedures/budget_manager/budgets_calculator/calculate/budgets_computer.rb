@@ -145,7 +145,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # first is for all expenses that were reimbursed through Finly, and hence will have a "paid_amount_..." value that would have been created from the callback inside payments
       # paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).sum(paid_amount_to_be_considered)
       # the second is for all expenses that are paid / settled / closed outside of Finly - we look for all cases where "paid_amount_..." is 0 and sum the expense amounts
-      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).where("#{paid_amount_to_be_considered} = 0").joins(self.amount_to_be_considered).sum(:value)
+      paid_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_paid_bucket).joins(self.amount_to_be_considered).sum(:value)
 
       # TODO - add money request items once they have been completely implemented
 
