@@ -98,6 +98,20 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_review_validate
+    endpoint Docs::UtilityBills::Subscriptions::Ops::BulkReviewValidate
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def bulk_review
+    endpoint Docs::UtilityBills::Subscriptions::Ops::BulkReview
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   private
 
   def resolve_layout

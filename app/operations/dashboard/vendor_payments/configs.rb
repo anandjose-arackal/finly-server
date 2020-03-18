@@ -49,7 +49,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       end
     else
       if user.enforce_policy_enabled?
-        user_roles = user.policy_user_roles.joins(:policy).where({policies:{default: false}}).pluck('policy_user_roles.user_role_id').uniq
+        user_roles = user.policy_user_roles.joins(:policy).where({policies: {default: false}}).pluck('policy_user_roles.user_role_id').uniq
       else
         user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
       end

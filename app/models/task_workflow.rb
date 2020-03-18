@@ -20,19 +20,18 @@
 #
 
 class TaskWorkflow < ApplicationRecord
+  include EventProducer
   include UUIDHelper
 
-  has_many :file_manager_actions, class_name: 'TaskFileManagerAction'
-
+  event_channel 'task_workflow'
   serialize :conditions, JSON
 
+  has_many :file_manager_actions, class_name: 'TaskFileManagerAction'
   belongs_to :user
   belongs_to :company
   belongs_to :task_schedule
 
   enum trigger_type: {schedule: 1, event: 2}
-
-  resolver TaskManager::Workflows::Policy::Resolver
 
   scope :with_event, -> (event) {where event_key: event}
 

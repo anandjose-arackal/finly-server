@@ -53,12 +53,12 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
                     CreditNoteProvider)
 
     role_provider_mapping = {
-        "PurchaseRequestProvider" =>"purchase_request_initiator",
-        "PurchaseOrderProvider" =>"purchase_order_initiator",
-        "NonPoInvoiceProvider" =>"non_po_invoice_initiator",
+        "PurchaseRequestProvider" => "purchase_request_initiator",
+        "PurchaseOrderProvider" => "purchase_order_initiator",
+        "NonPoInvoiceProvider" => "non_po_invoice_initiator",
         "PoInvoiceProvider" => "po_invoice_initiator",
-        "BankPaymentRequestProvider" =>"bank_payment_request_initiator",
-        "YesBankVendorProvider" =>"vendor_creator",
+        "BankPaymentRequestProvider" => "bank_payment_request_initiator",
+        "YesBankVendorProvider" => "vendor_creator",
         "PaymentAgreementProvider" => "payment_agreement_initiator",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_initiator",
         "BbpsBillProvider" => "utility_bill_initiator",
@@ -104,7 +104,7 @@ class Admin::Implementations::Master::ApprovalFlow::Export < Admin::Implementati
       else
         vp_policies = policies.with_application(:vp)
         vp_policies.each do |policy|
-          user_ids = company.users.joins(:policy_user_roles).where(policy_user_roles:{policy_id: policy.id}).where(policy_user_roles:{ user_role_id: UserRole.id_for(role_provider_mapping[provider].to_sym)}).pluck('users.id').uniq
+          user_ids = company.users.joins(:policy_user_roles).where(policy_user_roles: {policy_id: policy.id}).where(policy_user_roles: {user_role_id: UserRole.id_for(role_provider_mapping[provider].to_sym)}).pluck('users.id').uniq
           users = company.users.where(id: user_ids)
           levels = policy.levels.non_deleted.where(associated_entity_type: provider).includes({level_user_reviewer_mappings: [reviewer: :profile]}, {level_reviewer_mappings: [reviewer: :profile]}).order(level_number: :asc)
           users.each do |emp|

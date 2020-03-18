@@ -1,5 +1,5 @@
 class Insights::Index < Transactions::API
 
-  step Transactions::Resolver::Model(InsightDashboard)
+  step Resolver::Transactions::Load(model: InsightDashboard)
 
 end

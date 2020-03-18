@@ -37,6 +37,7 @@
 #  approved_at                   :datetime
 #  credit_note_number            :string(255)
 #  last_adjusted_at              :datetime
+#  review_note                   :text(65535)
 #
 
 require 'rails_helper'

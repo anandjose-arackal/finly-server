@@ -20,13 +20,15 @@
 #  sgst_internal_id     :string(255)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::TaxRate < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::TaxRate
-  events 'tax_rate.update', 'tax_rate.create', 'tax_rate.destroy'
+  consume 'tax_rate.update', 'tax_rate.create', 'tax_rate.destroy'
 
   map :name
   map :rate

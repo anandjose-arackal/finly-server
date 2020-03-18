@@ -30,13 +30,15 @@
 #  tds_applicable       :boolean
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::Item < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::Item
-  events 'item.update', 'item.create', 'item.destroy'
+  consume 'item.update', 'item.create', 'item.destroy'
 
   map :tax
   map :discount

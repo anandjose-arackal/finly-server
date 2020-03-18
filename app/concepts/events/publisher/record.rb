@@ -19,8 +19,12 @@ class Events::Publisher::Record < Events::Publisher
   end
 
   def self.Transition(record, user, action, from_status, options = {})
-    broadcast "#{record.class.event_channel}.#{action}",
+    broadcast "#{get_event_channel(record)}.#{action}",
               Events::Payload::Record.(record, user, action, options.merge(from_status: from_status)),
               current_user: user
+  end
+
+  def self.get_event_channel(record)
+    record.class.respond_to?(:event_channel) ? record.class.event_channel : record.class.table_name
   end
 end

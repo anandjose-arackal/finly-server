@@ -18,11 +18,11 @@
 #  previously_delivered     :decimal(20, 5)
 #  is_deleted               :boolean          default(FALSE), not null
 #  deleted_at               :datetime
-#  accepting_item_amount_id :integer
 #  billable_amount          :decimal(20, 5)   default(0.0)
 #  order_amount             :decimal(20, 5)   default(0.0)
 #  previously_billed_amount :decimal(20, 5)   default(0.0)
 #  product_type_id          :integer          default(1)
+#  accepting_item_amount_id :integer
 #
 
 class InwardDocumentItem < ApplicationRecord

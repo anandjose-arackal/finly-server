@@ -1,11 +1,11 @@
 class StateDrop < Drop
 
   def code
-    @object.code
+    record.code
   end
 
   def name
-    @object.name
+    record.name
   end
 
 end
