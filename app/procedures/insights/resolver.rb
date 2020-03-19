@@ -21,12 +21,19 @@ class Insights::Resolver < Resolver::API
     end
     app = RequestStoreUtil.current_app
 
+    if app and user.admin?(app)
+      roles << UserRole.id_for(:admin)
+    end
+
     # scope = self.scope.where(application: app)
     query = "application = \"#{app}\" AND ("
 
     # All blank
     # collection = scope.where(company_id: nil, user_id: nil, policy_id: nil, user_role_id: nil)
     query += "(company_id IS NULL AND user_id IS NULL and policy_id IS NULL and user_role_id IS NULL)"
+
+    # Scoping based only on role
+    query += " OR (company_id IS NULL AND user_id IS NULL and policy_id IS NULL and user_role_id IN (#{roles.join(',')}))"
 
     # only with company
     # collection = collection.or(scope.where(company_id: company.id, user_id: nil, policy_id: nil, user_role_id: nil))

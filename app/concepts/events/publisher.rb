@@ -49,7 +49,7 @@ class Events::Publisher
   class Async
     def self.call(routing_key, payload, current_user: nil)
       begin
-        Hutch.connect
+        Hutch.connect unless Hutch.connected?
       rescue Hutch::ConnectionError => e
         raise e if Rails.env.production?
 
