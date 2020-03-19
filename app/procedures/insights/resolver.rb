@@ -21,6 +21,10 @@ class Insights::Resolver < Resolver::API
     end
     app = RequestStoreUtil.current_app
 
+    if app.present? and user.admin?(app)
+      roles << UserRole.id_for(:admin)
+    end
+
     # scope = self.scope.where(application: app)
     query = "application = \"#{app}\" AND ("
 
