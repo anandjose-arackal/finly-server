@@ -21,7 +21,7 @@ class Insights::Resolver < Resolver::API
     end
     app = RequestStoreUtil.current_app
 
-    if app and user.admin?(app)
+    if app and user.admin?(app.to_s)
       roles << UserRole.id_for(:admin)
     end
 
