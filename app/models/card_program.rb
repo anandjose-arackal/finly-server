@@ -18,7 +18,6 @@
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
 #  non_personal_fund_transfer    :boolean
-#  uuid                          :string(36)
 #  deleted_at                    :datetime
 #
 

@@ -22,7 +22,6 @@
 #  created_by_id      :integer
 #  modified_by_id     :integer
 #  deleted_at         :datetime
-#  uuid               :string(36)
 #
 
 class Receipt < ApplicationRecord

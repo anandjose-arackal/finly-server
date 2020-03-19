@@ -3919,6 +3919,7 @@ Rails.application.routes.draw do
     get 'vp/vendors', to: 'vendor_payments#vendors'
     get 'vp/payment_agreements', to: 'vendor_payments#payment_agreements'
     get 'vp/purchase_request_approved_items', to: 'vendor_payments#purchase_request_approved_items'
+    get 'vp/agreement_invoices', to: 'vendor_payments#agreement_invoices'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
 
@@ -4014,6 +4015,8 @@ Rails.application.routes.draw do
     get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
     get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
     get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    patch 'subscriptions/bulk_review_validate', to: 'subscriptions#bulk_review_validate'
+    patch 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
@@ -4027,6 +4030,8 @@ Rails.application.routes.draw do
     get 'bills/actions_config', to: 'bills#actions_config'
     get 'bills/filters_config', to: 'bills#filters_config'
     get 'bills/payables', to: 'bills#payable_bills'
+    patch 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
+    patch 'bills/bulk_review', to: 'bills#bulk_review'
     resources :bills do
       patch 'review', to: 'bills#review'
       get 'transaction_status', to: 'bills#transaction_status'
@@ -4044,6 +4049,8 @@ Rails.application.routes.draw do
   get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
   get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
   get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+  patch 'credit_notes/bulk_review_validate', to: 'credit_notes#bulk_review_validate'
+  patch 'credit_notes/bulk_review', to: 'credit_notes#bulk_review'
 
   resources :credit_notes do
     patch 'review', to: 'credit_notes#review'

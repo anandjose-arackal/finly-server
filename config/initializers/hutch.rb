@@ -1,21 +1,9 @@
-# if Rails.env.development?
-#   Hutch.connect
-# end
-# Todo handle production
-# if Rails.env.production? and File.exists?("#{Rails.root}/config/bunny.yml")
-#   bunny_config = Rails.application.config_for(:bunny)&.with_indifferent_access
-#   MQ_PUBLISHER = Bunny.new(bunny_config)
-#   Sneakers.configure :connection => MQ_PUBLISHER,
-#                      :exchange => "amq.topic",
-#                      :exchange_options=>{:type=>:topic, :durable=>true, :auto_delete=>false, :arguments=>{}},
-#                      :start_worker_delay => 0.2, # When workers do frenzy-die, randomize to avoid resource starvation
-#                      :workers => 4 # Number of per-cpu processes to run
-# else
-#   MQ_PUBLISHER = Bunny.new
-#   Sneakers.configure :connection => MQ_PUBLISHER,
-#                      :exchange => "amq.topic",
-#                      :exchange_options=>{:type=>:topic, :durable=>true, :auto_delete=>false, :arguments=>{}},
-#                      :start_worker_delay => 0.2, # When workers do frenzy-die, randomize to avoid resource starvation
-#                      :workers => 4 # Number of per-cpu processes to run
-# end
-#
+path = "#{Rails.root}/config/hutch.yml"
+if File.exists?(path)
+  values = YAML.load_file(path)
+  values.each do |key, value|
+    next unless key.present?
+
+    Hutch::Config.set(key.to_sym, value)
+  end
+end

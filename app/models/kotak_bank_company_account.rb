@@ -8,7 +8,6 @@
 #  company_id :integer
 #  balance_id :integer
 #  enabled    :boolean          default(FALSE)
-#  uuid       :string(36)
 #  deleted_at :datetime
 #
 

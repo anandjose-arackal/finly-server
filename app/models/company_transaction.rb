@@ -15,7 +15,6 @@
 #  updated_at            :datetime         not null
 #  transaction_mode      :string(255)
 #  merchant_type_key     :string(255)
-#  uuid                  :string(36)
 #  deleted_at            :datetime
 #
 

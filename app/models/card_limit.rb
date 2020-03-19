@@ -11,7 +11,6 @@
 #  budget              :decimal(10, )
 #  limit_type_id       :integer
 #  allowed             :boolean
-#  uuid                :string(36)
 #  deleted_at          :datetime
 #
 

@@ -254,6 +254,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def total_amount(invoice_line_item)
+    if invoice_line_item&.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      return invoice_line_item.amount&.value
+    end
     (invoice_line_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)) ? invoice_line_item.billable_amount&.value : invoice_line_item.amount&.value
   end
 
@@ -275,7 +278,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def tds_amount(invoice_line_item)
-    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
+    return 0.0 unless invoice_line_item&.tds_applicable?
+    # invoice_line_item.tds_amount
     invoice_line_item.parent.tds_amount&.value || 0.0
   end
 

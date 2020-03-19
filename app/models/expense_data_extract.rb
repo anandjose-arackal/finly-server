@@ -18,7 +18,6 @@
 #  datetime                       :datetime
 #  expense_data_extract_source_id :integer
 #  status_id                      :integer          not null
-#  uuid                           :string(36)
 #  deleted_at                     :datetime
 #
 

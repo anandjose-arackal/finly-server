@@ -36,7 +36,6 @@
 #  customer_id                   :integer
 #  default_account               :boolean
 #  deleted_at                    :datetime
-#  uuid                          :string(36)
 #
 
 # parent here will be either the payment receivable, or user, or whatever

@@ -27,7 +27,6 @@
 #  terminated_at         :datetime
 #  terminated_by_id      :integer
 #  termination_reason    :text(65535)
-#  uuid                  :string(36)
 #  deleted_at            :datetime
 #  revision_of_pa_id     :integer
 #  revision_reason       :text(65535)
@@ -279,6 +278,10 @@ class PaymentAgreement < ApplicationRecord
   scope :exclude_revision, -> {where.not(status_id: PaymentAgreementStatus.id_for(:revised))}
 
 
+  scope :include_for_index, -> {includes(:policy, :creator, :status, :security_deposits,:beneficiary_payments,:rental_invoices, :general_invoices )}
+
+
+
   def as_json(options={})
     {
         id: self.id,
@@ -307,6 +310,20 @@ class PaymentAgreement < ApplicationRecord
         revision_reason: self.revision_reason,
         termination_reason: self.termination_reason,
         reject_note: self.reject_note
+    }
+  end
+
+
+  def as_json_index(options={})
+    {
+        id: self.id,
+        agreement_number: get_agreement_number,
+        title: self.title,
+        policy_id: self.policy_id,
+        policy: self.policy&.name,
+        created_by: self.creator&.name,
+        status: self.status&.name,
+        vendors: get_related_vendors(options)
     }
   end
 
@@ -492,6 +509,17 @@ class PaymentAgreement < ApplicationRecord
   def is_agreement_invoice_auditing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), self)
+  end
+
+  def get_custom_fields(options)
+    #default return custom fields but index not needed custom fields
+    if options[:load_custom_fields].nil?
+      self.custom_fields
+    elsif options[:load_custom_fields].present? && options[:load_custom_fields] == true
+      self.custom_fields
+    elsif options[:load_custom_fields] && options[:load_custom_fields] == false
+      nil
+    end
   end
 
 end

@@ -27,7 +27,6 @@
 #  terminated_at         :datetime
 #  terminated_by_id      :integer
 #  termination_reason    :text(65535)
-#  uuid                  :string(36)
 #  deleted_at            :datetime
 #  revision_of_pa_id     :integer
 #  revision_reason       :text(65535)

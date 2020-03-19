@@ -6,7 +6,6 @@
 #  entity_type          :string(255)
 #  entity_id            :bigint
 #  company_id           :integer
-#  user_id              :integer
 #  message_id           :string(255)
 #  sender               :string(255)
 #  recipient            :string(255)
@@ -26,7 +25,6 @@
 #  link_open_count      :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  uuid                 :string(36)
 #  deleted_at           :datetime
 #
 

@@ -46,7 +46,6 @@
 #  hsn_sac                :string(255)
 #  merchant_bill_no       :string(255)
 #  tax_rate_id            :integer
-#  uuid                   :string(36)
 #
 
 class Expense < ApplicationRecord
@@ -174,6 +173,8 @@ class Expense < ApplicationRecord
   default_scope {order('expenses.created_at DESC')}
 
   scope :with_id, -> (ids) {where id: ids}
+  scope :filter_id, ->(id) {with_id(id)}
+  scope :filter_ids, ->(id) {with_id(id)}
 
   scope :non_personal, -> {
     where(personal: false)

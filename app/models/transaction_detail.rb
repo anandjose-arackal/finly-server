@@ -19,7 +19,6 @@
 #  updated_at               :datetime         not null
 #  sequence_number          :integer
 #  payment_id               :bigint
-#  uuid                     :string(36)
 #  deleted_at               :datetime
 #
 

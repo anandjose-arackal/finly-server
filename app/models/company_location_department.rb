@@ -7,7 +7,6 @@
 #  company_department_id :integer          not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  uuid                  :string(36)
 #  deleted_at            :datetime
 #
 

@@ -20,7 +20,6 @@
 #  category_code              :string(255)
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
-#  uuid                       :string(36)
 #  deleted_at                 :datetime
 #
 

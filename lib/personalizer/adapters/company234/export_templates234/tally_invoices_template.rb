@@ -35,42 +35,42 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
     generate_headers
     sl_no = 1
     data.find_each do |inv|
-      total_credit_entries(inv).map{|entry| rows << entry}
-      line_item_entries(inv).map{|entry| rows << entry}
+      total_credit_entries(inv).map {|entry| rows << entry}
+      line_item_entries(inv).map {|entry| rows << entry}
 
       if with_tax(inv)
-        gst_item_entries(inv).map{|entry| rows << entry}
+        gst_item_entries(inv).map {|entry| rows << entry}
       end
 
       if with_tds(inv)
-        tds_item_entries(inv).map{|entry| rows << entry}
+        tds_item_entries(inv).map {|entry| rows << entry}
       end
-      sl_no +=1
+      sl_no += 1
       progress_update sl_no
     end
   end
 
   def total_credit_entries(invoice)
-    entries=[]
-      row = ExportManager::Builders::Spreadsheet::Row.new(record: invoice, header: header)
-      {
-          'Date': {value: invoice.submitted_at, type: 'date'},
-          'Voucher No': invoice.invoice_number,
-          'Invoice  Date': {value: invoice.date, type: 'date'},
-          'New Ref': invoice.invoice_number,
-          'Ledger Name': invoice.vendor&.display_name,
-          'CR Amt':((invoice.taxable_amount&.value&.to_f || 0) + invoice.tax_amount&.value&.to_f) - invoice.tds_amount&.value&.to_f,
-          'Cost Centre': invoice.cost_center&.name,
-          'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at} towards #{invoice.narration}",
-          'Voucher Type': 'Purchase',
-      }.each do |k, v|
-        row.add k, v
-      end
-      entries << row
+    entries = []
+    row = ExportManager::Builders::Spreadsheet::Row.new(record: invoice, header: header)
+    {
+        'Date': {value: invoice.submitted_at, type: 'date'},
+        'Voucher No': invoice.invoice_number,
+        'Invoice  Date': {value: invoice.date, type: 'date'},
+        'New Ref': invoice.invoice_number,
+        'Ledger Name': invoice.vendor&.display_name,
+        'CR Amt': ((invoice.taxable_amount&.value&.to_f || 0) + invoice.tax_amount&.value&.to_f) - invoice.tds_amount&.value&.to_f,
+        'Cost Centre': invoice.cost_center&.name,
+        'Narration': "Being amount to be paid against invoice no: #{invoice.invoice_number} dated: #{invoice.created_at} towards #{invoice.narration}",
+        'Voucher Type': 'Purchase',
+    }.each do |k, v|
+      row.add k, v
+    end
+    entries << row
   end
 
   def line_item_entries(invoice)
-    entries=[]
+    entries = []
     invoice.items.each do |item|
       row = ExportManager::Builders::Spreadsheet::Row.new(record: item, header: header)
       {
@@ -92,8 +92,8 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
   end
 
   def gst_item_entries(invoice)
-    entries=[]
-    tax_types =[:igst, :sgst, :cgst]
+    entries = []
+    tax_types = [:igst, :sgst, :cgst]
     tax_types.each do |tax_type|
       invoice.items.each do |item|
         next if item.send(tax_type).to_f <= 0
@@ -118,7 +118,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
   end
 
   def tds_item_entries(invoice)
-    entries=[]
+    entries = []
     row = ExportManager::Builders::Spreadsheet::Row.new(record: invoice, header: header)
     {
         'Date': {value: invoice.submitted_at, type: 'date'},
@@ -176,7 +176,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
     if tax_type == :igst
       "IGST #{item.tax&.to_s&.sub(/\.?0+$/, '')}% Input Credit"
     else
-      ledger = "#{tax_type.to_s.upcase} #{(item.tax/2)&.to_s&.sub(/\.?0+$/, '')}%"
+      ledger = "#{tax_type.to_s.upcase} #{(item.tax / 2)&.to_s&.sub(/\.?0+$/, '')}%"
       # state will be blank if vendor not have gstin registration and system not mapped
       state = state_code(item).to_s
       state += " - " if state.present?

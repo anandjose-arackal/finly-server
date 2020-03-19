@@ -8,10 +8,9 @@
 #  dependent_choice_id        :string(255)      not null
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  uuid                       :string(36)       primary key
+#  deleted_at                 :datetime
 #  form_id                    :string(255)      not null
 #  dependent_choice_type      :string(255)
-#  deleted_at                 :datetime
 #
 
 class FormDependencyChoiceMapping < ApplicationRecord

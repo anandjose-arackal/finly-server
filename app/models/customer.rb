@@ -16,7 +16,6 @@
 #  active        :boolean          default(TRUE)
 #  is_deleted    :boolean          default(FALSE)
 #  deleted_at    :datetime
-#  uuid          :string(36)
 #
 
 class Customer < ApplicationRecord

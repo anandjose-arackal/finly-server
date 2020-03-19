@@ -3,11 +3,10 @@
 # Table name: task_file_manager_actions
 #
 #  id                 :bigint           not null, primary key
+#  event_workflow_id  :integer          not null
 #  export_template_id :bigint           not null
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  event_workflow_id  :integer          not null
-#  uuid               :string(36)
 #  deleted_at         :datetime
 #
 

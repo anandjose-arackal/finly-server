@@ -14,7 +14,6 @@
 #  department_code :string(255)
 #  code            :string(255)
 #  gl_code         :string(255)
-#  uuid            :string(36)
 #
 
 class Department < ApplicationRecord

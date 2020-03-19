@@ -38,7 +38,6 @@
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
 #  controlling_level_id               :integer
-#  company_id                         :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
 #  uuid                               :string(36)
@@ -114,6 +113,7 @@ class Report < ApplicationRecord
 
   scope :with_id, ->(id) {where id: id}
   scope :filter_id, ->(id) {with_id(id)}
+  scope :filter_ids, ->(id) {with_id(id)}
   scope :without_id, ->(id) {where.not id: id}
   scope :with_policy, ->(policy_id) {where policy_id: policy_id}
   scope :with_policy_id, ->(policy_id) {where policy_id: policy_id}

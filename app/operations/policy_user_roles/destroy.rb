@@ -84,7 +84,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
       if self.reviewer_type.include?("initiator")
         provider = self.reviewer_type.camelize.gsub("Initiator", "Provider")
         level_ids = ReviewalLevel.where(policy_id: policy.id, associated_entity_type: provider)&.pluck(:id)
-        associated_lurms = policy.level_user_reviewer_mappings.where(level_id: level_ids,user_id: policy_user_role&.user.id)
+        associated_lurms = policy.level_user_reviewer_mappings.where(level_id: level_ids, user_id: policy_user_role&.user.id)
         return associated_lurms
       end
     end

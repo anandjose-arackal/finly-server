@@ -80,13 +80,16 @@
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
 #  cost_allocation_items           :boolean          default(FALSE)
-#  po_number                       :string(255)
 #  narration                       :text(65535)
+#  po_number                       :string(255)
 #  bank_account_id                 :integer
 #  rejection_note                  :text(65535)
 #  payment_agreement_id            :integer
 #  vendor_location_id              :integer
 #  billing_type_id                 :integer
+#  vendor_poc_id                   :integer
+#  vlpm_id                         :integer
+#  client_note                     :text(65535)
 #  agreement_item_type             :string(255)
 #  agreement_item_id               :integer
 #  payable                         :boolean          default(FALSE)
@@ -369,6 +372,7 @@ class Invoice < ApplicationRecord
   scope :created_at_asc, -> {order(created_at: :asc)}
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+  scope :filter_cost_center_id, -> (id) {where cost_center_id: id} #somewhere FE is using this
 
   # this scope checks for an exact match of invoice number
   scope :with_invoice_number, -> (invoice_number) {where invoice_number: invoice_number}

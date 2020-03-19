@@ -11,7 +11,6 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  success     :boolean
-#  uuid        :string(36)
 #  deleted_at  :datetime
 #
 

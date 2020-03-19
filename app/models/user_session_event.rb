@@ -20,7 +20,6 @@
 #  mouse_pos_x               :integer
 #  mouse_pos_y               :integer
 #  ip                        :string(255)
-#  uuid                      :string(36)
 #  deleted_at                :datetime
 #
 

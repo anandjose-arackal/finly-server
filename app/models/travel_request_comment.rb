@@ -18,7 +18,6 @@
 #  is_deleted               :boolean          default(FALSE)
 #  delegated_action_user_id :integer
 #  deleted_at               :datetime
-#  uuid                     :string(36)
 #
 
 class TravelRequestComment < ApplicationRecord

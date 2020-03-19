@@ -26,8 +26,8 @@
 #  company_id            :integer
 #  request_id            :string(255)
 #  transfer_mode_id      :integer
-#  uuid                  :string(36)
 #  deleted_at            :datetime
+#  bank_error_message    :text(16777215)
 #
 
 class IciciBankTransaction < ApplicationRecord

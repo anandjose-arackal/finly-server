@@ -9,7 +9,6 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  biller_id       :integer
-#  uuid            :string(36)
 #  deleted_at      :datetime
 #
 

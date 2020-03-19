@@ -45,8 +45,8 @@
 #  order_number_type          :string(255)
 #  tax_rate_id                :integer
 #  hsn_sac                    :string(255)
-#  uuid                       :string(36)
 #  paid_at                    :datetime
+#  review_note                :text(65535)
 #
 
 class BbpsBill < ApplicationRecord
@@ -87,6 +87,13 @@ class BbpsBill < ApplicationRecord
   delegate :amount_value, to: :amount
 
   default_scope {order('bbps_bills.created_at DESC')}
+
+  scope :with_ids, -> (ids) {
+    where(id: ids)
+  }
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
 
   scope :filter_status, -> (status) {
     case status
@@ -132,7 +139,7 @@ class BbpsBill < ApplicationRecord
   }
 
   scope :includes_for_index, -> {
-    includes(subscription: [:pocs])
+    includes(:department, :cost_center, :policy, :location, :user, :status, :tax_rate, :category, amount: [:currency], subscription: [:pocs, :biller])
   }
 
   scope :filter_department_id, -> (id) {
@@ -221,6 +228,7 @@ class BbpsBill < ApplicationRecord
         biller: subscription.biller.as_json({index: true}),
         autofetched: autofetched,
         # name: name,
+        name: subscription.name,
         sequence_id: sequence_id,
         department: department.as_json,
         cost_center: cost_center.as_json,
@@ -350,7 +358,7 @@ class BbpsBill < ApplicationRecord
     end
   end
 
-  def role_based_reviewer_associated_items(user, role_id, options={})
+  def self.role_based_reviewer_associated_items(user, role_id, options = {})
     policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
 
     if role_id == UserRole.id_for(:utility_bill_reviewer)

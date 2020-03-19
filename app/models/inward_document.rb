@@ -19,7 +19,6 @@
 #  user_id                     :integer
 #  deleted_at                  :datetime
 #  grn_number                  :string(255)
-#  uuid                        :string(36)
 #
 
 class InwardDocument < ApplicationRecord

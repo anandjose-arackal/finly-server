@@ -2,7 +2,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers
 
   # 'approved_by', 'approved_to', 'approved_for'
 
-  class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedBy < Notifier::Mailer
+  class Docs::P2P::CreditNotes::Mailers::Approve::ApprovedBy < Docs::P2P::CreditNotes::Mailers::Approve
 
     consumes_event! 'credit_note.approve'
 
@@ -59,7 +59,7 @@ class Docs::P2P::CreditNotes::Mailers::Approve < Docs::P2P::CreditNotes::Mailers
     end
 
     assign :to do |user, params|
-      [params[:document].user&.email]
+      [params[:record].user&.email]
     end
 
     assign :hero_bg_image, "bg_success"

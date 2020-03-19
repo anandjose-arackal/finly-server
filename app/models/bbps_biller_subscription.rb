@@ -2,54 +2,53 @@
 #
 # Table name: bbps_biller_subscriptions
 #
-#  id                       :bigint           not null, primary key
-#  bbps_biller_id           :bigint           not null
-#  name                     :string(255)      not null
-#  department_id            :integer
-#  cost_center_id           :integer
-#  location_id              :integer
-#  policy_id                :integer
-#  note                     :text(65535)
-#  active                   :boolean          default(TRUE)
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  status_id                :integer          not null
-#  deleted_at               :datetime
-#  subscription_id          :string(255)
-#  require_poc_verification :boolean          default(TRUE)
-#  user_id                  :integer
-#  agreement_id             :integer
-#  expected_bill_day        :string(255)
-#  controlling_level_id     :integer
-#  reminder_before_days     :string(255)
-#  biller_category_name     :string(255)
-#  submitted_at             :datetime
-#  approved_at              :datetime
-#  company_id               :integer
-#  mobile_number            :string(255)
-#  customer_param_key_1     :string(255)
-#  customer_param_value_1   :string(255)
-#  customer_param_key_2     :string(255)
-#  customer_param_value_2   :string(255)
-#  customer_param_key_3     :string(255)
-#  customer_param_value_3   :string(255)
-#  customer_param_key_4     :string(255)
-#  customer_param_value_4   :string(255)
-#  customer_param_key_5     :string(255)
-#  customer_param_value_5   :string(255)
-#  fetch_requirement        :string(255)
-#  auto_generate_bill       :boolean          default(TRUE)
-#  support_bill_validation  :string(255)
-#  customer_name            :string(255)
-#  customer_email           :string(255)
-#  customer_aadhar_number   :string(255)
-#  customer_pan             :string(255)
-#  tax_rate_id              :integer
-#  category_id              :integer
-#  hsn_sac                  :string(255)
-#  quick_pay                :string(255)      default("N")
-#  uuid                     :string(36)
-#  sequence_id              :string(255)
+#  id                      :bigint           not null, primary key
+#  bbps_biller_id          :bigint           not null
+#  name                    :string(255)      not null
+#  sequence_id             :string(255)      not null
+#  department_id           :integer
+#  cost_center_id          :integer
+#  location_id             :integer
+#  policy_id               :integer
+#  deleted_at              :datetime
+#  active                  :boolean          default(TRUE)
+#  note                    :text(65535)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  status_id               :integer          not null
+#  user_id                 :integer
+#  agreement_id            :integer
+#  expected_bill_day       :string(255)
+#  controlling_level_id    :integer
+#  reminder_before_days    :string(255)
+#  biller_category_name    :string(255)
+#  submitted_at            :datetime
+#  approved_at             :datetime
+#  company_id              :integer
+#  mobile_number           :string(255)
+#  customer_param_key_1    :string(255)
+#  customer_param_value_1  :string(255)
+#  customer_param_key_2    :string(255)
+#  customer_param_value_2  :string(255)
+#  customer_param_key_3    :string(255)
+#  customer_param_value_3  :string(255)
+#  customer_param_key_4    :string(255)
+#  customer_param_value_4  :string(255)
+#  customer_param_key_5    :string(255)
+#  customer_param_value_5  :string(255)
+#  fetch_requirement       :string(255)
+#  auto_generate_bill      :boolean          default(TRUE)
+#  support_bill_validation :string(255)
+#  customer_name           :string(255)
+#  customer_email          :string(255)
+#  customer_aadhar_number  :string(255)
+#  customer_pan            :string(255)
+#  tax_rate_id             :integer
+#  category_id             :integer
+#  hsn_sac                 :string(255)
+#  quick_pay               :string(255)      default("N")
+#  last_paid_at            :datetime
+#  review_note             :text(65535)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
@@ -88,6 +87,13 @@ class BbpsBillerSubscription < ApplicationRecord
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
 
+  scope :with_ids, -> (ids) {
+    where(id: ids)
+  }
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
   scope :filter_status, -> (status, user = nil) {
     case status
     when 'approved', :approved
@@ -109,7 +115,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   scope :includes_for_index, -> {
-    includes(:pocs)
+    includes(:pocs, :department, :cost_center, :policy, :location, :biller, :status, :category, :user, :attachments, :tax_rate)
   }
 
   scope :filter_department_id, -> (id) {
@@ -225,7 +231,7 @@ class BbpsBillerSubscription < ApplicationRecord
     'BbpsBillerSubscriptionStatus'
   end
 
-  def role_based_initiator_associated_items(user, role_id, options = {})
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       super
     elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
