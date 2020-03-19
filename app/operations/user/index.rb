@@ -11,8 +11,9 @@ class User::Index < User::Base
     end
 
     if RequestStore.store[:from_controller]
-      self.users = self.users.filter_expense_management if RequestStore.store[:current_app].to_sym == :em
-      self.users = self.users.filter_vendor_payments if RequestStore.store[:current_app].to_sym == :vp
+      mapping = self.users.joins(:role_mapping)
+      self.users = mapping.where(user_role_mappings: {purpose_id: Purpose.id_for(:expense_management)}) if RequestStore.store[:current_app].to_sym == :em
+      self.users = mapping.where(user_role_mappings: {purpose_id: Purpose.id_for(:vendor_payments)}) if RequestStore.store[:current_app].to_sym == :vp
     end
   end
 
