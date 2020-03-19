@@ -62,8 +62,6 @@ class Insights::Resolver < Resolver::API
     end
     query += ")"
 
-    debugger
-
     self.entity.where(query)
   end
 end
