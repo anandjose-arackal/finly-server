@@ -9,6 +9,11 @@ class User::Index < User::Base
     else
       add_message :error, (operation.messages[:error] + operation.messages[:failure])
     end
+
+    if RequestStore.store[:from_controller]
+      self.users = self.users.filter_expense_management if RequestStore.store[:current_app].to_sym == :em
+      self.users = self.users.filter_vendor_payments if RequestStore.store[:current_app].to_sym == :vp
+    end
   end
 
   def success
