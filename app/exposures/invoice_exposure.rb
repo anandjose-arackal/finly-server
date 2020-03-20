@@ -19,24 +19,38 @@ class InvoiceExposure < Exposures::API
   attribute :invoice_number, record_attribute: true
   attribute :created_at, record_attribute: true
   attribute :created_by, record_attribute: true, exposure: true
-  attribute :net_amount, exposure: true, includes: [:net_amount] do
-    record.net_amount
-  end
+  attribute :net_amount, exposure: true, record_attribute: true, includes: [:net_amount]
   attribute :net_amount_value, includes: [:net_amount] do
     record.net_amount&.value || 0
   end
-  attribute :gross_amount, exposure: true, includes: [:gross_amount] do
-    record.gross_amount
-  end
+  attribute :gross_amount, record_attribute: true, exposure: true, includes: [:gross_amount]
   attribute :gross_amount_value, includes: [:gross_amount] do
     record.gross_amount&.value || 0
   end
-  attribute :tds_amount, exposure: true, includes: [:tds_amount] do
-    record.tds_amount
-  end
+  attribute :tds_amount, exposure: true, record_attribute: true, includes: [:tds_amount]
   attribute :tds_amount_value, includes: [:tds_amount] do
     record.tds_amount&.value || 0
   end
+  attribute :balance_due, includes: [:balance_due], record_attribute: true
+  attribute :balance_due_value, includes: [:balance_due] do
+    record.balance_due&.value || 0
+  end
+  attribute :freight_amount, record_attribute: true, includes: [:freight_amount]
+  attribute :freight_amount_value, includes: [:freight_amount] do
+    record.freight_amount&.value || 0
+  end
+  attribute :roundoff_amount, record_attribute: true
+  attribute :tax_type do
+    case record.tax_type_id
+    when 1
+      'CGST + IGST'
+    when 2
+      'IGST'
+    else
+      nil
+    end
+  end
+  attribute :tax_type_id, record_attribute: true
   attribute :tds_slab, record_attribute: true, exposure: true, includes: [:tds_slab]
   # Fixme: Performance incase the number of line items it high
   attribute :line_items, record_attribute: :invoice_items, exposure: true, includes: [:line_items]
