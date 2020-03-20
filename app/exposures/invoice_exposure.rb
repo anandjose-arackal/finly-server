@@ -58,6 +58,7 @@ class InvoiceExposure < Exposures::API
   attribute :po_number, includes: [{procurement: :purchase_order}] do
     record&.procurement&.purchase_order&.po_number
   end
+  attribute :cost_allocation_items, record_attribute: true
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id

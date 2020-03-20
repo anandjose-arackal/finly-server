@@ -67,13 +67,13 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: :po_number
   end
 
-  # column :cost_center, sort: :cost_center_name, default: true, includes: [:cost_center] do
-  #   text value: "{{record.cost_center.name}}"
-  # end
-  #
-  # column :department, sort: :department_name, default: true, includes: [:department] do
-  #   text value: "{{record.department.name}}"
-  # end
+  column :cost_center, default: true, includes: [:cost_center] do
+    text value: :cost_center_name
+  end
+
+  column :department, default: true, includes: [:department] do
+    text value: :department_name
+  end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
     text value: "{{record.gstin_location.location}}"
@@ -99,6 +99,18 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
       counter.add status.id, status.name.humanize, counts[status.id]
     end
     counter
+  end
+
+  def self.cost_center_name(user, record_exposure)
+    return "Multiple" if record_exposure.cost_allocation_items
+
+    record_exposure.cost_center&.name
+  end
+
+  def self.department_name(user, record_exposure)
+    return "Multiple" if record_exposure.cost_allocation_items
+
+    record_exposure.department&.name
   end
 
 end
