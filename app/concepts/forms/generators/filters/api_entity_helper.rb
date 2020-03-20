@@ -2,12 +2,12 @@ module Forms::Generators::Filters::ApiEntityHelper
   extend ActiveSupport::Concern
 
   DEFAULT_OPERATORS = %i(
-            eq
-            not_eq
+            eq_any
+            not_eq_any
             cont_any
             not_cont_any
-            in
-            not_in
+            in_any
+            not_in_any
             blank
             present
         )
