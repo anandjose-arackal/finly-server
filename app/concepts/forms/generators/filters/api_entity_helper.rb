@@ -3,11 +3,11 @@ module Forms::Generators::Filters::ApiEntityHelper
 
   DEFAULT_OPERATORS = %i(
             eq_any
-            not_eq_any
+            not_eq_all
             cont_any
-            not_cont_any
+            not_cont_all
             in_any
-            not_in_any
+            not_in_all
             blank
             present
         )
