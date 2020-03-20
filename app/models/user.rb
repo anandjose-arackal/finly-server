@@ -65,6 +65,7 @@
 class User < ApplicationRecord
   include OperationCallbacks
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'user'
@@ -208,6 +209,9 @@ class User < ApplicationRecord
   has_many :travel_manager_travel_request_trails, -> {travel_manager_role}, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
   has_many :travel_manager_travel_requests, -> {distinct}, source: :travel_request, through: :travel_manager_travel_request_trails
 
+  # Trips - New
+  has_many :trips, foreign_key: :created_by_id
+
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
@@ -276,6 +280,7 @@ class User < ApplicationRecord
   # has_one :feature_access, as: :accessible
 
   has_many :map_location_user_queries
+  has_many :index_view_segments
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
@@ -463,7 +468,7 @@ class User < ApplicationRecord
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
     ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
-                                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                                                "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
     self.where(id: ids)
@@ -472,7 +477,7 @@ class User < ApplicationRecord
   scope :user_search, -> (term) {
     if term.present?
       ids = self.left_outer_joins(:profile).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ? or user_profiles.employee_id like ?",
-                                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                                                  "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
       ids.uniq!
       self.where(id: ids)
     end
@@ -1563,7 +1568,6 @@ class User < ApplicationRecord
   def is_agreement_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:agreement_invoice_auditor), document)
   end
-
   ########### Agreement Based Payments Role End #############
 
   def is_po_invoice_initiator?(document = nil)

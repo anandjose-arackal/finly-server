@@ -102,7 +102,7 @@ class ExportManager::Master::MoneyRequests::Index < ExportManager::Builders::Spr
   end
 
   def required_by_date(money_request)
-    money_request.required_by_date
+    money_request.required_by_date&.strftime("%d-%b-%Y")
   end
 
   def purpose(money_request)

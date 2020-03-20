@@ -1,9 +1,33 @@
 class ActionsManager::Master::Bbps::Subscriptions::Index < ActionsManager::Master::Base
 
   register_handle :bbps_subscriptions_index
-  register_actions [:create]
+  register_actions [:create, :bulk_approve, :bulk_reject, :bulk_take_control, :bulk_return_control, :bulk_deactivate, :bulk_reactivate]
 
   def create
     user.has_policy_role?(UserRole.id_for(:utility_bill_master_initiator))
+  end
+
+  def bulk_approve
+    user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) || user.vendor_payment_admin?
+  end
+
+  def bulk_reject
+    user.has_policy_role?(UserRole.id_for(:utility_bill_master_reviewer)) || user.vendor_payment_admin?
+  end
+
+  def bulk_take_control
+    user.vendor_payment_admin?
+  end
+
+  def bulk_return_control
+    user.vendor_payment_admin?
+  end
+
+  def bulk_deactivate
+    user.vendor_payment_admin?
+  end
+
+  def bulk_reactivate
+    user.vendor_payment_admin?
   end
 end

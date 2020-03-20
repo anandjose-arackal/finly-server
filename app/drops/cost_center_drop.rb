@@ -1,11 +1,11 @@
 class CostCenterDrop < Drop
 
   def gl_code
-    @object.gl_code
+    record.gl_code
   end
 
   def name
-    @object.name
+    record.name
   end
 
 end

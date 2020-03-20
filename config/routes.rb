@@ -2457,6 +2457,10 @@
 
 Rails.application.routes.draw do
 
+  get 'index_view_segments/create'
+  get 'index_view_segments/update'
+  get 'index_view_segments/show'
+  get 'index_view_segments/destroy'
   get 'unique_identifiers/index'
   get 'unique_identifiers/set'
   get 'qukickbooks_configurations/create'
@@ -3038,6 +3042,13 @@ Rails.application.routes.draw do
 
   ######################### TRAVEL REQUESTS API START ##########################
 
+  # get 'trips', to: 'trips#index'
+  get 'trips/:id/header', to: 'trips#show_header'
+  get 'trips/:id/passengers', to: 'trips#show_passengers'
+  get 'trips/:id/routes', to: 'trips#show_routes'
+  get 'trips/:id/booking_requests', to: 'trips#show_booking_requests'
+  resources :trips
+
   get 'travel_requests/count', to: 'travel_requests#count'
   get 'travel_requests/config', to: 'travel_requests#configuration'
   resources :travel_requests do
@@ -3275,6 +3286,7 @@ Rails.application.routes.draw do
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
   get 'autocomplete/vendors', to: 'autocomplete#vendors'
+  get 'autocomplete/:entity', to: 'autocomplete#route'
 
   # get 'features', to: 'static_pages#features'
 
@@ -3834,7 +3846,6 @@ Rails.application.routes.draw do
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
 
 
-
     get 'inward_invoices/templates', to: 'inward_invoices#template_index'
     get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
@@ -4006,6 +4017,8 @@ Rails.application.routes.draw do
     get 'subscriptions/biller_field_config', to: 'subscriptions#biller_field_config'
     get 'subscriptions/actions_config', to: 'subscriptions#actions_config'
     get 'subscriptions/filters_config', to: 'subscriptions#filters_config'
+    patch 'subscriptions/bulk_review_validate', to: 'subscriptions#bulk_review_validate'
+    patch 'subscriptions/bulk_review', to: 'subscriptions#bulk_review'
     put 'subscriptions/validate_customer_params', to: 'subscriptions#validate_customer_params'
     resources :subscriptions do
       patch 'review', to: 'subscriptions#review'
@@ -4019,6 +4032,8 @@ Rails.application.routes.draw do
     get 'bills/actions_config', to: 'bills#actions_config'
     get 'bills/filters_config', to: 'bills#filters_config'
     get 'bills/payables', to: 'bills#payable_bills'
+    patch 'bills/bulk_review_validate', to: 'bills#bulk_review_validate'
+    patch 'bills/bulk_review', to: 'bills#bulk_review'
     resources :bills do
       patch 'review', to: 'bills#review'
       get 'transaction_status', to: 'bills#transaction_status'
@@ -4036,6 +4051,8 @@ Rails.application.routes.draw do
   get 'credit_notes/edit_config', to: 'credit_notes#edit_config'
   get 'credit_notes/filters_config', to: 'credit_notes#filters_config'
   get 'credit_notes/actions_config', to: 'credit_notes#actions_config'
+  patch 'credit_notes/bulk_review_validate', to: 'credit_notes#bulk_review_validate'
+  patch 'credit_notes/bulk_review', to: 'credit_notes#bulk_review'
 
   resources :credit_notes do
     patch 'review', to: 'credit_notes#review'
@@ -4044,6 +4061,13 @@ Rails.application.routes.draw do
 
 
   get 'accounting_exports', to: 'accounting_exports#index'
+
+  get 'filters/:route', to: "filters#index"
+  get 'index/:route/config', to: "index#fetch_config"
+  get 'index/:route/counts', to: 'index#counts'
+  get 'index/:route', to: "index#show"
+
+  resources :views, controller: 'index_view_segments', except: [:show]
 
   get 'maps/auto_complete', to: 'maps#auto_complete'
   get 'maps/places/:id/details', to: 'maps#details'

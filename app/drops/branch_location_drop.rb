@@ -1,19 +1,19 @@
 class BranchLocationDrop < Drop
 
   def name
-    @object.name
+    record.name
   end
 
   def gstin
-    @object.gstin
+    record.gstin
   end
 
   def state
-    @object.state
+    record.state
   end
 
   def gl_code
-    @object.gl_code
+    record.gl_code
   end
 
 end

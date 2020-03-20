@@ -4,29 +4,37 @@ module Analytics::Mapper
   extend ActiveSupport::Concern
 
   included do
-    include Events::Consumer
     include DynamicAttributes
 
     class_attr :is_sync, default: false
-    class_attr :transaction_model
-    class_attr :field_mappings
+    # class_attr :transaction_model
+    class_attr :field_mappings, default: []
     class_attr :olap_model
     class_attr :required_relationships, default: []
     class_attr :input, default: -> (user, payload) {payload[:record]}
 
-    define_singleton_method :field_mappings do
-      next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
-      self.attribute_field_mappings ||= []
-      set_defaults
-      self.attribute_field_mappings
-    end
+    # define_singleton_method :field_mappings do
+    #   # next self.attribute_field_mappings unless self.attribute_field_mappings.nil?
+    #   # self.attribute_field_mappings ||= []
+    #   value = instance_variable_get("@attribute_field_mappings")
+    #   next value unless value.nil?
+    #   instance_variable_set("@attribute_field_mappings", value || [])
+    #   set_defaults
+    #   # self.attribute_field_mappings
+    #   instance_variable_get("@attribute_field_mappings")
+    # end
 
     define_singleton_method :transaction_model do |klass = NoObject|
       unless klass == NoObject
         Analytics::Master.register klass, self
-        self.attribute_transaction_model = klass
+        # self.attribute_transaction_model = klass
+        instance_variable_set("@attribute_transaction_model", klass)
+        # super(klass)
+        #
+        # klass.super
       end
-      self.attribute_transaction_model
+      # self.attribute_transaction_model
+      instance_variable_get("@attribute_transaction_model")
     end
   end
 
@@ -78,13 +86,11 @@ module Analytics::Mapper
       is_sync
     end
 
-    def events(*list)
+    def consume(*events)
       raise "Event is already defined" if @events.present?
 
-      @events = list
-      @events.each do |event|
-        EventHandler.build(self, event)
-      end
+      @events = events
+      consumes_event!(*events, sync: sync?)
     end
 
     def sync(after: nil)
@@ -98,6 +104,21 @@ module Analytics::Mapper
 
   def in_sync?(record, payload = {})
     finly_ref_updated_at == record.updated_at
+  end
+
+  def work(user, payload)
+    puts "User: #{user} payload: #{payload}"
+    olap_model = self.class.olap_model || self.class
+    input = olap_model.input.call(user, payload)
+    input = [input] unless input.respond_to?(:each)
+    input.each do |record|
+      sync = Analytics::Synchronizer::Persist.(params: {record: record, olap_model: olap_model, payload: payload})
+      if sync.failure? and not sync[:in_sync]
+        # Todo log failure with reason
+        raise "Sync Error: #{sync.errors}}"
+      end
+    end
+    Success()
   end
 
 end

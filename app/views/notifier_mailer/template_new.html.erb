@@ -1,0 +1,388 @@
+<div class="wrapper-main">
+  <div class="mail-container">
+    <div class="section-header">
+      <img src="<%= @payload["company"]["logo_url"].present? ? @payload["company"]["logo_url"] : @payload["company"]["name"] %>" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: right">
+      <a href="https://www.finly.io/login">Login</a>
+    </div>
+    <div class="section-body">
+
+      <!--
+        Common Banner on the Basis of IF-ElSE condition
+       -->
+      <div class="banner-wrapper">
+        <img src="./images/BG/Report_Rejected.png"/>
+        <div class="banner-details">
+          <span class="main-header"><%= @payload["title"] %></span>
+          <% if @payload["sub_header"].present? %>
+            <span class="sub-header"><%= @payload["sub_header"] %></span>
+          <% end %>
+        </div>
+      </div>
+      <!-- END -->
+
+      <!-- Message Body FOR "EXPENSE REPORTS" -->
+      <div class="mailer-details-wrapper">
+        <% if @payload["tables"].present? %>
+          <% @payload["tables"].each_with_index do |table, index| %>
+            <div class="items-list">
+              <% if table["header"].present? %>
+                <div class="items-list-header">
+                  <p><%= table["header"] %></p>
+                </div>
+              <% end %>
+
+              <% if table["content"].present? %>
+                <table class="table-items-list">
+                  <% if table["content"]["thead"].present? %>
+                    <thead>
+                    <tr>
+                      <% table["content"]["thead"].each do |header| %>
+                        <th><%= header %></th>
+                      <% end %>
+                    </tr>
+                    </thead>
+                  <% end %>
+
+                  <% if table["content"]["tbody"].present? && table["content"]["tbody"].is_a?(Array) %>
+                    <tbody>
+                    <% table["content"]["tbody"].each do |tr| %>
+                      <tr>
+                        <% tr.each do |cell| %>
+                          <td><%= cell %></td>
+                        <% end %>
+                      </tr>
+                    <% end %>
+                    </tbody>
+                  <% end %>
+                </table>
+              <% end %>
+            </div>
+            <div class="divider"></div>
+          <% end %>
+        <% end %>
+        <% if @payload["actions"].present? %>
+          <div class="redirect-section actions">
+            <% @payload["actions"].each do |action| %>
+              <a href="<%= action.href %>" class="button"><%= action.title %></a>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <!-- END -->
+    </div>
+
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="wrapper-main" style="background: #F5F7FA;height: 100%;overflow: auto;">
+  <div class="mail-container" style="max-width: 700px;margin: 30px auto;height: 100%;display: table;">
+    <div class="section-header" style="padding: 15px 0;">
+      <img src="./images/company_logo.png" width="100" height="auto">
+      <a href="https://www.finly.io/login" style="float: right;font-weight: 600;margin-top: 5px;font-size: 17px;">Login</a>
+    </div>
+
+    <div class="section-body" style="overflow: hidden;">
+      <!--
+        Common Banner on the Basis of IF-ElSE condition
+       -->
+      <div class="banner-wrapper" style="height: 400px;position: relative;">
+        <img src="./images/BG/Report_Rejected.png" style="width: 100%;height: 100%;">
+        <div class="banner-details" style="position: absolute;top: 100px;width: 100%;">
+          <span class="main-header" style="display: block;text-align: center;font-size: 28px;font-weight: 600;width: 100%;color: white;padding: 15px 0;"><%= @payload["title"] %></span>
+          <% if @payload["sub_header"].present? %>
+            <span class="sub-header" style="display: block;text-align: center;font-size: 17px;font-weight: 600;width: 100%;color: antiquewhite;"><%= @payload["sub_header"] %></span>
+          <% end %>
+        </div>
+      </div>
+      <!-- END -->
+
+      <!-- Message Body FOR "EXPENSE REPORTS" -->
+      <div class="mailer-details-wrapper" style="background: white;">
+        <div class="user-message" style="padding: 15px;">
+          <div class="header" style="overflow: hidden;">
+            <span class="circle" style="width: 10px;display: inline-block;height: 10px;background: #eee;border-radius: 50%;padding: 15px;float: left;"></span>
+            <span class="user-name" style="display: inline-block;font-weight: 600;font-size: 21px;margin-left: 15px;line-height: 1.95;">Vivek AG</span>
+          </div>
+          <div class="body" style="margin: 15px 0;color: slategray;">
+
+          </div>
+        </div>
+
+        <% if @payload["tables"].present? %>
+          <% @payload["tables"].each_with_index do |table, index| %>
+            <div class="items-list">
+              <% if table["header"].present? %>
+                <div class="items-list-header" style="padding: 15px;border-top: 1px solid #eee;font-size: 19px;font-weight: 600;">
+                  <span class="list-item-count" style="color: #e95869;">3 Expenses</span>
+                  <span class="list-item-total" style="float: right;">Total : 15,829</span>
+                </div>
+              <% end %>
+
+              <% if table["content"].present? %>
+                <table class="table-items-list" style="margin: 0;width: 100%;background: #edeff1;">
+                  <% if table["content"]["thead"].present? %>
+                    <thead>
+                    <tr>
+                      <% table["content"]["thead"].each do |header| %>
+                        <th><%= header %></th>
+                      <% end %>
+                    </tr>
+                    </thead>
+                  <% end %>
+
+                  <% if table["content"]["tbody"].present? && table["content"]["tbody"].is_a?(Array) %>
+                    <tbody>
+                    <% table["content"]["tbody"].each do |tr| %>
+                      <tr>
+                        <% tr.each do |cell| %>
+                          <td style="height: 70px;font-size: 13px;padding-left: 15px;padding-right: 15px;text-align: right;font-weight: 600;"><%= cell %></td>
+                        <% end %>
+                      </tr>
+                    <% end %>
+                    </tbody>
+                  <% end %>
+                </table>
+              <% end %>
+            </div>
+            <div class="divider"></div>
+          <% end %>
+        <% end %>
+
+        <% if @payload["actions"].present? %>
+          <div class="redirect-section actions" style="text-align: center;padding: 50px 0;">
+            <% @payload["actions"].each do |action| %>
+              <a href="&lt;%= action.href %&gt;" class="button" style="display: inline-block;margin: auto;padding: 10px 15px;border: none;min-width: 160px;border-radius: 4px;background: #e95869;color: white;text-decoration: none;font-weight: 600;font-size: 17px;box-shadow: 0px 10px 10px #e958692e !important;"><%= action.title %></a>
+            <% end %>
+          </div>
+        <% end %>
+
+      </div>
+      <!-- END -->
+    </div>
+
+    <% render 'notifier_mailer/partials/footer', locals: {payload: payload} %>
+
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    font-size: 14px;
+    color: #474747;
+  }
+
+  .wrapper-main {
+    background: #F5F7FA;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .wrapper-main .mail-container {
+    max-width: 700px;
+    margin: 30px auto;
+    height: 100%;
+    display: table;
+  }
+
+  .wrapper-main .mail-container .section-header {
+    padding: 15px 0;
+  }
+
+  .wrapper-main .mail-container .section-header a {
+    float: right;
+    font-weight: 600;
+    margin-top: 5px;
+    font-size: 17px;
+  }
+
+  .wrapper-main .mail-container .section-body {
+    overflow: hidden;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .user-message {
+    padding: 15px;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .user-message .header {
+    overflow: hidden;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .user-message .header .circle {
+    width: 10px;
+    display: inline-block;
+    height: 10px;
+    background: #eee;
+    border-radius: 50%;
+    padding: 15px;
+    float: left;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .user-message .header .user-name {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 21px;
+    margin-left: 15px;
+    line-height: 1.95;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .user-message .body {
+    margin: 15px 0;
+    color: slategray;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list .items-list-header {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list .items-list-header .list-item-count {
+    color: #e95869;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list .items-list-header .list-item-total {
+    float: right;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list table.table-items-list {
+    margin: 0;
+    width: 100%;
+    background: #edeff1;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list table.table-items-list tr > td {
+    height: 70px;
+    font-size: 13px;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list table.table-items-list tr > td:first-child {
+    padding-left: 15px;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper .items-list table.table-items-list tr > td:last-child {
+    padding-right: 15px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .wrapper-main .mail-container .section-body .mailer-details-wrapper {
+    background: white;
+  }
+
+  .wrapper-main .mail-container .mailer-details-wrapper .redirect-section {
+    text-align: center;
+    padding: 50px 0;
+  }
+
+  .wrapper-main .mail-container .mailer-details-wrapper .redirect-section a.button {
+    display: inline-block;
+    margin: auto;
+    padding: 10px 15px;
+    border: none;
+    min-width: 160px;
+    border-radius: 4px;
+    background: #e95869;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 17px;
+    box-shadow: 0px 10px 10px #e958692e !important;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper {
+    height: 400px;
+    position: relative;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper .banner-details {
+    position: absolute;
+    top: 100px;
+    width: 100%;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper .banner-details .main-header {
+    display: block;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    width: 100%;
+    color: white;
+    padding: 15px 0;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper .banner-details .sub-header {
+    display: block;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    width: 100%;
+    color: antiquewhite;
+  }
+
+  .wrapper-main .mail-container .section-body .banner-wrapper .banner-details .header-title {
+    display: block;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    width: 100%;
+    color: white;
+    padding: 5px 0px;
+  }
+
+  .wrapper-main .mail-container .section-footer {
+    background: #e4e4e469;
+    padding: 25px;
+    overflow: hidden;
+  }
+
+
+  .wrapper-main .mail-container .section-footer span.footer-item {
+    display: inline-block;
+    float: left;
+    width: 33%;
+    text-align: center;
+    border-right: 1px solid #ddd;
+    color: slategray;
+    font-weight: 600;
+  }
+
+  .wrapper-main .mail-container .section-footer span.footer-item:last-child {
+    border-right: none;
+  }
+
+  .wrapper-main .mail-container .section-footer span.footer-item:last-child a {
+    margin-left: 5px;
+  }
+</style>

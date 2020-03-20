@@ -1,7 +1,7 @@
 class YesBankVendorDrop < Drop
 
   def business_name
-    @object&.business_name
+    record&.business_name
   end
 
   def gl_name
