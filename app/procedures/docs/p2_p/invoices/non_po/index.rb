@@ -65,7 +65,7 @@ class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
   end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
-    text value: "{{record.vendor_location.location}}"
+    text value: "{{record.gstin_location.location}}"
   end
 
   column :billing_location, default: false, includes: [:location] do
