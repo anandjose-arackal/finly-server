@@ -24,6 +24,7 @@ json.result do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
+    json.description payment.payment_order&.bank_payment_request&.description
 
     po_number = ''
     if (payment.parent_type == 'PurchaseOrder') || (payment.parent_type == 'Invoice')

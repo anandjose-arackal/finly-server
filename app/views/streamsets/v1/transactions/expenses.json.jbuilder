@@ -34,7 +34,7 @@ json.result do
     json.pocket do
       json.name expense.spent_from&.name
       json.id expense.spent_from&.id
-      json.balance expense.spent_from&.name
+      json.balance expense.spent_from&.balance&.value
     end
 
     json.bank_account do
@@ -214,7 +214,11 @@ json.result do
     json.report_id expense.report_id
     json.report_approved_at expense.report&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.report_created_at expense.report&.created_at&.strftime("%Y-%m-%d %H:%M:%S")
-    json.report_note expense.report.memo
+    json.report_note expense.report&.memo
+    json.report_bank_reference_number expense.report&.bank_reference_number
+    json.report_source_account expense.report&.source_account
+    json.report_submitted_at expense.report&.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.finance_approved_date expense.report&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
 
 
     # exxtra fields

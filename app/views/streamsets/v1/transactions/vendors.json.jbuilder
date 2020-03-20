@@ -1,3 +1,6 @@
+# This is a replica of the vendor master index api
+# 
+
 json.result do
 
   json.array!(@result.paginated_vendors) do |vendor|
@@ -5,7 +8,7 @@ json.result do
     json.trade_name vendor.trade_name
     json.pan vendor.pan
     json.gstin vendor.gstin_locations&.pluck(:gstin)
-    json.extract! vendor, :id, :name, :business_name, :description, :vendor_id, :email, :mobile_number
+    json.extract! vendor, :id, :name, :business_name, :description, :vendor_id, :email, :mobile_number, :msme_registration_number, :msme_registered
     json.vendor_id vendor&.vendor_id
     json.vendor_type vendor.vendor_type&.as_json
     json.vendor_disabled vendor.deactivated?

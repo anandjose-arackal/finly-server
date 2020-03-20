@@ -93,6 +93,9 @@ json.result do
     json.invoice_creator_name "#{invoice.created_by&.first_name} #{invoice.created_by&.last_name}"
     json.invoice_creator_employee_id invoice.created_by&.employee_id
     json.invoice_creator_email invoice.created_by&.email
+
+    # total count of items which are part of the invoice
+    json.total_items invoice.items&.count
   end
 end
 json.count @result.invoice_line_items.count
