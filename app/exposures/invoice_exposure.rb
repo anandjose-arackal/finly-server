@@ -31,11 +31,11 @@ class InvoiceExposure < Exposures::API
   attribute :tds_amount_value, includes: [:tds_amount] do
     record.tds_amount&.value || 0
   end
-  attribute :balance_due, includes: [:balance_due], record_attribute: true
+  attribute :balance_due, includes: [:balance_due], record_attribute: true, exposure: true
   attribute :balance_due_value, includes: [:balance_due] do
     record.balance_due&.value || 0
   end
-  attribute :freight_amount, record_attribute: true, includes: [:freight_amount]
+  attribute :freight_amount, record_attribute: true, exposure: true, includes: [:freight_amount]
   attribute :freight_amount_value, includes: [:freight_amount] do
     record.freight_amount&.value || 0
   end
