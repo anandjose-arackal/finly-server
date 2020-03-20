@@ -536,6 +536,11 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
   }
 
+  scope :scope_all_except_voided_rejected, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected)]
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
