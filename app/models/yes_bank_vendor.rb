@@ -365,4 +365,8 @@ class YesBankVendor < ApplicationRecord
     return false if self.action_users(:approve).include?(user)
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
+
+  def name
+    business_name
+  end
 end

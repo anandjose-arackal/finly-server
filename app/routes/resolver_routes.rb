@@ -41,4 +41,8 @@ Resolver::Router.draw do
     route "default", Masters::Policies::Resolver
   end
 
+  scope :vendors do
+    route "default", Masters::Vendors::Resolver
+  end
+
 end

@@ -12,4 +12,5 @@ AutoComplete::Router.draw do
   route "cost_centers", Masters::CostCenters::AutoComplete
   route "categories", Masters::Categories::AutoComplete
   route "policies", Masters::Policies::AutoComplete
+  route "vendor", Masters::Vendors::AutoComplete # Went with singular because plural was already being used by other areas of the app
 end
