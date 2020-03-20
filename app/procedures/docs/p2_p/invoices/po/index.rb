@@ -47,6 +47,12 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
            currency_symbol: "{{record.gross_amount.currency.symbol}}"
   end
 
+  column :balance_due, default: true, includes: [gross_amount: :currency] do
+    amount value: "{{record.balance_due.value}}",
+           currency_code: "{{record.balance_due.currency.country_code}}",
+           currency_symbol: "{{record.balance_due.currency.symbol}}"
+  end
+
   column :tds_amount, default: true, includes: [tds_amount: :currency] do
     amount value: "{{record.tds_amount.value}}",
            currency_code: "{{record.tds_amount.currency.country_code}}",
