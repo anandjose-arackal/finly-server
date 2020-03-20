@@ -332,7 +332,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
       forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
       approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
-      action_taken = (dlrm.action_taken_at.exist? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
+      action_taken = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
       if forwarded_to.present?
         (approved ? "#{forwarded_to.name} - #{action_taken}" : forwarded_to.name)
       elsif taken_control_by.present?
