@@ -99,7 +99,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, message
       return
     end
-    self.reports = reports_presenter.reports.approved.not_settled.include_reimbursable_user_accounts
+    self.reports = reports_presenter.reports.approved.not_settled.includes(trails: :action_user)
     if not params&.dig(:init_all) and params&.dig(:report_id).present?
       self.reports = self.reports.with_id(params&.dig(:report_id))
     end
@@ -111,6 +111,8 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     self.user_count = 0
 
     user_ids = self.reports.pluck(:user_id).uniq
+    report_ids = self.reports.pluck(:id).uniq
+    all_report_associated_expenses = Expense.where(report_id: report_ids)
     users_map = User.with_id(user_ids).index_by(&:id)
     user_ids.each do |user_id|
       self.user_count += 1
@@ -128,8 +130,8 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         settlement_currency_code = settlement_currency.country_code
         currency_reports = user_reports.with_id(report_ids)
         currency_report_ids = currency_reports.pluck(:id)
-        expenses = Expense.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
-        reimbursements = Expense.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
+        expenses = all_report_associated_expenses.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
+        reimbursements = all_report_associated_expenses.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
         self.reimbursement_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.reimbursement_total[settlement_currency_code].nil?
         self.reimbursement_total[settlement_currency_code].value += reimbursements
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?
