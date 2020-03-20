@@ -66,13 +66,13 @@ class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
     text value: "{{record.tds_slab.name}}"
   end
 
-  column :cost_center, default: true, includes: [:cost_center] do
-    text value: "{{record.cost_center.name}}"
-  end
-
-  column :department, default: true, includes: [:department] do
-    text value: "{{record.department.name}}"
-  end
+  # column :cost_center, default: true, includes: [:cost_center] do
+  #   text value: "{{record.cost_center.name}}"
+  # end
+  #
+  # column :department, default: true, includes: [:department] do
+  #   text value: "{{record.department.name}}"
+  # end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
     text value: "{{record.gstin_location.location}}"

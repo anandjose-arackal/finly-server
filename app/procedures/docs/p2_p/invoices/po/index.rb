@@ -67,13 +67,13 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: :po_number
   end
 
-  column :cost_center, sort: :cost_center_name, default: true, includes: [:cost_center] do
-    text value: "{{record.cost_center.name}}"
-  end
-
-  column :department, sort: :department_name, default: true, includes: [:department] do
-    text value: "{{record.department.name}}"
-  end
+  # column :cost_center, sort: :cost_center_name, default: true, includes: [:cost_center] do
+  #   text value: "{{record.cost_center.name}}"
+  # end
+  #
+  # column :department, sort: :department_name, default: true, includes: [:department] do
+  #   text value: "{{record.department.name}}"
+  # end
 
   column :vendor_location, default: false, includes: [:gstin_location] do
     text value: "{{record.gstin_location.location}}"
