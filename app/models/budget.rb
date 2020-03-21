@@ -263,6 +263,7 @@ class Budget < ApplicationRecord
       budget_consumption: budget_consumption,
       budget_group: budget_group,
       # spent_amount: processor_instance.spent_amount,
+      criteria_name: budget_group_criterium&.name,
       associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name: (vendor.name || vendor.business_name) }},
       associated_categories: budget_group_criterium&.budgetable_categories.as_json,
       associated_cost_centers: budget_group_criterium&.budgetable_cost_centers.as_json,

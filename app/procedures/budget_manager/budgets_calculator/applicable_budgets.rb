@@ -42,7 +42,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     when "BankPaymentRequest", "PaymentOrder"
       # here we'll extract the categories as well from the invoice / purchase order
       # that is linked to each respective payment in the payment order
-      case document.payments.first.parent_type
+      case document.payments.first&.parent_type
       when "PurchaseOrder"
         self.categories = Category.with_id(PurchaseOrderItem.with_purchase_order_id(document.payments.pluck(:parent_id)).pluck(:category_id))
       when "Invoice"

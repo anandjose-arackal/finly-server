@@ -35,6 +35,8 @@ class BudgetGroup < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  validate :check_for_valid_start_end_date
+
   default_scope { order(created_at: :desc) }
 
   scope :with_id, -> (ids) {where id: ids}
@@ -106,5 +108,32 @@ class BudgetGroup < ApplicationRecord
       end_date: self.end_date&.strftime("%d-%b-%Y"),
       total_budgets: self.budgets.count
     }
+  end
+
+  private
+
+  def check_for_valid_start_end_date
+    case self.period_id
+    when Period.id_for(:day)
+      if end_date - start_date < 1.day
+        errors.add(:period, "cannot be less than the difference between start and end dates")
+      end
+    when Period.id_for(:month)
+      if end_date - start_date < 28.days
+        errors.add(:period, "cannot be less than the difference between start and end dates")
+      end
+    when Period.id_for(:week)
+      if end_date - start_date < 7.days
+        errors.add(:period, "cannot be less than the difference between start and end dates")
+      end
+    when Period.id_for(:quarter)
+      if end_date - start_date < (3.months - 1.day)
+        errors.add(:period, "cannot be less than the difference between start and end dates")
+      end
+    when Period.id_for(:year)
+      if end_date - start_date < 365.days
+        errors.add(:period, "cannot be less than the difference between start and end dates")
+      end
+    end
   end
 end
