@@ -5,4 +5,6 @@ class Forms::API::Entity::Types::Formula < Forms::API::Entity::Base
   can_editable_be_changed false
 
   consumes_choices!
+
+  operators :eq_any, :not_eq, :blank, :present
 end
