@@ -6,7 +6,7 @@ class Forms::API::Entity::Types::Text < Forms::API::Entity::Base
   option :regex #, default: {format: "", message: ""}
   option :format #, validates: {inclusion: {in: [nil, "", "text", "email", "url", "phone_number"]}}
 
-  operators :eq_any, :not_eq, :cont_any, :not_cont_any, :blank, :present
+  operators :eq_any, :not_eq_all, :cont_any, :not_cont_any, :blank, :present
 
   contract do
     required(:char_limit).value(:int?, lteq?: 255)

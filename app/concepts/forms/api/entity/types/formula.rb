@@ -6,5 +6,5 @@ class Forms::API::Entity::Types::Formula < Forms::API::Entity::Base
 
   consumes_choices!
 
-  operators :eq_any, :not_eq, :blank, :present
+  operators :eq_any, :not_eq_all, :blank, :present
 end

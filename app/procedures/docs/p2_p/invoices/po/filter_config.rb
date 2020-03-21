@@ -1,9 +1,11 @@
 class Docs::P2P::Invoices::Po::FilterConfig < Filters::API
 
   attribute :invoice_id, label: "Invoice ID", type: :text, simple: true
-  attribute :created_at, type: :datetime, simple: true
-  attribute :updated_at, type: :datetime, simple: true
-  # attribute :created_by_name, label: "Created By", type: :lookup, auto_complete_route: 'users'
+  attribute :invoice_number, label: "Invoice Number", type: :text, simple: true
+  attribute :created_at, type: :datetime, simple: false
+  attribute :updated_at, type: :datetime, simple: false
+  attribute :date, label: "Invoice Date", type: :datetime, simple: true
+  attribute :due_date, label: "Due Date", type: :datetime, simple: true
   attribute :vendor_id, label: "Vendor", simple: true, type: :lookup,  auto_complete_route: "vendor"
   attribute :vendor_vendor_id, label: "Vendor ID"
   attribute :location_id, label: "Billing Location", type: :lookup, auto_complete_route: "locations"
