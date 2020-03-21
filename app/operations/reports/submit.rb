@@ -70,10 +70,10 @@ class Reports::Submit < Reports::Base
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     if self.report.expenses.present?
-      op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-      if op.success?
-        self.budgets = op.budget_data
-      end
+      # op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
+      # if op.success?
+      #   self.budgets = op.budget_data
+      # end
     end
     if user.company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
       add_message :error, "You cannot submit this report because there are no budgets associated with it"

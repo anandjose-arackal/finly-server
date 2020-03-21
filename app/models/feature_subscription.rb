@@ -43,6 +43,7 @@
 #  user_level_custom_fields       :boolean          default(FALSE)
 #  deleted_at                     :datetime
 #  sso_login_enforced             :boolean          default(FALSE)
+#  card_service_provider_id       :integer
 #
 
 class FeatureSubscription < ApplicationRecord
