@@ -6,8 +6,10 @@ class AutoComplete::API < Transactions::API
   class_attr :resolver
   class_attr :json_builder
   class_attr :max_per_page, default: 10
+  class_attr :search_key
 
   pass :define_pagination
+  pass :define_search
   step Resolver::Transactions::Load(builder: :resolver_builder, paginate: true)
   step :render
 
@@ -17,6 +19,13 @@ class AutoComplete::API < Transactions::API
     params[:per_page] = [params[:per_page], self.class.max_per_page].min
     context[:page] = params[:page]
     context[:per_page] = params[:per_page]
+  end
+
+  def define_search(context, params:, **)
+    raise "Search key is not defined for #{self.class.name}" unless self.class.search_key.present?
+
+    params[:q] = {}
+    params[:q][self.class.search_key] = params["search"]
   end
 
   def render(context, options)
