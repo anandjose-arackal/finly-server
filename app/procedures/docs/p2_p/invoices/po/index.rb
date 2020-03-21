@@ -8,7 +8,7 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     context['model.records'] = context['model.records'].where(invoice_type_id: type_id)
   end
 
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "po"
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

@@ -9,7 +9,7 @@ class Docs::P2P::Invoices::Agreement::Index < IndexBuilder::API
   end
 
 
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "non_po", invoice_type: "recurring_invoice"
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

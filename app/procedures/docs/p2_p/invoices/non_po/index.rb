@@ -1,7 +1,7 @@
 class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
 
   resolver Docs::P2P::Invoices::Resolver
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}'
+  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "non_po"
 
   def self.resolve(context)
     super(context)
