@@ -161,18 +161,18 @@ class IciciBankApi::Base < BaseHandler
         end
       end
 
-      # if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
-      #   # just update the bank transaction with the latest details
-      #   self.bank_transaction = payment.reference_resource
-      #   self.bank_transaction.update(
-      #       transfer_status_id: self.transfer_status_id
-      #   )
-      # else
-      #   # if payment object exists but it didn't have an associated bank transaction object
-      #   if self.payment.present? && self.payment.reference_resource.blank?
-      #     Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
-      #   end
-      # end
+        # if self.payment&.reference_resource&.is_a?(IciciBankTransaction)
+        #   # just update the bank transaction with the latest details
+        #   self.bank_transaction = payment.reference_resource
+        #   self.bank_transaction.update(
+        #       transfer_status_id: self.transfer_status_id
+        #   )
+        # else
+        #   # if payment object exists but it didn't have an associated bank transaction object
+        #   if self.payment.present? && self.payment.reference_resource.blank?
+        #     Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        #   end
+        # end
 
     rescue Faraday::ResourceNotFound
       self.end_time = DateUtils.local_date_time

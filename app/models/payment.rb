@@ -52,14 +52,13 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
-#  reference_payment_id           :integer
 #  last_retried_at                :datetime
-#  utr                            :string(255)
 #
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -432,11 +431,11 @@ class Payment < ApplicationRecord
   }
 
   scope :include_for_index, -> {
-        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:initiating_user, :receiving_user,
-                  :receiving_account,
-                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+    includes(:payment_status, :amount, :department, :category, :system_messages, :initiating_account, :initiating_user, :receiving_user,
+             :receiving_account,
+             invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
-                  payment_order: [bank_payment_request: [:status]])
+             payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_minimal_for_index, -> {
@@ -444,10 +443,10 @@ class Payment < ApplicationRecord
   }
 
   scope :include_for_streamsets, -> {
-        includes( :payment_status, :amount, :department, :category,:initiating_account,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
-                  invoice: [:category, :cost_center, :invoice_status, :invoice_type],
-                  payment_order: [bank_payment_request: [:status]])
+    includes(:payment_status, :amount, :department, :category, :initiating_account, :initiating_user, :receiving_user,
+             receiving_account: [:account_owner],
+             invoice: [:category, :cost_center, :invoice_status, :invoice_type],
+             payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true

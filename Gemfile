@@ -15,7 +15,6 @@ gem 'parslet', '~> 1.8.2'
 gem 'rack', github: 'rack/rack', :ref => 'f690bb71425aa31d7b9b3113829af773950d8ab5'
 gem 'rufus-scheduler', '~> 3.6'
 gem 'clockwork', '~> 2.0'
-gem 'dry-monads', '~> 1.3.0'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
@@ -35,9 +34,12 @@ gem 'devise_zxcvbn', '4.4.1'
 gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
+gem 'dry-container', '~> 0.7'
+gem 'dry-monads', '~> 1.3.0'
 gem 'dry-validation', '~> 1.3'
 gem 'trailblazer', '~> 2.1'
 gem 'trailblazer-rails', '~> 2.1'
+# gem "cells-rails", '~> 0.1'
 gem 'trailblazer-activity', '~> 0.1'
 gem 'trailblazer-activity-dsl-linear', '~> 0.2'
 gem 'trailblazer-context', '~> 0.2'
@@ -59,7 +61,7 @@ gem 'figaro', '~> 1.1.1'
 gem 'puma', '~> 3.12.0'
 
 gem 'resque', '~> 2.0.0'
-# gem 'ransack'
+gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
 # gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
@@ -67,6 +69,7 @@ gem 'sinatra', '~> 2.1.0', require: nil, github: 'sinatra/sinatra', branch: 'mas
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
+
 gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
@@ -100,6 +103,7 @@ gem 'mysql2', '~> 0.5'
 gem 'will_paginate', '~> 3.1.6'
 
 gem 'sneakers', '~> 2.12'
+gem 'hutch', '~> 0.27'
 
 gem 'jwt', '~> 2.2'
 

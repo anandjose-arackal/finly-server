@@ -40,7 +40,6 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
-#  gst_details_id         :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -173,6 +172,8 @@ class Expense < ApplicationRecord
   default_scope {order('expenses.created_at DESC')}
 
   scope :with_id, -> (ids) {where id: ids}
+  scope :filter_id, ->(id) {with_id(id)}
+  scope :filter_ids, ->(id) {with_id(id)}
 
   scope :non_personal, -> {
     where(personal: false)
@@ -841,6 +842,7 @@ class Expense < ApplicationRecord
       return []
     end
   end
+
 
   def partially_transcribed
     self.system_messages.each do |system_message|

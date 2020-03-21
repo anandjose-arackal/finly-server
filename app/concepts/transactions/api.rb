@@ -6,6 +6,7 @@ class Transactions::API < Trailblazer::Operation
   include Transactions::Authorization::DSL
   include Transactions::Matcher::DSL
   extend Trailblazer::Activity::TaskBuilder
+  include Transactions::Result::Evaluator
   include Dry::Monads[:result]
 
   # Dummy step to help define schema after operation has started
@@ -17,6 +18,16 @@ class Transactions::API < Trailblazer::Operation
     Transactions::Task.build id: "assign_model_user" do |context, **|
       context[:model].send("#{key}=", context[:current_user])
       context[:model].company = context[:model].send(key)&.company
+      true
+    end
+  end
+
+  def self.ModelDestroy(key: :model)
+    Transactions::Task.build id: "destroy" do |context, **|
+      unless context[key].destroy
+        return on_error context, :base, context[key].errors.full_messages
+      end
+
       true
     end
   end

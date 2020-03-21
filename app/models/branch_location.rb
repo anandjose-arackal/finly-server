@@ -31,6 +31,7 @@ class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'location'

@@ -39,6 +39,7 @@
 
 class InvoiceLineItem < ApplicationRecord
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include MathUtil
 
   belongs_to :invoice, optional: true
@@ -58,6 +59,8 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :purchase_order_item, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
+
+  delegate :goods?, :service?, to: :inventory_line_item
 
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
@@ -148,10 +151,10 @@ class InvoiceLineItem < ApplicationRecord
         discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
         amount_attributes: {id: self.amount_id, value: precision_value(self.amount&.value), currency_id: self.amount&.currency_id},
         total_amount: precision_value(net_amount&.value),
-        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id, line_item_id: self.id },
+        net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id, line_item_id: self.id},
         hsn_sac: self.hsn_sac,
         taxable_amount: precision_value(taxable_amount&.value),
-        taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.taxable_amount&.value), currency_id: self.taxable_amount&.currency_id },
+        taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.taxable_amount&.value), currency_id: self.taxable_amount&.currency_id},
         inventory_line_item_id: self.inventory_line_item_id,
         item_info: self.item_info,
         comment: self.comment,
@@ -199,6 +202,10 @@ class InvoiceLineItem < ApplicationRecord
     end
   end
 
+  def tds_amount
+    service? ? calculate_tds(self.billable_amount&.value.to_f) : calculate_tds(self.taxable_amount&.value.to_f)
+  end
+
   private
 
   def budget_trail_entry
@@ -216,4 +223,16 @@ class InvoiceLineItem < ApplicationRecord
       BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
   end
+
+  def tds_percentage
+    return 0.0 unless tds_applicable?
+    self.parent.tds_slab&.tds || 0.0
+  end
+
+  def calculate_tds(amount)
+    new_gross_amount = TaxCalculationUtils.tds_amount(amount, tds_percentage)
+    tds_amount = (amount - new_gross_amount) rescue 0
+    tds_amount.ceil
+  end
+
 end

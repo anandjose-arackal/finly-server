@@ -261,6 +261,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def execute_callback(payment)
     post_params = {
         payment_id: payment.id,
+        external_reference_id: payment.external_reference_id,
         payment_amount: payment.amount_value,
         note: payment.note,
         status: payment.payment_status&.name,

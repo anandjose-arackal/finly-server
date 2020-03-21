@@ -1,11 +1,11 @@
 class CategoryDrop < Drop
 
   def name
-    @object.name
+    record.name
   end
 
   def gl_code
-    @object.gl_code
+    record.gl_code
   end
 
 end

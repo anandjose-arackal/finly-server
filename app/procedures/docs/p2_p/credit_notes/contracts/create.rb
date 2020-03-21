@@ -1,4 +1,4 @@
-class Docs::P2P::CreditNotes::Contracts::Create < Transactions::Contract
+class Docs::P2P::CreditNotes::Contracts::Create < Reform::Form
 
   property :id
   property :company_id, validates: {presence: true}
