@@ -1,5 +1,12 @@
 class PopulateNewColumnsForOldBudgetTrails < ActiveRecord::Migration[5.2]
   def change
+
+    ######################################## IMPORTANT ###############################
+    # The below has moved to a lib file that will be executed asynchronously. Do NOT
+    # uncomment the below for any reason
+    # #################################################################################
+
+
     # we are now going to populate the old budget trails models with data computed
     # according to the new logic that we have for budgets. All the data is available and
     # we only need to do a computation, so that's what we'll do

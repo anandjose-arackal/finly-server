@@ -7,6 +7,7 @@ class CreateBudgetConsumptions < ActiveRecord::Migration[5.2]
       t.integer :payment_processing_amount_id, references: "Amount", foreign_key: true, index: true
       t.integer :paid_amount_id, references: "Amount", foreign_key: true, index: true
       t.integer :budget_id, references: "Budget", foreign_key: true, index: true
+      t.datetime :deleted_at, index: true
 
       t.timestamps
     end
