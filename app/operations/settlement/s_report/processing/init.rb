@@ -114,6 +114,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     grouped_reports = self.reports.group_by(&:user_id)
     self.user_count = grouped_reports.keys.size
     grouped_reports.each do |key, reports_array|
+      user = User.find key
       report_currency_map = reports_array.group_by{|report|  report.policy.settlement_currency.country_code}
       report_currency_map.each do |settlement_currency_code, currency_report_array|
         report_ids = currency_report_array.pluck(:id)
@@ -127,7 +128,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?
         self.expenses_total[settlement_currency_code].value += expenses
         self.user_reports << {
-            user: currency_reports.first.user,
+            user: user ,
             expenses_total: Amount.new(value: expenses, currency: settlement_currency),
             reimbursement_total: Amount.new(value: reimbursements, currency: settlement_currency),
             reports: currency_reports,
