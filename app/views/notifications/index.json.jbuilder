@@ -1,5 +1,6 @@
 json.array!(@result.notifications) do |notif|
-  json.extract! notif, :read, :record_type
+  json.extract! notif, :read
+  json.record_type notif.record_type&.downcase&.gsub(" ", "_")
   json.body notif.generate_body(current_user)
   json.title notif.generate_title
   json.date notif.timestamp.strftime("%d %b %Y")
