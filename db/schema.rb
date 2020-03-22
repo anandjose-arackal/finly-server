@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_17_125225) do
+ActiveRecord::Schema.define(version: 2020_03_22_131152) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -5343,6 +5343,8 @@ ActiveRecord::Schema.define(version: 2020_03_17_125225) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
     t.index ["deleted_at"], name: "index_map_location_details_on_deleted_at"
     t.index ["name"], name: "index_map_location_details_on_name"
     t.index ["place_id"], name: "index_map_location_details_on_place_id"

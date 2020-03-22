@@ -13,6 +13,7 @@ class Maps::PlaceDetails < Transactions::API
 
   def query_details(context, model:, params:, current_user:, **)
     return true if model.present?
+
     result = GoogleMaps::PlaceDetails.(
         params: {
             place_id: params[:id],
@@ -23,20 +24,22 @@ class Maps::PlaceDetails < Transactions::API
       return on_error context, :base, "Error processing request"
     end
 
-    parsed_result = result['response.parsed'] || {}
+    parsed_result = result['response.parsed']&.dig('result') || {}
 
-    unless parsed_result['status'] == 'OK'
+    unless result['response.parsed']['status'] == 'OK'
       return on_error context, :base, "Invalid request"
     end
 
     detail = MapLocationDetail.new(
         {
-            result: result['response.parsed'],
+            result: parsed_result,
             address: parsed_result['formatted_address'],
             icon: parsed_result['icon'],
             place_id: parsed_result['place_id'],
             url: parsed_result['url'],
             name: parsed_result['name'],
+            latitude: parsed_result&.dig('geometry', 'location', 'lat'),
+            longitude: parsed_result&.dig('geometry', 'location', 'lng')
         }
     )
     unless detail.save
