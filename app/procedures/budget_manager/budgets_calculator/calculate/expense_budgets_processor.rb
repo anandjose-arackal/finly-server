@@ -32,12 +32,12 @@ class BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < Bud
         amount_before_tax_attributes: {
             id: trail&.amount_before_tax&.id,
             value: expense.amount_before_tax,
-            currency_id: expense.amount.currency_id
+            currency_id: expense.amount&.currency_id
         },
         amount_after_tax_attributes: {
             id: trail&.amount_after_tax&.id,
             value: expense.amount_after_tax,
-            currency_id: expense.amount.currency_id
+            currency_id: expense.amount&.currency_id
         }
     }
     # now calling super so that the budget trail is saved
