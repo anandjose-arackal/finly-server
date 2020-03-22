@@ -45,6 +45,7 @@ class PurchaseRequest < ApplicationRecord
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
+  has_many :items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 

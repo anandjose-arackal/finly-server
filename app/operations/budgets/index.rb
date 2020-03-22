@@ -49,7 +49,7 @@ class Budgets::Index < Budgets::Base
       self.budgets = apply_scopes(self.budgets, params)
       per_page = params[:per_page] || 30
       page = params[:page] || 1
-      self.paginated_budgets = self.budgets.paginate(per_page: per_page, page: page)
+      self.paginated_budgets = self.budgets.paginate(per_page: per_page, page: page).include_details
       self.count = self.budgets.count
     end
   end

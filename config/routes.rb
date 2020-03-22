@@ -73,6 +73,10 @@
 #                                          user_password_expired GET    /users/password_expired(.:format)                                                                                   devise/password_expired#show
 #                                                                PATCH  /users/password_expired(.:format)                                                                                   devise/password_expired#update
 #                                                                PUT    /users/password_expired(.:format)                                                                                   devise/password_expired#update
+#                                            users_saml_validate POST   /users/saml/validate(.:format)                                                                                      users#saml_validator
+#                                             users_saml_sign_in GET    /users/saml/sign_in(.:format)                                                                                       single_sign_on#saml
+#                                                users_saml_auth POST   /users/saml/auth(.:format)                                                                                          single_sign_on#create
+#                                              users_saml_logout DELETE /users/saml/logout(.:format)                                                                                        single_sign_on#saml_logout
 #                                     native_oauth_authorization GET    /oauth/authorize/native(.:format)                                                                                   doorkeeper/authorizations#show
 #                                            oauth_authorization GET    /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#new
 #                                                                DELETE /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#destroy
@@ -343,6 +347,7 @@
 #                                               mobile_v1_lookup POST   /mobile/v1/lookup(.:format)                                                                                         mobile/v1/users#lookup
 #                                mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                                                                          mobile/v1/users#send_verification_otp
 #                                      mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                                                                                mobile/v1/users#verify_user_otp
+#                                                      mobile_v2 GET    /mobile/v2/maps/config/:type(.:format)                                                                              mobile/v2/google_maps#maps_config
 #                              mobile_v2_available_expense_types GET    /mobile/v2/available_expense_types(.:format)                                                                        mobile/v2/expenses#available_expense_types
 #                                             mobile_v2_expenses GET    /mobile/v2/expenses(.:format)                                                                                       mobile/v2/expenses#index
 #                                                                POST   /mobile/v2/expenses(.:format)                                                                                       mobile/v2/expenses#create
@@ -671,6 +676,7 @@
 #                                                                PATCH  /card_restrictions/:id(.:format)                                                                                    card_restrictions#update
 #                                                                PUT    /card_restrictions/:id(.:format)                                                                                    card_restrictions#update
 #                                                                DELETE /card_restrictions/:id(.:format)                                                                                    card_restrictions#destroy
+#                                         single_sign_on_configs GET    /companies/sso_configs(.:format)                                                                                    companies#single_sign_on_configs
 #                                               companies_notify GET    /companies/notify(.:format)                                                                                         companies#notify
 #                                                   load_options GET    /companies/load_options(.:format)                                                                                   companies#load_options
 #                          companies_categories_and_cost_centers GET    /companies/categories_and_cost_centers(.:format)                                                                    companies#categories_and_cost_centers
@@ -706,6 +712,9 @@
 #                                organization_account_categories GET    /organization_account/categories(.:format)                                                                          organization_account#categories
 #                               organization_account_departments GET    /organization_account/departments(.:format)                                                                         organization_account#departments
 #                         organization_account_all_expense_types GET    /organization_account/all_expense_types(.:format)                                                                   organization_account#all_expense_types
+#                            organization_account_transfer_modes GET    /organization_account/transfer_modes(.:format)                                                                      organization_account#transfer_modes
+#                     organization_account_create_transfer_modes POST   /organization_account/create_transfer_modes(.:format)                                                               organization_account#create_transfer_modes
+#                    organization_account_destroy_transfer_modes DELETE /organization_account/destroy_transfer_modes(.:format)                                                              organization_account#destroy_transfer_modes
 #                        organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                                                  organization_account#export_preferences
 #                                                    state_codes GET    /state_codes(.:format)                                                                                              organization_account#gst_state_codes
 #                                                   add_category POST   /add_category(.:format)                                                                                             organization_account#add_category
@@ -841,6 +850,16 @@
 #                                                                DELETE /expenses/:id(.:format)                                                                                             expenses#destroy
 #                                               configs_loc_dept GET    /configs/loc_dept(.:format)                                                                                         configurations#loc_dept
 #                                            expenses_unreported POST   /expenses/unreported(.:format)                                                                                      expenses#unreported
+#                                                      documents GET    /task_workflows/documents(.:format)                                                                                 task_workflows#documents
+#                                                         config GET    /task_workflows/config(.:format)                                                                                    task_workflows#configuration
+#                                                 task_workflows GET    /task_workflows(.:format)                                                                                           task_workflows#index
+#                                                                POST   /task_workflows(.:format)                                                                                           task_workflows#create
+#                                              new_task_workflow GET    /task_workflows/new(.:format)                                                                                       task_workflows#new
+#                                             edit_task_workflow GET    /task_workflows/:id/edit(.:format)                                                                                  task_workflows#edit
+#                                                  task_workflow GET    /task_workflows/:id(.:format)                                                                                       task_workflows#show
+#                                                                PATCH  /task_workflows/:id(.:format)                                                                                       task_workflows#update
+#                                                                PUT    /task_workflows/:id(.:format)                                                                                       task_workflows#update
+#                                                                DELETE /task_workflows/:id(.:format)                                                                                       task_workflows#destroy
 #                                                receipts_export GET    /receipts/export(.:format)                                                                                          receipts#export
 #                                               receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                                                                            receipts#add_note
 #                                   receipt_enable_transcription PATCH  /receipts/:receipt_id/enable(.:format)                                                                              receipts#enable_transcription
@@ -996,7 +1015,6 @@
 #                             statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                                                       statements#company_balance_summary
 #                        statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                                                  statements#company_transactions_summary
 #                            statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                                                      statements#company_policies_summary
-#                                                                GET    /exports/:type(.:format)                                                                                            export#processor
 #                                        statements_user_summary GET    /statements/user_summary(.:format)                                                                                  statements#user_summary
 #                                 statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                                           statements#user_summary_export
 #                                                                POST   /statements/user_summary(.:format)                                                                                  statements#user_summary
@@ -1027,9 +1045,11 @@
 #                                                      resources GET    /resources(.:format)                                                                                                home#resources
 #                                                     currencies GET    /currencies(.:format)                                                                                               expenses#currencies
 #                                          autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                                                    autocomplete#merchant
+#                                         autocomplete_employees GET    /autocomplete/employees(.:format)                                                                                   autocomplete#employees
 #                                              autocomplete_user GET    /autocomplete/user(.:format)                                                                                        autocomplete#user
 #                                              autocomplete_card GET    /autocomplete/card(.:format)                                                                                        autocomplete#card
 #                                   autocomplete_inventory_items GET    /autocomplete/inventory_items(.:format)                                                                             autocomplete#inventory_items
+#                                      autocomplete_bbps_billers GET    /autocomplete/bbps_billers(.:format)                                                                                autocomplete#bbps_billers
 #                                         autocomplete_customers GET    /autocomplete/customers(.:format)                                                                                   invoicing/autocomplete#customer
 #                                           autocomplete_vendors GET    /autocomplete/vendors(.:format)                                                                                     autocomplete#vendors
 #                                            external_url_report GET    /external/reports/:id(.:format)                                                                                     external_url#report
@@ -1259,6 +1279,7 @@
 #                                                                PATCH  /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#update
 #                                                                PUT    /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#update
 #                                                                DELETE /bank_transfer/payment_orders/:id(.:format)                                                                         bank_transfer/payment_orders#destroy
+#                                         bank_transfer_progress GET    /bank_transfer/bank_payment_requests/progress(.:format)                                                             bank_transfer/bank_payment_requests#progress
 #                                            bank_transfer_count GET    /bank_transfer/bank_payment_requests/count(.:format)                                                                bank_transfer/bank_payment_requests#count
 #                               bank_transfer_count_with_filters GET    /bank_transfer/bank_payment_requests/count_with_filters(.:format)                                                   bank_transfer/bank_payment_requests#count_with_filters
 #                        bank_transfer_get_company_bank_accounts GET    /bank_transfer/payment_requests/get_company_bank_accounts(.:format)                                                 bank_transfer/bank_payment_requests#get_company_bank_accounts
@@ -1275,6 +1296,7 @@
 #                                     bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                                               bank_transfer/bank_payment_requests#bulk_approve
 #                                bank_transfer_bulk_take_control PATCH  /bank_transfer/bulk_take_control(.:format)                                                                          bank_transfer/bank_payment_requests#bulk_take_control
 #                                      bank_transfer_bulk_reject PATCH  /bank_transfer/bulk_reject(.:format)                                                                                bank_transfer/bank_payment_requests#bulk_reject
+#                                     bank_transfer_bulk_actions POST   /bank_transfer/bulk_actions(.:format)                                                                               bank_transfer/bank_payment_requests#bulk_actions
 #                                           bank_transfer_new_pr POST   /bank_transfer/new_pr(.:format)                                                                                     bank_transfer/bank_payment_requests#new_pr
 #                           bank_transfer_unified_payment_ticket POST   /bank_transfer/unified_payment_ticket(.:format)                                                                     bank_transfer/bank_payment_requests#unified_payment_ticket
 #                            bank_transfer_create_invoice_ticket POST   /bank_transfer/create_invoice_ticket(.:format)                                                                      bank_transfer/bank_payment_requests#create_invoice_ticket
@@ -1301,6 +1323,7 @@
 #            bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)                            bank_transfer/bank_payment_requests#within_timeframe
 #              bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)                              bank_transfer/bank_payment_requests#update_payment
 #                bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)                                    bank_transfer/bank_payment_requests#payments_list
+#               bank_transfer_bank_payment_request_payments_info GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_info(.:format)                               bank_transfer/bank_payment_requests#payments_info
 #              bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)                              bank_transfer/bank_payment_requests#payments_count
 #           bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_attachment
 #                            bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#index
@@ -1547,12 +1570,14 @@
 #                              payment_agreement_invoice_history GET    /payment_agreements/:payment_agreement_id/invoice_history(.:format)                                                 payment_agreements#invoice_history
 #                                  payment_agreement_attachments GET    /payment_agreements/:payment_agreement_id/attachments(.:format)                                                     payment_agreements#attachments
 #                                    payment_agreement_terminate PATCH  /payment_agreements/:payment_agreement_id/terminate(.:format)                                                       payment_agreements#terminate
+#                                       payment_agreement_revise PATCH  /payment_agreements/:payment_agreement_id/revise(.:format)                                                          payment_agreements#revise
 #                             document_config_payment_agreements GET    /payment_agreements/document_config(.:format)                                                                       payment_agreements#document_config
 #                                       count_payment_agreements GET    /payment_agreements/count(.:format)                                                                                 payment_agreements#count
 #                               policy_config_payment_agreements GET    /payment_agreements/policy_config(.:format)                                                                         payment_agreements#policy_config
 #                               filter_config_payment_agreements GET    /payment_agreements/filter_config(.:format)                                                                         payment_agreements#filter_config
 #             payment_agreement_action_config_payment_agreements GET    /payment_agreements/payment_agreement_action_config(.:format)                                                       payment_agreements#actions_configuration
 #                       all_upcoming_invoices_payment_agreements GET    /payment_agreements/all_upcoming_invoices(.:format)                                                                 payment_agreements#all_upcoming_invoices
+#                             editable_fields_payment_agreements GET    /payment_agreements/editable_fields(.:format)                                                                       payment_agreements#editable_fields
 #                                             payment_agreements GET    /payment_agreements(.:format)                                                                                       payment_agreements#index
 #                                                                POST   /payment_agreements(.:format)                                                                                       payment_agreements#create
 #                                          new_payment_agreement GET    /payment_agreements/new(.:format)                                                                                   payment_agreements#new
@@ -1580,7 +1605,12 @@
 #                                                                GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                                  ping_database GET    /ping/database(.:format)                                                                                            ping#database
 #                                             sample_import_file GET    /budgets/sample_import_file(.:format)                                                                               budgets#sample_import_file
+#                                         generate_template_file GET    /budgets/generate_template_file(.:format)                                                                           budgets#sample_import_file
 #                                                  budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
+#                                          process_template_file POST   /budgets/:budget_id/process_template_file(.:format)                                                                 budgets#process_template_file
+#                                                    sub_budgets GET    /budgets/:id/children(.:format)                                                                                     budgets#sub_budgets
+#                                            bulk_update_budgets POST   /budgets/bulk_update(.:format)                                                                                      budgets#bulk_update
+#                                                    trail_items GET    /budgets/:id/trail_items(.:format)                                                                                  budgets#show_trail_items
 #                                              budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                           budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                                  budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
@@ -1593,6 +1623,22 @@
 #                                                                PUT    /budgets/:id(.:format)                                                                                              budgets#update
 #                                                                DELETE /budgets/:id(.:format)                                                                                              budgets#destroy
 #                                             new_budgets_config GET    /new_budget_config(.:format)                                                                                        budgets#new_budgets_config
+#                                                  budget_groups GET    /budget_groups(.:format)                                                                                            budget_groups#index
+#                                                                POST   /budget_groups(.:format)                                                                                            budget_groups#create
+#                                               new_budget_group GET    /budget_groups/new(.:format)                                                                                        budget_groups#new
+#                                              edit_budget_group GET    /budget_groups/:id/edit(.:format)                                                                                   budget_groups#edit
+#                                                   budget_group GET    /budget_groups/:id(.:format)                                                                                        budget_groups#show
+#                                                                PATCH  /budget_groups/:id(.:format)                                                                                        budget_groups#update
+#                                                                PUT    /budget_groups/:id(.:format)                                                                                        budget_groups#update
+#                                                                DELETE /budget_groups/:id(.:format)                                                                                        budget_groups#destroy
+#                                                                GET    /budget_groups/:id/budget_group_criteria(.:format)                                                                  budget_group_criteria#index
+#                                          budget_group_criteria POST   /budget_group_criteria(.:format)                                                                                    budget_group_criteria#create
+#                                     new_budget_group_criterium GET    /budget_group_criteria/new(.:format)                                                                                budget_group_criteria#new
+#                                    edit_budget_group_criterium GET    /budget_group_criteria/:id/edit(.:format)                                                                           budget_group_criteria#edit
+#                                         budget_group_criterium GET    /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#show
+#                                                                PATCH  /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#update
+#                                                                PUT    /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#update
+#                                                                DELETE /budget_group_criteria/:id(.:format)                                                                                budget_group_criteria#destroy
 #                                                    grn_pending GET    /grn/pending(.:format)                                                                                              procure/procurements#index
 #                             procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                       procure/procurements#filter_config
 #                         procure_inward_documents_filter_config GET    /procure/inward_documents/filter_config(.:format)                                                                   procure/inward_documents#filter_config
@@ -1732,6 +1778,7 @@
 #                          procure_inward_invoice_apply_template POST   /procure/inward_invoices/:inward_invoice_id/apply_template(.:format)                                                procure/inward_invoices#template_apply
 #                                  procure_inward_invoice_delete DELETE /procure/inward_invoices/:inward_invoice_id/delete(.:format)                                                        procure/inward_invoices#destroy
 #                             procure_inward_invoice_save_submit PUT    /procure/inward_invoices/:inward_invoice_id/save_submit(.:format)                                                   procure/inward_invoices#save_submit
+#                                    procure_inward_invoice_void PUT    /procure/inward_invoices/:inward_invoice_id/void(.:format)                                                          procure/inward_invoices#void
 #                                        procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#index
 #                                                                POST   /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#create
 #                                     new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                              procure/inward_invoices#new
@@ -1819,6 +1866,12 @@
 #                               dashboards_vp_payment_agreements GET    /dashboards/vp/payment_agreements(.:format)                                                                         dashboards/vendor_payments#payment_agreements
 #                  dashboards_vp_purchase_request_approved_items GET    /dashboards/vp/purchase_request_approved_items(.:format)                                                            dashboards/vendor_payments#purchase_request_approved_items
 #                                          dashboards_vp_budgets GET    /dashboards/vp/budgets(.:format)                                                                                    dashboards/vendor_payments#budgets
+#                                         dashboards_em_expenses GET    /dashboards/em/expenses(.:format)                                                                                   dashboards/expense_management#expenses
+#                                          dashboards_em_reports GET    /dashboards/em/reports(.:format)                                                                                    dashboards/expense_management#reports
+#                                   dashboards_em_money_requests GET    /dashboards/em/money_requests(.:format)                                                                             dashboards/expense_management#money_requests
+#                                            dashboards_em_trips GET    /dashboards/em/trips(.:format)                                                                                      dashboards/expense_management#trips
+#                                  dashboards_em_awaiting_action GET    /dashboards/em/awaiting_action(.:format)                                                                            dashboards/expense_management#awaiting_action
+#                                          dashboards_em_configs GET    /dashboards/em/configs(.:format)                                                                                    dashboards/expense_management#configs
 #                                      vendors_new_vendor_config GET    /vendors/new_vendor_config(.:format)                                                                                vendors#new_vendor_config
 #                                          vendors_filter_config GET    /vendors/filter_config(.:format)                                                                                    vendors#filter_config
 #                                      vendors_create_and_submit POST   /vendors/create_and_submit(.:format)                                                                                vendors#create_and_submit
@@ -1870,6 +1923,88 @@
 #                                             user_onboarding_em POST   /user_onboarding/em(.:format)                                                                                       pending_invites#em_onboarding
 #                                             user_onboarding_vp POST   /user_onboarding/vp(.:format)                                                                                       pending_invites#vp_onboarding
 #                             user_onboarding_configuration_data GET    /user_onboarding/configuration_data(.:format)                                                                       pending_invites#configuration_data
+#                                                 exports_config GET    /exports/config(.:format)                                                                                           export_jobs#export_jobs_config
+#                                                                GET    /exports/:type(.:format)                                                                                            export_jobs#create
+#                                                                POST   /exports/:type(.:format)                                                                                            export_jobs#create
+#                                                    export_jobs GET    /export_jobs(.:format)                                                                                              export_jobs#index
+#                                                                GET    /maps/config/:type(.:format)                                                                                        google_maps#maps_config
+#                                                           auth POST   /streamsets/v1/auth(.:format)                                                                                       streamsets/v1/token#create
+#                                          transactions_expenses GET    /streamsets/v1/transactions/expenses(.:format)                                                                      streamsets/v1/transactions#expenses
+#                                          transactions_invoices GET    /streamsets/v1/transactions/invoices(.:format)                                                                      streamsets/v1/transactions#invoices
+#                                          transactions_payments GET    /streamsets/v1/transactions/payments(.:format)                                                                      streamsets/v1/transactions#payments
+#                                                          forms GET    /forms(.:format)                                                                                                    forms#index
+#                                                                POST   /forms(.:format)                                                                                                    forms#create
+#                                                       new_form GET    /forms/new(.:format)                                                                                                forms#new
+#                                                      edit_form GET    /forms/:id/edit(.:format)                                                                                           forms#edit
+#                                                           form GET    /forms/:id(.:format)                                                                                                forms#show
+#                                                                PATCH  /forms/:id(.:format)                                                                                                forms#update
+#                                                                PUT    /forms/:id(.:format)                                                                                                forms#update
+#                                                                DELETE /forms/:id(.:format)                                                                                                forms#destroy
+#                                                       insights GET    /insights(.:format)                                                                                                 insights#index
+#                                                                POST   /insights(.:format)                                                                                                 insights#create
+#                                                    new_insight GET    /insights/new(.:format)                                                                                             insights#new
+#                                                   edit_insight GET    /insights/:id/edit(.:format)                                                                                        insights#edit
+#                                                        insight GET    /insights/:id(.:format)                                                                                             insights#show
+#                                                                PATCH  /insights/:id(.:format)                                                                                             insights#update
+#                                                                PUT    /insights/:id(.:format)                                                                                             insights#update
+#                                                                DELETE /insights/:id(.:format)                                                                                             insights#destroy
+#                                 bbps_subscriptions_edit_config GET    /bbps/subscriptions/edit_config(.:format)                                                                           bbps/subscriptions#edit_config
+#                          bbps_subscriptions_biller_type_config GET    /bbps/subscriptions/biller_type_config(.:format)                                                                    bbps/subscriptions#biller_type_config
+#                         bbps_subscriptions_biller_field_config GET    /bbps/subscriptions/biller_field_config(.:format)                                                                   bbps/subscriptions#biller_field_config
+#                              bbps_subscriptions_actions_config GET    /bbps/subscriptions/actions_config(.:format)                                                                        bbps/subscriptions#actions_config
+#                              bbps_subscriptions_filters_config GET    /bbps/subscriptions/filters_config(.:format)                                                                        bbps/subscriptions#filters_config
+#                    bbps_subscriptions_validate_customer_params PUT    /bbps/subscriptions/validate_customer_params(.:format)                                                              bbps/subscriptions#validate_customer_params
+#                                       bbps_subscription_review PATCH  /bbps/subscriptions/:subscription_id/review(.:format)                                                               bbps/subscriptions#review
+#                            bbps_subscription_update_and_submit PUT    /bbps/subscriptions/:subscription_id/update_and_submit(.:format)                                                    bbps/subscriptions#update_and_submit
+#                                     bbps_subscription_add_bill PATCH  /bbps/subscriptions/:subscription_id/add_bill(.:format)                                                             bbps/subscriptions#add_bill
+#                                   bbps_subscription_fetch_bill GET    /bbps/subscriptions/:subscription_id/fetch_bill(.:format)                                                           bbps/subscriptions#fetch_bill
+#                        bbps_subscription_fetch_and_create_bill PATCH  /bbps/subscriptions/:subscription_id/fetch_and_create_bill(.:format)                                                bbps/subscriptions#fetch_and_create_bill
+#                                             bbps_subscriptions GET    /bbps/subscriptions(.:format)                                                                                       bbps/subscriptions#index
+#                                                                POST   /bbps/subscriptions(.:format)                                                                                       bbps/subscriptions#create
+#                                          new_bbps_subscription GET    /bbps/subscriptions/new(.:format)                                                                                   bbps/subscriptions#new
+#                                         edit_bbps_subscription GET    /bbps/subscriptions/:id/edit(.:format)                                                                              bbps/subscriptions#edit
+#                                              bbps_subscription GET    /bbps/subscriptions/:id(.:format)                                                                                   bbps/subscriptions#show
+#                                                                PATCH  /bbps/subscriptions/:id(.:format)                                                                                   bbps/subscriptions#update
+#                                                                PUT    /bbps/subscriptions/:id(.:format)                                                                                   bbps/subscriptions#update
+#                                                                DELETE /bbps/subscriptions/:id(.:format)                                                                                   bbps/subscriptions#destroy
+#                                         bbps_bills_edit_config GET    /bbps/bills/edit_config(.:format)                                                                                   bbps/bills#edit_config
+#                                      bbps_bills_actions_config GET    /bbps/bills/actions_config(.:format)                                                                                bbps/bills#actions_config
+#                                      bbps_bills_filters_config GET    /bbps/bills/filters_config(.:format)                                                                                bbps/bills#filters_config
+#                                            bbps_bills_payables GET    /bbps/bills/payables(.:format)                                                                                      bbps/bills#payable_bills
+#                                               bbps_bill_review PATCH  /bbps/bills/:bill_id/review(.:format)                                                                               bbps/bills#review
+#                                   bbps_bill_transaction_status GET    /bbps/bills/:bill_id/transaction_status(.:format)                                                                   bbps/bills#transaction_status
+#                                    bbps_bill_update_and_submit PUT    /bbps/bills/:bill_id/update_and_submit(.:format)                                                                    bbps/bills#update_and_submit
+#                                        bbps_bill_bill_validate PATCH  /bbps/bills/:bill_id/bill_validate(.:format)                                                                        bbps/bills#bill_validate
+#                                     bbps_bill_download_receipt GET    /bbps/bills/:bill_id/download_receipt(.:format)                                                                     bbps/bills#download_receipt
+#                                                     bbps_bills GET    /bbps/bills(.:format)                                                                                               bbps/bills#index
+#                                                                POST   /bbps/bills(.:format)                                                                                               bbps/bills#create
+#                                                  new_bbps_bill GET    /bbps/bills/new(.:format)                                                                                           bbps/bills#new
+#                                                 edit_bbps_bill GET    /bbps/bills/:id/edit(.:format)                                                                                      bbps/bills#edit
+#                                                      bbps_bill GET    /bbps/bills/:id(.:format)                                                                                           bbps/bills#show
+#                                                                PATCH  /bbps/bills/:id(.:format)                                                                                           bbps/bills#update
+#                                                                PUT    /bbps/bills/:id(.:format)                                                                                           bbps/bills#update
+#                                                                DELETE /bbps/bills/:id(.:format)                                                                                           bbps/bills#destroy
+#                                                bbps_complaints GET    /bbps/complaints(.:format)                                                                                          bbps/complaints#index
+#                                                                POST   /bbps/complaints(.:format)                                                                                          bbps/complaints#create
+#                                             new_bbps_complaint GET    /bbps/complaints/new(.:format)                                                                                      bbps/complaints#new
+#                                            edit_bbps_complaint GET    /bbps/complaints/:id/edit(.:format)                                                                                 bbps/complaints#edit
+#                                                 bbps_complaint GET    /bbps/complaints/:id(.:format)                                                                                      bbps/complaints#show
+#                                                                PATCH  /bbps/complaints/:id(.:format)                                                                                      bbps/complaints#update
+#                                                                PUT    /bbps/complaints/:id(.:format)                                                                                      bbps/complaints#update
+#                                                                DELETE /bbps/complaints/:id(.:format)                                                                                      bbps/complaints#destroy
+#                                       credit_notes_edit_config GET    /credit_notes/edit_config(.:format)                                                                                 credit_notes#edit_config
+#                                    credit_notes_filters_config GET    /credit_notes/filters_config(.:format)                                                                              credit_notes#filters_config
+#                                    credit_notes_actions_config GET    /credit_notes/actions_config(.:format)                                                                              credit_notes#actions_config
+#                                             credit_note_review PATCH  /credit_notes/:credit_note_id/review(.:format)                                                                      credit_notes#review
+#                                  credit_note_update_and_submit PUT    /credit_notes/:credit_note_id/update_and_submit(.:format)                                                           credit_notes#update_and_submit
+#                                                   credit_notes GET    /credit_notes(.:format)                                                                                             credit_notes#index
+#                                                                POST   /credit_notes(.:format)                                                                                             credit_notes#create
+#                                                new_credit_note GET    /credit_notes/new(.:format)                                                                                         credit_notes#new
+#                                               edit_credit_note GET    /credit_notes/:id/edit(.:format)                                                                                    credit_notes#edit
+#                                                    credit_note GET    /credit_notes/:id(.:format)                                                                                         credit_notes#show
+#                                                                PATCH  /credit_notes/:id(.:format)                                                                                         credit_notes#update
+#                                                                PUT    /credit_notes/:id(.:format)                                                                                         credit_notes#update
+#                                                                DELETE /credit_notes/:id(.:format)                                                                                         credit_notes#destroy
 #                                             accounting_exports GET    /accounting_exports(.:format)                                                                                       accounting_exports#index
 #                                             rails_service_blob GET    /rails/active_storage/blobs/:signed_id/*filename(.:format)                                                          active_storage/blobs#show
 #                                      rails_blob_representation GET    /rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format)                            active_storage/representations#show
@@ -3727,8 +3862,14 @@ Rails.application.routes.draw do
   ######## Budget apis start ######
 
   get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  get 'budgets/generate_template_file', to: 'budgets#sample_import_file', as: :generate_template_file
   post 'budgets/import', to: 'budgets#import', as: :budget_import
+  post 'budgets/:budget_id/process_template_file', to: 'budgets#process_template_file', as: :process_template_file
+  get 'budgets/:id/children', to: 'budgets#sub_budgets', as: :sub_budgets
+  post 'budgets/bulk_update', to: 'budgets#bulk_update', as: :bulk_update_budgets
   ## Budget apis start ##
+
+  get 'budgets/:id/trail_items', to: 'budgets#show_trail_items', as: :trail_items
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
     patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
@@ -3736,6 +3877,10 @@ Rails.application.routes.draw do
   end
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
+  resources :budget_groups do
+  end
+  get 'budget_groups/:id/budget_group_criteria',to: 'budget_group_criteria#index'
+  resources :budget_group_criteria, except: [:index]
   ######## Budget apis end #########
 
 

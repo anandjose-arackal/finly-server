@@ -28,12 +28,12 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
-    if self.purchase_order.items.present?
-      op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-      if op.success?
-        self.budgets = op.budget_data
-      end
-    end
+    # if self.purchase_order.items.present?
+    #   op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+    #   if op.success?
+    #     self.budgets = op.budget_data
+    #   end
+    # end
     if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.empty?
       add_message :error, "You cannot submit this PO because there are not budgets associated with it"
       return

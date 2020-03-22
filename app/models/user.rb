@@ -312,6 +312,7 @@ class User < ApplicationRecord
   validate :password_complexity
 
   scope :with_id, ->(user_id) {where id: user_id}
+  scope :with_ids, -> (user_ids) { where id: user_ids }
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids

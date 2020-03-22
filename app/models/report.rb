@@ -40,10 +40,10 @@
 #  controlling_level_id               :integer
 #  bank_reference_number              :string(255)
 #  source_account                     :string(255)
-#  uuid                               :string(36)
 #  location_id                        :integer
 #  cost_center_id                     :integer
 #  reference_payment_id               :integer
+#  company_id                         :integer
 #
 
 class Report < ApplicationRecord
@@ -56,6 +56,7 @@ class Report < ApplicationRecord
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
+  belongs_to :company
   belongs_to :status, optional: true, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
@@ -84,6 +85,7 @@ class Report < ApplicationRecord
   # belongs_to :money_request
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department"
+  belongs_to :cost_center, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -653,20 +655,14 @@ class Report < ApplicationRecord
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report_status_id)
-      self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
-      end
-    else
-      self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
-      end
+    self.expenses.each do |expense|
+      BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
     end
   end
 
   def budget_trail_destroy
     self.expenses.each do |expense|
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
+      BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
     end
   end
 

@@ -8,6 +8,10 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
     def init
       self.invoice = params[:inward_invoice]
+
+      # calling budgets computer to get the consumed budgets
+      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
+      self.budgets = op["result"][:budgets]
       # op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
       # if op.success?
       #   self.budgets = op.budget_data

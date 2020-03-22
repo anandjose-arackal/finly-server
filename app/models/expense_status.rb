@@ -44,4 +44,17 @@ class ExpenseStatus < ApplicationRecord
     self.id_for(:verified)
   end
 
+  def self.status_ids_for_paid_bucket
+    [
+        ExpenseStatus.id_for(:verified)
+    ]
+  end
+
+  def self.status_ids_for_pending_bucket
+    [
+        ExpenseStatus.id_for(:unsubmitted),
+        ExpenseStatus.id_for(:submitted)
+    ]
+  end
+
 end

@@ -109,14 +109,15 @@ end
 
 json.actions @result.actions
 
-json.budgets do
-  json.array! @result.budgets do |budget|
-    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :start_date, :end_date
-    json.user budget[:budget].user.as_json
-    json.spent_amount budget[:spent_amount]
-    json.budget_amount budget[:budget].budget_amount.as_json
-  end
-end
+json.budgets @result.budgets
+# json.budgets do
+#   json.array! @result.budgets do |budget|
+#     json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :start_date, :end_date
+#     json.user budget[:budget].user.as_json
+#     json.spent_amount budget[:spent_amount]
+#     json.budget_amount budget[:budget].budget_amount.as_json
+#   end
+# end
 
 json.reviewal_chain @result.bank_payment_request.get_reviewal_chain
 json.transfer_modes current_company.transfer_modes.as_json
