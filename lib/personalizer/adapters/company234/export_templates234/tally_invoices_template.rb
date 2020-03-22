@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company234::ExportTemplates234::TallyInvoicesTempl
   label 'Tally Invoices Export'
   description 'Tally Invoices Export'
   configurable false
-  handle :tally_invoices_export
+  handle :tally_invoices_export_sme
   screen 'invoices.index'
   system :vp
   scope 'development', 2, 'L&C Ltd.'
