@@ -21,7 +21,7 @@ class Maps::AutoComplete < Transactions::API
     # Todo: Return the actual error message
     return on_error context, :base, "Error fetching data" unless result.success?
 
-    parsed_result = result['response.parsed']&.dig('result') || {}
+    parsed_result = result['response.parsed'] || {}
     unless parsed_result['status'] == 'OK'
       return on_error context, :base, "Invalid request"
     end

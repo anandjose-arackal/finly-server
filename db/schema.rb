@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_09_155713) do
+ActiveRecord::Schema.define(version: 2020_03_17_125225) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1429,6 +1429,28 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
 
+  create_table "budget_consumptions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "pending_amount_id"
+    t.integer "committed_amount_id"
+    t.integer "pending_payment_amount_id"
+    t.integer "payment_processing_amount_id"
+    t.integer "paid_amount_id"
+    t.integer "budget_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "budget_amount_id"
+    t.integer "remaining_amount_id"
+    t.integer "total_consumed_amount_id"
+    t.index ["budget_id"], name: "index_budget_consumptions_on_budget_id"
+    t.index ["committed_amount_id"], name: "index_budget_consumptions_on_committed_amount_id"
+    t.index ["deleted_at"], name: "index_budget_consumptions_on_deleted_at"
+    t.index ["paid_amount_id"], name: "index_budget_consumptions_on_paid_amount_id"
+    t.index ["payment_processing_amount_id"], name: "index_budget_consumptions_on_payment_processing_amount_id"
+    t.index ["pending_amount_id"], name: "index_budget_consumptions_on_pending_amount_id"
+    t.index ["pending_payment_amount_id"], name: "index_budget_consumptions_on_pending_payment_amount_id"
+  end
+
   create_table "budget_criteria_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_id"
     t.integer "budgetable_id"
@@ -1438,6 +1460,59 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
     t.index ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id"
+  end
+
+  create_table "budget_date_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "budget_group_criteria", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.integer "budget_group_id"
+    t.string "ancestry"
+    t.datetime "deleted"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "created_by_user_id"
+    t.integer "company_id"
+    t.datetime "deleted_at"
+    t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
+    t.index ["deleted"], name: "index_budget_group_criteria_on_deleted"
+  end
+
+  create_table "budget_group_criteria_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "budget_group_criterium_id"
+    t.integer "budgetable_id"
+    t.string "budgetable_type"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_budget_group_criteria_mappings_on_deleted_at"
+  end
+
+  create_table "budget_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "company_id"
+    t.integer "created_by_user_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "period_id"
+    t.boolean "purchase_order"
+    t.boolean "payment"
+    t.boolean "expense"
+    t.boolean "purchase_request"
+    t.boolean "invoice"
+    t.string "name"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "budget_date_type_id"
+    t.boolean "active", default: true
+    t.index ["company_id"], name: "index_budget_groups_on_company_id"
+    t.index ["created_by_user_id"], name: "index_budget_groups_on_created_by_user_id"
+    t.index ["deleted_at"], name: "index_budget_groups_on_deleted_at"
   end
 
   create_table "budget_modification_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -1556,11 +1631,36 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.integer "department_id"
-    t.date "date"
+    t.date "entity_date"
     t.integer "sub_department_id"
     t.integer "procurement_id"
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+    t.decimal "payment_processing_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "payment_processing_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "tds_value", precision: 20, scale: 10, default: "0.0"
+    t.boolean "billed", default: false
+    t.integer "entity_status_id"
+    t.boolean "reimbursable", default: false
+    t.integer "amount_before_tax_id"
+    t.integer "amount_after_tax_id"
+    t.datetime "entity_created_at"
+    t.datetime "entity_submitted_at"
+    t.integer "purchase_order_id"
+    t.integer "invoice_id"
+    t.integer "payment_purpose_id"
+    t.integer "po_trail_item_id"
+    t.decimal "billed_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "billed_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_before_tax_value", precision: 20, scale: 10
+    t.decimal "remaining_amount_after_tax_value", precision: 20, scale: 10
+    t.decimal "paid_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "paid_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.integer "billed_quantity"
+    t.decimal "billed_rate", precision: 20, scale: 10
+    t.integer "remaining_quantity"
+    t.boolean "revised", default: false
+    t.boolean "payment_confirmed", default: false
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -1584,6 +1684,13 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.string "ancestry"
     t.datetime "deleted_at"
     t.string "uuid", limit: 36
+    t.integer "budget_group_id"
+    t.boolean "calculated_before_tax_amount", default: false
+    t.boolean "purchase_request"
+    t.boolean "invoice"
+    t.integer "budget_group_criterium_id"
+    t.boolean "active", default: true
+    t.integer "budget_date_type_id"
     t.index ["budget_amount_id"], name: "index_budgets_on_budget_amount_id"
     t.index ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id"
     t.index ["company_id"], name: "index_budgets_on_company_id"
@@ -5340,6 +5447,7 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.string "gl_code"
     t.string "uuid", limit: 36
     t.datetime "deleted_at"
+    t.integer "category_id"
     t.index ["active"], name: "index_money_request_item_categories_on_active"
     t.index ["company_id"], name: "index_money_request_item_categories_on_company_id"
     t.index ["name"], name: "index_money_request_item_categories_on_name"
@@ -5912,6 +6020,10 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.integer "revision_of_pa_id"
     t.text "revision_reason"
     t.integer "revised_by_id"
+    t.index ["company_id", "status_id", "policy_id", "created_at"], name: "payment_agreement_joined_indeexes"
+    t.index ["creator_id"], name: "index_payment_agreements_on_creator_id"
+    t.index ["policy_id"], name: "index_payment_agreements_on_policy_id"
+    t.index ["status_id"], name: "index_payment_agreements_on_status_id"
     t.index ["total_amount_id"], name: "index_payment_agreements_on_total_amount_id"
   end
 
@@ -7487,6 +7599,8 @@ ActiveRecord::Schema.define(version: 2020_03_09_155713) do
     t.string "bank_reference_number"
     t.string "source_account"
     t.string "uuid", limit: 36
+    t.integer "location_id"
+    t.integer "cost_center_id"
     t.index ["card_expenses_total_id"], name: "index_reports_on_card_expenses_total_id"
     t.index ["cash_in_hand_deduction_id"], name: "index_reports_on_cash_in_hand_deduction_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
