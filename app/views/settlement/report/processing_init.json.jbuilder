@@ -20,12 +20,12 @@ json.details do
         json.extract! report, :id, :name, :policy, :date_as_string
         json.submitted_on DateUtils.date_formatted(report.submitted_at)
         json.approved_on DateUtils.date_formatted(report.approved_at)
-        final_approver = report.final_approver
-        json.auto_approved final_approver.blank?
+        #final_approver = report.final_approver
+        json.auto_approved false
         json.final_approver do
-          json.name final_approver&.name
-          json.email final_approver&.email
-          json.mobile_number final_approver&.mobile_number
+          json.name "test"
+          json.email "test"
+          json.mobile_number "test"
         end
         json.expenses_total report.total_amount
         json.reimbursement_total report.reimbursable_expenses
