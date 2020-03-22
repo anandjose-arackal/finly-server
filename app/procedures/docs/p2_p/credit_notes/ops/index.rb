@@ -25,7 +25,7 @@ class Docs::P2P::CreditNotes::Ops::Index < Transactions::API
 
 
   step Policy::Pundit(Docs::P2P::CreditNotes::Authorizer, :index?)
-  # step Transactions::Resolver::Model(BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
+  # step Resolver::Transactions::Load(model: BbpsBillerSubscription, scope: :default, filter: true, paginate: true)
   step :index!
 
   def index!(options, params:, current_user:, **)

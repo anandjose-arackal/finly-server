@@ -12,7 +12,7 @@
 #  dependent_entity_editable :boolean
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  deleted_at                :datetime
+#  uuid                      :string(36)
 #
 
 require 'rails_helper'

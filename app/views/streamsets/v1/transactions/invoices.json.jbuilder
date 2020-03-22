@@ -48,8 +48,8 @@ json.result do
     json.line_item_cgst invoice_line_item.cgst || 0
     json.line_item_igst invoice_line_item.igst || 0
 
-    json.line_item_sgst_percentage (invoice_line_item.tax.to_f/2) || 0
-    json.line_item_cgst_percentage (invoice_line_item.tax.to_f/2) || 0
+    json.line_item_sgst_percentage (invoice_line_item.tax.to_f / 2) || 0
+    json.line_item_cgst_percentage (invoice_line_item.tax.to_f / 2) || 0
     json.line_item_igst_percentage invoice_line_item.tax || 0
 
     if invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)

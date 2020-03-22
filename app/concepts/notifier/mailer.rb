@@ -1,0 +1,60 @@
+# Mandatory
+# to, subject, :body_header, :template, :
+
+class Notifier::Mailer < Notifier::API
+  # require 'bunny'
+
+  assign :from, "noreply@finly.io"
+  assign :subject, "Finly Notification"
+  # assign :body_header, "New Notification from Finly"
+  assign :hero_bg_image, "bg_default"
+  assign :hero_bg_icon, "icon_default"
+
+  assign :company do |user, params|
+    company_id = params[:record].respond_to?(:company_id) ? params[:record].company_id : User.find(params[:record].send(params[:record].class.document_owner_attribute)).company_id
+    company = Company.find company_id
+    company = {
+        logo_url: company.configuration.logo.url(:thumb),
+        name: company.name
+    }
+  end
+
+  def permissions(ctx, options)
+    true
+  end
+
+  # def self.bunny_queue(queue)
+  #   connection = Bunny.new(automatically_recover: false)
+  #   connection.start
+  #
+  #   channel = connection.create_channel
+  #   queue = channel.queue(queue)
+  #
+  #   begin
+  #     puts ' [*] Waiting for messages. To exit press CTRL+C'
+  #     # block: true is only used to keep the main thread
+  #     # alive. Please avoid using it in real world applications.
+  #     queue.subscribe(block: true) do |_delivery_info, _properties, body|
+  #       puts " [x] Received #{body}"
+  #     end
+  #   rescue Interrupt => _
+  #     connection.close
+  #
+  #     exit(0)
+  #   end
+  # end
+
+  def prepare(options, params:, current_user:, **)
+    super
+  end
+
+  def validate(ctx, options)
+    true
+  end
+
+  def dispatch(options, payload:, **)
+    ap payload
+    NotifierMailer.delay.send_mail(payload.to_json.to_s)
+    true
+  end
+end

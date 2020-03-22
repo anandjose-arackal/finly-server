@@ -1,0 +1,7 @@
+<% if actions.present? %>
+  <div class="redirect-section actions" style="text-align: center;padding: 50px 0;">
+    <% actions.each do |action| %>
+      <a href="<%= action.href %>" class="button" style="display: inline-block;margin: auto;padding: 10px 15px;border: none;min-width: 160px;border-radius: 4px;background: #e95869;color: white;text-decoration: none;font-weight: 600;font-size: 17px;box-shadow: 0px 10px 10px #e958692e !important;"><%= action.title %></a>
+    <% end %>
+  </div>
+<% end %>

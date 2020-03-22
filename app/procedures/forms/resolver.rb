@@ -1,7 +1,7 @@
-class Forms::Resolver < Transactions::Resolver::Scope
+class Forms::Resolver < Resolver::API
 
   def load(params)
-    scope.where(company_id: @user.company_id)
+    entity.where(company_id: user.company_id)
   end
 
 end

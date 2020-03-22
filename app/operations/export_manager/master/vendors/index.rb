@@ -28,12 +28,16 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
   attribute :description
   attribute :vendor_type
   attribute :default_account_number
+  attribute :default_account_name
   attribute :default_account_ifsc
   attribute :second_account_number
+  attribute :second_account_name
   attribute :second_account_ifsc
   attribute :third_account_number
+  attribute :third_account_name
   attribute :third_account_ifsc
   attribute :fourth_account_number
+  attribute :fourth_account_name
   attribute :fourth_account_ifsc
   attribute :created_at
   attribute :active
@@ -154,6 +158,12 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
     account&.account_number
   end
 
+  def default_account_name(vendor)
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.first
+    account = self.vendor_ba.first if account.blank?
+    account&.name
+  end
+
   def default_account_ifsc(vendor)
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.first
     account = self.vendor_ba.first if account.blank?
@@ -164,6 +174,12 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.second
     account = self.vendor_ba.second if account.blank?
     account&.account_number
+  end
+
+  def second_account_name(vendor)
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.second
+    account = self.vendor_ba.second if account.blank?
+    account&.name
   end
 
   def second_account_ifsc(vendor)
@@ -178,6 +194,12 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
     account&.account_number
   end
 
+  def third_account_name(vendor)
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.third
+    account = self.vendor_ba.third if account.blank?
+    account&.name
+  end
+
   def third_account_ifsc(vendor)
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.third
     account = self.vendor_ba.third if account.blank?
@@ -188,6 +210,12 @@ class ExportManager::Master::Vendors::Index < ExportManager::Builders::Spreadshe
     account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
     account = self.vendor_ba.fourth if account.blank?
     account&.account_number
+  end
+
+  def fourth_account_name(vendor)
+    account = self.vendor_ba.map {|ba| ba if ba.default_account}.compact.fourth
+    account = self.vendor_ba.fourth if account.blank?
+    account&.name
   end
 
   def fourth_account_ifsc(vendor)

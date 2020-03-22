@@ -87,16 +87,16 @@ class Admin::Implementations::Master::Categories::Import < Admin::Implementation
       active = data[:active].to_s.upcase == 'N' ? false : true
 
       params = {
-              name: name,
-              gl_code: gl_code,
-              category_code: category_code,
-              active: active,
-              expense_management: expense_management,
-              vendor_payments: vendor_payment,
-              inward_invoice_line_items: inward_invoice_line_items,
-              gst_applicable:gst_applicable,
-              tds_applicable:tds_applicable,
-              ancestry: ancestry
+          name: name,
+          gl_code: gl_code,
+          category_code: category_code,
+          active: active,
+          expense_management: expense_management,
+          vendor_payments: vendor_payment,
+          inward_invoice_line_items: inward_invoice_line_items,
+          gst_applicable: gst_applicable,
+          tds_applicable: tds_applicable,
+          ancestry: ancestry
       }
       [params,messages]
     end

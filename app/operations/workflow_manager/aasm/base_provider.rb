@@ -65,6 +65,9 @@ class WorkflowManager::Aasm::BaseProvider
 
     # Add Success Message
     add_success_message
+
+    # Broadcast event
+    broadcast_event
   end
 
   def update_dlrms
@@ -243,6 +246,10 @@ class WorkflowManager::Aasm::BaseProvider
     else
       self.messages[:success].push "Successfully Performed Action"
     end
+  end
+
+  def broadcast_event
+    Events::Publisher::Record::Transition(document, user, aasm.current_event, aasm.current_state)
   end
 
   def reviewers_not_present?

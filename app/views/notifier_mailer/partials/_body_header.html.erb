@@ -1,0 +1,13 @@
+<% if payload["body_header"].present? %>
+
+  <div class="user-message" style="padding: 15px;">
+    <!--  <div class="header" style="overflow: hidden;">-->
+    <!--    <span class="circle" style="width: 10px;display: inline-block;height: 10px;background: #eee;border-radius: 50%;padding: 15px;float: left;"></span>-->
+    <!--    <span class="user-name" style="display: inline-block;font-weight: 600;font-size: 21px;margin-left: 15px;line-height: 1.95;"></span>-->
+    <!--  </div>-->
+    <div class="body" style="margin: 15px 0;color: slategray;">
+      <%= payload["body_header"] %>
+    </div>
+  </div>
+
+<% end %>

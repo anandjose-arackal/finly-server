@@ -1,5 +1,5 @@
 json.partial! 'money_request', money_request: @result.money_request
-json.reviewers @result.money_request&.get_reviewers.map{|user| user.name}
+json.reviewers @result.money_request&.get_reviewers.map {|user| user.name}
 json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
 json.actions @result.actions
 json.categories @result.items.each do |item|
