@@ -112,7 +112,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     user_ids = self.reports.pluck(:user_id).uniq
     report_ids = self.reports.pluck(:id).uniq
     all_report_associated_expenses = Expense.where(report_id: report_ids)
-    grouped_reports = self.reports.group_by(:user_id)
+    grouped_reports = self.reports.group_by(&:user_id)
     self.user_count = grouped_reports.keys.size
     grouped_reports.each do |key, reports_array|
       report_currency_map = reports_array.group_by{|report|  report.policy.settlement_currency_id}
