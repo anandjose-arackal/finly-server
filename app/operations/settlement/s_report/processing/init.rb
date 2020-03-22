@@ -121,8 +121,10 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         settlement_currency = Currency.currency_for(settlement_currency_code)
         currency_reports = reports.with_id(report_ids)
         currency_report_ids = currency_reports.pluck(:id)
-        expenses = all_report_associated_expenses.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
-        reimbursements = all_report_associated_expenses.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
+        #expenses = all_report_associated_expenses.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
+        #reimbursements = all_report_associated_expenses.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
+        expenses = currency_reports.map{|rpt| rpt.total_amount([],{currency_code: settlement_currency_code })}.inject(:+)
+        reimbursements = currency_reports.map{|rpt| rpt.reimbursable_expenses({currency_code: settlement_currency_code })}.inject(:+)
         self.reimbursement_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.reimbursement_total[settlement_currency_code].nil?
         self.reimbursement_total[settlement_currency_code].value += reimbursements
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?

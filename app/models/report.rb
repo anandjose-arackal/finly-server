@@ -467,8 +467,8 @@ class Report < ApplicationRecord
   end
 
   def total_amount(types = [], options = {})
-    return 0 unless self.expenses.present?
     temp_expenses = self.expenses
+    return 0 unless temp_expenses.present?
     if types.present?
       types = [types] unless types.kind_of?(Array)
       if types.present?
