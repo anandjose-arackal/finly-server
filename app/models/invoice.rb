@@ -212,7 +212,7 @@ class Invoice < ApplicationRecord
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
            :approved?, :retracted?, :auto_approved?, :initiated?, :closed?, :voided?, to: :invoice_status, allow_nil: true
-  delegate :payment?, :advance?, to: :invoice_type
+  delegate :payment?, :advance?, :tax_invoice?, to: :invoice_type
 
   attr_accessor :invoice_custom_fields
 
@@ -541,9 +541,17 @@ class Invoice < ApplicationRecord
     where.not invoice_status_id: InwardInvoiceStatus.id_for(:voided)
   }
 
+  scope :scope_all_except_voided_rejected, -> {
+    where.not invoice_status_id: [InwardInvoiceStatus.id_for(:voided),
+                                  InwardInvoiceStatus.id_for(:rejected)]
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
+  # the below callback deals with cases where the PO advance has been paid, and then an invoice is being raised
+  after_save :handle_po_advance_budget_trails
   after_destroy :budget_trail_destroy
+
 
   template_merge :procurement_id
   template_config do
@@ -827,9 +835,9 @@ class Invoice < ApplicationRecord
 
   def include_original_amount
     if self.invoice_items.present?
-        precision_value(self.amount&.value)
+      precision_value(self.amount&.value)
     else
-        precision_value(self.original_amount&.value)
+      precision_value(self.original_amount&.value)
     end
   end
 
@@ -1065,6 +1073,14 @@ class Invoice < ApplicationRecord
     invoice_status_id != InwardInvoiceStatus.id_for(:open)
   end
 
+  def amount_before_tax
+    self.taxable_amount&.value
+  end
+
+  def amount_after_tax
+    self.gross_amount&.value.to_f + self.tax_amount&.value.to_f
+  end
+
   def invoice_payment_status
     payment_status_ids = self.payments.pluck(:payment_status_id)
 
@@ -1081,6 +1097,11 @@ class Invoice < ApplicationRecord
     configurations = current_user.company.field_configurations.where.not(id: invoice_cf_ids).exclude_deleted.root_fields.order_created_at_desc
       custom_fields_config = configurations.with_parent_type(FieldParentType.id_for(:invoice))
       return custom_fields_config
+  end
+
+
+  def tds_per_item
+    self.tds_amount&.value.to_f / self.items.count
   end
 
   private
@@ -1139,20 +1160,20 @@ class Invoice < ApplicationRecord
 
   def budget_trail_entry
     # as of now, no condition is being used to determine when to add the invoice to the budget trail
-    if self.open? || self.rejected? || self.retracted? || self.voided?
+    if self.rejected? || self.voided?
       self.invoice_items.each do |invoice_item|
-        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+        BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
       end
     else
       self.invoice_items.each do |invoice_item|
-        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+        BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
       end
     end
   end
 
   def budget_trail_destroy
     self.invoice_items.each do |invoice_item|
-      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+      BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
     end
   end
 
@@ -1341,6 +1362,36 @@ class Invoice < ApplicationRecord
   def rollback_agreement_invoice
     if self.agreement_item.present?
       self.agreement_item.update(is_payment_agreement_upcoming_invoice: true)
+    end
+  end
+
+
+  # in case this invoice is paid or partially paid and the procurement it belongs to has a PO advance that has been initiated
+  # we need to mark that amount in the "paid_amount" attribute of each of the trail items of this invoice
+  # This will only apply in case it's an invoice raised as part of a PO
+  def handle_po_advance_budget_trails
+    if self.tax_invoice? && (self.paid? || self.partially_paid?)
+      # po = self.procurement.purchase_order
+      # if po.payments.present?
+      #   paid_amount = po.payments.successful.joins(:amount).sum(:value)
+      #   payment_processing_amount = po.payments.payment_processing_bucket.joins(:amount).sum(:value)
+      #   paid_percent_before_tax = paid_amount / self.amount_before_tax
+      #   paid_percent_after_tax = paid_amount / self.amount_after_tax
+      #   processing_percent_before_tax = payment_processing_amount / self.amount_before_tax
+      #   processing_percent_after_tax = payment_processing_amount / self.amount_after_tax
+      #   sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * billed_amount_before_tax_value)
+      #                                           WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_before_tax)
+      #   sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * billed_amount_before_tax_value)
+      #                                         WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_before_tax)
+      #   sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * billed_amount_after_tax_value)
+      #                                           WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_after_tax)
+      #   sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * billed_amount_after_tax_value)
+      #                                        WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+      #   ActiveRecord::Base.connection.execute(sql_after_tax)
+      # end
     end
   end
 

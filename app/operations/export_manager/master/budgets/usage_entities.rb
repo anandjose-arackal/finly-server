@@ -29,7 +29,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return
     end
     budget = op.budget
-    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
     items = processor_instance.spent_entities
     items[0] + items[1] + items[2] + items[3]
   end

@@ -82,6 +82,7 @@ class Reports::Create < Reports::Base
                                          policy_id: policy_id,
                                          travel_request_id: params[:travel_request_id],
                                          name: params[:name],
+                                         company_id: user.company_id,
                                          created_by: delegated_action_user
     report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
     ActiveRecord::Base.transaction do

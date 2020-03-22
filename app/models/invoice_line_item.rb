@@ -133,7 +133,7 @@ class InvoiceLineItem < ApplicationRecord
     self.inventory_line_item&.tds_applicable?
   end
 
-  def as_json
+  def as_json(options = {})
     {
         id: self.id,
         description: self.description,
@@ -210,17 +210,17 @@ class InvoiceLineItem < ApplicationRecord
 
   def budget_trail_entry
     if self.parent&.is_a?(Invoice)
-      if self.parent.open? || self.parent.rejected? || self.parent.retracted? || self.parent.voided?
-        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
+      if self.parent.rejected? || self.parent.voided?
+        BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
       else
-        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
+        BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
       end
     end
   end
 
   def budget_trail_destroy
     if self.parent&.is_a?(Invoice)
-      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
+      BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
   end
 

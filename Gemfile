@@ -64,7 +64,8 @@ gem 'resque', '~> 2.0.0'
 gem 'ransack', '~> 2.3'
 gem 'crono', '~> 1.1.2'
 # gem 'haml', '~> 5.0.4'
-gem 'sinatra', '~> 2.0', '>= 2.0.5'#, require: nil, github: 'sinatra/sinatra', branch: 'master'
+# gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'master'
+gem 'sinatra', '~> 2.1.0', require: nil, github: 'sinatra/sinatra', branch: 'master'
 gem 'gyoku', '~> 1.3'
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
@@ -260,6 +261,9 @@ group :development, :test do
   # gem 'better_errors'
   # gem 'binding_of_caller'
 
+end
+
+group :test do
   gem 'rspec-rails', '~> 3.8'
   gem 'spring-commands-rspec', '~> 1.0.4'
   gem 'capybara', '~> 3.29'
@@ -268,7 +272,7 @@ end
 
 group :test do
   gem 'factory_bot_rails', require: false
-  gem 'factory_bot'
+  gem 'factory_bot', "~> 4.10.0"
   gem 'database_cleaner'
 end
 
