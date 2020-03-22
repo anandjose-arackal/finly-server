@@ -23,7 +23,7 @@ class Maps::PlaceDetails < Transactions::API
       return on_error context, :base, "Error processing request"
     end
 
-    parsed_result = result['response.parsed']&.dig('result') || {}
+    parsed_result = result['response.parsed'] || {}
 
     unless parsed_result['status'] == 'OK'
       return on_error context, :base, "Invalid request"
