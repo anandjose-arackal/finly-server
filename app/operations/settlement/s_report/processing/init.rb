@@ -108,27 +108,17 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     self.user_reports = []
     self.reimbursement_total = {}
     self.expenses_total = {}
-    self.user_count = 0
 
     user_ids = self.reports.pluck(:user_id).uniq
     report_ids = self.reports.pluck(:id).uniq
     all_report_associated_expenses = Expense.where(report_id: report_ids)
-    users_map = User.with_id(user_ids).index_by(&:id)
-    user_ids.each do |user_id|
-      self.user_count += 1
-
-      # Map which is of the format {currency_id1:[*report_ids*], currency_id2: [*report_ids*]}
-      report_currency_map = {}
-      user_reports = self.reports.with_user(user_id)
-      user_reports.includes_policy.map do |report|
-        if report_currency_map[report.policy.settlement_currency].nil?
-          report_currency_map[report.policy.settlement_currency] = []
-        end
-        report_currency_map[report.policy.settlement_currency] << report.id
-      end
-      report_currency_map.each do |settlement_currency, report_ids|
-        settlement_currency_code = settlement_currency.country_code
-        currency_reports = user_reports.with_id(report_ids)
+    grouped_reports = self.reports.group_by(:user_id)
+    self.user_count = grouped_reports.keys.size
+    grouped_reports.each do |key, reports_array|
+      report_currency_map = reports_array.group_by{|report|  report.policy.settlement_currency_id}
+      report_currency_map.each do |settlement_currency_code, currency_report_array|
+        report_ids = currency_report_array.pluck(:id)
+        currency_reports = reports.with_id(report_ids)
         currency_report_ids = currency_reports.pluck(:id)
         expenses = all_report_associated_expenses.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
         reimbursements = all_report_associated_expenses.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
@@ -137,9 +127,9 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?
         self.expenses_total[settlement_currency_code].value += expenses
         self.user_reports << {
-            user: users_map[user_id],
-            expenses_total: Amount.new(value: expenses, currency: settlement_currency),
-            reimbursement_total: Amount.new(value: reimbursements, currency: settlement_currency),
+            user: currency_reports.first.user,
+            expenses_total: Amount.new(value: expenses, currency: Currency.currency_for(settlement_currency_code)),
+            reimbursement_total: Amount.new(value: reimbursements, currency: Currency.currency_for(settlement_currency_code)),
             reports: currency_reports,
             has_errors: false
         }
