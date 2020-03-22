@@ -4,5 +4,5 @@ class Forms::API::Entity::Types::Lookup < Forms::API::Entity::Base
 
   consumes_choices!
 
-  operators :eq_any, :blank, :present
+  operators :eq_any#, :blank, :present
 end
