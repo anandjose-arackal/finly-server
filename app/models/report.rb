@@ -150,7 +150,6 @@ class Report < ApplicationRecord
 
   # todo - having issues, where amounts are not matching actual expense amounts
   scope :expenses_total, -> {joins(expenses: :amount).sum(:'amounts.INR')}
-  scope :expenses_total, -> {joins()}
   # todo - having issues, where amounts are not matching actual reimbursements amounts
   scope :expenses_reimbursable_total, -> do
     # joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR')
