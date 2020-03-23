@@ -1176,6 +1176,9 @@ class Payment < ApplicationRecord
       when "Invoice"
         invoice = self.parent
         parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
+        # if there are no such trails, then we can return safely from this block and not execute any of the below statements
+        return true if parent_trails.blank?
+
         paid_amount = invoice.payments.successful.joins(:amount).sum(:value) + invoice.advance_amount&.value.to_f
         payment_processing_amount = invoice.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / invoice.amount_before_tax
@@ -1198,6 +1201,9 @@ class Payment < ApplicationRecord
       when "PurchaseOrder"
         purchase_order = self.parent
         parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: purchase_order.items.pluck(:id))
+        # if there are no such trails, then we can return safely from this block and not execute any of the below statements
+        return true if parent_trails.blank?
+
         paid_amount = purchase_order.payments.successful.joins(:amount).sum(:value)
         payment_processing_amount = purchase_order.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / purchase_order.amount_before_tax
