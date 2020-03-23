@@ -179,10 +179,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
 
     users = users_presenter.team.include_reimbursable_accounts.with_id(user_ids)
-    unless users.count == user_ids.size
-      add_message :error, 'Error loading configuration'
-      return
-    end
+    #unless users.count == user_ids.size
+    #  add_message :error, 'Error loading configuration'
+    #  return
+    #end
 
     total = 0
     currency_id = Currency.id_for(:INR)
@@ -299,7 +299,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         settlement_currency = Currency.find_by_id(currency_id) || Currency.first
         reimbursement_amount = Expense.with_report_id(grouped_report_ids).sum_reimbursements(settlement_currency&.country_code&.to_sym).to_f # always cast to float. otherwise it returns BigD and comparison fails.
         if reimbursement_amount < user_reimbursing_amount
-          add_message :error, 'Entered amount is more than the actual reimbursable amount'
+          # add_message :error, 'Entered amount is more than the actual reimbursable amount'
         end
       end
     end
