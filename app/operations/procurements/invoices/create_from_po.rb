@@ -270,11 +270,15 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id #,
+          purchase_order_item_id: item.id, #,
           # billable_amount_attributes: {
           #     value: get_billable_amount(item),
           #     currency_id: 1
           # }
+          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+              value: item.taxable_amount&.value.to_f,
+              currency_id: 1
+          }
       }
       if item.inventory_line_item.service?
         data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}

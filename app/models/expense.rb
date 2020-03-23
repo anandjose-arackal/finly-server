@@ -40,7 +40,6 @@
 #  created_by_id          :integer
 #  modified_by_id         :integer
 #  deleted_at             :datetime
-#  gst_details_id         :integer
 #  gstin_location_id      :integer
 #  state_of_expense_id    :integer
 #  hsn_sac                :string(255)
@@ -173,6 +172,8 @@ class Expense < ApplicationRecord
   default_scope {order('expenses.created_at DESC')}
 
   scope :with_id, -> (ids) {where id: ids}
+  scope :filter_id, ->(id) {with_id(id)}
+  scope :filter_ids, ->(id) {with_id(id)}
 
   scope :non_personal, -> {
     where(personal: false)
@@ -420,6 +421,8 @@ class Expense < ApplicationRecord
                                        {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
                                        {time_expense: [custom_fields: [:field_configuration]]},
                                        {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                       {amount: [:currency]}, :expense_status)}
+  scope :includes_budget_show, -> {includes(:category, :user,
                                        {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
   scope :sum_amounts, -> (currency_code = :INR) {includes_amount.sum("amounts.#{currency_code}")}
@@ -1125,7 +1128,6 @@ class Expense < ApplicationRecord
     field_label_values
   end
 
-
   def amount_before_tax
     if self.gst_amount.present?
       return amount_value - gst_amount.value
@@ -1138,6 +1140,28 @@ class Expense < ApplicationRecord
     amount_value
   end
 
+  def self.as_json(options = {})
+    {
+        id: id,
+        note: note,
+        amount_value: amount_value,
+        currency_symbol: currency_symbol,
+        currency_country_code: currency_country_code,
+        merchant_name: merchant_name,
+        date: date,
+        expense_type_name: expense_type_name,
+        expense_status_name: expense_status_name,
+        category_id: category_id,
+        category_name: category&.name,
+        reimbursable: reimbursable,
+        spent_from_id: spent_from_id,
+        spent_from_name: spent_from&.name,
+        tax_rate_value: tax_rate&.value,
+        distance_value: distance_value,
+        gst_percentage: gst_percentage,
+        expense_tax_type: expense_tax_type
+    }
+  end
 
   private
 
@@ -1228,16 +1252,14 @@ class Expense < ApplicationRecord
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if self.report.present?
-      if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
-      else
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
-      end
+    if self.report_id.present?
+      BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+    else
+      BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
     end
   end
 
   def budget_trail_destroy
-    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    BudgetManager::BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
   end
 end

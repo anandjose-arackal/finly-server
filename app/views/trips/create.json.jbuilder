@@ -1,0 +1,1 @@
+json.id @op[:model]&.id

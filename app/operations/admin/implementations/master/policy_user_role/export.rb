@@ -63,7 +63,6 @@ class Admin::Implementations::Master::PolicyUserRole::Export < Admin::Implementa
   end
 
 
-
   def user_email_mobile(user)
     identifier = user&.email
     if identifier.blank?
@@ -100,11 +99,11 @@ class Admin::Implementations::Master::PolicyUserRole::Export < Admin::Implementa
 
   def export(headers, contents)
     file = Tempfile.new(['policy_user_role_result', '.xlsx'])
-    workbook  = ::WriteXLSX.new(file)
-    contents.each  do |name, sheet|
+    workbook = ::WriteXLSX.new(file)
+    contents.each do |name, sheet|
       worksheet = workbook.add_worksheet(name)
       self.headers[name].values.each_with_index do |item, index|
-        worksheet.write( 0, index, item )
+        worksheet.write(0, index, item)
       end
       sheet.each_with_index do |items, row|
         items.each_with_index do |item, column|
@@ -121,15 +120,15 @@ class Admin::Implementations::Master::PolicyUserRole::Export < Admin::Implementa
 
   def get_policy_user_roles
     policies = apply_scopes(company.policies)
-    result =[]
+    result = []
     user_role_names = headers["Vendor Payments"].keys - [:user_id, :policy_name]
     policies.includes(:policy_user_roles).each do |policy|
       policy.policy_user_roles.group_by(&:user_id).each do |user_id, purs|
-        user_role_ids =purs.map(&:user_role_id).uniq
-        row=[]
+        user_role_ids = purs.map(&:user_role_id).uniq
+        row = []
         row << policy.name
         row << user_email_mobile(purs.first.user)
-        user_role_names.map{ |user_role_name| row << (user_role_ids.include?(UserRole.id_for(user_role_name)) ? "Y" : "") }
+        user_role_names.map {|user_role_name| row << (user_role_ids.include?(UserRole.id_for(user_role_name)) ? "Y" : "")}
         result << row
       end
     end
@@ -139,19 +138,19 @@ class Admin::Implementations::Master::PolicyUserRole::Export < Admin::Implementa
   def get_policy_user_mapping
     policies = apply_scopes(company.policies)
     user_role_names = headers["Expense Management"].keys - [:user_id, :policy_name]
-    user_role_mapping = UserRoleMapping.select("user_role_id, user_id").where(purpose_id: Purpose.id_for(:expense_management),user_id: company.users&.pluck(:id)).to_a&.group_by(&:user_id)
+    user_role_mapping = UserRoleMapping.select("user_role_id, user_id").where(purpose_id: Purpose.id_for(:expense_management), user_id: company.users&.pluck(:id)).to_a&.group_by(&:user_id)
     user_based_role_ids = {}
-    user_role_mapping.map{|mapping| user_based_role_ids.merge!({mapping[0] => mapping[1].map(&:user_role_id).uniq})}
-    result =[]
+    user_role_mapping.map {|mapping| user_based_role_ids.merge!({mapping[0] => mapping[1].map(&:user_role_id).uniq})}
+    result = []
     user_role_names = headers["Expense Management"].keys - [:user_id, :policy_name]
     policies.includes(:users).each do |policy|
       policy.users.each do |user|
         next unless user&.user_panel_subscription&.expense_management
-        row=[]
+        row = []
         row << policy.name
         row << user_email_mobile(user)
         user.policy_user_roles.where(purpose_id: 1)
-        user_role_names.map{ |user_role_name| row << (user_based_role_ids[user.id]&.include?(UserRole.id_for(user_role_name)) ? "Y" : "") }
+        user_role_names.map {|user_role_name| row << (user_based_role_ids[user.id]&.include?(UserRole.id_for(user_role_name)) ? "Y" : "")}
         result << row
       end
     end

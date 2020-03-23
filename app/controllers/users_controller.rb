@@ -17,6 +17,7 @@ class UsersController < BaseControllers::WebBase
 
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
+    RequestStore.store[:from_controller] = true
     @result = User::Index.(current_user, params)
     respond
   end

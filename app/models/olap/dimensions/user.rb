@@ -29,13 +29,15 @@
 #  finly_id             :string(255)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::User < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::User
-  events 'user.update', 'user.create', 'user.destroy'
+  consume 'user.update', 'user.create', 'user.destroy'
 
   required_relationships([:profile])
 

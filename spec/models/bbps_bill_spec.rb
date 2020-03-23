@@ -46,6 +46,7 @@
 #  tax_rate_id                :integer
 #  hsn_sac                    :string(255)
 #  paid_at                    :datetime
+#  review_note                :text(65535)
 #
 
 require 'rails_helper'

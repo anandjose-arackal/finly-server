@@ -1,17 +1,28 @@
 class Forms::API
-  include Forms::Definitions::DSL
-  include Forms::Builders::Contract
-  include Forms::Builders::Filters
-  # include Forms::Builders::Configuration
+  include DynamicAttributes
 
-  def self.master
-    return (@master ||= {}) if self == Forms::API
+  class_attr :sections, default: []
+  class_attr :dependencies, default: []
+  class_attr :model
 
-    # Ensure all masters are always referencing the API.master
-    @master ||= Forms::API.master
+  def self.section(name, options = {}, &block)
+    sections << Forms::API::Entity::Section.new(self, name, options, &block)
   end
 
-  class << self
-    delegate :[], :[]=, to: :master
+  def self.dependency(map)
+    dependencies << Forms::API::Dependency::Item.new(map)
   end
+
+  def self.find_entity(field_path)
+    sections.each do |section|
+      entity = section.find_entity field_path
+      return entity if entity
+    end
+    nil
+  end
+
+  def self.fetch(user)
+    ::Form.find_by(company_id: user.company_id, klass_name: self.name)
+  end
+
 end

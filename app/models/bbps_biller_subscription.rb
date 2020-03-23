@@ -48,11 +48,16 @@
 #  hsn_sac                 :string(255)
 #  quick_pay               :string(255)      default("N")
 #  last_paid_at            :datetime
+#  review_note             :text(65535)
 #
 
 class BbpsBillerSubscription < ApplicationRecord
   include Sequenced::ActsAsSequenced
   include SoftDeletable, Transitionable
+
+  include EventProducer
+
+  event_channel 'bbps_biller_subscription'
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_biller_subscription, editable: false, prefix: 'UBM'
 
@@ -82,6 +87,13 @@ class BbpsBillerSubscription < ApplicationRecord
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
 
+  scope :with_ids, -> (ids) {
+    where(id: ids)
+  }
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
   scope :filter_status, -> (status, user = nil) {
     case status
     when 'approved', :approved
@@ -103,7 +115,7 @@ class BbpsBillerSubscription < ApplicationRecord
   }
 
   scope :includes_for_index, -> {
-    includes(:pocs)
+    includes(:pocs, :department, :cost_center, :policy, :location, :biller, :status, :category, :user, :attachments, :tax_rate)
   }
 
   scope :filter_department_id, -> (id) {
@@ -219,7 +231,7 @@ class BbpsBillerSubscription < ApplicationRecord
     'BbpsBillerSubscriptionStatus'
   end
 
-  def role_based_initiator_associated_items(user, role_id, options = {})
+  def self.role_based_initiator_associated_items(user, role_id, options = {})
     if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       super
     elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)

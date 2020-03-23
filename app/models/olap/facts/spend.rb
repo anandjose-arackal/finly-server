@@ -103,6 +103,7 @@
 #  created_at                            :datetime         not null
 #  updated_at                            :datetime         not null
 #  type                                  :string(255)
+#  uuid                                  :string(36)       not null
 #
 
 class Olap::Facts::Spend < OlapRecord

@@ -1,4 +1,4 @@
-class ExportTemplates::Contract < Transactions::Contract
+class ExportTemplates::Contract < Reform::Form
 
   property :name, validates: {presence: true}
   property :description, validates: {presence: true}

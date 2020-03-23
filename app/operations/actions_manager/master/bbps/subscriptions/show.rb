@@ -23,7 +23,12 @@ class ActionsManager::Master::Bbps::Subscriptions::Show < ActionsManager::Master
   end
 
   def edit
-    (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id) || (bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user))
+    # Owner of Document When in Open State
+    # Controlling User When in awaiting_approval state
+    # Admin Post Approval
+    (BbpsBillerSubscription.open_statuses.include?(bbps_subscription.status_id) && bbps_subscription.user_id == user.id) ||
+        (bbps_subscription.awaiting_approval? && bbps_subscription.get_reviewers.include?(user)) ||
+        (BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(bbps_subscription.status_id) && user.vendor_payment_admin?)
   end
 
   def policy_editable

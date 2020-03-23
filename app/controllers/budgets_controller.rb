@@ -1,33 +1,73 @@
 class BudgetsController < BaseControllers::WebBase
+
+  layout 'trailblazers', only: [:index, :show, :sub_budgets, :create, :update]
+
   def index
-    @result = Budgets::Index.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::Index
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def show
-    @result = Budgets::Show.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::Show
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def show_trail_items
+    endpoint BudgetManager::BudgetsTrb::Ops::ShowTrailItems
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::ShowTrailItems.(current_user, params)
+    # respond
+  end
+
+  def sub_budgets
+    endpoint BudgetManager::BudgetsTrb::Ops::Show
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def create
-    @result = Budgets::Create.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::Create
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def update
-    @result = Budgets::Update.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::Update
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def bulk_update
+    @result = Budgets::BulkUpdate.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/bulk_update'
+    end
   end
 
   def destroy
-    @result = Budgets::Destroy.(current_user, params)
-    respond
+    endpoint BudgetManager::BudgetsTrb::Ops::Deactivate
+    respond_to do |format|
+      format.json {}
+    end
+    # @result = Budgets::Destroy.(current_user, params)
+    # respond
   end
 
-  def configuration
-    @result = Budget::Configuration.(current_user, params)
-    respond
-  end
+  # def configuration
+  #   @result = Budget::Configuration.(current_user, params)
+  #   respond
+  # end
 
   def add_budget
     @result = Budgets::Edit::AddBudget.(current_user, params)
@@ -51,11 +91,29 @@ class BudgetsController < BaseControllers::WebBase
 
   def sample_import_file
     @result = Budgets::GenerateSampleFile.(current_user, params)
-    respond
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+
   end
 
+  # deprecated op
   def import
     @result = Budgets::Import.(current_user, params)
     respond
   end
+
+  def process_template_file
+    @result = Budgets::ProcessTemplateFile.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'budgets/process_template_file'
+    end
+  end
+
 end

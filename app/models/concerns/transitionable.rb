@@ -16,6 +16,15 @@ module Transitionable
       self.send(self.class.document_owner_attribute)
     end
 
+    def taken_control?(level_id = nil)
+      level_id ||= self.level_id
+      if level_id.present?
+        self.document_level_reviewer_mappings.with_level_id(level_id).first&.taken_control
+      else
+        false
+      end
+    end
+
     def associated_users(type=nil)
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
       user_ids = []
@@ -671,7 +680,7 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :goods_receiver, 'goods_receiver'
           # nothing
-         when :non_po_invoice_initiator, 'non_po_invoice_initiator'
+        when :non_po_invoice_initiator, 'non_po_invoice_initiator'
           if self.table_name == 'credit_notes'
             data = data.or(role_based_initiator_associated_items(user, role_id))
           else
@@ -715,7 +724,7 @@ module Transitionable
           data = data.or(role_based_manager_associated_items(user, role_id))
         when :inventory_manager, 'inventory_manager'
           #nothing
-            when :vendor_creator, 'vendor_creator'
+        when :vendor_creator, 'vendor_creator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
         when :vendor_reviewer, 'vendor_reviewer'
           data = data.or(role_based_reviewer_associated_items(user, role_id))
@@ -723,11 +732,11 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         when :vendor_manager, 'vendor_manager'
           # data = []
-            when :policy_admin, 'policy_admin'
+        when :policy_admin, 'policy_admin'
           # data = []
-            when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+        when :bank_payment_request_auditor, 'bank_payment_request_auditor'
           # data = []
-            when :budget_manager, 'budget_manager'
+        when :budget_manager, 'budget_manager'
           data = []
         when :payment_agreement_initiator, 'payment_agreement_initiator'
           data = data.or(role_based_initiator_associated_items(user, role_id))
@@ -755,7 +764,7 @@ module Transitionable
           data = data.or(role_based_auditor_associated_items(user, role_id))
         else
           # data = []
-         end
+        end
       end
       data
     end

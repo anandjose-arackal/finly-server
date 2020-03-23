@@ -13,13 +13,15 @@
 #  deleted_at           :datetime
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::TdsRate < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::TdsRatesList
-  events 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
+  consume 'tds_rate.update', 'tds_rate.create', 'tds_rate.destroy'
 
   map :name
   map :tds
