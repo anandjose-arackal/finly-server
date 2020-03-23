@@ -179,10 +179,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
 
     users = users_presenter.team.include_reimbursable_accounts.with_id(user_ids)
-    unless users.count == user_ids.size
-      add_message :error, 'Error loading configuration'
-      return
-    end
+    #unless users.count == user_ids.size
+    #  add_message :error, 'Error loading configuration'
+    #  return
+    #end
 
     total = 0
     currency_id = Currency.id_for(:INR)
