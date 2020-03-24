@@ -16,8 +16,22 @@ class Menu::API < Transactions::API
     @items ||= []
   end
 
-  def self.item(key, path: nil, icon: nil, label: nil, create: false, permissions: [], features: nil, &block)
-    items << Menu::Item.new(key: key, path: path, icon: icon, label: label, create: create, permissions: permissions, features: features, &block)
+  def self.item(key, path: nil, icon: nil, label: nil, create: false, permissions: [], features: [], &block)
+    items << Menu::Item.new(
+        key: key, path: path, icon: icon, label: label, create: create,
+        permissions: permissions, features: features, scopes: scopes,
+        &block
+    )
+  end
+
+  def self.scopes
+    @scopes ||= []
+  end
+
+  def self.scope(path: nil, create: false, permissions: [], features: nil, &block)
+    scopes.push({path: path, create: create, permissions: permissions, features: features})
+    instance_eval &block
+    scopes.pop
   end
 
   step :authorize!
@@ -34,7 +48,7 @@ class Menu::API < Transactions::API
   end
 
   def build(context, current_user:, **)
-    context['config'] = self.class.items.as_json(current_user: current_user).reject {|item| item.nil?}
+    context['config'] = self.class.items.as_json(current_user: current_user).reject { |item| item.nil? }
 
     true
   end

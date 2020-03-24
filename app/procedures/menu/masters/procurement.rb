@@ -8,13 +8,13 @@ class Menu::Masters::Procurement < Menu::API
 
   item :dashboard, icon: 'https://img.icons8.com/windows/22/ffffff/speed.png'
 
-  # scope features: :purchase_requisition_system do
+  scope features: :purchase_requisition_system do
     item :request, path: 'purchase_requests', icon: 'https://img.icons8.com/windows/22/ffffff/request-money.png',
-         permissions: [:purchase_request_initiator, :purchase_request_reviewer]
-  # end
+         permissions: [:purchase_request_initiator, :purchase_request_reviewer], create: true
+  end
 
   item :procure, icon: 'https://img.icons8.com/windows/22/ffffff/add-shopping-cart.png' do
-    item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor]
+    item :purchase_orders, permissions: [:purchase_order_initiator, :purchase_order_reviewer, :purchase_order_auditor], create: true
     item :pr_approved_items, path: 'po_approval_items', permissions: [:purchase_order_initiator]
   end
 
@@ -38,7 +38,7 @@ class Menu::Masters::Procurement < Menu::API
   end
   item :payments, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
     item :payment_tickets, permissions: [:auditor] # Todo
-    item :payments, permissions: [:auditor] # Todo
+    # item :payments, permissions: [:auditor] # Todo
   end
   item :manage, icon: "https://img.icons8.com/windows/22/ffffff/commercial-development-management.png" do
     item :vendors, create: true, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor]
