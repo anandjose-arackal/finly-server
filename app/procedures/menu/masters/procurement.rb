@@ -36,10 +36,12 @@ class Menu::Masters::Procurement < Menu::API
       # item :unbilled_items, permissions: [] # todo
     end
   end
+
   item :payments, icon: "https://img.icons8.com/windows/22/ffffff/sales-performance.png" do
     item :payment_tickets, permissions: [:auditor] # Todo
     # item :payments, permissions: [:auditor] # Todo
   end
+
   item :manage, icon: "https://img.icons8.com/windows/22/ffffff/commercial-development-management.png" do
     item :vendors, create: true, permissions: [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :auditor]
     item :item_master, create: true, permissions: [:item_master_manager, :inventory_manager, :auditor]
@@ -55,6 +57,7 @@ class Menu::Masters::Procurement < Menu::API
     item :utility_subscriptions, create: true
     item :users, create: true, permissions: [:admin]
   end
+
   item :download_manager, icon: "https://img.icons8.com/windows/22/ffffff/software-installer.png"
 
 end
