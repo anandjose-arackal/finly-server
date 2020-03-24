@@ -105,7 +105,7 @@ class Notification < ApplicationRecord
     #     # do nothing
     # end
 
-    content += object
+    content += object if object.present?
 
     action = ""
     case self.action_type_id
