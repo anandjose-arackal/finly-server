@@ -59,12 +59,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       self.actions = get_actions
 
-      if self.invoice.items.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
-        if op.success?
-          self.budgets = op.budget_data
-        end
-      end
+      # calling budgets computer to get the consumed budgets
+      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
+      self.budgets = op["result"][:budgets]
 
       if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
         self.reviewal_chains = []

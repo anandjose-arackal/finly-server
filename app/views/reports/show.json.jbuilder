@@ -216,14 +216,7 @@ json.custom_fields do
   json.array! @result.report.custom_fields.as_json
 end
 
-json.budgets do
-  json.array! @result.budgets do |budget|
-    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date
-    json.user budget[:budget].user.as_json
-    json.spent_amount budget[:spent_amount]
-    json.budget_amount budget[:budget].budget_amount.as_json
-  end
-end
+json.budgets @result.budgets
 
 travel_desk_enabled = @result.report.user.travel_desk_enabled?
 json.show_trips travel_desk_enabled

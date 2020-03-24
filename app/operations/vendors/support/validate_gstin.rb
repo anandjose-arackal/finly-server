@@ -1,6 +1,7 @@
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
   attr_accessor :gstin_params, :connection, :api_response, :response_body, :state,
-                :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
+                :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile,
+                :file_logger, :url
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
@@ -21,6 +22,9 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     self.gstin_params = generate_params
     self.valid_response = false
     self.api_call_count = 1
+    if Rails.env.production?
+      self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_gstin_verification_requests.log', sync: true)
+    end
     setup_connection
   end
 
@@ -133,6 +137,18 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     Rails.logger.info "Making GSTIN Search API Call"
     self.api_response = self.connection.get
     self.api_call_count += 1
+
+    if Rails.env.production?
+      # logging the API call details in the logstash logger file
+      self.file_logger.info(
+                          path: self.url,
+                          method: "get",
+                          status_code: self.api_response.status,
+                          response: (JSON.parse(self.api_response.body) rescue {}),
+                          gstin: self.gstin_params[:gstin],
+                          request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
+      )
+    end
 
     if self.api_response.status && self.api_response.status == 200
       self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
@@ -278,8 +294,8 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
     return false if config_data.blank?
 
-    url = config_data.base_url + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
-    self.connection = Faraday.new(url: url) do |req|
+    self.url = config_data.base_url + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
+    self.connection = Faraday.new(url: self.url) do |req|
       req.adapter Faraday.default_adapter # make requests with Net::HTTP
 
       req.headers['Content-Type'] = config_data.content_type
