@@ -157,9 +157,7 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    RequestStore.store[:current_user] = User.find(13)
     if RequestStore.store[:current_user].present?
-      RequestStore.store[:current_company] = Company.find(1)
       if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != "User"
         return RequestStore.store[:current_user]
       end
