@@ -443,10 +443,11 @@ class Payment < ApplicationRecord
   }
 
   scope :include_for_streamsets, -> {
-    includes(:payment_status, :amount, :department, :category, :initiating_account, :initiating_user, :receiving_user,
-             receiving_account: [:account_owner],
-             invoice: [:category, :cost_center, :invoice_status, :invoice_type],
-             payment_order: [bank_payment_request: [:status]])
+        # keep this always during conflict - dont add receiving account sub relation
+        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource, :initiating_user, :receiving_user,
+                  :receiving_account,
+                  invoice: [:category, :cost_center, :invoice_status, :invoice_type],
+                  payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true
