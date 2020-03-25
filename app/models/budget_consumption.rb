@@ -46,4 +46,6 @@ class BudgetConsumption < ApplicationRecord
         total_consumed_amount: total_consumed_amount.as_json(rounded: true)
     }
   end
+
+  alias_method :spent_amount, :total_consumed_amount
 end
