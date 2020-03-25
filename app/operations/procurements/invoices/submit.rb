@@ -18,6 +18,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   def validate
     unless self.invoice.present?
       add_message :error, 'Invoice not found'
+      return
     end
 
     if invoice.payment_agreement_id.blank? || vendor_gstin_registered
@@ -37,13 +38,13 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     # has budgeting enforced or not
     # this will apply only if this invoice is part of a non-PO
     if self.invoice.procurement&.non_po_procurement?
-      # if self.invoice.items.present?
-      #   op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
-      #   if op.success?
-      #     self.budgets = op.budget_data
-      #   end
-      # end
-      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
+      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.invoice.items.present?
+        op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
+        if op.success?
+          self.budgets = op["result"][:budgets]
+        end
+      end
+      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.blank?
         add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
         return
       end
