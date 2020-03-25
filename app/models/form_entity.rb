@@ -127,7 +127,7 @@ class FormEntity < ApplicationRecord
         allow_clearing_default_value: allow_clearing_default_value,
         options: options,
         chained: chained,
-        choices_provider: choices_provider.config,
+        choices_provider: choices_provider&.config,
         internal: internal,
         field_path: field_path
     }

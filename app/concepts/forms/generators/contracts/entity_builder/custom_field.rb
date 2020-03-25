@@ -26,8 +26,8 @@ class Forms::Generators::Contracts::EntityBuilder::CustomField
               }
           )
         end
-        if input[:custom_fields]&.dig(custom_field_entity.uuid)
-          custom_field.value = input[:custom_fields]&.dig(custom_field_entity.uuid)
+        if input[custom_field_entity.field_key]
+          custom_field.value = input[custom_field_entity.field_key]
         end
         represented.custom_fields.append(custom_field)
       end

@@ -6,10 +6,10 @@ module Forms::Generators::Contracts::ModelHelpers::FormEntity
     if custom_field
       entity = self
       property_options[:virtual] = true
-      property_options[:deserializer] = -> (input, represented, **) do
-        associated_cf = represented.custom_fields.find {|custom_field| custom_field.form_entity_id == entity.uuid}
-        represented.send("#{entity.field_key}=", (associated_cf.value))
-      end
+      # property_options[:deserializer] = -> (input, represented, **) do
+      #   associated_cf = represented.custom_fields.find {|custom_field| custom_field.form_entity_id == entity.uuid}
+      #   represented.send("#{entity.field_key}=", (associated_cf.value))
+      # end
     end
 
     if populate_if_empty.present? and not property_options[:populate_if_empty]
