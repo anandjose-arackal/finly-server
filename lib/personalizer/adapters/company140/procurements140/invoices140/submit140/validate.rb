@@ -46,7 +46,7 @@ class Personalizer::Adapters::Company140::Procurements140::Invoices140::Submit14
       budget_exceeded = false
       self.budgets.each do |budget|
         budget_amount = budget.budget_consumption&.budget_amount&.value
-        budget_spent_amount = budget.budget_consumption&.spent_amount&.value
+        budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
 
         spent_amount = budget_spent_amount
 
