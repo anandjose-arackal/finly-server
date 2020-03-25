@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_22_131152) do
+ActiveRecord::Schema.define(version: 2020_03_25_140452) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3549,6 +3549,7 @@ ActiveRecord::Schema.define(version: 2020_03_22_131152) do
     t.index ["gst_amount_id"], name: "index_expenses_on_gst_amount_id"
     t.index ["gst_type_id"], name: "index_expenses_on_gst_type_id"
     t.index ["modified_by_id"], name: "index_expenses_on_modified_by_id"
+    t.index ["reimbursable"], name: "index_expenses_on_reimbursable"
     t.index ["rejecting_manager_id"], name: "index_expenses_on_rejecting_manager_id"
     t.index ["report_id"], name: "index_expenses_on_report_id"
     t.index ["spent_from_id"], name: "index_expenses_on_spent_from_id"
@@ -5373,6 +5374,8 @@ ActiveRecord::Schema.define(version: 2020_03_22_131152) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
     t.index ["deleted_at"], name: "index_map_location_user_queries_on_deleted_at"
     t.index ["map_location_detail_id"], name: "index_map_location_user_queries_on_map_location_detail_id"
     t.index ["place_id"], name: "index_map_location_user_queries_on_place_id"
@@ -7616,6 +7619,7 @@ ActiveRecord::Schema.define(version: 2020_03_22_131152) do
     t.index ["modified_by_id"], name: "index_reports_on_modified_by_id"
     t.index ["name"], name: "index_reports_on_name"
     t.index ["non_reimbursable_expenses_total_id"], name: "index_reports_on_non_reimbursable_expenses_total_id"
+    t.index ["policy_id", "report_status_id"], name: "report_joined_index_plcy_status"
     t.index ["policy_id"], name: "index_reports_on_policy_id"
     t.index ["reimbursable_expenses_total_id"], name: "index_reports_on_reimbursable_expenses_total_id"
     t.index ["reimbursement_id"], name: "index_reports_on_reimbursement_id"

@@ -6,9 +6,12 @@ class MapLocationUserQuery < ApplicationRecord
 
   def as_json(options = {})
     {
-        place_id: place_id,
         name: name,
-        address: address
+        address: address,
+        description: "#{name}, #{address}",
+        place_id: place_id,
+        latitude: latitude,
+        longitude: longitude
     }
   end
 
