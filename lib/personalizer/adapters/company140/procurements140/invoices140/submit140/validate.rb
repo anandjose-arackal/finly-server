@@ -5,7 +5,7 @@ class Personalizer::Adapters::Company140::Procurements140::Invoices140::Submit14
     self.invoice = op_instance.invoice
     self.procurement = self.invoice.procurement
     self.purchase_order = self.procurement&.purchase_order
-    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
+    op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.invoice, current_user: User.first})
     if op.success?
       self.budgets = op["result"][:budgets] rescue []
     end
