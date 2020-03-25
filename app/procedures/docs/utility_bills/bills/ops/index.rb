@@ -22,6 +22,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_amount, using: [:gteq, :lteq], type: :hash
 
   has_scope :filter_payable_bills
+  has_scope :filter_ids, type: :array
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
