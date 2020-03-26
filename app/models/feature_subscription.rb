@@ -45,6 +45,7 @@
 #  uuid                           :string(36)
 #  deleted_at                     :datetime
 #  sso_login_enforced             :boolean          default(FALSE)
+#  card_service_provider_id       :integer
 #
 
 class FeatureSubscription < ApplicationRecord
