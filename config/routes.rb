@@ -3125,6 +3125,7 @@ Rails.application.routes.draw do
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
   get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
+  get 'export/bank_payment_request(.:format)' => 'export#bank_payment_request', as: :export_bank_payment_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
