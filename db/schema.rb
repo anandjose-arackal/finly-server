@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_15_214227) do
+ActiveRecord::Schema.define(version: 2020_03_22_180939) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -819,6 +819,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.string "hsn_sac"
     t.string "quick_pay", default: "N"
     t.datetime "last_paid_at"
+    t.text "review_note"
     t.index ["active"], name: "index_bbps_biller_subscriptions_on_active"
     t.index ["bbps_biller_id"], name: "index_bbps_biller_subscriptions_on_bbps_biller_id"
     t.index ["cost_center_id"], name: "index_bbps_biller_subscriptions_on_cost_center_id"
@@ -915,6 +916,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.integer "tax_rate_id"
     t.string "hsn_sac"
     t.datetime "paid_at"
+    t.text "review_note"
     t.index ["amount_id"], name: "index_bbps_bills_on_amount_id"
     t.index ["autofetched"], name: "index_bbps_bills_on_autofetched"
     t.index ["controlling_level_id"], name: "index_bbps_bills_on_controlling_level_id"
@@ -2476,6 +2478,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.datetime "approved_at"
     t.string "credit_note_number"
     t.datetime "last_adjusted_at"
+    t.text "review_note"
     t.index ["billing_location_id"], name: "index_credit_notes_on_billing_location_id"
     t.index ["company_id"], name: "index_credit_notes_on_company_id"
     t.index ["controlling_level_id"], name: "index_credit_notes_on_controlling_level_id"
@@ -3373,6 +3376,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.index ["gst_amount_id"], name: "index_expenses_on_gst_amount_id"
     t.index ["gst_type_id"], name: "index_expenses_on_gst_type_id"
     t.index ["modified_by_id"], name: "index_expenses_on_modified_by_id"
+    t.index ["reimbursable"], name: "index_expenses_on_reimbursable"
     t.index ["rejecting_manager_id"], name: "index_expenses_on_rejecting_manager_id"
     t.index ["report_id"], name: "index_expenses_on_report_id"
     t.index ["spent_from_id"], name: "index_expenses_on_spent_from_id"
@@ -3788,60 +3792,72 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
+  create_table "form_custom_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "document_type"
+    t.string "document_id"
+    t.string "form_id", null: false
+    t.string "form_entity_id", null: false
+    t.string "field_key", null: false
+    t.string "value"
+    t.string "value_text"
+    t.index ["document_id"], name: "index_form_custom_fields_on_document_id"
+    t.index ["document_type", "document_id"], name: "index_form_custom_fields_on_document_type_and_document_id"
+    t.index ["document_type"], name: "index_form_custom_fields_on_document_type"
+    t.index ["field_key"], name: "index_form_custom_fields_on_field_key"
+    t.index ["form_entity_id"], name: "index_form_custom_fields_on_form_entity_id"
+    t.index ["form_id"], name: "index_form_custom_fields_on_form_id"
+    t.index ["uuid"], name: "index_form_custom_fields_on_uuid"
+    t.index ["value"], name: "index_form_custom_fields_on_value"
+    t.index ["value_text"], name: "index_form_custom_fields_on_value_text"
+  end
+
   create_table "form_dependencies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "dependency_type_id", null: false
-    t.integer "controlling_user_id", null: false
-    t.integer "controlling_entity_id", null: false
-    t.integer "dependent_entity_id", null: false
+    t.string "controlling_entity_id", null: false
+    t.string "dependent_entity_id", null: false
     t.integer "created_by_id", null: false
     t.integer "updated_by_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "form_id", null: false
     t.index ["company_id"], name: "index_form_dependencies_on_company_id"
     t.index ["controlling_entity_id"], name: "index_form_dependencies_on_controlling_entity_id"
-    t.index ["controlling_user_id"], name: "index_form_dependencies_on_controlling_user_id"
     t.index ["created_by_id"], name: "index_form_dependencies_on_created_by_id"
-    t.index ["dependency_type_id"], name: "index_form_dependencies_on_dependency_type_id"
     t.index ["dependent_entity_id"], name: "index_form_dependencies_on_dependent_entity_id"
     t.index ["updated_by_id"], name: "index_form_dependencies_on_updated_by_id"
   end
 
   create_table "form_dependency_choice_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "form_dependency_choice_id", null: false
-    t.integer "dependent_choice_id", null: false
+    t.string "form_dependency_mapping_id", null: false
+    t.string "dependent_choice_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.string "form_id", null: false
+    t.string "dependent_choice_type"
     t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
     t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
-    t.index ["form_dependency_choice_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
+    t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
   end
 
-  create_table "form_dependency_choices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "form_dependency_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
-    t.integer "form_dependency_id", null: false
-    t.integer "controlling_choice_id", null: false
-    t.boolean "is_choice_selected"
-    t.boolean "dependent_entity_required"
-    t.boolean "dependent_entity_visible"
-    t.boolean "dependent_entity_editable"
+    t.string "form_dependency_id", null: false
+    t.string "controlling_choice_id", null: false
+    t.boolean "dependent_required"
+    t.boolean "dependent_visible"
+    t.boolean "dependent_editable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
-    t.index ["company_id"], name: "index_form_dependency_choices_on_company_id"
-    t.index ["controlling_choice_id"], name: "index_form_dependency_choices_on_controlling_choice_id"
-    t.index ["form_dependency_id"], name: "index_form_dependency_choices_on_form_dependency_id"
-  end
-
-  create_table "form_dependency_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
-    t.index ["name"], name: "index_form_dependency_types_on_name"
+    t.string "form_id", null: false
+    t.string "controlling_choice_type"
+    t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
+    t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
+    t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
   end
 
   create_table "form_entities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -3880,6 +3896,13 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.text "scope"
+    t.boolean "internal", default: false
+    t.boolean "is_modified", default: false
+    t.string "field_path"
+    t.string "parent_id"
+    t.string "populate_if_empty"
+    t.boolean "associate_custom_fields", default: false
     t.index ["company_id"], name: "index_form_entities_on_company_id"
     t.index ["created_at"], name: "index_form_entities_on_created_at"
     t.index ["created_by_user_id"], name: "index_form_entities_on_created_by_user_id"
@@ -3920,8 +3943,8 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "section_type"
     t.datetime "deleted_at"
+    t.boolean "associate_custom_fields", default: false
     t.index ["active"], name: "index_form_sections_on_active"
     t.index ["company_id"], name: "index_form_sections_on_company_id"
     t.index ["form_id"], name: "index_form_sections_on_form_id"
@@ -4227,6 +4250,29 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.index ["company_id"], name: "index_icici_virtual_cards_on_company_id"
   end
 
+  create_table "index_view_segments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "screen", null: false
+    t.string "name", null: false
+    t.text "filters"
+    t.text "columns"
+    t.boolean "system_view", default: false
+    t.integer "company_id"
+    t.integer "user_id"
+    t.datetime "last_viewed_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_index_view_segments_on_company_id"
+    t.index ["deleted_at"], name: "index_index_view_segments_on_deleted_at"
+    t.index ["last_viewed_at"], name: "index_index_view_segments_on_last_viewed_at"
+    t.index ["name"], name: "index_index_view_segments_on_name"
+    t.index ["screen"], name: "index_index_view_segments_on_screen"
+    t.index ["system_view"], name: "index_index_view_segments_on_system_view"
+    t.index ["user_id"], name: "index_index_view_segments_on_user_id"
+    t.index ["uuid"], name: "index_index_view_segments_on_uuid"
+  end
+
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -4366,8 +4412,12 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "can_filter_from"
-    t.boolean "can_filter_to"
+    t.boolean "can_filter_date"
+    t.boolean "can_filter_policy", default: false
+    t.boolean "can_filter_department", default: false
+    t.boolean "can_filter_location", default: false
+    t.boolean "can_filter_cost_center", default: false
+    t.boolean "can_filter_category", default: false
     t.index ["active"], name: "index_insight_dashboards_on_active"
     t.index ["admin_user_id"], name: "index_insight_dashboards_on_admin_user_id"
     t.index ["app"], name: "index_insight_dashboards_on_app"
@@ -7099,6 +7149,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.index ["modified_by_id"], name: "index_reports_on_modified_by_id"
     t.index ["name"], name: "index_reports_on_name"
     t.index ["non_reimbursable_expenses_total_id"], name: "index_reports_on_non_reimbursable_expenses_total_id"
+    t.index ["policy_id", "report_status_id"], name: "report_joined_index_plcy_status"
     t.index ["policy_id"], name: "index_reports_on_policy_id"
     t.index ["reimbursable_expenses_total_id"], name: "index_reports_on_reimbursable_expenses_total_id"
     t.index ["reimbursement_id"], name: "index_reports_on_reimbursement_id"
@@ -7773,6 +7824,176 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
     t.index ["policy_id"], name: "index_travel_requests_on_policy_id"
     t.index ["status_id"], name: "index_travel_requests_on_status_id"
     t.index ["user_id"], name: "index_travel_requests_on_user_id"
+  end
+
+  create_table "trip_hotel_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "trip_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
+    t.bigint "company_id"
+    t.string "location"
+    t.string "preferred_area"
+    t.datetime "checkin_at"
+    t.datetime "checkout_at"
+    t.text "description"
+    t.integer "budget_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_trip_hotel_requests_on_budget_id"
+    t.index ["company_id"], name: "index_trip_hotel_requests_on_company_id"
+    t.index ["created_by_id"], name: "index_trip_hotel_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_hotel_requests_on_deleted_at"
+    t.index ["traveller_id"], name: "index_trip_hotel_requests_on_traveller_id"
+    t.index ["trip_id"], name: "index_trip_hotel_requests_on_trip_id"
+    t.index ["uuid"], name: "index_trip_hotel_requests_on_uuid"
+  end
+
+  create_table "trip_local_conveyance_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "trip_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
+    t.bigint "company_id"
+    t.string "location"
+    t.string "pickup_area"
+    t.datetime "pickup_at"
+    t.datetime "drop_at"
+    t.text "description"
+    t.integer "budget_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_trip_local_conveyance_requests_on_budget_id"
+    t.index ["company_id"], name: "index_trip_local_conveyance_requests_on_company_id"
+    t.index ["created_by_id"], name: "index_trip_local_conveyance_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_local_conveyance_requests_on_deleted_at"
+    t.index ["traveller_id"], name: "index_trip_local_conveyance_requests_on_traveller_id"
+    t.index ["trip_id"], name: "index_trip_local_conveyance_requests_on_trip_id"
+    t.index ["uuid"], name: "index_trip_local_conveyance_requests_on_uuid"
+  end
+
+  create_table "trip_passengers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "trip_id"
+    t.string "name"
+    t.string "contact_number"
+    t.string "email"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_passengers_on_deleted_at"
+    t.index ["trip_id"], name: "index_trip_passengers_on_trip_id"
+    t.index ["uuid"], name: "index_trip_passengers_on_uuid"
+  end
+
+  create_table "trip_routes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "trip_id"
+    t.string "from_location"
+    t.string "to_location"
+    t.date "depart_on"
+    t.date "return_on"
+    t.boolean "require_transport", default: false
+    t.boolean "require_hotel", default: false
+    t.boolean "require_local_conveyance", default: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_routes_on_deleted_at"
+    t.index ["depart_on"], name: "index_trip_routes_on_depart_on"
+    t.index ["from_location"], name: "index_trip_routes_on_from_location"
+    t.index ["require_hotel"], name: "index_trip_routes_on_require_hotel"
+    t.index ["require_local_conveyance"], name: "index_trip_routes_on_require_local_conveyance"
+    t.index ["require_transport"], name: "index_trip_routes_on_require_transport"
+    t.index ["return_on"], name: "index_trip_routes_on_return_on"
+    t.index ["to_location"], name: "index_trip_routes_on_to_location"
+    t.index ["trip_id"], name: "index_trip_routes_on_trip_id"
+    t.index ["uuid"], name: "index_trip_routes_on_uuid"
+  end
+
+  create_table "trip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_statuses_on_deleted_at"
+    t.index ["name"], name: "index_trip_statuses_on_name"
+  end
+
+  create_table "trip_transport_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.string "trip_id"
+    t.integer "created_by_id"
+    t.integer "traveller_id"
+    t.bigint "company_id"
+    t.string "from_location"
+    t.string "to_location"
+    t.string "mode"
+    t.date "depart_on"
+    t.string "preferred_timeframe"
+    t.integer "budget_id"
+    t.text "description"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_id"], name: "index_trip_transport_requests_on_budget_id"
+    t.index ["company_id"], name: "index_trip_transport_requests_on_company_id"
+    t.index ["created_by_id"], name: "index_trip_transport_requests_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trip_transport_requests_on_deleted_at"
+    t.index ["depart_on"], name: "index_trip_transport_requests_on_depart_on"
+    t.index ["from_location"], name: "index_trip_transport_requests_on_from_location"
+    t.index ["mode"], name: "index_trip_transport_requests_on_mode"
+    t.index ["to_location"], name: "index_trip_transport_requests_on_to_location"
+    t.index ["traveller_id"], name: "index_trip_transport_requests_on_traveller_id"
+    t.index ["trip_id"], name: "index_trip_transport_requests_on_trip_id"
+    t.index ["uuid"], name: "index_trip_transport_requests_on_uuid"
+  end
+
+  create_table "trip_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_trip_types_on_deleted_at"
+    t.index ["name"], name: "index_trip_types_on_name"
+  end
+
+  create_table "trips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "uuid", limit: 36, null: false
+    t.integer "company_id", null: false
+    t.integer "created_by_id", null: false
+    t.integer "status_id", null: false
+    t.string "trip_id"
+    t.integer "policy_id"
+    t.date "start_date"
+    t.date "end_date"
+    t.text "purpose"
+    t.integer "estimated_booking_cost_id"
+    t.integer "booking_cost_id"
+    t.integer "advance_requested_id"
+    t.integer "advance_processed_id"
+    t.integer "expenses_total_id"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "trip_type_id"
+    t.index ["advance_processed_id"], name: "index_trips_on_advance_processed_id"
+    t.index ["advance_requested_id"], name: "index_trips_on_advance_requested_id"
+    t.index ["booking_cost_id"], name: "index_trips_on_booking_cost_id"
+    t.index ["company_id"], name: "index_trips_on_company_id"
+    t.index ["created_by_id"], name: "index_trips_on_created_by_id"
+    t.index ["deleted_at"], name: "index_trips_on_deleted_at"
+    t.index ["end_date"], name: "index_trips_on_end_date"
+    t.index ["estimated_booking_cost_id"], name: "index_trips_on_estimated_booking_cost_id"
+    t.index ["expenses_total_id"], name: "index_trips_on_expenses_total_id"
+    t.index ["policy_id"], name: "index_trips_on_policy_id"
+    t.index ["start_date"], name: "index_trips_on_start_date"
+    t.index ["status_id"], name: "index_trips_on_status_id"
+    t.index ["trip_id"], name: "index_trips_on_trip_id"
+    t.index ["trip_type_id"], name: "index_trips_on_trip_type_id"
+    t.index ["uuid"], name: "index_trips_on_uuid"
   end
 
   create_table "unique_identifiers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -9208,6 +9429,7 @@ ActiveRecord::Schema.define(version: 2020_03_15_214227) do
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
   add_foreign_key "travel_requests", "users"
+  add_foreign_key "trips", "trip_types"
   add_foreign_key "unique_identifiers", "companies"
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"

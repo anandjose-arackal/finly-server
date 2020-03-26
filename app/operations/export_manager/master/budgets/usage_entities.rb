@@ -2,6 +2,10 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
 
   attr_accessor :entities
 
+  description 'Budget Trails Export'
+  configurable true
+  system :fi
+  screen ['budget_group_criteria.index']
   validate :input
   handle :budget_entities
 
