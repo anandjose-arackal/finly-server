@@ -72,6 +72,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
           category_id: payment[:category_id],
           company_id: user.company_id,
           cost_center_id: payment[:cost_center_id],
+          location_id: payment[:location_id],
           api_initiated: true,
           parent_type: payment[:parent_type],
           parent_id: payment[:parent_id],

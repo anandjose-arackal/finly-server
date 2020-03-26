@@ -19,6 +19,7 @@ class CostCenter < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'cost_center'
@@ -41,6 +42,10 @@ class CostCenter < ApplicationRecord
   scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app
+  }
+
+  scope :with_id, -> (ids) {
+    where id: ids
   }
 
   scope :vendor_payments_only, -> {

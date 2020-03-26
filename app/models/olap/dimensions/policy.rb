@@ -18,13 +18,15 @@
 #  deleted_at             :datetime
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  uuid                   :string(36)       not null
 #
 
 class Olap::Dimensions::Policy < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::Policy
-  events 'policy.update', 'policy.create', 'policy.destroy'
+  consume 'policy.update', 'policy.create', 'policy.destroy'
 
   map :name
   map :company_id

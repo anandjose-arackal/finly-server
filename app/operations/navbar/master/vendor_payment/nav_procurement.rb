@@ -9,7 +9,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances,:divider, :invoices_section,  :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices,:divider, :utility_bills, :divider, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters]},
+          {manage: [:analytics, :manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters]},
           :download_manager,
           # :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
@@ -291,7 +291,9 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def analytics
-    {name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+    return nil unless RequestStoreUtil.current_company&.analytics_system_enabled?
+
+    {name: 'Analytics', id: 'admin', url: 'analytics/params={}'}
   end
 
 end

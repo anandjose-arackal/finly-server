@@ -101,7 +101,7 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     end
 
     if self.expense_params.dig(:per_diem_expense_attributes, :per_diem_id).blank?
-      add_message :error, 'Per Dime name can\'t be blank'
+      add_message :error, 'Per Diem name can\'t be blank'
       return
     end
 

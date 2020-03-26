@@ -36,7 +36,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
-    # if the payment has failed, or is in open state, it can be processed with the already generated unique request number
+      # if the payment has failed, or is in open state, it can be processed with the already generated unique request number
     elsif bank_transaction&.retriable? || bank_transaction&.open?
       reference_number = bank_transaction.unique_request_number
     else
@@ -219,24 +219,24 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
     bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
-                                         transfer_type: transfer_request.transfer_type,
-                                         bank_reference_number: transfer_request.bank_reference_number,
-                                         beneficiary_bank_account: self.account,
-                                         transfer_status_id: transfer_status_id,
-                                         transfer_mode_id: payment.transfer_mode_id,
-                                         bank_response: transfer_request.transaction_result,
-                                         amount_attributes: {
+                                                            transfer_type: transfer_request.transfer_type,
+                                                            bank_reference_number: transfer_request.bank_reference_number,
+                                                            beneficiary_bank_account: self.account,
+                                                            transfer_status_id: transfer_status_id,
+                                                            transfer_mode_id: payment.transfer_mode_id,
+                                                            bank_response: transfer_request.transaction_result,
+                                                            amount_attributes: {
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
 
-     # now updating the bank transaction and associating it with the payment according to new
-     # structure
-     unless bank_transaction.update(reference_payment_id: payment.id)
-       Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
-     end
+    # now updating the bank transaction and associating it with the payment according to new
+    # structure
+    unless bank_transaction.update(reference_payment_id: payment.id)
+      Event::EAlert::Create.(nil, title: 'New bank transaction did not update with the payment', description: "New bank transaction #{bank_transaction.to_json} did not update with the payment: #{payment.to_json}", subject: 'New bank transaction did not update with the payment inside Payment Executor')
+    end
 
-     # additionally also update the payment reference_resource_type to YesBankTransaction
+    # additionally also update the payment reference_resource_type to YesBankTransaction
     payment.update(reference_resource_type: bank_transaction.class.name)
 
     # payment.with_lock do

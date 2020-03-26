@@ -65,12 +65,16 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
-#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
+#  discount_type_id             :integer
 #  rejection_note               :text(65535)
+#  vendor_poc_id                :integer
+#  vlpm_id                      :integer
+#  vendor_note                  :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -137,7 +141,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :bank_account, optional: true
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
@@ -813,6 +817,15 @@ class PurchaseOrder < ApplicationRecord
   end
 
 
+  def amount_before_tax
+    self.total_before_tax&.value
+  end
+
+  def amount_after_tax
+    self.total_after_tax&.value
+  end
+
+
   private
 
   # def populate_advance_amount
@@ -984,21 +997,21 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def budget_trail_entry
-    if self.voided? || self.rejected? || self.retracted? || self.open?
+    if self.voided? || self.rejected?
       # this will delete the trails of all the items within this particular purchase order
       self.items.each do |item|
-        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
       end
     else
       self.items.each do |item|
-        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
       end
     end
   end
 
   def budget_trail_destroy
     self.items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
     end
   end
 
@@ -1155,5 +1168,4 @@ class PurchaseOrder < ApplicationRecord
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
   end
-
 end

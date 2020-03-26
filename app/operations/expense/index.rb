@@ -99,6 +99,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_report_status_id, type: :array # shows only personal expenses
     has_scope :filter_split_link
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_ids, type: :array
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)

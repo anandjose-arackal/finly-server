@@ -1,5 +1,8 @@
 class ApplicationRecord < ActiveRecord::Base
-  include LiquidDroppable, ActiveRecordMaster
+  include LiquidDroppable
+  include Exposures::Model::Exposable
+  include Resolver::ActiveRecordHelper
+  include EventProducer
 
   self.abstract_class = true
 

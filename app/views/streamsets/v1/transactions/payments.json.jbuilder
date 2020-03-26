@@ -24,6 +24,7 @@ json.result do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
+    json.description payment.payment_order&.bank_payment_request&.description
 
     po_number = ''
     if (payment.parent_type == 'PurchaseOrder') || (payment.parent_type == 'Invoice')
@@ -44,6 +45,7 @@ json.result do
     json.invoice_delivery_location_code payment.invoice.delivery_location&.location_code rescue ""
 
     json.invoice_gstin_location_state payment&.invoice&.gstin_location&.state&.name rescue ""
+    json.invoice_gstin_location_city payment&.invoice&.gstin_location&.location rescue ""
     json.invoice_gstin_location_code payment&.invoice&.gstin_location&.state&.state_code rescue ""
     json.invoice_department_code payment.invoice&.items&.first.department&.department_code rescue ""
 

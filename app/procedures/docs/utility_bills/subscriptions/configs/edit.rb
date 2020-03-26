@@ -16,18 +16,16 @@ class Docs::UtilityBills::Subscriptions::Configs::Edit < Transactions::API
 
     result['reviewal_chains'] = []
 
-    if model.present?
-      if model.user_id == current_user.id && BbpsBillerSubscription.status_ids(:draft, :retracted, :rejected).include?(model.status_id)
-        parameters = {reviewal_document: model, provider_name: 'BbpsBillerSubscriptionProvider'}
-        result['policies'].each do |policy|
-          parameters['policy_id'] = policy.id
-          chain = {
-              policy_id: policy.id,
-              reviewal_chain: get_reviewal_chain(current_user, parameters)
-          }
+    if model.present? && model.user_id.present?
+      parameters = {reviewal_document: model, provider_name: 'BbpsBillerSubscriptionProvider'}
+      result['policies'].each do |policy|
+        parameters['policy_id'] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain(model.user, parameters)
+        }
 
-          result['reviewal_chains'].push(chain)
-        end
+        result['reviewal_chains'].push(chain)
       end
     else
       parameters = {provider_name: 'BbpsBillerSubscriptionProvider'}

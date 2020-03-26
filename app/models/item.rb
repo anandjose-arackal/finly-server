@@ -185,7 +185,7 @@ class Item < ApplicationRecord
   def budget_trail_entry
     purchase_order_items = PurchaseOrderItem.with_inventory_line_item(self.id)
     purchase_order_items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
   end
 
