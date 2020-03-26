@@ -51,7 +51,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     if bank_transaction&.retriable?
       # here we shall create a new bank transaction that will contain the trails of the previous transaction
       bank_transaction = create_bank_transaction(payment, transfer_request)
-    # i.e. it is the first time the payment is being credited
+      # i.e. it is the first time the payment is being credited
     elsif bank_transaction.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
     elsif payment.in_progress?
@@ -80,8 +80,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     # be determined based on the status update cron job that runs later
     op = IciciBankApi::TransactionInitiate.(
       transfer_request: transfer_request,
-      payment: payment,
-      bank_transaction: bank_transaction
+          payment: payment,
+          bank_transaction: bank_transaction
     )
 
 

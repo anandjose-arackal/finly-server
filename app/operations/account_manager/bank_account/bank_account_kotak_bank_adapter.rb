@@ -66,7 +66,6 @@ class AccountManager::BankAccount::BankAccountKotakBankAdapter < AccountManager:
     end
 
 
-
     # unless bank_transaction
     #   payment.system_messages.build(
     #                              content: "Payment cannot be processed at this time",

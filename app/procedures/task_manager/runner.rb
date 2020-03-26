@@ -164,7 +164,7 @@ class TaskManager::Runner < Transactions::API
   protected
 
   def execute_function(function, *args)
-    Transactions::Helper.execute_function(self, function, *args)
+    Transactions::Evaluator.eval(self, function, *args)
   end
 
 end

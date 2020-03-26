@@ -147,3 +147,5 @@ json.result do
     json.reviewal_chain @result.reviewal_chain
   end
 end
+
+json.budgets @result.budgets

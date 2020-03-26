@@ -1,15 +1,15 @@
 class TdsRatesListDrop < Drop
 
   def name
-    @object.name
+    record.name
   end
 
   def rate
-    @object.tds
+    record.tds
   end
 
   def gl_code
-    @object.gl_code
+    record.gl_code
   end
 
 end

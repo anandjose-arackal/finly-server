@@ -15,6 +15,7 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
           {team: [:team_settlements, :team_users, :team_exports, :divider, :documents_section, :team_money_requests, :team_expenses , :team_reports, :team_trips, :travel_request_bookings]},
           {admin: [:analytics, :company_settlements, :company_users, :company_exports, :divider, :documents_section, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
           {auditor: [:analytics, :company_money_requests, :company_expenses, :company_reports, :company_trips]},
+          :download_manager,
           # :analytics,
           # {expenses: [:your_expenses, :company_expenses]},
           # {money_requests: [:your_money_requests, :money_requests_awaiting_approval, :team_money_requests, :company_money_requests]},
@@ -45,6 +46,10 @@ class Navbar::Master::ExpenseManagement::NavConfig < Navbar::Master::Base
   def self.accept?
     return false unless RequestStoreUtil.current_company&.feature_subscription&.expense_management_enabled
     true
+  end
+
+  def download_manager
+    {name: 'Download Manager', id: 'download_manager', url: 'download_manager'}
   end
 
   def dashboard

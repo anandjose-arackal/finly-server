@@ -153,7 +153,7 @@ class User::Invite::Accept < User::Invite::Base
 
   def user_params
     params.require(:user).permit(:password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
-                                 :last_name, :mothers_maiden_name,:default_password,
+                                 :last_name, :mothers_maiden_name, :default_password,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
   end

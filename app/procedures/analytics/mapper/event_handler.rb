@@ -4,18 +4,16 @@ class Analytics::Mapper::EventHandler
 
   class_attr :mapper_klass
 
-  def self.build(mapper, event)
-    Class.new(self) do
-      consumes_event!(event, consumer_key: "analytics.synchronizer.#{event}", name: "Analytics Synchronizer for #{event}", sync: mapper.sync?)
-      mapper_klass(mapper)
-    end
+  def self.build(mapper, events)
+    consumes_event!(*events, sync: mapper.sync?)
+    mapper_klass(mapper)
   end
 
   def mapper_klass
     self.class.mapper_klass
   end
 
-  def on_event(user, payload)
+  def work(user, payload)
     olap_model = mapper_klass.olap_model || self.mapper_klass
     input = olap_model.input.call(user, payload)
     input = [input] unless input.respond_to?(:each)

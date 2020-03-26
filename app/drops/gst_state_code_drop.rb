@@ -1,11 +1,11 @@
 class GstStateCodeDrop < Drop
 
   def code
-    @object.state_code
+    record.state_code
   end
 
   def name
-    @object.name
+    record.name
   end
 
 end
