@@ -1,7 +1,7 @@
 class CompanyDrop < Drop
 
   def name
-    @object.name
+    record.name
   end
 
 end

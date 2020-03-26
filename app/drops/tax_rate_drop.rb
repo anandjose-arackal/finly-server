@@ -1,27 +1,27 @@
 class TaxRateDrop < Drop
 
   def name
-    @object.name
+    record.name
   end
 
   def rate
-    @object.rate
+    record.rate
   end
 
   def cgst
-    @object.cgst
+    record.cgst
   end
 
   def sgst
-    @object.sgst
+    record.sgst
   end
 
   def igst
-    @object.igst
+    record.igst
   end
 
   def display_name
-    @object.display_name
+    record.display_name
   end
 
 

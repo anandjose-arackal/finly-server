@@ -25,7 +25,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
-  # step Transactions::Resolver::Model(BbpsBills)
+  # step Resolver::Transactions::Load(model: BbpsBills)
   step :index!
 
   def index!(options, params:, current_user:, **)

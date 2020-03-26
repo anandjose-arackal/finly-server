@@ -32,7 +32,7 @@ class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::
     if user.is_payment_agreement_initiator? && document_owner?
       if payment_agreement.draft? || payment_agreement.rejected? || payment_agreement.retracted? # || payment_agreement.revised?
         return true
-      end 
+      end
     end
 
     if payment_agreement.is_reviewing_user?

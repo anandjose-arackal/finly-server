@@ -23,6 +23,7 @@ json.vendor do
     json.rejection_note @result.vendor&.reject_note
     json.tds_rates do
       json.array! @result.vendor.vendor_tds_rates do |vtr|
+        next if vtr.tds_rates.nil?
         json.id vtr.id
         json.tds_rates_list_id vtr.tds_rates.id
         json.extract! vtr.tds_rates, :name, :tds

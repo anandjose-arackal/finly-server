@@ -328,7 +328,7 @@ class RentalInvoice < ApplicationRecord
         balance_due_attributes: {id: self.balance_due_id, value: precision_value(self.balance_due&.value), currency_id: self.amount&.currency_id},
         status: self&.status&.name&.titleize,
         creation_date: self.created_at.to_date,
-        tds_slab_attributes: { id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds },
+        tds_slab_attributes: {id: self.tds_slab_id, name: self.tds_slab&.name, tds: self.tds_slab&.tds},
         agreement_type: self.class.name.underscore,
         payment_agreement_id: self.payment_agreement_id,
         vendor_id: self.vendor_id,

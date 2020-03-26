@@ -100,20 +100,30 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
   # config.mailer_config = config_for(:mailer_config)
   ################## SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = {host: 'staging.finly.io'}
+  config.mailer_config = config_for(:mailer_config)
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address: 'smtp.sendgrid.net',
-      port: 587,
-      domain: 'staging.finly.io',
-      user_name: 'vivekagb',
-      password: 'idAr5APhk61X',
-      # ssl:                  true,
-      # tls:                  true,
-      authentication: :plain,
-      enable_starttls_auto: true,
-      :openssl_verify_mode => 'none'
-  }
+  if config.mailer_config["mailcatcher"].present?
+    config.action_mailer.smtp_settings = {
+        :address => '127.0.0.1', :port => config.mailer_config["port"]
+    }
+    config.action_mailer.raise_delivery_errors = false
+    # config.action_mailer.default_url_options = {host: config.mailer_config["host"]}
+    config.action_mailer.default_url_options = {host: 'qa3.finly.io'}
+  else
+    config.action_mailer.default_url_options = {host: 'staging.finly.io'}
+    config.action_mailer.smtp_settings = {
+        address: 'smtp.sendgrid.net',
+        port: 587,
+        domain: 'staging.finly.io',
+        user_name: 'vivekagb',
+        password: 'idAr5APhk61X',
+        # ssl:                  true,
+        # tls:                  true,
+        authentication: :plain,
+        enable_starttls_auto: true,
+        :openssl_verify_mode => 'none'
+    }
+  end
 
   ####################################################################
 
@@ -153,6 +163,6 @@ Rails.application.configure do
   #     }
   # }
   #########################################################################################
-  #
+  
 
 end
