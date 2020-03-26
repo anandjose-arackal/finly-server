@@ -149,7 +149,7 @@ class Report < ApplicationRecord
   scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   # todo - having issues, where amounts are not matching actual expense amounts
-  scope :expenses_total, -> {joins(expenses: :amount).sum(:INR)}
+  scope :expenses_total, -> {joins(expenses: :amount).sum(:'amounts.INR')}
   # todo - having issues, where amounts are not matching actual reimbursements amounts
   scope :expenses_reimbursable_total, -> do
     # joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR')
@@ -467,8 +467,8 @@ class Report < ApplicationRecord
   end
 
   def total_amount(types = [], options = {})
-    return 0 unless self.expenses.present?
     temp_expenses = self.expenses
+    return 0 unless temp_expenses.present?
     if types.present?
       types = [types] unless types.kind_of?(Array)
       if types.present?
