@@ -188,6 +188,8 @@ class Trail < ApplicationRecord
         action = " deactivated"
       when TrailAction.id_for(:reactivate)
         action = " reactivated"
+      when TrailAction.id_for(:settle)
+        action = " settled"
       else
         action = ""
     end

@@ -10,15 +10,15 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def personalizer
     {
-        pre_validate: {
-            before: Personalizer::Process.new([:expense, :manual_update], :pre_validate, self)
-        },
-        pre_process: {
-            before: Personalizer::Process.new([:expense, :manual_update], :pre_process, self)
-        },
-        validate: {
-            before: Personalizer::Process.new([:expense, :manual, :update], :validate, self)
-        }
+      pre_validate: {
+        before: Personalizer::Process.new([:expense, :manual_update], :pre_validate, self)
+      },
+      pre_process: {
+        before: Personalizer::Process.new([:expense, :manual_update], :pre_process, self)
+      },
+      validate: {
+        before: Personalizer::Process.new([:expense, :manual, :update], :validate, self)
+      }
     }
   end
 
@@ -65,7 +65,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
       if params[:receipt_id].present?
         # If a new receipt is attached from existing receipts, remove the old receipt
-        self.old_receipt = expense.receipts.first if expense.receipts.present?
+        # self.old_receipt = expense.receipts.first if expense.receipts.present?
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end

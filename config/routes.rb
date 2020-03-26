@@ -3140,6 +3140,9 @@ Rails.application.routes.draw do
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
+    get 'report_expenses', to: 'reports#report_expenses', as: :expenses
+    get 'report_summary', to: 'reports#report_summary', as: :summary
+    get 'report_comments', to: 'reports#report_comments', as: :comments
   end
 
   # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control

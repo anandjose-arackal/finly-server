@@ -12,7 +12,7 @@ class Expense::ExPerDiem::Base < Expense::Base
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
     p = params.require(:expense).permit(:note, :category_id, :date,
-                                        :expense_type_id, :expense_status_id, :report_id,
+                                        :expense_type_id, :report_id,
                                         :reimbursable, :receipt_id, :receipt, :created_by_id, :modified_by_id,
                                         per_diem_expense_attributes: [:id, :quantity, :per_diem_id])
     # Hack as image upload from API is failing in strong params
