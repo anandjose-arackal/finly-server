@@ -6,6 +6,8 @@ Loader.watch! "Form Contract Transformers", dir: "app/concepts/index_builder/con
 
 Loader.watch! "Transaction Contract PreProcessors", dir: "app/concepts/transactions/contracts/pre_processors/**/*.rb"
 
+Loader.watch! "Menu Masters", dir: "app/procedures/menu/masters/**/*.rb"
+
 # Clear and reload all routers
 Loader.watch! "Routes Loader" do
   Routers::Registry.routers.each do |router|
