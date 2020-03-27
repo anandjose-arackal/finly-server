@@ -1,5 +1,0 @@
-class Actions::API
-
-
-
-end
