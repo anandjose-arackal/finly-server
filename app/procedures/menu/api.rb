@@ -1,6 +1,21 @@
 class Menu::API < Transactions::API
   include DynamicAttributes
 
+  MODULES_CONFIG = [
+      {
+          config: {name: 'Expense Management', id: 'expense_management', url: '/'},
+          feature: :expense_management_enabled, app: :em
+      },
+      {
+          config: {name: 'Vendor Payments', id: 'vendor_payments', url: '/payments'},
+          feature: :yes_bank_account, user_subscription: :yes_bank_account_transfer, app: :vp
+      },
+      {
+          config: {name: 'Finly Budgets', id: 'insights', url: '/insights'},
+          feature: :budgeting_system, permissions: :budget_manager, app: :fi
+      }
+  ]
+
   class_attr :app
 
   def self.inherited(sub_class)
@@ -35,7 +50,8 @@ class Menu::API < Transactions::API
   end
 
   step :authorize!
-  step :build
+  pass :build_menu
+  pass :build_modules
 
   def authorize!(context, current_user:, **)
     error = false
@@ -47,10 +63,24 @@ class Menu::API < Transactions::API
     true
   end
 
-  def build(context, current_user:, **)
-    context['config'] = self.class.items.as_json(current_user: current_user).reject { |item| item.nil? }
+  def build_menu(context, current_user:, **)
+    context[:menu] = self.class.items.as_json(current_user: current_user).reject { |item| item.nil? }
+  end
 
-    true
+  def build_modules(context, current_user:, **)
+    context[:modules] = []
+    MODULES_CONFIG.each do |mod|
+      next if [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app)
+      next if mod[:feature] and not current_user.company.feature_subscription.send(mod[:feature])
+      next if mod[:user_subscription] and not current_user.user_panel_subscription.send(mod[:user_subscription])
+      if mod[:permissions].present?
+        permissions = mod[:permissions]
+        permissions = [permissions] unless permissions.respond_to?(:each)
+        next if permissions.present? and not current_user.has_roles?(permissions)
+      end
+
+      context[:modules] << mod[:config]
+    end
   end
 
 end
