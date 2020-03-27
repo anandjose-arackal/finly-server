@@ -73,6 +73,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           category_id: payment[:category_id],
           company_id: user.company_id,
           cost_center_id: payment[:cost_center_id],
+          location_id: payment[:location_id],
           api_initiated: true,
           custom_fields: payment[:custom_fields],
           parent_type: payment[:parent_type],
