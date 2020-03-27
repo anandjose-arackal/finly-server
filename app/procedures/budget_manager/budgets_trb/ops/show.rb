@@ -8,12 +8,12 @@ class BudgetManager::BudgetsTrb::Ops::Show < Transactions::API
 
   step :recalculate_buckets!
 
-  def recalculate_buckets!(options, calculate_buckets:, model:, **)
+  def recalculate_buckets!(options, model:, **)
     budget = model
     # TODO - the below will be removed as the budgets will be updated dynamically
-    if calculate_buckets
+    # if calculate_buckets
       op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: true, calculate_trail_items: false})
-    end
+    # end
     return true
   end
 
