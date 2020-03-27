@@ -4,7 +4,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
 
     action :template,
            label: "Create Non PO Invoice",
-           icon: "",
+           icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            function: "non_po_invoice_create"
 
       scope permissions: :admin do
@@ -26,7 +26,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "procure/inward_invoices/bulk_approve.json",
                authorize: :reject?
-        action :transition,
+        action :reassign,
                label: "Forward",
                icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
                url: "procure/inward_invoices/bulk_approve.json",
@@ -35,7 +35,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
 
       action :export,
              label: "Export",
-             icon: "",
+             icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
              route: "invoices.index",
              authorize: :export?
 
