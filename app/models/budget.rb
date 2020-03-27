@@ -212,7 +212,7 @@ class Budget < ApplicationRecord
   }
 
   scope :active, -> {
-    where active: true
+    joins(:budget_group).where('budget_groups.active IS ?', true).where('budgets.active IS ?', true)
   }
 
   # scope :filter_criteria, -> (criteria) {

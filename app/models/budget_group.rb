@@ -38,6 +38,8 @@ class BudgetGroup < ApplicationRecord
 
   validate :check_for_valid_start_end_date
 
+  after_save :deactivate_budgets_if_deactivated
+
   default_scope { order(created_at: :desc) }
 
   scope :with_id, -> (ids) {where id: ids}
@@ -136,6 +138,12 @@ class BudgetGroup < ApplicationRecord
       if end_date - start_date < 365.days
         errors.add(:period, "cannot be less than the difference between start and end dates")
       end
+    end
+  end
+
+  def deactivate_budgets_if_deactivated
+    unless self.active
+      self.budgets.update(active: false)
     end
   end
 end

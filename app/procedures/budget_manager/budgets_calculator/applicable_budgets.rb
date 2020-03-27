@@ -75,7 +75,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
   # this method will extract the budget group criteria that are relevant to the extracted criteria in the
   # above init step
   def criteria_based_budgets!(options, **)
-    budget_criteria = self.company.budget_group_criteria.active
+    budget_criteria = self.company.budget_group_criteria
     criteria_mappings = BudgetGroupCriteriaMapping.with_budget_group_criteria_id(budget_criteria.pluck(:id))
     # first extract all criteria mappings that apply to this particular combination of departments, locations, cost centers etc
     applicable_criteria_mappings = criteria_mappings.where("(budgetable_type = ? AND budgetable_id IN (?))
