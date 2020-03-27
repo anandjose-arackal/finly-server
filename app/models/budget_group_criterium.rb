@@ -189,6 +189,7 @@ class BudgetGroupCriterium < ApplicationRecord
                                budget_group_id: self.budget_group.id,
                                user_id: self.budget_group.created_by_user_id,
                                budget_date_type_id: self.budget_group.budget_date_type_id,
+                               calculated_before_tax_amount: self.budget_group.calculated_before_tax_amount,
                                budget_amount_attributes: {
                                    value: 0,
                                    currency_id: 1
