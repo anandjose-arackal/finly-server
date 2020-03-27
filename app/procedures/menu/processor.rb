@@ -12,7 +12,7 @@ class Menu::Processor < Transactions::API
     end
 
     unless context['master'].present?
-      return on_error context, :base,'Could not process the request'
+      return on_error context, :base, 'Could not process the request'
     end
 
     true
@@ -21,7 +21,8 @@ class Menu::Processor < Transactions::API
   def build_config(context, params:, master:, current_user:, **)
     result = master.(params: params, current_user: current_user)
     if result.success?
-      context['config'] = result['config']
+      context[:menu] = result[:menu]
+      context[:modules] = result[:modules]
       return true
     end
 
