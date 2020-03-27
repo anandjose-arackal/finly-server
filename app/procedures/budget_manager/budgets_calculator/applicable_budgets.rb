@@ -85,7 +85,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))",
                                                               "Department", self.departments.pluck(:id),
-                                                              "Location", self.locations.pluck(:id),
+                                                              "BranchLocation", self.locations.pluck(:id),
                                                               "CostCenter", self.cost_centers.pluck(:id),
                                                               "YesBankVendor", self.vendors.pluck(:id),
                                                               "User", self.users.pluck(:id),
@@ -118,7 +118,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
         budget_ids << budget.id if budget.within_timeframe?(date)
       end
     end
-    budgets = Budget.with_id(budget_ids)
+    budgets = Budget.with_id(budget_ids).active
     result = {
         budgets: budgets
     }

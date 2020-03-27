@@ -68,6 +68,8 @@ class Payment < ApplicationRecord
     CARD = 'Card'
   end
 
+  event_channel 'payment'
+
   belongs_to :amount, optional: true
   belongs_to :payment_type, optional: true
   belongs_to :initiating_user, optional: true, polymorphic: true

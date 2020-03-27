@@ -104,6 +104,8 @@ class Invoice < ApplicationRecord
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
+  event_channel 'invoice'
+
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
   belongs_to :gross_amount, optional: true, class_name: "Amount"
