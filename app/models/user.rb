@@ -1441,6 +1441,10 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
+  def has_roles?(role_id)
+    policy_user_roles.where(user_id: self.id, user_role_id: role_id).count > 0
+  end
+
   def has_policy_role?(role_id, document = nil)
     if document.present?
       policy = Policy.with_company_id(self.company_id).find_by_id document.policy_id

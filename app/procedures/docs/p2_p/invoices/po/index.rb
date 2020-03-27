@@ -107,6 +107,7 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     counter
   end
 
+
   def self.cost_center_name(user, record_exposure)
     return "Multiple" if record_exposure.cost_allocation_items
 
