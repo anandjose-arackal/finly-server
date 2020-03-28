@@ -2,7 +2,7 @@ module ActionManager::Builder
   extend ActiveSupport::Concern
 
   def build(user, params)
-    has_permission?(user)
+    return unless has_permission?(user)
 
     {
         label: self.label,
@@ -18,6 +18,7 @@ module ActionManager::Builder
 
   def has_permission?(user)
     return true if permissions.blank?
+    return true if permissions.include?(:admin) and user.admin?(RequestStoreUtil.current_app)
     return true if user.has_roles?(permissions)
 
     false

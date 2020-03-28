@@ -3,7 +3,9 @@ class ActionManager::Action
   include ActionManager::Builder
   include DynamicAttributes
 
-  attr_accessor :type, :id, :path, :parent, :root, :scopes, :permissions, :label, :icon, :policy, :authorize, :actions
+  attr_accessor :type, :id, :path, :parent, :root, :scopes,
+                :permissions, :label, :icon, :policy, :authorize,
+                :actions, :model
 
   class_attribute :registered_type
 

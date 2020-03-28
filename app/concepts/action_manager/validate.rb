@@ -42,17 +42,17 @@ class ActionManager::Validate < Transactions::API
   end
 
   def authorize_record(context, route_klass:, action:, params:, current_user:, **)
-    return true if params[:document_id].blank?
+    return true if params[:record_id].blank?
     return on_error context, :base, "Could not verify action" if action.model.blank? or action.policy.blank? or action.authorize.blank?
 
-    records = action.model.where(company_id: current_user.company_id, id: params[:document_id])
+    records = action.model.where(company_id: current_user.company_id, id: params[:record_id])
     context[:records] = {processable: [], unprocessable: []}
     records.each do |record|
       policy = action.policy.new(current_user, record)
       if policy.send(action.authorize)
-        context[:records][:processable] = record.id
+        context[:records][:processable] << record.id
       else
-        context[:records][:unprocessable] = record.id
+        context[:records][:unprocessable] << record.id
       end
     end
 
