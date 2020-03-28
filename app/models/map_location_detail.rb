@@ -8,7 +8,7 @@ class MapLocationDetail < ApplicationRecord
         name: name,
         address: address,
         description: "#{name}, #{address}",
-        place_id: place_id,
+        maps_id: place_id,
         latitude: latitude,
         longitude: longitude,
     }
