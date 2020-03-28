@@ -1,16 +1,16 @@
-class ActionManager::API
+class ActionManager::API < Transactions::API
   include DynamicAttributes
 
   class_attr :registered_type
 
   def self.actions
-    @actions ||= []
+    @actions ||= {}
   end
 
-  def self.action(type, config={}, &block)
+  def self.action(type, id, config={}, &block)
     raise "Invalid action #{type}" unless ActionManager::Registry[type].present?
 
-    actions << ActionManager::Registry[type].new(type, config: config, scopes: scopes, &block)
+    actions[id] = ActionManager::Registry[type].new(type, id, config: config, scopes: scopes, &block)
   end
 
   def self.scopes
@@ -23,15 +23,25 @@ class ActionManager::API
     scopes.pop
   end
 
-  def self.build(user, params)
-    result = []
-    actions.each do |action|
-      hash = action.build(user, params)
+  step :validate_route
+  pass :build
+
+  def validate_route(context, params:, **)
+    unless params[:route].present? and ActionManager::Router.routes.include?(params[:route])
+      return on_error context, :base, "Invalid route"
+    end
+
+    true
+  end
+
+  def build(context, params:, current_user:, **)
+    context[:config] = []
+    self.class.actions.each_pair do |id, action|
+      hash = action.build(current_user, params)
       next if hash.nil?
 
-      result << hash
+      context[:config] << hash
     end
-    result
   end
 
 end

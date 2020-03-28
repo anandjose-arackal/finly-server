@@ -3,7 +3,7 @@ class ActionManager::Action
   include ActionManager::Builder
   include DynamicAttributes
 
-  attr_accessor :type, :scopes, :permissions, :label, :icon, :policy, :authorize, :actions
+  attr_accessor :type, :id, :scopes, :permissions, :label, :icon, :policy, :authorize, :actions
 
   class_attribute :registered_type
 
@@ -28,7 +28,8 @@ class ActionManager::Action
     end
   end
 
-  def initialize(type, config: {}, scopes: [], &block)
+  def initialize(type, id, config: {}, scopes: [], &block)
+    self.id = id
     self.type = type
     self.scopes = scopes
 
@@ -70,11 +71,11 @@ class ActionManager::Action
   end
 
   def actions
-    @actions ||= []
+    @actions ||= {}
   end
 
-  def action(type, config = {}, &block)
-    actions << ActionManager::Action.new(type: type, config: config, scopes: scopes, &block)
+  def action(type, id, config = {}, &block)
+    actions[id] = ActionManager::Action.new(type, id, config: config, scopes: scopes, &block)
   end
 
   def scopes

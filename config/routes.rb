@@ -4221,6 +4221,8 @@ Rails.application.routes.draw do
 
   get 'menu', to: 'menu#show'
 
+  get 'actions/:route', to: "actions#show"
+
   resources :views, controller: 'index_view_segments', except: [:show]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
