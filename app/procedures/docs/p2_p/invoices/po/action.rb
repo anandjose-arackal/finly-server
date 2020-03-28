@@ -3,7 +3,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
   scope policy: Docs::P2P::Invoices::Po::Policy do
 
     action :template,
-           :create_non_po_invoice,
+           :create,
            label: "Create Non PO Invoice",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
            function: "non_po_invoice_create"

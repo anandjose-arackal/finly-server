@@ -6,7 +6,7 @@ class ActionsController < BaseControllers::WebBase
   end
 
   def validate
-
+    endpoint ActionManager::Validate
   end
 
 end
