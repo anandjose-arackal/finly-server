@@ -86,8 +86,8 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
             '',
             '',
             '',
-            retrieve_account(expense),
-            retrieve_sub_account(expense),
+            {value: retrieve_account(expense), type: "string"},
+            {value: retrieve_sub_account(expense), type: "string"},
             {value: (report.user.gl_config&.dig(:location_code).present? ? sprintf("%05d", report.user.gl_config&.dig(:location_code)) : ''), type: "string"},
             report.user.gl_config&.dig(:cost_center),
             '',
@@ -206,14 +206,15 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
     parent_category_id = expense.category&.ancestry
     if parent_category_id.present?
       parent = self.categories.find(parent_category_id.to_i)
-      return "#{parent.gl_code}"
+      return "#{parent.gl_code&.strip}"
     else
-      return "#{expense.category&.gl_code}"
+      return "#{expense.category&.gl_code&.strip}"
     end
   end
 
   def retrieve_sub_account(expense)
-    "#{expense.category&.gl_code}"
+    gl_code = expense.category&.gl_code&.strip&.to_i
+    (gl_code.present?  ? sprintf("%08d", gl_code) : '')
   end
 
 end
