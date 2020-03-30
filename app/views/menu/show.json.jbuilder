@@ -16,5 +16,5 @@ json.data do
     json.mobile_number current_user.mobile_number
   end
   json.menu @op[:menu]
-  json.modules @op[:modules]
+  json.entities @op[:entities]
 end

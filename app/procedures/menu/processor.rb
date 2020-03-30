@@ -22,7 +22,7 @@ class Menu::Processor < Transactions::API
     result = master.(params: params, current_user: current_user)
     if result.success?
       context[:menu] = result[:menu]
-      context[:modules] = result[:modules]
+      context[:entities] = result[:entities]
       return true
     end
 
