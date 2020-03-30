@@ -85,7 +85,7 @@ class Menu::API < Transactions::API
   def build_modules(context, current_user:, **)
     context[:entities] = []
 
-    if current_user.company.group_entity_structure_enabled?
+    if current_user.company.group_entity_structure_enabled? and not RequestStore.store[:actual_current_user].present?
       group_companies = current_user.company.group.companies.where(status_id: CompanyStatus.ids_for(:active, :partial_block, :hidden))
     else
       group_companies = [current_user.company]
