@@ -21,6 +21,8 @@ class FormDependencyMapping < ApplicationRecord
 
   belongs_to :company
   belongs_to :form_dependency
+  belongs_to :controlling_entity, class_name: "FormEntity"
+  belongs_to :dependent_entity, class_name: "FormEntity"
   belongs_to :controlling_choice, polymorphic: true
   has_many :dependency_choice_mappings, class_name: "FormDependencyChoiceMapping"
 

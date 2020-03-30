@@ -4003,7 +4003,7 @@ Rails.application.routes.draw do
   # resources :form_entities
   get 'forms/config/:name', to: 'forms#form_config'
   get 'forms/config/:name/dependency', to: 'forms#form_dependency_config'
-  get 'forms/:id/entities/:entity_id/choices', to: 'forms#form_entity_choices'
+  post 'forms/:form_name/entities/:entity_field_key/choices', to: 'forms#form_entity_choices'
   resources :forms
 
   resources :insights

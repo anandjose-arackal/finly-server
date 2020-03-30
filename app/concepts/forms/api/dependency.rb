@@ -19,6 +19,9 @@ class Forms::API::Dependency
             form_id: form.id,
             company_id: user.company_id,
             controlling_entity: controlling_entity,
+            controlling_entity_key: controlling_entity.field_key,
+            dependent_entity: dependent_entity,
+            dependent_entity_key: dependent_entity.field_key,
             controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
             dependent_choice: dependent_entity.choices_provider.find_by_name(dependent_choice, user: user)
         }
@@ -27,6 +30,10 @@ class Forms::API::Dependency
       {
           form_id: form.id,
           company_id: user.company_id,
+          controlling_entity: controlling_entity,
+          controlling_entity_key: controlling_entity.field_key,
+          dependent_entity: dependent_entity,
+          dependent_entity_key: dependent_entity.field_key,
           controlling_choice: controlling_entity.choices_provider.find_by_name(controlling_choice, user: user),
           dependent_required: self.dependent_required,
           dependent_editable: self.dependent_editable,
@@ -62,7 +69,9 @@ class Forms::API::Dependency
             form_id: form.id,
             company_id: user.company_id,
             controlling_entity_id: entities[controlling_field].id,
+            controlling_entity_key: entities[controlling_field].field_key,
             dependent_entity_id: entities[dependent_field].id,
+            dependent_entity_key: entities[dependent_field].field_key,
             dependency_mappings_attributes: dependency_mapping_attributes
         }
     )
