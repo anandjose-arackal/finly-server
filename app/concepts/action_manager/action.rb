@@ -82,7 +82,7 @@ class ActionManager::Action
   end
 
   def action(type, id, config = {}, &block)
-    actions[id] = ActionManager::Action.new(type, id, config: config, scopes: scopes, parent: self, root: root, &block)
+    actions[id] = ActionManager::Registry[type].new(type, id, config: config, scopes: scopes, parent: self, root: root, &block)
   end
 
   def scopes
