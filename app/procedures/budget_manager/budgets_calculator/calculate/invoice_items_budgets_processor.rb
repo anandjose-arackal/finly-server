@@ -66,6 +66,7 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_amount_after_tax_value: billed_amount_after_tax,
         billed_quantity: invoice_item.quantity,
         tds_value: invoice_item.parent.tds_per_item,
+        tax_amount_value: invoice_item.tax_amount&.value.to_f,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

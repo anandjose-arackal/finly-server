@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_26_072049) do
+ActiveRecord::Schema.define(version: 2020_03_30_061832) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1587,6 +1587,7 @@ ActiveRecord::Schema.define(version: 2020_03_26_072049) do
     t.decimal "payment_processing_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "payment_processing_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "tds_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "tax_amount_value", precision: 20, scale: 10, default: "0.0"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
@@ -5890,6 +5891,7 @@ ActiveRecord::Schema.define(version: 2020_03_26_072049) do
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["created_at"], name: "index_payments_on_created_at"
+    t.index ["date", "created_at"], name: "index_payments_on_date_and_created_at"
     t.index ["date"], name: "index_payments_on_date"
     t.index ["department_id"], name: "index_payments_on_department_id"
     t.index ["destination_pocket_id"], name: "index_payments_on_destination_pocket_id"

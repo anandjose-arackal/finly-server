@@ -108,16 +108,6 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       committed_amount = self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.status_ids_for_committed_bucket).sum("#{po_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
       committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
-
-      # # now we need to subtract the amount that has already been paid as a purchase order advance
-      # pos = PurchaseOrder.with_id(PurchaseOrderItem.with_id(self.budget_trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id)).pluck(:purchase_order_id))
-
-      # calculating pending payment amount - will include all invoice items that are approved and above, but not the ones that have payments initiated against them
-
-      # pending_payment_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
-      #
-      # pending_payment_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
-
       committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
 
       committed_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
