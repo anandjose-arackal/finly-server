@@ -1,14 +1,22 @@
 class IciciStatementsFetch < ActiveJob::Base
 
   def perform
+    error_logger = Logger.new("#{Rails.root}/log/icici_statements_fetch_errors.log")
     Company.all.each do |company|
       unless company.bank_service_provider == "ICICI"
         next
       end
-      op = IciciBankApi::AccountStatement.(company, {start_date: Date.yesterday, end_date: Date.today})
-      unless op.success?
-        # trigger email notifying the fact that the statement fetch failed
-        # todo
+      begin
+        op = IciciBankApi::AccountStatement.(company, {start_date: (Date.today - 10.days), end_date: Date.today})
+        unless op.success?
+          # trigger email notifying the fact that the statement fetch failed
+          # todo
+        end
+      rescue => error
+        error_logger.error("Company Name - #{company.name}, with ID - #{company.id} statement fetch failed because: #{error.message}")
+        error.backtrace.each do |line|
+          error_logger.error "\t #{line}"
+        end
       end
     end
   end

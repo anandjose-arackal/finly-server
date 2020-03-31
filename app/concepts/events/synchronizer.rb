@@ -26,7 +26,7 @@ module Events::Synchronizer
       event event
       block block
       options options
-      consumes_event! event, consumer_key: options[:consumer_key], name: options[:name]
+      consumes_event! event, name: options[:name]
     end
 
     def self.model(model_class = NoObject)
@@ -49,7 +49,7 @@ module Events::Synchronizer
       @options ||= {}
     end
 
-    def on_event(user, message)
+    def work(user, message)
       records = self.class.model.with_event(self.class.event)
       return unless user.present?
 

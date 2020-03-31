@@ -1,7 +1,7 @@
-class TaskManager::Workflows::Resolver < Transactions::Resolver::Scope
+class TaskManager::Workflows::Resolver < Resolver::API
 
   def load(params)
-    scope.where(user: @user)
+    entity.where(user: user)
   end
 
 end

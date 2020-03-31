@@ -54,4 +54,14 @@ class InwardInvoiceType < ApplicationRecord
     self.id == InwardInvoiceType.id_for(:agreement_invoice)
   end
 
+  def self.status_ids_for_committed_bucket
+    [
+        InwardInvoiceType.id_for(:non_po_invoice),
+        InwardInvoiceType.id_for(:general_invoice),
+        InwardInvoiceType.id_for(:beneficiary),
+        InwardInvoiceType.id_for(:rental_invoice),
+        InwardInvoiceType.id_for(:agreement_invoice)
+    ]
+  end
+
 end

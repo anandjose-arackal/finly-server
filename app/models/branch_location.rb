@@ -31,6 +31,7 @@ class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'location'
@@ -54,6 +55,8 @@ class BranchLocation < ApplicationRecord
   has_many :users
 
   scope :with_ids, -> (ids) { where id: ids }
+  scope :with_id, -> (id) {where id: id}
+
   scope :include_state, -> { includes :state }
   default_scope {unscope(:where)}
 

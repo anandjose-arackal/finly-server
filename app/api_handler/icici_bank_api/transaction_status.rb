@@ -79,12 +79,12 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
           case self.transaction_status_response&.upcase
           when "SUCCESS"
             utr = self.parsed_response["UTRNUMBER"]
-            # This is because only IMPS and RTGS transactions return the URT in the API
+            # This is because only IMPS and RTGS transactions return the UTR in the API
             # Now all transactions give UTR in the transaction status API
             if utr.present?
-              if self.icici_bank_transaction.neft?
-                utr = "0#{utr}1"
-              end
+              # if self.icici_bank_transaction.neft?
+              #   utr = "0#{utr}1"
+              # end
               self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed), utr: utr)
             end
           when "PENDING FOR PROCESSING"
@@ -106,9 +106,9 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
         elsif api_response&.upcase == "FAILURE"
           # this condition is because apparently, for IMPS transactions, the message being sent is: "Session could not be retrieved"
           message = self.parsed_response["MESSAGE"] || self.parsed_response["Message"]
-          if self.icici_bank_transaction.imps? && message.downcase == "session could not be retrieved"
-            self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-          end
+          # if self.icici_bank_transaction.imps? && message.downcase == "session could not be retrieved"
+          #   self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+          # end
           if message == "Invalid Inquiry Req id or unique Id"
             self.icici_bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
           end

@@ -1,5 +1,7 @@
 json.result do
   json.array!(@result.paginated_expenses) do |expense|
+    user = expense.user
+    report = expense.report
     json.extract! expense, :id, :note, :merchant_name, :expense_type_id,
                   :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
                   :expense_tax_type_id
@@ -7,8 +9,15 @@ json.result do
     json.updated_at expense.updated_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.user expense.user
     json.user_employee_id expense.user&.profile&.employee_id
+    json.user_cost_center user.cost_center&.name
+    json.user_cost_center_code user.cost_center&.cost_center_code
+    json.user_location user.location&.name
+    json.user_location_code user.location&.location_code
+    json.user_department user.department&.name
+    json.user_department_code user.department&.department_code
     json.operating_unit expense.user.gl_config[:operation_unit] rescue ''
     json.expense_type expense.expense_type&.name
+    json.total_expenses report&.expenses&.count
 
     json.usage_dates do
       json.type expense.usage_date_type
@@ -17,15 +26,20 @@ json.result do
     end
 
     json.parent_category do
-      json.id expense.category&.parent&.id
-      json.name expense.category&.parent&.name
+      json.id expense.category&.id
+      json.name expense.category&.name
       json.gl_code expense.category&.gl_code
     end
 
     json.pocket do
       json.name expense.spent_from&.name
       json.id expense.spent_from&.id
-      json.balance expense.spent_from&.name
+      json.balance expense.spent_from&.balance&.value
+    end
+
+    json.bank_account do
+      # json.merge! expense.user.bank_accounts.where(default_account: true, disabled: false).non_deleted.first.as_json
+      json.merge! expense.user.bank_accounts.default_accounts.first.as_json
     end
 
     json.distance do
@@ -200,7 +214,11 @@ json.result do
     json.report_id expense.report_id
     json.report_approved_at expense.report&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.report_created_at expense.report&.created_at&.strftime("%Y-%m-%d %H:%M:%S")
-    json.report_note expense.report.memo
+    json.report_note expense.report&.memo
+    json.report_bank_reference_number expense.report&.bank_reference_number
+    json.report_source_account expense.report&.source_account
+    json.report_submitted_at expense.report&.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
+    json.finance_approved_date expense.report&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
 
 
     # exxtra fields

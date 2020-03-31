@@ -102,23 +102,23 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def report_name(expense)
-    expense.report.name
+    expense.report&.name
   end
 
   def report_status_name(expense)
-    expense.report.status.name
+    expense.report.status&.name
   end
 
   def report_creator(expense)
-    expense.report.user.name
+    expense.report.user&.name
   end
 
   def report_creator_employee_id(expense)
-    expense.report.user.employee_id
+    expense.report.user&.employee_id
   end
 
   def report_creator_payroll_id(expense)
-    expense.report.user.payroll_id
+    expense.report.user&.payroll_id
   end
 
   def report_created_at(expense)
@@ -206,7 +206,7 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
   end
 
   def expense_spent_from_account(expense)
-    expense.spent_from.present? ? expense.spent_from.name : "NONE"
+    expense.spent_from.present? ? expense.spent_from&.name : "NONE"
   end
 
   def report_policy(expense)
@@ -227,12 +227,12 @@ class ExportManager::Master::Reports::Index < ExportManager::Builders::Spreadshe
 
   def expense_igst(expense)
     gst_applicable = expense.category&.gst_applicable?
-    (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value).round(2) : '') : '')
+    (gst_applicable ? (expense.gst_type&.name == 'igst' ? (expense.gst_amount&.value.to_f)&.round(2) : '') : '')
   end
 
   def expense_sgst_cgst(expense)
     gst_applicable = expense.category&.gst_applicable?
-    ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value) / 2).round(2) : '') : '') rescue '')
+    ((gst_applicable ? (expense.gst_type&.name == 'cgst_sgst' ? ((expense.gst_amount&.value.to_f) / 2)&.round(2) : '') : '') rescue '')
   end
 
   def bank_reference_number(expense)

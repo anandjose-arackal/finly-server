@@ -15,7 +15,7 @@ class TaskManager::API
   # TODO consume request params as well for filtering
 
   # When a new event is received
-  def on_event(user, message)
+  def work(user, message)
     TaskManager::Runner.({api: self.class, message: message}, 'current_user' => user, 'trigger' => :event)
   end
 

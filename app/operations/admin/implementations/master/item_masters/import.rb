@@ -111,16 +111,16 @@ class Admin::Implementations::Master::ItemMasters::Import < Admin::Implementatio
     end
 
     [{
-        description: description,
-        category_id: category_id,
-        hsn_sac: clean_up_data(hsn_sac),
-        item_number: item_number,
-        item_expense_type_id: item_expense_type_id,
-        supply_item_type_id: supply_item_type_id,
-        product_type_id: product_type_id,
-        discount: discount,
-        rate: rate,
-        tds_applicable: tds_applicable
+         description: description,
+         category_id: category_id,
+         hsn_sac: clean_up_data(hsn_sac),
+         item_number: item_number,
+         item_expense_type_id: item_expense_type_id,
+         supply_item_type_id: supply_item_type_id,
+         product_type_id: product_type_id,
+         discount: discount,
+         rate: rate,
+         tds_applicable: tds_applicable
     }, messages]
   end
 

@@ -45,6 +45,7 @@ class YesBankVendor < ApplicationRecord
   include Transitionable, CustomFieldFilterSupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   validates :business_name, presence: true
 

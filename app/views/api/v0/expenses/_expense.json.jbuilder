@@ -1,4 +1,4 @@
-json.extract! expense, :id, :merchant_name, :date, :note, :user_id, :category_id, :report_id, :expense_status_id, :expense_status_name, :from_cash_on_hand,:usage_date_type
+json.extract! expense, :id, :merchant_name, :date, :note, :user_id, :category_id, :report_id, :expense_status_id, :expense_status_name, :from_cash_on_hand, :usage_date_type
 json.amount expense.amount.value
 json.user_name expense.user.name
 json.category_name expense.category.name

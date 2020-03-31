@@ -1,0 +1,52 @@
+<% if tables.present? %>
+  <% tables.each_with_index do |table, index| %>
+    <div class="items-list">
+      <% if table["header"].present? && (table["header"]["title"].present? || table["header"]["body"].present?) %>
+        <div class="items-list-header" style="padding: 15px;font-size: 19px;font-weight: 600;">
+          <% if table["header"]["title"].present? %>
+            <span class="list-item-count" style="color: #e95869;"><%= table["header"]["title"] %></span>
+          <% end %>
+          <% if table["header"]["body"].present? %>
+            <span class="list-item-total"><%= table["header"]["body"] %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if table["content"].present? %>
+        <table class="table-items-list" style="margin: 0;width: 100%;">
+          <% if table["content"]["thead"].present? %>
+            <thead>
+            <tr>
+              <% table["content"]["thead"].each do |header| %>
+                <th><%= header %></th>
+              <% end %>
+            </tr>
+            </thead>
+          <% end %>
+
+          <% if table["content"]["tbody"].present? && table["content"]["tbody"].is_a?(Array) %>
+            <tbody>
+            <% table["content"]["tbody"].each do |tr| %>
+              <tr>
+                <% tr.each_with_index do |cell, index| %>
+                  <td style="
+                  height: 40px;
+                      font-size: 13px;
+                      padding-left: 15px;
+                      padding-right: 15px;
+                      text-align: right;
+                      <% if index == 0 %>
+                      text-align: left;
+                      <% end %>
+                  "><%= cell %></td>
+                <% end %>
+              </tr>
+            <% end %>
+            </tbody>
+          <% end %>
+        </table>
+      <% end %>
+    </div>
+    <div class="divider"></div>
+  <% end %>
+<% end %>

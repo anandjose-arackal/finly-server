@@ -1,5 +1,5 @@
 class TaskManager::Workflows::Index < Transactions::API
 
-  step Transactions::Resolver::Model(TaskWorkflow, scope: :default, filter: true, paginate: true)
+  step Resolver::Transactions::Load(model: TaskWorkflow, scope: :default, filter: true, paginate: true)
 
 end

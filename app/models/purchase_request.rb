@@ -11,13 +11,13 @@
 #  creator_id                 :integer
 #  submitted_at               :datetime
 #  approved_at                :datetime
-#  order_number               :string(255)
-#  reject_note                :text(65535)
 #  location_id                :integer
 #  department_id              :integer
 #  policy_id                  :integer
 #  controlling_level_id       :integer
 #  company_id                 :integer
+#  order_number               :string(255)
+#  reject_note                :text(65535)
 #  cost_center_id             :integer
 #  total_amount_id            :integer
 #  cost_allocation_items      :boolean          not null
@@ -45,6 +45,7 @@ class PurchaseRequest < ApplicationRecord
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
+  has_many :items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 

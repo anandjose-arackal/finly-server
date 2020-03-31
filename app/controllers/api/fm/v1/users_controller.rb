@@ -1,6 +1,5 @@
 class Api::Fm::V1::UsersController < ApiApplicationController
 
-
   def create
     formatted_params = RequestFormatter::ApiParser::FmParser::V1::Users::Create.(current_user, params).formatted_request
     @result = User::Create.(current_user, formatted_params)
@@ -26,14 +25,17 @@ class Api::Fm::V1::UsersController < ApiApplicationController
     operation = nil
     success_message = nil
     case params[:type]
-      when 'role'
+    when 'role'
         formatted_params = RequestFormatter::ApiParser::FmParser::V1::Users::UpdateRole.(current_user, params).formatted_request
         operation = User::Role::Set.new(current_user, formatted_params)
         success_message = 'Role updated'
-      when 'state', 'status'
+    when 'state', 'status'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'Status updated'
-      else
+    when 'details', 'details'
+      operation = User::Configuration::UpdateDetails.new(current_user, params)
+      success_message = 'Details updated'
+    else
         # do nothing, ha!
     end
     unless operation.present?
@@ -52,5 +54,6 @@ class Api::Fm::V1::UsersController < ApiApplicationController
     @result = User::Balances::Show.(current_user, params)
     respond
   end
+
 
 end
