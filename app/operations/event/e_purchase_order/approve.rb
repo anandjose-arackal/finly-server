@@ -70,9 +70,6 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     if purchase_order.purchase_request_items.present? && purchase_request_creator.present?
       affected_user += purchase_request_creator
     end
-    if approved
-      affected_user += purchase_order.user
-    end
     return affected_user
   end
 
