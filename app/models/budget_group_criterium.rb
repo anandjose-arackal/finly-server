@@ -35,11 +35,11 @@ class BudgetGroupCriterium < ApplicationRecord
   has_many :budgets
 
   after_create :include_parent_criteria_mappings
-  # after_create :create_related_budgets
+  after_create :create_related_budgets
 
   validate :cannot_create_empty_budget_criteria
 
-  event_channel 'budget_group_criteria'
+  # event_channel 'budget_group_criteria'
 
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
