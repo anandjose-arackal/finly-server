@@ -73,7 +73,7 @@ class Budget < ApplicationRecord
 
   after_create :set_budget_consumption
   after_create :reflect_budget_group_attributes
-  after_save :update_consumption_model
+  after_create :update_consumption_model
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
