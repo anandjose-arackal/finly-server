@@ -39,6 +39,8 @@ class BudgetGroupCriterium < ApplicationRecord
 
   validate :cannot_create_empty_budget_criteria
 
+  event_channel 'budget_group_criteria'
+
   accepts_nested_attributes_for :budget_group_criteria_mappings
 
   scope :with_id, -> (ids) do
