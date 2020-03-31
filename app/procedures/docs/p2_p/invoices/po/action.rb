@@ -11,7 +11,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
                :take_control,
                label: "Take Control",
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
-               url: "procure/inward_invoices/bulk_approve.json",
+               url: "procure/inward_invoices/bulk_take_control.json",
                authorize: :take_control?
         scope permissions: :po_invoice_reviewer do
           action :transition,
@@ -24,7 +24,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
                  :reject,
                  label: "Reject",
                  icon: "https://img.icons8.com/windows/17/708090/cancel-2.png",
-                 url: "procure/inward_invoices/bulk_approve.json",
+                 url: "procure/inward_invoices/bulk_reject.json",
                  authorize: :reject?
           action :reassign,
                  :forward,
