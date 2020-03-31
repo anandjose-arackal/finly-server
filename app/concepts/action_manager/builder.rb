@@ -5,6 +5,7 @@ module ActionManager::Builder
     return unless has_permission?(user)
 
     map = {
+        id: self.id,
         label: self.label,
         icon: self.icon,
         type: self.type,
