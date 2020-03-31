@@ -30,7 +30,8 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
                  :forward,
                  label: "Forward",
                  icon: "https://img.icons8.com/windows/17/708090/fast-forward.png",
-                 url: "procure/inward_invoices/bulk_approve.json",
+                 url: "procure/inward_invoices/forward.json",
+                 users_url: "forwardable_users.json",
                  authorize: :forward?
         end
       end
