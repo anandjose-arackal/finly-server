@@ -35,7 +35,7 @@ class BudgetGroupCriterium < ApplicationRecord
   has_many :budgets
 
   after_create :include_parent_criteria_mappings
-  after_create :create_related_budgets
+  # after_create :create_related_budgets
 
   validate :cannot_create_empty_budget_criteria
 

@@ -69,7 +69,7 @@ class BudgetTrail < ApplicationRecord
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
   scope :within_date, -> (start_date, end_date, date_to_be_considered) {
-    where("#{date_to_be_considered} >= ? AND #{date_to_be_considered} <= ?", start_date, end_date)
+    where("#{date_to_be_considered} >= ? AND #{date_to_be_considered} <= ?", start_date.beginning_of_day, end_date.end_of_day)
   }
 
   scope :billed, -> {
