@@ -1239,6 +1239,7 @@ class Payment < ApplicationRecord
     # paid amount for all the expenses inside all those reports that have been paid against
     if PaymentPurpose.ids_for(:reimbursement, :reimbursement_outside_finly).include?(self.payment_order.payment_purpose_id)
       report_processor_mapping = ReportProcessorGroupMapping.find_by(payment_id: self.id)
+      return true if report_processor_mapping.blank?
       report_ids = report_processor_mapping.reports.pluck(:id)
       expense_trails = BudgetTrail.where(entity_type: "Expense", entity_id: Expense.with_report_id(report_ids).pluck(:id))
       if self.completed?
