@@ -214,7 +214,7 @@ class Personalizer::Adapters::Company164::ExportTemplates164::SapTemplate < Pers
 
   def retrieve_sub_account(expense)
     gl_code = expense.category&.gl_code&.strip&.to_i
-    (gl_code.present?  ? sprintf("%08d", gl_code) : '')
+    (gl_code.present?  ? sprintf("%06d", gl_code) : '')
   end
 
 end
