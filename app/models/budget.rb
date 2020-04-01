@@ -2,26 +2,32 @@
 #
 # Table name: budgets
 #
-#  id               :integer          not null, primary key
-#  name             :string(255)
-#  period_id        :integer
-#  start_date       :date
-#  end_date         :date
-#  budget_amount_id :integer
-#  spent_amount_id  :integer
-#  budgetable_id    :integer
-#  budgetable_type  :string(255)
-#  is_deleted       :boolean          default(FALSE)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  user_id          :integer
-#  company_id       :integer
-#  purchase_order   :boolean
-#  payment          :boolean
-#  expense          :boolean
-#  ancestry         :string(255)
-#  deleted_at       :datetime
-#  uuid             :string(36)
+#  id                           :integer          not null, primary key
+#  name                         :string(255)
+#  period_id                    :integer
+#  start_date                   :date
+#  end_date                     :date
+#  budget_amount_id             :integer
+#  spent_amount_id              :integer
+#  budgetable_id                :integer
+#  budgetable_type              :string(255)
+#  is_deleted                   :boolean          default(FALSE)
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  user_id                      :integer
+#  company_id                   :integer
+#  purchase_order               :boolean
+#  payment                      :boolean
+#  expense                      :boolean
+#  ancestry                     :string(255)
+#  deleted_at                   :datetime
+#  budget_group_id              :integer
+#  calculated_before_tax_amount :boolean          default(FALSE)
+#  purchase_request             :boolean
+#  invoice                      :boolean
+#  budget_group_criterium_id    :integer
+#  active                       :boolean          default(TRUE)
+#  budget_date_type_id          :integer
 #
 
 class Budget < ApplicationRecord
@@ -29,14 +35,19 @@ class Budget < ApplicationRecord
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
+  has_one :budget_consumption, dependent: :destroy
 
-
+  belongs_to :budget_date_type, optional: true
   belongs_to :user, optional: true
   belongs_to :company, optional: true
-  belongs_to :period, optional: true
   belongs_to :budget_amount, optional: true, class_name: "Amount"
   belongs_to :spent_amount, optional: true, class_name: "Amount"
+  belongs_to :budget_group
+  belongs_to :budget_group_criterium
 
+  # Above details like period, name, budget amount etc. will be held in the budget itself for now
+  # the below will now be moved to the Budget Group which will house the details of the criteria
+  ###################### DEPRECATED #########################
   has_many :budget_criteria_mappings
   has_many :budgetables, through: :budget_criteria_mappings
   has_many :budgetable_vendors, through: :budget_criteria_mappings, source: :budgetable, source_type: 'YesBankVendor'
@@ -45,8 +56,10 @@ class Budget < ApplicationRecord
   has_many :budgetable_locations, through: :budget_criteria_mappings, source: :budgetable, source_type: 'BranchLocation'
   has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
   has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
+  ###################### DEPRECATED #########################
 
   has_many :budget_modification_trails
+  has_one :budget_consumption
 
   accepts_nested_attributes_for :budget_amount
   accepts_nested_attributes_for :budget_criteria_mappings
@@ -54,6 +67,10 @@ class Budget < ApplicationRecord
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
+
+  after_create :set_budget_consumption
+  after_create :reflect_budget_group_attributes
+  after_save :update_consumption_model
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
@@ -183,6 +200,27 @@ class Budget < ApplicationRecord
     where.not(id: id)
   }
 
+  scope :filter_budget_group_id, -> (budget_group_id) {
+    where budget_group_id: budget_group_id
+  }
+
+  scope :with_budget_criteria_id, -> (budget_criteria_ids) {
+    where budget_group_criterium_id: budget_criteria_ids
+  }
+
+  scope :active, -> {
+    where active: true
+  }
+
+  # scope :filter_criteria, -> (criteria) {
+  #   case criteria
+  #   when 'budget', :budget, '1'
+
+  #   when 'timeline', :timeline, '2'
+
+  #   end
+  # }
+
   scope :include_details, -> {
     includes([
                  # :budget_criteria_mappings,
@@ -208,11 +246,88 @@ class Budget < ApplicationRecord
              ])
   }
 
+  def as_json(options={})
+    budget_criteria_id = budget_group_criterium&.id
+    get_budget_criteria_as_json(budget_criteria_id)
+  end
+
+  def get_budget_criteria_as_json(budget_criteria_id=nil)
+  {
+      id: id,
+      name: name,
+      active: active,
+      start_date: start_date&.strftime("%d-%b-%Y"),
+      end_date: end_date&.strftime("%d-%b-%Y"),
+      budget_amount: budget_consumption.budget_amount.as_json,
+      spent_amount: budget_consumption.total_consumed_amount.as_json,
+      budget_consumption: budget_consumption,
+      budget_group: budget_group,
+      # spent_amount: processor_instance.spent_amount,
+      criteria_name: budget_group_criterium&.name,
+      associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name: (vendor.name || vendor.business_name) }},
+      associated_categories: budget_group_criterium&.budgetable_categories.as_json,
+      associated_cost_centers: budget_group_criterium&.budgetable_cost_centers.as_json,
+      associated_locations: budget_group_criterium&.budgetable_locations.as_json,
+      associated_departments: budget_group_criterium&.budgetable_departments.as_json,
+      associated_users: budget_group_criterium&.budgetable_users&.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      user: {
+        id: user.id,
+        mobile_number: user.mobile_number,
+        email: user.email
+
+      },
+      criteria_id: budget_criteria_id,
+      sub_budgets: get_sub_budgets_as_json(budget_criteria_id),
+      sub_budgets_count: budget_group_criterium&.children&.map(&:budgets)&.flatten&.count
+    }
+  end
+
+  def get_sub_budgets_as_json(budget_criteria_id=nil)
+    data = []
+    budget_group_criterium&.children.each{|child| child.budgets&.each{|budget| data << budget.get_budget_criteria_as_json(budget_criteria_id)}}
+    data
+  end
+
+  def budget_criteria_as_json(options={})
+    budget_criteria_id= budget_group_criterium&.id
+    get_budget_criteria_as_json(budget_criteria_id)
+  end
+
+  def timeline_criteria_as_json(options={})
+    {
+      id: id,
+      name: name,
+      start_date: start_date&.strftime("%d-%b-%Y"),
+      end_date: end_date&.strftime("%d-%b-%Y"),
+      budget_amount: budget_amount.as_json,
+      budget_consumption: budget_consumption,
+      sub_budgets: children.map(&:timeline_criteria_as_json),
+      sub_budgets_count: children.size,
+    }
+  end
+
+  def only_name_as_json
+    {
+      id: id,
+      name: name,
+      sub_budgets: children.map(&:only_name_as_json)
+    }
+  end
+
+  def criteria_as_json(options = {})
+
+  end
+
+  def consumed_budget
+    # calculate in percentage how much budget amount is actually spent
+    ((processor_instance.spent_amount / self.budget_amount.value) * 100) rescue 0
+  end
+
   def validate_if_owner?(user)
     self.user_id == user.id
   end
 
-  def validate_of_manager?(user)
+  def validate_if_manager?(user)
     user.is_budget_manager?
   end
 
@@ -220,13 +335,22 @@ class Budget < ApplicationRecord
     user.admin? || user.vp_admin_or_auditor?
   end
 
+  def within_timeframe?(date)
+    true if (start_date <= date and end_date >= date)
+  end
+
   private
 
+  def processor_instance
+   BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
+  end
+
   def recalculate_parent_budget
-    if self.parent.present?
-      sum_children = self.parent.children.joins(:budget_amount).sum(:value)
-      self.parent.budget_amount.update(value: sum_children)
-    end
+    # parent budget amount should not be dependent on the sum of its child budgets amount
+    # if self.parent.present?
+    #   sum_children = self.parent.children.joins(:budget_amount).sum(:value)
+    #   self.parent.budget_amount.update(value: sum_children)
+    # end
   end
 
   def reassign_parent_mappings
@@ -239,6 +363,60 @@ class Budget < ApplicationRecord
         end
       end
     end
+  end
+
+  # initializing the budget consumption model with default values
+  # currently being done here because TBZ doesn't have very good callbacks
+  def set_budget_consumption
+    budget_consumption = self.build_budget_consumption(
+            budget_amount_attributes: {
+                value: self.budget_amount.value,
+                currency: Currency.first
+            },
+            pending_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            committed_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            pending_payment_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            payment_processing_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            paid_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            },
+            remaining_amount_attributes: {
+                value: self.budget_amount.value,
+                currency: Currency.first
+            },
+            total_consumed_amount_attributes: {
+                value: 0,
+                currency: Currency.first
+            }
+    )
+    budget_consumption.save
+  end
+
+  def update_consumption_model
+    op = BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: self, current_user: User.first, calculate_buckets: true, calculate_trail_items: false})
+  end
+
+  def reflect_budget_group_attributes
+    self.update_attributes(
+        purchase_order: self.budget_group.purchase_order,
+        invoice: self.budget_group.invoice,
+        purchase_request: self.budget_group.purchase_request,
+        expense: self.budget_group.expense,
+        payment: self.budget_group.payment
+    )
   end
 
 end

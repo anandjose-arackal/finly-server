@@ -10,6 +10,10 @@ module Transactions::Messages
     base.extend(ClassMethods)
   end
 
+  # here "key" will represent a type of error that can later be used for a specific section in the FE. Eg. while creating a vendor,
+  # each card on the FE will have a key, and you can send an error message that is specific to that key.
+  # In case it is generic for the whole form, it will be under "base"
+
   def on_info(options, key, message)
     add_message options, :info, key, message
     true
