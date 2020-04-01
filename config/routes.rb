@@ -2848,6 +2848,7 @@ Rails.application.routes.draw do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
         patch 'users/deactivate/:id', to: 'users#deactivate_user'
+        post 'users/:id', to: 'users#update'
         resources :users, only: [:create, :show, :index, :update]
         resources :cards, only: [:index, :show]
         resources :cards do

@@ -41,25 +41,26 @@ class Personalizer::Adapters::Company140::Procurements140::Invoices140::Submit14
       end
     end
 
+      # TODO - change the below logic once the ApplicableBudgets has been fixed
     # adding logic for checking if budget is being exceeded
-    if self.invoice.procurement&.non_po_procurement?
-      budget_exceeded = false
-      self.budgets.each do |budget|
-        budget_amount = budget.budget_consumption&.budget_amount&.value
-        budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
-
-        spent_amount = budget_spent_amount
-
-        if spent_amount > budget_amount
-          budget_exceeded = false
-          add_message :error,  "Invoice Amount exceeding Budget - #{budget.name}"
-        end
-      end
-
-      # adding overall message to the user
-      if budget_exceeded
-        add_message :error, 'Please contact finance to allocate more budget'
-      end
-    end
+    # if self.invoice.procurement&.non_po_procurement?
+    #   budget_exceeded = false
+    #   self.budgets.each do |budget|
+    #     budget_amount = budget.budget_consumption&.budget_amount&.value
+    #     budget_spent_amount = budget.budget_consumption&.total_consumed_amount&.value
+    #
+    #     spent_amount = budget_spent_amount
+    #
+    #     if spent_amount > budget_amount
+    #       budget_exceeded = false
+    #       add_message :error,  "Invoice Amount exceeding Budget - #{budget.name}"
+    #     end
+    #   end
+    #
+    #   # adding overall message to the user
+    #   if budget_exceeded
+    #     add_message :error, 'Please contact finance to allocate more budget'
+    #   end
+    # end
   end
 end

@@ -26,8 +26,8 @@ json.result do
     end
 
     json.parent_category do
-      json.id expense.category&.parent&.id
-      json.name expense.category&.parent&.name
+      json.id expense.category&.id
+      json.name expense.category&.name
       json.gl_code expense.category&.gl_code
     end
 
