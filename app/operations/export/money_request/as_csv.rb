@@ -8,9 +8,9 @@ class Export::MoneyRequest::AsCsv < Export::MoneyRequest::Base
 
   def personalizer
     {
-        post_process: {
-            before: Personalizer::Process.new([:export, :money_requests], :as_csv, self)
-        }
+      post_process: {
+          before: Personalizer::Process.new([:export, :money_requests], :as_csv, self)
+      }
     }
   end
 
