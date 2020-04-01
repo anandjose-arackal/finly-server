@@ -13,6 +13,7 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.actions @result.actions_for(group)
   user_count = 0
   report_count = 0
-  json.user_count group.mapping.count
-  json.report_count group.map{|rpg_mapping|  rpg_mapping.reports.count }.inject(:+)
+  json.user_count group.mappings.count
+  json.report_count group.mappings.map{|rpg_mapping|  rpg_mapping.reports.count }.inject(:+)
+
 end
