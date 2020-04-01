@@ -10,7 +10,7 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
     if payment.payment_purpose_id == PaymentPurpose.id_for(:advance_against_purchase_order)
       purchase_order_id = payment.parent_id
       invoice_id = nil
-    elsif payment.payment_purpose_id = PaymentPurpose.id_for(:vendor_payment)
+    elsif payment.payment_purpose_id == PaymentPurpose.id_for(:vendor_payment)
       purchase_order_id = nil
       invoice_id = (payment.parent_type == "Invoice" ? payment.parent_id : nil)
     else
