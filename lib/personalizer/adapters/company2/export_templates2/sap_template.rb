@@ -33,7 +33,8 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
 
     self.reports = reports.processed.includes({user: :profile}, expenses: [:category, :amount], report_processor_group_mapping: [:payment])
     self.reports = apply_scopes(self.reports, params)
-    self.categories = user.company.categories.select(:id, :ancestry, :gl_code).map{|c| categories[c.id] ={gl_code: c.gl_code, ancestry: c.ancestry&.to_i}}
+    self.categories ={}
+    self.user.company.categories.select(:id, :ancestry, :gl_code).map{|c| self.categories[c.id] ={gl_code: c.gl_code, ancestry: c.ancestry&.to_i}}
 
 
     self.headers = [
