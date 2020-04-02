@@ -1201,12 +1201,12 @@ class Payment < ApplicationRecord
 
         sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0)
                                               WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
-                                              WHERE (net_paid_amount_before_tax_value < tax_amount_value)"
+                                              AND (net_paid_amount_before_tax_value < tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
-        
+
         sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value)), 0)
                                               WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
-                                              WHERE (net_paid_amount_before_tax_value >= tax_amount_value)"
+                                              AND (net_paid_amount_before_tax_value >= tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
         sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value))
