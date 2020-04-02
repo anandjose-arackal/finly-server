@@ -86,17 +86,13 @@ class Menu::API < Transactions::API
     context[:entities] = []
 
     if current_user.company.group_entity_structure_enabled? and not RequestStore.store[:actual_current_user].present?
-      group_companies = current_user.company.group.companies.where(status_id: CompanyStatus.ids_for(:active, :partial_block, :hidden))
+      users = User.where(finly_id: current_user.finly_id).includes(company: :configuration)
     else
-      group_companies = [current_user.company]
+      users = [current_user]
     end
-    users = User.with_company_id(group_companies.pluck(:id)).with_email_or_mobile_number(current_user.email, current_user.mobile_number)
-    companies = Company.with_id(users.pluck(:company_id))
-    user_map = {}
-    users.each { |u| user_map[u.company_id] = u }
 
-    companies.each do |company|
-      user = user_map[company.id]
+    users.each do |user|
+      company = user.company
       conf = {
           company_id: company.id,
           name: company.name,
@@ -119,21 +115,8 @@ class Menu::API < Transactions::API
         conf[:modules] << mod[:config].merge(selected: selected)
       end
 
-
-      context[:entities] << conf if conf[:modules].present?
+      context[:entities] << conf
     end
-    # MODULES_CONFIG.each do |mod|
-    #   next if [mod[:app].to_s, mod[:app]].include?(RequestStoreUtil.current_app)
-    #   next if mod[:feature] and not current_user.company.feature_subscription.send(mod[:feature])
-    #   next if mod[:user_subscription] and not current_user.user_panel_subscription.send(mod[:user_subscription])
-    #   if mod[:permissions].present?
-    #     permissions = mod[:permissions]
-    #     permissions = [permissions] unless permissions.respond_to?(:each)
-    #     next if permissions.present? and not current_user.has_roles?(permissions)
-    #   end
-    #
-    #   context[:modules] << mod[:config]
-    # end
   end
 
 end
