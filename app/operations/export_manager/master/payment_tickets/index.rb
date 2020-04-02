@@ -43,7 +43,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   attribute :error_message
 
   def input
-    result = BankTransfer::PaymentRequest::Index.(user, params)
+    result = ::BankTransfer::PaymentRequest::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
@@ -57,7 +57,8 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
       end
     end
 
-    payment = Payment.where(id: result_payments_ids)
+    payments = Payment.where(id: result_payments_ids)
+    payments
   end
 
   def payment_order_id ( payment )
