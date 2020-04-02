@@ -1,6 +1,6 @@
 class Docs::P2P::Invoices::NonPo::Action < ActionManager::API
 
-  scope policy: Docs::P2P::Invoices::Po::Policy, model: Invoice do
+  scope policy: Docs::P2P::Invoices::NonPo::Policy, model: Invoice do
 
     action :template,
            :create,

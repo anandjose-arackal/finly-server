@@ -102,16 +102,20 @@ class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
     counter
   end
 
-  def self.cost_center_name(user, record_exposure)
+  def self.cost_center_name(user, record, record_exposure)
     return "Multiple" if record_exposure.cost_allocation_items
 
     record_exposure.cost_center&.name
   end
 
-  def self.department_name(user, record_exposure)
+  def self.department_name(user, record, record_exposure)
     return "Multiple" if record_exposure.cost_allocation_items
 
     record_exposure.department&.name
+  end
+
+  def self.custom_fields(user, record, record_exposure)
+    record.custom_fields
   end
 
 end

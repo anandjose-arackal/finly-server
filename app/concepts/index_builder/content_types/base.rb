@@ -40,7 +40,7 @@ class IndexBuilder::ContentTypes::Base
     self.class.content_type
   end
 
-  def build(context, user, exposure)
+  def build(context, user, record, exposure)
     data = {content_type: content_type}
     self.class.attributes.each do |attribute|
       value = nil
@@ -54,7 +54,7 @@ class IndexBuilder::ContentTypes::Base
         value = exposure.template(retriever)
       elsif retriever.is_a?(Symbol)
         if context.respond_to?(retriever)
-          value = context.send(retriever, user, exposure)
+          value = context.send(retriever, user, record, exposure)
         else
           value = exposure.send(retriever)
         end

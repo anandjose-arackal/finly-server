@@ -1,6 +1,6 @@
 class Docs::P2P::Invoices::Agreement::Action < ActionManager::API
 
-  scope policy: Docs::P2P::Invoices::Po::Policy, model: Invoice do
+  scope policy: Docs::P2P::Invoices::Agreement::Policy, model: Invoice do
 
     scope permissions: :admin do
       action :transition,

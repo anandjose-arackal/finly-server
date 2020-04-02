@@ -32,10 +32,10 @@ class IndexBuilder::API::Column
     }
   end
 
-  def build(context, user, record)
+  def build(context, user, record, record_exposure)
     values = []
     fields.each do |field|
-      values << field.build(context, user, record)
+      values << field.build(context, user, record, record_exposure)
     end
     values
   end
