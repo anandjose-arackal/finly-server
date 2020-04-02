@@ -149,11 +149,11 @@ class ExportManager::Master::UtilityBills::Subscriptions::Index < ExportManager:
   end
 
   def submitted_at(record)
-    record.draft? ? "NA" : record.submitted_at.strftime("%I:%M %p, %d %b %Y")
+    record.draft? ? "NA" : record.submitted_at&.strftime("%I:%M %p, %d %b %Y")
   end
 
   def approved_at(record)
-    BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :activated, :deactivated).include?(record.status_id) ? record.approved_at.strftime("%I:%M %p, %d %b %Y") : "NA"
+    BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :activated, :deactivated).include?(record.status_id) ? record.approved_at&.strftime("%I:%M %p, %d %b %Y") : "NA"
   end
 
   def mobile_number(record)
