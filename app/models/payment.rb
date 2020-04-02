@@ -817,6 +817,10 @@ class Payment < ApplicationRecord
       when "BbpsBill"
         parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
         parent.update(status_id: BbpsBillStatus.id_for(:paid))
+      when "SecurityDeposit"
+        payment.parent.update(status_id: SecurityDepositStatus.id_for(:paid)) if payment.parent.payment_agreement_id.present?
+      when "BeneficiaryPayment"
+        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:paid)) if payment.parent.payment_agreement_id.present?
       end
     end
 
