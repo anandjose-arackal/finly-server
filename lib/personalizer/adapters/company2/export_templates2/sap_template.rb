@@ -33,7 +33,9 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
 
     self.reports = reports.processed.includes({user: :profile}, expenses: [:category, :amount], report_processor_group_mapping: [:payment])
     self.reports = apply_scopes(self.reports, params)
-    self.categories = user.company.categories
+    self.categories ={}
+    self.user.company.categories.select(:id, :ancestry, :gl_code).map{|c| self.categories[c.id] ={gl_code: c.gl_code, ancestry: c.ancestry&.to_i}}
+
 
     self.headers = [
         'S. NO.',
@@ -86,8 +88,8 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
             '',
             '',
             '',
-            retrieve_account(expense),
-            retrieve_sub_account(expense),
+            {value: retrieve_account(expense), type: "string"},
+            {value: retrieve_sub_account(expense), type: "string"},
             {value: (report.user.gl_config&.dig(:location_code).present? ? sprintf("%05d", report.user.gl_config&.dig(:location_code)) : ''), type: "string"},
             report.user.gl_config&.dig(:cost_center),
             '',
@@ -205,15 +207,16 @@ class Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate < Personal
   def retrieve_account(expense)
     parent_category_id = expense.category&.ancestry
     if parent_category_id.present?
-      parent = self.categories.find(parent_category_id.to_i)
-      return "#{parent.gl_code}"
+      parent = self.categories[parent_category_id.to_i]
+      return "#{parent[:gl_code]&.strip}"
     else
-      return "#{expense.category&.gl_code}"
+      return "#{expense.category&.gl_code&.strip}"
     end
   end
 
   def retrieve_sub_account(expense)
-    "#{expense.category&.gl_code}"
+    gl_code = expense.category&.gl_code&.strip&.to_i
+    (gl_code.present?  ? sprintf("%06d", gl_code) : '')
   end
 
 end
