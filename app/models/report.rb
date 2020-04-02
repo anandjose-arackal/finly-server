@@ -361,7 +361,7 @@ class Report < ApplicationRecord
 
   before_destroy :clear_expenses
 
-  # after_save :budget_trail_entry
+  after_save :budget_trail_entry
 
   after_destroy :budget_trail_destroy
 
