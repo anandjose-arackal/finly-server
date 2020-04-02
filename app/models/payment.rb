@@ -1229,7 +1229,7 @@ class Payment < ApplicationRecord
         processing_percent_before_tax = payment_processing_amount / purchase_order.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / purchase_order.amount_after_tax
 
-        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
+        sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
         sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * remaining_amount_before_tax_value)
