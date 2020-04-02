@@ -10,7 +10,7 @@ class Admin::Implementations::Master::ItemMasters::Export < Admin::Implementatio
       :hsn_sac => "HSN - SAC",
       :item_number => "Item Code",
       :item_expense_type => "Expense Type",
-      :po_item =>  "PO Item (Y/N)",
+      :po_item => "PO Item (Y/N)",
       :non_po_item => "Non PO Item (Y/N)",
       :good_service => "Goods or Service ( G / S)",
       :tds_applicable => "TDS Applicable (Y/N)",

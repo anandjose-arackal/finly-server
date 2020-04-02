@@ -43,8 +43,8 @@ class User::Configuration::UpdateDetails < BaseOperation
     if params[:user_id].present?
       formatted_request = RequestFormatter::ApiParser::FmParser::V1::Users::Update.(user, params).formatted_request
       formatted_request.require(:user).permit(:user_id, :first_name, :last_name, :mobile_number, :mothers_maiden_name,
-                  :department_id, :active, :location_id, profile_attributes: [:gender, :date_of_birth,
-                  :employee_id, :payroll_id,:address_1, :address_2, :city, :state_id, :pin_code ])
+                                              :department_id, :active, :location_id, profile_attributes: [:gender, :date_of_birth,
+                                                                                                          :employee_id, :payroll_id, :address_1, :address_2, :city, :state_id, :pin_code])
     else
       params.require(:user).permit(:name, :mobile_number)
     end
