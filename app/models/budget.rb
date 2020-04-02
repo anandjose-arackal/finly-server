@@ -265,6 +265,7 @@ class Budget < ApplicationRecord
       spent_amount: budget_consumption.total_consumed_amount.as_json,
       budget_consumption: budget_consumption,
       budget_group: budget_group,
+      calculated_before_tax_amount: calculated_before_tax_amount,
       # spent_amount: processor_instance.spent_amount,
       criteria_name: budget_group_criterium&.name,
       associated_vendors: budget_group_criterium&.budgetable_vendors&.collect {|vendor| {id:vendor.id, name: (vendor.name || vendor.business_name) }},
@@ -306,6 +307,7 @@ class Budget < ApplicationRecord
       budget_consumption: budget_consumption,
       sub_budgets: children.map(&:timeline_criteria_as_json),
       sub_budgets_count: children.size,
+      calculated_before_tax_amount: calculated_before_tax_amount,
     }
   end
 
