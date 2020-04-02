@@ -39,13 +39,14 @@
 #  purchase_order_id                          :integer
 #  invoice_id                                 :integer
 #  payment_purpose_id                         :integer
-#  paid_amount_before_tax_value               :decimal(20, 10)  default(0.0)
+#  effective_paid_amount_before_tax_value     :decimal(20, 10)  default(0.0)
 #  paid_amount_after_tax_value                :decimal(20, 10)  default(0.0)
 #  reimbursable                               :boolean          default(FALSE)
 #  payment_processing_amount_before_tax_value :decimal(20, 10)  default(0.0)
 #  payment_processing_amount_after_tax_value  :decimal(20, 10)  default(0.0)
 #  tds_value                                  :decimal(20, 10)  default(0.0)
 #  tax_amount_value                           :decimal(20, 10)  default(0.0)
+#  net_paid_amount_before_tax_value           :decimal(20, 10)
 #
 
 class BudgetTrail < ApplicationRecord

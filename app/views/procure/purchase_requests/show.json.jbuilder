@@ -146,6 +146,8 @@ json.result do
     end
     json.reviewal_chain @result.reviewal_chain
   end
+
+  json.budgets @result.budgets
 end
 
 json.budgets @result.budgets

@@ -86,6 +86,7 @@ class InwardInvoiceStatus < ApplicationRecord
     ]
   end
 
+  # THIS INCLUDES THE PAID BUCKET
   def self.ids_for_payment_processing_bucket
     [
         InwardInvoiceStatus.id_for(:initiated),

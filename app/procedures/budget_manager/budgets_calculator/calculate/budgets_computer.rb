@@ -90,7 +90,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       when :amount_before_tax
         po_item_amount_to_be_considered = "remaining_amount_before_tax_value"
         invoice_item_amount_to_be_considered = "billed_amount_before_tax_value"
-        paid_amount_to_be_considered = "paid_amount_before_tax_value"
+        paid_amount_to_be_considered = "effective_paid_amount_before_tax_value"
         payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
       end
 
