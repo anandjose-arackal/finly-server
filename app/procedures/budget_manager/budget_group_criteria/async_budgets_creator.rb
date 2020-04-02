@@ -2,7 +2,7 @@ class BudgetManager::BudgetGroupCriteria::AsyncBudgetsCreator < Transactions::AP
 
   include Events::Consumer
 
-  # consumes_event! 'budget_group_criteria.create'
+  consumes_event! 'budget_group_criteria.create'
 
   def work(user, payload)
     self.class.(params: payload, current_user: user)
