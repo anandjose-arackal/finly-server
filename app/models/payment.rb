@@ -481,6 +481,20 @@ class Payment < ApplicationRecord
   after_destroy :calculate_paid_amount_in_parent_trails
   after_destroy :reset_status
 
+
+  def amount_before_tax
+    if self.parent_type == "BeneficiaryPayment"
+      return (self.amount_value - self.parent&.tax_amount&.value.to_f)
+    else
+      return self.amount_value
+    end
+  end
+
+  def amount_after_tax
+    self.amount_value
+  end
+
+
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
 
