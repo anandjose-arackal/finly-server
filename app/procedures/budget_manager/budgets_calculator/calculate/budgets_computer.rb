@@ -7,6 +7,12 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   attr_accessor :budget, :budget_trails, :budget_consumption,
                 :amount_to_be_considered, :date_to_be_considered
 
+  consumes_event! 'budget.update'
+
+  def work(user, payload)
+    self.class.(params: payload, current_user: user)
+  end
+
   step :initialize!
 
   # below method will retrieve all the trails for a particular
@@ -30,7 +36,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   # failure :return_errors!
 
   def initialize!(options, budget:, **)
-    self.budget = budget
+    self.budget = budget || params[:record]
     if budget.blank?
       errors.add(:budget, "Budget cannot be blank")
       return false
