@@ -37,8 +37,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
   # failure :return_errors!
 
-  def initialize!(options, budget:, **)
-    self.budget = budget || options&.dig(:params, :record)
+  def initialize!(options, **)
+    self.budget = options[:budget] || options&.dig(:params, :record)
     if budget.blank?
       errors.add(:budget, "Budget cannot be blank")
       return false
