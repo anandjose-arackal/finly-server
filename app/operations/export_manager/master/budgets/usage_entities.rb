@@ -6,8 +6,9 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   configurable true
   system :fi
   screen ['budget_group_criteria.index']
-  validate :input
   handle :budget_entities
+
+  validate :input
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type

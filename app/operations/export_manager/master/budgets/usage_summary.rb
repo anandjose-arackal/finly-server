@@ -1,13 +1,18 @@
 class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Spreadsheet
 
-  attr_accessor :spent_amount
+  attr_accessor :budgets, :index
 
+  description 'Budget Usage Summary'
+  configurable true
+  system :fi
+  screen ['budget_group_criteria.index']
   handle :budget_summary
-
 
   validate :input
 
+  attribute :serial_no
   attribute :budget_name
+  attribute :budget_criteria_name
   attribute :budget_start_date
   attribute :budget_end_date
   attribute :budget_amount
@@ -15,53 +20,52 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
   attribute :usage_percentage
 
   def input
-    op = ::Budgets::Index.(user, params)
+    budget_group_id = params[:budget_group_id]
+    op = BudgetManager::BudgetGroupCriteria::Ops::Index.(params: {id: budget_group_id}, "current_user" => User.first)
     unless op.success?
-      add_message :error, result.messages[:error]
+      add_message :error, op.messages[:error]
       return
     end
-    budgets = op.budgets
-    all_budget_ids = []
-    # extracting all the budget ids including the children
-    budgets.each do |budget|
-      all_budget_ids += budget.children.pluck(:id)
-      all_budget_ids << budget.id
-    end
-    Budget.with_id(all_budget_ids)
+
+    budget_group_criteria = op["budget_group_criteria"]
+    self.budgets = Budget.with_budget_criteria_id(budget_group_criteria.pluck(:id))
+    self.index = 0
+    return self.budgets
+  end
+
+  def serial_no(budget)
+    self.index += 1
+    return self.index
   end
 
   def budget_name(budget)
     budget.name
   end
 
+  def budget_criteria_name(budget)
+    budget.budget_group_criterium.name
+  end
+
   def budget_start_date(budget)
-    budget.start_date
+    budget.start_date.strftime("%d %B, %Y")
   end
 
   def budget_end_date(budget)
-    budget.end_date
+    budget.end_date.strftime("%d %B, %Y")
   end
 
   def budget_amount(budget)
-    budget.budget_amount&.value
+    budget.budget_consumption.budget_amount&.value.to_f
   end
 
   def budget_usage(budget)
-    # if self.spent_amount.present?
-    #   return self.spent_amount
-    # else
-    #   processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    #   self.spent_amount = processor_instance.spent_amount
-    #   return self.spent_amount
-    # end
-    processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    spent_amount = processor_instance.spent_amount
+    budget.budget_consumption.spent_amount&.value.to_f
   end
 
   def usage_percentage(budget)
-    processor_instance = BudgetManager::BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    spent_amount = processor_instance.spent_amount
-    return ((spent_amount / budget.budget_amount&.value.to_f) * 100).round(2)
+    spent_amount = budget.budget_consumption.spent_amount&.value.to_f
+    return 0 if budget.budget_consumption.budget_amount.value == 0
+    return ((spent_amount / budget.budget_consumption.budget_amount&.value.to_f) * 100).round(2)
   end
 
 end
