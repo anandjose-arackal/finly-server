@@ -102,8 +102,13 @@ class BudgetsController < BaseControllers::WebBase
 
   def import
     @result = BudgetManager::BudgetsTrb::Import::ImportBudgets.(current_user, params)
-    # @result = Budgets::Import.(current_user, params)
-    respond
+    if @result.success?
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def process_template_file

@@ -1,11 +1,12 @@
 class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsTrb::Import::Base
 
-  attr_accessor :parsed_data, :file, :errors, :headers, :contents
+  attr_accessor :parsed_data, :file, :errors, :headers, :contents, :sheets
 
   def init
     self.file = params[:file]
     self.headers = default_headers
     self.contents = []
+    self.sheets = []
     begin
       self.parsed_data = ImportUtil.load_spreadsheet_quickly(file, default_headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError, RuntimeError => e
