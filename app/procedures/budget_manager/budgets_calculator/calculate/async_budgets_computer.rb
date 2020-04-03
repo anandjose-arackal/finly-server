@@ -8,6 +8,7 @@ class BudgetManager::BudgetsCalculator::Calculate::AsyncBudgetsComputer < Transa
   consumes_event! 'invoice.update', 'invoice.create', 'invoice.destroy'
   consumes_event! 'report.update', 'report.create', 'report.destroy', 'expense.update', 'expense.create', 'expense.destroy'
   consumes_event! 'bank_payment_request.update', 'bank_payment_request.create', 'bank_payment_request.destroy'
+  consumes_event! 'purchase_request.create', 'purchase_request.update', 'purchase_request.destroy'
 
   def work(user, payload)
     self.class.(params: payload, current_user: user)
