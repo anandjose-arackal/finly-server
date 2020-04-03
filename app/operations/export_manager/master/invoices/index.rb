@@ -279,8 +279,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
 
   def tds_amount(invoice_line_item)
     return 0.0 unless invoice_line_item&.tds_applicable?
-    # invoice_line_item.tds_amount
-    invoice_line_item.parent.tds_amount&.value || 0.0
+    # invoice_line_item.parent.tds_amount&.value || 0.0
+    invoice_line_item.tds_amount # show line item wise tds instead of header
   end
 
   def rcm_enabled(invoice_line_item)
