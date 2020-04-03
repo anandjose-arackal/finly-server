@@ -8,7 +8,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
                 :amount_to_be_considered, :date_to_be_considered
 
   include Events::Consumer
-  
+
   consumes_event! 'budget.update'
 
   def work(user, payload)
@@ -37,7 +37,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
   # failure :return_errors!
 
-  def initialize!(options, budget:, **)
+  def initialize!(options, budget:, params:, **)
     self.budget = budget || params[:record]
     if budget.blank?
       errors.add(:budget, "Budget cannot be blank")
@@ -86,7 +86,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   end
 
   # here we calculate the various buckets
-  def calculate_buckets!(options, **)
+  def calculate_buckets!(options, params:, **)
     calculate_buckets = params[:calculate_buckets]
     if calculate_buckets and self.budget.active
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
@@ -215,7 +215,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     return true
   end
 
-  def prepare_budgetable_entities!(options, **)
+  def prepare_budgetable_entities!(options, params:, **)
     calculate_trail_items = params[:calculate_trail_items]
     result = {}
     if calculate_trail_items
