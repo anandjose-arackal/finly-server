@@ -90,7 +90,7 @@ class BudgetsController < BaseControllers::WebBase
   end
 
   def sample_import_file
-    @result = Budgets::GenerateSampleFile.(current_user, params)
+    @result = BudgetManager::BudgetsTrb::Import::GenerateImportTemplate.(current_user, params)
     if @result.success?
       respond_to do |format|
         format.json {}
@@ -98,7 +98,6 @@ class BudgetsController < BaseControllers::WebBase
     else
       respond response: :failure, message: @result.messages[:error]
     end
-
   end
 
   # deprecated op
