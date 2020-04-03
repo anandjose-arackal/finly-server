@@ -84,8 +84,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   end
 
   # here we calculate the various buckets
-  def calculate_buckets!(options, calculate_buckets:, **)
-
+  def calculate_buckets!(options, **)
+    calculate_buckets = params[:calculate_buckets]
     if calculate_buckets and self.budget.active
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
       case amount_to_be_considered
@@ -213,7 +213,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     return true
   end
 
-  def prepare_budgetable_entities!(options, calculate_trail_items:, **)
+  def prepare_budgetable_entities!(options, **)
+    calculate_trail_items = params[:calculate_trail_items]
     result = {}
     if calculate_trail_items
       expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
