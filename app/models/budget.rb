@@ -77,6 +77,7 @@ class Budget < ApplicationRecord
 
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
+  after_update :update_spent_amount_in_consumption_model
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -422,6 +423,10 @@ class Budget < ApplicationRecord
         expense: self.budget_group.expense,
         payment: self.budget_group.payment
     )
+  end
+
+  def update_spent_amount_in_consumption_model
+    self.budget_consumption.budget_amount.update(value: self.budget_amount&.value)
   end
 
 end

@@ -100,9 +100,9 @@ class BudgetsController < BaseControllers::WebBase
     end
   end
 
-  # deprecated op
   def import
-    @result = Budgets::Import.(current_user, params)
+    @result = BudgetManager::BudgetsTrb::Import::ImportBudgets.(current_user, params)
+    # @result = Budgets::Import.(current_user, params)
     respond
   end
 
