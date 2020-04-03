@@ -13,6 +13,9 @@ json.result do
     json.period_id budget_group_criterium.budget_group.period_id
     json.period budget_group_criterium.budget_group.period&.name
     json.budget_group_name budget_group_criterium.budget_group&.name
+    json.start_date budget_group_criterium.budget_group.start_date.strftime("%d-%b-%Y")
+    json.end_date budget_group_criterium.budget_group.end_date.strftime("%d-%b-%Y")
+    json.calculated_before_tax_amount budget_group_criterium.budget_group.calculated_before_tax_amount
     json.purchase_order budget_group_criterium.budget_group&.purchase_order
     json.invoice budget_group_criterium.budget_group&.invoice
     json.expense budget_group_criterium.budget_group&.expense
