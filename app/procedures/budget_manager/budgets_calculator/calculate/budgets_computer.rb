@@ -37,8 +37,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
   # failure :return_errors!
 
-  def initialize!(options, budget:, params:, **)
-    self.budget = budget || params[:record]
+  def initialize!(options, budget:, **)
+    self.budget = budget || options&.dig(:params, :record)
     if budget.blank?
       errors.add(:budget, "Budget cannot be blank")
       return false
@@ -86,8 +86,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   end
 
   # here we calculate the various buckets
-  def calculate_buckets!(options, params:, **)
-    calculate_buckets = params[:calculate_buckets]
+  def calculate_buckets!(options, **)
+    calculate_buckets = options[:calculate_buckets]
     if calculate_buckets and self.budget.active
       # setting the respective keys to look for in the BudgetTrail model for PO Items and Invoices respectively
       case amount_to_be_considered
@@ -215,8 +215,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     return true
   end
 
-  def prepare_budgetable_entities!(options, params:, **)
-    calculate_trail_items = params[:calculate_trail_items]
+  def prepare_budgetable_entities!(options, **)
+    calculate_trail_items = options[:calculate_trail_items]
     result = {}
     if calculate_trail_items
       expenses = Expense.with_id(self.budget_trails.with_entity_type("Expense").pluck(:entity_id))
