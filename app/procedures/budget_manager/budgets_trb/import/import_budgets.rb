@@ -5,7 +5,7 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
   def init
     self.file = params[:file]
     self.headers = default_headers
-    self.content = []
+    self.contents = []
     begin
       self.parsed_data = ImportUtil.load_spreadsheet_quickly(file, default_headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError, RuntimeError => e
@@ -37,12 +37,18 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
       unless budget.budget_amount.update(value: amount)
         result_row += budget.errors.full_messages
       end
-      self.content << result_row
+      self.contents << result_row
     end
+
+    self.sheets << {
+        item_headers: self.headers,
+        item_contents: self.contents,
+        name: "Budget Import"
+    }
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content}}, messages)
+    Exporter.new(user, {xlsx: {headers: headers, contents: contents, sheets: self.sheets}}, messages)
   end
 
   private
