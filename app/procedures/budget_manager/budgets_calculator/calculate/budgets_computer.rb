@@ -7,6 +7,8 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
   attr_accessor :budget, :budget_trails, :budget_consumption,
                 :amount_to_be_considered, :date_to_be_considered
 
+  include Events::Consumer
+  
   consumes_event! 'budget.update'
 
   def work(user, payload)
