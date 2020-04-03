@@ -1,6 +1,6 @@
 class BudgetManager::BudgetsTrb::Import::GenerateImportTemplate < BudgetManager::BudgetsTrb::Import::Base
 
-  attr_accessor :company, :headers, :contents, :budget_group
+  attr_accessor :company, :headers, :contents, :budget_group, :sheets
 
   def pre_validate
     if user.blank? || params.blank?
@@ -14,6 +14,7 @@ class BudgetManager::BudgetsTrb::Import::GenerateImportTemplate < BudgetManager:
     self.budget_group = user.company.budget_groups.find_by(id: id)
     self.headers = default_headers
     self.contents = []
+    self.sheets = []
   end
 
   def validate
@@ -34,10 +35,16 @@ class BudgetManager::BudgetsTrb::Import::GenerateImportTemplate < BudgetManager:
         self.contents << content_for_budget(budget)
       end
     end
+
+    self.sheets << {
+        item_headers: self.headers,
+        item_contents: self.contents,
+        name: "Budget Import"
+    }
   end
 
   def success
-    Exporter.new(user, {spreadsheet: {headers: headers, contents: contents}}, messages)
+    Exporter.new(user, {xlsx: {headers: headers, contents: contents, sheets: self.sheets}}, messages)
   end
 
   private
