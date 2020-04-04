@@ -1,6 +1,6 @@
 class Masters::Vendors::AutoComplete < AutoComplete::API
 
-  resolver Masters::Vendors::Resolver
+  resolver 'vendors.default'
   json do |context, record|
     {
         id: record.id,

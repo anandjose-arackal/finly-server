@@ -1,6 +1,6 @@
 class Masters::Categories::AutoComplete < AutoComplete::API
 
-  resolver Masters::Categories::Resolver
+  resolver 'category.default'
   json :id, :name
   search_key :name_or_category_code_cont
 
