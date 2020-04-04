@@ -110,6 +110,8 @@ class BudgetGroup < ApplicationRecord
       calculated_before_tax_amount: calculated_before_tax_amount,
       start_date: self.start_date&.strftime("%d-%b-%Y"),
       end_date: self.end_date&.strftime("%d-%b-%Y"),
+      total_amount: self.budgets.joins(:budget_amount).sum(:value),
+      consumed_amount: 0,
       total_budgets: self.budgets.count
     }
   end
