@@ -20,10 +20,11 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   attribute :department
   attribute :cost_center
   attribute :location
-  attribute :pending_amount
-  attribute :committed_amount
-  attribute :payment_processing_amount
-  attribute :paid_amount
+  attribute :amount
+  # attribute :pending_amount
+  # attribute :committed_amount
+  # attribute :payment_processing_amount
+  # attribute :paid_amount
   attribute :vendor
   attribute :merchant
   attribute :created_at
@@ -151,7 +152,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
-  def pending_amount(item)
+  def amount(item)
     # the below needs to be worked on because the amounts will depend on each bucket
     if item.entity.is_a?(PurchaseOrderItem)
       return item.entity.total_amount&.value
@@ -165,48 +166,65 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     ""
   end
 
-  def committed_amount(item)
-    # the below needs to be worked on because the amounts will depend on each bucket
-    if item.entity.is_a?(PurchaseOrderItem)
-      return item.entity.total_amount&.value
-    elsif item.entity.is_a?(InvoiceLineItem)
-      return item.entity.net_amount&.value
-    elsif item.entity.is_a?(Payment)
-      return item.entity.amount&.value
-    elsif item.entity.is_a?(Expense)
-      return item.entity.amount&.value
-    end
-    ""
-  end
-
-  def payment_processing_amount(item)
-    # the below needs to be worked on because the amounts will depend on each bucket
-    if item.entity.is_a?(PurchaseOrderItem)
-      return item.entity.total_amount&.value
-    elsif item.entity.is_a?(InvoiceLineItem)
-      return item.entity.net_amount&.value
-    elsif item.entity.is_a?(Payment)
-      return item.entity.amount&.value
-    elsif item.entity.is_a?(Expense)
-      return item.entity.amount&.value
-    end
-    ""
-  end
-
-
-  def paid_amount(item)
-    # the below needs to be worked on because the amounts will depend on each bucket
-    if item.entity.is_a?(PurchaseOrderItem)
-      return item.entity.total_amount&.value
-    elsif item.entity.is_a?(InvoiceLineItem)
-      return item.entity.net_amount&.value
-    elsif item.entity.is_a?(Payment)
-      return item.entity.amount&.value
-    elsif item.entity.is_a?(Expense)
-      return item.entity.amount&.value
-    end
-    ""
-  end
+  # def pending_amount(item)
+  #   # the below needs to be worked on because the amounts will depend on each bucket
+  #   if item.entity.is_a?(PurchaseOrderItem)
+  #     return item.entity.total_amount&.value if PurchaseOrderStatus.status_ids_for_pending_bucket.include?(item.entity_status_id)
+  #     return 0
+  #   elsif item.entity.is_a?(InvoiceLineItem)
+  #     return 0
+  #   elsif item.entity.is_a?(Payment)
+  #     return 0
+  #   elsif item.entity.is_a?(Expense)
+  #     return item.entity.amount&.value if ReportStatus.ids_for_pending_bucket.include?(item.entity_status_id)
+  #     return 0
+  #   end
+  #   ""
+  # end
+  #
+  # def committed_amount(item)
+  #   # the below needs to be worked on because the amounts will depend on each bucket
+  #   if item.entity.is_a?(PurchaseOrderItem)
+  #     return item.entity.total_amount&.value if PurchaseOrderStatus.status_ids_for_committed_bucket.include?(item.entity_status_id)
+  #     return 0
+  #   elsif item.entity.is_a?(InvoiceLineItem)
+  #     return item.entity.net_amount&.value if InwardInvoiceStatus.ids_for_committed_bucket.include?(item.entity_status_id) or InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(item.entity_status_id)
+  #   elsif item.entity.is_a?(Payment)
+  #     return item.entity.amount&.value
+  #   elsif item.entity.is_a?(Expense)
+  #     return item.entity.amount&.value
+  #   end
+  #   ""
+  # end
+  #
+  # def payment_processing_amount(item)
+  #   # the below needs to be worked on because the amounts will depend on each bucket
+  #   if item.entity.is_a?(PurchaseOrderItem)
+  #     return item.entity.total_amount&.value
+  #   elsif item.entity.is_a?(InvoiceLineItem)
+  #     return item.entity.net_amount&.value
+  #   elsif item.entity.is_a?(Payment)
+  #     return item.entity.amount&.value
+  #   elsif item.entity.is_a?(Expense)
+  #     return item.entity.amount&.value
+  #   end
+  #   ""
+  # end
+  #
+  #
+  # def paid_amount(item)
+  #   # the below needs to be worked on because the amounts will depend on each bucket
+  #   if item.entity.is_a?(PurchaseOrderItem)
+  #     return item.entity.total_amount&.value
+  #   elsif item.entity.is_a?(InvoiceLineItem)
+  #     return item.entity.net_amount&.value
+  #   elsif item.entity.is_a?(Payment)
+  #     return item.entity.amount&.value
+  #   elsif item.entity.is_a?(Expense)
+  #     return item.entity.amount&.value
+  #   end
+  #   ""
+  # end
 
   def merchant(item)
     if item.entity.is_a?(Expense)
