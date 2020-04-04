@@ -82,7 +82,22 @@ class InwardInvoiceStatus < ApplicationRecord
         InwardInvoiceStatus.id_for(:unpaid),
         InwardInvoiceStatus.id_for(:partially_paid),
         InwardInvoiceStatus.id_for(:initiated),
-        InwardInvoiceStatus.id_for(:paid),
+        InwardInvoiceStatus.id_for(:paid)
+    ]
+  end
+
+  def self.ids_for_tds_in_committed_bucket
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:rejected),
+        InwardInvoiceStatus.id_for(:retracted),
+        InwardInvoiceStatus.id_for(:processing),
+        InwardInvoiceStatus.id_for(:approved),
+        InwardInvoiceStatus.id_for(:auto_approved),
+        InwardInvoiceStatus.id_for(:unpaid),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:paid)
     ]
   end
 

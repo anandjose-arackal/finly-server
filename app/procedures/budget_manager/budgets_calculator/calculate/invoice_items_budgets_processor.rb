@@ -78,8 +78,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         tds_value: invoice_item.parent.tds_per_item,
         tax_amount_value: tax_amount,
         rcm_tax_value: rcm_tax_value,
-        paid_amount_after_tax: paid_amount,
-        paid_amount_before_tax: paid_amount,
+        paid_amount_after_tax_value: paid_amount,
+        effective_paid_amount_before_tax_value: paid_amount,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

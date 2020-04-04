@@ -20,9 +20,12 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
 
     if payment.parent_type == "BeneficiaryPayment"
       tds_value = payment.parent&.tds_amount&.value.to_f
+      paid_amount = payment.parent&.advance_amount&.value.to_f
     else
       tds_value = 0
+      paid_amount = 0
     end
+
     self.trail_hash = {
         id: trail_id,
         entity: payment,
@@ -40,6 +43,8 @@ class BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor < Bud
         purchase_order_id: purchase_order_id,
         invoice_id: invoice_id,
         tds_value: tds_value,
+        paid_amount_after_tax_value: paid_amount,
+        effective_paid_amount_before_tax_value: paid_amount,
         amount_attributes: {
             id: trail&.amount&.id,
             value: payment.amount.value,

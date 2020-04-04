@@ -118,12 +118,13 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       # this is so that RCM enabled item's taxes remain in the committed bucket
       if amount_to_be_considered == :amount_after_tax
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - rcm_tax_value")
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - rcm_tax_value")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").sum("rcm_tax_value")
       else
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_tds_in_committed_bucket).sum("tds_value")
       end
 
       committed_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
@@ -160,6 +161,9 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       paid_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket).without_invoice_or_po
                          .joins(self.amount_to_be_considered).sum('amounts.value')
+
+      paid_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.all_except_failed).without_invoice_or_po
+                         .sum(paid_amount_to_be_considered)
 
       total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
 
