@@ -3,8 +3,8 @@ class IndexBuilder::API
   include DynamicAttributes
   include IndexBuilder::Counter::DSL
 
-  def self.resolver(klass = nil, params: {})
-    @resolver = {klass: klass, params: params} if klass
+  def self.resolver(route = nil, params: {})
+    @resolver = {route: route, params: params} if route
 
     @resolver
   end
@@ -35,8 +35,10 @@ class IndexBuilder::API
     # Todo support resolver[:params] to be a proc to execute dynamic filters
     # context["params"].deep_merge!(resolver[:params])
 
+    resolver_klass = Resolver::Router[resolver[:route]]&.first&.klass
+    raise "Resolver with route #{resolver[:route]} not found" if resolver_klass.blank?
 
-    Resolver::Transactions::Resolve.with(context, resolver[:klass], paginate: true, filter: true)
+    Resolver::Transactions::Resolve.with(context, resolver_klass, paginate: true, filter: true)
   end
 
   def self.include_associations!(collection, required_columns)

@@ -31,6 +31,9 @@ Resolver::Router.draw do
 
   scope :invoices do
     route "default", Docs::P2P::Invoices::Resolver
+    route "po", Docs::P2P::Invoices::Resolver
+    route "non_po", Docs::P2P::Invoices::Resolver
+    route "agreement", Docs::P2P::Invoices::Resolver
   end
 
   scope :index_view_segments do

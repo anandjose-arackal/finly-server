@@ -1,13 +1,7 @@
 class Docs::P2P::Invoices::NonPo::Index < IndexBuilder::API
 
-  resolver Docs::P2P::Invoices::Resolver
+  resolver 'invoices.non_po'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "non_po"
-
-  def self.resolve(context)
-    super(context)
-    type_id = InwardInvoiceType.id_for(:non_po_invoice)
-    context['model.records'] = context['model.records'].where(invoice_type_id: type_id)
-  end
 
   # Fixed column is always default true
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do

@@ -1,13 +1,6 @@
 class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
 
-  resolver Docs::P2P::Invoices::Resolver
-
-  def self.resolve(context)
-    super(context)
-    type_id = InwardInvoiceType.id_for(:tax_invoice)
-    context['model.records'] = context['model.records'].where(invoice_type_id: type_id)
-  end
-
+  resolver 'invoices.po'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "po"
 
   # Fixed column is always default true
