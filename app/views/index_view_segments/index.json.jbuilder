@@ -1,9 +1,4 @@
 json.data do
-  json.array! @op['model.records'].each do |record|
-    json.id record.id
-    json.name record.name
-    json.filters record.filters
-    json.default record.default
-    json.columns record.columns
-  end
+  json.system_views @op[:system_views]
+  json.user_views @op[:user_views]
 end

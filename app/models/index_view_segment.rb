@@ -29,5 +29,15 @@ class IndexViewSegment < ApplicationRecord
 
   event_channel :index_view_segments
 
-  default_scope {order(name: :asc)}
+  default_scope { order(name: :asc) }
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        filters: filters,
+        default: default,
+        columns: columns
+    }
+  end
 end

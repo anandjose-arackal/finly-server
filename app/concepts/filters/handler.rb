@@ -1,3 +1,4 @@
+# terminologies https://github.com/activerecord-hackery/ransack/blob/85fc41b329ca2b316bab32c464dd8920fae74998/lib/ransack/locale/en.yml
 class Filters::Handler
   attr_accessor :query, :validation
 

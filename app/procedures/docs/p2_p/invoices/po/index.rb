@@ -14,7 +14,7 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: "{{record.created_by.email}}"
   end
 
-  column :created_at, sort: :created_at, default: true do
+  column :created_at, sort: :created_at do
     date value: :created_at
   end
 
@@ -32,6 +32,14 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
 
   column :due_date, sort: :due_date, default: true do
     date value: :due_date
+  end
+
+  column :submitted_at, sort: :submitted_at, default: false do
+    date value: :submitted_at
+  end
+
+  column :approved_at, sort: :approved_at, default: true do
+    date value: :approved_at
   end
 
   column :net_amount, default: true, includes: [net_amount: :currency] do
@@ -84,10 +92,6 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
 
   column :shipping_location, sort: :shipping_location_name, default: false, includes: [:delivery_location] do
     text value: "{{record.shipping_location.name}}"
-  end
-
-  column :approved_at, sort: :approved_at, default: true do
-    date value: :approved_at
   end
 
   counter -> (collection) do
