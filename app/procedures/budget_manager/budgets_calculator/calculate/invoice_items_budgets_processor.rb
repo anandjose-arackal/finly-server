@@ -38,8 +38,10 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
 
     if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
       billed = true
+      paid_amount = invoice_item.paid_amount_after_tax_value
     else
       billed = false
+      paid_amount = invoice.advance_amount&.value.to_f
     end
 
     if invoice.rcm_enabled
@@ -51,8 +53,6 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       rcm_tax_value = 0
       tax_amount = invoice_item.tax_amount&.value.to_f
     end
-
-    paid_amount = invoice.advance_amount&.value.to_f
 
     # extracting the PO Item's BudgetTrail object here to store the reference, because we need to update
     # this once the invoice is created to adjust the remaining amount and remaining quantity
