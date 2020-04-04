@@ -162,6 +162,7 @@ class BudgetGroupCriterium < ApplicationRecord
         budgetable_departments: budgetable_departments,
         sub_criteria: self.children,
         budgets: budgets,
+        budget_creation_in_progress: budget_creation_in_progress,
         time_periods: time_periods
     }
   end
