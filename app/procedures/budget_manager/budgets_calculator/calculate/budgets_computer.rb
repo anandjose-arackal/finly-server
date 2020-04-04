@@ -121,7 +121,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       # this is so that RCM enabled item's taxes remain in the committed bucket
       if amount_to_be_considered == :amount_after_tax
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("rcm_tax_value")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").sum("rcm_tax_value")
       end
 
       committed_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)

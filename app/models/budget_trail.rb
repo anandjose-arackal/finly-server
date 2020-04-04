@@ -148,6 +148,10 @@ class BudgetTrail < ApplicationRecord
     where entity_status_id: entity_status_id
   }
 
+  scope :without_entity_status_id, -> (entity_status_id) {
+    where entity_status_id: entity_status_id
+  }
+
   private
 
   # here we are reducing the amounts against each line item to match the amount that has been invoices

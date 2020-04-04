@@ -1077,7 +1077,11 @@ class Invoice < ApplicationRecord
   end
 
   def amount_after_tax
-    self.gross_amount&.value.to_f + self.tax_amount&.value.to_f
+    if self.rcm_enabled
+      self.gross_amount&.value.to_f
+    else
+      self.gross_amount&.value.to_f + self.tax_amount&.value.to_f
+    end
   end
 
   def invoice_payment_status
