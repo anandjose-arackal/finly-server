@@ -37,6 +37,7 @@ class BudgetManager::BudgetGroupCriteria::AsyncBudgetsCreator < Transactions::AP
       # now setting the start date as the next day of the end date
       start_date = end_date + 1.day
     end
+    budget_group_criteria.update(budget_creation_in_progress: true)
     true
   end
 

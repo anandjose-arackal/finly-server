@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_04_062929) do
+ActiveRecord::Schema.define(version: 2020_04_04_090254) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1415,6 +1415,7 @@ ActiveRecord::Schema.define(version: 2020_04_04_062929) do
     t.integer "created_by_user_id"
     t.integer "company_id"
     t.datetime "deleted_at"
+    t.boolean "budget_creation_in_progress", default: false
     t.index ["budget_group_id"], name: "index_budget_group_criteria_on_budget_group_id"
   end
 
