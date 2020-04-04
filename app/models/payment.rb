@@ -484,7 +484,11 @@ class Payment < ApplicationRecord
 
   def amount_before_tax
     if self.parent_type == "BeneficiaryPayment"
-      return (self.amount_value - self.parent&.tax_amount&.value.to_f)
+      if self.parent.inclusive_of_taxes
+        return self.amount_value
+      else
+        return (self.amount_value - self.parent&.tax_amount&.value.to_f)
+      end
     else
       return self.amount_value
     end
@@ -1223,11 +1227,11 @@ class Payment < ApplicationRecord
                                               AND (net_paid_amount_before_tax_value >= tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value - rcm_tax_value))
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value))
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
 
-        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value - rcm_tax_value))
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value))
                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
       when "PurchaseOrder"
@@ -1288,16 +1292,4 @@ class Payment < ApplicationRecord
     end
   end
 
-  def budget_trail_entry
-    if self.failed?
-      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
-      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-    else
-      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
-    end
-  end
-
-  def budget_trail_destroy
-    BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-  end
 end

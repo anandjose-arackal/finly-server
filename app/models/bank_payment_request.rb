@@ -698,4 +698,5 @@ class BankPaymentRequest < ApplicationRecord
       end
     end
   end
+
 end

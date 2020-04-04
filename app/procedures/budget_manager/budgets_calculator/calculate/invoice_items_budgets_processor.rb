@@ -50,6 +50,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       tax_amount = invoice_item.tax_amount&.value.to_f
     end
 
+    paid_amount = invoice.advance_amount&.value.to_f
+
     # extracting the PO Item's BudgetTrail object here to store the reference, because we need to update
     # this once the invoice is created to adjust the remaining amount and remaining quantity
     po_trail_item = BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: invoice_item.purchase_order_item_id)
@@ -76,6 +78,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         tds_value: invoice_item.parent.tds_per_item,
         tax_amount_value: tax_amount,
         rcm_tax_value: rcm_tax_value,
+        paid_amount_after_tax: paid_amount,
+        paid_amount_before_tax: paid_amount,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,
