@@ -42,6 +42,14 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       billed = false
     end
 
+    if invoice.rcm_enabled
+      rcm_tax_value = invoice_item.tax_amount&.value.to_f
+      tax_amount = 0
+    else
+      rcm_tax_value = 0
+      tax_amount = invoice_item.tax_amount&.value.to_f
+    end
+
     # extracting the PO Item's BudgetTrail object here to store the reference, because we need to update
     # this once the invoice is created to adjust the remaining amount and remaining quantity
     po_trail_item = BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: invoice_item.purchase_order_item_id)
@@ -66,7 +74,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         billed_amount_after_tax_value: billed_amount_after_tax,
         billed_quantity: invoice_item.quantity,
         tds_value: invoice_item.parent.tds_per_item,
-        tax_amount_value: invoice_item.tax_amount&.value.to_f,
+        tax_amount_value: tax_amount,
+        rcm_tax_value: rcm_tax_value,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,
