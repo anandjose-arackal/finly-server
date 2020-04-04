@@ -45,6 +45,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     if invoice.rcm_enabled
       rcm_tax_value = invoice_item.tax_amount&.value.to_f
       tax_amount = 0
+      # in case it's an RCM invoice we can always say that amount before and after tax is gonna be the same
+      billed_amount_after_tax = billed_amount_before_tax
     else
       rcm_tax_value = 0
       tax_amount = invoice_item.tax_amount&.value.to_f
