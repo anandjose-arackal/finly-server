@@ -1292,4 +1292,17 @@ class Payment < ApplicationRecord
     end
   end
 
+  def budget_trail_entry
+    if self.failed?
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    else
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+  end
+
 end
