@@ -162,7 +162,7 @@ class BudgetTrail < ApplicationRecord
     if self.po_trail_item_id.present?
       invoice_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", po_trail_item_id: self.po_trail_item_id)
       remaining_amount_before_tax = po_trail_item.amount_before_tax&.value.to_f - invoice_trails.sum(:billed_amount_before_tax_value)
-      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value)
+      remaining_amount_after_tax = po_trail_item.amount_after_tax&.value.to_f - invoice_trails.sum(:billed_amount_after_tax_value) - invoice_trails.sum(:rcm_tax_value)
       remaining_quantity = po_trail_item&.entity&.quantity - invoice_trails.sum(:billed_quantity)
       po_trail_item.update_columns(remaining_amount_before_tax_value: remaining_amount_before_tax, remaining_amount_after_tax_value: remaining_amount_after_tax, remaining_quantity: remaining_quantity)
     end
