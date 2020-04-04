@@ -141,7 +141,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # TODO - add money request items here after they have been completely implemented
 
       payment_processing_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket).without_invoice_or_po
-                                      .joins(self.amount_to_be_considered).sum('amounts.value - budget_trails.tds_value')
+                                      .joins(self.amount_to_be_considered).sum('amounts.value')
 
 
 
@@ -159,7 +159,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # TODO - add money request items once they have been completely implemented
 
       paid_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_paid_bucket).without_invoice_or_po
-                         .joins(self.amount_to_be_considered).sum('amounts.value - budget_trails.tds_value')
+                         .joins(self.amount_to_be_considered).sum('amounts.value')
 
       total_consumed_amount = (pending_amount + committed_amount + pending_payment_amount + payment_processing_amount + paid_amount)
 

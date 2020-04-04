@@ -1,6 +1,7 @@
 class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::Spreadsheet
 
-  attr_accessor :entities, :budget_trails
+  attr_accessor :entities, :budget_trails, :amount_to_be_considered,
+                :po_item_amount_to_be_considered, :invoice_item_amount_to_be_considered, :paid_amount_to_be_considered, :payment_processing_amount_to_be_considered
 
   description 'Budget Trails Export'
   configurable true
@@ -39,6 +40,25 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return
     end
     budget = op["model"]
+    if budget.calculated_before_tax_amount
+      self.amount_to_be_considered = :amount_before_tax
+    else
+      self.amount_to_be_considered = :amount_after_tax
+    end
+
+    case amount_to_be_considered
+    when :amount_after_tax
+      self.po_item_amount_to_be_considered = "remaining_amount_after_tax_value"
+      self.invoice_item_amount_to_be_considered = "billed_amount_after_tax_value"
+      self.paid_amount_to_be_considered = "paid_amount_after_tax_value"
+      self.payment_processing_amount_to_be_considered = "payment_processing_amount_after_tax_value"
+    when :amount_before_tax
+      self.po_item_amount_to_be_considered = "remaining_amount_before_tax_value"
+      self.invoice_item_amount_to_be_considered = "billed_amount_before_tax_value"
+      self.paid_amount_to_be_considered = "effective_paid_amount_before_tax_value"
+      self.payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
+    end
+
     calculator = ::BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer.({budget: budget, current_user: User.first, calculate_buckets: false, calculate_trail_items: true})
     self.budget_trails = calculator["result"][:budget_trails]
     return self.budget_trails
@@ -185,14 +205,15 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   # def committed_amount(item)
   #   # the below needs to be worked on because the amounts will depend on each bucket
   #   if item.entity.is_a?(PurchaseOrderItem)
-  #     return item.entity.total_amount&.value if PurchaseOrderStatus.status_ids_for_committed_bucket.include?(item.entity_status_id)
+  #     return (item.send(self.po_item_amount_to_be_considered) - item.send(self.paid_amount_to_be_considered) - item.send(self.payment_processing_amount_to_be_considered)) if PurchaseOrderStatus.status_ids_for_committed_bucket.include?(item.entity_status_id)
   #     return 0
   #   elsif item.entity.is_a?(InvoiceLineItem)
-  #     return item.entity.net_amount&.value if InwardInvoiceStatus.ids_for_committed_bucket.include?(item.entity_status_id) or InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(item.entity_status_id)
+  #     return (item.send(self.invoice_item_amount_to_be_considered) - item.send(self.paid_amount_to_be_considered) - item.send(self.payment_processing_amount_to_be_considered)) if InwardInvoiceStatus.ids_for_committed_bucket.include?(item.entity_status_id) or InwardInvoiceStatus.ids_for_pending_payment_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(Payment)
-  #     return item.entity.amount&.value
+  #     return item.tds_value if PaymentStatus.all_except_failed.include?(item.entity_status_id)
   #   elsif item.entity.is_a?(Expense)
-  #     return item.entity.amount&.value
+  #     return item.send(self.amount_to_be_considered)&.value.to_f if ReportStatus.ids_for_pending_payment_bucket.include?(item.entity_status_id)
   #   end
   #   ""
   # end
@@ -200,13 +221,16 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   # def payment_processing_amount(item)
   #   # the below needs to be worked on because the amounts will depend on each bucket
   #   if item.entity.is_a?(PurchaseOrderItem)
-  #     return item.entity.total_amount&.value
+  #     return item.send(self.payment_processing_amount_to_be_considered) if PurchaseOrderStatus.ids_for_payment_processing_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(InvoiceLineItem)
-  #     return item.entity.net_amount&.value
+  #     return item..send(self.payment_processing_amount_to_be_considered) if InwardInvoiceStatus.ids_for_payment_processing_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(Payment)
-  #     return item.entity.amount&.value
+  #     return item.send(self.amount_to_be_considered)&.value.to_f if PaymentStatus.ids_for_payment_processing_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(Expense)
-  #     return item.entity.amount&.value
+  #     return 0
   #   end
   #   ""
   # end
@@ -215,13 +239,17 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
   # def paid_amount(item)
   #   # the below needs to be worked on because the amounts will depend on each bucket
   #   if item.entity.is_a?(PurchaseOrderItem)
-  #     return item.entity.total_amount&.value
+  #     return item.send(self.paid_amount_to_be_considered) if PurchaseOrderStatus.ids_for_payment_processing_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(InvoiceLineItem)
-  #     return item.entity.net_amount&.value
+  #     return item..send(self.paid_amount_to_be_considered) if InwardInvoiceStatus.ids_for_payment_processing_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(Payment)
-  #     return item.entity.amount&.value
+  #     return item.send(self.amount_to_be_considered)&.value.to_f if PaymentStatus.ids_for_paid_bucket.include?(item.entity_status_id)
+  #     return 0
   #   elsif item.entity.is_a?(Expense)
-  #     return item.entity.amount&.value
+  #     return item.send(self.amount_to_be_considered)&.value.to_f if ReportStatus.ids_for_paid_bucket.include?(item.entity_status_id)
+  #     return 0
   #   end
   #   ""
   # end
@@ -235,9 +263,9 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
 
   def vendor(item)
     if item.entity.is_a?(PurchaseOrderItem)
-      return item.entity.purchase_order.vendor&.name
+      return item.entity.purchase_order.vendor&.name || item.entity.purchase_order.vendor&.business_name
     elsif item.entity.is_a?(InvoiceLineItem)
-      return item.entity.parent.vendor&.name
+      return item.entity.parent.vendor&.name || item.entity.parent.vendor&.business_name
     elsif item.entity.is_a?(Payment)
       return item.entity.receiving_user&.name
     end
