@@ -27,6 +27,8 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
   end
 
   def process
+    # adding a result column to the headers array
+    self.headers << "Result"
     self.parsed_data.each do |data|
       result_row = data.values
       budget_id = data[:id]
@@ -35,7 +37,18 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
         result_row += "Budget not found"
       end
       amount = data[:budget_amount]
-      unless budget.budget_amount.update(value: amount)
+      # checking to make sure the amount isn't 0
+      if amount.to_f == 0
+        result_row << "Budget amount can't be 0 (zero)"
+        self.contents << result_row
+        next
+      end
+
+      # assigning amount to budget
+      budget.budget_amount.value = amount
+      if budget.save
+        result_row << "Success!"
+      else
         result_row += budget.errors.full_messages
       end
       self.contents << result_row
