@@ -1107,6 +1107,10 @@ class Invoice < ApplicationRecord
     self.tds_amount&.value.to_f / self.items.count
   end
 
+  def advance_per_item
+    self.advance_amount&.value.to_f / self.items.count
+  end
+
   private
 
   # def payment_agreement_updations

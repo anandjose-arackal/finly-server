@@ -43,8 +43,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
     end
 
     if InwardInvoiceStatus.ids_for_committed_bucket.include? invoice_item.parent.invoice_status_id
-      paid_amount_before_tax = invoice.advance_amount&.value.to_f
-      paid_amount_after_tax = invoice.advance_amount&.value.to_f
+      paid_amount_before_tax = invoice.advance_per_item
+      paid_amount_after_tax = invoice.advance_per_item
     else
       paid_amount_before_tax = trail.effective_paid_amount_before_tax_value
       paid_amount_after_tax = trail.paid_amount_after_tax_value
