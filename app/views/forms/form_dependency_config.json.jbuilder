@@ -1,8 +1,14 @@
 form = @op["model"]
 json.data do
   json.array! form.dependencies do |dependency|
-    json.controlling_entity_id dependency.controlling_entity_id
-    json.dependent_entity_id dependency.dependent_entity_id
+    json.controlling_entity do
+      json.id dependency.controlling_entity_id
+      json.key dependency.controlling_entity_key
+    end
+    json.dependent_entity do
+      json.id dependency.dependent_entity_id
+      json.key dependency.dependent_entity_key
+    end
     json.dependency_mappings do
       json.array! dependency.dependency_mappings do |mapping|
         json.controlling_choice_id mapping.controlling_choice_id

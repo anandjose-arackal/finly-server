@@ -2,18 +2,19 @@ class Forms::Ops::Choices < Transactions::API
 
   schema do
     params do
-      required(:id).filled
+      required(:form_name).filled
       optional(:controlling_entity_values).array do
         hash do
-          required(:controlling_entity_id).filled
+          required(:controlling_entity_key).filled
           required(:controlling_choice_id).filled
         end
       end
-      required(:entity_id).filled
+      required(:entity_field_key).filled
     end
   end
 
-  step Model(Form, :find_by_uuid)
+  # step Model(Form, :find_by_uuid)
+  step :find_model
   step Policy::Pundit(Forms::Policy, :config?)
   step :init_entity
   pass :init_dependency_mappings
@@ -21,8 +22,15 @@ class Forms::Ops::Choices < Transactions::API
   pass :scope_user
   pass :fetch
 
+  def find_model(context, params:, current_user:, **)
+    context[:model] = Form.find_by(model: params[:form_name], company_id: current_user.company_id)
+    return false unless context[:model].present?
+
+    true
+  end
+
   def init_entity(context, model:, params:, **)
-    context[:entity] = model.entities.find_by(uuid: params[:entity_id])
+    context[:entity] = model.entities.find_by(field_key: params[:entity_field_key])
     if context[:entity].blank?
       return on_error context, :base, "field not found"
     end
@@ -44,8 +52,8 @@ class Forms::Ops::Choices < Transactions::API
 
     map = {}
     dependency_choice_mappings.each do |mapping|
-      map[mapping.controlling_entity_id] ||= []
-      map[mapping.controlling_entity_id] << mapping.dependent_choice_id
+      map[mapping.controlling_entity_key] ||= []
+      map[mapping.controlling_entity_key] << mapping.dependent_choice_id
     end
     intersecting_choices = nil
     map.values.each do |value_arr|
@@ -71,7 +79,7 @@ class Forms::Ops::Choices < Transactions::API
     query = ""
     values.each do |map|
       query += " OR " if query.present?
-      query += "(controlling_entity_id = #{map[:controlling_entity_id]} AND controlling_choice_id = #{controlling_choice_id})"
+      query += " (`form_dependency_choice_mappings`.`controlling_entity_key` = '#{map[:controlling_entity_key]}' AND `form_dependency_choice_mappings`.`controlling_choice_id` = '#{map[:controlling_choice_id]}')"
     end
     query
   end

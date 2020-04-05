@@ -75,6 +75,7 @@ class FormEntity < ApplicationRecord
   scope :root, -> {where parent_id: nil}
   scope :system_fields, -> {where.not custom_field: true}
   scope :custom_fields, -> {where custom_field: true}
+  scope :exclude_internal, -> {where.not internal: true}
 
   def populate_if_empty
     val = super()
@@ -127,7 +128,7 @@ class FormEntity < ApplicationRecord
         allow_clearing_default_value: allow_clearing_default_value,
         options: options,
         chained: chained,
-        choices_provider: choices_provider.config,
+        choices_provider: choices_provider&.config,
         internal: internal,
         field_path: field_path
     }

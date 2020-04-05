@@ -1,7 +1,7 @@
 form = @op["model"]
 form.sections.each do |section|
   json.set! section.name do
-    json.array! section.entities do |entity|
+    json.array! section.entities.exclude_internal do |entity|
       json.id entity.uuid
       json.field_key entity.field_key
       json.label entity.label
