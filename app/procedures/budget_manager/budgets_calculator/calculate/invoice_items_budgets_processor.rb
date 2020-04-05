@@ -36,12 +36,18 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
       billed_amount_before_tax = invoice_item.before_tax_amount
     end
 
-    if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.status_ids_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
+    if (InwardInvoiceStatus.ids_for(:approved, :auto_approved, :unpaid, :partially_paid, :paid).include?(invoice_item.parent.invoice_status_id)) || (InwardInvoiceType.types_for_committed_bucket.include?(invoice_item.parent.invoice_type_id))
       billed = true
-      paid_amount = invoice_item.paid_amount_after_tax_value
     else
       billed = false
-      paid_amount = invoice.advance_amount&.value.to_f
+    end
+
+    if InwardInvoiceStatus.ids_for_committed_bucket.include? invoice_item.parent.invoice_status_id
+      paid_amount_before_tax = invoice.advance_amount&.value.to_f
+      paid_amount_after_tax = invoice.advance_amount&.value.to_f
+    else
+      paid_amount_before_tax = trail.effective_paid_amount_before_tax_value
+      paid_amount_after_tax = trail.paid_amount_after_tax_value
     end
 
     if invoice.rcm_enabled
@@ -80,8 +86,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         tds_value: invoice_item.parent.tds_per_item,
         tax_amount_value: tax_amount,
         rcm_tax_value: rcm_tax_value,
-        paid_amount_after_tax_value: paid_amount,
-        effective_paid_amount_before_tax_value: paid_amount,
+        paid_amount_after_tax_value: paid_amount_after_tax,
+        effective_paid_amount_before_tax_value: paid_amount_before_tax,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

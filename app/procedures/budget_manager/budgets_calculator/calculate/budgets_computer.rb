@@ -124,7 +124,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       else
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_tds_in_committed_bucket).sum("tds_value")
+        # committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_tds_in_committed_bucket).sum("tds_value")
       end
 
       committed_amount += self.budget_trails.with_entity_type("Expense").with_entity_status_id(ReportStatus.ids_for_pending_payment_bucket).joins(self.amount_to_be_considered).sum(:value)
@@ -149,7 +149,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # Paid amount will be calculated from the paid amount attribute inside the PO Item, Invoice and Expense budget trails,
       # because that is calculated keeping in mind the various ways in which partial payments can be made
       # You can find the callbacks that handle that inside the payment model - look for method `calculate_paid_amount_in_parent_trails`
-      paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
+      paid_amount = self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_paid_amount_consideration).sum(paid_amount_to_be_considered)
       paid_amount += self.budget_trails.with_entity_type("PurchaseOrderItem").with_entity_status_id(PurchaseOrderStatus.ids_for_payment_processing_bucket).sum(paid_amount_to_be_considered)
 
       # first is for all expenses that were reimbursed through Finly, and hence will have a "paid_amount_..." value that would have been created from the callback inside payments

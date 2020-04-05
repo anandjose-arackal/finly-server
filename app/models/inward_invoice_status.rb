@@ -86,10 +86,10 @@ class InwardInvoiceStatus < ApplicationRecord
     ]
   end
 
-  def self.ids_for_tds_in_committed_bucket
+  # the below is the bucket from which paid amount will be considered
+  def self.ids_for_paid_amount_consideration
     [
         InwardInvoiceStatus.id_for(:open),
-        InwardInvoiceStatus.id_for(:rejected),
         InwardInvoiceStatus.id_for(:retracted),
         InwardInvoiceStatus.id_for(:processing),
         InwardInvoiceStatus.id_for(:approved),

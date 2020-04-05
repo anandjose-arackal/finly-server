@@ -485,7 +485,7 @@ class Payment < ApplicationRecord
   def amount_before_tax
     if self.parent_type == "BeneficiaryPayment"
       if self.parent.inclusive_of_taxes
-        return self.amount_value
+        return (self.amount_value - self.parent&.tax_amount&.value.to_f)
       else
         return (self.amount_value - self.parent&.tax_amount&.value.to_f)
       end
@@ -1209,20 +1209,20 @@ class Payment < ApplicationRecord
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
 
-        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0)
+        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0) + #{invoice.advance_amount&.value.to_f})
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(effective_sql_before_tax)
 
-        sql_before_tax = "UPDATE `budget_trails` SET `net_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value))
+        sql_before_tax = "UPDATE `budget_trails` SET `net_paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value)), `paid_tds_value` = (#{paid_percent_before_tax} * (tds_value))
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0)
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value + net_paid_amount_before_tax_value), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
                                               WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
                                               AND (net_paid_amount_before_tax_value < tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value)), 0)
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = GREATEST((#{processing_percent_before_tax} * (billed_amount_before_tax_value)), 0), `processing_tds_value` = (#{processing_percent_before_tax} * (tds_value))
                                               WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})
                                               AND (net_paid_amount_before_tax_value >= tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
