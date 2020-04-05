@@ -1202,14 +1202,14 @@ class Payment < ApplicationRecord
         # if there are no such trails, then we can return safely from this block and not execute any of the below statements
         return true if parent_trails.blank?
 
-        paid_amount = invoice.payments.successful.joins(:amount).sum(:value) + invoice.advance_amount&.value.to_f
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
         payment_processing_amount = invoice.payments.payment_processing_bucket.joins(:amount).sum(:value)
         paid_percent_before_tax = paid_amount / invoice.amount_before_tax
         paid_percent_after_tax = paid_amount / invoice.amount_after_tax
         processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
         processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
 
-        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0))
+        effective_sql_before_tax = "UPDATE `budget_trails` SET `effective_paid_amount_before_tax_value` = (GREATEST((#{paid_percent_before_tax} * (billed_amount_before_tax_value) - tax_amount_value), 0) + #{invoice.advance_per_item})
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(effective_sql_before_tax)
 
@@ -1227,7 +1227,7 @@ class Payment < ApplicationRecord
                                               AND (net_paid_amount_before_tax_value >= tax_amount_value)"
         ActiveRecord::Base.connection.execute(sql_before_tax)
 
-        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value))
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value) + #{invoice.advance_per_item})
                                                 WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
         ActiveRecord::Base.connection.execute(sql_after_tax)
 
