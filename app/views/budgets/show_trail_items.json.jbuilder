@@ -52,11 +52,11 @@ json.budget_trail_items do
       json.array!(purchase_order_items) do |purchase_order_item|
         json.item_name purchase_order_item.description
         json.vendor purchase_order_item.purchase_order.vendor&.business_name
-        json.cost_center purchase_order_item.purchase_order.cost_center&.name
+        json.cost_center purchase_order_item.cost_center&.name || purchase_order_item.purchase_order.cost_center&.name
         json.amount purchase_order_item.total_amount&.value
         json.date purchase_order_item.purchase_order&.created_at&.strftime("%d-%b-%Y")
         json.location purchase_order_item.purchase_order.location&.name
-        json.department purchase_order_item.purchase_order.department&.name
+        json.department purchase_order_item.department&.name || purchase_order_item.purchase_order.department&.name
         json.sub_department purchase_order_item.purchase_order.sub_department&.name
         json.po_number purchase_order_item.purchase_order.po_number
         json.index index
@@ -70,11 +70,11 @@ json.budget_trail_items do
       json.array!(invoice_items) do |invoice_line_item|
         json.item_name invoice_line_item.description
         json.vendor invoice_line_item.parent.vendor&.business_name
-        json.cost_center invoice_line_item.parent.cost_center&.name
+        json.cost_center invoice_line_item.cost_center&.name || invoice_line_item.parent.cost_center&.name
         json.amount invoice_line_item.net_amount&.value
         json.date invoice_line_item.parent.created_at&.strftime("%d-%b-%Y")
         json.location invoice_line_item.parent.location&.name
-        json.department invoice_line_item.parent.department&.name
+        json.department invoice_line_item.department&.name || invoice_line_item.parent.department&.name
         json.sub_department invoice_line_item.parent&.sub_department&.name
         json.invoice_number invoice_line_item.parent.invoice_number
         json.index index
@@ -89,8 +89,8 @@ json.budget_trail_items do
         json.pr_number purchase_request_item.purchase_request.order_number
         json.name purchase_request_item.item&.get_custom_description
         json.location purchase_request_item.purchase_request.location&.name
-        json.department purchase_request_item.purchase_request.department&.name
-        json.cost_center purchase_request_item.purchase_request.cost_center&.name
+        json.department purchase_request_item.department&.name || purchase_request_item.purchase_request.department&.name
+        json.cost_center purchase_request_item.cost_center&.name || purchase_request_item.purchase_request.cost_center&.name
         json.amount purchase_request_item.estimated_amount&.value
         json.date purchase_request_item.created_at&.strftime("%d-%b-%Y")
         index += 1
