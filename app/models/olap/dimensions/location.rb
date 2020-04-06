@@ -28,13 +28,15 @@
 #  gl_code               :string(255)
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  uuid                  :string(36)       not null
 #
 
 class Olap::Dimensions::Location < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::BranchLocation
-  events 'branch_location.update', 'branch_location.create', 'branch_location.destroy'
+  consume 'branch_location.update', 'branch_location.create', 'branch_location.destroy'
 
   map :name
   map :gstin

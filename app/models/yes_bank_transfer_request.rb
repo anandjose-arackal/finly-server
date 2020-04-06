@@ -21,14 +21,14 @@ class YesBankTransferRequest < NonPersistentModel
 
   def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, unique_reference_number, company_id, transfer_currency = "INR")
     self.new({
-        beneficiary_account_number: beneficiary_account_number,
-        beneficiary_name: beneficiary_name,
-        ifsc: ifsc,
-        transfer_type: get_transfer_type(transfer_type, ifsc),
-        transfer_amount: transfer_amount,
-        transfer_currency_code: transfer_currency,
-        unique_reference_number: set_unique_reference(unique_reference_number, transfer_type, beneficiary_account_number),
-        company_id: company_id
+                 beneficiary_account_number: beneficiary_account_number,
+                 beneficiary_name: beneficiary_name,
+                 ifsc: ifsc,
+                 transfer_type: get_transfer_type(transfer_type, ifsc),
+                 transfer_amount: transfer_amount,
+                 transfer_currency_code: transfer_currency,
+                 unique_reference_number: set_unique_reference(unique_reference_number, transfer_type, beneficiary_account_number),
+                 company_id: company_id
     })
   end
 

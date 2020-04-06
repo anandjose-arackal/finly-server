@@ -22,10 +22,11 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_amount, using: [:gteq, :lteq], type: :hash
 
   has_scope :filter_payable_bills
+  has_scope :filter_ids, type: :array
 
 
   step Policy::Pundit(Docs::UtilityBills::Bills::Authorizer, :index?)
-  # step Transactions::Resolver::Model(BbpsBills)
+  # step Resolver::Transactions::Load(model: BbpsBills)
   step :index!
 
   def index!(options, params:, current_user:, **)

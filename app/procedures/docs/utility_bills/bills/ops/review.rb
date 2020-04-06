@@ -5,6 +5,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   step :verify_policy
   # step :set_default_params
   step :transition
+  step :post_process
 
   fail :check
 
@@ -16,7 +17,7 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
   def verify_policy(options, current_user:, params:, model:, **)
     policy = Docs::UtilityBills::Bills::Authorizer.new(current_user, model)
 
-    success = policy.send((params['aasm_event'].to_s + '?').to_sym)
+    success = policy.send((params[:aasm_event].to_s + '?').to_sym)
 
     unless success
       return false
@@ -37,6 +38,19 @@ class Docs::UtilityBills::Bills::Ops::Review < Transactions::API
     end
 
     op.success?
+  end
+
+  def post_process(options, params:, model:, current_user:, **)
+    if params[:note].present?
+      model.update(review_note: params[:note])
+    end
+
+    if params[:aasm_event].present? && params[:aasm_event].to_sym == :submit
+      unless model.user_id.present?
+        model.update(user_id: current_user.id)
+      end
+    end
+    true
   end
 
 

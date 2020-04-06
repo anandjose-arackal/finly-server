@@ -3,7 +3,7 @@ require "reform/form/validation/unique_validator"
 class Analytics::Mapper::ContractBuilder
 
   def self.build(klass)
-    Class.new(Transactions::Contract) do
+    Class.new(Reform::Form) do
       klass.field_mappings.each do |field|
         property field[:primary_key], deserializer: -> (input, represented, record:, **) do
           if field.has_key?(:block)

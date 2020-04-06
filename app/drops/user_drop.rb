@@ -1,3 +1,3 @@
-class UserDrop
+class UserDrop < Drop
 
 end

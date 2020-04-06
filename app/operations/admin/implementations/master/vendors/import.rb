@@ -64,7 +64,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       return result false, messages.join(', ')
     end
 
-    vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes","bank_accounts_attributes"))
+    vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes", "bank_accounts_attributes", "status_id"))
     if vendor_params["vendor"]["bank_accounts_attributes"].present?
       bank_account = vendor.bank_accounts.first
       if bank_account.present?

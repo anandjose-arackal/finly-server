@@ -1,9 +1,9 @@
 class Documents::Invoices::Policy < ApplicationPolicy
 
-  class Documents::Invoices::Policy::Scope < Transactions::Resolver::Scope
+  class Documents::Invoices::Policy::Scope < Resolver::API
 
     def load(params)
-      scope.where(created_by_user_id: @user.id)
+      entity.where(created_by_user_id: user.id)
     end
 
   end

@@ -13,12 +13,12 @@
 #  subdomain        :string(255)
 #  group_id         :integer
 #  deleted_at       :datetime
-#  sub_domain       :string(255)
 #
 
 class Company < ApplicationRecord
   include Constants
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'company'
@@ -27,6 +27,7 @@ class Company < ApplicationRecord
   belongs_to :status, optional: true, class_name: 'CompanyStatus'
   belongs_to :group, optional: true, class_name: 'CompanyGroup'
 
+  has_many :trips
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -75,6 +76,9 @@ class Company < ApplicationRecord
   has_many :icici_statements
   has_many :insight_dashboards
 
+  has_many :budget_groups
+  has_many :budget_group_criteria
+
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
   has_one :enforce_budget_configuration
@@ -109,6 +113,7 @@ class Company < ApplicationRecord
   has_many :bbps_yes_bank_transactions
 
   has_many :budgets
+  has_many :budget_groups
   has_many :procurements
   has_many :procurement_terms
   has_many :procurement_attachments

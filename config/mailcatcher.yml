@@ -1,0 +1,7 @@
+development:
+  host: 'staging.finly.io'
+  address: 'smtp.sendgrid.net'
+  port: 587
+  domain: 'staging.finly.io'
+  username: 'vivekagb'
+  password: 'idAr5APhk61X'

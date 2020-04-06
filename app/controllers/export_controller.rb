@@ -45,6 +45,19 @@ class ExportController < BaseControllers::WebBase
   # end
 
   def report
+    if request.format == :pdf
+      respond_to do |format|
+        format.pdf {
+          op = Reports::ExportHandler.(current_user, params)
+          local_variables = op.local_variables
+          template = op.template
+          local_variables[:op] = op
+          @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
+          @result.render(self)
+        }
+      end and return
+    end
+
     params[:type] = 'reports'
     result = ExportManager::RequestHandler.(current_user, params)
     if result.success?
@@ -53,9 +66,6 @@ class ExportController < BaseControllers::WebBase
           job_id: result.export_job&.id,
           messages: result.messages
       }
-      # respond_to do |format|
-      #   format.json { render json: @response.as_json }
-      # end
       render json: @response.as_json
     else
       respond response: :failure, message: result.messages[:error]

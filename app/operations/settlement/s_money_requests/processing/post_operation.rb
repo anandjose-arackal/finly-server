@@ -176,7 +176,7 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
     if op.success?
       coh_payment = op.payments.first
-      mapping.payment.update(reference_payment_id: coh_payment.id)
+      mapping.payment.update(reference_payment_id: coh_payment.id) if mapping.payment.present?
     end
   end
 

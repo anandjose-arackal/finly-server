@@ -15,7 +15,12 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def update?
-    ((@model.draft? || @model.retracted? || @model.rejected?) && @model.user_id == @user.id) || (@model.awaiting_approval? && @model.get_reviewers.include?(@user))
+    # Owner of Document When in Open State
+    # Controlling User When in awaiting_approval state
+    # Admin Post Approval
+    (BbpsBillerSubscription.open_statuses.include?(@model.status_id) && @model.user_id == @user.id) ||
+        (@model.awaiting_approval? && @model.get_reviewers.include?(@user)) ||
+        (BbpsBillerSubscriptionStatus.ids_for(:approved, :auto_approved, :deactivated, :reactivated).include?(@model.status_id) && @user.vendor_payment_admin?)
   end
 
   def index?
@@ -60,11 +65,11 @@ class Docs::UtilityBills::Subscriptions::Authorizer
   end
 
   def take_control?
-    @user.vendor_payment_admin? && @model.get_reviewers.exclude?(@user)
+    @user.vendor_payment_admin? && @model.awaiting_approval? && @model.get_reviewers.exclude?(@user)
   end
 
   def return_control?
-    @user.vendor_payment_admin? && @model.get_reviewers.include?(@user)
+    @user.vendor_payment_admin? && @model.awaiting_approval? && @model.taken_control? && @model.get_reviewers.include?(@user)
   end
 
   def deactivate?

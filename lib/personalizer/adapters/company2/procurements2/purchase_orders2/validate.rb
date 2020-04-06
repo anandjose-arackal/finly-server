@@ -3,10 +3,10 @@ class Personalizer::Adapters::Company2::Procurements2::PurchaseOrders2::Validate
   def init
     self.purchase_order = op_instance.purchase_order
 
-    op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-    if op.success?
-      self.budgets = op.budget_data
-    end
+    # op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+    # if op.success?
+    #   self.budgets = op.budget_data
+    # end
   end
 
   def validate
@@ -16,8 +16,8 @@ class Personalizer::Adapters::Company2::Procurements2::PurchaseOrders2::Validate
   end
 
   def process
-    budgets.each do |budget|
-    end
+    # budgets.each do |budget|
+    # end
   end
 
 end
