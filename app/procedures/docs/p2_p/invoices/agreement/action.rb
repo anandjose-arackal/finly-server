@@ -4,6 +4,7 @@ class Docs::P2P::Invoices::Agreement::Action < ActionManager::API
 
     action :button_group,
            :actions,
+           contextual: true,
            label: "Actions" do
       scope permissions: :admin do
         action :transition,

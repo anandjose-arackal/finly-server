@@ -6,6 +6,7 @@ class Docs::P2P::Invoices::Po::Action < ActionManager::API
 
       action :button_group,
              :actions,
+             contextual: true,
              label: "Actions" do
         action :transition,
                :take_control,

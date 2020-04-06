@@ -10,6 +10,7 @@ class Docs::P2P::Invoices::NonPo::Action < ActionManager::API
 
     action :button_group,
            :actions,
+           contextual: true,
            label: "Actions" do
       scope permissions: :admin do
         action :transition,

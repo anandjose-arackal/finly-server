@@ -1,6 +1,7 @@
 class ActionManager::Actions::ButtonGroup < ActionManager::Action
 
   register :button_group
+  config :contextual
 
   def build(user, params)
     map = super(user, params)
