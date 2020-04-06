@@ -43,8 +43,13 @@ class Resolver::API
     entity.all
   end
 
+  # *q* is for queries
+  # *qs* is for simple queries
+  # *qa* is for advanced queries
+  # this helps in applying multiple types of filters for producing the results
+  # Ex: In index, if you apply the status filter from the NavBar while applying advanced filters
   def filter(collection, params)
-    collection.ransack(params[:q]).result(distinct: true)
+    collection.ransack(params[:q]).result.ransack(params[:qs]).result.ransack(params[:qa]).result(distinct: true)
   end
 
   def paginate(collection, params)

@@ -19,8 +19,8 @@ class IndexBuilder::Counter
     @counts ||= []
   end
 
-  def add(filter_id, label, count, params: {})
-    count = {filter_id: filter_id, label: label, count: (count || 0), params: params}
+  def add(filter_id, label, count)
+    count = {filter_id: filter_id, label: label, count: (count || 0)}
     counts << count
   end
 

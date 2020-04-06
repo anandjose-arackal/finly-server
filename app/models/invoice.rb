@@ -607,6 +607,10 @@ class Invoice < ApplicationRecord
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
+  def self.ransackable_scopes(auth_object = nil)
+    [:with_status_id]
+  end
+
   def policy
     return super if self.policy_id.present?
     self.payments&.first&.payment_order&.bank_payment_request&.policy
