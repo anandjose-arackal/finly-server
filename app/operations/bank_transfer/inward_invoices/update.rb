@@ -111,9 +111,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-      if params[:invoice][:balance_amount_attributes][:value].to_i < 0
-        add_message :error, "Balance due amount cannot be less than zero"
-      end
+      # if params[:invoice][:balance_amount_attributes][:value].to_i < 0
+      #   add_message :error, "Balance due amount cannot be less than zero"
+      # end
       if params[:invoice][:balance_amount_attributes][:value].to_i > (self.purchase_order.balance_amount&.value + 1) # adding a buffer to account for roundoff amount
           add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
         return
