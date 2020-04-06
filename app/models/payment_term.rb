@@ -75,7 +75,7 @@ class PaymentTerm < ApplicationRecord
     where("payment_terms.name LIKE ?", "%#{name}%")
   }
 
-  def as_json
+  def as_json(options={})
     {
       id: self.id, 
       name: self.name, 

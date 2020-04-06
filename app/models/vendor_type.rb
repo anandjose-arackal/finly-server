@@ -14,7 +14,7 @@
 class VendorType < ApplicationRecord
   belongs_to :company, optional: true
 
-  def as_json
+  def as_json(options={})
     {id: id, name: name}
   end
 end

@@ -48,4 +48,12 @@ Resolver::Router.draw do
     route "default", Masters::Vendors::Resolver
   end
 
+  scope :vendor_types do
+    route 'default', Masters::Vendors::Types::Resolver
+  end
+
+  scope :payment_terms do
+    route 'default', Masters::PaymentTerms::Resolver
+  end
+
 end

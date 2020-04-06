@@ -6,6 +6,7 @@ class Docs::P2P::Vendors::Action < ActionManager::API
 
       action :button_group,
              :actions,
+             contextual: true,
              label: "Actions" do
         action :transition,
                :take_control,
@@ -41,7 +42,7 @@ class Docs::P2P::Vendors::Action < ActionManager::API
            :export,
            label: "Export",
            icon: "https://img.icons8.com/windows/17/708090/--checkmark-yes.png",
-           route: "invoices.index",
+           route: "vendors.index",
            authorize: :export?
 
   end
