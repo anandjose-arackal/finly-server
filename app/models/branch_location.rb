@@ -55,7 +55,7 @@ class BranchLocation < ApplicationRecord
   has_many :users
 
   scope :with_ids, -> (ids) { where id: ids }
-  scope :with_id, -> (id) { where id: id }
+  scope :with_id, -> (id) {where id: id}
 
   scope :include_state, -> { includes :state }
   default_scope {unscope(:where)}

@@ -32,16 +32,16 @@ class Budgets::Create < Budgets::Base
       end
     end
 
-    valid_date = Date.parse(budget_params[:start_date]) rescue false 
+    valid_date = Date.parse(budget_params[:start_date]) rescue false
     unless valid_date
-        add_message :error, 'Invalid start date provided'
-        return
+      add_message :error, 'Invalid start date provided'
+      return
     end
 
-    valid_date = Date.parse(budget_params[:end_date]) rescue false 
+    valid_date = Date.parse(budget_params[:end_date]) rescue false
     unless valid_date
-        add_message :error, 'Invalid end date provided'
-        return
+      add_message :error, 'Invalid end date provided'
+      return
     end
 
     # this logic expects first to update the parent and then the child, if

@@ -460,7 +460,7 @@ class Notification < ApplicationRecord
       else
         return ""
     end
-    owner =  object.user rescue (object.creator rescue(object.created_by rescue(object.owner  rescue self.user)))
+    owner = object.user rescue (object.creator rescue (object.created_by rescue (object.owner rescue self.user)))
     if self.action_type_id == NotificationActionType.id_for(:notify_auto_approve)
       return ""
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)

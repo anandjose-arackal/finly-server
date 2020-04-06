@@ -2,12 +2,12 @@
 # 
 class Budgets::ProcessTemplateFile < Budgets::Base
 
-  attr_accessor :file, 
-                :parsed_data, 
-                :item_details, 
-                :headers, 
+  attr_accessor :file,
+                :parsed_data,
+                :item_details,
+                :headers,
                 :valid,
-                :contents, 
+                :contents,
                 :validate_operation,
                 :company,
                 :user_id,
@@ -71,7 +71,7 @@ class Budgets::ProcessTemplateFile < Budgets::Base
     self.validate_operation = Budgets::BulkValidateFileData.(user, {item_details: self.parsed_data})
     binding.pry
     if validate_operation.success?
-      
+
     else
       self.contents = validate_operation.contents
       self.headers = validate_operation.headers

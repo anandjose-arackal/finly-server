@@ -10,12 +10,12 @@ json.result do
     json.created_at payment.created_at.strftime("%Y-%m-%d %H:%M:%S")
     json.payment_ticket_id payment.payment_order&.bank_payment_request&.id
     json.payment_ticket_name payment.payment_order&.bank_payment_request&.name
-    
+
     case payment.receiving_account.class.name
     when 'UserPocket', 'UserWallet', 'Card'
-        beneficiary_name = payment.receiving_account&.user&.name
+      beneficiary_name = payment.receiving_account&.user&.name
     else
-        beneficiary_name = payment.receiving_account&.try(:account_owner).try(:name)
+      beneficiary_name = payment.receiving_account&.try(:account_owner).try(:name)
     end
 
     json.beneficiary_name beneficiary_name

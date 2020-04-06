@@ -3880,7 +3880,7 @@ Rails.application.routes.draw do
 
   resources :budget_groups do
   end
-  get 'budget_groups/:id/budget_group_criteria',to: 'budget_group_criteria#index'
+  get 'budget_groups/:id/budget_group_criteria', to: 'budget_group_criteria#index'
   resources :budget_group_criteria, except: [:index]
   ######## Budget apis end #########
 
