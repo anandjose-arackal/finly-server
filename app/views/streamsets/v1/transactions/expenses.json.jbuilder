@@ -7,7 +7,7 @@ json.result do
                   :expense_tax_type_id
     json.created_at expense.created_at.strftime("%Y-%m-%d %H:%M:%S")
     json.updated_at expense.updated_at&.strftime("%Y-%m-%d %H:%M:%S")
-    json.user expense.user
+    json.user expense.user&.json_for_trail({:streamsets => true})
     json.user_employee_id expense.user&.profile&.employee_id
     json.user_cost_center user.cost_center&.name
     json.user_cost_center_code user.cost_center&.cost_center_code
