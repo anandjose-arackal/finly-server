@@ -25,6 +25,7 @@ json.result do
     json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
     json.description payment.payment_order&.bank_payment_request&.description
+    json.user payment.initiating_user&.json_for_trail({:streamsets => true})
 
     po_number = ''
     if (payment.parent_type == 'PurchaseOrder') || (payment.parent_type == 'Invoice')
