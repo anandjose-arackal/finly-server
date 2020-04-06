@@ -96,10 +96,10 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     lrm_params = set_params(data)
     lrm = LevelReviewerMapping.find_by id: lrm_params[:id]
     unless lrm.present?
-      return result  false, "Mapping not found"
+      return result false, "Mapping not found"
     else
       if lrm.destroy
-        return result  true, "Level Reviewer Mapping Destroyed"
+        return result true, "Level Reviewer Mapping Destroyed"
       end
     end
   end
@@ -108,7 +108,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     lrm_params = set_params(data)
     lrm = LevelReviewerMapping.find_by id: lrm_params[:id]
     unless lrm.present?
-      return result  false, message: "Mapping not found"
+      return result false, message: "Mapping not found"
     end
     self.policy = lrm.level&.policy
 
@@ -121,7 +121,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     if lrm_params[:reviewer_email].present?
       reviewer_email = clean_up_data lrm_params[:reviewer_email]
       reviewer = get_reviewer(reviewer_email, application)&.id
-      unless  reviewer.present?
+      unless reviewer.present?
         return result false, "Reviewer Not Found"
       end
     else
@@ -129,7 +129,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
     end
     lrm_params[:reviewer_id] = reviewer
 
-    unless lrm.update(lrm_params.except(:id,:reviewer_email,:policy_name,:policy_creation_flag,:user_email,:department_code, :location_code))
+    unless lrm.update(lrm_params.except(:id, :reviewer_email, :policy_name, :policy_creation_flag, :user_email, :department_code, :location_code))
       return result false, lrm.errors.full_messages
     end
     result true, 'Updated Successfully'
@@ -186,7 +186,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         else
           reviewer = nil
         end
-        mapping_exist = self.level.level_reviewer_mappings.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
+        mapping_exist = self.level.level_reviewer_mappings.non_deleted.where( reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception).first
         self.level.level_reviewer_mappings.create(reviewer_id: reviewer&.id, min: min, max: max, exception: exception, wo_exception: wo_exception) unless mapping_exist.present?
       else
         return  result false, 'Level Number and Name Cant be blank'
@@ -291,7 +291,7 @@ class Admin::Implementations::Master::Lrms::Import < Admin::Implementations::Pro
         "PaymentAgreementProvider" => "payment_agreement_reviewer",
         "BbpsBillerSubscriptionProvider" => "utility_bill_master_reviewer",
         "BbpsBillProvider" => "utility_bill_reviewer",
-        "CreditNoteProvider"=> "credit_note_reviewer"}
+        "CreditNoteProvider" => "credit_note_reviewer"}
 
     user = get_user_entity(reviewer_id)
     if application == 'em' && user.present? && user&.roles&.pluck(:name)&.exclude?(role_provider_mapping[provider]&.to_sym)

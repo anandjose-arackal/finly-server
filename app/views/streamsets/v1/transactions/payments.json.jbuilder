@@ -9,8 +9,11 @@ json.result do
     json.payment_ticket_name payment.payment_order&.bank_payment_request&.name
     json.beneficiary_name payment.receiving_account&.account_owner&.name
     json.beneficiary_code (payment.receiving_user_type == 'YesBankVendor' ? payment.receiving_user&.vendor_id : nil)
+    json.beneficiary_pan (payment.receiving_user_type == 'YesBankVendor' ? payment.receiving_user&.pan : nil)
+    json.beneficiary_msme_number (payment.receiving_user_type == 'YesBankVendor' ? payment.receiving_user&.msme_registration_number : nil)
     json.beneficiary_account_name payment.receiving_account&.name
     json.beneficiary_account_number payment.receiving_account&.account_number
+    json.beneficiary_ifsc payment.receiving_account&.ifsc
     json.payment_mode payment.payment_mode&.upcase
     json.initiated_by payment.initiating_user&.name
     json.initiater_email payment.initiating_user&.email
@@ -21,6 +24,8 @@ json.result do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
+    json.description payment.payment_order&.bank_payment_request&.description
+    json.user payment.initiating_user&.json_for_trail({:streamsets => true})
 
     po_number = ''
     if (payment.parent_type == 'PurchaseOrder') || (payment.parent_type == 'Invoice')
@@ -41,8 +46,11 @@ json.result do
     json.invoice_delivery_location_code payment.invoice.delivery_location&.location_code rescue ""
 
     json.invoice_gstin_location_state payment&.invoice&.gstin_location&.state&.name rescue ""
+    json.invoice_gstin_location_city payment&.invoice&.gstin_location&.location rescue ""
     json.invoice_gstin_location_code payment&.invoice&.gstin_location&.state&.state_code rescue ""
     json.invoice_department_code payment.invoice&.items&.first.department&.department_code rescue ""
+
+    json.invoice_gl_code payment.invoice&.category&.gl_code rescue ""
 
   end
 end

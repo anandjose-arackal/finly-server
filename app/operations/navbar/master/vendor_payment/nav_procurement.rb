@@ -9,7 +9,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {procure: [:divider, :po_section, :po_initiator, :po_awaiting_approval, :po_team, :po_company, :divider, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances,:divider, :invoices_section,  :po_invoices, :non_po_invoices, :agreement_invoices, :upcoming_invoices,:divider, :utility_bills, :divider, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters]},
+          {manage: [:analytics, :manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements, :credit_notes, :utility_bill_masters]},
           :download_manager,
           # :analytics,
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
@@ -67,7 +67,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_team
-    return nil unless user.is_purchase_order_reviewer?
+    return nil unless user.is_purchase_order_reviewer? || user.is_po_invoice_initiator?
     # {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
     {name: 'Team POs', indent: true, id: 'procure', url: 'purchase_orders/params={"team_po":"true"}'}
   end
@@ -120,12 +120,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def agreement_invoices
-    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_credit_note_initiator? || user.is_credit_note_reviewer?)
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_credit_note_initiator? || user.is_credit_note_reviewer?)
     {name: 'Agreement Invoices', indent: true, id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"agreement_invoice"}'}
   end
 
   def upcoming_invoices
-    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator?)
+    return nil unless user.company.agreement_based_payment_system_enabled? && (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vendor_payments_admin? || user.is_payment_agreement_auditor? || user.is_non_po_invoice_initiator?)
     {name: 'Upcoming Invoices', id: 'payables', url: 'upcoming_invoices'}
   end
 
@@ -192,7 +192,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_payment_agreements
-    return nil unless (user.is_agreement_invoice_initiator? ||  user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
+    return nil unless (user.is_agreement_invoice_initiator? || user.is_agreement_invoice_reviewer? || user.is_agreement_invoice_auditor? || user.is_payment_agreement_initiator? || user.vp_admin_or_auditor? || user.is_payment_agreement_auditor? || user.is_payment_agreement_reviewer?) && user.company.agreement_based_payment_system_enabled?
     {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
   end
 
@@ -291,7 +291,9 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def analytics
-    {name: 'Analytics', id: 'analytics', url: "analytics/params={}"}
+    return nil unless RequestStoreUtil.current_company&.analytics_system_enabled?
+
+    {name: 'Analytics', id: 'admin', url: 'analytics/params={}'}
   end
 
 end

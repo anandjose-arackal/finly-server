@@ -24,7 +24,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       end
     end
 
-    self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:invoice_items) : nil
+    self.previous_invoices = (self.procurement.invoices.scope_all_except_voided.present?) ? self.procurement.invoices.scope_all_except_voided.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
 
@@ -66,7 +66,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       self.invoice.save
 
       if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
-        if self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?
+        if (self.po_adjusted_advance.value.zero? || self.po_adjusted_advance_id.blank?) && self.purchase_order.advance_payments.present?
           calculcate_po_adjusted_advance
         end
       end
@@ -108,7 +108,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       return nil
     end
 
-    self.advance = self.purchase_order.advance_amount
+    self.advance = self.purchase_order.requested_advance_amount
 
     receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
 
@@ -176,13 +176,16 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       gstin_location_id: self.purchase_order.gstin_location_id,
       cost_allocation_items: self.purchase_order.cost_allocation_items,
       po_number: self.purchase_order.po_number,
-      discount_type_id: self.purchase_order.discount_type_id
+      discount_type_id: self.purchase_order.discount_type_id,
+      tds_slab_id: self.purchase_order.advance_tds_slab_id
     }
 
     if self.advance.present?
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
         invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+        # invoice_params[:advance_amount_required] = true
+        invoice_params[:advance_amount_required] = (self.po_prev_adjusted_advance == self.po_advance) ? false : true
     end
 
     return invoice_params
@@ -267,11 +270,15 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           cgst: item.cgst,
           sgst: item.sgst,
           igst: item.igst,
-          purchase_order_item_id: item.id #,
+          purchase_order_item_id: item.id, #,
           # billable_amount_attributes: {
           #     value: get_billable_amount(item),
           #     currency_id: 1
           # }
+          billable_amount_attributes: { # billable amount needs to be always present even if it is a good
+              value: item.taxable_amount&.value.to_f,
+              currency_id: 1
+          }
       }
       if item.inventory_line_item.service?
         data[:billable_amount_attributes] = {value: item.taxable_amount&.value.to_f, currency_id: 1}

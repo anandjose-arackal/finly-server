@@ -35,9 +35,12 @@
 #  transfer_status_id   :integer
 #  amount_id            :integer
 #  quick_pay            :string(255)      default("N")
+#  deleted_at           :datetime
 #
 
 class BbpsYesBankTransaction < ApplicationRecord
+
+  belongs_to :reference_payment, class_name: "Payment"
 
   has_one :payment, as: :reference_resource
   belongs_to :transfer_status, class_name: "BankTransferStatus"
@@ -51,8 +54,16 @@ class BbpsYesBankTransaction < ApplicationRecord
   delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
   delegate :amount_value, to: :amount
 
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
+
   # stub method for reference number that is generated at bank's end
   def bank_reference_number
+    self.bbps_ref_id
+  end
+
+  def utr
     self.bbps_ref_id
   end
 

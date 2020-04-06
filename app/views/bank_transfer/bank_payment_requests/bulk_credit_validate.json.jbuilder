@@ -47,7 +47,7 @@ json.orders do
           json.array! (payment.system_messages)
         end
         json.bank_transfer_type payment.payment_mode&.upcase
-        json.bank_reference_number payment.reference_resource&.bank_reference_number
+        json.bank_reference_number payment.utr
         json.initiating_user do
           json.name payment.initiating_user&.name
           json.email payment.initiating_user&.email

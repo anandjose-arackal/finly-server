@@ -7,10 +7,12 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  state_code :string(255)
+#  deleted_at :datetime
 #
 
 class GstStateCode < ApplicationRecord
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   scope :with_state_code, -> (state_code) {
     where(state_code: state_code)

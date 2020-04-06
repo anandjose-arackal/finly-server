@@ -6,7 +6,7 @@
 #  purchase_order_id        :integer
 #  inventory_line_item_id   :integer
 #  product_id               :string(255)
-#  description              :text(65535)
+#  description              :text(16777215)
 #  hsn_sac                  :string(255)
 #  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
@@ -113,24 +113,26 @@ class PurchaseOrderItem < ApplicationRecord
     self.tax_rate&.rate || super
   end
 
+  def before_tax_amount
+    self.taxable_amount&.value.to_f
+  end
+
+  def after_tax_amount
+    self.total_amount&.value.to_f
+  end
+
   private
 
   def budget_trail_entry
-    # if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order&.purchase_order_status_id)
-    #   calling the trail saving processor method that will take care of saving the budget trail
-      # BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
-    # else
-    #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
-    # end
-    if self.purchase_order.voided? || self.purchase_order.rejected? || self.purchase_order.retracted? || self.purchase_order.open?
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    if self.purchase_order.voided?
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     else
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
     end
   end
 
   def budget_trail_destroy
-    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
   end
 
 end

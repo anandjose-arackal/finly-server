@@ -105,6 +105,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       invoice.send("#{column_name}=", general_invoice.send(column_name.to_sym).dup)
     end
     update_due_date(invoice, general_invoice)
+    invoice.invoice_type_id = InwardInvoiceType.id_for(:general_invoice)
     if invoice.save 
       unless map_line_items(general_invoice, invoice)
         invoice.destroy
@@ -129,6 +130,7 @@ class Procurements::Invoices::RecurringInvoices::Create < Procurements::Invoices
       invoice.send("#{column_name}=", rental_invoice.send(column_name.to_sym).dup)
     end
     update_due_date(invoice, rental_invoice)
+    invoice.invoice_type_id = InwardInvoiceType.id_for(:recurring_invoice)
     if invoice.save
       unless map_line_items(rental_invoice, invoice)
         invoice.destroy

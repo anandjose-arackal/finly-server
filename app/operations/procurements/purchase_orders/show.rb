@@ -41,6 +41,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.locations = Company::Locations::Index.(self.purchase_order.user, params).policy_location_filter_mapping&.leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
+      # calling applicable budgets so that the relevant budgets are shown
+      op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.purchase_order, current_user: User.first})
+      self.budgets = op["result"][:budgets]
+
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.leaves
       else
@@ -80,12 +84,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         end
       end
 
-      if purchase_order_items.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-        if op.success?
-          self.budgets = op.budget_data
-        end
-      end
+      # if purchase_order_items.present?
+      #   op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+      #   if op.success?
+      #     self.budgets = op.budget_data
+      #   end
+      # end
     end
 
     def get_actions
@@ -237,6 +241,9 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     # Give access to grn initiator once PO is approved
     return if user.has_policy_role?(UserRole.id_for(:goods_receiver), purchase_order) && (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?)
     return if params[:skip_for_mailer]
+    return if user.is_po_invoice_initiator?(purchase_order)
+    return if user.is_po_invoice_reviewer?(purchase_order)
+    return if user.is_po_invoice_auditor?(purchase_order)
     raise_unauthorized_exception
   end
 end

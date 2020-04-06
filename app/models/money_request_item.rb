@@ -9,6 +9,7 @@
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  money_request_item_category_id :integer
+#  deleted_at                     :datetime
 #
 
 class MoneyRequestItem < ApplicationRecord
@@ -60,6 +61,24 @@ class MoneyRequestItem < ApplicationRecord
 
   def category_id
     self.money_request_item_category_id
+  end
+
+
+  private
+
+  def budget_trail_entry
+    # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
+    if self.money_request.present?
+      if MoneyRequestStatus.ids_for([:open, :retracted, :rejected]).include?(self.money_request&.status_id)
+        BudgetManager::BudgetsCalculator::Calculate::MoneyRequestItemBudgetsProcessor.new.destroy_trail(self)
+      else
+        BudgetManager::BudgetsCalculator::Calculate::MoneyRequestItemBudgetsProcessor.new.save_trail(self)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetManager::BudgetsCalculator::Calculate::MoneyRequestItemBudgetsProcessor.new.destroy_trail(self)
   end
 
 end

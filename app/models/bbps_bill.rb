@@ -45,13 +45,18 @@
 #  order_number_type          :string(255)
 #  tax_rate_id                :integer
 #  hsn_sac                    :string(255)
+#  paid_at                    :datetime
+#  review_note                :text(65535)
 #
 
 class BbpsBill < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
+  include EventProducer
 
   acts_as_sequenced column: :sequence_id, purpose: :bbps_bill, editable: false, prefix: 'UB'
+
+  event_channel 'bbps_bill'
 
   before_save :resolve_bill_validation
   before_save :set_quick_pay
@@ -74,6 +79,7 @@ class BbpsBill < ApplicationRecord
   belongs_to :category, class_name: 'Category', optional: true
 
   has_many :payments, as: :parent
+  has_many :attachments, as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :amount
 
@@ -81,6 +87,13 @@ class BbpsBill < ApplicationRecord
   delegate :amount_value, to: :amount
 
   default_scope {order('bbps_bills.created_at DESC')}
+
+  scope :with_ids, -> (ids) {
+    where(id: ids)
+  }
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
 
   scope :filter_status, -> (status) {
     case status
@@ -121,12 +134,14 @@ class BbpsBill < ApplicationRecord
     where id: id
   }
 
+  scope :filter_ids, -> (ids) {where(id: ids)}
+
   scope :sort_for_index, -> {
     reorder('bbps_bills.created_at DESC')
   }
 
   scope :includes_for_index, -> {
-    includes(subscription: [:pocs])
+    includes(:department, :cost_center, :policy, :location, :user, :status, :tax_rate, :category, amount: [:currency], subscription: [:pocs, :biller])
   }
 
   scope :filter_department_id, -> (id) {
@@ -215,6 +230,7 @@ class BbpsBill < ApplicationRecord
         biller: subscription.biller.as_json({index: true}),
         autofetched: autofetched,
         # name: name,
+        name: subscription.name,
         sequence_id: sequence_id,
         department: department.as_json,
         cost_center: cost_center.as_json,
@@ -230,8 +246,6 @@ class BbpsBill < ApplicationRecord
         user: user&.json_for_trail,
         payment_ticket_id: self.payments&.first&.payment_order&.bank_payment_request&.id,
         # biller_category_name: biller_category_name,
-
-        autofetched: autofetched,
 
         amount: amount.as_json,
         total_amount: total_amount.as_json,
@@ -260,7 +274,8 @@ class BbpsBill < ApplicationRecord
         customer_email: subscription.customer_email,
         customer_name: subscription.customer_name,
         customer_pan: subscription.customer_pan,
-        show_payment_details: false
+        show_payment_details: false,
+        attachments: attachments.as_json
     }
 
     if BbpsBill.status_ids(:paid, :failed).include?(self.status_id)
@@ -271,6 +286,14 @@ class BbpsBill < ApplicationRecord
     data
   end
 
+  def get_default_provider
+    if autofetched
+      'BbpsBillAutofetchedProvider'
+    else
+      'BbpsBillNonAutofetchedProvider'
+    end
+  end
+
   def generate_receipt
     {
         biller_name: subscription.biller&.biller_name,
@@ -278,10 +301,10 @@ class BbpsBill < ApplicationRecord
         bill_number: bill_number,
         bill_date: bill_date,
         due_date: due_date,
-        transaction_ref_id: payments&.first&.reference_resource&.bbps_ref_id,
+        transaction_ref_id: payments&.first&.bbps_bank_transaction&.bbps_ref_id,
         payment_mode: "BSC",
         bill_amount: payments&.first&.amount.as_json,
-        transaction_date: payments&.first&.reference_resource&.created_at&.strftime("%I:%M %p, %d %b %Y"),
+        transaction_date: paid_at&.strftime("%I:%M %p, %d %b %Y"),
         status: payments&.first&.payment_status&.name
     }
   end
@@ -337,7 +360,7 @@ class BbpsBill < ApplicationRecord
     end
   end
 
-  def role_based_reviewer_associated_items(user, role_id, options={})
+  def self.role_based_reviewer_associated_items(user, role_id, options = {})
     policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
 
     if role_id == UserRole.id_for(:utility_bill_reviewer)
@@ -393,6 +416,10 @@ class BbpsBill < ApplicationRecord
 
   def self.open_statuses
     self.status_ids(:open, :retracted, :rejected)
+  end
+
+  def self.human_name(options = {})
+    options[:plural] ? 'Utility Bills' : 'Utility Bill'
   end
 
   def payable?

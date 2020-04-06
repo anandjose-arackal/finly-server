@@ -12,7 +12,7 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
       :location_code => 'LocationCode',
       :level_name => 'Level Name',
       :level_number => 'Level Number',
-      :reviewer_email_mobile => 'Reviewer Email / Mobile',
+      :reviewer_email_mobile => 'Reviewer Employee ID / Email / Mobile',
       :with_exception => 'With Exception Y/N',
       :without_exception => 'Without Exception Y/N',
       :min => "Minimum Threshold",
@@ -61,11 +61,14 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
   end
 
   def reviewer_email_mobile(lrm)
-    user = lrm.reviewer&.email
-    if user.blank?
-      lrm.reviewer&.mobile_number
+    identifier = lrm.reviewer&.profile&.employee_id
+    if identifier.blank?
+      identifier = lrm.reviewer&.email
     end
-    user
+    if identifier.blank?
+      identifier = lrm.reviewer&.mobile_number
+    end
+    identifier
   end
 
   def with_exception(lrm)
@@ -117,7 +120,7 @@ class Admin::Implementations::Master::Lrms::Export < Admin::Implementations::Pro
       contents[provider] = []
       policy_ids = apply_scopes(company.policies).pluck(:id)
       level_ids  = ReviewalLevel.non_deleted.where(policy_id: policy_ids,associated_entity_type: provider).pluck(:id)
-      data = LevelReviewerMapping.non_deleted.where(level_id: level_ids)
+      data = LevelReviewerMapping.non_deleted.where(level_id: level_ids).includes(level: :policy, reviewer: :profile)
       total_count += data.count
       self.implementation_request.update(requested_items: data.count)
       data.each_with_index do |entry, index|

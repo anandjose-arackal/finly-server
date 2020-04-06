@@ -65,13 +65,13 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  taxable_amount_id            :integer
 #  vendor_address               :text(65535)
-#  discount_type_id             :integer
 #  vendor_poc_name              :string(255)
 #  vendor_poc_email             :string(255)
 #  vendor_poc_mobile_number     :string(255)
+#  discount_type_id             :integer
 #  rejection_note               :text(65535)
-#  taxable_amount_id            :integer
 #  vendor_poc_id                :integer
 #  vlpm_id                      :integer
 #  vendor_note                  :text(65535)
@@ -141,7 +141,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :bank_account, optional: true
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, :po_revised?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
@@ -254,7 +254,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil,
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.ids_for([:po_processing, :closed])], advance_amount_id: nil,
               purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
                                           PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
                                           PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
@@ -264,7 +264,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :show_only_po_which_have_advances, -> (show_it = false) {
     if StringUtils.to_bool(show_it)
-      where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing]))
+      where(advance_amount_required: true, advance_amount_status_id: AdvanceAmountStatus.ids_for([:to_be_processed, :initiated, :paid, :failed, :pending, :po_processing, :closed]))
     end
   }
 
@@ -700,6 +700,10 @@ class PurchaseOrder < ApplicationRecord
     self.advance_amount_status.blank?
   end
 
+  def advance_closed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:closed)
+  end
+
   def updatable?
     if (self.procurement.invoices.blank? && self.procurement.inward_documents.blank?)
       self.open? || self.processing?
@@ -810,6 +814,15 @@ class PurchaseOrder < ApplicationRecord
 
   def purchase_order_number
     self.override_po_number.present? ? self.override_po_number : self.po_number
+  end
+
+
+  def amount_before_tax
+    self.total_before_tax&.value
+  end
+
+  def amount_after_tax
+    self.total_after_tax&.value
   end
 
 
@@ -984,21 +997,21 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def budget_trail_entry
-    if self.voided? || self.rejected? || self.retracted? || self.open?
+    if self.voided? || self.rejected?
       # this will delete the trails of all the items within this particular purchase order
       self.items.each do |item|
-        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
       end
     else
       self.items.each do |item|
-        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+        BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
       end
     end
   end
 
   def budget_trail_destroy
     self.items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
     end
   end
 
@@ -1036,6 +1049,7 @@ class PurchaseOrder < ApplicationRecord
         :purchase_order_initiator,
         :purchase_order_reviewer,
         :purchase_order_auditor,
+        :po_invoice_initiator,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
         :bank_payment_request_creditor,
@@ -1144,7 +1158,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.role_based_initiator_associated_items(user, role_id, options = {})
-    if role_id == UserRole.id_for(:bank_payment_request_initiator)
+    if UserRole.ids_for([:bank_payment_request_initiator, :po_invoice_initiator]).include? role_id
       policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
       return user.company.purchase_orders.where(policy_id: policy_ids, purchase_order_status_id: finance_associated_status_ids)
     end
@@ -1154,5 +1168,4 @@ class PurchaseOrder < ApplicationRecord
   def update_po_cost_allocation_items
     self.update_column('cost_allocation_items', true)
   end
-
 end

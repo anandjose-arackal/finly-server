@@ -23,7 +23,6 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
       return
     end
 
-
     if params[:reject_to_user].present? && params[:reject_to_level].present?
       reject_to_details = self.purchase_order.reject_to_users # {dlrm_level_id => reviewer, dlrm_level_id => reviewer, ...}
       

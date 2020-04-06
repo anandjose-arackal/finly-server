@@ -173,7 +173,11 @@ class Settlement::SMoneyRequests::Processing::PostOperation < FinlyPostOperation
     destination_pocket = mapping.money_requests.first.destination_pocket
     payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, purpose)
     payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, destination_pocket, amount, reference_resource: mapping.payment))
-    AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    if op.success?
+      coh_payment = op.payments.first
+      mapping.payment.update(reference_payment_id: coh_payment.id) if mapping.payment.present?
+    end
   end
 
   def update_mapping_data

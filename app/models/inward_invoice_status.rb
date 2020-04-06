@@ -6,13 +6,14 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class InwardInvoiceStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated]
+    [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated, :voided]
   end
 
   def unpaid?
@@ -61,6 +62,48 @@ class InwardInvoiceStatus < ApplicationRecord
 
   def initiated?
     self.id == InwardInvoiceStatus.id_for(:initiated)
+  end
+
+
+  # this will encapsulate all IDs of an invoice that come under the committed bucket of a budget
+  def self.ids_for_committed_bucket
+    [
+        InwardInvoiceStatus.id_for(:open),
+        InwardInvoiceStatus.id_for(:rejected),
+        InwardInvoiceStatus.id_for(:retracted),
+        InwardInvoiceStatus.id_for(:processing)
+    ]
+  end
+
+  def self.ids_for_pending_payment_bucket
+    [
+        InwardInvoiceStatus.id_for(:approved),
+        InwardInvoiceStatus.id_for(:auto_approved),
+        InwardInvoiceStatus.id_for(:unpaid),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:paid),
+    ]
+  end
+
+  def self.ids_for_payment_processing_bucket
+    [
+        InwardInvoiceStatus.id_for(:initiated),
+        InwardInvoiceStatus.id_for(:partially_paid),
+        InwardInvoiceStatus.id_for(:paid)
+    ]
+  end
+
+  def voided?
+    self.id == InwardInvoiceStatus.id_for(:voided)
+  end
+
+  def self.status_ids_for_owner
+    [
+        PurchaseOrderStatus.id_for(:open),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:retracted)
+    ]
   end
 
 end

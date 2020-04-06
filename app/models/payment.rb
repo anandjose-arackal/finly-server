@@ -52,11 +52,13 @@
 #  on_hold                        :boolean
 #  disabled                       :boolean
 #  transfer_mode_id               :integer
+#  last_retried_at                :datetime
 #
 
 class Payment < ApplicationRecord
   include PostOperationExecution, SoftDeletable, MathUtil
   include LiquidDroppable
+  include Exposures::Model::Exposable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -74,6 +76,7 @@ class Payment < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :company, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :location, class_name: "BranchLocation", optional: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -86,6 +89,8 @@ class Payment < ApplicationRecord
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+
+  belongs_to :reference_payment, class_name: "Payment", optional: true
 
   has_one :payment, as: :reference_resource
 
@@ -233,6 +238,7 @@ class Payment < ApplicationRecord
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :all_except_failed, -> {where payment_status_id: PaymentStatus.all_except_failed}
+  scope :payment_processing_bucket, -> {where payment_status_id: PaymentStatus.ids_for_payment_processing_bucket}
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
@@ -366,8 +372,9 @@ class Payment < ApplicationRecord
   }
 
   scope :virtual_account_transaction_purpose, -> (purpose_id) {
-    virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
-    virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
+    virtual_account_transactions = VirtualAccountTransaction.where(reference_payment_id: self.pluck(:id))
+    # virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
+    # virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
     virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:virtual_account_id))
     case purpose_id
       when 1, '1'
@@ -386,7 +393,9 @@ class Payment < ApplicationRecord
         virtual_account_ids = []
     end
     virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
-    where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+    # because virtual account transactions are linked to the payment now via the foreign key, not the orher way around
+    where(id: virtual_account_transactions.pluck(:reference_payment_id))
+    # where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
   }
 
   scope :with_budgetable_category_ids, -> (category_ids) {
@@ -422,20 +431,21 @@ class Payment < ApplicationRecord
   }
 
   scope :include_for_index, -> {
-        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  :receiving_account,
-                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+    includes(:payment_status, :amount, :department, :category, :system_messages, :initiating_account, :initiating_user, :receiving_user,
+             :receiving_account,
+             invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
                             :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
-                  payment_order: [bank_payment_request: [:status]])
+             payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_minimal_for_index, -> {
-    includes(:payment_status, :amount, :reference_resource, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
+    includes(:payment_status, :amount, :receiving_user, :receiving_account, payment_order: [bank_payment_request: [:status]])
   }
 
   scope :include_for_streamsets, -> {
-        includes( :payment_status, :amount, :department, :category,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
-                  receiving_account: [:account_owner],
+    # keep this always during conflict - dont add receiving account sub relation
+    includes(:payment_status, :amount, :department, :category, :initiating_account, :reference_resource, :initiating_user, :receiving_user,
+             :receiving_account,
                   invoice: [:category, :cost_center, :invoice_status, :invoice_type],
                   payment_order: [bank_payment_request: [:status]])
   }
@@ -460,9 +470,12 @@ class Payment < ApplicationRecord
   after_save :budget_trail_entry
   after_save :recalculate_order_summary
   after_save :add_company_id
+  after_save :calculate_paid_amount_in_parent_trails
   after_commit :update_parent_status
 
   after_destroy :budget_trail_destroy
+  after_destroy :calculate_paid_amount_in_parent_trails
+  after_destroy :reset_status
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -683,8 +696,36 @@ class Payment < ApplicationRecord
     end
   end
 
+  def bank_payment_request
+    return self.payment_order&.bank_payment_request
+  end
+
   def payment_mode
     mode || super
+  end
+
+  # adding this association to extract the related
+  # reference resources for this particular payment
+  def reference_resources
+    return [] if reference_resource_type.blank?
+    return reference_resource_type.constantize.where(reference_payment_id: self.id).reorder(created_at: :desc)
+  end
+
+  # since only one virtual account transaction can correspond to a single payment
+  # can change in the future, but unlikely
+  def virtual_account_transaction
+    return nil unless self.reference_resources.first.is_a?(VirtualAccountTransaction)
+    self.reference_resources.first
+  end
+
+  def bbps_bank_transaction
+    return nil unless self.reference_resources.first.is_a?(BbpsYesBankTransaction)
+    self.reference_resources.first
+  end
+
+  def utr
+    return super unless super.blank?
+    return self.reference_resources.first&.try(:utr) || self.reference_resource&.utr
   end
 
   private
@@ -736,20 +777,6 @@ class Payment < ApplicationRecord
     end
   end
 
-  def budget_trail_entry
-    if self.completed? || self.processing? || self.possible_failure?
-      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
-    else
-      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
-      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-    end
-  end
-
-  def budget_trail_destroy
-    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
-    reset_status
-  end
-
   def reset_status
     case self.parent_type
     when 'Invoice'
@@ -790,6 +817,10 @@ class Payment < ApplicationRecord
       when "BbpsBill"
         parent = initiating_user.company.bbps_bills.find_by(id: self.parent_id)
         parent.update(status_id: BbpsBillStatus.id_for(:paid))
+      when "SecurityDeposit"
+        payment.parent.update(status_id: SecurityDepositStatus.id_for(:paid)) if payment.parent.payment_agreement_id.present?
+      when "BeneficiaryPayment"
+        payment.parent.update(status_id: BeneficiaryPaymentStatus.id_for(:paid)) if payment.parent.payment_agreement_id.present?
       end
     end
 
@@ -812,6 +843,8 @@ class Payment < ApplicationRecord
 
         if total_payments < invoice_amount
           parent_details.update payable: true
+        else
+          parent_details.update payable: false
         end
       end
     end
@@ -1137,5 +1170,107 @@ class Payment < ApplicationRecord
   def available_credits_amount
     adj_amount =  self.parent.credit_note_adjustments.joins(:amount).pluck('amounts.value').sum rescue nil
     precision_value(adj_amount)
+  end
+
+
+  # aim of this method is to keep track of how much was paid against an invoice or PO annd enusuring that amount isn't considered in the
+  # buckets before payment is released for budgets
+  def calculate_paid_amount_in_parent_trails
+    if self.parent.present?
+      case parent_type
+      when "Invoice"
+        invoice = self.parent
+        parent_trails = BudgetTrail.where(entity_type: "InvoiceLineItem", entity_id: invoice.items.pluck(:id))
+        # if there are no such trails, then we can return safely from this block and not execute any of the below statements
+        return true if parent_trails.blank?
+
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value) + invoice.advance_amount&.value.to_f
+        payment_processing_amount = invoice.payments.payment_processing_bucket.joins(:amount).sum(:value)
+        paid_percent_before_tax = paid_amount / invoice.amount_before_tax
+        paid_percent_after_tax = paid_amount / invoice.amount_after_tax
+        processing_percent_before_tax = payment_processing_amount / invoice.amount_before_tax
+        processing_percent_after_tax = payment_processing_amount / invoice.amount_after_tax
+
+        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * (billed_amount_before_tax_value))
+                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_before_tax)
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * (billed_amount_before_tax_value))
+                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_before_tax)
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * (billed_amount_after_tax_value))
+                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_after_tax)
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * (billed_amount_after_tax_value))
+                                             WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_after_tax)
+      when "PurchaseOrder"
+        purchase_order = self.parent
+        parent_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem", entity_id: purchase_order.items.pluck(:id))
+        # if there are no such trails, then we can return safely from this block and not execute any of the below statements
+        return true if parent_trails.blank?
+
+        paid_amount = purchase_order.payments.successful.joins(:amount).sum(:value)
+        payment_processing_amount = purchase_order.payments.payment_processing_bucket.joins(:amount).sum(:value)
+        paid_percent_before_tax = paid_amount / purchase_order.amount_before_tax
+        paid_percent_after_tax = paid_amount / purchase_order.amount_after_tax
+        processing_percent_before_tax = payment_processing_amount / purchase_order.amount_before_tax
+        processing_percent_after_tax = payment_processing_amount / purchase_order.amount_after_tax
+
+        sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = (#{paid_percent_before_tax} * remaining_amount_before_tax_value)
+                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_before_tax)
+        sql_before_tax = "UPDATE budget_trails SET `payment_processing_amount_before_tax_value` = (#{processing_percent_before_tax} * remaining_amount_before_tax_value)
+                                              WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_before_tax)
+        sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = (#{paid_percent_after_tax} * remaining_amount_after_tax_value)
+                                                WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_after_tax)
+        sql_after_tax = "UPDATE budget_trails SET `payment_processing_amount_after_tax_value` = (#{processing_percent_after_tax} * remaining_amount_after_tax_value)
+                                             WHERE `budget_trails`.`id` IN (#{parent_trails.pluck(:id).join(",").to_s})"
+        ActiveRecord::Base.connection.execute(sql_after_tax)
+      else
+        # yet to handle security deposit and rental invoice TODO
+        return true
+      end
+    end
+
+      # the below is to do the same, but with report reimbursements and their respective expenses
+      # We will be extracting the report_processor_group_mapping for this payment, and then updating the
+      # paid amount for all the expenses inside all those reports that have been paid against
+      # below not needed because we are directly calculating the amount from the trails
+      # if PaymentPurpose.ids_for(:reimbursement, :reimbursement_outside_finly).include?(self.payment_order.payment_purpose_id)
+      #   report_processor_mapping = ReportProcessorGroupMapping.find_by(payment_id: self.id)
+      #   report_ids = report_processor_mapping.reports.pluck(:id)
+      #   expense_trails = BudgetTrail.where(entity_type: "Expense", entity_id: Expense.with_report_id(report_ids).pluck(:id))
+      #   if self.completed?
+      #     sql_before_tax = "UPDATE `budget_trails` SET `paid_amount_before_tax_value` = `billed_amount_before_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      #   # below will only come in if we want to track the settlements that are in processing but not credited yet. So
+      #   # that amount will go into the payment processing bucket. As of now, the amount moves diretly from the pending payment bucket to paid bucket
+      #   # else
+      #   #   sql_before_tax = "UPDATE `budget_trails` SET `payment_processing_amount_before_tax_value` = `billed_amount_before_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      #   end
+      #   ActiveRecord::Base.connection.execute(sql_before_tax)
+      #   if self.completed?
+      #     sql_after_tax = "UPDATE `budget_trails` SET `paid_amount_after_tax_value` = `billed_amount_after_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      #     # below will only come in if we want to track the settlements that are in processing but not credited yet. So
+      #     # that amount will go into the payment processing bucket. As of now, the amount moves diretly from the pending payment bucket to paid bucket
+      #   # else
+      #   #   sql_after_tax = "UPDATE `budget_trails` SET `payment_processing_amount_after_tax_value` = `billed_amount_after_tax_value` WHERE `budget_trails`.`id` IN (#{expense_trails.pluck(:id).join(",").to_s})"
+      #   end
+      #   ActiveRecord::Base.connection.execute(sql_after_tax)
+      # end
+  end
+
+  def budget_trail_entry
+    if self.failed?
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    else
+      BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetManager::BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
 end

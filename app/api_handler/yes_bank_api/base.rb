@@ -136,9 +136,9 @@ class YesBankApi::Base < BaseHandler
       self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
-      if self.payment&.reference_resource&.is_a?(YesBankTransaction)
+      self.bank_transaction = payment.reference_resources.first
+      if self.bank_transaction.is_a?(YesBankTransaction)
         # just update the bank transaction with the latest details
-        self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
             bank_reference_number: self.transfer_request.bank_reference_number,
             transfer_status_id: self.transfer_status_id,
@@ -147,7 +147,7 @@ class YesBankApi::Base < BaseHandler
         self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
         # this is an anomaly, so send email and flag it
-        if self.payment.present? && self.payment.reference_resource.blank?
+        if self.payment.present? && self.bank_transaction.blank?
           Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
         end
       end
@@ -163,6 +163,17 @@ class YesBankApi::Base < BaseHandler
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      # rescue Faraday::SSLError
+      #   debugger
+      #   # temporarily making this so that the bank transaction gives off a success
+      #   self.transfer_status_id = 1
+      #   self.bank_transaction = payment.reference_resources.first
+      #   self.bank_transaction.update(
+      #       bank_reference_number: "afbioheakdfbkasdfjbg",
+      #       transfer_status_id: self.transfer_status_id,
+      #       bank_response: "",
+      #       beneficiary_full_name: "some shit"
+      #   )
     end
 
   end

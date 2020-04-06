@@ -62,6 +62,10 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
     endpoint Docs::UtilityBills::Subscriptions::Ops::FetchBill
   end
 
+  def fetch_and_create_bill
+    endpoint Docs::UtilityBills::Subscriptions::Ops::FetchAndCreateBill
+  end
+
   def update_and_submit
     params[:id] = params[:id] || params[:_id]
     endpoint Docs::UtilityBills::Subscriptions::Ops::UpdateAndSubmit
@@ -92,6 +96,20 @@ class Bbps::SubscriptionsController < BaseControllers::WebBase
   def actions_config
     @result = ActionsManager::Processor.(current_user, params)
     respond
+  end
+
+  def bulk_review_validate
+    endpoint Docs::UtilityBills::Subscriptions::Ops::BulkReviewValidate
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def bulk_review
+    endpoint Docs::UtilityBills::Subscriptions::Ops::BulkReview
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   private

@@ -24,6 +24,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     attribute :invoice_status
     attribute :policy
     attribute :narration
+    attribute :invoice_amount
     attribute :advance_amount
     attribute :invoice_net_payable_amount
     attribute :approvers
@@ -102,7 +103,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoices_presenter = fetch_invoices
     return if has_errors?
 
-    invoices = invoices_presenter.invoices
+    invoices = invoices_presenter.invoices.scope_all_except_voided
     InvoiceLineItem.where(parent_type: 'Invoice').includes({purchase_order_item: :purchase_order}, :category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {dlrms: [:reviewer, :taken_control_by, :forwarded_to]}, {custom_fields: [:value, :field_configuration]}, {tds_amount: :currency}, :amount, {procurement: [{purchase_order: :advance_amount}]}]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
   end
 
@@ -253,7 +254,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def total_amount(invoice_line_item)
-    invoice_line_item.amount&.value
+    if invoice_line_item&.parent&.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      return invoice_line_item.amount&.value
+    end
+    (invoice_line_item.inventory_line_item&.product_type_id == ProductType.id_for(:service)) ? invoice_line_item.billable_amount&.value : invoice_line_item.amount&.value
   end
 
   def tax_amount(invoice_line_item)
@@ -274,7 +278,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
   end
 
   def tds_amount(invoice_line_item)
-    return 0.0 unless invoice_line_item&.inventory_line_item&.tds_applicable
+    return 0.0 unless invoice_line_item&.tds_applicable?
+    # invoice_line_item.tds_amount
     invoice_line_item.parent.tds_amount&.value || 0.0
   end
 
@@ -327,12 +332,13 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
       forwarded_to = dlrm.forwarded_to
       reviewer = dlrm.reviewer
       approved = [TrailAction.id_for(:approve), TrailAction.id_for(:approve_and_forward)].include?(dlrm.action_id)
+      action_taken = (dlrm.action_taken_at.present? ? dlrm.action_taken_at.strftime("%I:%M %p, %d %b %Y") : dlrm.updated_at.strftime("%I:%M %p, %d %b %Y"))
       if forwarded_to.present?
-        (approved ? "#{forwarded_to.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d-%b-%Y"}" : forwarded_to.name)
+        (approved ? "#{forwarded_to.name} - #{action_taken}" : forwarded_to.name)
       elsif taken_control_by.present?
-        (approved ? "#{taken_control_by.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d-%b-%Y"}" : taken_control_by.name)
+        (approved ? "#{taken_control_by.name} - #{action_taken}" : taken_control_by.name)
       elsif reviewer.present?
-        (approved ? "#{reviewer.name} - #{dlrm.updated_at.strftime "%I:%M %p, %d-%b-%Y"}" : reviewer.name)
+        (approved ? "#{reviewer.name} - #{action_taken}" : reviewer.name)
       end
     end
     approvers.reject { |e| e.to_s.empty? }.join(", ")
@@ -374,5 +380,9 @@ class ExportManager::Master::Invoices::Index < ExportManager::Builders::Spreadsh
     invoice_line_item.parent.get_reviewers&.map(&:name)&.join(", ")
   end
 
+  def invoice_amount(invoice_line_item)
+    parent_invoice  = invoice_line_item.parent
+    ((parent_invoice&.balance_due&.value || 0 ) + (parent_invoice&.po_adjusted_advance&.value || 0) || 0)
+  end
 
 end

@@ -60,6 +60,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
           purchase_order_id: payment[:purchase_order_id],
           invoice_id: payment[:invoice_id],
           payment_mode: self.payment_mode,
+          reference_resource_type: self.bank_payment_request&.owner&.company&.feature_subscription&.bank_transaction_class&.name,
           amount_attributes: {
               value: payment[:requested_amount],
               currency_id: Currency.first.id
@@ -71,6 +72,7 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
           category_id: payment[:category_id],
           company_id: user.company_id,
           cost_center_id: payment[:cost_center_id],
+          location_id: payment[:location_id],
           api_initiated: true,
           parent_type: payment[:parent_type],
           parent_id: payment[:parent_id],

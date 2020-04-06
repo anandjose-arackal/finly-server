@@ -12,9 +12,31 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
   step Contract::Persist()
 
+  step :setup_dlrm
+
+  step :update_attachments
+
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
 
   def set_default_params(options, params:, current_user:, **)
     params[:subscription][:current_user] = current_user
+  end
+
+  def update_attachments(options, params:, current_user:, model:, **)
+    attachments = Attachment.where(id: params[:attachment_ids])
+    attachment_ids = attachments.where(resource_type: nil, resource_id: nil).or(attachments.where(resource: model)).pluck(:id)
+
+    Attachment.where(id: attachment_ids).update(resource_id: model, resource_type: model.class.name)
+    model.attachments.where.not(id: attachment_ids).destroy_all
+    true
+  end
+
+  def setup_dlrm(options, current_user:, params:, model:, **)
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Set.(current_user, {
+        reviewal_document: model,
+        document_reviewer_mappings: params[:document_reviewer_mappings]
+    })
+
+    dlrm_validation_op.success?
   end
 end

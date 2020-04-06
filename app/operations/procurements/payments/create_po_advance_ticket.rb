@@ -313,11 +313,11 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       vendor = purchase_order.vendor
       # bank_account = vendor.bank_accounts.where(default_account: true).first
       bank_account = purchase_order.bank_account
-      set_payment_params={
+      set_payment_params = {
           name: vendor.name,
           bank_account_number: bank_account&.account_number,
           ifsc: bank_account.ifsc,
-          requested_amount:advance_amount,
+          requested_amount: advance_amount,
           account_id: bank_account.id,
           purchase_order_id: purchase_order&.id,
           payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
@@ -325,7 +325,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
           parent_id: purchase_order&.id,
           advance_tds_slab_id: po_advance[:advance_tds_slab_id],
           transfer_mode_id: self.transfer_mode_id,
-          note: purchase_order&.procurement&.name
+          note: purchase_order&.procurement&.name,
+          location_id: purchase_order&.location_id
       }
 
       unless purchase_order&.cost_allocation_items

@@ -45,6 +45,9 @@ class CardTransaction < ApplicationRecord
   belongs_to :card, optional: true
 
   has_one :card_expense, dependent: :destroy
+
+  belongs_to :reference_payment, class_name: "Payment", optional: true
+
   has_one :payment, as: :reference_resource
 
   # i.e. a combination of reference ID, type of details and transaction type should be unique

@@ -64,7 +64,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
       return result false, messages.join(', ')
     end
 
-    vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes","bank_accounts_attributes"))
+    vendor.assign_attributes(vendor_params["vendor"].except("gstin_locations_attributes", "bank_accounts_attributes", "status_id"))
     if vendor_params["vendor"]["bank_accounts_attributes"].present?
       bank_account = vendor.bank_accounts.first
       if bank_account.present?
@@ -204,7 +204,7 @@ class Admin::Implementations::Master::Vendors::Import < Admin::Implementations::
     existing_vendor = company.yes_bank_vendors.non_deleted.find_by_vendor_id vendor_params["vendor_id"]
   end
 
-  def check_existing_location(vendor, gstin_location_params )
+  def check_existing_location(vendor, gstin_location_params)
     return false if gstin_location_params["gstin"].blank?
     vendor.gstin_locations.where(gstin: gstin_location_params["gstin"]).blank?
   end

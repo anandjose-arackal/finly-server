@@ -11,7 +11,7 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
-    self.payment = bank_transaction.payment
+    self.payment = bank_transaction.reference_payment
     self.payment_order = self.payment&.payment_order
   end
 
@@ -52,6 +52,48 @@ class BankTransfer::Icici::Transactions::CheckStatus < BaseOperation
         self.payment_order.update_order_status
         self.payment_order.update_processed_amount
         self.payment_order.execute_post_operation(true)
+      end
+    end
+  end
+
+  def post_process
+    # trigger event for sending mailer to the receiver of the payment
+    if self.payment&.completed?
+      #Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment) rescue nil
+      execute_callback(self.payment)
+    elsif payment&.failed?
+      execute_callback(self.payment)
+    end
+  end
+
+  def execute_callback(payment)
+    post_params = {
+        payment_id: payment.id,
+        external_reference_id: payment.external_reference_id,
+        payment_amount: payment.amount_value,
+        note: payment.note,
+        status: payment.payment_status&.name,
+        receiving_account: {
+            receiving_account_type: "BankAccount",
+            receiving_account_id: payment.receiving_account&.id,
+            receiving_account_number: payment.receiving_account&.account_number,
+            receiving_account_ifsc: payment.receiving_account&.ifsc
+        },
+        bank_reference_number: payment.utr
+    }
+    if payment.failed?
+      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
+    end
+    # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
+    company = payment.initiating_user&.company
+    op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
+    # creating the webhook track based on the response of the particular operation
+    if company.web_hooks.present?
+      callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
+      if op.success?
+        callback_track.update(success: true, response: (op.body rescue nil))
+      else
+        callback_track.update(success: false, response: (op.body rescue nil))
       end
     end
   end

@@ -27,12 +27,12 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
     # that is required for creating actually making the request with YesBank's servers
     self.transfer_request = create_transfer_request("IMPS", nil)
     self.bank_transaction = self.company.yes_bank_transactions.create(
-       unique_request_number: self.transfer_request.generate_unique_reference,
-       transfer_type: "IMPS",
-       bank_reference_number: self.transfer_request.bank_reference_number,
-       transfer_status_id: BankTransferStatus.id_for(:open),
-       account_name_check: true,
-       amount_attributes: {
+        unique_request_number: self.transfer_request.unique_reference_number,
+        transfer_type: "IMPS",
+        bank_reference_number: self.transfer_request.bank_reference_number,
+        transfer_status_id: BankTransferStatus.id_for(:open),
+        account_name_check: true,
+        amount_attributes: {
            value: 1,
            # value: 0.1,
            currency_id: Currency.first.id

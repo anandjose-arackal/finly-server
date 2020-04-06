@@ -47,6 +47,8 @@
 #  category_id             :integer
 #  hsn_sac                 :string(255)
 #  quick_pay               :string(255)      default("N")
+#  last_paid_at            :datetime
+#  review_note             :text(65535)
 #
 
 require 'rails_helper'

@@ -16,7 +16,7 @@ class CheckForFailedNeftTransactions < ApplicationJob
         next if utr.blank?
 
         # first making the UTR the same as the one we store in the DB
-        utr = "0#{utr[0..(utr.length-3)]}"
+        utr = "0#{utr[0..(utr.length - 3)]}"
 
         # find the bank transaction that has the above UTR
         bank_transaction = IciciBankTransaction.find_by(utr: utr)
@@ -33,11 +33,11 @@ class CheckForFailedNeftTransactions < ApplicationJob
           bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
           # also mark the associated payment as failed
-          bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:failed))
-          bank_transaction.payment&.system_messages.create(
+          bank_transaction.reference_payment&.update(payment_status_id: PaymentStatus.id_for(:failed))
+          bank_transaction.reference_payment&.system_messages.create(
               content: "This transaction was returned from NEFT servers",
               system_message_type_id: SystemMessageType.id_for(:error)).save
-          bank_transaction.payment&.payment_order&.update_order_status
+          bank_transaction.reference_payment&.payment_order&.update_order_status
         end
       end
     end

@@ -7,6 +7,7 @@
 #  order      :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 
@@ -104,6 +105,34 @@ class ReportStatus < ApplicationRecord
 
   def self.auto_approved_id
     10
+  end
+
+  def self.ids_for_pending_bucket
+    [
+        ReportStatus.id_for(:open),
+        ReportStatus.id_for(:retracted),
+        ReportStatus.id_for(:processing)
+    ]
+  end
+
+  def self.ids_for_pending_payment_bucket
+    [
+        ReportStatus.id_for(:approved),
+        ReportStatus.id_for(:auto_approved),
+    # ReportStatus.id_for(:settled),
+    # ReportStatus.id_for(:settlement_confirmed),
+    # ReportStatus.id_for(:closed),
+    ]
+  end
+
+  def self.ids_for_paid_bucket
+    [
+        # ReportStatus.id_for(:approved),
+        # ReportStatus.id_for(:auto_approved),
+        ReportStatus.id_for(:settled),
+        ReportStatus.id_for(:settlement_confirmed),
+        ReportStatus.id_for(:closed),
+    ]
   end
 
 end

@@ -26,4 +26,13 @@ class FormEntityChoice < ApplicationRecord
   belongs_to :form_entity
   belongs_to :created_by_user, class_name: 'User', optional: true
 
+  def as_json(options = {})
+    {
+        id: uuid,
+        value: value,
+        position: position,
+        active: active,
+    }
+  end
+
 end

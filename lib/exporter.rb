@@ -156,15 +156,15 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
               worksheet.write_number(1 + row, column, item[:value])
             when 'date'
               if item[:value].present?
-               date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
-               date = item[:value].strftime('%d-%m-%Y')
-               worksheet.write_date_time(1 + row, column, date, date_format)
+                date_format = workbook.add_format({:num_format => 'dd-mm-yyyy'})
+                date = item[:value].strftime('%d-%m-%Y')
+                worksheet.write_date_time(1 + row, column, date, date_format)
               else
                 worksheet.write_blank(1 + row, column)
               end
             when 'currency'
             else
-               worksheet.write_string(1 + row, column, item[:value])
+              worksheet.write_string(1 + row, column, item[:value])
             end
           else
             worksheet.write(1 + row, column, item)
@@ -207,6 +207,25 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
           csv << content
         end
       end
+    end
+
+    def generate_csv_file
+      file = Tempfile.new(['export', '.csv'])
+      CSV.open(file, 'w', write_headers: true, headers: headers) do |csv|
+        self.contents&.each do |content|
+          row = []
+          content.each do |column|
+            if column.is_a?(Hash)
+              (column[:type] == 'date' ? row << column[:value].strftime('%d-%m-%Y') : row << column[:value])
+            else
+              row << column
+            end
+          end
+          csv << row
+        end
+      end
+      file.rewind
+      file
     end
     # Handle CSV END
   end

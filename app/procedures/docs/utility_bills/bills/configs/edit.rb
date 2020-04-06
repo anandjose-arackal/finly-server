@@ -10,19 +10,20 @@ class Docs::UtilityBills::Bills::Configs::Edit < Transactions::API
     result['policies'] = ::Policy::VendorPayments::Index.(current_user, {filter_role_id: [UserRole.id_for(:utility_bill_initiator)]}).policies rescue Policy.none
     result['reviewal_chains'] = []
 
-    if model.present? && model.user_id == current_user.id && BbpsBill.status_ids(:open, :retracted, :rejected).include?(model.status_id)
-      parameters = {reviewal_document: model, provider_name: 'BbpsBillProvider'}
+    if model.present? && model.user_id.present?
+      parameters = {reviewal_document: model}
+      parameters[:provider_name] = model.autofetched ? 'BbpsBillAutofetchedProvider' : 'BbpsBillNonAutofetchedProvider'
       result['policies'].each do |policy|
         parameters['policy_id'] = policy.id
         chain = {
             policy_id: policy.id,
-            reviewal_chain: get_reviewal_chain(current_user, parameters)
+            reviewal_chain: get_reviewal_chain(model.user, parameters)
         }
 
         result['reviewal_chains'].push(chain)
       end
     else
-      parameters = {provider_name: 'BbpsBillProvider'}
+      parameters = {provider_name: 'BbpsBillAutofetchedProvider'}
       result['policies'].each do |policy|
         parameters['policy_id'] = policy.id
         chain = {

@@ -10,8 +10,6 @@
 #  updated_at       :datetime         not null
 #  is_deleted       :boolean
 #  deleted_at       :datetime
-#  category_id      :integer
-#  code             :string(255)
 #  cost_center_code :string(255)
 #  ancestry         :string(255)
 #  gl_code          :string(255)
@@ -21,6 +19,7 @@ class CostCenter < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   event_channel 'cost_center'
@@ -43,6 +42,10 @@ class CostCenter < ApplicationRecord
   scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app
+  }
+
+  scope :with_id, -> (ids) {
+    where id: ids
   }
 
   scope :vendor_payments_only, -> {

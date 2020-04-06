@@ -53,6 +53,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
       unless op.success?
         self.virtual_account_transaction.update(processed: false)
         self.virtual_account_transaction.log_state(:error, 'Invoice payment not reconciled')
+        add_message :error, "Invoice payment not reconciled"
       end
     else
       # do nothing?
@@ -122,7 +123,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
             currency_id: Currency.id_for(:INR)
         },
         date: self.virtual_account_transaction&.transfer_timestamp,
-        reference_resource: self.virtual_account_transaction,
+        reference_resource: self.virtual_account_transaction, # this is legacy, although we are saving it to the reference_resource attribute
         note: self.virtual_account_transaction&.note
     )
     self.payment.save
@@ -135,7 +136,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     end
     if self.adapter.on_va_transaction(self.payment)
       self.virtual_account_transaction.log_state(:info, "#{self.adapter.account.class.name} Credited")
-      self.virtual_account_transaction.update(receiving_account_credited: true)
+      self.virtual_account_transaction.update(receiving_account_credited: true, reference_payment_id: self.payment.id)
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
     else
       self.virtual_account_transaction.log_state(:error, 'Payment Credit Failed')

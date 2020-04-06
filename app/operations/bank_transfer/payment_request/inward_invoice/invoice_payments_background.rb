@@ -61,6 +61,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           invoice_id: payment[:invoice_id],
           payment_mode: self.payment_mode,
           transfer_mode_id: self.transfer_mode_id,
+          reference_resource_type: self.bank_payment_request&.owner&.company&.feature_subscription&.bank_transaction_class&.name,
           amount_attributes: {
               value: payment[:requested_amount],
               currency_id: Currency.first.id

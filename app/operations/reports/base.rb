@@ -83,7 +83,7 @@ class Reports::Base < BaseOperation
     def init
       self.report = params[:report]
       report.reload
-      self.categories = report.user.company.categories.active
+      self.categories = report.user.company.categories
       self.expenses = report.expenses.includes(:amount,:receipts,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type,{manual_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{card_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{distance_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]},{time_expense:[custom_fields: [field_configuration:[:parent_dependent_field_configuration_mappings]]]})
       self.status = report.relative_status_name user
       self.total = report.total_amount
@@ -134,15 +134,10 @@ class Reports::Base < BaseOperation
         self.policies = Policy.where(id: self.report&.policy&.id)
       end
 
-      # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
-      # self.budgets = budgets_op.budgets
-      self.budgets = []
 
       if self.report.expenses.present?
-        op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
-        if op.success?
-          self.budgets = op.budget_data
-        end
+        op = BudgetManager::BudgetsCalculator::ApplicableBudgets.({document: self.report, current_user: User.first})
+        self.budgets = op["result"][:budgets]
       end
     end
 

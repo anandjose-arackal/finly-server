@@ -161,6 +161,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return false
       end
 
+      if invoice.voided?
+        add_message :error, "This invoice, with id #{invoice.invoice_id}, has been \"Voided\". Please remove them before creating a payment ticket."
+        return
+      end
+
       if total_payments >= invoice_amount.round(2)
         # invoice.update payable: false
         self.update_payable_for_invoices << invoice.id
@@ -200,7 +205,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       Rails.logger.fatal "BEFORE inward_invoices,\n #{inward_invoices.inspect}"
       # self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
       Rails.logger.fatal "AFTER inward_invoices,\n #{inward_invoices.inspect}"
-      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
+      self.inward_invoices.update(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
       payment_params = initialize_payment_objects
       op = BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, invoices_status: invoices_status})
     else
@@ -258,6 +263,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           category_id: invoice.category_id,
           cost_center_id: invoice.cost_center_id,
           department_id: invoice.department_id,
+          location_id: invoice.location_id,
           date: DateUtils.local_date,
           invoice_id: invoice.id,
           parent_type: invoice&.class.name,

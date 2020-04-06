@@ -101,7 +101,11 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
     self.users.each do |user|
       next if self.existing_emails.include? user.email # skip if email already exist in current gc company, even if present in other gc company
       user.default_company_id = company_id
-      user_list << user.attributes.with_indifferent_access
+      user_attributes_clone = user.attributes.with_indifferent_access.except("invitation_token")
+      if user_attributes_clone["id"].present?
+        user_attributes_clone[:profile_attributes] = User.where(id: user_attributes_clone["id"]).first&.profile&.attributes&.with_indifferent_access.except("id")
+      end
+      user_list << user_attributes_clone
     end
 
     user_list
@@ -145,6 +149,7 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       options[:company_id] = user.company_id
       options[:default_company_id] = user.company_id
       options = setup_user_panel_subscription(options)
+      options = setup_user_profile(options)
 
       if current_company.feature_subscription.group_entity_structure and common_emails.include?(list[:email])
         u = User.new options
@@ -174,6 +179,13 @@ class UserOnboarding::BuildUsersForImport < BaseOperation
       options[:user_panel_subscription_attributes] = {expense_management: true}
       return options
     end
+  end
+
+  def setup_user_profile(options)
+    if options[:profile_attributes].nil?
+      options[:profile_attributes] = {employee_id: nil}
+    end
+    options
   end
 
   def update_user_panel_subscription

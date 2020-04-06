@@ -20,12 +20,14 @@
 #  category_code              :string(255)
 #  gst_applicable             :boolean          default(FALSE)
 #  tds_applicable             :boolean
+#  deleted_at                 :datetime
 #
 
 class Category < ApplicationRecord
   include AncestrySupport
   include Sequenced::ActsAsSequenced
   include LiquidDroppable
+  include Exposures::Model::Exposable
   include EventProducer
 
   acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
@@ -53,6 +55,8 @@ class Category < ApplicationRecord
 
   scope :active, -> { where active: true }
   scope :with_id, ->(id) { where id: id }
+  scope :with_ids, -> (ids) {where id: ids}
+
   scope :with_name, ->(name) { where name: name }
   scope :others, -> { where name: 'Other' }
   scope :with_purpose, -> (purposes) {

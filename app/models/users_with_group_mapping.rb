@@ -6,6 +6,7 @@
 #  user_id    :integer
 #  company_id :integer
 #  group_id   :integer
+#  deleted_at :datetime
 #
 
 class UsersWithGroupMapping < ApplicationRecord

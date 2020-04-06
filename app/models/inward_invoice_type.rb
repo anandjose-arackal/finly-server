@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class InwardInvoiceType < ApplicationRecord
@@ -51,6 +52,16 @@ class InwardInvoiceType < ApplicationRecord
 
   def agreement_invoice?
     self.id == InwardInvoiceType.id_for(:agreement_invoice)
+  end
+
+  def self.status_ids_for_committed_bucket
+    [
+        InwardInvoiceType.id_for(:non_po_invoice),
+        InwardInvoiceType.id_for(:general_invoice),
+        InwardInvoiceType.id_for(:beneficiary),
+        InwardInvoiceType.id_for(:rental_invoice),
+        InwardInvoiceType.id_for(:agreement_invoice)
+    ]
   end
 
 end

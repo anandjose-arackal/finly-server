@@ -20,6 +20,8 @@
 #  account_name_check          :boolean          default(FALSE)
 #  beneficiary_full_name       :string(255)
 #  transfer_mode_id            :integer
+#  deleted_at                  :datetime
+#  bank_error_message          :text(16777215)
 #
 
 class YesBankTransaction < ApplicationRecord
@@ -30,6 +32,8 @@ class YesBankTransaction < ApplicationRecord
   belongs_to :bank_transaction_type, optional: true
   belongs_to :transfer_mode, optional: true, class_name: 'TransferModeCompanyMapping'
 
+  belongs_to :reference_payment, class_name: "Payment", optional: true
+
   has_one :payment, as: :reference_resource
 
   validates :bank_reference_number, presence: true, if: :successful?
@@ -39,6 +43,7 @@ class YesBankTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :company, presence: true
   validates :transfer_type, presence: true
+  validates :reference_payment, presence: true, unless: :account_name_check?
 
   accepts_nested_attributes_for :amount
 
@@ -48,6 +53,10 @@ class YesBankTransaction < ApplicationRecord
   scope :processing_transactions, -> {where transfer_status_id: [BankTransferStatus.id_for(:processing), BankTransferStatus.id_for(:possible_failure)]}
 
   scope :non_penny_test, -> { where.not(account_name_check: true) }
+
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
 
   def retriable?
     self.transfer_status_id == BankTransferStatus.id_for(:failed)

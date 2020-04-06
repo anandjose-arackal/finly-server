@@ -25,6 +25,7 @@
 #  category_id                  :integer
 #  hsn_sac                      :string(255)
 #  rate_contract_item_id        :integer
+#  deleted_at                   :datetime
 #
 
 # table_name => purchase_request_items
@@ -68,6 +69,8 @@ class PurchaseRequestItem < ApplicationRecord
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
   validates_presence_of :cost_center, :department, if: :cost_allocation_items?
@@ -201,6 +204,26 @@ class PurchaseRequestItem < ApplicationRecord
 
   def cost_allocation_items?
     self.purchase_request.cost_allocation_items
+  end
+
+  private
+
+  def budget_trail_entry
+    # if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order&.purchase_order_status_id)
+    #   calling the trail saving processor method that will take care of saving the budget trail
+    # BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+    # else
+    #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    # end
+    if self.purchase_request.draft? || self.purchase_request.rejected? || self.purchase_request.retracted? || self.purchase_request.cancelled?
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(self)
+    else
+      BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.save_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetManager::BudgetsCalculator::Calculate::PurchaseRequestItemsBudgetsProcessor.new.destroy_trail(self)
   end
 
 end

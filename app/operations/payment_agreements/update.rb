@@ -63,8 +63,8 @@ class PaymentAgreements::Update < PaymentAgreements::Base
         if PaymentAgreement.status_ids(:draft, :retracted, :rejected).include?(payment_agreement.status_id) && payment_agreement.creator_id == user.id
           if payment_agreement.dlrms.present?
             dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-              reviewal_document: self.payment_agreement,
-              document_reviewer_mappings_params: document_reviewer_mappings_params
+                reviewal_document: self.payment_agreement,
+                document_reviewer_mappings_params: document_reviewer_mappings_params
             })
             unless dlrm_validation_op.success?
               add_message :error, dlrm_validation_op.messages[:error]

@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class NotificationType < ApplicationRecord
@@ -23,11 +24,9 @@ class NotificationType < ApplicationRecord
     end
   end
 
-  self.class.instance_eval do
-    VALUES.each do |key, value|
-      define_method "#{key}_id" do
-        value
-      end
+  VALUES.each do |key, value|
+    define_singleton_method "#{key}_id" do
+      value
     end
   end
 

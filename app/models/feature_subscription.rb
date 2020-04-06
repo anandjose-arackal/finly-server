@@ -31,16 +31,19 @@
 #  vendor_empanelment_workflow    :boolean          default(FALSE)
 #  purchase_requisition_system    :boolean
 #  bank_service_provider          :string(255)
+#  agreement_based_payment_system :boolean          default(FALSE)
 #  group_entity_structure         :boolean          default(FALSE)
-#  vendor_portal                  :boolean          default(FALSE)
 #  grn_enabled                    :boolean          default(TRUE)
 #  srn_enabled                    :boolean          default(FALSE)
-#  agreement_based_payment_system :boolean          default(FALSE)
+#  vendor_portal                  :boolean          default(FALSE)
 #  gstin_verification_enabled     :boolean          default(FALSE)
-#  user_level_custom_fields       :boolean          default(FALSE)
-#  request_encryption_enabled     :boolean          default(FALSE)
 #  utility_bills_enabled          :boolean          default(FALSE)
 #  analytics_system               :boolean
+#  request_encryption_enabled     :boolean          default(FALSE)
+#  user_level_custom_fields       :boolean          default(FALSE)
+#  deleted_at                     :datetime
+#  sso_login_enforced             :boolean          default(FALSE)
+#  card_service_provider_id       :integer
 #
 
 class FeatureSubscription < ApplicationRecord
@@ -57,6 +60,21 @@ class FeatureSubscription < ApplicationRecord
       return true
     end
     false
+  end
+
+  # this is only for when we are using the workaround
+  # for multi bank support
+  def bank_transaction_class
+    case self.bank_service_provider
+    when "YES"
+      return YesBankTransaction
+    when "ICICI"
+      return IciciBankTransaction
+    when "KOTAK"
+      return KotakBankTransaction
+    else
+      return YesBankTransaction
+    end
   end
 
 end

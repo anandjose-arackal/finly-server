@@ -125,6 +125,15 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
           subject: 'BPR Payments have multiple initiating accounts'
       })
     end
+
+    case self.bank_payment_request.payments.first&.class&.name
+    when 'Invoice'
+      payments = self.bank_payment_request.payments.joins(:invoice).where(invoices: {invoice_status_id: InwardInvoiceStatus.id_for(:voided)})
+      if payments.present?
+        add_message :error, "Payments with IDs #{payments.pluck(:id).join(", ")} have invoices which are voided. Please remove them before marking the Ticket as credited."
+        return
+      end
+    end
   end
 
   def pre_process

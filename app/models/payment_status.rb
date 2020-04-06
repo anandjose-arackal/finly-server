@@ -6,6 +6,7 @@
 #  name       :string(255)      not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
 #
 
 class PaymentStatus < ApplicationRecord
@@ -100,6 +101,33 @@ class PaymentStatus < ApplicationRecord
         PaymentStatus.id_for(:in_progress),
         PaymentStatus.id_for(:pending),
         PaymentStatus.id_for(:completed),
+        PaymentStatus.id_for(:scheduled),
+        PaymentStatus.id_for(:possible_failure),
+        PaymentStatus.id_for(:processing)
+    ]
+  end
+
+  def self.ids_for_pending_payment_bucket
+    [
+        PaymentStatus.id_for(:pending_approval),
+        PaymentStatus.id_for(:failed)
+    ]
+  end
+
+  def self.ids_for_paid_bucket
+    [
+        PaymentStatus.id_for(:completed)
+    ]
+  end
+
+  def self.ids_for_payment_processing_bucket
+    [
+        PaymentStatus.id_for(:initiated),
+        PaymentStatus.id_for(:pending_credit),
+        PaymentStatus.id_for(:pending_approval),
+        PaymentStatus.id_for(:processing),
+        PaymentStatus.id_for(:in_progress),
+        PaymentStatus.id_for(:pending),
         PaymentStatus.id_for(:scheduled),
         PaymentStatus.id_for(:possible_failure),
         PaymentStatus.id_for(:processing)

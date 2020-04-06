@@ -16,13 +16,15 @@
 #  gl_code              :string(255)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  uuid                 :string(36)       not null
 #
 
 class Olap::Dimensions::CostCenter < OlapRecord
+  include Events::Consumer
   include Analytics::Mapper
 
   transaction_model ::CostCenter
-  events 'cost_center.update', 'cost_center.create', 'cost_center.destroy'
+  consume 'cost_center.update', 'cost_center.create', 'cost_center.destroy'
 
   map :name
   map :application

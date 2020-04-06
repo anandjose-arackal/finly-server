@@ -8,6 +8,7 @@
 #  budgetable_type :string(255)
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  deleted_at      :datetime
 #
 
 class BudgetCriteriaMapping < ApplicationRecord
@@ -23,5 +24,15 @@ class BudgetCriteriaMapping < ApplicationRecord
   scope :with_budgetable_id, -> (budgetable_id) {
     where budgetable_id: budgetable_id
   }
+
+  def as_json(options = {})
+    {
+        id: id,
+        name: name,
+        budgetable_id: budgetable_id,
+        budgetable_type: budgetable_type,
+        budgetable_name: budgetable.name
+    }
+  end
 
 end
