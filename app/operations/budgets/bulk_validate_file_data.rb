@@ -2,7 +2,7 @@ class Budgets::BulkValidateFileData < Budgets::Base
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :all_budgets, :all_budget_ids,
-                :all_categories, :all_departments, :all_vendors, :all_locations, 
+                :all_categories, :all_departments, :all_vendors, :all_locations,
                 :budget_criteria_mappings
 
   class Budgets::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -61,19 +61,19 @@ class Budgets::BulkValidateFileData < Budgets::Base
 
   def process
     self.item_details.each do |item|
-    	# parent_id = item[:parent_id] || item["parent_id"]
-    	budget_name = item[:budget_name] || item["budget_name"]
-    	amount = item[:amount] || item["amount"]
-    	start_date = item[:start_date] || item["start_date"]
-    	end_date = item[:end_date] || item["end_date"]
-    	# users = item[:users] || item["users"]
-    	categories = item[:categories] || item["categories"]
-    	departments = item[:departments] || item["departments"]
-    	locations = item[:locations] || item["locations"]
-    	# vendors = item[:vendors] || item["vendors"]
-    	expense = item[:expense] || item["expense"]
-    	payment = item[:payment] || item["payment"]
-    	purchase_order = item[:purchase_order] || item["purchase_order"]
+      # parent_id = item[:parent_id] || item["parent_id"]
+      budget_name = item[:budget_name] || item["budget_name"]
+      amount = item[:amount] || item["amount"]
+      start_date = item[:start_date] || item["start_date"]
+      end_date = item[:end_date] || item["end_date"]
+      # users = item[:users] || item["users"]
+      categories = item[:categories] || item["categories"]
+      departments = item[:departments] || item["departments"]
+      locations = item[:locations] || item["locations"]
+      # vendors = item[:vendors] || item["vendors"]
+      expense = item[:expense] || item["expense"]
+      payment = item[:payment] || item["payment"]
+      purchase_order = item[:purchase_order] || item["purchase_order"]
 
       self.error_messages = []
       self.issue_item = {}
@@ -111,50 +111,49 @@ class Budgets::BulkValidateFileData < Budgets::Base
       end
 
       if categories.blank? and departments.blank? and locations.blank?
-      	self.valid = false
-      	self.error_messages << "Atlease one budget criteria needs to be specified"
-      	self.issue_item[:categories] = self.issue_item[:departments] = self.issue_item[:locations] = "Atlease one budget criteria needs to be specified"
+        self.valid = false
+        self.error_messages << "Atlease one budget criteria needs to be specified"
+        self.issue_item[:categories] = self.issue_item[:departments] = self.issue_item[:locations] = "Atlease one budget criteria needs to be specified"
       end
 
       # categories.split(",").map(&:strip)
       # self.all_category_ids
 
       if categories.present?
-      	# split by comma, then check to see if array contains only digits and is properly formatted
-      	# the check tries to invalidate characters, if the array has any, then throw error
-      	err = []
-      	categories.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i }
-      	if err.present?
-      		self.valid = false
-      		self.error_messages << "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      		self.issue_item[:categories] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      	end
+        # split by comma, then check to see if array contains only digits and is properly formatted
+        # the check tries to invalidate characters, if the array has any, then throw error
+        err = []
+        categories.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i}
+        if err.present?
+          self.valid = false
+          self.error_messages << "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+          self.issue_item[:categories] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+        end
       end
 
       if departments.present?
-      	# split by comma, then check to see if array contains only digits and is properly formatted
-      	# the check tries to invalidate characters, if the array has any, then throw error
-      	err = []
-      	departments.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i }
-      	if err.present?
-      		self.valid = false
-      		self.error_messages << "Departments budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      		self.issue_item[:departments] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      	end
+        # split by comma, then check to see if array contains only digits and is properly formatted
+        # the check tries to invalidate characters, if the array has any, then throw error
+        err = []
+        departments.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i}
+        if err.present?
+          self.valid = false
+          self.error_messages << "Departments budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+          self.issue_item[:departments] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+        end
       end
 
       if locations.present?
-      	# split by comma, then check to see if array contains only digits and is properly formatted
-      	# the check tries to invalidate characters, if the array has any, then throw error
-      	err = []
-      	locations.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i }
-      	if err.present?
-      		self.valid = false
-      		self.error_messages << "Locations budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      		self.issue_item[:locations] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
-      	end
+        # split by comma, then check to see if array contains only digits and is properly formatted
+        # the check tries to invalidate characters, if the array has any, then throw error
+        err = []
+        locations.split(",").map {|cat| cat.strip if cat.strip.present?}.compact.map {|i| err << i unless i.to_i.to_s == i}
+        if err.present?
+          self.valid = false
+          self.error_messages << "Locations budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+          self.issue_item[:locations] = "Categories budgetable is not formatted properly. Please comma separate the ID's and include only digits. Error found near - #{err.first}"
+        end
       end
-
 
 
       if valid
@@ -212,16 +211,16 @@ class Budgets::BulkValidateFileData < Budgets::Base
 
   def retrieve_header_names
     [
-	    "Budget Name",
-	    "Amount",
-	    "Start Date (dd-mm-yyyy)",
-	    "End Date (dd-mm-yyyy)",
-	    "Categories Budgetable ",
-	    "Departments Budgetable",
-	    "Locations Budgetable",
-	    "Expense? (Y/N)",
-	    "Payment? (Y/N)",
-	    "Purchase Order? (Y/N)"
+        "Budget Name",
+        "Amount",
+        "Start Date (dd-mm-yyyy)",
+        "End Date (dd-mm-yyyy)",
+        "Categories Budgetable ",
+        "Departments Budgetable",
+        "Locations Budgetable",
+        "Expense? (Y/N)",
+        "Payment? (Y/N)",
+        "Purchase Order? (Y/N)"
     ]
   end
 

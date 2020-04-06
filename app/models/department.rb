@@ -48,7 +48,7 @@ class Department < ApplicationRecord
   default_scope {unscope(:where)}
 
   scope :with_ids, -> (id) { where id: id }
-  scope :with_id, -> (id) { where id: id }
+  scope :with_id, -> (id) {where id: id}
 
   scope :with_name, -> (name) {where name: name}
   # scope :only_sub_departments, -> {
