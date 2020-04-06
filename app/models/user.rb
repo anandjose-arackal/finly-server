@@ -1680,6 +1680,16 @@ class User < ApplicationRecord
     UserRoleMapping.with_user_id(associated_user_ids).pluck(:user_role_id).uniq + PolicyUserRole.with_user_id(associated_user_ids).pluck(:user_role_id).uniq
   end
 
+  def has_permission?(permissions)
+    return true if permissions.blank?
+
+    permissions = [permissions] unless permissions.respond_to?(:each)
+    return true if permissions.include?(:admin) and admin?(RequestStoreUtil.current_app)
+    return true if has_roles?(permissions)
+
+    false
+  end
+
   protected
 
   # Checks whether a password is needed or not. For validations only.

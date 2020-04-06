@@ -268,9 +268,12 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
   }
 
-
   scope :with_status_id, -> (status_id) {
-    where invoice_status_id: status_id
+    if status_id == 99
+      where(invoice_status_id: InwardInvoiceStatus.id_for(:processing), controlling_user_id: RequestStoreUtil.current_user&.id).where.not(controlling_user_id: nil)
+    else
+      where(invoice_status_id: status_id)
+    end
   }
 
   scope :filter_payable_invoices, -> (enabled) {

@@ -99,19 +99,11 @@ class Menu::Item
   def authorized?(options = {})
     current_user = options[:current_user]
     return false unless current_user.present?
-    return false unless has_permission?(current_user)
+    return false unless current_user.has_permission?(permissions)
     return false unless company_subscribed?(current_user)
     return false unless user_subscribed?(current_user)
 
     true
-  end
-
-  def has_permission?(user)
-    return true if permissions.blank?
-    return true if user.admin?
-    return true if user.has_roles?(permissions)
-
-    false
   end
 
   def company_subscribed?(user)

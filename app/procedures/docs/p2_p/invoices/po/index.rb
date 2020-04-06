@@ -1,4 +1,4 @@
-class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
+class Docs::P2P::Invoices::Po::Index < Docs::P2P::Invoices::Index
 
   resolver 'invoices.po'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "po"
@@ -7,6 +7,10 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
   column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
     text value: "{{record.vendor.business_name}}", format: 'primary'
     text value: "Vendor ID: {{record.vendor.vendor_id}}"
+  end
+
+  column :status, default: true do
+    badge value: "{{record.status.name | upcase}}", format: :format_status
   end
 
   column :created_by, default: true, includes: [:created_by] do
@@ -94,27 +98,8 @@ class Docs::P2P::Invoices::Po::Index < IndexBuilder::API
     text value: "{{record.shipping_location.name}}"
   end
 
-  counter -> (collection) do
-    counter = IndexBuilder::Counter.new :invoice_status_id
-    counts = collection.group(:invoice_status_id).count
-    counter.add nil, "All", counts.values.reduce(0, :+)
-    InwardInvoiceStatus.all.each do |status|
-      counter.add status.id, status.name.humanize, counts[status.id]
-    end
-    counter
-  end
-
-
-  def self.cost_center_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
-
-    record_exposure.cost_center&.name
-  end
-
-  def self.department_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
-
-    record_exposure.department&.name
+  def self.awaiting_approval_roles
+    :po_invoice_reviewer
   end
 
 end
