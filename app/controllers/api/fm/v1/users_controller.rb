@@ -2,8 +2,8 @@ class Api::Fm::V1::UsersController < ApiApplicationController
 
   def create
     formatted_params = RequestFormatter::ApiParser::FmParser::V1::Users::Create.(current_user, params).formatted_request
-    @result = User::Create.(current_user, formatted_params)
-    respond response: (@result&.success? ? :success : :failure)
+    @result = Users::Create.(current_user, formatted_params)
+    respond
   end
 
   def index
@@ -17,6 +17,7 @@ class Api::Fm::V1::UsersController < ApiApplicationController
   end
 
   def update
+    binding.pry
     params[:validate_password] = false
     unless params[:type]
       respond(response: :failure, message: 'Error while updating status. Type not found')
@@ -47,6 +48,18 @@ class Api::Fm::V1::UsersController < ApiApplicationController
       respond(response: :success, message: success_message)
     else
       respond response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+    end
+  end
+
+  def deactivate
+    params[:validate_password] = false
+    params[:active] = false
+    @result = User::Configuration::UpdateState.(current_user, params)
+    success_message = 'Status updated'
+    if @result&.success?
+      respond(response: :success, message: success_message)
+    else
+      respond response: :failure, message: (@result&.messages[:error] || 'Error while Deactivate user')
     end
   end
 
