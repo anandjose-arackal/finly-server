@@ -1,4 +1,4 @@
-class Docs::P2P::Vendors::FilterConfig < Filters::API
+class Masters::Vendors::FilterConfig < Filters::API
 
   attribute :vendor_id, type: :text, simple: true
   attribute :legal_name, type: :text, simple: true

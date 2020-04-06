@@ -1,6 +1,6 @@
-class Docs::P2P::Vendors::Action < ActionManager::API
+class Masters::Vendors::Action < ActionManager::API
 
-  scope policy: Docs::P2P::Vendors::Policy, model: YesBankVendor do
+  scope policy: Masters::Vendors::Policy, model: YesBankVendor do
 
     scope permissions: :admin do
 

@@ -1,4 +1,4 @@
-class Docs::P2P::Vendors::Policy < ApplicationPolicy
+class Masters::Vendors::Policy < ApplicationPolicy
 
   def create?
     true

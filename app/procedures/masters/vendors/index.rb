@@ -1,4 +1,4 @@
-class Docs::P2P::Vendors::Index < IndexBuilder::API
+class Masters::Vendors::Index < IndexBuilder::API
 
   resolver 'vendors.index'
   reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "po"
