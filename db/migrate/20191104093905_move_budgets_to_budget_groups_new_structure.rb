@@ -1,7 +1,7 @@
 class MoveBudgetsToBudgetGroupsNewStructure < ActiveRecord::Migration[5.2]
   def change
     # TODO - temporarily commenting this so that it can be changed later
-    
+
     # Budget.all.each do |budget|
     #   budget_criteria_mappings = budget.budget_criteria_mappings
     #   mapping_attributes = []

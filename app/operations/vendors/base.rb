@@ -171,8 +171,8 @@ class Vendors::Base < BaseOperation
     if vendor.present? && vendor.is_a?(YesBankVendor)
       if self.vendor.bank_accounts.present?
         account_numbers = self.vendor.bank_accounts.map(&:account_number)
-        duplicate_account_numbers =[]
-        self.vendor.bank_accounts.group_by{|bank_account|[bank_account.account_number, bank_account.ifsc]}.map{|key,data| duplicate_account_numbers << data.pluck(:account_number).uniq if data.count > 1};nil
+        duplicate_account_numbers = []
+        self.vendor.bank_accounts.group_by {|bank_account| [bank_account.account_number, bank_account.ifsc]}.map {|key, data| duplicate_account_numbers << data.pluck(:account_number).uniq if data.count > 1}; nil
         if duplicate_account_numbers.present?
           add_message :error, "Duplicate records found for account numbers #{duplicate_account_numbers.join(', ')}"  
         end

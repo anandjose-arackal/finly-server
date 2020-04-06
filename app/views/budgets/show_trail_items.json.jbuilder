@@ -82,7 +82,7 @@ json.budget_trail_items do
       end
     end
 
-   when 'purchase_request_items'
+  when 'purchase_request_items'
     json.purchase_request_items do
       json.array!(purchase_request_items) do |purchase_request_item|
         json.index index
@@ -117,5 +117,5 @@ json.budget_trail_items_count do
     json.paginated_entities_count invoice_items.count
   when 'purchase_request_items'
     json.paginated_entities_count purchase_request_items.count
-  end 
+  end
 end

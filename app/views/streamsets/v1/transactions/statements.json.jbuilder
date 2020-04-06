@@ -1,4 +1,7 @@
 # These fields are a replica of Payment Ticket Exports
+# if adding a method from reference_resource in the root, make sure it responds to that method. otherwise this would fail
+# not all reference_resources share the same attributes
+# 
 json.result do
   json.array!(@result.paginated_payments) do |payment|
     # standard fields
@@ -7,12 +10,12 @@ json.result do
     json.created_at payment.created_at.strftime("%Y-%m-%d %H:%M:%S")
     json.payment_ticket_id payment.payment_order&.bank_payment_request&.id
     json.payment_ticket_name payment.payment_order&.bank_payment_request&.name
-    
+
     case payment.receiving_account.class.name
     when 'UserPocket', 'UserWallet', 'Card'
-        beneficiary_name = payment.receiving_account&.user&.name
+      beneficiary_name = payment.receiving_account&.user&.name
     else
-        beneficiary_name = payment.receiving_account&.try(:account_owner).try(:name)
+      beneficiary_name = payment.receiving_account&.try(:account_owner).try(:name)
     end
 
     json.beneficiary_name beneficiary_name
@@ -29,7 +32,7 @@ json.result do
     json.payment_order_schedule_date payment.payment_order&.scheduled_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.payment_order_submitted_date payment.payment_order&.bank_payment_request&.submitted_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.payment_order_processed_date payment.payment_order&.processed_at&.strftime("%Y-%m-%d %H:%M:%S")
-    json.bank_reference_number payment.reference_resource&.bank_reference_number
+    json.bank_reference_number payment.reference_resource&.try(:bank_reference_number)
     json.finance_approved_date payment.payment_order&.bank_payment_request&.approved_at&.strftime("%Y-%m-%d %H:%M:%S")
     json.note payment.note
 
