@@ -8,7 +8,7 @@ class Budgets::NewBudgetsConfig < Budgets::Base
 
   def process
     company_budgets = user.company.budgets
-    
+
     # self.root_budgets = user.company.budgets.roots.reorder(end_date: :desc)
     self.root_budgets = company_budgets.roots.reorder(end_date: :desc)
 

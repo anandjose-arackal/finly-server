@@ -87,6 +87,8 @@ class BbpsBillerSubscription < ApplicationRecord
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
 
+  scope :filter_ids, -> (ids) {where(id: ids)}
+
   scope :with_ids, -> (ids) {
     where(id: ids)
   }

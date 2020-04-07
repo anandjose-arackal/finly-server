@@ -115,7 +115,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     self.user_count = grouped_reports.keys.size
     grouped_reports.each do |key, reports_array|
       user = User.find key
-      report_currency_map = reports_array.group_by{|report|  report.policy.settlement_currency.country_code}
+      report_currency_map = reports_array.group_by {|report| report.policy.settlement_currency.country_code}
       report_currency_map.each do |settlement_currency_code, currency_report_array|
         report_ids = currency_report_array.pluck(:id)
         settlement_currency = Currency.currency_for(settlement_currency_code)
@@ -123,14 +123,14 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         currency_report_ids = currency_reports.pluck(:id)
         #expenses = all_report_associated_expenses.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
         #reimbursements = all_report_associated_expenses.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
-        expenses = currency_reports.map{|rpt| rpt.total_amount([],{currency_code: settlement_currency_code })}.inject(:+)
-        reimbursements = currency_reports.map{|rpt| rpt.reimbursable_expenses({currency_code: settlement_currency_code })}.inject(:+)
+        expenses = currency_reports.map {|rpt| rpt.total_amount([], {currency_code: settlement_currency_code})}.inject(:+)
+        reimbursements = currency_reports.map {|rpt| rpt.reimbursable_expenses({currency_code: settlement_currency_code})}.inject(:+)
         self.reimbursement_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.reimbursement_total[settlement_currency_code].nil?
         self.reimbursement_total[settlement_currency_code].value += reimbursements
         self.expenses_total[settlement_currency_code] = Amount.new(value: 0, currency: settlement_currency) if self.expenses_total[settlement_currency_code].nil?
         self.expenses_total[settlement_currency_code].value += expenses
         self.user_reports << {
-            user: user ,
+            user: user,
             expenses_total: Amount.new(value: expenses, currency: settlement_currency),
             reimbursement_total: Amount.new(value: reimbursements, currency: settlement_currency),
             reports: currency_reports,

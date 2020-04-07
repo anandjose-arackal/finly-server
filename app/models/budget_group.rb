@@ -37,7 +37,7 @@ class BudgetGroup < ApplicationRecord
 
   validate :check_for_valid_start_end_date
 
-  default_scope { order(created_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -93,20 +93,20 @@ class BudgetGroup < ApplicationRecord
 
   def as_json(options = {})
     {
-      id: id,
-      name: name,
-      created_by_user: created_by_user&.name,
-      created_at: created_at.strftime("%d-%b-%Y"),
-      period_id: period_id,
-      period: period&.name,
-      purchase_order: purchase_order,
-      invoice: invoice,
-      purchase_request: purchase_request,
-      payment: payment,
-      expense: expense,
-      start_date: self.start_date&.strftime("%d-%b-%Y"),
-      end_date: self.end_date&.strftime("%d-%b-%Y"),
-      total_budgets: self.budgets.count
+        id: id,
+        name: name,
+        created_by_user: created_by_user&.name,
+        created_at: created_at.strftime("%d-%b-%Y"),
+        period_id: period_id,
+        period: period&.name,
+        purchase_order: purchase_order,
+        invoice: invoice,
+        purchase_request: purchase_request,
+        payment: payment,
+        expense: expense,
+        start_date: self.start_date&.strftime("%d-%b-%Y"),
+        end_date: self.end_date&.strftime("%d-%b-%Y"),
+        total_budgets: self.budgets.count
     }
   end
 

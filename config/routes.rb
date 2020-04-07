@@ -2847,9 +2847,11 @@ Rails.application.routes.draw do
       namespace :v1 do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
-        patch 'users/deactivate/:id', to: 'users#deactivate_user'
         post 'users/:id', to: 'users#update'
         resources :users, only: [:create, :show, :index, :update]
+        resources :users do
+          delete 'deactivate', to: 'users#deactivate'
+        end
         resources :cards, only: [:index, :show]
         resources :cards do
           get 'transactions', to: 'cards#transactions'
@@ -3884,7 +3886,7 @@ Rails.application.routes.draw do
 
   resources :budget_groups do
   end
-  get 'budget_groups/:id/budget_group_criteria',to: 'budget_group_criteria#index'
+  get 'budget_groups/:id/budget_group_criteria', to: 'budget_group_criteria#index'
   resources :budget_group_criteria, except: [:index]
   ######## Budget apis end #########
 

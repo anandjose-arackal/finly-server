@@ -122,7 +122,7 @@ class BbpsBillsFetch < ApplicationJob
       }
       op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
       if op.success?
-        new_bill = op['result']['model']
+        new_bill = op['model']
         Docs::UtilityBills::Bills::Mailers::New::Autofetched.(params: {record: new_bill}, current_user: User.first)
       end
     else
@@ -137,7 +137,11 @@ class BbpsBillsFetch < ApplicationJob
           subscription_id: subscription.id,
           autofetched: autofetched
       }
-      op = Docs::UtilityBills::Bills::Ops::Create.(params)
+      op = Docs::UtilityBills::Bills::Ops::Create.(params: params, current_user: User.first)
+      if op.success?
+        new_bill = op['model']
+        Docs::UtilityBills::Bills::Mailers::New::Manual.(params: {record: new_bill}, current_user: User.first)
+      end
     end
   end
 

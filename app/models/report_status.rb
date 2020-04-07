@@ -119,9 +119,9 @@ class ReportStatus < ApplicationRecord
     [
         ReportStatus.id_for(:approved),
         ReportStatus.id_for(:auto_approved),
-        # ReportStatus.id_for(:settled),
-        # ReportStatus.id_for(:settlement_confirmed),
-        # ReportStatus.id_for(:closed),
+    # ReportStatus.id_for(:settled),
+    # ReportStatus.id_for(:settlement_confirmed),
+    # ReportStatus.id_for(:closed),
     ]
   end
 
