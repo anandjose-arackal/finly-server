@@ -12,7 +12,8 @@
 #
 
 class KotakBankCompanyAccount < ApplicationRecord
-
+  include Accountable
+  
   belongs_to :company
   belongs_to :balance, class_name: "Amount", optional: true
 
