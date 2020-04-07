@@ -25,7 +25,7 @@ class Docs::P2P::PurchaseRequests::Index < IndexBuilder::API
   end
 
   column :status, sort: :status_name, default: true, includes: [:status] do
-    text value: "{{record.status.name | upcase}}", format: :format_status
+    badge value: "{{record.status.name | upcase}}", format: :format_status
   end
 
   column :policy, default: true, includes: [:policy] do
