@@ -1,6 +1,6 @@
 class Masters::Vendors::FilterConfig < Filters::API
 
-  attribute :vendor_id, type: :text, simple: true
+  attribute :vendor_id, label: "Vendor ID", type: :text, simple: true
   attribute :legal_name, type: :text, simple: true
   attribute :trade_name, type: :text, simple: true
   attribute :created_at, type: :datetime, simple: false

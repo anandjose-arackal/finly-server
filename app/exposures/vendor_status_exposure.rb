@@ -1,5 +1,7 @@
 class VendorStatusExposure < Exposures::API
 
-  attribute :name, record_attribute: true
+  attribute :name do
+    record.name.humanize
+  end
 
 end

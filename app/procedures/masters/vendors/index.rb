@@ -13,36 +13,35 @@ class Masters::Vendors::Index < IndexBuilder::API
     badge value: :vendor_id, format: "success"
   end
 
-  column :created_by, default: true, includes: [:created_by] do
-    text value: "{{record.created_by.name}}"
-    text value: "{{record.created_by.email}}"
-  end
-
   column :created_at, sort: :created_at do
     date value: :created_at
-  end
-
-  column :gst_registered do
-    text value: :is_gst_registered
   end
 
   column :vendor_type, sort: :vendor_type_name, default: true do
     text value: "{{record.vendor_type.name}}"
   end
 
-  column :gstin, includes: [:gstin_locations] do
+  column :status, default: true, includes: [:status] do
+    badge value: "{{record.status.name | upcase}}", format: :format_status
+  end
+
+  column :gst_registered, default: true do
+    text value: :is_gst_registered
+  end
+
+  column :gstin, default: true, includes: [:gstin_locations] do
     text value: :vendor_gstin
   end
 
-  column :locations, includes: [:gstin_locations] do
+  column :locations, default: true, includes: [:gstin_locations] do
     text value: :vendor_locations
   end
 
-  column :submitted_at, sort: :submitted_at, default: false do
+  column :submitted_at, sort: :submitted_at do
     date value: :submitted_at
   end
 
-  column :approved_at, sort: :approved_at, default: true do
+  column :approved_at, sort: :approved_at do
     date value: :approved_at
   end
 
@@ -50,12 +49,13 @@ class Masters::Vendors::Index < IndexBuilder::API
     text value: :pan
   end
 
-  column :pan do
+  column :policy, default: true do
     text value: "{{record.policy.name}}"
   end
 
-  column :status do
-    badge value: "{{record.status.name}}", format: :format_status
+  column :created_by, default: true, includes: [:created_by] do
+    text value: "{{record.created_by.name}}"
+    text value: "{{record.created_by.email}}"
   end
 
   counter -> (user, collection) do
@@ -92,18 +92,16 @@ class Masters::Vendors::Index < IndexBuilder::API
     case record.status&.name&.to_s&.to_sym
     when :rejected
       format = 'danger'
-    when :paid, :approved, :closed, :auto_approved
+    when :approved, :auto_approved
       format = 'success'
-    when :processing
+    when :awaiting_approval
       if record.controlling_user_id == user
         format = 'warning'
       else
         format = 'info'
       end
-    when :open, :retracted, :pending, :voided, :initiated
+    when :draft, :retracted, :deactivated
       format = 'info'
-    when :unpaid, :partially_paid
-      format = 'warning'
     else
       format = 'danger'
     end
