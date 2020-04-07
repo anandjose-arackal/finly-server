@@ -121,6 +121,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def after_tax_amount
+
     self.net_amount&.value.to_f
   end
 
