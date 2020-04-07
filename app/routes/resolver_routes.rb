@@ -7,6 +7,8 @@ Resolver::Router.draw do
   #   route "departments", Masters::Departments::AutoComplete, :department_2, options: {company: 156, env: :dev}
   #   route "departments", :department
   # end
+
+  # Masters
   scope :department do
     route "default", Masters::Departments::Resolver
   end
@@ -23,17 +25,6 @@ Resolver::Router.draw do
 
   scope :category do
     route 'default', Masters::Categories::Resolver
-  end
-
-  scope :trips do
-    route 'default', Docs::Trips::Resolver
-  end
-
-  scope :invoices do
-    route "default", Docs::P2P::Invoices::Resolver
-    route "po", Docs::P2P::Invoices::Resolver
-    route "non_po", Docs::P2P::Invoices::Resolver
-    route "agreement", Docs::P2P::Invoices::Resolver
   end
 
   scope :index_view_segments do
@@ -54,6 +45,22 @@ Resolver::Router.draw do
 
   scope :payment_terms do
     route 'default', Masters::PaymentTerms::Resolver
+  end
+
+  # Docs
+  scope :trips do
+    route 'default', Docs::Trips::Resolver
+  end
+
+  scope :invoices do
+    route "default", Docs::P2P::Invoices::Resolver
+    route "po", Docs::P2P::Invoices::Resolver
+    route "non_po", Docs::P2P::Invoices::Resolver
+    route "agreement", Docs::P2P::Invoices::Resolver
+  end
+
+  scope :purchase_requests do
+    route 'default', Docs::P2P::PurchaseRequests::Resolver
   end
 
 end

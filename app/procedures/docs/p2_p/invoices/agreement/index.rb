@@ -94,6 +94,10 @@ class Docs::P2P::Invoices::Agreement::Index < Docs::P2P::Invoices::Index
     date value: :approved_at
   end
 
+  column :policy, default: true, includes: [:policy] do
+    text value: "{{record.policy.name}}"
+  end
+
   def self.awaiting_approval_roles
     :agreement_invoice_reviewer
   end

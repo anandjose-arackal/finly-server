@@ -6,6 +6,7 @@ class Docs::P2P::Invoices::Po::FilterConfig < Filters::API
   attribute :updated_at, type: :datetime, simple: false
   attribute :date, label: "Invoice Date", type: :datetime, simple: true
   attribute :due_date, label: "Due Date", type: :datetime, simple: true
+  attribute :policy, type: :lookup, simple: true, auto_complete_route: 'policies'
   attribute :vendor_id, label: "Vendor", simple: true, type: :lookup,  auto_complete_route: "vendor"
   attribute :vendor_vendor_id, label: "Vendor ID"
   attribute :location_id, label: "Billing Location", type: :lookup, auto_complete_route: "locations"

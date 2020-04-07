@@ -7,10 +7,15 @@ AutoComplete::Router.draw do
   #   route "departments", Masters::Departments::AutoComplete, :department_2, options: {company: 156, env: :dev}
   #   route "departments", :department
   # end
+
+  # Masters
   route "departments", Masters::Departments::AutoComplete
   route "locations", Masters::Locations::AutoComplete
   route "cost_centers", Masters::CostCenters::AutoComplete
   route "categories", Masters::Categories::AutoComplete
   route "policies", Masters::Policies::AutoComplete
   route "vendor", Masters::Vendors::AutoComplete # Went with singular because plural was already being used by other areas of the app
+
+  # Docs
+  route 'purchase_requests', Docs::P2P::PurchaseRequests::AutoComplete
 end

@@ -46,6 +46,10 @@ class Docs::P2P::Invoices::Po::Index < Docs::P2P::Invoices::Index
     date value: :approved_at
   end
 
+  column :policy, default: true, includes: [:policy] do
+    text value: "{{record.policy.name}}"
+  end
+
   column :net_amount, default: true, includes: [net_amount: :currency] do
     amount value: "{{record.net_amount.value}}",
            currency_code: "{{record.net_amount.currency.country_code}}",
