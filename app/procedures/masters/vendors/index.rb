@@ -1,12 +1,16 @@
 class Masters::Vendors::Index < IndexBuilder::API
 
-  resolver 'vendors.index'
-  reference '{{record.id}}', procurement_id: '{{record.procurement_id}}', procurement_type: "po"
+  resolver 'vendors.default'
+  reference '{{record.id}}'
 
   # Fixed column is always default true
-  column :vendor, label: 'Vendor Details', fixed: true, sort: :vendor_business_name, includes: [:vendor] do
-    text value: "{{record.vendor.business_name}}", format: 'primary'
-    text value: "Vendor ID: {{record.vendor.vendor_id}}"
+  column :vendor, label: 'Name', fixed: true, sort: :business_name do
+    text value: "{{record.business_name}}", format: 'primary'
+    text value: :vendor_trade_name
+  end
+
+  column :vendor_id, sort: :vendor_id, label: "Vendor ID", default: true do
+    badge value: :vendor_id, format: "success"
   end
 
   column :created_by, default: true, includes: [:created_by] do
@@ -18,20 +22,20 @@ class Masters::Vendors::Index < IndexBuilder::API
     date value: :created_at
   end
 
-  column :invoice_id, sort: :invoice_id, label: "Invoice ID", default: true do
-    badge value: :invoice_id, format: "success"
+  column :gst_registered do
+    text value: :is_gst_registered
   end
 
-  column :invoice_number, default: true do
-    text value: :invoice_number
+  column :vendor_type, sort: :vendor_type_name, default: true do
+    text value: "{{record.vendor_type.name}}"
   end
 
-  column :invoice_date, sort: :invoice_date, default: true do
-    date value: :date
+  column :gstin, includes: [:gstin_locations] do
+    text value: :vendor_gstin
   end
 
-  column :due_date, sort: :due_date, default: true do
-    date value: :due_date
+  column :locations, includes: [:gstin_locations] do
+    text value: :vendor_locations
   end
 
   column :submitted_at, sort: :submitted_at, default: false do
@@ -42,79 +46,68 @@ class Masters::Vendors::Index < IndexBuilder::API
     date value: :approved_at
   end
 
-  column :net_amount, default: true, includes: [net_amount: :currency] do
-    amount value: "{{record.net_amount.value}}",
-           currency_code: "{{record.net_amount.currency.country_code}}",
-           currency_symbol: "{{record.net_amount.currency.symbol}}"
+  column :pan do
+    text value: :pan
   end
 
-  column :gross_amount, default: true, includes: [gross_amount: :currency] do
-    amount value: "{{record.gross_amount.value}}",
-           currency_code: "{{record.gross_amount.currency.country_code}}",
-           currency_symbol: "{{record.gross_amount.currency.symbol}}"
+  column :pan do
+    text value: "{{record.policy.name}}"
   end
 
-  column :balance_due, default: true, includes: [gross_amount: :currency] do
-    amount value: "{{record.balance_due.value}}",
-           currency_code: "{{record.balance_due.currency.country_code}}",
-           currency_symbol: "{{record.balance_due.currency.symbol}}"
+  column :status do
+    badge value: "{{record.status.name}}", format: :format_status
   end
 
-  column :tds_amount, default: true, includes: [tds_amount: :currency] do
-    amount value: "{{record.tds_amount.value}}",
-           currency_code: "{{record.tds_amount.currency.country_code}}",
-           currency_symbol: "{{record.tds_amount.currency.symbol}}"
-  end
-
-  column :tds_slab, default: true, includes: [:tds_slab] do
-    text value: "{{record.tds_slab.name}}"
-  end
-
-  column :po_number, sort: :po_number, default: true, includes: [{procurement: :purchase_order}] do
-    text value: :po_number
-  end
-
-  column :cost_center, default: true, includes: [:cost_center] do
-    text value: :cost_center_name
-  end
-
-  column :department, default: true, includes: [:department] do
-    text value: :department_name
-  end
-
-  column :vendor_location, default: false, includes: [:gstin_location] do
-    text value: "{{record.gstin_location.location}}"
-  end
-
-  column :billing_location, sort: :billing_location_name, default: false, includes: [:location] do
-    text value: "{{record.billing_location.name}}"
-  end
-
-  column :shipping_location, sort: :shipping_location_name, default: false, includes: [:delivery_location] do
-    text value: "{{record.shipping_location.name}}"
-  end
-
-  counter -> (collection) do
-    counter = IndexBuilder::Counter.new :invoice_status_id
-    counts = collection.group(:invoice_status_id).count
+  counter -> (user, collection) do
+    counter = IndexBuilder::Counter.new :status_id
+    counts = collection.group(:status_id).count
     counter.add nil, "All", counts.values.reduce(0, :+)
-    InwardInvoiceStatus.all.each do |status|
+    VendorStatus.all.each do |status|
       counter.add status.id, status.name.humanize, counts[status.id]
     end
     counter
   end
 
+  def self.is_gst_registered(user, record, record_exposure)
+    return "Yes" if record.gst_registered
 
-  def self.cost_center_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
-
-    record_exposure.cost_center&.name
+    "No"
   end
 
-  def self.department_name(user, record, record_exposure)
-    return "Multiple" if record_exposure.cost_allocation_items
+  def self.vendor_gstin(user, record, record_exposure)
+    record.gstin_locations.map(&:gstin).join(', ')
+  end
 
-    record_exposure.department&.name
+  def self.vendor_locations(user, record, record_exposure)
+    record.gstin_locations.map(&:location)
+  end
+
+  def self.vendor_trade_name(user, record, record_exposure)
+    return "Trade Name: #{record.trade_name}" if record.trade_name.present?
+
+    nil
+  end
+
+  def self.format_status(user, record, record_exposure)
+    case record.status&.name&.to_s&.to_sym
+    when :rejected
+      format = 'danger'
+    when :paid, :approved, :closed, :auto_approved
+      format = 'success'
+    when :processing
+      if record.controlling_user_id == user
+        format = 'warning'
+      else
+        format = 'info'
+      end
+    when :open, :retracted, :pending, :voided, :initiated
+      format = 'info'
+    when :unpaid, :partially_paid
+      format = 'warning'
+    else
+      format = 'danger'
+    end
+    format
   end
 
 end

@@ -34,7 +34,7 @@ class ActionManager::Validate < Transactions::API
   end
 
   def authorize_action(context, action:, params:, current_user:, **)
-    unless action.has_permission?(current_user)
+    unless current_user.has_permission?(action.permissions)
       return on_error context, :base, "Unauthorized!"
     end
 

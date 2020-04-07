@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_30_111704) do
+ActiveRecord::Schema.define(version: 2020_03_31_225347) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4052,6 +4052,9 @@ ActiveRecord::Schema.define(version: 2020_03_30_111704) do
     t.string "controlling_entity_id"
     t.string "controlling_choice_id"
     t.string "controlling_choice_type"
+    t.string "controlling_entity_key"
+    t.string "dependent_entity_key"
+    t.integer "dependent_entity_id"
     t.index ["company_id"], name: "index_form_dependency_choice_mappings_on_company_id"
     t.index ["dependent_choice_id"], name: "index_form_dependency_choice_mappings_on_dependent_choice_id"
     t.index ["form_dependency_mapping_id"], name: "index_form_dependency_choice_mappings_form_dependency_choice_id"
@@ -4073,6 +4076,10 @@ ActiveRecord::Schema.define(version: 2020_03_30_111704) do
     t.datetime "deleted_at"
     t.boolean "has_dependent_choices"
     t.boolean "lazy_load_dependent_choices"
+    t.integer "dependent_entity_id"
+    t.string "dependent_entity_key"
+    t.integer "controlling_entity_id"
+    t.string "controlling_entity_key"
     t.index ["company_id"], name: "index_form_dependency_mappings_on_company_id"
     t.index ["controlling_choice_id"], name: "index_form_dependency_mappings_on_controlling_choice_id"
     t.index ["form_dependency_id"], name: "index_form_dependency_mappings_on_form_dependency_id"
@@ -4197,7 +4204,7 @@ ActiveRecord::Schema.define(version: 2020_03_30_111704) do
   create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
-    t.text "params"
+    t.text "params", limit: 16777215, collation: "utf8_bin"
     t.text "headers"
     t.string "act"
     t.string "premise"
@@ -6279,6 +6286,7 @@ ActiveRecord::Schema.define(version: 2020_03_30_111704) do
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["created_at"], name: "index_payments_on_created_at"
+    t.index ["date", "created_at"], name: "index_payments_on_date_and_created_at"
     t.index ["date"], name: "index_payments_on_date"
     t.index ["deleted_at"], name: "index_payments_on_deleted_at"
     t.index ["department_id"], name: "index_payments_on_department_id"

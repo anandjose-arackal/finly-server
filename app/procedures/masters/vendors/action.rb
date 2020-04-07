@@ -4,6 +4,12 @@ class Masters::Vendors::Action < ActionManager::API
 
     scope permissions: :admin do
 
+      action :redirect,
+             :create,
+             label: 'Add Vendor',
+             icon: 'https://img.icons8.com/windows/17/708090/--checkmark-yes.png',
+             url: 'vendor/add'
+
       action :button_group,
              :actions,
              contextual: true,
@@ -14,7 +20,7 @@ class Masters::Vendors::Action < ActionManager::API
                icon: "https://img.icons8.com/windows/17/708090/credit-control.png",
                url: "procure/inward_invoices/bulk_take_control.json",
                authorize: :take_control?
-        scope permissions: :po_invoice_reviewer do
+        scope permissions: :vendor_reviewer do
           action :transition,
                  :approve,
                  label: "Approve",
