@@ -69,7 +69,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   end
 
   def payment_order_id ( payment )
-    payment&.payment_order_id
+    payment&.payment_order&.bank_payment_request&.id
   end
   
   def payment_order_name ( payment )
@@ -163,7 +163,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment_type.eql?('PurchaseOrder')
       precision_value(payment&.parent&.total_after_tax&.value)
     elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.original_amount&.value || 0.0
+      payment&.parent&.original_amount&.value.to_f
     else
       original_amount_invoice(payment)
     end
@@ -174,9 +174,9 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment_type.eql?('PurchaseOrder')
       precision_value(payment&.parent&.advance_amount&.value)
     elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.advance_amount&.value || 0.0
+      payment&.parent&.advance_amount&.value.to_f
     else
-      payment&.invoice&.advance_amount&.value || 0.0
+      payment&.invoice&.advance_amount&.value.to_f
     end
   end
   
@@ -185,7 +185,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if ['PurchaseOrder', 'BeneficiaryPayment'].include? (payment_type)
       0.0
     else
-      payment&.invoice&.discount_amount&.value || 0.0
+      payment&.invoice&.discount_amount&.value.to_f
     end
   end
   
@@ -196,23 +196,24 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     elsif payment_type.eql?('BeneficiaryPayment')
       payment&.parent&.tax_amount&.value || 0
     else
-      payment&.invoice&.tax || 0.0
+      payment&.invoice&.tax.to_f
     end
   end
   
   def tds ( payment )
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
-      payment&.parent&.advance_tds_slab&.tds || 0.0
+      "#{payment&.parent&.advance_tds_slab&.tds.to_f} %"
     elsif payment_type.eql?('BeneficiaryPayment')
-      payment&.parent&.tds_amount&.value || 0
+      tds_value  = payment&.parent&.tds_amount
+      "#{tds_value&.value.to_f} #{tds_value&.currency&.country_code}"
     else
-      payment&.invoice&.tds || 0.0
+      "#{payment&.invoice&.tds.to_f} %"
     end
   end
   
   def net_payable_amount ( payment )
-    payment&.amount&.value || 0.0
+    payment&.amount&.value.to_f
   end
 
   def bank_reference_number ( payment )
@@ -236,12 +237,12 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
     if payment.invoice.present?
       invoice = payment.invoice
       if invoice&.invoice_items.present?
-        original_amount = (invoice.amount&.value || 0.0)
+        original_amount = (invoice.amount&.value.to_f)
       else
-        original_amount = (invoice&.original_amount&.value || 0.0)
+        original_amount = (invoice&.original_amount&.value.to_f)
       end
     else
-      original_amount = (payment&.amount&.value || 0.0)
+      original_amount = (payment&.amount&.value.to_f)
     end
     original_amount
   end
@@ -249,9 +250,9 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def tds_amount(payment)
     tds_amount = 0.0
     if payment.parent_type == 'PurchaseOrder'
-      tds_amount = (payment.parent.advance_tds_amount&.value || 0.0)
+      tds_amount = (payment.parent.advance_tds_amount&.value.to_f)
     else
-      tds_amount = (payment.invoice&.tds_amount&.value || 0.0)
+      tds_amount = (payment.invoice&.tds_amount&.value.to_f) 
     end
     tds_amount
   end
