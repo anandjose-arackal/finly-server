@@ -1074,7 +1074,7 @@ class Invoice < ApplicationRecord
   end
 
   def amount_before_tax
-    self.taxable_amount&.value.to_f
+    self.gross_amount&.value.to_f
   end
 
   def amount_after_tax
