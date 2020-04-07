@@ -13,6 +13,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
 
   attribute :entity_name #, column_name: "Entity Name", optional: false
   attribute :entity_type
+  attribute :pr_number
   attribute :po_number
   attribute :invoice_number
   attribute :payment_id
@@ -74,16 +75,28 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return "Payment to #{item.entity.receiving_user.name}"
     when "Expense"
       return "Expense at #{item.entity.merchant_name}"
+    when "PurchaseRequestItem"
+      return item.entity.item&.get_custom_description
     end
   end
 
   def entity_type(item)
-    item.entity_type
+    item.entity_type.underscore.humanize
+  end
+
+  def pr_number(item)
+    if item.entity.is_a?(PurchaseRequestItem)
+      return item.entity&.purchase_request&.order_number
+    elsif item.entity.is_a?(PurchaseOrderItem)
+      return item.entity&.purchase_request_item&.purchase_request&.order_number
+    end
   end
 
   def po_number(item)
     if item.entity.is_a?(PurchaseOrderItem)
       return item.entity.purchase_order.po_number
+    elsif item.entity.is_a?(InvoiceLineItem)
+      return item.entity.purchase_order_item&.purchase_order&.po_number
     end
     ""
   end
@@ -118,6 +131,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return item.entity.report.department&.name
     elsif item.entity.is_a?(Payment)
       return item.entity.department&.name
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.department&.name
     end
     ""
   end
@@ -130,6 +145,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     elsif item.entity&.is_a?(Expense)
       return item.entity.report.cost_center&.name
     elsif item.entity.is_a?(Payment)
+      return item.entity.cost_center&.name
+    elsif item.entity.is_a?(PurchaseRequestItem)
       return item.entity.cost_center&.name
     end
     ""
@@ -144,6 +161,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       ""
     elsif item.entity.is_a?(Payment)
       return item.entity.location&.name
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.purchase_request.location&.name
     end
     ""
   end
@@ -168,6 +187,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       else
         return ""
       end
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.category&.name
     end
     ""
   end
@@ -182,6 +203,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return item.entity.amount&.value
     elsif item.entity.is_a?(Expense)
       return item.entity.amount&.value
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.estimated_amount&.value
     end
     ""
   end
@@ -268,6 +291,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return item.entity.parent.vendor&.name || item.entity.parent.vendor&.business_name
     elsif item.entity.is_a?(Payment)
       return item.entity.receiving_user&.name
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.purchase_request.vendor&.name || item.entity.purchase_request.vendor&.business_name
     end
     ""
   end
@@ -285,6 +310,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return item.entity.bank_payment_request.submitted_at&.strftime("%d %B, %Y")
     elsif item.entity.is_a?(Expense)
       return item.entity.report.submitted_at&.strftime("%d %B, %Y")
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.purchase_request.submitted_at&.strftime("%d %B, %Y")
     end
   end
 
@@ -297,6 +324,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
       return item.entity.initiating_user&.name
     elsif item.entity.is_a?(Expense)
       return item.entity.user&.name
+    elsif item.entity.is_a?(PurchaseRequestItem)
+      return item.entity.purchase_request.created&.name
     end
     ""
   end

@@ -11,7 +11,6 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
   validate :input
 
   attribute :serial_no
-  attribute :budget_name
   attribute :budget_criteria_name
   attribute :budget_start_date
   attribute :budget_end_date
@@ -38,9 +37,9 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
     return self.index
   end
 
-  def budget_name(budget)
-    budget.name
-  end
+  # def budget_name(budget)
+  #   budget.name
+  # end
 
   def budget_criteria_name(budget)
     budget.budget_group_criterium.name

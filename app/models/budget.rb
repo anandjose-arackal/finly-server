@@ -64,7 +64,7 @@ class Budget < ApplicationRecord
   has_many :budget_modification_trails
   has_one :budget_consumption
 
-  accepts_nested_attributes_for :budget_amount
+  accepts_nested_attributes_for :budget_amount, :spent_amount
   accepts_nested_attributes_for :budget_criteria_mappings
 
   validates :name, presence: true

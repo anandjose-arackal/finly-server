@@ -111,7 +111,7 @@ class BudgetGroup < ApplicationRecord
       start_date: self.start_date&.strftime("%d-%b-%Y"),
       end_date: self.end_date&.strftime("%d-%b-%Y"),
       total_amount: self.budgets.joins(:budget_amount).sum(:value),
-      consumed_amount: 0,
+      consumed_amount: self.budgets.joins(:spent_amount).sum(:value),
       total_budgets: self.budgets.count
     }
   end

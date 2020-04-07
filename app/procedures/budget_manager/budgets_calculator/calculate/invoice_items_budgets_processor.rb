@@ -88,6 +88,8 @@ class BudgetManager::BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor 
         rcm_tax_value: rcm_tax_value,
         paid_amount_after_tax_value: paid_amount_after_tax,
         effective_paid_amount_before_tax_value: paid_amount_before_tax,
+        cn_adjusted_amount_after_tax_value: invoice_item.cn_adjusted_amount_with_tax,
+        cn_adjusted_amount_before_tax_value: invoice_item.cn_adjusted_amount_without_tax,
         amount_attributes: {
             id: trail&.amount&.id,
             value: invoice_item.after_tax_amount,

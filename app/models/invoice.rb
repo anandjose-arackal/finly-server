@@ -180,6 +180,7 @@ class Invoice < ApplicationRecord
   has_many :trails, as: :parent
   has_many :notify_users, as: :document
   has_many :credit_note_adjustments, dependent: :destroy
+  has_many :credit_notes, through: :credit_note_adjustments
 
 
   accepts_nested_attributes_for :address
@@ -1109,6 +1110,10 @@ class Invoice < ApplicationRecord
 
   def advance_per_item
     self.advance_amount&.value.to_f / self.items.count
+  end
+
+  def cn_adjustment_per_item
+    precision_value(self.invoice.credit_note_adjustments.joins(:amount).sum(:value) / self.items.count)
   end
 
   private

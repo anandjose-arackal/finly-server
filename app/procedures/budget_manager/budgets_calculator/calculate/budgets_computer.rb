@@ -96,11 +96,13 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
         invoice_item_amount_to_be_considered = "billed_amount_after_tax_value"
         paid_amount_to_be_considered = "paid_amount_after_tax_value"
         payment_processing_amount_to_be_considered = "payment_processing_amount_after_tax_value"
+        cn_adjusted_amount_to_be_considered = "cn_adjusted_amount_after_tax_value"
       when :amount_before_tax
         po_item_amount_to_be_considered = "remaining_amount_before_tax_value"
         invoice_item_amount_to_be_considered = "billed_amount_before_tax_value"
         paid_amount_to_be_considered = "effective_paid_amount_before_tax_value"
         payment_processing_amount_to_be_considered = "payment_processing_amount_before_tax_value"
+        cn_adjusted_amount_to_be_considered = "cn_adjusted_amount_before_tax_value"
       end
 
       # calculating pending amount - PurchaseRequests that are approved or auto approved and POs that are everything below approved will come under pending
@@ -118,12 +120,12 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
 
       # this is so that RCM enabled item's taxes remain in the committed bucket
       if amount_to_be_considered == :amount_after_tax
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
         committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").sum("rcm_tax_value")
       else
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
-        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_committed_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
+        committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_pending_payment_bucket).sum("#{invoice_item_amount_to_be_considered} - #{paid_amount_to_be_considered} - #{payment_processing_amount_to_be_considered} - #{cn_adjusted_amount_to_be_considered}")
         # committed_amount += self.budget_trails.with_entity_type("InvoiceLineItem").with_entity_status_id(InwardInvoiceStatus.ids_for_tds_in_committed_bucket).sum("tds_value")
       end
 
@@ -214,6 +216,15 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
                                      id: self.budget_consumption.total_consumed_amount_id,
                                      value: total_consumed_amount
                                  }
+      )
+
+      # also assigning the spent amount for a budget in the budget model
+      self.budget.assign_attributes(
+                     spent_amount_attributes: {
+                         id: self.budget.spent_amount_id,
+                         value: total_consumed_amount,
+                         currency_id: 1
+                     }
       )
     end
     true

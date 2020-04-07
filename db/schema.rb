@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_05_071906) do
+ActiveRecord::Schema.define(version: 2020_04_06_144513) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1593,6 +1593,8 @@ ActiveRecord::Schema.define(version: 2020_04_05_071906) do
     t.decimal "rcm_tax_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "paid_tds_value", precision: 20, scale: 10, default: "0.0"
     t.decimal "processing_tds_value", precision: 20, default: "0"
+    t.decimal "cn_adjusted_amount_before_tax_value", precision: 20, scale: 10, default: "0.0"
+    t.decimal "cn_adjusted_amount_after_tax_value", precision: 20, scale: 10, default: "0.0"
     t.index ["entity_type", "entity_id"], name: "index_budget_trails_on_entity_type_and_entity_id"
   end
 
