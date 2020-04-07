@@ -18,7 +18,7 @@ class HoverCard::API < Transactions::API
   step :render
 
   def find_model(context, params:, current_user:, **)
-    context['model'] = context['result.model'] = self.class.model.find_by(id: params[:id])
+    context['model'] = context['result.model'] = self.class.model.find_by(company_id: current_user.company_id, id: params[:id])
     context['model'].present?
   end
 
@@ -26,6 +26,7 @@ class HoverCard::API < Transactions::API
     policy = self.class.policy&.new(current_user, model)
     if policy.present? and not policy.send(self.class.policy_action)
       context[:'result.authorization'] = Failure(message: 'Breach')
+      return false
     end
 
     true
