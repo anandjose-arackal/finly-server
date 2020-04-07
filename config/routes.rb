@@ -4226,6 +4226,9 @@ Rails.application.routes.draw do
   get 'actions/:route/validate', to: "actions#validate"
 
   resources :views, controller: 'index_view_segments', except: [:show]
+
+  get 'cards/:route/:id', to: 'hover_card#route'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   # The priority is based upon order of creation: first created -> highest priority.

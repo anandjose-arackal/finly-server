@@ -63,6 +63,10 @@ class IndexBuilder::ContentTypes::Base
       end
       data[attribute[:name]] = value
     end
+    format_value(context, user, record, exposure, data)
+  end
+
+  def format_value(context, user, record, exposure, data)
     data
   end
 
