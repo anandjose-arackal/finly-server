@@ -27,6 +27,11 @@ class BudgetManager::BudgetGroupCriteria::AsyncBudgetsCreator < Transactions::AP
           user_id: budget_group_criteria.budget_group.created_by_user_id,
           budget_date_type_id: budget_group_criteria.budget_group.budget_date_type_id,
           calculated_before_tax_amount: budget_group_criteria.budget_group.calculated_before_tax_amount,
+          expense: budget_group.expense,
+          purchase_order: budget_group.purchase_order,
+          payment: budget_group.payment,
+          invoice: budget_group.invoice,
+          purchase_request: budget_group.purchase_request,
           budget_amount_attributes: {
               value: 0,
               currency_id: 1
