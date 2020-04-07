@@ -71,6 +71,8 @@ class BudgetTrail < ApplicationRecord
 
   after_save :set_po_trail_attributes
 
+  after_destroy :set_po_trail_attributes
+
   accepts_nested_attributes_for :amount, :amount_after_tax, :amount_before_tax
 
   scope :within_date, -> (start_date, end_date, date_to_be_considered) {
