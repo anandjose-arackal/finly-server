@@ -1217,6 +1217,24 @@ class User < ApplicationRecord
         status: self.active
       }
       return data
+    elsif options[:streamsets]
+      {
+        id: id,
+        name: name,
+        email: email,
+        employee_id: self.profile&.employee_id,
+        mobile_number: self.mobile_number,
+        location_name: self.location&.name,
+        department_name: self.department&.full_name,
+        status: self.active,
+        full_address: self.profile&.full_address,
+        address_1: self.profile&.address_1,
+        address_2: self.profile&.address_2,
+        pin_code: self.profile&.pin_code,
+        city: self.profile&.city,
+        state_id: self.profile&.state_id,
+        state_name: self.profile&.state_name
+      }
     else
       {
           id: id,

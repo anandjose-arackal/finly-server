@@ -19,7 +19,7 @@ json.result do
     json.created_by vendor.created_by&.name
     json.created_at vendor.created_at.strftime "%d %b %y"
     json.updated_at vendor.updated_at.strftime "%d %b %y"
-    json.vendor_creator vendor.created_by&.json_for_trail({:vendor_show => true})
+    json.vendor_creator vendor.created_by&.json_for_trail({:streamsets => true})
 
     json.tds_rates vendor.tds_rates&.as_json
     json.tds_available vendor.tds_rates.present?
