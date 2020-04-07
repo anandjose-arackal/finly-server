@@ -218,7 +218,7 @@ class InvoiceLineItem < ApplicationRecord
     adjusted_amount = (applied_credit_notes.joins(:gross_receivable_amount).sum(:value)) * ((self.before_tax_amount) / (self.parent.amount_before_tax))
     adjusted_amount
   end
-  
+
 
   private
 
