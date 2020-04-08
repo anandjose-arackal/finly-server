@@ -1,4 +1,4 @@
-class BankTransfer::VendorTypes::BulkDestroy < BankTransfer::VendorTypes::Base
+class BankTransfer::VendorTypes::Destroy < BankTransfer::VendorTypes::Base
   attr_accessor :vendor_type
 
   def init
