@@ -33,6 +33,7 @@ json.budget_trail_items do
     # list of payments that need to be processed
     json.payments do
       json.array!(payments) do |payment|
+        json.id payment.id
         json.vendor payment.receiving_user&.business_name || payment.receiving_account&.name
         json.category_name payment.category&.name
         json.department payment.department&.name
