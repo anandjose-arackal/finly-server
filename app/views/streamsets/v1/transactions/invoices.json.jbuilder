@@ -71,7 +71,7 @@ json.result do
     json.line_item_type invoice_line_item&.inventory_line_item&.supply_item_type&.name&.humanize
     json.line_item_expense_type invoice_line_item&.inventory_line_item&.item_expense_type&.name&.humanize
     json.nature_of_item invoice_line_item&.inventory_line_item&.product_type&.name&.humanize
-    json.user invoice.created_by&.json_for_trail({:vendor_show => true})
+    json.user invoice.created_by&.json_for_trail({:streamsets => true})
     # extra fields
     json.buyer_location_state invoice.location&.state&.name
     json.buyer_location_code invoice.location&.location_code

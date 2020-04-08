@@ -156,7 +156,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         end
       end
 
-      # remove this check permanently, causing customer issue with their internal process of tds deduction
+      # remove this check permanently, causing customer issue with their internal process of tds deduction 
       #
       # if self.payment.parent.invoice_type_id == InwardInvoiceType.id_for(:tax_invoice)
       #   if purchase_order.advance_tds_slab_id.present? && (self.payment_params.dig(:invoice_attributes, :tds_slab_id).to_i != self.payment.parent.tds_slab_id) && purchase_order.advance_amount_required
