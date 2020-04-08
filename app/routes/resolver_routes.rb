@@ -63,4 +63,8 @@ Resolver::Router.draw do
     route 'default', Docs::P2P::PurchaseRequests::Resolver
   end
 
+  scope :purchase_orders do
+    route 'default', Docs::P2P::PurchaseOrders::Resolver
+  end
+
 end

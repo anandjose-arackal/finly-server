@@ -1,7 +1,7 @@
 class InwardInvoiceTypeExposure < Exposures::API
 
   def name
-    record.name
+    record.name.humanize
   end
 
 end

@@ -54,8 +54,7 @@ class Masters::Vendors::Index < IndexBuilder::API
   end
 
   column :created_by, default: true, includes: [:created_by] do
-    text value: "{{record.created_by.name}}"
-    text value: "{{record.created_by.email}}"
+    user value: :created_by
   end
 
   counter -> (user, collection) do

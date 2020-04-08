@@ -14,8 +14,7 @@ class Docs::P2P::Invoices::NonPo::Index < Docs::P2P::Invoices::Index
   end
 
   column :created_by, default: true, includes: [:created_by] do
-    text value: "{{record.created_by.name}}"
-    text value: "{{record.created_by.email}}"
+    user value: :created_by
   end
 
   column :created_at, default: true do
@@ -36,6 +35,10 @@ class Docs::P2P::Invoices::NonPo::Index < Docs::P2P::Invoices::Index
 
   column :due_date, default: true do
     date value: :due_date
+  end
+
+  column :due_in_days, sort: :due_date do
+    text value: :due_in_days
   end
 
   column :net_amount, default: true, includes: [net_amount: :currency] do

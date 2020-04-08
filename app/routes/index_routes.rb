@@ -7,4 +7,5 @@ IndexBuilder::Router.draw do
   route "invoices_non_po", Docs::P2P::Invoices::NonPo::Index
   route "invoices_agreement", Docs::P2P::Invoices::Agreement::Index
   route 'purchase_requests', Docs::P2P::PurchaseRequests::Index
+  route 'purchase_orders', Docs::P2P::PurchaseOrders::Index
 end

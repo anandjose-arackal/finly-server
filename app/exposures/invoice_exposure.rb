@@ -10,6 +10,14 @@ class InvoiceExposure < Exposures::API
   attribute :vendor, record_attribute: true, exposure: true, includes: [:vendor]
   attribute :date, record_attribute: true
   attribute :due_date, record_attribute: true
+  attribute :due_in_days do
+    next unless record.due_date.present?
+
+    days = record.due_date - Date.today
+    next unless days >= 0
+
+    days
+  end
   attribute :approved_at, record_attribute: true
   attribute :cost_center, record_attribute: true, exposure: true, includes: [:cost_center]
   attribute :department, record_attribute: true, exposure: true, includes: [:department]
@@ -59,7 +67,7 @@ class InvoiceExposure < Exposures::API
     record&.procurement&.purchase_order&.po_number
   end
   attribute :cost_allocation_items, record_attribute: true
-  attribute :status, record_attribute: true, exposure: true
+  attribute :status, record_attribute: true, exposure: true, includes: [:status]
 
   # def vendor_ref_num(invoice_line_item)
   #   invoice_line_item.parent&.vendor_id
