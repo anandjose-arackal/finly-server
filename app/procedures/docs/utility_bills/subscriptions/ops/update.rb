@@ -14,12 +14,22 @@ class Docs::UtilityBills::Subscriptions::Ops::Update < Transactions::API
 
   step :setup_dlrm
 
+  step :assign_poc_roles
+
   step :update_attachments
 
   step Transactions::Messages::SuccessMessage('Successfully Updated Utility Bill Master')
 
   def set_default_params(options, params:, current_user:, **)
     params[:subscription][:current_user] = current_user
+  end
+
+  def assign_poc_roles(options, model:, params:, **)
+    model.pocs.each do |poc|
+      pur = PolicyUserRole.find_or_initialize_by(user_id: poc.user_id, policy_id: model.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
+      pur.save
+    end
+    true
   end
 
   def update_attachments(options, params:, current_user:, model:, **)
