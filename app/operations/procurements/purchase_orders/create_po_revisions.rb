@@ -54,10 +54,13 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       if self.purchase_order.purchase_request_items.present?
         update_purchase_request_item
       end
-    end
 
-    if self.purchase_order.advance_payments.present?
-      self.purchase_order.advance_payments.update_all(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
+      # moving the advance payments along with the revised PO update
+      # changed the update_all to an update because callbacks need to be triggered for the
+      # payment object that will update the paid amount in the new, revised PO
+      if self.purchase_order.advance_payments.present?
+        self.purchase_order.advance_payments.update(parent_id: self.duplicate_po.id, purchase_order_id: self.duplicate_po.id)
+      end
     end
 
     self.klass.each_with_index do |k, kid| 
