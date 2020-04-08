@@ -12,6 +12,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Index < Transactions::API
   has_scope :filter_biller_id
   has_scope :filter_user_id
   has_scope :filter_ids, type: :array
+  has_scope :filter_creation_date, using: [:from, :to]
 
 
   step Policy::Pundit( Docs::UtilityBills::Subscriptions::Authorizer, :index? )

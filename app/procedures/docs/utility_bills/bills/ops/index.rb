@@ -20,6 +20,7 @@ class Docs::UtilityBills::Bills::Ops::Index < Transactions::API
   has_scope :filter_due_date, using: [:from, :to], type: :hash
   has_scope :filter_paid_on_date, using: [:from, :to], type: :hash
   has_scope :filter_amount, using: [:gteq, :lteq], type: :hash
+  has_scope :filter_creation_date, using: [:from, :to]
 
   has_scope :filter_payable_bills
   has_scope :filter_ids, type: :array
