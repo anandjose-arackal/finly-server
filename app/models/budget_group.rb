@@ -38,6 +38,7 @@ class BudgetGroup < ApplicationRecord
 
   validate :check_for_valid_start_end_date
 
+  before_save :set_start_and_end_date
   after_save :deactivate_budgets_if_deactivated
 
   default_scope { order(created_at: :desc) }
@@ -147,5 +148,11 @@ class BudgetGroup < ApplicationRecord
     unless self.active
       self.budgets.update(active: false)
     end
+  end
+
+  def set_start_and_end_date
+    # setting start and end date appropriately to adjust for timezone
+    self.start_date = self.start_date&.end_of_day
+    self.end_date = self.end_date&.beginning_of_day
   end
 end

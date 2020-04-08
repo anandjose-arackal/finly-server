@@ -235,6 +235,10 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       add_message(options, :error, :budget_consumption, "The budget consumption could not be saved because #{self.budget_consumption.errors.full_messages.to_sentence}")
       return false
     end
+    unless self.budget.save
+      add_message(options, :error, :budget, "Spent amount could not be saved")
+      return false
+    end
     return true
   end
 
