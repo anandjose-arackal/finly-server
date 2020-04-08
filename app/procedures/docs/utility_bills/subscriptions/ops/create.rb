@@ -86,7 +86,7 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
 
   def assign_poc_roles(options, model:, params:, **)
     model.pocs.each do |poc|
-      pur = PolicyUserRole.find_or_initialize_by(user_id: poc.user_id, policy_id: model.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
+      pur = PolicyUserRole.find_or_initialize_by(user_id: poc.id, policy_id: model.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
       pur.save
     end
     true
