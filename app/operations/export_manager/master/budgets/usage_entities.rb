@@ -325,7 +325,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     elsif item.entity.is_a?(Expense)
       return item.entity.user&.name
     elsif item.entity.is_a?(PurchaseRequestItem)
-      return item.entity.purchase_request.created&.name
+      return item.entity.purchase_request.creator&.name
     end
     ""
   end
