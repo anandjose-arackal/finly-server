@@ -76,7 +76,8 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     when "InvoiceLineItem"
       return item.entity.description
     when "Payment"
-      return "Payment to #{item.entity.receiving_user.name}"
+      entity_name = "Payment to #{item.entity.receiving_user.name || item.entity.receiving_user.business_name}" rescue ""
+      return entity_name
     when "Expense"
       return "Expense at #{item.entity.merchant_name}"
     when "PurchaseRequestItem"
