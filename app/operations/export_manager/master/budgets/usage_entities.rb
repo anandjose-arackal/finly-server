@@ -292,7 +292,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Builders::S
     elsif item.entity.is_a?(Payment)
       return item.entity.receiving_user&.name
     elsif item.entity.is_a?(PurchaseRequestItem)
-      return item.entity.purchase_request.vendor&.name || item.entity.purchase_request.vendor&.business_name
+      return item.entity.vendor&.name || item.entity.vendor&.business_name
     end
     ""
   end
