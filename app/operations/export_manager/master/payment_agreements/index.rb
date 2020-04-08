@@ -24,21 +24,55 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
 
   section :general_invoice do
     attribute :invoice_number
-    attribute
+    attribute :vendor_name
+    attribute :vendor_code
+    attribute :start_date
+    attribute :end_date
+    attribute :vendor_gstin
+    attribute :department
+    attribute :location
+    attribute :cost_center
+    attribute :billing_type
+    attribute :prepaid
+    attribute :invoice_frequency
   end
 
   section :rental_invoices do
-    attribute :test
+    attribute :invoice_number
+    attribute :vendor_name
+    attribute :vendor_code
+    attribute :start_date
+    attribute :end_date
+    attribute :lock_in_period
+    attribute :rent_free_period
+    attribute :tenancy_period
+    attribute :notice_period
+    attribute :square_feet
+    attribute :vendor_gstin
+    attribute :department
+    attribute :location
+    attribute :cost_center
   end
 
-  section :custom_fields do
-    attribute :custom_fields, dynamic: true
+  section :item_details do
+    attribute :item_description
+    attribute :tds_applicable
+    attribute :comment
+    attribute :item_quantity
+    attribute :expected_rate
+    attribute :discount
+    attribute :taxable_amount
+    attribute :tax_rate
+    attribute :tax_amount
+    attribute :item_total_amount
+    attribute :net_payable_amount
+    attribute :remaining_amount
   end
 
   def custom_fields(row, invoice_line_item)
   end
 
-  def fetch_invoices
+  def fetch_agreements
     agreement_presenter = PaymentAgreements::Index.(user, params)
     unless agreement_presenter.success?
       add_message :error, agreement_presenter.messages[:error]
@@ -48,7 +82,158 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def input
-    fetch_invoices
+    agreement_presenter = fetch_agreements
+    agreements = agreement_presenter.payment_agreements
+    rental_agreements = RentalInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id:  agreements.pluck(:id)).template_invoices
+    general_agreements = GeneralInvoice.where(fixed_periodic_template: [nil, FALSE],payment_agreement_id: agreements.pluck(:id)).template_invoices
+    rental_agreement_line_items =     InvoiceLineItem.where(parent_type: 'RentalInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
+    general_agreement_line_items =     InvoiceLineItem.where(parent_type: 'GeneralInvoice').includes(:category, :department, :tax_rate, :cost_center, :inventory_line_item, {amount: :currency}, {tax_amount: :currency}, :discount_amount, parent: [:invoice_attachments, :invoice_type, :vendor, :delivery_location, :invoice_status, :location, :tds_slab, :advance_amount, :balance_due, :discount_amount, :created_by, :gstin_location, {tds_amount: :currency}, :amount]).where(parent_id: invoices.pluck(:id)).order(parent_id: :asc)
+    {general_invoices: general_agreement_line_items, rental_invoices: rental_agreement_line_items}
   end
 
+  def agreement_number(line_item)
+    line_item.parent.payment_agreement.get_agreement_number
+  end
+
+  def tittle(line_item)
+    line_item.parent.payment_agreement.tittle
+  end
+  def policy(line_item)
+    line_item.parent.payment_agreement.policy&.name
+  end
+  def agreement_date(line_item)
+    line_item.parent.payment_agreement.agreement_date
+  end
+
+  def status(line_item)
+    line_item.parent.payment_agreement.status.name
+  end
+
+  def execution_date(line_item)
+    line_item.parent.payment_agreement.execution_date
+  end
+
+  def expiration_date(line_item)
+    line_item.parent.payment_agreement.expiration_date
+  end
+
+  def never_expire(line_item)
+    (line_item.parent.payment_agreement.no_expiration ? 'YES' :  'NO')
+  end
+
+  def renewal_date(line_item)
+    line_item.parent.payment_agreement.renewal_date
+  end
+
+  def renewal_reminder(line_item)
+    line_item.parent.payment_agreement.renewal_reminder_date
+  end
+
+  def invoice_number(line_item)
+    line_item.parent.invoice_number
+  end
+
+  def vendor_name(line_item)
+    line_item.parent.vendor.display_name
+  end
+
+  def vendor_code(line_item)
+    line_item.parent.vendor.vendor_id
+  end
+
+  def start_date(line_item)
+    line_item.parent.start_date
+  end
+
+  def end_date(line_item)
+    line_item.parent.end_date
+  end
+
+  def vendor_gstin(line_item)
+    line_item.parent.vendor_location&.gstin
+  end
+
+  def department(line_item)
+    line_item.parent.department.name
+  end
+
+  def location(line_item)
+    line_item.parent..location.name
+  end
+
+  def cost_center(line_item)
+    line_item.parent.cost_center.name
+  end
+
+  def billing_type(line_item)
+    line_item.billing_type.name
+  end
+
+  def prepaid(line_item)
+    (line_item.parent.prepaid  ? 'YES' : 'NO')
+  end
+
+  def invoice_frequency(line_item)
+    line_item.parent.get_invoice_frequency_attributes&[:number]
+  end
+
+  def lock_in_period(line_item)
+    line_item.parent.lock_in_period
+  end
+
+  def rent_free_period(line_item)
+    line_item.parent.rent_free_period
+  end
+
+  def tenancy_period(line_item)
+    line_item.parent.tenancy_period
+  end
+
+  def notice_period(line_item)
+    line_item.parent.notice_period
+  end
+
+  def square_feet(line_item)
+    line_item.parent.square_feet
+  end
+
+  def item_description(line_item)
+    line_item.description
+  end
+  def tds_applicable(line_item)
+    (line_item.tds_applicable? ? 'YES' : 'NO')
+  end
+  def comment(line_item)
+    line_item.comment
+  end
+  def item_quantity(line_item)
+    line_item.quantity
+  end
+  def expected_rate(line_item)
+    line_item.rate
+  end
+  def discount(line_item)
+    line_item.discount
+  end
+  def taxable_amount(line_item)
+    line_item.taxable_amount&.value
+  end
+  def tax_rate(line_item)
+    line_item.tax_rate
+  end
+  def tax_amount(line_item)
+    line_item.tax_amount&.value
+
+  end
+  def item_total_amount(line_item)
+    line_item.net_amount&.value
+  end
+
+  def net_payable_amount(line_item)
+    line_item.parent.net_amount&.value
+  end
+
+  def remaining_amount(line_item)
+    line_item.parent.balance_due&.value
+  end
 end
