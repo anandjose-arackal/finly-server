@@ -20,7 +20,7 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
 
   def input
     budget_group_id = params[:budget_group_id]
-    op = BudgetManager::BudgetGroupCriteria::Ops::Index.(params: {id: budget_group_id}, "current_user" => User.first)
+    op = BudgetManager::BudgetGroupCriteria::Ops::Index.(params: {id: budget_group_id, include_children: true}, "current_user" => User.first)
     unless op.success?
       add_message :error, op.messages[:error]
       return
@@ -63,7 +63,7 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Builders::Sp
 
   def usage_percentage(budget)
     spent_amount = budget.budget_consumption.spent_amount&.value.to_f
-    return 0 if budget.budget_consumption.budget_amount.value == 0
+    return "N/A" if budget.budget_consumption.budget_amount.value == 0
     return ((spent_amount / budget.budget_consumption.budget_amount&.value.to_f) * 100).round(2)
   end
 
