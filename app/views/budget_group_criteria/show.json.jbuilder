@@ -10,6 +10,8 @@ json.result do
     json.budgetable_cost_centers budget_group_criterium.budgetable_cost_centers
     json.name budget_group_criterium.name
     json.id budget_group_criterium.id
+    json.parent_name budget_group_criterium.parent&.name
+    json.parent_id budget_group_criterium.parent&.id
     json.period_id budget_group_criterium.budget_group.period_id
     json.period budget_group_criterium.budget_group.period&.name
     json.budget_group_name budget_group_criterium.budget_group&.name
