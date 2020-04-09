@@ -234,7 +234,7 @@ class ExportManager::Master::PaymentAgreements::Index < ExportManager::Builders:
   end
 
   def execution_date(line_item)
-    return line_item.payment_agreement.excution_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
+    return line_item.payment_agreement.execution_date if [SecurityDeposit, BeneficiaryPayment].include?(line_item.class)
     line_item.parent.payment_agreement.execution_date
   end
 
