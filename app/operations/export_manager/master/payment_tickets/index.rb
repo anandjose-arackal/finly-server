@@ -174,7 +174,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
   def advance_amount ( payment )
     payment_type = payment.parent_type
     if payment_type.eql?('PurchaseOrder')
-      0.0
+      0.to_f
     elsif payment_type.eql?('BeneficiaryPayment')
       precision_value(payment&.parent&.advance_amount&.value).to_f
     elsif payment_type.eql?('Invoice')
@@ -184,7 +184,7 @@ class ExportManager::Master::PaymentTickets::Index < ExportManager::Builders::Sp
         payment&.parent&.advance_amount&.value&.to_f
       end
     else
-      payment&.parent&.advance_amount&.value&.to_f
+      0.to_f
     end
   end
   
