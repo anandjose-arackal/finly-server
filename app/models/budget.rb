@@ -75,6 +75,7 @@ class Budget < ApplicationRecord
   after_create :reflect_budget_group_attributes
   after_create :update_consumption_model
 
+
   after_update :recalculate_parent_budget
   after_update :reassign_parent_mappings
   after_update :update_spent_amount_in_consumption_model
@@ -343,6 +344,24 @@ class Budget < ApplicationRecord
 
   def within_timeframe?(date)
     true if (start_date <= date and end_date >= date)
+  end
+
+  def generate_modification_trails(old_amount)
+    current_user = RequestStoreUtil.current_user
+    new_amount = self.budget_amount.value
+    if new_amount > old_amount
+      budget_modification_type_id = BudgetModificationAction.id_for(:add_amount)
+    elsif new_amount < old_amount
+      budget_modification_type_id = BudgetModificationAction.id_for(:reduce_amount)
+    else
+      budget_modification_type_id = nil
+    end
+    # creating the budget modification trail object
+    if budget_modification_type_id
+      self.budget_modification_trails.build(action_user_id: current_user.id,
+                                            action_id: budget_modification_type_id,
+                                            current_value: new_amount).save
+    end
   end
 
   private

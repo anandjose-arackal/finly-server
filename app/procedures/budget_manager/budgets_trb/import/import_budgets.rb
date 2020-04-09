@@ -38,6 +38,7 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
         self.contents << result_row
         next
       end
+      old_amount = budget.budget_amount&.value.to_f
       amount = data[:budget_amount]
       # checking to make sure the amount isn't 0
       if amount.to_f == 0
@@ -49,6 +50,7 @@ class BudgetManager::BudgetsTrb::Import::ImportBudgets < BudgetManager::BudgetsT
       # assigning amount to budget
       budget.budget_amount.value = amount
       if budget.save
+        budget.generate_modification_trails(old_amount)
         result_row << "Success!"
       else
         result_row += budget.errors.full_messages

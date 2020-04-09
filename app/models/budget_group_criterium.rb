@@ -161,7 +161,8 @@ class BudgetGroupCriterium < ApplicationRecord
         budgetable_users: budgetable_users,
         budgetable_departments: budgetable_departments,
         sub_criteria: self.children,
-        budgets: budgets,
+        # budgets: budgets.select(:start_date, :end_date, :budget_amount, :spent_amount, :id, :name),
+        budgets: budgets.includes(:budget_consumption),
         budget_creation_in_progress: budget_creation_in_progress,
         time_periods: time_periods
     }
