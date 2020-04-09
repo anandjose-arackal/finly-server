@@ -5,7 +5,7 @@ class Budgets::GenerateSampleFile < Budgets::Base
   def pre_validate
 
   end
-  
+
   def init
     self.company = user.company
   end

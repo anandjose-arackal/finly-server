@@ -87,6 +87,8 @@ class BbpsBillerSubscription < ApplicationRecord
 
   default_scope {order('bbps_biller_subscriptions.created_at DESC')}
 
+  scope :filter_ids, -> (ids) {where(id: ids)}
+
   scope :with_ids, -> (ids) {
     where(id: ids)
   }
@@ -235,7 +237,11 @@ class BbpsBillerSubscription < ApplicationRecord
     if [UserRole.id_for(:utility_bill_master_initiator)].include?(role_id)
       super
     elsif [UserRole.id_for(:utility_bill_initiator)].include?(role_id)
+      # Any bills the user had created earlier but now has been removed as the POC
       ids = BbpsBill.role_based_initiator_associated_items(user, role_id).pluck(:subscription_id)
+
+      # Anywhere the user is a POC for any subscription
+      ids += BbpsSubscriptionPoc.where(user_id: user.id).pluck(:subscription_id)
       where(id: ids)
     elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
       role_based_creditor_associated_items(user, role_id)

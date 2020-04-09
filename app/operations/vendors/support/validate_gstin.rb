@@ -141,12 +141,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     if Rails.env.production?
       # logging the API call details in the logstash logger file
       self.file_logger.info(
-                          path: self.url,
-                          method: "get",
-                          status_code: self.api_response.status,
-                          response: (JSON.parse(self.api_response.body) rescue {}),
-                          gstin: self.gstin_params[:gstin],
-                          request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
+          path: self.url,
+          method: "get",
+          status_code: self.api_response.status,
+          response: (JSON.parse(self.api_response.body) rescue {}),
+          gstin: self.gstin_params[:gstin],
+          request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
       )
     end
 

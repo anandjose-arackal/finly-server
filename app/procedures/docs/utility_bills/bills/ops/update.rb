@@ -34,9 +34,11 @@ class Docs::UtilityBills::Bills::Ops::Update < Transactions::API
   end
 
   def update_attachments(options, params:, current_user:, model:, **)
-    attachment_ids = params[:attachment_ids]
-    attachments_to_remove = model.attachments.where.not(id: attachment_ids)
-    attachments_to_remove.destroy_all
+    attachments = Attachment.where(id: params[:attachment_ids])
+    attachment_ids = attachments.where(resource_id: nil).or(attachments.where(resource_id: model.id, resource_type: model.class.name)).pluck(:id)
+
+    Attachment.where(id: attachment_ids).update(resource_id: model.id, resource_type: model.class.name)
+    model.attachments.where.not(id: attachment_ids).destroy_all
     true
   end
 end

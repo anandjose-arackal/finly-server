@@ -381,6 +381,16 @@ class MoneyRequest < ApplicationRecord
     end
   end
 
+  def utr
+    return self.bank_reference_number if self.bank_reference_number.present?
+    (self.money_request_processor_mapping&.bank_reference_number.present?) ? self.money_request_processor_mapping&.bank_reference_number : self.money_request_processor_mapping&.payment&.utr
+  end
+
+  def source_account
+    mrpm = self.money_request_processor_mapping&.processor
+    mrpm&.payment_type == 'bank_transfer' ? 'Bank Transfer' : super
+  end
+
   private
 
   # doesn't make it private

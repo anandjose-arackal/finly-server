@@ -10,8 +10,8 @@ class PaymentFiles::Formats::HdfcBank::ValidateConfig < PaymentFiles::Formats::B
   end
 
   def init
-    # self.config = (params[:config] or user.company.payment_file_configuration)
-    # self.options = (params[:options] or config.options)
+     self.config = (params[:config] or user.company.payment_file_configuration)
+     self.options = (params[:options] or config.options)
   end
 
   def validate

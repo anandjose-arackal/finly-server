@@ -134,6 +134,8 @@ class BbpsBill < ApplicationRecord
     where id: id
   }
 
+  scope :filter_ids, -> (ids) {where(id: ids)}
+
   scope :sort_for_index, -> {
     reorder('bbps_bills.created_at DESC')
   }

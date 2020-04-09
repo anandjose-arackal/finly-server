@@ -29,7 +29,9 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   property :customer_pan
   property :customer_aadhar_number
 
-  collection :subscription_pocs, populator: :subscription_pocs! do
+
+  # collection :subscription_pocs, populator: :subscription_pocs! do
+  collection :subscription_pocs, populate_if_empty: BbpsSubscriptionPoc do
     property :user_id, validates: {presence: true}
     property :subscription_id
     property :_destroy, virtual: true
@@ -201,7 +203,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
   end
 
   def subscription_pocs!(collection:, fragment:, index:, options:, **)
-    item = subscription_pocs.find {|subscription_poc| subscription_poc.id.to_s == fragment["id"].to_s}
+    item = subscription_pocs.find {|subscription_poc| subscription_poc.id.to_s == fragment["id"]&.to_s}
     # item = (BbpsSubscriptionPoc.find_by(id: fragment["id"]) || BbpsSubscriptionPoc.new) if validate_or_assign_role(fragment)
 
     if fragment["_destroy"]
@@ -212,7 +214,7 @@ class Docs::UtilityBills::Subscriptions::Contracts::Base < Reform::Form
     validate_or_assign_role(fragment)
 
 
-    item || subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
+    item || subscription_pocs << BbpsSubscriptionPoc.new
 
       # item ? subscription_pocs.insert(index, item.model) : subscription_pocs.insert(index, BbpsSubscriptionPoc.new)
   end

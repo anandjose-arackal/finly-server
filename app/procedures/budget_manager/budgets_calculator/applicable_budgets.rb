@@ -52,7 +52,7 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
       end
       self.departments = Department.with_id(document.payments.pluck(:department_id).compact)
       self.cost_centers = CostCenter.with_id(document.payments.pluck(:cost_center_id).compact)
-      self.vendors = YesBankVendor.with_id(document.payments.map { |payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor)})
+      self.vendors = YesBankVendor.with_id(document.payments.map {|payment| payment.receiving_user_id if payment.receiving_user.is_a?(YesBankVendor)})
       self.locations = BranchLocation.with_id(document.payments.pluck(:location_id).compact)
       self.categories += Category.with_id(document.payments.pluck(:category_id).compact)
       self.users = []
@@ -84,12 +84,12 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))
                                                               OR (budgetable_type = ? AND budgetable_id IN (?))",
-                                                              "Department", self.departments.pluck(:id),
-                                                              "BranchLocation", self.locations.pluck(:id),
-                                                              "CostCenter", self.cost_centers.pluck(:id),
-                                                              "YesBankVendor", self.vendors.pluck(:id),
-                                                              "User", self.users.pluck(:id),
-                                                              "Category", self.categories.pluck(:id))
+                                                           "Department", self.departments.pluck(:id),
+                                                           "BranchLocation", self.locations.pluck(:id),
+                                                           "CostCenter", self.cost_centers.pluck(:id),
+                                                           "YesBankVendor", self.vendors.pluck(:id),
+                                                           "User", self.users.pluck(:id),
+                                                           "Category", self.categories.pluck(:id))
 
 
     # applicable_criteria_mapping_ids = criteria_mappings.with_budgetable_type("Department").with_budgetable_id(self.departments.pluck(:id)).pluck(:id)
@@ -124,7 +124,6 @@ class BudgetManager::BudgetsCalculator::ApplicableBudgets < BudgetManager::Budge
     }
     options["result"] = result
   end
-
 
 
   def get_dates_from_document(document, date_type_id)

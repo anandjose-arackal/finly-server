@@ -186,14 +186,14 @@ class BudgetGroupCriterium < ApplicationRecord
       end_date = BudgetManagerUtils.next_date(start_date, final_end_date, self.budget_group.period_id)
       break if end_date.blank?
       budget = self.budgets.build(
-                               start_date: start_date,
-                               end_date: end_date,
-                               name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
-                               company_id: self.company_id,
-                               budget_group_id: self.budget_group.id,
-                               user_id: self.budget_group.created_by_user_id,
-                               budget_date_type_id: self.budget_group.budget_date_type_id,
-                               calculated_before_tax_amount: self.budget_group.calculated_before_tax_amount,
+          start_date: start_date,
+          end_date: end_date,
+          name: "#{start_date.strftime("%d %B, %Y")} - #{end_date.strftime("%d %B, %Y")}",
+          company_id: self.company_id,
+          budget_group_id: self.budget_group.id,
+          user_id: self.budget_group.created_by_user_id,
+          budget_date_type_id: self.budget_group.budget_date_type_id,
+          calculated_before_tax_amount: self.budget_group.calculated_before_tax_amount,
                                budget_amount_attributes: {
                                    value: 0,
                                    currency_id: 1

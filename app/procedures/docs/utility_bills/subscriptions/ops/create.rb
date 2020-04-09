@@ -26,6 +26,9 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
   # Creates DLRMs post creation of document
   step :setup_dlrm
 
+  # Assign roles utility bill initiator role to POC
+  step :assign_poc_roles
+
   # Update Attachments
   step :update_attachments
 
@@ -81,9 +84,17 @@ class Docs::UtilityBills::Subscriptions::Ops::Create < Transactions::API
     end
   end
 
+  def assign_poc_roles(options, model:, params:, **)
+    model.pocs.each do |poc|
+      pur = PolicyUserRole.find_or_initialize_by(user_id: poc.id, policy_id: model.policy_id, user_role_id: UserRole.id_for(:utility_bill_initiator))
+      pur.save
+    end
+    true
+  end
+
   def update_attachments(options, model:, params:, **)
     attachments = Attachment.where(id: params[:attachment_ids])
-    attachment_ids = attachments.where(resource_type: nil, resource_id: nil).or(attachments.where(resource: model)).pluck(:id)
+    attachment_ids = attachments.where(resource_id: nil).or(attachments.where(resource_id: model.id, resource_type: model.class.name)).pluck(:id)
 
     Attachment.where(id: attachment_ids).update(resource_id: model.id, resource_type: model.class.name)
     true

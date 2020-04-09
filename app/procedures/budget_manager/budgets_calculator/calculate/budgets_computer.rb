@@ -77,10 +77,10 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
     budgetable_entities << "PurchaseRequestItem" if self.budget.purchase_request
 
     self.budget_trails = BudgetTrail.not_revised.within_date(self.budget.start_date, self.budget.end_date, self.date_to_be_considered).with_vendors(vendor_ids)
-                 .without_invoice_or_po
-                 .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
-                 .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
-                 .with_budgetable_entities(budgetable_entities)
+                             .without_invoice_or_po
+                             .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                             .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+                             .with_budgetable_entities(budgetable_entities)
 
     true
   end
@@ -144,8 +144,7 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # TODO - add money request items here after they have been completely implemented
 
       payment_processing_amount += self.budget_trails.with_entity_type("Payment").with_entity_status_id(PaymentStatus.ids_for_payment_processing_bucket).without_invoice_or_po
-                                      .joins(self.amount_to_be_considered).sum('amounts.value')
-
+                                       .joins(self.amount_to_be_considered).sum('amounts.value')
 
 
       # Paid amount will be calculated from the paid amount attribute inside the PO Item, Invoice and Expense budget trails,
@@ -187,38 +186,38 @@ class BudgetManager::BudgetsCalculator::Calculate::BudgetsComputer < Transaction
       # end
 
       self.budget_consumption.assign_attributes(
-                                 budget_amount_attributes: {
-                                     id: self.budget_consumption.budget_amount_id,
-                                     value: self.budget.budget_amount&.value
-                                 },
-                                 pending_amount_attributes: {
-                                     id: self.budget_consumption.pending_amount_id,
-                                     value: pending_amount
-                                 },
-                                 committed_amount_attributes: {
-                                     id: self.budget_consumption.committed_amount_id,
-                                     value: committed_amount
-                                 },
-                                 pending_payment_amount_attributes: {
-                                     id: self.budget_consumption.pending_payment_amount_id,
-                                     value: pending_payment_amount
-                                 },
-                                 payment_processing_amount_attributes: {
-                                     id: self.budget_consumption.payment_processing_amount_id,
-                                     value: payment_processing_amount
-                                 },
-                                 paid_amount_attributes: {
-                                     id: self.budget_consumption.paid_amount_id,
-                                     value: paid_amount
-                                 },
-                                 remaining_amount_attributes: {
-                                     id: self.budget_consumption.remaining_amount_id,
-                                     value: remaining_amount
-                                 },
-                                 total_consumed_amount_attributes: {
-                                     id: self.budget_consumption.total_consumed_amount_id,
-                                     value: total_consumed_amount
-                                 }
+          budget_amount_attributes: {
+              id: self.budget_consumption.budget_amount_id,
+              value: self.budget.budget_amount&.value
+          },
+          pending_amount_attributes: {
+              id: self.budget_consumption.pending_amount_id,
+              value: pending_amount
+          },
+          committed_amount_attributes: {
+              id: self.budget_consumption.committed_amount_id,
+              value: committed_amount
+          },
+          pending_payment_amount_attributes: {
+              id: self.budget_consumption.pending_payment_amount_id,
+              value: pending_payment_amount
+          },
+          payment_processing_amount_attributes: {
+              id: self.budget_consumption.payment_processing_amount_id,
+              value: payment_processing_amount
+          },
+          paid_amount_attributes: {
+              id: self.budget_consumption.paid_amount_id,
+              value: paid_amount
+          },
+          remaining_amount_attributes: {
+              id: self.budget_consumption.remaining_amount_id,
+              value: remaining_amount
+          },
+          total_consumed_amount_attributes: {
+              id: self.budget_consumption.total_consumed_amount_id,
+              value: total_consumed_amount
+          }
       )
 
       # also assigning the spent amount for a budget in the budget model

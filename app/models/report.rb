@@ -609,6 +609,15 @@ class Report < ApplicationRecord
     self.status.name&.split(/[_ ]/)&.map{|word| word.capitalize}&.join(" ")
   end
 
+  def utr
+    return self.bank_reference_number if self.bank_reference_number.present?
+    (self.report_processor_group_mapping&.bank_reference_number.present?) ? self.report_processor_group_mapping&.bank_reference_number : self.report_processor_group_mapping&.payment&.utr
+  end
+
+  def source_account
+    rpg = self.report_processor_group_mapping&.processor_group
+    rpg&.payment_type == 'bank_transfer' ? 'Bank Transfer' : super
+  end
 
   private
 

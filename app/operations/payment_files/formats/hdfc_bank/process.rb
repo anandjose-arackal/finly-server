@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests#, :customer_reference_number
+  attr_accessor :payment_requests, :transaction_type, :beneficiary_email, :show_reference_number
 
   def pre_validate
     return if has_errors?
@@ -10,6 +10,9 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
     super
     self.payment_requests = params[:bank_payment_requests]
     # self.customer_reference_number = self.options[:customer_reference_number]
+    self.transaction_type = ( self.options[:transaction_type].nil?  ?  'N' : self.options[:transaction_type] )
+    self.beneficiary_email = self.options[:beneficiary_email]
+    self.show_reference_number = self.options[:show_reference_number]
   end
 
   def validate
@@ -24,8 +27,8 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
     content = []
     self.payment_file_data.each do |payment|
       content << [
-          'N',
-          '',
+          self.transaction_type,
+          payment[:receiving_user_name][0..7],
           payment[:beneficiary_account_number],
           sprintf('%.2f',payment[:amount]),
           payment[:receiving_user_name],
@@ -37,7 +40,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           '',
           '',
           '',
-          '',
+          (self.show_reference_number ?  payment[:invoice_number] : ''),
           '',
           '',
           '',
@@ -51,7 +54,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           payment[:beneficiary_ifsc],
           payment[:beneficiary_account_name],
           '',
-          payment[:receiving_user_email]
+          (self.beneficiary_email.present? ? self.beneficiary_email : payment[:receiving_user_email])
       ]
     end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
